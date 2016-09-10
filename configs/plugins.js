@@ -1,12 +1,12 @@
 import webpack from 'webpack'
 
-export default [
+const prodPlugins [
   new webpack.optimize.UglifyJsPlugin({
     compress: {
-      warnings: false,
+      warnings: false
     },
     output: {
-      comments: false,
-    },
+      comments: false
+    }
   })
 ]
