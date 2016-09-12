@@ -5,6 +5,9 @@ root = true
 [*]
 end_of_line = lf
 insert_final_newline = true
-indent_size = 4
+indent_size = 2
 indent_style = space
 charset = utf-8
+
+[*.{js,jsx,html,css,less,scss}]
+# indent_size = 4

@@ -1,19 +1,18 @@
-const webpack = require('webpack')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 const path = require('path')
-const HtmlWebpackPlugin= require('html-webpack-plugin')
+const webpack = require('webpack')
 
 const nodePaths = (process.env.NODE_PATH || '')
   .split(process.platform === 'win32' ? ';' : ':')
   .filter(Boolean)
-  .map(p => path.resolve(p));
+  .map(p => path.resolve(p))
 
 const PATHS = {
   nodePaths,
   appHtml: path.resolve('index.tmpl.html'),
   appSrc: path.resolve('src/index'),
   appBuild: path.resolve('bin'),
-  appNodeModules: path.resolve('node_modules'),
-  ownNodeModules: path.resolve('node_modules')
+  appNodeModules: path.resolve('node_modules')
 }
 
 module.exports = {
@@ -21,7 +20,7 @@ module.exports = {
   entry: [
     require.resolve('webpack-dev-server/client') + '?/',
     require.resolve('webpack/hot/dev-server'),
-    require.resolve('./configs/polyfills'),
+    // require.resolve('./configs/polyfills'),
     PATHS.appSrc
   ],
   output: {
@@ -34,13 +33,13 @@ module.exports = {
     fallback: PATHS.nodePaths,
     extensions: ['.js', '.json', '.jsx', '']
   },
-  resolveLoader: {
-    root: PATHS.ownNodeModules,
-    moduleTemplates: ['*-loader']
-  },
+  // resolveLoader: {
+  //   root: PATHS.appNodeModules,
+  //   moduleTemplates: ['*-loader']
+  // },
   module: {
     noParse: /node_modules\/.bin/,
-    preloaders: [
+    preLoaders: [
       {
         test: /\.(js|jsx)$/,
         loader: 'eslint',
@@ -51,8 +50,7 @@ module.exports = {
     loaders: [
       {
         test: /\.(js|jsx)$/,
-        include: PATHS.appSrc,
-        exclude: /(node_modules|bower_components)/,
+        exclude: /node_modules/,
         loader: 'babel',
         query: {
           cacheDirectory: true
@@ -60,7 +58,15 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        loader: 'style!css!postcss'
+        loader: 'style-loader!css-loader'
+      },
+      {
+        test: /\.less$/,
+        loader: 'style-loader!css-loader!less-loader'
+      },
+      {
+        test: /\.scss$/,
+        loader: 'style-loader!css-loader!sass-loader'
       },
       {
         test: /\.(ico|jpg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)(\?.*)?$/,
@@ -107,9 +113,9 @@ module.exports = {
       inject: true,
       template: PATHS.appHtml,
       hash: true
-    }),
+    })
     // new webpack.DefinePlugin(env),
-    new webpack.HotModuleReplacementPlugin()
+    // new webpack.HotModuleReplacementPlugin()
     // new CaseSensitivePathsPlugin(),
     // new WatchMissingNodeModulesPlugin(PATHS.appNodeModules)
   ]
