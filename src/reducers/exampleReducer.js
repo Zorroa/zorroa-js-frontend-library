@@ -1,4 +1,4 @@
-import { SYNC_CLICK, ASYNC_CLICK } from '../actions/testAction'
+import { SYNC_CLICK, ASYNC_CLICK } from '../actions/exampleAction'
 
 export default function (previousState = '', action) {
   switch (action.type) {

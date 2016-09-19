@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux'
 import { routerReducer } from 'react-router-redux'
-import test from './testReducer'
+import example from './exampleReducer'
 
 export default combineReducers({
-  test,
+  example,
   routing: routerReducer
 })

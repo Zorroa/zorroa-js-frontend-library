@@ -49,11 +49,9 @@ $ npm run test:lint
 ## Todo
 
 - [x] Dev: Setup routing
-- [ ] Tools: Production Build
-- [ ] Tools: 
-- [ ] Tools:
+- [ ] Dev: Setup network layer
+- [x] Tools: Production build
 - [ ] Test: Unit tests for redux
 - [ ] Test: UI tests using enzyme
-- [ ] Fun: Add some cool UI components I have built
 - [ ] Docs: Browser Tools
 - [ ] Docs: Browser Tools
