@@ -36,19 +36,36 @@ $ npm run test:unit
 $ npm run test:lint
 ```
 
+## Running the project
+
+In order to run the project you must do the previous steps for dependency installations.
+
+There are two different mode this project can be run in: a static mode and dev mode.  The static mode will bundle all the code using our production settings into the bin directory, then serve that directory using a node server.  The bin directory is the final product and can be deployed to and could server.  Dev mode does not actually build into a directory but runs the project though a dev server which has live reloading enabled.  This basically required for development.
+
+Run one of the following commands from your server
+
+```
+npm start # will run a build then serve the static content
+npm run dev # will run with hot reloading on a special server
+```
+
+Possible errors:  Sometimes the live reloading or a node server may hang (you did not close it).  You will get an error similiar to this `EADDRINUSE`.  A simple solution to this usually will be to run `killall node`.  It sounds worse than it is.
+
+It is highly recommended that you run `npm run build` and test on the static server before submitting pull requests.
+
 ## Testing
 
-### Unit tests
-
-### Component Tests
-
-[Jest](https://facebook.github.io/jest/) https://github.com/facebook/jest
+#### [Jest](https://facebook.github.io/jest/) https://github.com/facebook/jest
 
 We are using Jest to run our tests.  It is newer in the testing realm but it is a product from facebook.  So it all kind was built to play nice with each other.
 
-- [Enzyme](http://airbnb.io/enzyme/)
+#### [Enzyme](http://airbnb.io/enzyme/)
 
 This is a product from AirBnB to allow us to do assertions on our react components!!!  This is the first good solution that I have really played with.  It is important to note that in the enzyme examples, they are using **not** using Jest for their assertions.
+
+#### Helpful links
+
+- https://github.com/reactjs/redux/blob/master/docs/recipes/WritingTests.md
 
 ## ES6
 
@@ -56,17 +73,15 @@ This is a product from AirBnB to allow us to do assertions on our react componen
 
 ## [Redux](http://redux.js.org/)
 
-### [Redux Dev Tools](https://github.com/gaearon/redux-devtools)
+- Really good docs to read through
 
-[![JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
+### [Redux Dev Tools](https://github.com/gaearon/redux-devtools)
 
 ## Todo
 
-- [x] Dev: Setup routing
-- [ ] Dev: Setup network layer
-- [x] Tools: Production build
 - [ ] Tools: Version bump
-- [ ] Test: Unit tests for redux actions
 - [ ] Test: Unit tests for redux reducers
-- [x] Test: UI tests using enzyme
-- [ ] Docs: Browser Tools
+- [ ] Test: Test coverage
+- [ ] Document the planet
+
+[![JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
