@@ -1,5 +1,4 @@
-export const SYNC_CLICK = 'SYNC_CLICK'
-export const ASYNC_CLICK = 'ASYNC_CLICK'
+import { SYNC_CLICK, ASYNC_CLICK } from '../constants/actionTypes'
 
 export function exampleActionSync () {
   return {
