@@ -28,13 +28,52 @@ $ npm start
 $ npm test
 ```
 
-We can also write custom scripts which can be invoked
+We can also write custom scripts:
 
 ```
-$ npm run start:dev
+$ npm run dev
 $ npm run test:unit
 $ npm run test:lint
 ```
+
+## Running the project
+
+In order to run the project you must do the previous steps for dependency installations.
+
+There are two different mode this project can be run in: a static mode and dev mode.  The static mode will bundle all the code using our production settings into the bin directory, then serve that directory using a node server.  The bin directory is the final product and can be deployed to and could server.  Dev mode does not actually build into a directory but runs the project though a dev server which has live reloading enabled.  This basically required for development.
+
+Run one of the following commands from your server
+
+```
+npm start # will run a build then serve the static content
+npm run dev # will run with hot reloading on a special server
+```
+
+It is highly recommended that you run `npm run build` and test on the static server before submitting a pull requests.
+
+The deploy script, `npm run deploy`, will run a shell script to do some npm and git versioning then do a build.  This script will need the actual deployment you wish to perform added.
+
+*Possible errors:*
+
+Sometimes the live reloading or a node server may hang (you did not close it).  You will get an error similiar to this `EADDRINUSE`.  A simple solution to this usually will be to run `killall node`.  It sounds worse than it is.
+
+One of the first things I do I am getting node errors is clean house.  We have a special script to delete all dependencies from your project and from your computers cache the reinstall them: `npm run purge`
+
+## Testing
+
+You can run the tests by executing the following command in your terminal: `npm test`.  This will run the entire test suite.  You can also use `npm run test:watch` to run the tests and have them watch for changes.  This is super useful when writing your tests.
+
+#### [Jest](https://facebook.github.io/jest/) https://github.com/facebook/jest
+
+We are using Jest to run our tests.  It is newer in the testing realm but it is a product from facebook.  So it all kind was built to play nice with each other.
+
+#### [Enzyme](http://airbnb.io/enzyme/)
+
+This is a product from AirBnB to allow us to do assertions on our react components!!!  This is the first good solution that I have really played with.  It is important to note that in the enzyme examples, they are using **not** using Jest for their assertions.
+
+#### Helpful links
+
+- https://github.com/reactjs/redux/blob/master/docs/recipes/WritingTests.md
 
 ## ES6
 
@@ -42,18 +81,14 @@ $ npm run test:lint
 
 ## [Redux](http://redux.js.org/)
 
-### [Redux Dev Tools](https://github.com/gaearon/redux-devtools)
+- Really good docs to read through
 
-[![JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
+### [Redux Dev Tools](https://github.com/gaearon/redux-devtools)
 
 ## Todo
 
-- [x] Dev: Setup routing
-- [ ] Tools: Production Build
-- [ ] Tools: 
-- [ ] Tools:
-- [ ] Test: Unit tests for redux
-- [ ] Test: UI tests using enzyme
-- [ ] Fun: Add some cool UI components I have built
-- [ ] Docs: Browser Tools
-- [ ] Docs: Browser Tools
+- [ ] Test: Unit tests for redux reducers
+- [ ] Test: Test coverage
+- [ ] Document the planet
+
+[![JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)

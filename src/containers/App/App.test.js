@@ -1,19 +1,47 @@
 import React from 'react'
-// import { render } from 'react-dom'
+import { Provider } from 'react-redux'
+import { mount } from 'enzyme'
 import App from './App'
+import ExampleBox from '../../components/ExampleBox'
 
-import { expect } from 'chai'
-import { mount, shallow } from 'enzyme'
+const storeFake = (state) => {
+  return {
+    default: () => {},
+    subscribe: () => {},
+    dispatch: () => {},
+    getState: () => {
+      return Object.assign({}, state)
+    }
+  }
+}
 
 describe('<App />', () => {
-  const wrapper = mount(<App />)
+  let app
 
-  it('calls componentDidMount', () => {
-    expect(App.prototype.componentDidMount.calledOnce).to.equal(true)
+  beforeEach(() => {
+    const store = storeFake({})
+    const wrapper = mount(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    )
+
+    app = wrapper.find(App)
   })
 
-  // it('should render', () => {
-  //   const div = document.createElement('div')
-  //   render(<App />, div)
-  // })
+  it('true should be true', () => {
+    expect(true).toBe(true)
+  })
+
+  it('should render', () => {
+    expect(app.length).toBeTruthy()
+  })
+
+  it('should render an <ExampleBox />', () => {
+    expect(app.find(ExampleBox)).toBeTruthy()
+  })
+
+  it('should have the header', () => {
+    expect(app.contains(<h1>App</h1>)).toBe(true)
+  })
 })
