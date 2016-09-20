@@ -79,7 +79,6 @@ This is a product from AirBnB to allow us to do assertions on our react componen
 
 ## Todo
 
-- [ ] Tools: Version bump
 - [ ] Test: Unit tests for redux reducers
 - [ ] Test: Test coverage
 - [ ] Document the planet
