@@ -49,11 +49,19 @@ npm start # will run a build then serve the static content
 npm run dev # will run with hot reloading on a special server
 ```
 
-Possible errors:  Sometimes the live reloading or a node server may hang (you did not close it).  You will get an error similiar to this `EADDRINUSE`.  A simple solution to this usually will be to run `killall node`.  It sounds worse than it is.
+It is highly recommended that you run `npm run build` and test on the static server before submitting a pull requests.
 
-It is highly recommended that you run `npm run build` and test on the static server before submitting pull requests.
+The deploy script, `npm run deploy`, will run a shell script to do some npm and git versioning then do a build.  This script will need the actual deployment you wish to perform added.
+
+*Possible errors:*
+
+Sometimes the live reloading or a node server may hang (you did not close it).  You will get an error similiar to this `EADDRINUSE`.  A simple solution to this usually will be to run `killall node`.  It sounds worse than it is.
+
+One of the first things I do I am getting node errors is clean house.  We have a special script to delete all dependencies from your project and from your computers cache the reinstall them: `npm run purge`
 
 ## Testing
+
+You can run the tests by executing the following command in your terminal: `npm test`.  This will run the entire test suite.  You can also use `npm run test:watch` to run the tests and have them watch for changes.  This is super useful when writing your tests.
 
 #### [Jest](https://facebook.github.io/jest/) https://github.com/facebook/jest
 
