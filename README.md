@@ -17,6 +17,12 @@ Run `npm install` from the project root using your terminal.  This command will 
 
 You can view the first level dependencies by running `npm list -g --depth 0`.  Depth here is the nesting level.  Try a number like 10 to see the full dependency chain.  It is important to note that while it looks like a tree when running this command, the install is flat and will make your `node_modules` directory look completely terrifying.
 
+## Code Style
+
+The one and only: 
+
+[![JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
+
 ## Starting the App
 
 Another thing we get with this type of project is the ability to use our `package.json` file to serve as the conductor for the application.  This file has the ability to serve as the entry point for all of our actions using npm scripts.  These are located in scripts section.
@@ -90,5 +96,4 @@ This is a product from AirBnB to allow us to do assertions on our react componen
 - [ ] Test: Unit tests for redux reducers
 - [ ] Test: Test coverage
 - [ ] Document the planet
-
-[![JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
+- [ ] Discuss pulling bin from version control
