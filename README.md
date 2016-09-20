@@ -66,6 +66,7 @@ This is a product from AirBnB to allow us to do assertions on our react componen
 - [ ] Dev: Setup network layer
 - [x] Tools: Production build
 - [ ] Tools: Version bump
-- [ ] Test: Unit tests for redux
-- [ ] Test: UI tests using enzyme
+- [ ] Test: Unit tests for redux actions
+- [ ] Test: Unit tests for redux reducers
+- [x] Test: UI tests using enzyme
 - [ ] Docs: Browser Tools
