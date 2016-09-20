@@ -28,13 +28,27 @@ $ npm start
 $ npm test
 ```
 
-We can also write custom scripts which can be invoked
+We can also write custom scripts:
 
 ```
-$ npm run start:dev
+$ npm run dev
 $ npm run test:unit
 $ npm run test:lint
 ```
+
+## Testing
+
+### Unit tests
+
+### Component Tests
+
+[Jest](https://facebook.github.io/jest/) https://github.com/facebook/jest
+
+We are using Jest to run our tests.  It is newer in the testing realm but it is a product from facebook.  So it all kind was built to play nice with each other.
+
+- [Enzyme](http://airbnb.io/enzyme/)
+
+This is a product from AirBnB to allow us to do assertions on our react components!!!  This is the first good solution that I have really played with.  It is important to note that in the enzyme examples, they are using **not** using Jest for their assertions.
 
 ## ES6
 
@@ -51,7 +65,7 @@ $ npm run test:lint
 - [x] Dev: Setup routing
 - [ ] Dev: Setup network layer
 - [x] Tools: Production build
+- [ ] Tools: Version bump
 - [ ] Test: Unit tests for redux
 - [ ] Test: UI tests using enzyme
-- [ ] Docs: Browser Tools
 - [ ] Docs: Browser Tools

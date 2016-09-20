@@ -20,7 +20,8 @@ class App extends Component {
 
   constructor (props) {
     super(props)
-    console.log('PROPS', props)
+
+    this.handleClick = this.handleClick.bind(this)
   }
 
   handleClick (isSyncAction) {
@@ -39,8 +40,8 @@ class App extends Component {
     return (
       <div>
         <h1>App</h1>
-        <button onClick={this.handleClick.bind(this, true)}>Sync Click</button>
-        <button onClick={this.handleClick.bind(this, false)}>Async Click</button>
+        <button onClick={this.handleClick(true)}>Sync Click</button>
+        <button onClick={this.handleClick(false)}>Async Click</button>
         <ExampleBox label={`Hi`} />
         <ExampleBox label={exampleMessage} />
       </div>
@@ -51,7 +52,8 @@ class App extends Component {
 // action creators to manipulate redux store
 // We map these actions on to the props for a component
 function mapDispatchToProps (dispatch) {
-  console.log('DISPATCH', dispatch)
+  console.log('App dispatch:', dispatch)
+
   return bindActionCreators({
     exampleActionSync,
     exampleActionAsync
@@ -60,7 +62,8 @@ function mapDispatchToProps (dispatch) {
 
 // redux store flowing into your module
 function mapStateToProps (state) {
-  console.log('STATE', state)
+  console.log('App state:', state)
+
   return {
     exampleMessage: state.example
   }
