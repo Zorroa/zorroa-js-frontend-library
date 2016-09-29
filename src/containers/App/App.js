@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import Header from '../../containers/Header'
+import Header from '../Header'
 
 class App extends Component {
   static get displayName () {

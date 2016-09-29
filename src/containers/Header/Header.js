@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
+import Logo from '../../components/Logo'
 
 class Header extends Component {
   static propTypes () {
@@ -35,10 +36,14 @@ class Header extends Component {
   render () {
     return (
       <nav className="navbar navbar-light">
-        <Link to="/" className="navbar-brand">Zorroa</Link>
-        <ul className="nav navbar-nav">
-          {this.renderLinks()}
-        </ul>
+        <div className="container-fluid">
+          <div className="navbar-header">
+            <Link to="/" className="navbar-brand"><Logo/></Link>
+          </div>
+          <ul className="nav navbar-nav navbar-right">
+            {this.renderLinks()}
+          </ul>
+        </div>
       </nav>
     )
   }
