@@ -12,7 +12,8 @@ module.exports = function getPlugins (env) {
     }),
     new webpack.DefinePlugin({
       'process.env': {
-        BUILD_ENV: process.env.ENV
+        BUILD_ENV: process.env.ENV,
+        'ROOT_URL': JSON.stringify('http://localhost:3090')
       }
     })
   ]

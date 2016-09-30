@@ -13,6 +13,7 @@ class Signup extends Component {
       errorMessage: PropTypes.string
     }
   }
+
   handleFormSubmit (formProps) {
     this.props.signupUser(formProps)
   }
@@ -27,22 +28,25 @@ class Signup extends Component {
     }
   }
 
+  renderField ({ input, label, type, meta: { touched, error } }) {
+    return (
+      <div>
+        <label>{label}</label>
+        <div>
+          <input {...input} placeholder={label} type={type} className="form-control" />
+          {touched && error && <div className="error">{error}</div>}
+        </div>
+      </div>
+    )
+  }
+
   render () {
     const { handleSubmit, pristine, submitting } = this.props
     return (
       <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))}>
-        <label>Email:</label>
-        <div>
-          <Field name="email" component="input" type="text" className="form-control"/>
-        </div>
-        <label>Password:</label>
-        <div>
-          <Field name="password" component="input" type="password" className="form-control"/>
-        </div>
-        <label>Confirm Password:</label>
-        <div>
-          <Field name="passwordConfirm" component="input" type="password" className="form-control"/>
-        </div>
+        <Field name="email" label="Email" component={this.renderField} type="text"/>
+        <Field name="password" label="Password" component={this.renderField} type="password"/>
+        <Field name="passwordConfirm" label="Confirm Password" component={this.renderField} type="password"/>
         <br/>
         {this.renderAlert()}
         <button action="submit" disabled={pristine || submitting} className="btn btn-primary">Sign up!</button>
@@ -51,25 +55,21 @@ class Signup extends Component {
   }
 }
 
-function validate (formProps) {
+const validate = values => {
   const errors = {}
-  if (!formProps.email) {
+  if (!values.email) {
     errors.email = 'Please enter an email'
   }
-  if (!formProps.password) {
+  if (!values.password) {
     errors.password = 'Please enter a password'
   }
-  if (!formProps.passwordConfirm) {
+  if (!values.passwordConfirm) {
     errors.passwordConfirm = 'Please enter a password confirmation'
   }
-  if (formProps.password !== formProps.passwordConfirm) {
+  if (values.password !== values.passwordConfirm) {
     errors.password = 'Passwords must match'
   }
   return errors
-}
-
-function mapStateToProps (state) {
-  return { errorMessage: state.auth.error }
 }
 
 const form = reduxForm({
@@ -77,4 +77,8 @@ const form = reduxForm({
   validate
 })
 
-export default connect(mapStateToProps, actions)(form(Signup))
+export default connect(
+  state => ({
+    errorMessage: state.auth.error
+  }), actions
+)(form(Signup))

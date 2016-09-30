@@ -6,7 +6,6 @@ import * as actions from './authAction'
 
 const middlewares = [ thunk ]
 const mockStore = configureMockStore(middlewares)
-const ROOT_URL = 'http://localhost:3090'
 
 describe('authActions', () => {
   const email = 'foo@bar.com'
@@ -31,7 +30,7 @@ describe('authActions', () => {
     })
 
     xit('creates user after checking', () => {
-      nock(`${ROOT_URL}`)
+      nock(`${process.env.ROOT_URL}`)
         .post('/signin', payload)
         .reply(200, { body: { token } })
 
