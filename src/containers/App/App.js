@@ -1,8 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { exampleActionSync, exampleActionAsync } from '../../actions/exampleAction'
-import ExampleBox from '../../components/ExampleBox'
+import Header from '../../containers/Header'
 
 class App extends Component {
   static get displayName () {
@@ -12,9 +11,7 @@ class App extends Component {
   // Defines the expected props for this component
   static propTypes () {
     return {
-      exampleActionSync: PropTypes.func.isRequired,
-      exampleActionAsync: PropTypes.func.isRequired,
-      exampleMessage: PropTypes.string
+      children: PropTypes.array
     }
   }
 
@@ -24,26 +21,11 @@ class App extends Component {
     this.state = {}
   }
 
-  handleClick (isSyncAction) {
-    const { exampleActionSync, exampleActionAsync } = this.props
-
-    if (isSyncAction) {
-      exampleActionSync()
-    } else {
-      exampleActionAsync()
-    }
-  }
-
   render () {
-    const { exampleMessage } = this.props
-
     return (
-      <div>
-        <h1>App</h1>
-        <button onClick={this.handleClick.bind(this, true)}>Sync Click</button>
-        <button onClick={this.handleClick.bind(this, false)}>Async Click</button>
-        <ExampleBox label={`Hi`} />
-        <ExampleBox label={exampleMessage} />
+      <div className="container">
+        <Header/>
+        {this.props.children}
       </div>
     )
   }
@@ -53,18 +35,12 @@ class App extends Component {
 // We map these actions onto the props for a component
 function mapDispatchToProps (dispatch) {
   return bindActionCreators({
-    exampleActionSync,
-    exampleActionAsync
   }, dispatch)
 }
 
 // redux store flowing into your module
 function mapStateToProps (state) {
-  console.log('APP STATE:', state)
-
-  return {
-    exampleMessage: state.example
-  }
+  return {}
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App)

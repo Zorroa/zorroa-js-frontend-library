@@ -1,8 +1,8 @@
 import React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
-import App from './App'
-import Header from '../../containers/Header'
+import { Link } from 'react-router'
+import Header from './Header'
 
 const storeFake = (state) => {
   return {
@@ -15,18 +15,18 @@ const storeFake = (state) => {
   }
 }
 
-describe('<App/>', () => {
-  let app
+describe('<Header/>', () => {
+  let header
 
   beforeEach(() => {
     const store = storeFake({ auth: { authenticated: true } })
     const wrapper = mount(
       <Provider store={store}>
-        <App/>
+        <Header/>
       </Provider>
     )
 
-    app = wrapper.find(App)
+    header = wrapper.find(Header)
   })
 
   it('true should be true', () => {
@@ -34,10 +34,10 @@ describe('<App/>', () => {
   })
 
   it('should render', () => {
-    expect(app.length).toBeTruthy()
+    expect(header.length).toBeTruthy()
   })
 
-  it('should render an <Header/>', () => {
-    expect(app.find(Header)).toBeTruthy()
+  it('should render an <Link/>', () => {
+    expect(header.find(Link)).toBeTruthy()
   })
 })
