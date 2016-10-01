@@ -79,7 +79,7 @@ This is a product from AirBnB to allow us to do assertions on our react componen
 
 #### Helpful links
 
-- https://github.com/reactjs/redux/blob/master/docs/recipes/WritingTests.md
+- [Writing react tests](https://github.com/reactjs/redux/blob/master/docs/recipes/WritingTests.md)
 
 ## Development Tools
 
@@ -93,17 +93,18 @@ the devtools setting, which controls the final compiled code style, and
 the source map configurations, which allow you to map from the transpiled
 code back to the original source files.
 
-Browser plugins can be very helpful:
+#### Plugins
+
 * [Redux Dev Tools](https://github.com/gaearon/redux-devtools)
 * [React Dev Tools](https://github.com/facebook/react-devtools)
 
-## ES6
+#### Documentation
 
-## React
-
-## [Redux](http://redux.js.org/)
-
-- Really good docs to read through
+- [EMCAScript 6 New Features: Overview & Comparison](http://es6-features.org)
+- [Redux docs](http://redux.js.org/)
+- [react-redux API from GitHub Readme](https://github.com/reactjs/react-redux/blob/master/docs/api.md) with connect, mapStateToProp and mapDispatchToProp API
+- [Axios HTTP framework](https://github.com/mzabriskie/axios) with examples for GET, POST, and other HTTP utilities
+- [redux-form](http://redux-form.com/6.0.5/docs/GettingStarted.md/) with examples of each type of form
 
 ## Todo
 
