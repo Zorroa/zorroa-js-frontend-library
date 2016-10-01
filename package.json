@@ -54,7 +54,8 @@
   },
   "jest": {
     "moduleNameMapper": {
-      "^.+\\.(css|less|scss)$": "<rootDir>/tests/StyleStub.js"
+      "^.+\\.(css|less|scss)$": "<rootDir>/tests/StyleStub.js",
+      "^.+\\.(jpg|png|jpeg|svg)$": "<rootDir>/tests/MediaStub.js"
     }
   },
   "dependencies": {
