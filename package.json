@@ -52,6 +52,11 @@
     "webpack": "1.13.2",
     "webpack-dev-server": "1.15.1"
   },
+  "jest": {
+    "moduleNameMapper": {
+      "^.+\\.(css|less|scss)$": "<rootDir>/tests/StyleStub.js"
+    }
+  },
   "dependencies": {
     "axios": "0.14.0",
     "debug": "2.2.0",
