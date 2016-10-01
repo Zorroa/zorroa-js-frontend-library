@@ -81,6 +81,22 @@ This is a product from AirBnB to allow us to do assertions on our react componen
 
 - https://github.com/reactjs/redux/blob/master/docs/recipes/WritingTests.md
 
+## Development Tools
+
+Our project will run in most standard JavaScript editors, including atom
+and WebStorm.
+
+You can set breakpoints and debug variables in Chrome, Firefox or
+other browser debuggers. The build/webpack.dev.js file contains
+additional debugging configuration for the transpiled code, specifically
+the devtools setting, which controls the final compiled code style, and
+the source map configurations, which allow you to map from the transpiled
+code back to the original source files.
+
+Browser plugins can be very helpful:
+* [Redux Dev Tools](https://github.com/gaearon/redux-devtools)
+* [React Dev Tools](https://github.com/facebook/react-devtools)
+
 ## ES6
 
 ## React
@@ -88,8 +104,6 @@ This is a product from AirBnB to allow us to do assertions on our react componen
 ## [Redux](http://redux.js.org/)
 
 - Really good docs to read through
-
-### [Redux Dev Tools](https://github.com/gaearon/redux-devtools)
 
 ## Todo
 
