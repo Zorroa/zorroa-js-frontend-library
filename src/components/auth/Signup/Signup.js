@@ -44,7 +44,7 @@ class Signup extends Component {
     const { handleSubmit, pristine, submitting } = this.props
     return (
       <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))}>
-        <Field name="email" label="Email" component={this.renderField} type="text"/>
+        <Field name="username" label="Username" component={this.renderField} type="text"/>
         <Field name="password" label="Password" component={this.renderField} type="password"/>
         <Field name="passwordConfirm" label="Confirm Password" component={this.renderField} type="password"/>
         <br/>
@@ -57,8 +57,8 @@ class Signup extends Component {
 
 const validate = values => {
   const errors = {}
-  if (!values.email) {
-    errors.email = 'Please enter an email'
+  if (!values.username) {
+    errors.username = 'Please enter an username'
   }
   if (!values.password) {
     errors.password = 'Please enter a password'

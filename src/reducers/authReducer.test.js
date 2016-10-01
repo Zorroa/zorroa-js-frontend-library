@@ -9,7 +9,7 @@ describe('authReducer', () => {
 
   it('UNAUTH_USER clears authenticated', () => {
     expect(authReducer([], { type: UNAUTH_USER }))
-      .toEqual({ authenticated: false })
+      .toEqual({ authenticated: false, user: null })
   })
 
   it('AUTH_ERROR sets message', () => {
