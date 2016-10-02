@@ -4,6 +4,7 @@ import { bindActionCreators } from 'redux'
 
 import Header from '../Header'
 import Sidebar from '../../components/Sidebar'
+import Accordion from '../../components/Accordion'
 
 class App extends Component {
   static get displayName () {
@@ -31,13 +32,13 @@ class App extends Component {
         <Header/>
         <div className="workspace">
           <Sidebar>
-            {leftSidebarItems.map(item => (<div key={item}>{item}</div>))}
+            <Accordion>{leftSidebarItems.map(item => (<div key={item}>{item}</div>))}</Accordion>
           </Sidebar>
           <div className="assets">
             {this.props.children}
           </div>
           <Sidebar isRightEdge={true}>
-            {rightSidebarItems.map(item => (<div key={item}>{item}</div>))}
+            <Accordion>{rightSidebarItems.map(item => (<div key={item}>{item}</div>))}</Accordion>
           </Sidebar>
         </div>
       </div>
