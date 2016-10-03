@@ -1,3 +1,42 @@
-h1 {
-    color: blue;
+// Adjust the outer-most react div to force full height
+// using flex-box column layout and magical 'vh' units
+// (viewport height) rather than 100%, which fails
+#application {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+// App class, containing header and workspace in columns
+.app {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex:1;
+}
+
+// Allow the workspace to fill the full height of App
+.workspace {
+  display:flex;
+  flex:1;
+}
+
+// Asset region, between the sidebars, filling the width
+.assets {
+  flex: 1 0 0;
+  padding: 8px;
+  background-color: #ededed;
+}
+
+// Sidebars use flex-basis to toggle between open and close
+.sidebar {
+  flex: 0 0 50px;
+  padding: 8px;
+  background-color: #ededed;
+  border-left: 1px solid #c3c3c3;
+  border-right: 1px solid #c3c3c3;
+
+  &.sidebar-open {
+    flex: 0 0 300px;
+  }
 }

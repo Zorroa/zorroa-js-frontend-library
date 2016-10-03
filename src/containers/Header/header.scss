@@ -1,3 +1,10 @@
+// Align nav text with center of Logo image by specifying height
+// FIXME: Should use flexbox alignment when we update menu
 .navbar-nav li a {
   line-height: 50px;
+}
+
+.header {
+  flex: 0 0 0;
+  padding: 8px 16px 0px 16px;
 }

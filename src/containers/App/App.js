@@ -1,7 +1,9 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
+
 import Header from '../Header'
+import Sidebar from '../../components/Sidebar'
 
 class App extends Component {
   static get displayName () {
@@ -22,10 +24,22 @@ class App extends Component {
   }
 
   render () {
+    const leftSidebarItems = [ 'Browsing', 'Collections', 'Metadata' ]
+    const rightSidebarItems = [ 'Search', 'Facet', 'Date' ]
     return (
-      <div className="container">
+      <div className="app">
         <Header/>
-        {this.props.children}
+        <div className="workspace">
+          <Sidebar>
+            {leftSidebarItems.map(item => (<div key={item}>{item}</div>))}
+          </Sidebar>
+          <div className="assets">
+            {this.props.children}
+          </div>
+          <Sidebar isRightEdge={true}>
+            {rightSidebarItems.map(item => (<div key={item}>{item}</div>))}
+          </Sidebar>
+        </div>
       </div>
     )
   }

@@ -35,15 +35,11 @@ class Header extends Component {
 
   render () {
     return (
-      <nav className="navbar navbar-light">
-        <div className="container-fluid">
-          <div className="navbar-header">
-            <Link to="/" className="navbar-brand"><Logo/></Link>
-          </div>
-          <ul className="nav navbar-nav navbar-right">
-            {this.renderLinks()}
-          </ul>
-        </div>
+      <nav className="header">
+        <Link to="/" className="navbar-brand"><Logo/></Link>
+        <ul className="nav navbar-nav navbar-right">
+          {this.renderLinks()}
+        </ul>
       </nav>
     )
   }
