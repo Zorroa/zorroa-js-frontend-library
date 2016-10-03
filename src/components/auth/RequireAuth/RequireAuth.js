@@ -1,21 +1,22 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 
-export default function (ComposedComponent) {
+export default function (ComposedComponent, url = '/') {
   class Authentication extends Component {
     static contextTypes = {
-      router: React.PropTypes.object
+      router: PropTypes.object,
+
     }
 
     componentWillMount () {
       if (!this.props.authenticated) {
-        this.context.router.push('/')
+        this.context.router.push(url)
       }
     }
 
     componentWillUpdate (nextProps) {
       if (!nextProps.authenticated) {
-        this.context.router.push('/')
+        this.context.router.push(url)
       }
     }
 
