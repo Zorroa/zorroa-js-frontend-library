@@ -28,20 +28,29 @@ export default class Sidebar extends Component {
     this.setState({ open: !this.state.open })
   }
 
-  render () {
+  buttonChar () {
     // Select the right or left facing triangle unicode char using XOR
-    const arrow = this.state.open !== this.props.isRightEdge ? '\u25C0' : '\u25B6'
-    const buttonClassNames = classnames('sidebar-button', {
+    return this.state.open !== this.props.isRightEdge ? '\u25C0' : '\u25B6'
+  }
+
+  buttonClassNames () {
+    return classnames('sidebar-button', {
       'sidebar-button-left': !this.props.isRightEdge
     })
-    const classNames = classnames('sidebar', {
+  }
+
+  sidebarClassNames () {
+    return classnames('sidebar', {
       'sidebar-open': this.state.open
     })
+  }
 
+  render () {
+    const arrow = this.buttonChar()
     return (
-      <div className={classNames}>
-        <div className={buttonClassNames}>
-          <label className="sidebar-button" onClick={this.handleClick.bind(this)}>{arrow}{arrow}</label>
+      <div className={this.sidebarClassNames()}>
+        <div className={this.buttonClassNames()}>
+          <label onClick={this.handleClick.bind(this)}>{arrow}{arrow}</label>
         </div>
         {this.props.children}
       </div>

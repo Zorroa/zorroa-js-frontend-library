@@ -15,6 +15,12 @@
   flex:1;
 }
 
+// Clean authentication view, with no furniture
+.auth {
+  width: 400px;
+  padding: 32px;
+}
+
 // Allow the workspace to fill the full height of App
 .workspace {
   display:flex;
@@ -24,8 +30,15 @@
 // Asset region, between the sidebars, filling the width
 .assets {
   flex: 1 0 0;
+  display: flex;
+  flex-direction: column;
   padding: 8px;
   background-color: #ededed;
+}
+
+// Thumbnail region, above the footer, filling up the height
+.thumbs {
+  flex: 1 0 0;
 }
 
 // Sidebars use flex-basis to toggle between open and close
@@ -37,6 +50,18 @@
   border-right: 1px solid #c3c3c3;
 
   &.sidebar-open {
+    flex: 0 0 300px;
+  }
+}
+
+// Footers use flex-basis to toggle between open and close
+.footer {
+  flex: 0 0 50px;
+  padding: 8px;
+  background-color: #f0f0f0;
+  border-top: 1px solid #c3c3c3;
+
+  &.footer-open {
     flex: 0 0 300px;
   }
 }
