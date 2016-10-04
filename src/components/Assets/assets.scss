@@ -1,0 +1,24 @@
+.assets-scroll {
+  overflow: auto;
+  height: 100%;
+}
+
+.assets-layout {
+  flex: 1 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+
+  &.assets-layout-empty {
+  }
+
+  &.assets-layout-masonry {
+  }
+
+  &.assets-layout-waterfall {
+  }
+
+  &.assets-layout-grid {
+  }
+}

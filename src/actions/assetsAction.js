@@ -1,5 +1,7 @@
 import axios from 'axios'
+
 import { ASSET_SEARCH, ASSET_SEARCH_ERROR } from '../constants/actionTypes'
+import Asset from '../models/Asset'
 
 const baseURL = 'https://localhost:8066'
 const archivist = axios.create({
@@ -14,9 +16,10 @@ export function searchAssets (query) {
       .then(response => {
         console.log('Query ' + query)
         console.log(response)
+        const assets = response.data.list.map(asset => (new Asset(asset)))
         dispatch({
           type: ASSET_SEARCH,
-          payload: response.data.list
+          payload: assets
         })
       })
       .catch(error => {

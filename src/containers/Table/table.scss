@@ -1,0 +1,14 @@
+.assets-table,th, td {
+  width: 100%;
+  border-bottom: 1px solid #aaa;
+  padding: 2px 8px 2px 2px;
+}
+
+tr:nth-child(even) {
+  background-color: #f6f6f6;
+}
+
+.assets-table-scroll {
+  overflow:auto;
+  height: 100%;
+}
