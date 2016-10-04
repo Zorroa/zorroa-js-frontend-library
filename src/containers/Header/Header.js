@@ -1,7 +1,9 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
+
 import Logo from '../../components/Logo'
+import Searchbar from '../../components/Searchbar'
 
 class Header extends Component {
   static propTypes () {
@@ -18,16 +20,16 @@ class Header extends Component {
   renderLinks () {
     if (this.props.authenticated) {
       return (
-        <li className="nav-item">
+        <li className="header-menu-item">
           <Link className="nav-link" to="/signout">Sign Out</Link>
         </li>
       )
     }
     return [
-      <li className="nav-item" key={1}>
+      <li className="header-menu-item" key={1}>
         <Link className="nav-link" to="/signin">Sign In</Link>
       </li>,
-      <li className="nav-item" key={2}>
+      <li className="header-menu-item" key={2}>
         <Link className="nav-link" to="/signup">Sign Up</Link>
       </li>
     ]
@@ -36,8 +38,11 @@ class Header extends Component {
   render () {
     return (
       <nav className="header">
-        <Link to="/" className="navbar-brand"><Logo/></Link>
-        <ul className="nav navbar-nav navbar-right">
+        <div className="header-logo-search">
+          <Link to="/" className="header-logo"><Logo/></Link>
+          <Searchbar/>
+        </div>
+        <ul className="header-menu">
           {this.renderLinks()}
         </ul>
       </nav>

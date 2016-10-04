@@ -1,0 +1,27 @@
+// Form layout
+.searchbar-group {
+  display: flex;
+}
+
+// Magnifying glass
+.searchbar-button {
+  padding: 0 0 0 12px;
+  border: none;
+  background: none;
+  color: #71b623;
+  font-size: 18pt;
+}
+
+// Underline-only bar
+.searchbar {
+  background: transparent;
+  border: none;
+  width: 347px;
+  border-bottom: 2px solid #71b623;
+}
+
+// Remove box highling when focused
+.searchbar:focus {
+  outline: none;
+}
+

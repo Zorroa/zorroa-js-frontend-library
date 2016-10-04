@@ -1,10 +1,34 @@
-// Align nav text with center of Logo image by specifying height
-// FIXME: Should use flexbox alignment when we update menu
-.navbar-nav li a {
-  line-height: 50px;
+// Header does not grow, and contains a row-layout flexbox
+// with the logo and searchbar scrunched on the left and
+// the menu right justified
+.header {
+  flex: 0 0 1;
+  justify-content: space-between;
+  padding: 8px 16px 8px 16px;
+  display:flex;
+  align-items: flex-end;
 }
 
-.header {
-  flex: 0 0 0;
-  padding: 8px 16px 0px 16px;
+// Box to left-justify the logo and search
+.header-logo-search {
+  display: flex;
+  align-items: flex-end;
+}
+
+// Adjust the logo size so search starts at expanded sidebar
+.header-logo {
+  flex: 1 0 284px;
+}
+
+// Simple menu text for now
+.header-menu {
+  list-style: none;
+  margin-bottom: 0;
+  padding-left: 0;
+}
+
+// Convert a list item into a nav-item
+.header-menu-item {
+  display: list-item;
+  text-align: -webkit-match-parent;
 }
