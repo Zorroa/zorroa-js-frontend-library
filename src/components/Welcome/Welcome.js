@@ -1,30 +1,20 @@
 import React, { Component } from 'react'
-import SelectMenu from '../SelectMenu'
 import DropdownMenu from '../DropdownMenu'
 
 export default class Welcome extends Component {
   render () {
-    const options = [
-      { label: 'Test 1', value: true },
-      { label: 'Test 2', value: false }
-    ]
-
     return (
       <div>
         Welcome to our little world.
 
-        <br />
-
-        <SelectMenu cb={(stuff) => { console.log(stuff) }} options={options} />
-
         <div>
           <DropdownMenu label="My Drop Down" style={{ width: 200 }}>
-            <div>test 1</div>
-            <div>test 2</div>
+            <a onClick={() => { console.log('1 clicked') }}>test 1</a>
+            <a onClick={() => { console.log('2 clicked') }}>test 2</a>
           </DropdownMenu>
           <DropdownMenu label="My Drop Down" style={{ width: 200 }}>
-            <div>test 3</div>
-            <div>test 4</div>
+            <a onClick={() => { console.log('3 clicked') }}>test 3</a>
+            <a onClick={() => { console.log('4 clicked') }}>test 4</a>
           </DropdownMenu>
         </div>
       </div>

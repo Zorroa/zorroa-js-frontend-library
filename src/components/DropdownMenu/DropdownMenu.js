@@ -9,7 +9,6 @@ export default class DropdownMenu extends Component {
     return {
       children: PropTypes.node,
       label: PropTypes.string,
-      cb: PropTypes.func,
       style: PropTypes.object
     }
   }
@@ -23,22 +22,10 @@ export default class DropdownMenu extends Component {
 
     this.show = this.show.bind(this)
     this.hide = this.hide.bind(this)
-    this.handleSelect = this.handleSelect.bind(this)
   }
 
   componentWillUnmount () {
     document.removeEventListener('click', this.hide)
-  }
-
-  handleSelect (se) {
-    console.log('se', se)
-
-    const { cb } = this.props
-    this.hide()
-
-    if (cb && cb instanceof Function) {
-      cb()
-    }
   }
 
   show () {
@@ -56,14 +43,14 @@ export default class DropdownMenu extends Component {
   render () {
     return (
       <div className="dropdown-menu" style={this.props.style}>
-        <button type="button" role="button" onClick={this.show}>
+        <button type="button" className="btn" role="button" onClick={this.show}>
           {this.props.label}
           <span className="dropdown-caret"></span>
         </button>
         { this.state.isVisible &&
           (<ul>
             {Children.map(this.props.children, (child, i) => {
-              return (<li key={i}><a onClick={this.handleSelect}>{child}</a></li>)
+              return (<li key={i}>{child}</li>)
             })}
           </ul>)
         }
