@@ -1,0 +1,60 @@
+// Asset region, between the sidebars, filling the width
+.workspace-asset-region {
+  flex: 1 0 0;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  background-color: #ededed;
+}
+
+// Allow the workspace to fill the full height of App
+.workspace {
+  display:flex;
+  flex:1;
+  background-color: #ededed;
+}
+
+// Asset and table, in a column
+.workspace-body {
+  flex: 1 0 0;
+  display: flex;
+  flex-direction: column;
+}
+
+
+// Sidebars use flex-basis to toggle between open and close
+.sidebar {
+  flex: 0 0 50px;
+  padding: 8px;
+  background-color: #ededed;
+  border-left: 1px solid #c3c3c3;
+  border-right: 1px solid #c3c3c3;
+
+  &.sidebar-open {
+    flex: 0 0 300px;
+  }
+}
+
+// Accordion items in sidebars
+.accordion-item {
+  border: 1px solid black;
+  padding: 20px;
+
+  &.accordion-open {
+    height: 200px;
+  }
+}
+
+// Footers use flex-basis to toggle between open and close
+.footer {
+  flex: 0 0 20px;
+  max-height: 20px;
+  padding: 8px;
+  border-top: 1px solid #c3c3c3;
+  margin-bottom: 4px;
+
+  &.footer-open {
+    max-height: 300px;
+    flex: 0 0 300px;
+  }
+}

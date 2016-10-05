@@ -19,7 +19,7 @@ export function signinUser ({ username, password }) {
         const user = new User(response.data)
         dispatch({ type: AUTH_USER, payload: user })
         localStorage.setItem(USER_ITEM, user)
-        browserHistory.push('/feature')
+        browserHistory.push('/')
       })
       .catch((error) => {
         dispatch(authError('Bad Login Info'))
@@ -34,7 +34,7 @@ export function signupUser ({ username, password }) {
         const user = User(response.data)
         dispatch({ type: AUTH_USER, payload: user })
         localStorage.setItem(USER_ITEM, user)
-        browserHistory.push('/feature')
+        browserHistory.push('/')
       })
       .catch(error => dispatch(authError(error.response.data.error)))
   }

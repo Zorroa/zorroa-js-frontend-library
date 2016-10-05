@@ -1,11 +1,9 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
+import classnames from 'classnames'
 
 import Header from '../Header'
-import Sidebar from '../../components/Sidebar'
-import Accordion from '../../components/Accordion'
-import Footer from '../../components/Footer'
 
 class App extends Component {
   static get displayName () {
@@ -22,42 +20,23 @@ class App extends Component {
 
   constructor (props) {
     super(props)
-
     this.state = {}
   }
 
-  render () {
-    if (!this.props.authenticated) {
-      return (
-        <div className="app">
-          <Header />
-          <div className="auth">
-            {this.props.children}
-          </div>
-        </div>
-      )
+  renderHeader () {
+    if (this.props.authenticated) {
+      return <Header/>
     }
-    const leftSidebarItems = [ 'Browsing', 'Collections', 'Metadata' ]
-    const rightSidebarItems = [ 'Search', 'Facet', 'Date' ]
+  }
+
+  render () {
+    const classNames = classnames('app', {
+      'app-auth': !this.props.authenticated
+    })
     return (
-      <div className="app">
-        <Header />
-        <div className="workspace">
-          <Sidebar>
-            <Accordion>{leftSidebarItems.map(item => (<div key={item}>{item}</div>))}</Accordion>
-          </Sidebar>
-          <div className="assets">
-            <div className="thumbs">
-              {this.props.children}
-            </div>
-            <Footer>
-              <div>Gorgeous table</div>
-            </Footer>
-          </div>
-          <Sidebar isRightEdge={true}>
-            <Accordion>{rightSidebarItems.map(item => (<div key={item}>{item}</div>))}</Accordion>
-          </Sidebar>
-        </div>
+      <div className={classNames}>
+        {this.renderHeader()}
+        {this.props.children}
       </div>
     )
   }
