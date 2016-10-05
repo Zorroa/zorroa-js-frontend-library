@@ -24,7 +24,7 @@ export default class Accordion extends Component {
 
   handleClick (i) {
     const { openItems } = this.state
-    const temp = Array(openItems.length).fill(false)
+    const temp = {...openItems}
     temp[i] = !openItems[i]
     this.setState({
       openItems: temp
@@ -37,10 +37,12 @@ export default class Accordion extends Component {
     const { children: accordianItems } = this.props
 
     return (
-      <div className="accordion">
-        {accordianItems.map((item, i) => {
-          return this.renderAccordianItem(item, i)
-        })}
+      <div style={{overflow: 'auto', height: '100%'}}>
+        <div className="accordion">
+          {accordianItems.map((item, i) => {
+            return this.renderAccordianItem(item, i)
+          })}
+        </div>
       </div>
     )
   }
