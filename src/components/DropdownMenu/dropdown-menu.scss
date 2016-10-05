@@ -1,19 +1,44 @@
 .dropdown-menu {
-  button {
+  box-sizing: border-box;
+  display: inline-block;
+  position:relative;
 
+  button {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    -webkit-appearance: button;
+    background-color: #fff;
+    border: 1px solid transparent;
+    box-sizing: border-box;
+    color: #444444;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1.25;
+    padding: .5rem 1rem;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+    width: 100%;
+
+    &:focus {
+      outline: none;
+    }
   }
 
   ul {
+    position: absolute;
+    box-sizing: border-box;
     background-clip: padding-box;
     background-color: #fff;
     border-radius: 4px;
     border: 1px solid #ccc;
-    font-size: 14px
     list-style-type: none;
     margin: 0;
-    min-width: 160px;
+    width: 100%;
     padding: 15px 18px;
-    position: absolute;
     text-align: left;
     top: 100%;
     z-index: 1000;
@@ -21,6 +46,12 @@
 
   li {
     line-height: 1.5
+  }
+
+  a {
+    cursor: pointer;
+    color: #444444;
+    font-size: 1rem;
   }
 
   .dropdown-caret {

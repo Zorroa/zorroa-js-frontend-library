@@ -17,12 +17,16 @@ export default class Welcome extends Component {
 
         <SelectMenu cb={(stuff) => { console.log(stuff) }} options={options} />
 
-        <br />
-
-        <DropdownMenu label="test">
-          <div>test 1</div>
-          <div>test 2</div>
-        </DropdownMenu>
+        <div>
+          <DropdownMenu label="My Drop Down" style={{ width: 200 }}>
+            <div>test 1</div>
+            <div>test 2</div>
+          </DropdownMenu>
+          <DropdownMenu label="My Drop Down" style={{ width: 200 }}>
+            <div>test 3</div>
+            <div>test 4</div>
+          </DropdownMenu>
+        </div>
       </div>
     )
   }

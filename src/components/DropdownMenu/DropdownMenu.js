@@ -8,7 +8,9 @@ export default class DropdownMenu extends Component {
   static get propTypes () {
     return {
       children: PropTypes.node,
-      label: PropTypes.string
+      label: PropTypes.string,
+      cb: PropTypes.func,
+      style: PropTypes.object
     }
   }
 
@@ -29,7 +31,14 @@ export default class DropdownMenu extends Component {
   }
 
   handleSelect (se) {
-    console.info(se)
+    console.log('se', se)
+
+    const { cb } = this.props
+    this.hide()
+
+    if (cb && cb instanceof Function) {
+      cb()
+    }
   }
 
   show () {
@@ -46,15 +55,15 @@ export default class DropdownMenu extends Component {
 
   render () {
     return (
-      <div className="dropdown-menu">
-        <button type="button" onClick={this.show} role="button">
+      <div className="dropdown-menu" style={this.props.style}>
+        <button type="button" role="button" onClick={this.show}>
           {this.props.label}
           <span className="dropdown-caret"></span>
         </button>
         { this.state.isVisible &&
           (<ul>
             {Children.map(this.props.children, (child, i) => {
-              return (<li key={i}><a href={this.handleSelect}>{child}</a></li>)
+              return (<li key={i}><a onClick={this.handleSelect}>{child}</a></li>)
             })}
           </ul>)
         }
