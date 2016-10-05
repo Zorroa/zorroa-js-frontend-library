@@ -1,5 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
+
+import Logo from '../../../components/Logo'
 import * as actions from '../../../actions/authAction'
 
 class Signout extends Component {
@@ -8,12 +10,27 @@ class Signout extends Component {
       signoutUser: PropTypes.func.isRequired
     }
   }
+
+  static contextTypes = {
+    router: PropTypes.object,
+  }
+
   componentWillMount () {
     this.props.signoutUser()
   }
 
   render () {
-    return <div>Sorry to see you go...</div>
+    setTimeout(() => { this.context.router.push('/') }, 3000);
+    return (
+      <div className="auth">
+        <div className="auth-logo">
+          <Logo/>
+        </div>
+        <div className="auth-message">
+          Logging out...
+        </div>
+      </div>
+    )
   }
 }
 

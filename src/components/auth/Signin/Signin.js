@@ -1,6 +1,9 @@
 import React, { Component, PropTypes } from 'react'
+import { Link } from 'react-router'
 import { connect } from 'react-redux'
 import { reduxForm, Field } from 'redux-form'
+
+import Logo from '../../../components/Logo'
 import * as actions from '../../../actions/authAction'
 
 class Signin extends Component {
@@ -30,12 +33,10 @@ class Signin extends Component {
 
   renderField ({ input, label, type, meta: { touched, error } }) {
     return (
-      <div>
-        <label>{label}</label>
-        <div>
-          <input {...input} placeholder={label} type={type} className="form-control" />
-          {touched && error && <div className="error">{error}</div>}
-        </div>
+      <div className="auth-field">
+        <input {...input} type={type} className="auth-input" />
+        <label className="auth-label">{label}</label>
+        {touched && error && <div className="error">{error}</div>}
       </div>
     )
   }
@@ -43,13 +44,18 @@ class Signin extends Component {
   render () {
     const { handleSubmit, pristine, submitting } = this.props
     return (
-      <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))}>
-        <Field name="username" label="Username" component={this.renderField} type="text"/>
-        <Field name="password" label="Password" component={this.renderField} type="password"/>
-        <br/>
-        {this.renderAlert()}
-        <button action="submit" disabled={pristine || submitting} className="btn btn-primary">Sign in</button>
-      </form>
+      <div className="auth">
+        <div className="auth-logo">
+          <Logo/>
+        </div>
+        <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))} className="auth-form">
+          <Field name="username" label="USERNAME" component={this.renderField} type="text" autofocus/>
+          <Field name="password" label="PASSWORD" component={this.renderField} type="password"/>
+          {this.renderAlert()}
+          <button action="submit" disabled={pristine || submitting} className="auth-button-primary">LOGIN</button>
+        </form>
+        <Link className="auth-forgot" to="/signup">Forgot Password?</Link>
+      </div>
     )
   }
 }

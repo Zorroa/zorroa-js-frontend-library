@@ -1,3 +1,90 @@
 .error {
   color: red;
 }
+
+
+.auth {
+  background-color: #fff;
+  margin: 32px auto;
+  padding: 50px;
+  width: 400px;
+  height: 454px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 3px;
+  box-shadow: 0px 24px 20px -20px #BBB;
+}
+
+.auth:before,
+.auth:after {
+  content:"";
+  position:absolute;
+  z-index:-2;
+}
+
+.auth-input {
+  width: 100%;
+  margin: 16px 0 0px 0;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #b3b3b3;
+  color: #4d4948;
+}
+
+// Remove box highling when focused
+.auth-input:focus {
+  outline: none;
+}
+
+.auth-label {
+  font-family: Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 300;
+  margin: 0;
+}
+
+.auth-logo {
+  display: flex;
+  justify-content: center;
+}
+
+.auth-forgot {
+  display: inline-block;
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  margin-top: 16px;
+  color: #4d4948;
+}
+
+.auth-button-primary {
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  margin-top: 24px;
+  padding: 7pt 24px 7pt 24px;
+  color: #fff;
+  background-color: #73b61c;
+  border-radius: 3px;
+  border: 1px solid transparent;
+}
+
+.auth-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.auth-field {
+  width: 100%;
+  margin: 4px;
+}
+
+.auth-message {
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  color: #4d4948;
+  margin-top:60;
+}
