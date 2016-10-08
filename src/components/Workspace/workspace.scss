@@ -1,3 +1,12 @@
+// App class, containing header and workspace in columns
+.app {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex: 1;
+  height: 100vh;
+}
+
 // Asset region, between the sidebars, filling the width
 .workspace-asset-region {
   flex: 1 0 0;

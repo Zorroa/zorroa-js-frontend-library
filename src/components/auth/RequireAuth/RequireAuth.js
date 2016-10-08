@@ -21,6 +21,9 @@ export default function (ComposedComponent, url = '/') {
     }
 
     render () {
+      if (!this.props.authenticated) {
+        return <div/>
+      }
       return <ComposedComponent {...this.props} />
     }
   }

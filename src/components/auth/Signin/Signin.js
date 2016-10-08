@@ -46,17 +46,19 @@ class Signin extends Component {
 
     return (
       <div className="auth">
-        <div className="auth-logo">
-          <Logo/>
+        <div className="auth-box">
+          <div className="auth-logo">
+            <Logo/>
+          </div>
+          <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))} className="auth-form">
+            <Field name="username" label="USERNAME" component={this.renderField} type="text" />
+            <Field name="password" label="PASSWORD" component={this.renderField} type="password"/>
+            <Field name="host" label="HOST" component={this.renderField} type="text" />
+            {this.renderAlert()}
+            <button action="submit" disabled={pristine || submitting} className="auth-button-primary">LOGIN</button>
+          </form>
+          <Link className="auth-forgot" to="/signup">Forgot Password?</Link>
         </div>
-        <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))} className="auth-form">
-          <Field name="username" label="USERNAME" component={this.renderField} type="text" />
-          <Field name="password" label="PASSWORD" component={this.renderField} type="password"/>
-          <Field name="host" label="HOST" component={this.renderField} type="text" />
-          {this.renderAlert()}
-          <button action="submit" disabled={pristine || submitting} className="auth-button-primary">LOGIN</button>
-        </form>
-        <Link className="auth-forgot" to="/signup">Forgot Password?</Link>
       </div>
     )
   }

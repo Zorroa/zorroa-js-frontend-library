@@ -25,11 +25,13 @@ class Signout extends Component {
     setTimeout(() => { this.context.router.push('/') }, 3000);
     return (
       <div className="auth">
-        <div className="auth-logo">
-          <Logo/>
-        </div>
-        <div className="auth-message">
-          Logging out...
+        <div className="auth-box">
+          <div className="auth-logo">
+            <Logo/>
+          </div>
+          <div className="auth-message">
+            Logging out...
+          </div>
         </div>
       </div>
     )

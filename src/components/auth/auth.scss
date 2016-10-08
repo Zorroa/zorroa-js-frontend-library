@@ -2,8 +2,15 @@
   color: red;
 }
 
-
 .auth {
+  background-color: #ededed;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100vh;
+}
+
+.auth-box {
   background-color: #fff;
   margin: 32px auto;
   padding: 50px;
