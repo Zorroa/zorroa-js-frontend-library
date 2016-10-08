@@ -1,16 +1,19 @@
+import Proxy from './Proxy'
+
 export default class Asset {
   constructor ({ id, document }) {
     this.id = id
     this.document = document
+
+    // Build the Proxy list from the ProxySchema
+    if (this.document && this.document.proxies && this.document.proxies.proxies) {
+      this.proxies = this.document.proxies.proxies.map(proxy => new Proxy(proxy))
+    }
   }
 
   source () { return this.document.source.filename }
 
   tinyProxy () { return this.document.proxies.tinyProxy }
-
-  proxyLevels () { return this.document.proxies.proxies.length }
-
-  proxy (level) { return this.document.proxies.proxies[level] }
 
   aspect () { return this.document.image.width / this.document.image.height }
 

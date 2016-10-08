@@ -9,7 +9,8 @@ const mockStore = configureMockStore(middlewares)
 describe('authActions', () => {
   const username = 'foo'
   const password = 'foobar'
-  const payload = { username, password }
+  const host = 'localhost'
+  const payload = { username, password, host }
   const token = '9017140nsada0814n'
 
   describe('authActionSync', () => {

@@ -1,18 +1,11 @@
-import axios from 'axios'
-
-import { ASSET_SEARCH, ASSET_SEARCH_ERROR } from '../constants/actionTypes'
+import { UNAUTH_USER, ASSET_SEARCH, ASSET_SEARCH_ERROR } from '../constants/actionTypes'
 import Asset from '../models/Asset'
-
-const baseURL = 'https://localhost:8066'
-const archivist = axios.create({
-  baseURL,
-  withCredentials: true
-})
+import { getArchivist } from './authAction'
 
 export function searchAssets (query) {
   return dispatch => {
     console.log('Search: ' + query)
-    archivist.post('/api/v3/assets/_search', {query})
+    getArchivist().post('/api/v3/assets/_search', {query})
       .then(response => {
         console.log('Query ' + query)
         console.log(response)
@@ -24,6 +17,12 @@ export function searchAssets (query) {
       })
       .catch(error => {
         console.log('Error searching for assets: ' + error)
+        if (error.response.status === 401) {
+          dispatch({
+            type: UNAUTH_USER,
+            payload: error.response.data
+          })
+        }
         dispatch({
           type: ASSET_SEARCH_ERROR,
           payload: error

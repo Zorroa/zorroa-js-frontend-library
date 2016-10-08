@@ -1,5 +1,6 @@
 export const AUTH_USER = 'AUTH_USER'
 export const UNAUTH_USER = 'UNAUTH_USER'
 export const AUTH_ERROR = 'AUTH_ERROR'
+export const AUTH_HOST = 'AUTH_HOST'
 export const ASSET_SEARCH = 'ASSET_SEARCH'
 export const ASSET_SEARCH_ERROR = 'ASSET_SEARCH_ERROR'

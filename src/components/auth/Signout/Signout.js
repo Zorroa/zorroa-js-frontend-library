@@ -1,13 +1,15 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 
+import User from '../../../models/User'
 import Logo from '../../../components/Logo'
 import * as actions from '../../../actions/authAction'
 
 class Signout extends Component {
   static propTypes () {
     return {
-      signoutUser: PropTypes.func.isRequired
+      signoutUser: PropTypes.func.isRequired,
+      user: PropTypes.instanceOf(User)
     }
   }
 
@@ -16,7 +18,7 @@ class Signout extends Component {
   }
 
   componentWillMount () {
-    this.props.signoutUser()
+    this.props.signoutUser(this.props.user)
   }
 
   render () {
@@ -34,4 +36,6 @@ class Signout extends Component {
   }
 }
 
-export default connect(null, actions)(Signout)
+export default connect(state => ({
+  user: state.auth.user
+}), actions)(Signout)

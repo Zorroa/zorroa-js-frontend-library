@@ -12,8 +12,9 @@ import ReduxPromise from 'redux-promise'
 
 import routes from './routes'
 import reducers from './reducers'
-import { AUTH_USER } from './constants/actionTypes'
-import { USER_ITEM } from './constants/localStorageItems'
+import { USER_ITEM, HOST_ITEM } from './constants/localStorageItems'
+import { validateUser } from './actions/authAction'
+import User from './models/User'
 
 const log = debug('application:bootstrap')
 
@@ -32,9 +33,11 @@ const applicationNode = (
 // If we have a token, consider the user to be signed in, and update local state
 // FIXME: Remove localStorage
 console.log('loading token')
-const user = localStorage.getItem(USER_ITEM)
-if (user) {
-  store.dispatch({ type: AUTH_USER, payload: user })
+const userItem = JSON.parse(localStorage.getItem(USER_ITEM))
+const user = userItem ? new User(userItem) : null
+const host = localStorage.getItem(HOST_ITEM)
+if (user && host) {
+  store.dispatch(validateUser(user, host))
 }
 
 log('creating dom node')

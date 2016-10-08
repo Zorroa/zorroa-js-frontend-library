@@ -17,8 +17,8 @@ class Signin extends Component {
     }
   }
 
-  handleFormSubmit ({ username, password }) {
-    this.props.signinUser({ username, password })
+  handleFormSubmit ({ username, password, host }) {
+    this.props.signinUser({ username, password, host })
   }
 
   renderAlert () {
@@ -43,14 +43,16 @@ class Signin extends Component {
 
   render () {
     const { handleSubmit, pristine, submitting } = this.props
+
     return (
       <div className="auth">
         <div className="auth-logo">
           <Logo/>
         </div>
         <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))} className="auth-form">
-          <Field name="username" label="USERNAME" component={this.renderField} type="text" autofocus/>
+          <Field name="username" label="USERNAME" component={this.renderField} type="text" />
           <Field name="password" label="PASSWORD" component={this.renderField} type="password"/>
+          <Field name="host" label="HOST" component={this.renderField} type="text" />
           {this.renderAlert()}
           <button action="submit" disabled={pristine || submitting} className="auth-button-primary">LOGIN</button>
         </form>
@@ -68,6 +70,9 @@ const validate = values => {
   if (!values.password) {
     errors.password = 'Please enter a password'
   }
+  if (!values.host) {
+    errors.host = 'Please enter a hostname'
+  }
   return errors
 }
 
@@ -78,6 +83,7 @@ const form = reduxForm({
 
 export default connect(
   state => ({
+    initialValues: { host: state.auth.host, username: state.auth.user ? state.auth.user.username : null },
     errorMessage: state.auth.error
   }), actions
 )(form(Signin))

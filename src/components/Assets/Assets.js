@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
-import Proxy from '../Proxy'
+import Thumb from '../Thumb'
 import Asset from '../../models/Asset'
 
 class Assets extends Component {
@@ -38,7 +38,7 @@ class Assets extends Component {
     return (
       <div className="assets-scroll">
         <div className={classNames}>
-          { assets.map(asset => (<Proxy key={asset.id} asset={asset}/>)) }
+          { assets.map(asset => (<Thumb key={asset.id} asset={asset}/>)) }
         </div>
       </div>
     )
