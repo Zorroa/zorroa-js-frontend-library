@@ -21,9 +21,7 @@ export function signinUser ({ username, password }) {
         localStorage.setItem(USER_ITEM, user)
         browserHistory.push('/')
       })
-      .catch((error) => {
-        dispatch(authError('Bad Login Info'))
-      })
+      .catch(error => dispatch(authError('Bad Login Info: ' + error)))
   }
 }
 
@@ -36,7 +34,7 @@ export function signupUser ({ username, password }) {
         localStorage.setItem(USER_ITEM, user)
         browserHistory.push('/')
       })
-      .catch(error => dispatch(authError(error.response.data.error)))
+      .catch(error => dispatch(authError('Cannot signin: ' + error)))
   }
 }
 

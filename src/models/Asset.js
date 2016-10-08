@@ -10,9 +10,19 @@ export default class Asset {
 
   proxyLevels () { return this.document.proxies.proxies.length }
 
-  proxy(level) { return this.document.proxies.proxies[level] }
+  proxy (level) { return this.document.proxies.proxies[level] }
 
-  aspect() { return this.document.image.width / this.document.image.height }
+  aspect () { return this.document.image.width / this.document.image.height }
 
   backgroundColor () { return this.tinyProxy() ? this.tinyProxy()[5] : getRandomColor() }
+
+}
+
+function getRandomColor () {
+  var letters = '0123456789ABCDEF'
+  var color = '#'
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)]
+  }
+  return color
 }

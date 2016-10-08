@@ -1,3 +1,3 @@
 import Assets from './Assets'
 import './assets.scss'
-export default Assets;
+export default Assets
