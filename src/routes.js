@@ -1,7 +1,7 @@
 import React from 'react'
 import { Route, IndexRoute } from 'react-router'
 
-import App from './containers/App'
+import App from './components/App'
 import Signin from './components/auth/Signin'
 import Signout from './components/auth/Signout'
 import RequireAuth from './components/auth/RequireAuth'

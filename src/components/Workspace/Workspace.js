@@ -2,9 +2,9 @@ import React, { Component, PropTypes } from 'react'
 
 import Accordion from '../../components/Accordion'
 import Footer from '../../components/Footer'
-import Header from '../../containers/Header'
+import Header from '../../components/Header'
 import Sidebar from '../../components/Sidebar'
-import Table from '../../containers/Table'
+import Table from '../../components/Table'
 import Assets from '../../components/Assets'
 
 export default class Workspace extends Component {

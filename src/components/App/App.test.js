@@ -2,7 +2,7 @@ import React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import App from './App'
-import Header from '../../containers/Header'
+import Header from '../Header'
 
 const storeFake = (state) => {
   return {
