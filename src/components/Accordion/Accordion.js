@@ -34,20 +34,20 @@ export default class Accordion extends Component {
   }
 
   render () {
-    const { children: accordianItems } = this.props
+    const { children: accordionItems } = this.props
 
     return (
       <div style={{overflow: 'auto', height: '100%'}}>
         <div className="accordion">
-          {accordianItems.map((item, i) => {
-            return this.renderAccordianItem(item, i)
+          {accordionItems.map((item, i) => {
+            return this.renderAccordionItem(item, i)
           })}
         </div>
       </div>
     )
   }
 
-  renderAccordianItem (item, i) {
+  renderAccordionItem (item, i) {
     const classNames = classnames('accordion-item', {
       'accordion-open': this.state.openItems[i]
     })
