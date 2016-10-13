@@ -1,0 +1,233 @@
+
+/*------------------------------
+
+Zorroa core (shared) css classes
+
+------------------------------*/
+
+// https://fonts.google.com/?query=roboto&category=Sans+Serif,Display,Handwriting,Monospace&selection.family=Roboto
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+
+* {
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+.hide { display:none!important; }
+
+.animate { transition:0.25s; }
+
+// no glows, EVER!
+input,input:focus,button,button:focus,.form-control,.form-control:focus {
+  outline:none;
+  box-shadow: none;
+}
+
+/*
+Define colors from the Zorroa style guide:
+https://app.zeplin.io/project.html#pid=57c999e39adaa8120388fa9a&styleguide
+*/
+
+$zorroa-greyish-brown  : #4d4948;
+$zorroa-black          : #1f1a17;
+$zorroa-white          : #e1e1e1;
+$zorroa-avocado-green  : #82a626;
+$zorroa-sickly-green   : #73b61c;
+$zorroa-faded-red      : #ce2d3f;
+$zorroa-orangish       : #fc6c2c;
+$zorroa-water-blue     : #1875d1;
+$zorroa-darkish-purple : #a11e77;
+$zorroa-medium-pink    : #ee4688;
+$zorroa-warm-grey-60   : rgba(128, 128, 128, 0.6);
+
+.zorroa-greyish-brown  { color: $zorroa-greyish-brown  ; }
+.zorroa-black          { color: $zorroa-black          ; }
+.zorroa-white          { color: $zorroa-white          ; }
+.zorroa-avocado-green  { color: $zorroa-avocado-green  ; }
+.zorroa-sickly-green   { color: $zorroa-sickly-green   ; }
+.zorroa-faded-red      { color: $zorroa-faded-red      ; }
+.zorroa-orangish       { color: $zorroa-orangish       ; }
+.zorroa-water-blue     { color: $zorroa-water-blue     ; }
+.zorroa-darkish-purple { color: $zorroa-darkish-purple ; }
+.zorroa-medium-pink    { color: $zorroa-medium-pink    ; }
+.zorroa-warm-grey-60   { color: $zorroa-warm-grey-60   ; }
+
+
+// A few extra useful colors Amber didn't specify
+
+$zorroa-darkgray   : #4a4a4a;
+$zorroa-gray       : #808080;
+$zorroa-lightgray  : #ccc;
+$zorroa-nearwhite  : #eee;
+$zorroa-transparent: transparent;
+
+.zorroa-darkgray    { color : $zorroa-darkgray    ; }
+.zorroa-gray        { color : $zorroa-gray        ; }
+.zorroa-lightgray   { color : $zorroa-lightgray   ; }
+.zorroa-nearwhite   { color : $zorroa-nearwhite   ; }
+.zorroa-transparent { color : $zorroa-transparent ; }
+
+
+/* Button classes */
+
+.zorroa-btn {
+  color: white;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border: none;
+  font-size: 14px;
+  padding: 10px 30px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+@mixin zorroa-btn-bg($color,$hover) {
+  background-color: $color;
+  &:hover {
+    color: white;
+    background-color: $hover;
+  }
+}
+@mixin zorroa-btn($color,$hover) {
+  @extend .zorroa-btn;
+  @include zorroa-btn-bg($color,$hover);
+  &:disabled {
+    color: white;
+    background-color: $zorroa-lightgray;
+  }
+}
+.zorroa-btn-success  { @include zorroa-btn($zorroa-sickly-green, darken($zorroa-sickly-green, 15%) ) ; }
+
+
+
+@mixin flexRow {
+  display : -webkit-box  ;
+  display : -moz-box     ;
+  display : -ms-flexbox  ;
+  display : -webkit-flex ;
+  display : flex         ;
+
+  -webkit-flex-direction : row ;
+  -moz-flex-direction    : row ;
+  -ms-flex-direction     : row ;
+  flex-direction         : row ;
+}
+
+.flexRow { @include flexRow; }
+
+@mixin flexRowRev {
+  display : -webkit-box  ;
+  display : -moz-box     ;
+  display : -ms-flexbox  ;
+  display : -webkit-flex ;
+  display : flex         ;
+
+  -webkit-flex-direction : row-reverse ;
+  -moz-flex-direction    : row-reverse ;
+  -ms-flex-direction     : row-reverse ;
+  flex-direction         : row-reverse ;
+}
+
+@mixin flexCol {
+  display : -webkit-box  ;
+  display : -moz-box     ;
+  display : -ms-flexbox  ;
+  display : -webkit-flex ;
+  display : flex         ;
+
+  -webkit-flex-direction : column ;
+  -moz-flex-direction    : column ;
+  -ms-flex-direction     : column ;
+  flex-direction         : column ;
+}
+
+.flexCol { @include flexCol; }
+
+@mixin flexColRev {
+  display : -webkit-box  ;
+  display : -moz-box     ;
+  display : -ms-flexbox  ;
+  display : -webkit-flex ;
+  display : flex         ;
+
+  -webkit-flex-direction : column-reverse ;
+  -moz-flex-direction    : column-reverse ;
+  -ms-flex-direction     : column-reverse ;
+  flex-direction         : column-reverse ;
+}
+
+/* flexRowThenCol is a row when wide, then a column when narrow */
+.flexRowThenCol {
+  @include flexRow;
+  @media screen and (max-width: 700px) { @include flexCol; }
+}
+
+@mixin flexRowThenCol($breakWidth) {
+  @include flexRow;
+  @media screen and (max-width: $breakWidth) { @include flexCol; }
+}
+
+@mixin flexRowThenColRev($breakWidth) {
+  @include flexRow;
+  @media screen and (max-width: $breakWidth) { @include flexColRev; }
+}
+
+@mixin flexWrap {
+    -webkit-flex-wrap: wrap;
+    -moz-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+}
+
+.flexWrap { @inlude flexWrap; }
+
+.flexALittle { -webkit-box-flex : 0.2 0.2 auto ; -moz-box-flex : 0.2 0.2 auto; -webkit-flex : 0.2 0.2 auto ; -ms-flex : 0.2 0.2 auto; flex : 0.2 0.2 auto; }
+.flex2       { -webkit-box-flex :   2   2 auto ; -moz-box-flex :   2   2 auto; -webkit-flex :   2   2 auto ; -ms-flex :   2   2 auto; flex :   2   2 auto; }
+
+@mixin flexOn  { -webkit-box-flex : 1 1 auto ; -moz-box-flex : 1 1 auto; -webkit-flex : 1 1 auto ; -ms-flex : 1 1 auto; flex : 1 1 auto; }
+@mixin flexOff { -webkit-box-flex : 0 0 auto ; -moz-box-flex : 0 0 auto; -webkit-flex : 0 0 auto ; -ms-flex : 0 0 auto; flex : 0 0 auto; }
+.flexOn  { @include flexOn ; }
+.flexOff { @include flexOff; }
+
+@mixin flexJustifyStart  { -webkit-justify-content: flex-start ; -moz-justify-content: flex-start ; -ms-flex-pack: flex-start ; justify-content: flex-start ; }
+@mixin flexJustifyCenter { -webkit-justify-content: center     ; -moz-justify-content: center     ; -ms-flex-pack: center     ; justify-content: center     ; }
+.flexJustifyEnd          { -webkit-justify-content: flex-end      ; -moz-justify-content: flex-end      ; -ms-flex-pack: flex-end      ; justify-content: flex-end      ; }
+@mixin flexJustifySpaceBetween { -webkit-justify-content: space-between ; -moz-justify-content: space-between ; -ms-flex-pack: space-between ; justify-content: space-between ; }
+.flexJustifySpaceAround  { -webkit-justify-content: space-around  ; -moz-justify-content: space-around  ; -ms-flex-pack: space-around  ; justify-content: space-around  ; }
+
+.flexJustifyStart        { @include flexJustifyStart       ; }
+.flexJustifyCenter       { @include flexJustifyCenter      ; }
+.flexJustifySpaceBetween { @include flexJustifySpaceBetween; }
+
+.flexAlignItemsStart  { -webkit-align-items: flex-start ; -moz-align-items: flex-start ; -ms-align-items: flex-start ; align-items: flex-start ; }
+@mixin flexAlignItemsCenter { -webkit-align-items: center     ; -moz-align-items: center     ; -ms-align-items: center     ; align-items: center     ; }
+.flexAlignItemsCenter { @include flexAlignItemsCenter; }
+.flexAlignItemsEnd    { -webkit-align-items: flex-end   ; -moz-align-items: flex-end   ; -ms-align-items: flex-end   ; align-items: flex-end   ; }
+
+.flexAlignContentStart        { -webkit-align-content: flex-start    ; -moz-align-content: flex-start    ; -ms-align-content: flex-start    ; align-content: flex-start    ; }
+.flexAlignContentCenter       { -webkit-align-content: center        ; -moz-align-content: center        ; -ms-align-content: center        ; align-content: center        ; }
+.flexAlignContentEnd          { -webkit-align-content: flex-end      ; -moz-align-content: flex-end      ; -ms-align-content: flex-end      ; align-content: flex-end      ; }
+.flexAlignContentSpaceBetween { -webkit-align-content: space-between ; -moz-align-content: space-between ; -ms-align-content: space-between ; align-content: space-between ; }
+.flexAlignContentSpaceAround  { -webkit-align-content: space-around  ; -moz-align-content: space-around  ; -ms-align-content: space-around  ; align-content: space-around  ; }
+
+.flexCenter {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include flexJustifyCenter;
+}
+
+@mixin flexColCenter {
+  @include flexCol;
+  @include flexAlignItemsCenter;
+  @include flexJustifyCenter;
+}
+
+.flexColCenter {
+  @include flexColCenter;
+}
+
+.fullWidth  { width  : 100%; max-width: 100%; }
+.fullHeight { height : 100%; }
+.fullFill   { width  : 100%; max-width: 100%; height : 100%; }
+
+/* this allows flex items to shrink below their min content */
+.minWidth0 { min-width: 0; }
