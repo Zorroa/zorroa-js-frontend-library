@@ -2,16 +2,16 @@
 
 // Form layout
 .searchbar-group {
-  display: flex;
+  font-size: 20px;
 }
 
 // Magnifying glass
 .searchbar-button {
-  padding: 0 0 0 12px;
+  padding-left: 12px;
   border: none;
   background: none;
   color: $zorroa-sickly-green;
-  font-size: 18pt;
+  font-size: 20px; // TODO: see if we can delete this when bootstrap is gone
 }
 
 // Underline-only bar
@@ -20,6 +20,7 @@
   border: none;
   width: 347px;
   border-bottom: 2px solid $zorroa-sickly-green;
+  font-size: 16px; // TODO: see if we can delete this when bootstrap is gone
 }
 
 // Remove box highling when focused
