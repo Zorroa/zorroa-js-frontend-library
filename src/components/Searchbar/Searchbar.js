@@ -37,7 +37,7 @@ class Searchbar extends Component {
         <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))}>
           <div className="searchbar-group">
             <Field name="query" label="Search" component={this.renderSearch} type="text"/>
-            <button htmlFor="query" action="submit" disabled={submitting} className="searchbar-button">{'\u2315'}</button>
+            <button htmlFor="query" action="submit" disabled={submitting} className="searchbar-submit searchbar-button icon-search"></button>
           </div>
         </form>
       </div>

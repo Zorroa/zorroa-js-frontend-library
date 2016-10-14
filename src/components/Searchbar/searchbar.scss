@@ -1,3 +1,5 @@
+@import '../../styles/core.scss';
+
 // Form layout
 .searchbar-group {
   display: flex;
@@ -8,7 +10,7 @@
   padding: 0 0 0 12px;
   border: none;
   background: none;
-  color: #71b623;
+  color: $zorroa-sickly-green;
   font-size: 18pt;
 }
 
@@ -17,11 +19,10 @@
   background: transparent;
   border: none;
   width: 347px;
-  border-bottom: 2px solid #71b623;
+  border-bottom: 2px solid $zorroa-sickly-green;
 }
 
 // Remove box highling when focused
 .searchbar:focus {
   outline: none;
 }
-
