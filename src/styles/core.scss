@@ -5,8 +5,24 @@ Zorroa core (shared) css classes
 
 ------------------------------*/
 
+/* tread carefully!!! */
+html, body {
+//   min-height: 100vh;
+//   width: 100%;
+//   // overflow-x: hidden;
+//   font-size: 16px; /* BOOTSTRAP: WTF?! */
+//   font-weight: 300;
+  padding:0;
+  margin:0;
+}
+
+// The custom icon set Amber made for us
+// To update icons, see /src/assets/fonts/zorroa-icons/how-to-update.txt
+@import '/src/assets/fonts/zorroa-icons/style.css';
+
 // https://fonts.google.com/?query=roboto&category=Sans+Serif,Display,Handwriting,Monospace&selection.family=Roboto
 @import url('https://fonts.googleapis.com/css?family=Roboto');
+
 
 * {
   box-sizing: border-box;
