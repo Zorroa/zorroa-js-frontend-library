@@ -1,23 +1,19 @@
+@import '../../styles/core.scss';
+
 // Header does not grow, and contains a row-layout flexbox
 // with the logo and searchbar scrunched on the left and
 // the menu right justified
 .header {
-  flex: 0 0 1;
-  justify-content: space-between;
   padding: 8px 16px 8px 16px;
-  display:flex;
-  align-items: flex-end;
+  height: 60px;
 }
 
 // Box to left-justify the logo and search
 .header-logo-search {
-  display: flex;
-  align-items: flex-end;
 }
 
 // Adjust the logo size so search starts at expanded sidebar
 .header-logo {
-  flex: 1 0 284px;
 }
 
 // Simple menu text for now
@@ -31,4 +27,14 @@
 .header-menu-item {
   display: list-item;
   text-align: -webkit-match-parent;
+  text-align: match-parent;
+  text-transform: uppercase;
+  padding: 0 1em 0 0;
+  font-size: 14px;
+}
+
+.header-menu-icon {
+  font-size: 10px;
+  color: $zorroa-gray;
+  padding: 5px;
 }
