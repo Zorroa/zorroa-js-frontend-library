@@ -114,6 +114,21 @@ $zorroa-transparent: transparent;
 .zorroa-btn-success  { @include zorroa-btn($zorroa-sickly-green, darken($zorroa-sickly-green, 15%) ) ; }
 
 
+/* Text classes */
+
+@mixin nowrap { white-space: nowrap; }
+.nowrap { @include nowrap; }
+
+@mixin clampText {
+  @include nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.clampText { @include clampText; }
+
+
+/* Flexbox classes */
+
 
 @mixin flexRow {
   display : -webkit-box  ;
@@ -225,11 +240,13 @@ $zorroa-transparent: transparent;
 .flexAlignContentSpaceBetween { -webkit-align-content: space-between ; -moz-align-content: space-between ; -ms-align-content: space-between ; align-content: space-between ; }
 .flexAlignContentSpaceAround  { -webkit-align-content: space-around  ; -moz-align-content: space-around  ; -ms-align-content: space-around  ; align-content: space-around  ; }
 
-.flexCenter {
+@mixin flexCenter {
   @include flexRow;
   @include flexAlignItemsCenter;
   @include flexJustifyCenter;
 }
+
+.flexCenter { @include flexCenter; }
 
 @mixin flexColCenter {
   @include flexCol;
