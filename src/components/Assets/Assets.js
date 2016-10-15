@@ -12,11 +12,6 @@ class Assets extends Component {
     }
   }
 
-  static get defaultProps () {
-    return {
-    }
-  }
-
   constructor (props) {
     super(props)
     this.state = {

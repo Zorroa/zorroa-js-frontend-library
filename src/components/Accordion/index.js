@@ -1,7 +1,6 @@
 /*
 The Accordion Class is a controller for any number of children palced within in.
 It maintains the open or closed state of all immediated children via css classes.
-Accordion behavior is designed to so that only a single item can be open
 
 Example usage:
 <Accordion>
