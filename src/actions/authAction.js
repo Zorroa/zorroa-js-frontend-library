@@ -43,7 +43,7 @@ export function validateUser (user, host) {
           browserHistory.push('/')
         })
         .catch(error => {
-          if (error.response.status === 401) {
+          if (error && error.response && error.response.status === 401) {
             dispatch({type: UNAUTH_USER, payload: error.response.data})
           } else {
             dispatch(authError('Cannot validate user ' + user.username + ': ' + error))
