@@ -1,0 +1,50 @@
+.lightbar {
+  color: #ffffff;
+  background-color: #000000;
+  justify-content: space-between;
+  display: flex;
+
+  .lightbar-attr {
+    display: flex;
+    margin-top: 22px;
+    margin-bottom: 22px;
+
+    .lightbar-attr-label {
+      margin-right: 10px;
+      font-family: Roboto;
+      font-size: 12px;
+      font-weight: 300;
+      text-align: right;
+      color: #ededed;
+    }
+
+    .lightbar-attr-value {
+      font-family: Roboto;
+      font-size: 14px;
+      color: #ffffff;
+    }
+  }
+
+  .lightbar-settings {
+    margin: 22px 40px 22px 12px;
+  }
+
+  button {
+    color: #fff;
+    padding: 0;
+    margin: 10px;
+    border: none;
+    background: none;
+    outline: none;
+
+  }
+
+  // Standin for whatever we should use here...
+  button:hover {
+    color: #71b623;
+  }
+
+  button:active {
+    color: chartreuse;
+  }
+}

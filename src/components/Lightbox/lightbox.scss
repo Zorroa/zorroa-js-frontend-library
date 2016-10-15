@@ -1,0 +1,13 @@
+.lightbox {
+  background-color: #4d4948; // $grayish-brown
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.lightbox-body {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

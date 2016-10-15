@@ -5,4 +5,8 @@ export default class Proxy {
     this.height = height
     this.format = format
   }
+
+  url (host) {
+    return `https://${host}:8066/api/v1/ofs/${this.id}`
+  }
 }

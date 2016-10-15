@@ -1,15 +1,22 @@
 import React, { Component, PropTypes } from 'react'
+import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 import Thumb from '../Thumb'
 import Asset from '../../models/Asset'
+import { isolateAsset } from '../../actions/assetsAction'
 
 class Assets extends Component {
   static get propTypes () {
     return {
-      assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset))
+      assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+      isolateAsset: PropTypes.func.isRequired
     }
+  }
+
+  static contextTypes = {
+    router: PropTypes.object,
   }
 
   constructor (props) {
@@ -19,6 +26,11 @@ class Assets extends Component {
       showTable: true,
       thumbSize: 128
     }
+  }
+
+  handleDoubleClick (asset) {
+    this.props.actions.isolateAsset(asset.id)
+    this.context.router.push('/lightbox')
   }
 
   renderAssets (assets) {
@@ -33,7 +45,7 @@ class Assets extends Component {
     return (
       <div className="assets-scroll">
         <div className={classNames}>
-          { assets.map(asset => (<Thumb key={asset.id} asset={asset}/>)) }
+          { assets.map(asset => (<Thumb key={asset.id} asset={asset} onDoubleClick={this.handleDoubleClick.bind(this, asset)} />)) }
         </div>
       </div>
     )
@@ -50,4 +62,6 @@ class Assets extends Component {
 
 export default connect(state => ({
   assets: state.assets.all
+}), dispatch => ({
+  actions: bindActionCreators({ isolateAsset }, dispatch)
 }))(Assets)

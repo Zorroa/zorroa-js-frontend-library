@@ -1,4 +1,4 @@
-import { UNAUTH_USER, ASSET_SEARCH, ASSET_SEARCH_ERROR } from '../constants/actionTypes'
+import { UNAUTH_USER, ASSET_SEARCH, ASSET_SEARCH_ERROR, ISOLATE_ASSET } from '../constants/actionTypes'
 import Asset from '../models/Asset'
 import { getArchivist } from './authAction'
 
@@ -29,4 +29,11 @@ export function searchAssets (query) {
         })
       })
   }
+}
+
+export function isolateAsset (id) {
+  return ({
+    type: ISOLATE_ASSET,
+    payload: id
+  })
 }
