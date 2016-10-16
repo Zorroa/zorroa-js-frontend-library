@@ -13,7 +13,7 @@ class Lightbox extends Component {
   static get propTypes () {
     return {
       assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
-      isolatedId: PropTypes.number
+      isolatedId: PropTypes.string.isRequired
     }
   }
 

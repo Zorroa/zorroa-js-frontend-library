@@ -1,11 +1,34 @@
 import assetsReducer from './assetsReducer'
 import { ASSET_SEARCH, ASSET_SEARCH_ERROR, ISOLATE_ASSET } from '../constants/actionTypes'
+import Page from '../models/Page'
 
 describe('assetsReducer', () => {
+  const query = 'foo'
+  const assets = ['a']
+  const page = new Page({size: 1})
+
   it('ASSET_SEARCH returns asset list', () => {
-    const a = 'a'
-    expect(assetsReducer([], { type: ASSET_SEARCH, payload: [a] }))
-      .toEqual({ all: [a], isolatedId: null })
+    const payload = { query, assets, page }
+    const result = { query, all: assets, page, isolatedId: null }
+    expect(assetsReducer([], { type: ASSET_SEARCH, payload }))
+      .toEqual(result)
+  })
+
+  it('ASSET_SEARCH for second page concats assets', () => {
+    // Reduce the first page of assets
+    const payload1 = { query, assets, page }
+    const state1 = assetsReducer({}, { type: ASSET_SEARCH, payload: payload1 })
+
+    // Reduce the second page of assets
+    const assets2 = ['b']
+    const page2 = new Page({ number: 2, size: 1 })
+    const payload2 = { query, assets: assets2, page: page2 }
+
+    // Construct the expected result -- concateated arrays
+    const concatAssets = assets.concat(assets2)
+    const result = { query, all: concatAssets, page: page2, isolatedId: null }
+    expect(assetsReducer(state1, { type: ASSET_SEARCH, payload: payload2 }))
+      .toEqual(result)
   })
 
   it('ASSET_SEARCH_ERROR returns error', () => {

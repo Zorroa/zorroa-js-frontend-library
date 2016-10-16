@@ -1,0 +1,77 @@
+.asset-counter {
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  color: #777;
+
+  .asset-counter-count {
+    font-weight: bold;
+    color: #4d4948;
+  }
+}
+
+.pager {
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  color: #4d4948;
+  background-color: #fff;
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 3px;
+  margin-top: 12px;
+  margin-bottom: 8px;
+
+  button {
+    padding: 10px 22px;
+    border: 1px solid #4d4948;
+    background: none;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-radius: 3px;
+    outline: none;
+    font-weight: bold;
+    font-size: 12px;
+  }
+
+  button:hover {
+    color: #71b623;
+    border: 1px solid #71b623;
+  }
+
+  button:active {
+    color: #fff;
+    border: 0;
+    background-color: #71b623;
+  }
+
+  .pager-showing-page {
+    display: flex;
+    margin-left: 12px;
+    color: #777;
+  }
+
+  .pager-page-size {
+    display: flex;
+    align-items: center;
+    margin-left: 4px;
+    margin-right: 4px;
+    color: #777;
+    font-size: 12px;
+
+    &.pager-page-size-selected {
+      color: #71b623;
+    }
+
+    button {
+      margin: 22px 10px;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+      border-bottom: 1px solid;
+      border-radius: 0;
+      padding: 0;
+      font-weight: normal;
+    }
+  }
+}

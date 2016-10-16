@@ -6,12 +6,15 @@ import classnames from 'classnames'
 import Thumb from '../Thumb'
 import Asset from '../../models/Asset'
 import { isolateAsset } from '../../actions/assetsAction'
+import Page from '../../models/Page'
+import Pager from './Pager'
 
 class Assets extends Component {
   static get propTypes () {
     return {
       assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
-      isolateAsset: PropTypes.func.isRequired
+      isolateAsset: PropTypes.func,
+      page: PropTypes.instanceOf(Page)
     }
   }
 
@@ -37,16 +40,19 @@ class Assets extends Component {
     if (!assets || !assets.length) {
       return (<div className="assets-layout-empty">No asset proxies</div>)
     }
+    const { page } = this.props
     const classNames = classnames('assets-layout', {
       'grid': this.state.layout === 'grid',
       'masonry': this.state.layout === 'masonry',
       'waterfall': this.state.layout === 'waterfall'
     })
+
     return (
       <div className="assets-scroll">
         <div className={classNames}>
           { assets.map(asset => (<Thumb key={asset.id} asset={asset} onDoubleClick={this.handleIsolateAsset.bind(this, asset)} />)) }
         </div>
+        { !page.isLast() && (<Pager total={page.totalCount} loaded={page.loaded()} />) }
       </div>
     )
   }
@@ -61,7 +67,8 @@ class Assets extends Component {
 }
 
 export default connect(state => ({
-  assets: state.assets.all
+  assets: state.assets.all,
+  page: state.assets.page
 }), dispatch => ({
   actions: bindActionCreators({ isolateAsset }, dispatch)
 }))(Assets)

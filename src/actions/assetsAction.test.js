@@ -6,6 +6,7 @@ import thunk from 'redux-thunk'
 import { searchAssets, isolateAsset } from './assetsAction'
 import Asset from '../models/Asset'
 import { ISOLATE_ASSET } from '../constants/actionTypes'
+import Page from '../models/Page'
 
 const middlewares = [ thunk ]
 const mockStore = configureMockStore(middlewares)
@@ -27,7 +28,7 @@ describe('assetsActions', () => {
     mockAdapter.onPost('/api/v3/assets/_search')
       .reply(200, {
         status: 200,
-        response: [asset]
+        response: { query: '', assets: [asset], page: new Page() }
       })
 
     return store.dispatch(searchAssets({query: 'foo'}))
