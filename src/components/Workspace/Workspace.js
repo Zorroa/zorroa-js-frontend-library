@@ -7,6 +7,7 @@ import Sidebar from '../../components/Sidebar'
 import Table from '../../components/Table'
 import Assets from '../../components/Assets'
 import Folders from '../../components/Folders'
+import Racetrack from '../../components/Racetrack'
 
 export default class Workspace extends Component {
   static get propTypes () {
@@ -33,7 +34,6 @@ export default class Workspace extends Component {
   }
 
   render () {
-    const rightSidebarItems = [ 'Search', 'Facet', 'Date' ]
     return (
       <div className="app">
         <Header/>
@@ -46,7 +46,7 @@ export default class Workspace extends Component {
             {this.renderTable()}
           </div>
           <Sidebar isRightEdge={true}>
-            <Accordion>{rightSidebarItems.map(item => (<div key={item}>{item}</div>))}</Accordion>
+            <Racetrack/>
           </Sidebar>
         </div>
       </div>

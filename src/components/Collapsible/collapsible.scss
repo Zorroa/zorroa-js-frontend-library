@@ -1,8 +1,9 @@
 .collapsible {
+  flex-direction: column;
 }
 
 .collapsible-header {
-}
+ }
 
 .collapsible-caret-open {
   border-left: 4px solid transparent;

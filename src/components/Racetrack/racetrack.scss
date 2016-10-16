@@ -1,0 +1,145 @@
+.racetrack {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+
+  .racetrack-body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .racetrack-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    background: none;
+    text-shadow: -1px -1px 0px rgba(200,200,200,0.8), 1px 1px 0px rgba(255,255,255,0.3);
+    color: rgba(220,220,220, 0.5);
+
+    .racetrack-empty-mag:before {
+      width: 48px;
+      height: 48px;
+      font-size: 48pt;
+    }
+
+    .racetrack-empty-mag {
+      padding: 12px;
+      margin-bottom: 30px;
+    }
+
+    .racetrack-empty-text {
+      text-align: center;
+      font-family: Roboto, sans-serif;
+      font-size: 12px;
+      font-weight: 300;
+    }
+
+    form {
+    }
+
+    input {
+      margin-top: 30px;
+      margin-left: 0;
+      margin-right: 0;
+      padding-left: 8px;
+      border-radius: 3px;
+      background: none;
+      border: 2px solid #ccc;
+      height: 24px;
+      font-family: Roboto, sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      outline: none;
+    }
+  }
+
+  .racetrack-filters {
+    flex: 0.8;
+    background-color: #fff;
+  }
+
+  .racetrack-add-filter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+    margin: 40px 0;
+
+    button {
+      padding: 12px 12px;
+      font-family: Roboto, sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      background-color: #4d4948;
+      color: #ededed;
+      border-radius: 3px;
+      border: none;
+      outline: none;
+    }
+
+    button:hover {
+      background-color: #a5a5a5;
+      color: #ededed;
+      font-weight: 500;
+    }
+
+    button:active {
+      background-color: #73b61c;
+      color: #ededed;
+      font-weight: 500;
+    }
+
+    input {
+      height: 28pt;
+      outline: none;
+      padding: 0 8px;
+      border-radius: 3px;
+      border: 1px solid #a5a5a5;
+      font-family: Roboto, sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+    }
+  }
+
+  .racetrack-footer {
+    display: flex;
+    justify-content: center;
+    border-top: 1px solid #ccc;
+
+    .racetrack-footer-group {
+      display: flex;
+    }
+
+    .racetrack-footer-save-button {
+      background-color: #a5a5a5;
+      color: #ededed;
+    }
+
+    button {
+      margin: 12px;
+      padding: 12px 30px;
+      font-family: Roboto, sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: #808080;
+      border-radius: 3px;
+      background: none;
+      border: none;
+      outline: none;
+    }
+
+    button:hover {
+      background-color: #a5a5a5;
+      color: #ededed;
+      font-weight: 500;
+    }
+
+    button:active {
+      background-color: #73b61c;
+      color: #ededed;
+      font-weight: 500;
+    }
+  }
+}
