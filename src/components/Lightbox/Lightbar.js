@@ -26,13 +26,13 @@ export default class Lightbar extends Component {
     const attrs = { 'Character Name': 'Elephants', 'File Name': 'Dumbo-disneyscreencaps.com-907.jpg' }
     return (
       <div className="lightbar">
-        <button><span className="lightbar-settings">*</span></button>
+        <button className="icon-cog" />
         { Object.keys(attrs).map((key) => (this.renderAttribute(key, attrs[key])))}
         <div className="flexOn" />
         <button>DOWNLOAD</button>
         <button>GET LINK</button>
         <button>ADD TO COLLECTION</button>
-        <button className="icon-cross2" onClick={this.closeLightbox.bind(this)} >X</button>
+        <button className="icon-cross2" onClick={this.closeLightbox.bind(this)} />
       </div>
     )
   }
