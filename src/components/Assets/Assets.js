@@ -28,7 +28,7 @@ class Assets extends Component {
     }
   }
 
-  handleDoubleClick (asset) {
+  handleIsolateAsset (asset) {
     this.props.actions.isolateAsset(asset.id)
     this.context.router.push('/lightbox')
   }
@@ -45,7 +45,7 @@ class Assets extends Component {
     return (
       <div className="assets-scroll">
         <div className={classNames}>
-          { assets.map(asset => (<Thumb key={asset.id} asset={asset} onDoubleClick={this.handleDoubleClick.bind(this, asset)} />)) }
+          { assets.map(asset => (<Thumb key={asset.id} asset={asset} onDoubleClick={this.handleIsolateAsset.bind(this, asset)} />)) }
         </div>
       </div>
     )
