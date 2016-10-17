@@ -6,6 +6,7 @@ import Header from '../../components/Header'
 import Sidebar from '../../components/Sidebar'
 import Table from '../../components/Table'
 import Assets from '../../components/Assets'
+import Folders from '../../components/Folders'
 
 export default class Workspace extends Component {
   static propTypes () {
@@ -32,14 +33,13 @@ export default class Workspace extends Component {
   }
 
   render () {
-    const leftSidebarItems = [ 'Browsing', 'Collections', 'Metadata' ]
     const rightSidebarItems = [ 'Search', 'Facet', 'Date' ]
     return (
       <div className="app">
         <Header/>
         <div className="workspace">
           <Sidebar>
-            <Accordion>{leftSidebarItems.map(item => (<div key={item}>{item}</div>))}</Accordion>
+            <Folders/>
           </Sidebar>
           <div className="workspace-body">
             <Assets/>
