@@ -9,7 +9,7 @@ export default class FolderItem extends Component {
     return {
       folders: PropTypes.object.isRequired,     // Can this be mapOf(Folder)?
       folderId: PropTypes.number.isRequired,
-      loadChildren: PropTypes.object.isRequired
+      loadChildren: PropTypes.func.isRequired
     }
   }
 
