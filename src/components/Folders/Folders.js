@@ -8,7 +8,7 @@ import FolderItem from './FolderItem'
 // Display all folders, starting with the root.
 // Later this will be broken into Collections and Smart Folders.
 class Folders extends Component {
-  static propTypes () {
+  static get propTypes () {
     return {
       folders: PropTypes.object.isRequired,
       actions: PropTypes.object.isRequired

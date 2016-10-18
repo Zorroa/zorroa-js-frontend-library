@@ -7,7 +7,7 @@ import Logo from '../../../components/Logo'
 import * as actions from '../../../actions/authAction'
 
 class Signin extends Component {
-  static propTypes () {
+  static get propTypes () {
     return {
       signinUser: PropTypes.func.isRequired,
       handleSubmit: PropTypes.func.isRequired,

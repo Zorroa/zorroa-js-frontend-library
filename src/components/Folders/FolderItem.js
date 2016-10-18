@@ -5,7 +5,7 @@ import Collapsible from '../Collapsible'
 // Recursively renders folder children as Collapsible elements.
 // Loads children of displayed items on-demand to display open caret.
 export default class FolderItem extends Component {
-  static propTypes () {
+  static get propTypes () {
     return {
       folders: PropTypes.object.isRequired,     // Can this be mapOf(Folder)?
       folderId: PropTypes.number.isRequired,

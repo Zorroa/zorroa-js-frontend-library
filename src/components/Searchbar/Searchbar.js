@@ -5,7 +5,7 @@ import { reduxForm, Field } from 'redux-form'
 import { searchAssets } from '../../actions/assetsAction'
 
 class Searchbar extends Component {
-  static propTypes () {
+  static get propTypes() {
     return {
       submitting: PropTypes.bool,
       handleSubmit: PropTypes.func.isRequired,
