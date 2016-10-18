@@ -1,3 +1,5 @@
+@import '../../styles/core.scss';
+
 .assets-scroll {
   overflow: auto;
   height: 100%;
@@ -12,15 +14,73 @@
   justify-content: space-between;
   align-items: center;
 
-  &.assets-layout-empty {
+  // Just making sure these work...
+  &.masonry {
+    background-color: lavender;
   }
 
-  &.assets-layout-masonry {
+  &.waterfall {
+    background-color: lemonchiffon;
   }
 
-  &.assets-layout-waterfall {
+  &.grid {
+    background-color: linen;
   }
 
-  &.assets-layout-grid {
+  &.slideshow {
+    background-color: beige;
+  }
+}
+
+.assets-footer {
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+.thumb-size-slider {
+  color: #000;
+  background-color: #fff;
+  padding: 5px 8px;
+  border-radius: 3px;
+}
+
+.thumb-layout {
+  margin: 10px;
+
+  .thumb-layout-button {
+    color: #000;
+    background-color: #fff;
+    width: 40px;
+    height: 40px;
+    border-radius: 3px;
+    border: none;
+    outline: none;
+    font-size: 20px;
+  }
+
+  .thumb-layout-enabled {
+    color: #fff;
+    background-color: $zorroa-sickly-green;
+  }
+}
+
+.table-toggle {
+  background-color: #fff;
+  margin: 10px;
+
+  .table-toggle-button {
+    color: #000;
+    background-color: #fff;
+    width: 40px;
+    height: 40px;
+    border-radius: 3px;
+    border: none;
+    outline: none;
+    font-size: 20px;
+  }
+
+  .table-toggle-enabled {
+    color: #fff;
+    background-color: $zorroa-sickly-green;
   }
 }

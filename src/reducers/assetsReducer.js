@@ -10,7 +10,7 @@ export default function (state = {}, action) {
       const { query, assets, page } = action.payload
       const all = state.all ? inject(state.all, page.firstIndex(), assets) : assets
       const lastPage = !state.page || page.number >= state.page.number ? page : state.page
-      return { ...state, all, query, page: lastPage, isolatedId: null }
+      return { ...state, all, query, lastPage, isolatedId: null }
     case ASSET_SEARCH_ERROR:
       return { ...state, error: action.payload }
     case ISOLATE_ASSET:

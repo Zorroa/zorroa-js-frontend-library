@@ -1,3 +1,5 @@
+import * as assert from 'assert'
+
 import { UNAUTH_USER, ASSET_SEARCH, ASSET_SEARCH_ERROR, ISOLATE_ASSET } from '../constants/actionTypes'
 import Asset from '../models/Asset'
 import Page from '../models/Page'
@@ -10,6 +12,7 @@ export function searchAssets (query) {
       query = { query }
     }
     console.log('Search: ' + query)
+    assert.ok(typeof query.page === 'undefined' || query.page > 0)
     getArchivist().post('/api/v3/assets/_search', query)
       .then(response => {
         console.log('Query ' + query)

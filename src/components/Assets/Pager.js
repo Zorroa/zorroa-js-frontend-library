@@ -15,7 +15,7 @@ class Pager extends Component {
       total: PropTypes.number.isRequired,
       actions: PropTypes.object.isRequired,
       query: PropTypes.object,
-      page: PropTypes.instanceOf(Page)
+      lastPage: PropTypes.instanceOf(Page)
     }
   }
 
@@ -37,13 +37,13 @@ class Pager extends Component {
   // FIXME: This does NOT work correctly if you change the page size
   //        after starting a search because pages are specified by index
   handleLoadPage () {
-    const { query, page } = this.props
+    const { query, lastPage } = this.props
     const { pageSize } = this.state
     var nextPageQuery = query ? JSON.parse(JSON.stringify(query)) : {}
-    nextPageQuery.page = page ? page.next : 0
+    nextPageQuery.page = lastPage ? lastPage.next : 0
     nextPageQuery.size = pageSize
     console.log('Loading page ' + nextPageQuery.page + ' at ' + nextPageQuery.size)
-    this.props.actions.searchAssets(nextPageQuery, page)
+    this.props.actions.searchAssets(nextPageQuery)
   }
 
   render () {
@@ -80,7 +80,7 @@ const mapDispatchToProps = dispatch => ({
 
 const mapStateToProps = state => ({
   query: state.assets.query,
-  page: state.assets.page
+  lastPage: state.assets.lastPage
 })
 
 export default connect(

@@ -9,7 +9,7 @@ describe('assetsReducer', () => {
 
   it('ASSET_SEARCH returns asset list', () => {
     const payload = { query, assets, page }
-    const result = { query, all: assets, page, isolatedId: null }
+    const result = { query, all: assets, lastPage: page, isolatedId: null }
     expect(assetsReducer([], { type: ASSET_SEARCH, payload }))
       .toEqual(result)
   })
@@ -26,7 +26,7 @@ describe('assetsReducer', () => {
 
     // Construct the expected result -- concateated arrays
     const concatAssets = assets.concat(assets2)
-    const result = { query, all: concatAssets, page: page2, isolatedId: null }
+    const result = { query, all: concatAssets, lastPage: page2, isolatedId: null }
     expect(assetsReducer(state1, { type: ASSET_SEARCH, payload: payload2 }))
       .toEqual(result)
   })
