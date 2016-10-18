@@ -13,7 +13,7 @@ class Signin extends Component {
       handleSubmit: PropTypes.func.isRequired,
       pristine: PropTypes.bool,
       submitting: PropTypes.bool,
-      errorMessage: PropTypes.object
+      errorMessage: PropTypes.string
     }
   }
 
