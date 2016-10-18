@@ -19,7 +19,7 @@ You can view the first level dependencies by running `npm list -g --depth 0`.  D
 
 ## Code Style
 
-The one and only: 
+The one and only:
 
 [![JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 
@@ -105,6 +105,8 @@ code back to the original source files.
 - [react-redux API from GitHub Readme](https://github.com/reactjs/react-redux/blob/master/docs/api.md) with connect, mapStateToProp and mapDispatchToProp API
 - [Axios HTTP framework](https://github.com/mzabriskie/axios) with examples for GET, POST, and other HTTP utilities
 - [redux-form](http://redux-form.com/6.0.5/docs/GettingStarted.md/) with examples of each type of form
+- [React property validation](https://facebook.github.io/react/docs/reusable-components.html)
+- [React URL handling](https://blog.marvelapp.com/managing-the-url-in-a-redux-app/)
 
 ## Todo
 
