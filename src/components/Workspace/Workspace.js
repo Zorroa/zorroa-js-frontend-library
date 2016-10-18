@@ -9,10 +9,8 @@ import Assets from '../../components/Assets'
 import Folders from '../../components/Folders'
 
 export default class Workspace extends Component {
-  static get propTypes () {
-    return {
-      children: PropTypes.array
-    }
+  static propTypes = {
+    children: PropTypes.array
   }
 
   constructor (props) {

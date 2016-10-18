@@ -9,14 +9,12 @@ import Page from '../../models/Page'
 import { searchAssets } from '../../actions/assetsAction'
 
 class Pager extends Component {
-  static get propTypes () {
-    return {
-      loaded: PropTypes.number.isRequired,
-      total: PropTypes.number.isRequired,
-      actions: PropTypes.object.isRequired,
-      query: PropTypes.object,
-      page: PropTypes.instanceOf(Page)
-    }
+  static propTypes = {
+    loaded  : PropTypes.number.isRequired,
+    total   : PropTypes.number.isRequired,
+    actions : PropTypes.object.isRequired,
+    query   : PropTypes.object,
+    page    : PropTypes.instanceOf(Page)
   }
 
   constructor (props) {

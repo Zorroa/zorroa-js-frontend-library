@@ -4,11 +4,9 @@ import { connect } from 'react-redux'
 import Asset from '../../models/Asset'
 
 class Inspector extends Component {
-  static get propTypes () {
-    return {
-      asset: PropTypes.instanceOf(Asset),
-      host: PropTypes.string
-    }
+  static propTypes = {
+    asset : PropTypes.instanceOf(Asset),
+    host  : PropTypes.string
   }
 
   render () {

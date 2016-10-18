@@ -5,12 +5,10 @@ export default class DropdownMenu extends Component {
     return 'DropdownMenu'
   }
 
-  static get propTypes () {
-    return {
-      children: PropTypes.node,
-      label: PropTypes.string,
-      style: PropTypes.object
-    }
+  static propTypes = {
+    children : PropTypes.node,
+    label    : PropTypes.string,
+    style    : PropTypes.object
   }
 
   constructor (props) {

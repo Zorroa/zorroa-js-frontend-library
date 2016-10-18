@@ -5,12 +5,10 @@ export default class Collapsible extends Component {
     return 'Collapsible'
   }
 
-  static get propTypes () {
-    return {
-      children: PropTypes.node,
-      header: PropTypes.node,
-      style: PropTypes.object
-    }
+  static propTypes = {
+    children : PropTypes.node,
+    header   : PropTypes.node,
+    style    : PropTypes.object
   }
 
   constructor (props) {

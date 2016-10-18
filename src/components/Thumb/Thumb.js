@@ -4,12 +4,10 @@ import { connect } from 'react-redux'
 import Asset from '../../models/Asset'
 
 class Thumb extends Component {
-  static get propTypes () {
-    return {
-      asset: PropTypes.instanceOf(Asset).isRequired,
-      host: PropTypes.string,
-      onDoubleClick: PropTypes.func.isRequired
-    }
+  static propTypes = {
+    asset         : PropTypes.instanceOf(Asset).isRequired,
+    host          : PropTypes.string,
+    onDoubleClick : PropTypes.func.isRequired
   }
 
   render () {

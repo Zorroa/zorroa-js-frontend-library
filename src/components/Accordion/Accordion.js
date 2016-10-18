@@ -6,10 +6,8 @@ export default class Accordion extends Component {
     return 'Accordion'
   }
 
-  static get propTypes () {
-    return {
-      children: PropTypes.node
-    }
+  static propTypes = {
+    children: PropTypes.node
   }
 
   constructor (props) {
