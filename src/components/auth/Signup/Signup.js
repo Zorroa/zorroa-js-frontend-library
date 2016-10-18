@@ -4,12 +4,14 @@ import { reduxForm, Field } from 'redux-form'
 import * as actions from '../../../actions/authAction'
 
 class Signup extends Component {
-  static propTypes = {
-    signupUser   : PropTypes.func.isRequired,
-    handleSubmit : PropTypes.func.isRequired,
-    pristine     : PropTypes.bool,
-    submitting   : PropTypes.bool,
-    errorMessage : PropTypes.string
+  static get propTypes () {
+    return {
+      signupUser: PropTypes.func.isRequired,
+      handleSubmit: PropTypes.func.isRequired,
+      pristine: PropTypes.bool,
+      submitting: PropTypes.bool,
+      errorMessage: PropTypes.string
+    }
   }
 
   handleFormSubmit (formProps) {

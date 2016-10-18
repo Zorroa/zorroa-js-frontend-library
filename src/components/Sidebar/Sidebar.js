@@ -6,9 +6,11 @@ export default class Sidebar extends Component {
     return 'Sidebar'
   }
 
-  static propTypes = {
-    isRightEdge : PropTypes.bool,
-    children    : PropTypes.node
+  static get propTypes () {
+    return {
+      isRightEdge: PropTypes.bool,
+      children: PropTypes.node
+    }
   }
 
   static get defaultProps () {

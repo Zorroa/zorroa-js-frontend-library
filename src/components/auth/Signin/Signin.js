@@ -7,12 +7,14 @@ import Logo from '../../../components/Logo'
 import * as actions from '../../../actions/authAction'
 
 class Signin extends Component {
-  static propTypes = {
-    signinUser   : PropTypes.func.isRequired,
-    handleSubmit : PropTypes.func.isRequired,
-    pristine     : PropTypes.bool,
-    submitting   : PropTypes.bool,
-    errorMessage : PropTypes.string
+  static get propTypes () {
+    return {
+      signinUser: PropTypes.func.isRequired,
+      handleSubmit: PropTypes.func.isRequired,
+      pristine: PropTypes.bool,
+      submitting: PropTypes.bool,
+      errorMessage: PropTypes.string
+    }
   }
 
   handleFormSubmit ({ username, password, host }) {

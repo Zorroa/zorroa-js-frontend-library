@@ -4,8 +4,10 @@ import { connect } from 'react-redux'
 import Asset from '../../models/Asset'
 
 class Table extends Component {
-  static propTypes = {
-    assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset))
+  static get propTypes () {
+    return {
+      assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset))
+    }
   }
 
   renderRow (asset) {

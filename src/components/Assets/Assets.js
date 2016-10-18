@@ -10,10 +10,12 @@ import Page from '../../models/Page'
 import Pager from './Pager'
 
 class Assets extends Component {
-  static propTypes = {
-    assets       : PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
-    isolateAsset : PropTypes.func,
-    page         : PropTypes.instanceOf(Page)
+  static get propTypes () {
+    return {
+      assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+      isolateAsset: PropTypes.func,
+      page: PropTypes.instanceOf(Page)
+    }
   }
 
   static contextTypes = {
