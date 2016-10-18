@@ -8,8 +8,8 @@ class Signup extends Component {
     return {
       signupUser: PropTypes.func.isRequired,
       handleSubmit: PropTypes.func.isRequired,
-      pristine: PropTypes.boolean,
-      submitting: PropTypes.boolean,
+      pristine: PropTypes.bool,
+      submitting: PropTypes.bool,
       errorMessage: PropTypes.string
     }
   }

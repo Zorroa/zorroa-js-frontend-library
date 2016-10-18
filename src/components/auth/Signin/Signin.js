@@ -11,8 +11,8 @@ class Signin extends Component {
     return {
       signinUser: PropTypes.func.isRequired,
       handleSubmit: PropTypes.func.isRequired,
-      pristine: PropTypes.boolean,
-      submitting: PropTypes.boolean,
+      pristine: PropTypes.bool,
+      submitting: PropTypes.bool,
       errorMessage: PropTypes.object
     }
   }

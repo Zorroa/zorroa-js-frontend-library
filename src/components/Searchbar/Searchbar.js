@@ -7,7 +7,7 @@ import { searchAssets } from '../../actions/assetsAction'
 class Searchbar extends Component {
   static propTypes () {
     return {
-      submitting: PropTypes.boolean,
+      submitting: PropTypes.bool,
       handleSubmit: PropTypes.func.isRequired,
       actions: PropTypes.object.isRequired
     }
