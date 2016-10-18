@@ -25,7 +25,7 @@ class Signin extends Component {
     let msg = ''
     if (this.props.errorMessage) {
       console.log(this.props.errorMessage)
-      msg = (<div className="auth-error-msg">That node and/or password don’t match. Please try again or use the <Link className="" to="/signup">forgot password</Link> link.</div>)
+      msg = (<div className="auth-error-msg">The username and/or password don&rsquo;t match. Please try again or use the <Link className="" to="/signup">forgot password</Link> link.</div>)
     }
     return (<span className="auth-error">{msg}</span>)
   }

@@ -24,12 +24,12 @@ class Signout extends Component {
   render () {
     setTimeout(() => { this.context.router.push('/') }, 3000);
     return (
-      <div className="auth">
-        <div className="auth-box">
-          <div className="auth-logo">
+      <div className="auth flexCenter">
+        <div className="auth-box flexColCenter">
+          <div className="auth-logo flexCenter">
             <Logo/>
           </div>
-          <div className="auth-message">
+          <div className="auth-message signout-message">
             Logging out...
           </div>
         </div>
