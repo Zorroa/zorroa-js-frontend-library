@@ -22,21 +22,22 @@ class Signin extends Component {
   }
 
   renderAlert () {
+    let msg = ''
     if (this.props.errorMessage) {
-      return (
-        <div className="alert alert-danger">
-          <strong>Oops!</strong> {this.props.errorMessage}
-        </div>
-      )
+      console.log(this.props.errorMessage)
+      msg = (<div className="auth-error-msg">That node and/or password don’t match. Please try again or use the <Link className="" to="/signup">forgot password</Link> link.</div>)
     }
+    return (<span className="auth-error">{msg}</span>)
   }
 
   renderField ({ input, label, type, meta: { touched, error } }) {
+    let msg = touched && error ? error : (<span>&nbsp;</span>)
+    let inputClass = `auth-input auth-${type}`
     return (
       <div className="auth-field">
-        <input {...input} type={type} className="auth-input" />
+        <input {...input} type={type} className={inputClass} />
         <label className="auth-label">{label}</label>
-        {touched && error && <div className="error">{error}</div>}
+        <div className="auth-validation-error">{msg}</div>
       </div>
     )
   }
@@ -45,16 +46,16 @@ class Signin extends Component {
     const { handleSubmit, pristine, submitting } = this.props
 
     return (
-      <div className="auth">
-        <div className="auth-box">
-          <div className="auth-logo">
+      <div className="auth flexCenter">
+        <div className="auth-box flexColCenter">
+          <div className="auth-logo flexCenter">
             <Logo/>
           </div>
-          <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))} className="auth-form">
-            <Field name="username" label="USERNAME" component={this.renderField} type="text" />
-            <Field name="password" label="PASSWORD" component={this.renderField} type="password"/>
-            <Field name="host" label="HOST" component={this.renderField} type="text" />
+          <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))} className="auth-form flexColCenter flexJustifySpaceBetween">
             {this.renderAlert()}
+            <Field name="username" label="Username" component={this.renderField} type="text" />
+            <Field name="password" label="Password" component={this.renderField} type="password"/>
+            <Field name="host" label="Host" component={this.renderField} type="text" />
             <button action="submit" disabled={pristine || submitting} className="auth-button-primary">LOGIN</button>
           </form>
           <Link className="auth-forgot" to="/signup">Forgot Password?</Link>
@@ -67,7 +68,7 @@ class Signin extends Component {
 const validate = values => {
   const errors = {}
   if (!values.username) {
-    errors.username = 'Please enter an username'
+    errors.username = 'Please enter a username'
   }
   if (!values.password) {
     errors.password = 'Please enter a password'
