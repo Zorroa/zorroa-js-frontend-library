@@ -27,9 +27,8 @@
 
 // Asset and table, in a column
 .workspace-body {
-  flex: 1 0 0;
-  display: flex;
-  flex-direction: column;
+  @include flexOn;
+  @include flexCol;
 }
 
 

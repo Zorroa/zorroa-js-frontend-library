@@ -1,10 +1,9 @@
 @import '../../styles/core-mixins.scss';
 
 .assets-scroll {
-  overflow: auto;
-  height: 100%;
-  margin-left: 8px;
-  margin-right: 8px;
+  // overflow: hidden;
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
 .assets-layout {
@@ -13,6 +12,7 @@
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  overflow: hidden;
 
   // Just making sure these work...
   &.masonry {
@@ -33,8 +33,8 @@
 }
 
 .assets-footer {
-  margin-left: 8px;
-  margin-right: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
 .thumb-size-slider {
