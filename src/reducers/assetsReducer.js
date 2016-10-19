@@ -8,9 +8,9 @@ export default function (state = {}, action) {
   switch (action.type) {
     case ASSET_SEARCH:
       const { query, assets, page } = action.payload
-      const all = state.all ? inject(state.all, page.firstIndex(), assets) : assets
-      const lastPage = !state.page || page.number >= state.page.number ? page : state.page
-      return { ...state, all, query, lastPage, isolatedId: null }
+      const all = state.all ? inject(state.all, page.from, assets) : assets
+      const totalCount = state.totalCount ? Math.max(state.totalCount, page.totalCount) : page.totalCount
+      return { ...state, all, query, totalCount, isolatedId: null }
     case ASSET_SEARCH_ERROR:
       return { ...state, error: action.payload }
     case ISOLATE_ASSET:

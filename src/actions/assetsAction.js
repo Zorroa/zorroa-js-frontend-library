@@ -11,11 +11,11 @@ export function searchAssets (query) {
     if (!query || query instanceof String) {
       query = { query }
     }
-    console.log('Search: ' + query)
-    assert.ok(typeof query.page === 'undefined' || query.page > 0)
+    console.log('Search: ' + JSON.stringify(query))
+    assert.ok(typeof query.from === 'undefined' || query.from >= 0)
     getArchivist().post('/api/v3/assets/_search', query)
       .then(response => {
-        console.log('Query ' + query)
+        console.log('Query ' + JSON.stringify(query))
         console.log(response)
         const page = new Page(response.data.page)
         const assets = response.data.list.map(asset => (new Asset(asset)))

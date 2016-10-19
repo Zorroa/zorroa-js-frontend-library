@@ -13,9 +13,12 @@ export default class Asset {
 
   source () { return this.document.source.filename }
 
-  tinyProxy () { return this.document.proxies.tinyProxy }
+  tinyProxy () { return this.document.proxies ? this.document.proxies.tinyProxy : null }
 
-  aspect () { return this.document.image.width / this.document.image.height }
+  width () { return this.document.image && this.document.image.width ? this.document.image.width : 0 }
+  height () { return this.document.image && this.document.image.height ? this.document.image.height : 0 }
+
+  aspect () { return this.width() / Math.max(1, this.height()) }
 
   backgroundColor () { return this.tinyProxy() ? this.tinyProxy()[5] : getRandomColor() }
 

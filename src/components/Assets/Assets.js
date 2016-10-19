@@ -17,7 +17,7 @@ class Assets extends Component {
     return {
       assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
       isolateAsset: PropTypes.func,
-      lastPage: PropTypes.instanceOf(Page)
+      totalCount: PropTypes.number
     }
   }
 
@@ -62,7 +62,7 @@ class Assets extends Component {
   }
 
   renderAssets () {
-    const { assets, lastPage } = this.props
+    const { assets, totalCount } = this.props
     const { layout, thumbSize } = this.state
     const classNames = classnames('assets-layout', layout)
 
@@ -75,13 +75,13 @@ class Assets extends Component {
         <div className={classNames}>
           { assets.map(asset => (<Thumb dim={thumbSize} layout={layout} key={asset.id} asset={asset} onDoubleClick={this.isolateToLightbox.bind(this, asset)} />)) }
         </div>
-        { !lastPage.isLast() && (<Pager total={lastPage.totalCount} loaded={lastPage.loaded()} />) }
+        { assets.length < totalCount && (<Pager total={totalCount} loaded={assets.length} />) }
       </div>
     )
   }
 
   render () {
-    const { lastPage } = this.props
+    const { assets, totalCount } = this.props
     const { showTable, layout, thumbSize } = this.state
     return (
       <div className="flexCol fullHeight">
@@ -89,10 +89,10 @@ class Assets extends Component {
           {this.renderAssets()}
         </div>
         { showTable && <Table/> }
-        { lastPage &&
+        { totalCount &&
         <Footer
-          total={lastPage.totalCount}
-          loaded={lastPage.loaded()}
+          total={totalCount}
+          loaded={assets.length}
           showTable={showTable}
           toggleShowTable={this.toggleShowTable.bind(this)}
           layout={layout}
@@ -107,7 +107,7 @@ class Assets extends Component {
 
 export default connect(state => ({
   assets: state.assets.all,
-  lastPage: state.assets.lastPage
+  totalCount: state.assets.totalCount
 }), dispatch => ({
   actions: bindActionCreators({ isolateAsset }, dispatch)
 }))(Assets)

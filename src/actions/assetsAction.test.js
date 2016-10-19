@@ -28,7 +28,7 @@ describe('assetsActions', () => {
     mockAdapter.onPost('/api/v3/assets/_search')
       .reply(200, {
         status: 200,
-        response: { query: '', assets: [asset], page: new Page() }
+        response: { query: '', assets: [asset], page: new Page({from: 0, size: 1, totalCount: 1}) }
       })
 
     return store.dispatch(searchAssets({query: 'foo'}))
