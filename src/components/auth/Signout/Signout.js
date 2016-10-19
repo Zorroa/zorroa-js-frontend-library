@@ -13,8 +13,10 @@ class Signout extends Component {
     }
   }
 
-  static contextTypes = {
-    router: PropTypes.object,
+  static get contextTypes () {
+    return {
+      router: PropTypes.object
+    }
   }
 
   componentWillMount () {
@@ -22,7 +24,7 @@ class Signout extends Component {
   }
 
   render () {
-    setTimeout(() => { this.context.router.push('/') }, 3000);
+    setTimeout(() => { this.context.router.push('/') }, 3000)
     return (
       <div className="auth flexCenter">
         <div className="auth-box flexColCenter">

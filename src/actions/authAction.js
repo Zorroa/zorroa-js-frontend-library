@@ -92,7 +92,7 @@ export function signoutUser (user) {
         dispatch({ type: UNAUTH_USER, payload: response.data })
         localStorage.setItem(USER_ITEM, JSON.stringify(new User({...user, id: -1})))
       })
-      .catch(error => dispatch(error => dispatch(authError(error))))
+      .catch(error => dispatch(authError(error)))
   }
 }
 

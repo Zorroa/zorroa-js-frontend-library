@@ -35,7 +35,7 @@ export default class Collapsible extends Component {
       <div style={style} className="collapsible">
         <div style={style} className="collapsible-header" onClick={this.handleClick.bind(this)}>
           { children && (<div className={caretClass} />) }
-             {header}
+          {header}
         </div>
         {open && (children)}
       </div>

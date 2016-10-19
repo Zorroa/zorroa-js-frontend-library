@@ -16,12 +16,15 @@ class Assets extends Component {
     return {
       assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
       selectedIds: PropTypes.object,
-      totalCount: PropTypes.number
+      totalCount: PropTypes.number,
+      actions: PropTypes.object
     }
   }
 
-  static contextTypes = {
-    router: PropTypes.object,
+  static get contextTypes () {
+    return {
+      router: PropTypes.object
+    }
   }
 
   constructor (props) {
@@ -103,7 +106,7 @@ class Assets extends Component {
   }
 
   changeThumbSize (thumbSize) {
-    assert.ok(typeof thumbSize == 'number')
+    assert.ok(typeof thumbSize === 'number')
     if (this.state.thumbSize !== thumbSize) {
       this.setState({...this.state, thumbSize})
     }
