@@ -1,32 +1,28 @@
+@import '../../styles/core-mixins.scss';
+
+.collapsible-caret {
+  font-size: 0px;
+  width: 16px;
+  min-width: 16px;
+  max-width: 16px;
+  margin-right: 1em;
+}
+
+
 .collapsible {
-  flex-direction: column;
+
+  &.parent .collapsible-caret {
+    font-size: 20px;
+  }
+
+  &.open .collapsible-caret {
+    transform: rotate(90deg);
+  }
 }
 
 .collapsible-header {
- }
-
-.collapsible-caret-open {
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-top: 4px solid;
-  display: inline-block;
-  height: 0;
-  margin-left: 2px;
-  margin-right: 5px;
-  vertical-align: middle;
-  width: 0;
-  align-self: center;
-}
-
-.collapsible-caret-closed {
-  border-left: 4px solid;
-  border-bottom: 4px solid transparent;
-  border-top: 4px solid transparent;
-  display: inline-block;
-  height: 0;
-  margin-left: 3px;
-  margin-right: 8px;
-  vertical-align: middle;
-  width: 0;
-  align-self: center;
+  @include nowrap;
+  height: 40px;
+  padding: 5px;
+  background-color: $zorroa-lightgray;
 }
