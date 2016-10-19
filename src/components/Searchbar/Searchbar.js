@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { reduxForm, Field } from 'redux-form'
+
 import { searchAssets } from '../../actions/assetsAction'
 
 class Searchbar extends Component {
@@ -9,15 +10,21 @@ class Searchbar extends Component {
     return {
       submitting: PropTypes.bool,
       handleSubmit: PropTypes.func.isRequired,
-      actions: PropTypes.object.isRequired
+      actions: PropTypes.object.isRequired,
+      totalCount: PropTypes.number
     }
   }
 
   componentWillMount () {
-    this.props.actions.searchAssets()
+    // Search if we haven't loaded any assets.
+    // TODO: Consider using the current query?
+    const { actions, totalCount } = this.props
+    if (!totalCount) {
+      actions.searchAssets()
+    }
   }
 
-  handleFormSubmit ({ query }) {
+  handleFormSubmit (query) {
     this.props.actions.searchAssets(query)
   }
 
@@ -54,6 +61,7 @@ const mapDispatchToProps = dispatch => ({
 })
 
 const mapStateToProps = state => ({
+  totalCount: state.assets ? state.assets.totalCount : null
 })
 
 export default connect(

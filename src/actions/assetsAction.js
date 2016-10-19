@@ -8,7 +8,7 @@ import { getArchivist } from './authAction'
 export function searchAssets (query) {
   return dispatch => {
     // Wrap undefined or simple string queries as an AssetSearch
-    if (!query || query instanceof String) {
+    if (!query || typeof query === 'string' || query instanceof String) {
       query = { query }
     }
     console.log('Search: ' + JSON.stringify(query))
