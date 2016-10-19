@@ -9,7 +9,6 @@ const Footer = (props) => (
   <div className="assets-footer flexRow flexJustifySpaceBetween flexAlignItemsCenter">
     <div className="flexRow">
       <AssetCounter loaded={props.loaded} total={props.total}/>
-      &nbsp;RESULTS
     </div>
     <div className="flexRow flexJustifyEnd flexAlignItemsCenter">
       <ThumbSizeSlider value={props.thumbSize} onChange={props.handleThumbSize} />
