@@ -16,6 +16,15 @@ import { USER_ITEM, HOST_ITEM } from './constants/localStorageItems'
 import { validateUser } from './actions/authAction'
 import User from './models/User'
 
+// Include all our app-wide style classes
+require('./styles/core-globals.scss')
+
+// We can require the custom fonts if we want to serve the font files separately.
+// The reason to do that would be to allow caching of the font files.
+// As it stands, this file is imported in core-globals.scss, and the fonts get
+// put in the app js bundle.
+// require('./assets/fonts/zorroa-icons/style.css')
+
 const log = debug('application:bootstrap')
 
 log('creating state container')
