@@ -1,3 +1,5 @@
+@import '../../styles/core-mixins.scss';
+
 .racetrack {
   display: flex;
   flex-direction: column;
@@ -72,8 +74,8 @@
       font-family: Roboto, sans-serif;
       font-size: 14px;
       font-weight: 500;
-      background-color: #4d4948;
-      color: #ededed;
+      background-color: $zorroa-greyish-brown;
+      color: $zorroa-nearwhite;
       border-radius: 3px;
       border: none;
       outline: none;
@@ -81,13 +83,13 @@
 
     button:hover {
       background-color: #a5a5a5;
-      color: #ededed;
+      color: $zorroa-nearwhite;
       font-weight: 500;
     }
 
     button:active {
-      background-color: #73b61c;
-      color: #ededed;
+      background-color: $zorroa-sickly-green;
+      color: $zorroa-nearwhite;
       font-weight: 500;
     }
 
@@ -114,7 +116,7 @@
 
     .racetrack-footer-save-button {
       background-color: #a5a5a5;
-      color: #ededed;
+      color: $zorroa-nearwhite;
     }
 
     button {
@@ -123,7 +125,7 @@
       font-family: Roboto, sans-serif;
       font-size: 14px;
       font-weight: 500;
-      color: #808080;
+      color: $zorroa-gray;
       border-radius: 3px;
       background: none;
       border: none;
@@ -132,13 +134,13 @@
 
     button:hover {
       background-color: #a5a5a5;
-      color: #ededed;
+      color: $zorroa-nearwhite;
       font-weight: 500;
     }
 
     button:active {
-      background-color: #73b61c;
-      color: #ededed;
+      background-color: $zorroa-sickly-green;
+      color: $zorroa-nearwhite;
       font-weight: 500;
     }
   }

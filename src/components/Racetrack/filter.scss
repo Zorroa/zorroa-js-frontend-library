@@ -1,3 +1,5 @@
+@import '../../styles/core-mixins.scss';
+
 .filter-header {
   display: flex;
   flex: 1;
@@ -16,7 +18,7 @@
 
 .simple-search {
   background-color: #fff;
-  color: #808080;
+  color: $zorroa-gray;
   display: flex;
   flex-direction: column;
 
@@ -24,7 +26,7 @@
     flex: 1;
     outline: none;
     background: none;
-    border: 1px solid #808080;
+    border: 1px solid $zorroa-gray;
     border-radius: 3px;
     font-family: Roboto, sans-serif;
     font-size: 14px;

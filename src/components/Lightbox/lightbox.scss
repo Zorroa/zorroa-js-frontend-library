@@ -1,5 +1,7 @@
+@import '../../styles/core-mixins.scss';
+
 .lightbox {
-  background-color: #4d4948; // $grayish-brown
+  background-color: $zorroa-greyish-brown; // $grayish-brown
   display: flex;
   flex-direction: column;
   height: 100vh;

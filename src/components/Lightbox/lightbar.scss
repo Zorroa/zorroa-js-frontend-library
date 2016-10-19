@@ -1,6 +1,8 @@
+@import '../../styles/core-mixins.scss';
+
 .lightbar {
-  color: #ffffff;
-  background-color: #000000;
+  color: white;
+  background-color: black;
   justify-content: space-between;
   display: flex;
   width: 100%;
@@ -16,13 +18,13 @@
       font-size: 12px;
       font-weight: 300;
       text-align: right;
-      color: #ededed;
+      color: $zorroa-nearwhite;
     }
 
     .lightbar-attr-value {
       font-family: Roboto;
       font-size: 14px;
-      color: #ffffff;
+      color: white;
     }
   }
 
@@ -31,7 +33,7 @@
   }
 
   button {
-    color: #fff;
+    color: white;
     padding: 0;
     margin: 10px;
     border: none;
