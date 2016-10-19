@@ -98,7 +98,7 @@ Make our color defs available as classes
 .flexCol { @include flexCol; }
 .flexCenter { @include flexCenter; }
 .flexColCenter { @include flexColCenter; }
-.flexWrap { @inlude flexWrap; }
+.flexWrap { @include flexWrap; }
 
 /* flexRowThenCol is a row when wide, then a column when narrow */
 // .flexRowThenCol {
