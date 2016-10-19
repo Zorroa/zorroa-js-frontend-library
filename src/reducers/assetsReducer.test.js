@@ -1,5 +1,5 @@
 import assetsReducer from './assetsReducer'
-import { ASSET_SEARCH, ASSET_SEARCH_ERROR, ISOLATE_ASSET } from '../constants/actionTypes'
+import { ASSET_SEARCH, ASSET_SEARCH_ERROR, ISOLATE_ASSET, SELECT_ASSETS } from '../constants/actionTypes'
 import Page from '../models/Page'
 
 describe('assetsReducer', () => {
@@ -9,7 +9,13 @@ describe('assetsReducer', () => {
 
   it('ASSET_SEARCH returns asset list', () => {
     const payload = { query, assets, page }
-    const result = { query, all: assets, totalCount: 1, isolatedId: null }
+    const result = {
+      query,
+      all: assets,
+      totalCount: 1,
+      selectedIds: null,
+      isolatedId: null
+    }
     expect(assetsReducer([], { type: ASSET_SEARCH, payload }))
       .toEqual(result)
   })
@@ -26,7 +32,13 @@ describe('assetsReducer', () => {
 
     // Construct the expected result -- concateated arrays
     const concatAssets = assets.concat(assets2)
-    const result = { query, all: concatAssets, totalCount: 2, isolatedId: null }
+    const result = {
+      query,
+      all: concatAssets,
+      totalCount: 2,
+      selectedIds: null,
+      isolatedId: null
+    }
     expect(assetsReducer(state1, { type: ASSET_SEARCH, payload: payload2 }))
       .toEqual(result)
   })
@@ -41,5 +53,13 @@ describe('assetsReducer', () => {
     const id = '1234-abcd'
     expect(assetsReducer([], { type: ISOLATE_ASSET, payload: id }))
       .toEqual({ isolatedId: id })
+  })
+
+  it('SELECT_ASSETS returns a selected asset id', () => {
+    const id0 = '1234-abcd'
+    const id1 = '5678-zwxy'
+    const ids = new Set([id0, id1])
+    expect(assetsReducer([], {type: SELECT_ASSETS, payload: ids}))
+      .toEqual({ selectedIds: ids })
   })
 })

@@ -1,6 +1,6 @@
 import * as assert from 'assert'
 
-import { UNAUTH_USER, ASSET_SEARCH, ASSET_SEARCH_ERROR, ISOLATE_ASSET } from '../constants/actionTypes'
+import { UNAUTH_USER, ASSET_SEARCH, ASSET_SEARCH_ERROR, ISOLATE_ASSET, SELECT_ASSETS } from '../constants/actionTypes'
 import Asset from '../models/Asset'
 import Page from '../models/Page'
 import { getArchivist } from './authAction'
@@ -44,5 +44,12 @@ export function isolateAsset (id) {
   return ({
     type: ISOLATE_ASSET,
     payload: id
+  })
+}
+
+export function selectAssets (ids) {
+  return ({
+    type: SELECT_ASSETS,
+    payload: ids
   })
 }

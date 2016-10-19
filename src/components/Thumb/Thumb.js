@@ -10,12 +10,14 @@ class Thumb extends Component {
       host: PropTypes.string,
       dim: PropTypes.number.isRequired,
       layout: PropTypes.string.isRequired,
+      selected: PropTypes.bool,
+      onClick: PropTypes.func.isRequired,
       onDoubleClick: PropTypes.func.isRequired
     }
   }
 
   render () {
-    const { asset, host, dim, layout, onDoubleClick } = this.props
+    const { asset, host, dim, layout, selected, onClick, onDoubleClick } = this.props
     if (!asset.proxies) {
       return <div className="thumb" style={{ backgroundColor: asset.backgroundColor() }} />
     }
@@ -36,8 +38,9 @@ class Thumb extends Component {
         break
     }
     const proxy = asset.closestProxy(width, height)
+    const selectedStyle = selected ? { border: '3px solid #73b61c' } : { border: '3px solid transparent' }
     return (
-      <img src={proxy.url(host)} width={width} height={height} onDoubleClick={onDoubleClick} />
+      <img src={proxy.url(host)} width={width} height={height} style={selectedStyle} onClick={onClick} onDoubleClick={onDoubleClick} />
     )
   }
 }

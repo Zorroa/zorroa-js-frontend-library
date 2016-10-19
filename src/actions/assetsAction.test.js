@@ -3,9 +3,9 @@ import MockAdapter from 'axios-mock-adapter'
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 
-import { searchAssets, isolateAsset } from './assetsAction'
+import { searchAssets, isolateAsset, selectAssets } from './assetsAction'
 import Asset from '../models/Asset'
-import { ISOLATE_ASSET } from '../constants/actionTypes'
+import { ISOLATE_ASSET, SELECT_ASSETS } from '../constants/actionTypes'
 import Page from '../models/Page'
 
 const middlewares = [ thunk ]
@@ -44,5 +44,15 @@ describe('assetsActions', () => {
       payload: id
     }
     expect(isolateAsset(id)).toEqual(expectedAction)
+  })
+
+  it('should select assets', () => {
+    const id = '12345-abcde'
+    const ids = new Set([id])
+    const expectedAction = {
+      type: SELECT_ASSETS,
+      payload: ids
+    }
+    expect(selectAssets(ids)).toEqual(expectedAction)
   })
 })
