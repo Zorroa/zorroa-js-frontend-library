@@ -63,8 +63,8 @@ class Assets extends Component {
             for (var i = min; i <= max; ++i) {
               ids.add(assets[i].id)
             }
-          }
-        }
+    }
+  }
     }
       if (!ids) {
         // Nothing in the extended selection set, treat as new selection
@@ -133,8 +133,8 @@ class Assets extends Component {
     const { assets, totalCount } = this.props
     const { showTable, layout, thumbSize } = this.state
     return (
-      <div className="flexCol fullHeight">
-          {this.renderAssets()}
+      <div className="assets-container flexOff flexCol fullHeight fullWidth">
+        {this.renderAssets()}
         { showTable && <Table/> }
         { totalCount &&
         <Footer

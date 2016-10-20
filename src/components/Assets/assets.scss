@@ -1,18 +1,23 @@
 @import '../../styles/core-mixins.scss';
 
+.assets-container {
+  overflow: hidden;
+  max-width: 100%;
+}
+
 .assets-scroll {
-  // overflow: hidden;
+  overflow-y: scroll;
+  overflow-x: hidden;
   padding-left: 8px;
   padding-right: 8px;
+  max-width: 100%;
 }
 
 .assets-layout {
   flex: 1 0 0;
   display: flex;
   flex-wrap: wrap;
-  // justify-content: space-between;
   align-items: center;
-  overflow: hidden;
 
   // Just making sure these work...
   &.masonry {
