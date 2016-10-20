@@ -48,3 +48,17 @@ export default class Modal extends Component {
   }
 }
 ```
+
+### Example usage for turning on the modal
+
+```
+this.props.updateModal({
+  title: 'test',
+  content: (<Logo />),
+  footer: (
+    <div>
+      <button className="zorroa-btn">Footer button</button>
+    </div>
+  )
+})
+```
