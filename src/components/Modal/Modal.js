@@ -1,36 +1,32 @@
 import React, { Component, PropTypes } from 'react'
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
+import domUtils from '../../services/domUtils'
 
 export default class Modal extends Component {
-  static get displayName () {
-    return 'Modal'
-  }
-
   static propTypes () {
     return {
       children: PropTypes.node,
       content: PropTypes.string,
-      footer: PropTypes.string,
-      dismiss: PropTypes.func.isRequired,
-      size: PropTypes.number,
+      footer: PropTypes.node,
+      dismiss: PropTypes.func,
       title: PropTypes.string
     }
   }
 
   componentWillReceiveProps (nextProps) {
     if (nextProps.content) {
-      // disable dom scroll
+      domUtils.disableScroll()
     } else {
-      // enable dom scroll
+      domUtils.enableScroll()
     }
-
-    return nextProps
   }
 
   render () {
     if (!this.props.content && !this.props.children) {
       return null
     }
+
+    const {dismiss, title, content, children, footer} = this.props
 
     return (
       <div className="modal-container">
@@ -43,15 +39,10 @@ export default class Modal extends Component {
           component="div"
         >
           <div className="modal" key="modal">
-            <header className="modal-header">
-              {this.props.title ? this.props.title : null}
-            </header>
-            <div className="modal-body">
-              {this.props.children ? this.props.children : null}
-              {this.props.content ? this.props.content : null}
-            </div>
-            <footer className="modal-footer">{this.props.footer}</footer>
-            <button className="modal-dismiss" onClick={this.props.dismiss}><div>X</div></button>
+            <header className="modal-header">{title}</header>
+            <div className="modal-body">{children}{content}</div>
+            <footer className="modal-footer">{footer}</footer>
+            <button className="modal-dismiss" onClick={dismiss}><div>X</div></button>
           </div>
         </ReactCSSTransitionGroup>
       </div>
