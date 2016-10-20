@@ -35,13 +35,13 @@ export default class Sidebar extends Component {
 
   buttonClassNames () {
     return classnames('sidebar-button', {
-      'sidebar-button-left': !this.props.isRightEdge
+      'left': !this.props.isRightEdge
     })
   }
 
   sidebarClassNames () {
     return classnames('sidebar', {
-      'sidebar-open': this.state.open
+      'open': this.state.open
     })
   }
 

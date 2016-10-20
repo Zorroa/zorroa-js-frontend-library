@@ -32,19 +32,6 @@
 }
 
 
-// Sidebars use flex-basis to toggle between open and close
-.sidebar {
-  flex: 0 0 50px;
-  padding: 8px;
-  background-color: $zorroa-nearwhite;
-  border-left: 1px solid #c3c3c3;
-  border-right: 1px solid #c3c3c3;
-
-  &.sidebar-open {
-    flex: 0 0 300px;
-  }
-}
-
 // Accordion items in sidebars
 .accordion-item {
   border: 1px solid black;

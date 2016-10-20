@@ -1,10 +1,25 @@
+@import '../../styles/core-mixins.scss';
+
+// Sidebars use flex-basis to toggle between open and close
+.sidebar {
+  flex: 0 0 50px;
+  padding: 8px;
+  background-color: $zorroa-nearwhite;
+  border-left: 1px solid #c3c3c3;
+  border-right: 1px solid #c3c3c3;
+
+  &.open {
+    flex: 0 0 300px;
+  }
+}
+
 .sidebar-button {
   opacity: 0.5;
   font-size: 9px;
   font-weight: 300;
   display: flex;
 
-  &.sidebar-button-left {
+  &.left {
     justify-content: flex-end;
   }
 }
