@@ -45,6 +45,8 @@ input,input:focus,button,button:focus,.form-control,.form-control:focus {
 
 .animate { @include animate; }
 
+.rot180 { transform: rotate(180deg); }
+
 /*
 Make our color defs available as classes
 */

@@ -1,13 +1,11 @@
 import React, { PropTypes } from 'react'
 
 const FilterHeader = (props) => (
-  <div className="filter-header">
-    <div>
-      {props.icon}
-    </div>
-    <div>
-      {props.label}
-    </div>
+  <div className="filter-header flexRow fullWidth">
+    <div>{props.icon}</div>
+    <div className='flexOn'/>
+    <div>{props.label}</div>
+    <div className='flexOn'/>
     <div className="icon-cross2" onClick={props.onClose} />
   </div>
 )

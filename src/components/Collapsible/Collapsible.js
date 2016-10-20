@@ -9,8 +9,8 @@ export default class Collapsible extends Component {
   static get propTypes () {
     return {
       children: PropTypes.node,
-      header: PropTypes.node,
-      style: PropTypes.object
+      headerFn: PropTypes.func.isRequired,
+      style: PropTypes.object,
     }
   }
 
@@ -29,15 +29,12 @@ export default class Collapsible extends Component {
 
   render () {
     const { open } = this.state
-    const { children, header, style } = this.props
+    const { children, headerFn, style } = this.props
 
     return (
-      <div style={style} className={classnames({'collapsible':true, 'parent': !!children, 'open': open })}>
+      <div style={style} className={classnames('collapsible', 'flexCol', {'parent': children, 'open': open })}>
         <div style={style} className="collapsible-header flexCenter" onClick={this.handleClick.bind(this)}>
-          <span className={`collapsible-header-icon ${classnames({'icon-folder':children&&!open, 'icon-folder2':children&&open})}`}/>
-          {header}
-          {parent && <div className='flexOn'/>}
-          {parent && <div className='collapsible-caret icon-arrow-down'/>}
+          {headerFn(children, open)}
         </div>
         {open && (children)}
       </div>

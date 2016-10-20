@@ -1,0 +1,21 @@
+@import '../../styles/core-mixins.scss';
+
+.folderitem-header {
+  @include nowrap;
+  height: 40px;
+  padding: 5px;
+  background-color: $zorroa-lightgray;
+  margin-bottom: 5px;
+}
+
+.folderitem-header-icon {
+  margin-right: 1em;
+}
+
+.folderitem-header-caret {
+  font-size: 18px;
+  width: 16px;
+  min-width: 16px;
+  max-width: 16px;
+  margin-right: 1em;
+}
