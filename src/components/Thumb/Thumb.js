@@ -41,10 +41,8 @@ class Thumb extends Component {
         break
     }
     const proxy = asset.closestProxy(width, height)
-    const selectedStyle = selected ? { border: '3px solid #73b61c' } : { border: '3px solid transparent' }
+    const borderColor = selected ? '#73b61c' : 'transparent';
     return (
-      <img src={proxy.url(host)} width={width} height={height} onDoubleClick={onDoubleClick} />
-      <img src={proxy.url(host)} width={width} height={height} style={selectedStyle} onClick={onClick} onDoubleClick={onDoubleClick} />
       <div
         className='assets-thumb'
         style={{
@@ -52,6 +50,7 @@ class Thumb extends Component {
           'backgroundSize': fit,
           'width': `${width}px`,
           'height':`${height}px`,
+          'border': `3px solid ${borderColor}`
         }}
         onDoubleClick={onDoubleClick}
         onClick={onClick}
