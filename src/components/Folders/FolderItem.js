@@ -20,11 +20,14 @@ export default class FolderItem extends Component {
   }
 
   renderFolderItemHeader (isParent, isOpen) {
-    const { folders, folderId, loadChildren } = this.props
+    const { folders, folderId } = this.props
     const folder = folders.get(folderId)
     return (
       <div className='folderitem-header flexCenter fullWidth'>
-        <span className={classnames('folderitem-header-icon', {'icon-folder2':isParent && isOpen, 'icon-folder':isParent && !isOpen})}/>
+        <span className={classnames('folderitem-header-icon', {
+          'icon-folder2': isParent && isOpen,
+          'icon-folder': isParent && !isOpen})
+        }/>
         {folder.name}
         <div className='flexOn'/>
         {isParent && <div className={classnames('folderitem-header-caret', 'icon-arrow-down', { 'rot180': isOpen })}/>}

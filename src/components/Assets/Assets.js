@@ -57,19 +57,19 @@ class Assets extends Component {
         if (lastSelectedIndex >= 0) {
           const index = assets.findIndex(a => (a.id === asset.id))
           if (index >= 0) {
-            ids = new Set ()
+            ids = new Set()
             const min = Math.min(index, lastSelectedIndex)
             const max = Math.max(index, lastSelectedIndex)
             for (var i = min; i <= max; ++i) {
               ids.add(assets[i].id)
             }
-    }
-  }
-    }
+          }
+        }
+      }
       if (!ids) {
         // Nothing in the extended selection set, treat as new selection
         ids = new Set([asset.id])
-        this.setState({...this.state, lastSelectedId: asset.id })
+        this.setState({...this.state, lastSelectedId: asset.id})
       }
     } else if (event.metaKey) {
       // Toggle the current asset on or off
@@ -78,13 +78,13 @@ class Assets extends Component {
         ids.delete(asset.id)
       } else {
         ids.add(asset.id)
-  }
+      }
       const lastSelectedId = ids.length ? asset.id : null
-      this.setState({...this.state, lastSelectedId })
+      this.setState({...this.state, lastSelectedId})
     } else {
       // Select the single asset and use it as the anchor point
-      ids =  new Set([asset.id])
-      this.setState({...this.state, lastSelectedId: asset.id })
+      ids = new Set([asset.id])
+      this.setState({...this.state, lastSelectedId: asset.id})
     }
     actions.selectAssets(ids)
   }

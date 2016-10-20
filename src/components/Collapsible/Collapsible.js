@@ -10,7 +10,7 @@ export default class Collapsible extends Component {
     return {
       children: PropTypes.node,
       headerFn: PropTypes.func.isRequired,
-      style: PropTypes.object,
+      style: PropTypes.object
     }
   }
 
@@ -32,7 +32,7 @@ export default class Collapsible extends Component {
     const { children, headerFn, style } = this.props
 
     return (
-      <div style={style} className={classnames('collapsible', 'flexCol', {'parent': children, 'open': open })}>
+      <div style={style} className={classnames('collapsible', 'flexCol', {'parent': children, 'open': open})}>
         <div style={style} className="collapsible-header flexCenter" onClick={this.handleClick.bind(this)}>
           {headerFn(children, open)}
         </div>
