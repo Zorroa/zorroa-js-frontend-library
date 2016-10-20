@@ -30,11 +30,11 @@ export default class Collapsible extends Component {
   render () {
     const { open } = this.state
     const { children, header, style } = this.props
-    const classNames = classnames('collapsible', { 'parent': !!children, 'open': open })
 
     return (
-      <div style={style} className={classNames}>
+      <div style={style} className={classnames({'collapsible':true, 'parent': !!children, 'open': open })}>
         <div style={style} className="collapsible-header flexCenter" onClick={this.handleClick.bind(this)}>
+          <span className={`collapsible-header-icon ${classnames({'icon-folder':children&&!open, 'icon-folder2':children&&open})}`}/>
           {header}
           {parent && <div className='flexOn'/>}
           {parent && <div className='collapsible-caret icon-arrow-down'/>}
