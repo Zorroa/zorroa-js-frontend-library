@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import Modal from '../Modal'
-import Logo from '../Logo'
 import { updateModal } from '../../actions/appActions'
 
 class App extends Component {

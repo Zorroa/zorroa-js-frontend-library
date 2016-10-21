@@ -3,7 +3,7 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 import domUtils from '../../services/domUtils'
 
 export default class Modal extends Component {
-  static propTypes () {
+  static get propTypes () {
     return {
       children: PropTypes.node,
       content: PropTypes.string,
