@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import classnames from 'classnames'
 import * as assert from 'assert'
 
 import Thumb from '../Thumb'
@@ -16,12 +15,15 @@ class Assets extends Component {
     return {
       assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
       selectedIds: PropTypes.object,
-      totalCount: PropTypes.number
+      totalCount: PropTypes.number,
+      actions: PropTypes.object
     }
   }
 
-  static contextTypes = {
-    router: PropTypes.object,
+  static get contextTypes () {
+    return {
+      router: PropTypes.object
+    }
   }
 
   constructor (props) {
@@ -55,7 +57,7 @@ class Assets extends Component {
         if (lastSelectedIndex >= 0) {
           const index = assets.findIndex(a => (a.id === asset.id))
           if (index >= 0) {
-            ids = new Set ()
+            ids = new Set()
             const min = Math.min(index, lastSelectedIndex)
             const max = Math.max(index, lastSelectedIndex)
             for (var i = min; i <= max; ++i) {
@@ -67,7 +69,7 @@ class Assets extends Component {
       if (!ids) {
         // Nothing in the extended selection set, treat as new selection
         ids = new Set([asset.id])
-        this.setState({...this.state, lastSelectedId: asset.id })
+        this.setState({...this.state, lastSelectedId: asset.id})
       }
     } else if (event.metaKey) {
       // Toggle the current asset on or off
@@ -78,11 +80,11 @@ class Assets extends Component {
         ids.add(asset.id)
       }
       const lastSelectedId = ids.length ? asset.id : null
-      this.setState({...this.state, lastSelectedId })
+      this.setState({...this.state, lastSelectedId})
     } else {
       // Select the single asset and use it as the anchor point
-      ids =  new Set([asset.id])
-      this.setState({...this.state, lastSelectedId: asset.id })
+      ids = new Set([asset.id])
+      this.setState({...this.state, lastSelectedId: asset.id})
     }
     actions.selectAssets(ids)
   }
@@ -103,7 +105,7 @@ class Assets extends Component {
   }
 
   changeThumbSize (thumbSize) {
-    assert.ok(typeof thumbSize == 'number')
+    assert.ok(typeof thumbSize === 'number')
     if (this.state.thumbSize !== thumbSize) {
       this.setState({...this.state, thumbSize})
     }
@@ -112,15 +114,14 @@ class Assets extends Component {
   renderAssets () {
     const { assets, selectedIds, totalCount } = this.props
     const { layout, thumbSize } = this.state
-    const classNames = classnames('assets-layout', layout)
 
     if (!assets || !assets.length) {
       return (<div className="assets-layout-empty">No asset proxies</div>)
     }
 
     return (
-      <div className="assets-scroll">
-        <div className={classNames}>
+      <div className="assets-scroll fullWidth fullHeight">
+        <div className={`assets-layout ${layout}`}>
           { assets.map(asset => (<Thumb selected={selectedIds && selectedIds.has(asset.id)} dim={thumbSize} layout={layout} key={asset.id} asset={asset} onClick={this.select.bind(this, asset)} onDoubleClick={this.isolateToLightbox.bind(this, asset)} />)) }
         </div>
         { assets.length < totalCount && (<Pager total={totalCount} loaded={assets.length} />) }
@@ -132,10 +133,8 @@ class Assets extends Component {
     const { assets, totalCount } = this.props
     const { showTable, layout, thumbSize } = this.state
     return (
-      <div className="flexCol fullHeight">
-        <div className="assets-layout">
-          {this.renderAssets()}
-        </div>
+      <div className="assets-container flexOff flexCol fullHeight fullWidth">
+        {this.renderAssets()}
         { showTable && <Table/> }
         { totalCount &&
         <Footer

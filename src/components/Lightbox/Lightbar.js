@@ -5,8 +5,10 @@ export default class Lightbar extends Component {
     return 'Lightbar'
   }
 
-  static contextTypes = {
-    router: PropTypes.object,
+  static get contextTypes () {
+    return {
+      router: PropTypes.object
+    }
   }
 
   closeLightbox () {

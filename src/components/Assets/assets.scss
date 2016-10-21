@@ -1,40 +1,45 @@
 @import '../../styles/core-mixins.scss';
 
+.assets-container {
+  overflow: hidden;
+  max-width: 100%;
+}
+
 .assets-scroll {
-  overflow: auto;
-  height: 100%;
-  margin-left: 8px;
-  margin-right: 8px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  padding-left: 8px;
+  padding-right: 8px;
+  max-width: 100%;
 }
 
 .assets-layout {
   flex: 1 0 0;
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
   align-items: center;
 
   // Just making sure these work...
   &.masonry {
-    background-color: lavender;
+    // background-color: lavender;
   }
 
   &.waterfall {
-    background-color: lemonchiffon;
+    // background-color: lemonchiffon;
   }
 
   &.grid {
-    background-color: linen;
+    // background-color: linen;
   }
 
   &.slideshow {
-    background-color: beige;
+    // background-color: beige;
   }
 }
 
 .assets-footer {
-  margin-left: 8px;
-  margin-right: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
 .thumb-size-slider {
