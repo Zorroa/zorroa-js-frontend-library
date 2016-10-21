@@ -19,7 +19,15 @@ describe('<App/>', () => {
   let app
 
   beforeEach(() => {
-    const store = storeFake({ auth: { authenticated: true } })
+    const store = storeFake({
+      auth: {
+        authenticated: true
+      },
+      app: {
+        modal: {}
+      }
+    })
+
     const wrapper = mount(
       <Provider store={store}>
         <App/>
@@ -27,10 +35,6 @@ describe('<App/>', () => {
     )
 
     app = wrapper.find(App)
-  })
-
-  it('true should be true', () => {
-    expect(true).toBe(true)
   })
 
   it('should render', () => {
