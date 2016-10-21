@@ -1,8 +1,8 @@
-const path          = require('path')
-const getLoaders    = require('./loaders')
+const path = require('path')
+const getLoaders = require('./loaders')
 const getPreloaders = require('./preloaders')
-const getPlugins    = require('./plugins')
-const paths         = require('./paths')
+const getPlugins = require('./plugins')
+const paths = require('./paths')
 const ENV = 'DEV'
 
 module.exports = {
@@ -34,7 +34,7 @@ module.exports = {
   watchOptions: {
     // let's ignore node_modules and slow down disk polling so the cpu isn't pegged
     ignored: /node_modules/,
-    aggregateTimeout: 1000,
+    aggregateTimeout: 1000
     // poll: 1000
   }
 }

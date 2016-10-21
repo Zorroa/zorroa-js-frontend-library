@@ -26,7 +26,6 @@ describe('authActions', () => {
 
   describe('authActionAsync', () => {
     xit('creates user after checking', () => {
-
       const expectedAction = {
         type: types.AUTH_USER,
         payload: {token}

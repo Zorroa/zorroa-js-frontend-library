@@ -1,18 +1,18 @@
+@import '../../styles/core-mixins.scss';
+
 .asset-counter {
-  font-family: Roboto, sans-serif;
   font-size: 14px;
   color: #777;
 
   .asset-counter-count {
     font-weight: bold;
-    color: #4d4948;
+    color: $zorroa-greyish-brown;
   }
 }
 
 .pager {
-  font-family: Roboto, sans-serif;
   font-size: 14px;
-  color: #4d4948;
+  color: $zorroa-greyish-brown;
   background-color: #fff;
   display: flex;
   flex: 1;
@@ -24,7 +24,7 @@
 
   button {
     padding: 10px 22px;
-    border: 1px solid #4d4948;
+    border: 1px solid $zorroa-greyish-brown;
     background: none;
     margin-top: 10px;
     margin-bottom: 10px;

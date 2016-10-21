@@ -4,7 +4,7 @@
 // with the logo and searchbar scrunched on the left and
 // the menu right justified
 .header {
-  padding: 8px 16px 8px 16px;
+  padding: 0px 22px 0px 22px;
   height: 60px;
 }
 
@@ -14,13 +14,15 @@
 
 // Adjust the logo size so search starts at expanded sidebar
 .header-logo {
+  padding-top: 6px;
+  width: 277px;
 }
 
 // Simple menu text for now
 .header-menu {
   list-style: none;
-  margin-bottom: 0;
-  padding-left: 0;
+  // margin-bottom: 0;
+  // padding-left: 0;
 }
 
 // Convert a list item into a nav-item

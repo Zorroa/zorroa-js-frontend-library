@@ -1,10 +1,18 @@
+@import '../../styles/core-mixins.scss';
+
 // App class, containing header and workspace in columns
 .app {
   display: flex;
   flex-direction: column;
   overflow: hidden;
   flex: 1;
+
+  // This is a full screen (viewport) app
   height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
 }
 
 // Asset region, between the sidebars, filling the width
@@ -13,36 +21,18 @@
   display: flex;
   flex-direction: column;
   padding: 8px;
-  background-color: #ededed;
+  background-color: $zorroa-nearwhite;
 }
 
 // Allow the workspace to fill the full height of App
 .workspace {
-  display:flex;
-  flex:1;
-  background-color: #ededed;
+  background-color: $zorroa-nearwhite;
 }
 
 // Asset and table, in a column
 .workspace-body {
-  flex: 1 0 0;
-  display: flex;
-  flex-direction: column;
 }
 
-
-// Sidebars use flex-basis to toggle between open and close
-.sidebar {
-  flex: 0 0 50px;
-  padding: 8px;
-  background-color: #ededed;
-  border-left: 1px solid #c3c3c3;
-  border-right: 1px solid #c3c3c3;
-
-  &.sidebar-open {
-    flex: 0 0 300px;
-  }
-}
 
 // Accordion items in sidebars
 .accordion-item {

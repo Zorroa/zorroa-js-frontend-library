@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react'
+import classnames from 'classnames'
 
 export default class Collapsible extends Component {
   static get displayName () {
@@ -8,7 +9,7 @@ export default class Collapsible extends Component {
   static get propTypes () {
     return {
       children: PropTypes.node,
-      header: PropTypes.node,
+      headerFn: PropTypes.func.isRequired,
       style: PropTypes.object
     }
   }
@@ -28,14 +29,12 @@ export default class Collapsible extends Component {
 
   render () {
     const { open } = this.state
-    const { children, header, style } = this.props
-    const caretClass = 'collapsible-caret-' + (open ? 'open' : 'closed')
+    const { children, headerFn, style } = this.props
 
     return (
-      <div style={style} className="collapsible">
-        <div style={style} className="collapsible-header" onClick={this.handleClick.bind(this)}>
-          { children && (<div className={caretClass} />) }
-             {header}
+      <div style={style} className={classnames('collapsible', 'flexCol', {'parent': children, 'open': open})}>
+        <div style={style} className="collapsible-header flexCenter" onClick={this.handleClick.bind(this)}>
+          {headerFn(children, open)}
         </div>
         {open && (children)}
       </div>

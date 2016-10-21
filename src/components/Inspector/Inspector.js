@@ -14,9 +14,12 @@ class Inspector extends Component {
   render () {
     const { asset, host } = this.props
     const proxy = asset ? asset.closestProxy(1024, 1024) : null
+    const inspectorStyle = { 'backgroundSize': 'fit' }
+    if (proxy) inspectorStyle['backgroundImage'] = `url(${proxy.url(host)})`
+
     return (
-      <div className="inspector">
-        { proxy ? <img src={proxy.url(host)} /> : <div/> }
+      <div className="inspector fullWidth fullHeight flexCenter">
+        <div className='inspector-content flexOn' style={inspectorStyle}/><div/>
       </div>
     )
   }

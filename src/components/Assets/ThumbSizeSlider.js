@@ -16,7 +16,7 @@ export default class ThumbSizeSlider extends Component {
     return (
       <div className="thumb-size-slider flexRow flexAlignItemsCenter">
         <div className="icon-picture2" style={{fontSize: '15px'}} />
-        <input type="range" min="48" max="1024" step="4" value={this.props.value}
+        <input type="range" min="48" max="480" step="4" value={this.props.value}
                onChange={this.handleChange.bind(this)}/>
         <div className="icon-picture2" style={{fontSize: '30px'}} />
       </div>

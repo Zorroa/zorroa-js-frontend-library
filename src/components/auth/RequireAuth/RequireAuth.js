@@ -3,9 +3,16 @@ import { connect } from 'react-redux'
 
 export default function (ComposedComponent, url = '/') {
   class Authentication extends Component {
-    static contextTypes = {
-      router: PropTypes.object,
+    static get contextTypes () {
+      return {
+        router: PropTypes.object
+      }
+    }
 
+    static get propTypes () {
+      return {
+        authenticated: PropTypes.bool
+      }
     }
 
     componentWillMount () {

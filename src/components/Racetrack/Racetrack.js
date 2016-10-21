@@ -56,7 +56,7 @@ class Racetrack extends Component {
   }
 
   renderFilterHeader (filter) {
-    return (
+    return (isParent, isOpen) => (
       <FilterHeader icon={filter.icon} label={filter.label} onClose={this.handleCloseFilter.bind(this, filter)} />
     )
   }
@@ -100,7 +100,7 @@ class Racetrack extends Component {
           { filters && filters.length > 0 && (
           <div className="racetrack-filters">
             { filters.map((filter, i) => (
-              <Collapsible style={collapsibleStyle} header={this.renderFilterHeader(filter)}>
+              <Collapsible style={collapsibleStyle} headerFn={this.renderFilterHeader(filter)} isRacetrack={true}>
                 {filter.body}
               </Collapsible>)
             )}

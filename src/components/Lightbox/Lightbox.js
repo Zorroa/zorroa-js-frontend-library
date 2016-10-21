@@ -21,9 +21,9 @@ class Lightbox extends Component {
     const { assets, isolatedId } = this.props
     const asset = assets && isolatedId ? assets.find(asset => (asset.id === isolatedId)) : null
     return (
-      <div className="lightbox flexCenter fullWidth">
+      <div className="lightbox flexCol fullWidth fullHeight">
         <Lightbar/>
-        <div className="lightbox-body">
+        <div className="lightbox-body flexOn fullWidth fullHeight">
           <Inspector asset={asset} />
         </div>
       </div>
