@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react'
+import Measure from 'react-measure'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as assert from 'assert'
@@ -121,10 +122,23 @@ class Assets extends Component {
 
     return (
       <div className="assets-scroll fullWidth fullHeight">
-        <div className={`assets-layout ${layout}`}>
-          { assets.map(asset => (<Thumb selected={selectedIds && selectedIds.has(asset.id)} dim={thumbSize} layout={layout} key={asset.id} asset={asset} onClick={this.select.bind(this, asset)} onDoubleClick={this.isolateToLightbox.bind(this, asset)} />)) }
-        </div>
-        { assets.length < totalCount && (<Pager total={totalCount} loaded={assets.length} />) }
+        <Measure>
+          {({width}) =>
+          <div className={`assets-layout ${layout}`}>
+            { assets.map(asset => (
+              <Thumb selected={selectedIds && selectedIds.has(asset.id)}
+                dim={thumbSize}
+                layout={layout}
+                key={asset.id}
+                asset={asset}
+                onClick={this.select.bind(this, asset)}
+                onDoubleClick={this.isolateToLightbox.bind(this, asset)}
+              />
+            ))}
+            { assets.length < totalCount && (<Pager total={totalCount} loaded={assets.length} />) }
+          </div>
+          }
+        </Measure>
       </div>
     )
   }
