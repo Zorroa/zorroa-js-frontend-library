@@ -36,6 +36,7 @@ export function searchAssets (query) {
           type: ASSET_SEARCH_ERROR,
           payload: error
         })
+        throw error
       })
   }
 }
