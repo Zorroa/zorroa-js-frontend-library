@@ -10,6 +10,7 @@ import { isolateAsset, selectAssets } from '../../actions/assetsAction'
 import Pager from './Pager'
 import Footer from './Footer'
 import Table from '../Table'
+import * as ComputeLayout from './ComputeLayout.js'
 
 class Assets extends Component {
   static get propTypes () {
@@ -122,23 +123,36 @@ class Assets extends Component {
 
     return (
       <div className="assets-scroll fullWidth fullHeight">
-        <Measure>
-          {({width}) =>
-          <div className={`assets-layout ${layout}`}>
-            { assets.map(asset => (
-              <Thumb selected={selectedIds && selectedIds.has(asset.id)}
-                dim={thumbSize}
-                layout={layout}
-                key={asset.id}
-                asset={asset}
-                onClick={this.select.bind(this, asset)}
-                onDoubleClick={this.isolateToLightbox.bind(this, asset)}
-              />
-            ))}
-            { assets.length < totalCount && (<Pager total={totalCount} loaded={assets.length} />) }
-          </div>
-          }
+        <Measure onMeasure={({width}) => console.log(`new width: ${width}`)}>
+          {({width}) => {
+            if (!width) return (<div style={{'width': '100%'}}></div>)
+            const positions = (layout => {
+              switch (layout) {
+                case 'grid': return ComputeLayout.grid(assets, width, thumbSize)
+                case 'masonry': return ComputeLayout.masonry(assets, width, thumbSize)
+                case 'slideshow': return ComputeLayout.masonry(assets, width, thumbSize)
+                case 'waterfall': return ComputeLayout.masonry(assets, width, thumbSize)
+              }
+            })(layout)
+            const lastPos = positions[positions.length - 1]
+            const height = lastPos.y + lastPos.height
+            return (
+              <div className={`assets-layout ${layout}`}
+              style={{'width': width, 'height': height}}>
+                { assets.map((asset, index) => (
+                  <Thumb selected={selectedIds && selectedIds.has(asset.id)}
+                    dim={positions[index]}
+                    key={asset.id}
+                    asset={asset}
+                    onClick={this.select.bind(this, asset)}
+                    onDoubleClick={this.isolateToLightbox.bind(this, asset)}
+                  />
+                ))}
+              </div>
+            )
+          }}
         </Measure>
+        { assets.length < totalCount && (<Pager total={totalCount} loaded={assets.length} />) }
       </div>
     )
   }

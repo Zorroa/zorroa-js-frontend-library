@@ -8,8 +8,7 @@ class Thumb extends Component {
     return {
       asset: PropTypes.instanceOf(Asset).isRequired,
       host: PropTypes.string,
-      dim: PropTypes.number.isRequired,
-      layout: PropTypes.string.isRequired,
+      dim: PropTypes.object.isRequired,
       selected: PropTypes.bool,
       onClick: PropTypes.func.isRequired,
       onDoubleClick: PropTypes.func.isRequired
@@ -17,40 +16,22 @@ class Thumb extends Component {
   }
 
   render () {
-    const { asset, host, dim, layout, selected, onClick, onDoubleClick } = this.props
+    const { asset, host, dim, selected, onClick, onDoubleClick } = this.props
     if (!asset.proxies) {
       return <div className="thumb" style={{ backgroundColor: asset.backgroundColor() }} />
     }
-    var width, height, fit
-    switch (layout) {
-      case 'grid':
-        width = dim
-        height = dim
-        fit = 'cover'
-        break
-      case 'masonry':
-      case 'slideshow':
-        height = dim
-        width = height * asset.aspect()
-        fit = 'contain'
-        break
-      case 'waterfall':
-        width = dim
-        height = width / asset.aspect()
-        fit = 'cover'
-        break
-    }
-    const proxy = asset.closestProxy(width, height)
-    const borderColor = selected ? '#73b61c' : 'transparent'
+    const proxy = asset.closestProxy(dim.width, dim.height)
     return (
       <div
         className='assets-thumb'
         style={{
           'backgroundImage': `url(${proxy.url(host)})`,
-          'backgroundSize': fit,
-          'width': `${width}px`,
-          'height': `${height}px`,
-          'border': `3px solid ${borderColor}`
+          'backgroundSize': 'cover',
+          'width': dim.width,
+          'height': dim.height,
+          'left': dim.x,
+          'top': dim.y,
+          'border': selected ? '3px solid #73b61c' : 'none'
         }}
         onDoubleClick={onDoubleClick}
         onClick={onClick}

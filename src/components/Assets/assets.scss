@@ -8,16 +8,15 @@
 .assets-scroll {
   overflow-y: scroll;
   overflow-x: hidden;
-  padding-left: 8px;
-  padding-right: 8px;
+  padding: 8px;
   max-width: 100%;
 }
 
 .assets-layout {
-  flex: 1 0 0;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  // flex: 1 0 0;
+  // display: flex;
+  // flex-wrap: wrap;
+  // align-items: center;
 
   // Just making sure these work...
   &.masonry {
