@@ -36,6 +36,12 @@ export function searchAssets (query) {
           type: ASSET_SEARCH_ERROR,
           payload: error
         })
+
+        // re-throw any caught errors, since they might not be API errors.
+        // I ran into this with a run-time error in the JS code being caught here
+        // If we don't re-throw then we can't see the actual error message or call stack
+        // TODO: check 'error' and only re-throw if it is not a
+        // response error from the post call to the server
         throw error
       })
   }
