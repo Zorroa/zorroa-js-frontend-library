@@ -1,6 +1,6 @@
 @import '../../styles/core-mixins.scss';
 
-.folderitem-header {
+.collapsibleheader {
   @include nowrap;
   height: 40px;
   padding: 5px;
@@ -8,11 +8,11 @@
   margin-bottom: 5px;
 }
 
-.folderitem-header-icon {
+.collapsibleheader-icon {
   margin-right: 1em;
 }
 
-.folderitem-header-caret {
+.collapsibleheader-caret {
   font-size: 18px;
   width: 16px;
   min-width: 16px;

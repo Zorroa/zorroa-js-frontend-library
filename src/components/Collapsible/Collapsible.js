@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component, PropTypes, cloneElement } from 'react'
 import classnames from 'classnames'
 
 export default class Collapsible extends Component {
@@ -9,34 +9,34 @@ export default class Collapsible extends Component {
   static get propTypes () {
     return {
       children: PropTypes.node,
-      headerFn: PropTypes.func.isRequired,
+      header: PropTypes.element.isRequired,
       style: PropTypes.object
     }
   }
 
   constructor (props) {
     super(props)
-    this.state = { open: false }
+    this.state = { isOpen: false }
   }
 
   handleClick () {
-    const { open } = this.state
+    const { isOpen } = this.state
     const { children } = this.props
     if (children) {
-      this.setState({ ...this.state, open: !open })
+      this.setState({ ...this.state, isOpen: !isOpen })
     }
   }
 
   render () {
-    const { open } = this.state
-    const { children, headerFn, style } = this.props
+    const { isOpen } = this.state
+    const { children, header, style } = this.props
 
     return (
       <div style={style} className={classnames('collapsible', 'flexCol', {'parent': children, 'open': open})}>
         <div style={style} className="collapsible-header flexCenter" onClick={this.handleClick.bind(this)}>
-          {headerFn(children, open)}
+          { cloneElement(header, { isOpen, isParent: children && children.length > 0 }) }
         </div>
-        {open && (children)}
+        { isOpen && (children) }
       </div>
     )
   }

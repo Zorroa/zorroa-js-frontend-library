@@ -5,6 +5,7 @@ import Sidebar from '../../components/Sidebar'
 import Assets from '../../components/Assets'
 import Folders from '../../components/Folders'
 import Racetrack from '../../components/Racetrack'
+import Metadata from '../../components/Metadata'
 
 const Workspace = () => (
   <div className="app">
@@ -12,6 +13,7 @@ const Workspace = () => (
     <div className="workspace flexRow fullWidth fullHeight">
       <Sidebar>
         <Folders/>
+        <Metadata/>
       </Sidebar>
       <div className="workspace-body flexOn fullHeight">
         <Assets/>

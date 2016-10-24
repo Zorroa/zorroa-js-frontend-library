@@ -1,3 +1,5 @@
+import * as assert from 'assert'
+
 import Proxy from './Proxy'
 
 export default class Asset {
@@ -29,13 +31,70 @@ export default class Asset {
       const proxy = this.proxies[i]
       const x = Math.abs(proxy.width - width)
       const y = Math.abs(proxy.height - height)
-      const d = Math.max(x, y)
+      const d = Math.min(x, y)
       if (d < bestDim) {
         bestDim = d
         bestProxy = proxy
       }
     }
     return bestProxy
+  }
+
+  // Return the value for a metadata field specified using dot-notation
+  // as a path through the JSON-structured asset document. Recursively
+  // invokes _field to navigate through the JSON and then uses
+  // _valueToString to get a displayable form of the value.
+  value (field) {
+    return Asset._field(this.document, field)
+  }
+
+  static _field (obj, key) {
+    const idx = key.indexOf('.')
+    if (idx >= 0) {
+      const namespace = key.slice(0, idx)
+      const nextkey = key.slice(idx + 1)
+      const value = obj[namespace]
+      assert.ok(typeof value === 'object', 'non-object namespace')
+      return Asset._field(value, nextkey)
+    }
+
+    // E.g. proxies, an array of objects
+    // FIXME: Unify array management with _valueToString
+    if (obj instanceof Array) {
+      let array = '['
+      obj.map((f, i) => {
+        array += Asset._field(f, key)
+        array += ', '
+      })
+      array = array.slice(0, array.length - 2)
+      array += ']'
+      return array
+    }
+
+    return Asset._valueToString(obj[key])
+  }
+
+  static _valueToString (value) {
+    // E.g. tinyProxy, an array of POD
+    // FIXME: Unify array management with _field
+    if (value instanceof Array) {
+      let array = '['
+      value.map((f, i) => {
+        array += Asset._valueToString(f)
+        array += ', '
+      })
+      array = array.slice(0, array.length - 2)
+      array += ']'
+      return array
+    }
+
+    assert.ok(!(value instanceof Object || typeof value === 'object'), 'object field')
+    if (value instanceof String || typeof value === 'string') {
+      return value
+    }
+    if (value instanceof Number || typeof value === 'number') {
+      return value.toLocaleString()
+    }
   }
 }
 
