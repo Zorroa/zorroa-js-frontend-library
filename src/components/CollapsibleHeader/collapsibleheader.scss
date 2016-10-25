@@ -4,18 +4,24 @@
   @include nowrap;
   height: 40px;
   padding: 5px;
-  background-color: $zorroa-lightgray;
+  padding-left: 10px;
+  background-color: #d8d8d8;
   margin-bottom: 5px;
+  text-transform: uppercase;
+  color: $zorroa-gray;
+  font-weight: 100;
 }
 
 .collapsibleheader-icon {
-  margin-right: 1em;
+  color: $zorroa-gray;
+  margin-right: 14px;
 }
 
 .collapsibleheader-caret {
-  font-size: 18px;
+  font-size: 15px;
   width: 16px;
   min-width: 16px;
   max-width: 16px;
   margin-right: 1em;
+  color: $zorroa-gray;
 }

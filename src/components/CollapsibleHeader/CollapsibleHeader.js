@@ -11,7 +11,7 @@ const CollapsibleHeader = ({ isOpen, isParent, isCollapsed, label, openIcon, clo
       <span className={'collapsibleheader-icon ' + (isOpen ? openIcon : closeIcon)}/>
       {label}
       <div className='flexOn'/>
-      { isParent && <div className={classnames('collapsibleheader-caret', 'icon-arrow-down', { 'rot180': isOpen })}/> }
+      { isParent && <div className={classnames('collapsibleheader-caret', 'icon-chevron-down', { 'rot180': isOpen })}/> }
     </div>
   )
 )
