@@ -1,7 +1,31 @@
 import { ASSET_SEARCH, ASSET_SEARCH_ERROR, ISOLATE_ASSET, SELECT_ASSETS } from '../constants/actionTypes'
 
 function inject (src, idx, arr) {
-  return src.slice(0, idx).concat(arr).concat(src.slice(idx))
+  idx = Math.min(idx, src.length)
+  let seen = new Set()
+  let dupeCount = 0
+  let injected = []
+
+  var copyChunk = (a, first, last) => {
+    for (let i = first; i < last; i++) {
+      if (!seen.has(a[i].id)) {
+        injected.push(a[i])
+        seen.add(a[i].id)
+      } else {
+        dupeCount++
+      }
+    }
+  }
+
+  copyChunk(src, 0, idx)
+  copyChunk(arr, 0, arr.length)
+  copyChunk(src, idx, src.length)
+
+  if (dupeCount) {
+    console.error(`WARNING ${dupeCount} duplicate asset ids present`)
+  }
+
+  return injected
 }
 
 export default function (state = {}, action) {
