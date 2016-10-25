@@ -130,8 +130,6 @@ class Assets extends Component {
               switch (layout) {
                 case 'grid': return ComputeLayout.grid(assets, width, thumbSize)
                 case 'masonry': return ComputeLayout.masonry(assets, width, thumbSize)
-                case 'slideshow': return ComputeLayout.masonry(assets, width, thumbSize)
-                case 'waterfall': return ComputeLayout.masonry(assets, width, thumbSize)
               }
             })(layout)
             const lastPos = positions[positions.length - 1]

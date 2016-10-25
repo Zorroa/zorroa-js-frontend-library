@@ -3,9 +3,7 @@ import classnames from 'classnames'
 
 const layouts = [
   { name: 'grid', icon: 'icon-layout2' },
-  { name: 'masonry', icon: 'icon-layout3' },
-  { name: 'waterfall', icon: 'icon-layout4' },
-  { name: 'slideshow', icon: 'icon-layout' }
+  { name: 'masonry', icon: 'icon-layout3' }
 ]
 
 function handleClick (onClick, layout) {
