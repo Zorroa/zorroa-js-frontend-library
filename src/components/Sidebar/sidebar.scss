@@ -5,8 +5,8 @@
   flex: 0 0 50px;
   padding: 8px;
   background-color: $zorroa-nearwhite;
-  border-left: 1px solid #c3c3c3;
-  border-right: 1px solid #c3c3c3;
+  border-left: 1px solid $zorroa-lightgray;
+  border-right: 1px solid $zorroa-lightgray;
 
   &.open {
     flex: 0 0 300px;
