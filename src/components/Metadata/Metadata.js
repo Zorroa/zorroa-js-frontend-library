@@ -16,8 +16,16 @@ class Metadata extends Component {
   }
 
   renderHeader () {
-    return (<CollapsibleHeader label="METADATA" isCollapsed={false}
-                               openIcon="icon-register" closeIcon="icon-register" />)
+    const metadataLabel = (
+      <div className='flexCenter'>
+        <span>Metadata</span>
+        <i className='metadata-icon icon-cog'></i>
+      </div>
+    )
+    return (<CollapsibleHeader
+      label={metadataLabel}
+      isCollapsed={false}
+      openIcon="icon-register" closeIcon="icon-register" />)
   }
 
   render () {

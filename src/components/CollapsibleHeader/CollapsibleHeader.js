@@ -20,7 +20,7 @@ CollapsibleHeader.propTypes = {
   isOpen: PropTypes.bool,
   isParent: PropTypes.bool,
   isCollapsed: PropTypes.bool.isRequired,
-  label: PropTypes.string.isRequired,
+  label: PropTypes.node.isRequired,
   openIcon: PropTypes.string.isRequired,
   closeIcon: PropTypes.string.isRequired
 }
