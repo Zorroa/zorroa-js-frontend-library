@@ -2,24 +2,33 @@
 
 // Sidebars use flex-basis to toggle between open and close
 .sidebar {
-  flex: 0 0 50px;
-  padding: 8px;
+  width: 70px;
+  max-width: 70px;
+  min-width: 70px;
+
+  padding-left: 20px;
+  padding-right: 10px;
+
   background-color: $zorroa-nearwhite;
   border-left: 1px solid $zorroa-lightgray;
   border-right: 1px solid $zorroa-lightgray;
 
   &.open {
-    flex: 0 0 300px;
+    width: $zorroa-sidebar-width;
+    max-width: $zorroa-sidebar-width;
+    min-width: $zorroa-sidebar-width;
   }
 }
 
 .sidebar-button {
-  opacity: 0.5;
+  height: 21px;
   font-size: 9px;
-  font-weight: 300;
-  display: flex;
+  color: $zorroa-lightgray;
+
+  @include flexRow;
+  @include flexAlignItemsCenter;
 
   &.left {
-    justify-content: flex-end;
+    @include flexJustifyEnd;
   }
 }

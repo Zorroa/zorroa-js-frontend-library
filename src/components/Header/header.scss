@@ -4,7 +4,8 @@
 // with the logo and searchbar scrunched on the left and
 // the menu right justified
 .header {
-  padding: 0px 22px 0px 22px;
+  padding: 0;
+  padding-right: 22px;
   height: 60px;
 }
 
@@ -15,7 +16,10 @@
 // Adjust the logo size so search starts at expanded sidebar
 .header-logo {
   padding-top: 6px;
-  width: 277px;
+  padding-left: 22px;
+  width: $zorroa-sidebar-width;
+  min-width: $zorroa-sidebar-width;
+  max-width: $zorroa-sidebar-width;
 }
 
 // Simple menu text for now

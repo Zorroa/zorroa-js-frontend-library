@@ -6,13 +6,12 @@ import Searchbar from '../../components/Searchbar'
 
 const Header = () => (
   <nav className="header flexCenter fullWidth">
-    <Link to="/" className="header-logo"><Logo/></Link>
+    <Link to="/" className='header-logo'><Logo/></Link>
     <Searchbar/>
     <div className="flexOn"></div>
     <div className="header-menu fullHeight flexCenter">
       <div id="header-menu-imports" className="header-menu-item">
         <span>Imports</span>
-        <span className='header-menu-icon icon-arrow-down'></span>
       </div>
       <div id="header-menu-layouts" className="header-menu-item">
         <span>Layouts</span>

@@ -40,6 +40,11 @@ $zorroa-nearwhite  : #ededed;
 $zorroa-transparent: transparent;
 
 
+/* shared metrics */
+
+$zorroa-sidebar-width : 320px;
+
+
 /* Button classes */
 
 @mixin zorroa-btn-bg($color,$hover) {
@@ -148,6 +153,7 @@ $zorroa-transparent: transparent;
 @mixin flexOff { -webkit-box-flex : 0 0 auto ; -moz-box-flex : 0 0 auto; -webkit-flex : 0 0 auto ; -ms-flex : 0 0 auto; flex : 0 0 auto; }
 
 @mixin flexJustifyStart  { -webkit-justify-content: flex-start ; -moz-justify-content: flex-start ; -ms-flex-pack: flex-start ; justify-content: flex-start ; }
+@mixin flexJustifyEnd    { -webkit-justify-content: flex-end   ; -moz-justify-content: flex-end   ; -ms-flex-pack: flex-end   ; justify-content: flex-end   ; }
 @mixin flexJustifyCenter { -webkit-justify-content: center     ; -moz-justify-content: center     ; -ms-flex-pack: center     ; justify-content: center     ; }
 @mixin flexJustifySpaceBetween { -webkit-justify-content: space-between ; -moz-justify-content: space-between ; -ms-flex-pack: space-between ; justify-content: space-between ; }
 
