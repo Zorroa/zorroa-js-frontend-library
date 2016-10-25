@@ -10,7 +10,7 @@ export default class Collapsible extends Component {
     return {
       children: PropTypes.node,
       header: PropTypes.element.isRequired,
-      style: PropTypes.object
+      bodyStyle: PropTypes.object
     }
   }
 
@@ -29,14 +29,16 @@ export default class Collapsible extends Component {
 
   render () {
     const { isOpen } = this.state
-    const { children, header, style } = this.props
+    const { children, header, bodyStyle } = this.props
 
     return (
-      <div style={style} className={classnames('collapsible', 'flexCol', {'parent': children, 'open': open})}>
-        <div style={style} className="collapsible-header flexCenter" onClick={this.handleClick.bind(this)}>
+      <div className={classnames('collapsible', 'flexCol', {'parent': children, 'open': open})}>
+        <div className="collapsible-header flexCenter" onClick={this.handleClick.bind(this)}>
           { cloneElement(header, { isOpen, isParent: children && children.length > 0 }) }
         </div>
-        { isOpen && (children) }
+        <div style={bodyStyle} className="collapsible-body">
+          { isOpen && (children) }
+        </div>
       </div>
     )
   }

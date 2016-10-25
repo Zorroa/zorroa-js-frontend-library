@@ -30,7 +30,7 @@ export default class FolderItem extends Component {
     const { folders, folderId, loadChildren } = this.props
     const folder = folders.get(folderId)
     return (
-      <Collapsible style={{marginLeft: '16px'}} header={this.renderHeader(folder)}>
+      <Collapsible bodyStyle={{marginLeft: '16px'}} header={this.renderHeader(folder)}>
         { folder.children !== undefined && folder.children.map(child => (
           <FolderItem key={child.id} folders={folders} folderId={child.id} loadChildren={loadChildren} />)
         )}
