@@ -1,6 +1,10 @@
 import { ASSET_SEARCH, ASSET_SEARCH_ERROR, ISOLATE_ASSET, SELECT_ASSETS } from '../constants/actionTypes'
 
 function inject (src, idx, arr) {
+  if (!window.DEBUG) {
+    return src.slice(0, idx).concat(arr).concat(src.slice(idx))
+  }
+
   idx = Math.min(idx, src.length)
   let seen = new Set()
   let dupeCount = 0
