@@ -1,5 +1,9 @@
 import React, { Component, PropTypes } from 'react'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
 import classnames from 'classnames'
+
+import { setSidebarFoldersSqueeze, setSidebarRacetrackSqueeze } from '../actions/sidebarAction';
 
 import Folders from '../../components/Folders'
 import Racetrack from '../../components/Racetrack'
@@ -25,11 +29,12 @@ export default class Sidebar extends Component {
 
   constructor (props) {
     super(props)
-    this.state = { open: true }
+    // this.state = { open: true }
   }
 
   handleClick () {
-    this.setState({ open: !this.state.open })
+    // this.setState({ open: !this.state.open })
+
   }
 
   buttonChar () {
@@ -72,3 +77,27 @@ export const SidebarWithRacetrack = () =>
   <Sidebar isRightEdge={true}>
     <Racetrack/>
   </Sidebar>
+
+//----------------------------------------------------------------------
+
+function mapStateToProps(state) {
+  // whatever is returned will show up as props
+  // inside of Component
+  return {
+    books: state.books
+  }
+}
+
+// Anything returned form this func will end up as props
+// on the Component container
+function mapDispatchToProps(dispatch) {
+  // When selectBook is called, the result should
+  // be passed to all our reducers
+  return bindActionCreators(
+    {setSidebarFoldersSqueeze, setSidebarRacetrackSqueeze}, dispatch);
+}
+
+// Promote Component from a component to a container-
+// it needs to knwo about this new dispatch method, selectBook.
+// Make it available as a prop.
+export default connect(mapStateToProps, mapDispatchToProps)(Sidebar);

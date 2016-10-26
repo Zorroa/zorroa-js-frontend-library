@@ -23,6 +23,7 @@ CollapsibleHeader.propTypes = {
   label: PropTypes.node.isRequired,
   openIcon: PropTypes.string.isRequired,
   closeIcon: PropTypes.string.isRequired
+  // ,squeezeKey: PropTypes.string.isRequired
 }
 
 export default CollapsibleHeader
