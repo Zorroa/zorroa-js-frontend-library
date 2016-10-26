@@ -1,3 +1,3 @@
-import Sidebar from './Sidebar'
+import Sidebar, { SidebarWithFolders, SidebarWithRacetrack } from './Sidebar'
 import './sidebar.scss'
-export default Sidebar
+export { Sidebar as default, SidebarWithFolders, SidebarWithRacetrack }

@@ -1,6 +1,10 @@
 import React, { Component, PropTypes } from 'react'
 import classnames from 'classnames'
 
+import Folders from '../../components/Folders'
+import Racetrack from '../../components/Racetrack'
+import Metadata from '../../components/Metadata'
+
 export default class Sidebar extends Component {
   static displayName () {
     return 'Sidebar'
@@ -57,3 +61,14 @@ export default class Sidebar extends Component {
     )
   }
 }
+
+export const SidebarWithFolders = () =>
+  <Sidebar>
+    <Folders/>
+    <Metadata/>
+  </Sidebar>
+
+export const SidebarWithRacetrack = () =>
+  <Sidebar isRightEdge={true}>
+    <Racetrack/>
+  </Sidebar>
