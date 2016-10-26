@@ -4,7 +4,7 @@ import Page from '../models/Page'
 
 describe('assetsReducer', () => {
   const query = 'foo'
-  const assets = ['a']
+  const assets = [{id: 'a'}]
   const page = new Page({size: 1, totalCount: 1})
 
   it('ASSET_SEARCH returns asset list', () => {
@@ -26,7 +26,7 @@ describe('assetsReducer', () => {
     const state1 = assetsReducer({}, { type: ASSET_SEARCH, payload: payload1 })
 
     // Reduce the second page of assets
-    const assets2 = ['b']
+    const assets2 = [{id: 'b'}]
     const page2 = new Page({ from: 1, size: 1, totalCount: 2 })
     const payload2 = { query, assets: assets2, page: page2 }
 
