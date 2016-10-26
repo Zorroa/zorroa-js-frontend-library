@@ -1,21 +1,19 @@
-import * from '../constants/actionTypes'
+import * as ACTION_TYPE from '../constants/actionTypes'
 
 const initialState = {
-  sidebar: {
-    racetrack: { open: true },
-    folders: { open: true }
-  }
+  racetrack: { open: true },
+  folders: { open: true }
 }
 export default function (state = initialState, action) {
   switch (action.type) {
-    case OPEN_SIDEBAR_FOLDERS:
-      return {...state, action.payload }
-    case CLOSE_SIDEBAR_FOLDERS:
-      return {...state, action.payload }
-    case OPEN_SIDEBAR_RACETRACK:
-      return {...state, action.payload }
-    case CLOSE_SIDEBAR_RACETRACK:
-      return {...state, action.payload }
+    case ACTION_TYPE.OPEN_SIDEBAR_FOLDERS:
+      return {...state, sidebar: action.payload }
+    case ACTION_TYPE.CLOSE_SIDEBAR_FOLDERS:
+      return {...state, sidebar: action.payload }
+    case ACTION_TYPE.OPEN_SIDEBAR_RACETRACK:
+      return {...state, sidebar: action.payload }
+    case ACTION_TYPE.CLOSE_SIDEBAR_RACETRACK:
+      return {...state, sidebar: action.payload }
   }
 
   return state

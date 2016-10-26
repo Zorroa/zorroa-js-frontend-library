@@ -3,13 +3,13 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
-import { setSidebarFoldersOpen, setSidebarRacetrackOpen } from '../actions/sidebarAction';
+import { setSidebarFoldersOpen, setSidebarRacetrackOpen } from '../../actions/sidebarAction'
 
 import Folders from '../../components/Folders'
 import Racetrack from '../../components/Racetrack'
 import Metadata from '../../components/Metadata'
 
-export default class Sidebar extends Component {
+class Sidebar extends Component {
   static displayName () {
     return 'Sidebar'
   }
@@ -39,7 +39,8 @@ export default class Sidebar extends Component {
 
   buttonChar () {
     // Select the right or left facing triangle unicode char using XOR
-    return this.state.open !== this.props.isRightEdge ? '\u25C0' : '\u25B6'
+    // return this.state.open !== this.props.isRightEdge ? '\u25C0' : '\u25B6'
+    return '\u25C0'
   }
 
   buttonClassNames () {
@@ -50,7 +51,7 @@ export default class Sidebar extends Component {
 
   sidebarClassNames () {
     return classnames('sidebar', {
-      'open': this.state.open
+      'open': true//this.state.open
     })
   }
 
@@ -83,9 +84,8 @@ export const SidebarWithRacetrack = () =>
 function mapStateToProps(state) {
   // whatever is returned will show up as props
   // inside of Component
-  return {
-    books: state.books
-  }
+  console.log('sidebar mapStateToProps', state.sidebar)
+  return state.sidebar
 }
 
 // Anything returned form this func will end up as props

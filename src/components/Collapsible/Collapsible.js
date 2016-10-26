@@ -2,7 +2,7 @@ import React, { Component, PropTypes, cloneElement } from 'react'
 import { connect } from 'react-redux';
 import classnames from 'classnames'
 
-export default class Collapsible extends Component {
+class Collapsible extends Component {
   static get displayName () {
     return 'Collapsible'
   }
@@ -48,9 +48,7 @@ export default class Collapsible extends Component {
 
 function mapStateToProps(state) {
   // whatever is returned will show up as props
-  return {
-    isSidebarOpen: state.sidebar
-  }
+  return state.sidebar;
 }
 
 // Promote BookList from a component to a container-
@@ -58,4 +56,4 @@ function mapStateToProps(state) {
 // Make it available as a prop.
 export default connect(mapStateToProps
   // , mapDispatchToProps
-)(BookDetail);
+)(Collapsible);
