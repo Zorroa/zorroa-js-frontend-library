@@ -14,7 +14,8 @@ module.exports = function getPlugins (env) {
       'process.env': {
         BUILD_ENV: process.env.ENV,
         'ROOT_URL': JSON.stringify('http://localhost:3090')
-      }
+      },
+      'DEBUG': (env === 'DEV')
     })
   ]
 
