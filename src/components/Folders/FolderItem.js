@@ -22,7 +22,7 @@ export default class FolderItem extends Component {
   renderHeader (folder) {
     return (
       <CollapsibleHeader label={folder.name} isCollapsed={false}
-                         openIcon="icon-folder2" closeIcon="icon-folder" squeezeKey="sidebarLeft"/>
+                         openIcon="icon-folder2" closeIcon="icon-folder" sidebarOpenKey="sidebarLeft"/>
     )
   }
 
@@ -30,7 +30,7 @@ export default class FolderItem extends Component {
     const { folders, folderId, loadChildren } = this.props
     const folder = folders.get(folderId)
     return (
-      <Collapsible header={this.renderHeader(folder)} squeezeKey="sidebarLeft">
+      <Collapsible header={this.renderHeader(folder)} sidebarOpenKey="sidebarLeft">
         { folder.children !== undefined && folder.children.map(child => (
           <FolderItem key={child.id} folders={folders} folderId={child.id} loadChildren={loadChildren} />)
         )}

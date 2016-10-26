@@ -22,8 +22,8 @@ CollapsibleHeader.propTypes = {
   isCollapsed: PropTypes.bool.isRequired,
   label: PropTypes.node.isRequired,
   openIcon: PropTypes.string.isRequired,
-  closeIcon: PropTypes.string.isRequired
-  // ,squeezeKey: PropTypes.string.isRequired
+  closeIcon: PropTypes.string.isRequired,
+  sidebarOpenKey: PropTypes.string.isRequired
 }
 
 export default CollapsibleHeader

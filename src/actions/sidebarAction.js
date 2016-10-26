@@ -1,15 +1,15 @@
 import '../constants/actionTypes'
 
-export function setSidebarFoldersSqueeze (isSqueezed) {
+export function setSidebarFoldersOpen (isOpen) {
   return {
-    type: (isSqueezed) ? SQUEEZE_SIDEBAR_FOLDERS : EXPAND_SIDEBAR_FOLDERS,
-    payload: isSqueezed
+    type: (isOpen) ? CLOSE_SIDEBAR_FOLDERS : OPEN_SIDEBAR_FOLDERS,
+    payload: isOpen
   }
 }
 
-export function setSidebarRacetrackSqueeze (isSqueezed) {
+export function setSidebarRacetrackOpen (isOpen) {
   return {
-    type: (isSqueezed) ? SQUEEZE_SIDEBAR_RACETRACK : EXPAND_SIDEBAR_RACETRACK,
-    payload: isSqueezed
+    type: (isOpen) ? CLOSE_SIDEBAR_RACETRACK : OPEN_SIDEBAR_RACETRACK,
+    payload: isOpen
   }
 }

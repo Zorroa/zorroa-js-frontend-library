@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
-import { setSidebarFoldersSqueeze, setSidebarRacetrackSqueeze } from '../actions/sidebarAction';
+import { setSidebarFoldersOpen, setSidebarRacetrackOpen } from '../actions/sidebarAction';
 
 import Folders from '../../components/Folders'
 import Racetrack from '../../components/Racetrack'
@@ -94,7 +94,7 @@ function mapDispatchToProps(dispatch) {
   // When selectBook is called, the result should
   // be passed to all our reducers
   return bindActionCreators(
-    {setSidebarFoldersSqueeze, setSidebarRacetrackSqueeze}, dispatch);
+    {setSidebarFoldersOpen, setSidebarRacetrackOpen}, dispatch);
 }
 
 // Promote Component from a component to a container-

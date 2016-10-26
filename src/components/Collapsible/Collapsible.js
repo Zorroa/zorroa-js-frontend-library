@@ -10,8 +10,9 @@ export default class Collapsible extends Component {
   static get propTypes () {
     return {
       children: PropTypes.node,
-      header: PropTypes.element.isRequired
-      // ,squeezeKey: PropTypes.string.isRequired
+      style: PropTypes.object,
+      header: PropTypes.element.isRequired,
+      sidebarOpenKey: PropTypes.string.isRequired
     }
   }
 
@@ -38,8 +39,8 @@ export default class Collapsible extends Component {
           { cloneElement(header, { isOpen, isParent: children && children.length > 0 }) }
         </div>
         <div style={{marginLeft: '16px'}} className="collapsible-body">
-        { isOpen && (children) }
-      </div>
+          { isOpen && (children) }
+        </div>
       </div>
     )
   }
@@ -48,7 +49,7 @@ export default class Collapsible extends Component {
 function mapStateToProps(state) {
   // whatever is returned will show up as props
   return {
-    isSqueezed: state.sidebar
+    isSidebarOpen: state.sidebar
   }
 }
 
