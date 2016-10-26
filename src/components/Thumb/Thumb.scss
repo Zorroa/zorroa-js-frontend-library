@@ -3,6 +3,8 @@
 .assets-thumb {
   background-repeat: no-repeat;
   background-position: center;
+  background-clip: border-box;
+  background-origin: border-box;
   // margin: 5px;
 
   position: absolute;
