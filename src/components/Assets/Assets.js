@@ -123,7 +123,7 @@ class Assets extends Component {
 
     return (
       <div className="assets-scroll fullWidth fullHeight">
-        <Measure onMeasure={({width}) => console.log(`new width: ${width}`)}>
+        <Measure>
           {({width}) => {
             if (!width) return (<div style={{'width': '100%'}}></div>)
             const positions = (layout => {

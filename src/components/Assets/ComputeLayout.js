@@ -12,7 +12,7 @@ export function masonry (assets, panelWidth, thumbSize) {
   const proposedRowHeight = panelWidth / idealAspectSum
   const margin = 5
 
-  let rows = [[]]
+  let rowLengths = [0]
   let rowAspects = [0]
   let aspects = []
 
@@ -24,13 +24,15 @@ export function masonry (assets, panelWidth, thumbSize) {
     let aspect = Math.min(3, proxy.width / proxy.height)
     aspects[i] = aspect
 
-    const rowIndex = rows.length - 1
-    // Let's say it'll fit if the space left in the row is more than half the width of the thumb being considered
+    const rowIndex = rowLengths.length - 1
+
+    // Let's say it'll fit if the space left in the row is
+    // more than half the width of the thumb being considered
     if (rowAspects[rowIndex] + aspect / 2 < idealAspectSum) {
-      rows[rowIndex].push(i)
+      rowLengths[rowIndex]++
       rowAspects[rowIndex] += aspect
     } else {
-      rows.push([i])
+      rowLengths.push(1)
       rowAspects.push(aspect)
     }
   }
@@ -39,30 +41,28 @@ export function masonry (assets, panelWidth, thumbSize) {
   // and adjust each one to fit in the exact panel width provided
   let thumbPositions = []
   let curY = 0
-  for (var r = 0; r < rows.length; r++) {
-    const row = rows[r]
+  const numRows = rowLengths.length
+  for (let r = 0, assetIndex = 0; r < numRows; r++) {
+    const rowLength = rowLengths[r]
     let curX = 0
 
-    const numMargins = row.length - 1
-    let preAdjustedRowWidthSansMargins = rowAspects[r] * proposedRowHeight
-    let rowExpandFactorSansMargins = panelWidth / preAdjustedRowWidthSansMargins
-    const approximatePreAdjustedMargin = margin / rowExpandFactorSansMargins
-    let preAdjustedRowWidth = rowAspects[r] * proposedRowHeight + approximatePreAdjustedMargin * numMargins
+    const numMargins = rowLength - 1
+    let rowWidthSansMargins = panelWidth - margin * numMargins
+    let rowHeight = rowWidthSansMargins / rowAspects[r]
 
-    let rowExpandFactor = panelWidth / preAdjustedRowWidth
-    if (r === rows.length - 1 && preAdjustedRowWidth < panelWidth && rowExpandFactor > 1.25) {
-      rowExpandFactor = 1
+    // Special handling for the last row -- don't expand it to fit unless it's already close
+    if (r === numRows - 1 && (rowAspects[r] / idealAspectSum < 0.75)) {
+      rowHeight = proposedRowHeight
     }
 
-    const actualRowHeight = Math.floor(proposedRowHeight * rowExpandFactor)
-    for (var c = 0; c < row.length; c++) {
-      const assetIndex = rows[r][c]
-      const width = Math.floor(proposedRowHeight * aspects[assetIndex] * rowExpandFactor)
-      let position = { x: curX, y: curY, width: width, height: actualRowHeight }
+    // Now that we know how big everything should be, store the final sizes
+    for (let c = 0; c < rowLength; c++, assetIndex++) {
+      const width = Math.floor(rowHeight * aspects[assetIndex])
+      let position = { x: curX, y: curY, width: width, height: rowHeight }
       curX += width + margin
       thumbPositions.push(position)
     }
-    curY += actualRowHeight + margin
+    curY += rowHeight + margin
   }
 
   return thumbPositions
