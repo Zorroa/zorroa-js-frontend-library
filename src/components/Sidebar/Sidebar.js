@@ -40,8 +40,14 @@ class Sidebar extends Component {
     super(props)
   }
 
-  handleClick () {
+  toggleOpenClosed () {
     this.props.actions.setSidebarOpen(this.props.sidebarKey, !this.isOpen())
+  }
+
+  openWhenClosed () {
+    if (!this.isOpen()) {
+      this.props.actions.setSidebarOpen(this.props.sidebarKey, true)
+    }
   }
 
   buttonChar () {
@@ -66,12 +72,14 @@ class Sidebar extends Component {
     return (
       <div className={this.sidebarClassNames()}>
         <div className={this.buttonClassNames()}>
-          <label onClick={this.handleClick.bind(this)}>{arrow}{arrow}</label>
+          <label onClick={this.toggleOpenClosed.bind(this)}>{arrow}{arrow}</label>
         </div>
-        {
-          React.Children.map(this.props.children,
-            child => cloneElement(child, { sidebarIsOpen: this.isOpen() }))
-        }
+        <div onClick={this.openWhenClosed.bind(this)}>
+          {
+            React.Children.map(this.props.children,
+              child => cloneElement(child, { sidebarIsOpen: this.isOpen() }))
+          }
+        </div>
       </div>
     )
   }
