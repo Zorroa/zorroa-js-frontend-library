@@ -1,15 +1,8 @@
-import '../constants/actionTypes'
+import * as ACTION_TYPE from '../constants/actionTypes'
 
-export function setSidebarFoldersOpen (isOpen) {
+export default function setSidebarOpen (sidebarKey, isOpen) {
   return {
-    type: (isOpen) ? CLOSE_SIDEBAR_FOLDERS : OPEN_SIDEBAR_FOLDERS,
-    payload: isOpen
-  }
-}
-
-export function setSidebarRacetrackOpen (isOpen) {
-  return {
-    type: (isOpen) ? CLOSE_SIDEBAR_RACETRACK : OPEN_SIDEBAR_RACETRACK,
-    payload: isOpen
+    type: (isOpen) ? ACTION_TYPE.CLOSE_SIDEBAR : ACTION_TYPE.OPEN_SIDEBAR,
+    payload: { sidebarKey, isOpen }
   }
 }

@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
-import { setSidebarFoldersOpen, setSidebarRacetrackOpen } from '../../actions/sidebarAction'
+import setSidebarOpen from '../../actions/sidebarAction'
 
 import Folders from '../../components/Folders'
 import Racetrack from '../../components/Racetrack'
@@ -16,6 +16,7 @@ class Sidebar extends Component {
 
   static get propTypes () {
     return {
+      actions: PropTypes.object.isRequired,
       isRightEdge: PropTypes.bool,
       children: PropTypes.node,
       sidebarKey: PropTypes.string.isRequired,
@@ -29,25 +30,23 @@ class Sidebar extends Component {
     }
   }
 
+  isOpen () {
+    const sidebarState = this.props.sidebar
+    const sidebarKey = this.props.sidebarKey
+    return sidebarState[sidebarKey].open
+  }
+
   constructor (props) {
     super(props)
-    // this.state = { open: true }
   }
 
   handleClick () {
-    // this.setState({ open: !this.state.open })
-
-    debugger
-    const sidebarState = this.props.sidebar
-    const sidebarKey = this.props.sidebarKey
-    const open = sidebarState[sidebarKey].open
-    setSidebarFoldersOpen(!open)
+    this.props.actions.setSidebarOpen(this.props.sidebarKey, !this.isOpen())
   }
 
   buttonChar () {
     // Select the right or left facing triangle unicode char using XOR
-    // return this.state.open !== this.props.isRightEdge ? '\u25C0' : '\u25B6'
-    return '\u25C0'
+    return this.isOpen() !== this.props.isRightEdge ? '\u25C0' : '\u25B6'
   }
 
   buttonClassNames () {
@@ -58,7 +57,7 @@ class Sidebar extends Component {
 
   sidebarClassNames () {
     return classnames('sidebar', {
-      'open': true//this.state.open
+      'open': this.isOpen()
     })
   }
 
@@ -69,22 +68,14 @@ class Sidebar extends Component {
         <div className={this.buttonClassNames()}>
           <label onClick={this.handleClick.bind(this)}>{arrow}{arrow}</label>
         </div>
-        {this.props.children}
+        {
+          React.Children.map(this.props.children,
+            child => cloneElement(child, { sidebarIsOpen: this.isOpen() }))
+        }
       </div>
     )
   }
 }
-
-const SidebarWithFoldersFn = () =>
-  <Sidebar sidebarKey={'folders'}>
-    <Folders/>
-    <Metadata/>
-  </Sidebar>
-
-const SidebarWithRacetrackFn = () =>
-  <Sidebar sidebarKey={'racetrack'} isRightEdge={true}>
-    <Racetrack/>
-  </Sidebar>
 
 //----------------------------------------------------------------------
 
@@ -99,14 +90,12 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   // When action is called, the result should
   // be passed to all our reducers
-  return bindActionCreators({setSidebarFoldersOpen, setSidebarRacetrackOpen}, dispatch);
+  return {
+    actions: bindActionCreators({setSidebarOpen}, dispatch)
+  }
 }
 
 // Promote Component from a component to a container-
 // it needs to know about this new dispatch method.
 // Make it available as a prop.
-const a = connect(mapStateToProps, mapDispatchToProps)(Sidebar)
-const SidebarWithFolders = connect(mapStateToProps, mapDispatchToProps)(SidebarWithFoldersFn)
-const SidebarWithRacetrack = connect(mapStateToProps, mapDispatchToProps)(SidebarWithRacetrackFn)
-export { a as default, SidebarWithFolders, SidebarWithRacetrack }
-
+export default connect(mapStateToProps, mapDispatchToProps)(Sidebar)
