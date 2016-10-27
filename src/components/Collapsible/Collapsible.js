@@ -12,8 +12,7 @@ class Collapsible extends Component {
       children: PropTypes.node,
       style: PropTypes.object,
       header: PropTypes.element.isRequired,
-      sidebarKey: PropTypes.string.isRequired,
-      sidebar: PropTypes.object.isRequired
+      sidebarIsOpen: PropTypes.bool.isRequired
     }
   }
 
@@ -37,7 +36,7 @@ class Collapsible extends Component {
     const childrenWithProps = _ => {
       if (!isOpen) return null;
       return React.Children.map(this.props.children,
-        child => cloneElement(child, { sidebarKey: this.props.sidebarKey }))
+        child => cloneElement(child, { sidebarIsOpen: this.state.isOpen }))
     }
 
     return (

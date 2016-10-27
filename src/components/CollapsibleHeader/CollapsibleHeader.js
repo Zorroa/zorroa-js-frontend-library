@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react'
 import classnames from 'classnames'
 
-const CollapsibleHeader = ({ isOpen, isParent, isCollapsed, label, openIcon, closeIcon }) => (
+const CollapsibleHeader = ({ isOpen, isParent, isCollapsed, label, openIcon, closeIcon, sidebarIsOpen }) => (
   isCollapsed ? (
       <div className="collapsible-header-collapsed">
         <span className={closeIcon} />
@@ -9,9 +9,9 @@ const CollapsibleHeader = ({ isOpen, isParent, isCollapsed, label, openIcon, clo
     ) : (
     <div className='collapsibleheader flexCenter fullWidth'>
       <span className={'collapsibleheader-icon ' + (isOpen ? openIcon : closeIcon)}/>
-      {label}
+      { (sidebarIsOpen) && label}
       <div className='flexOn'/>
-      { isParent && <div className={classnames('collapsibleheader-caret', 'icon-chevron-down', { 'rot180': isOpen })}/> }
+      { isParent && sidebarIsOpen && <div className={classnames('collapsibleheader-caret', 'icon-chevron-down', { 'rot180': isOpen })}/> }
     </div>
   )
 )
@@ -22,7 +22,8 @@ CollapsibleHeader.propTypes = {
   isCollapsed: PropTypes.bool.isRequired,
   label: PropTypes.node.isRequired,
   openIcon: PropTypes.string.isRequired,
-  closeIcon: PropTypes.string.isRequired
+  closeIcon: PropTypes.string.isRequired,
+  sidebarIsOpen: PropTypes.bool.isRequired
 }
 
 export default CollapsibleHeader

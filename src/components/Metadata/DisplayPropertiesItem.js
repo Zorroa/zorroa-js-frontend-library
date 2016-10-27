@@ -9,7 +9,8 @@ export default class DisplayPropertiesItem extends Component {
     return {
       field: PropTypes.string.isRequired,
       displayProperties: PropTypes.instanceOf(DisplayProperties).isRequired,
-      selectedAssets: PropTypes.object
+      selectedAssets: PropTypes.object,
+      sidebarIsOpen: PropTypes.bool.isRequired
     }
   }
 
@@ -39,11 +40,15 @@ export default class DisplayPropertiesItem extends Component {
                        <CollapsibleHeader label={displayProperties.name}
                                           isCollapsed={false}
                                           openIcon="icon-register"
-                                          closeIcon="icon-register" /> } >
+                                          closeIcon="icon-register"
+                                          sidebarIsOpen={this.props.sidebarIsOpen}
+                       /> } >
           { displayProperties.children.map(child => (
             <DisplayPropertiesItem field={`${field}.${child.name}`}
                                    selectedAssets={selectedAssets}
-                                   key={child.name} displayProperties={child} />
+                                   key={child.name} displayProperties={child}
+                                   sidebarIsOpen={this.props.sidebarIsOpen}
+            />
           ))}
         </Collapsible>
       )
