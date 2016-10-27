@@ -22,6 +22,10 @@ class Collapsible extends Component {
   }
 
   handleClick () {
+    // ignore collapsible open/close events when the sidebar is closed
+    // we could alternatively open the sidebar and process this event...
+    if (!this.props.sidebarIsOpen) return
+
     const { isOpen } = this.state
     const { children } = this.props
     if (children) {
@@ -34,9 +38,11 @@ class Collapsible extends Component {
     const { children, header } = this.props
 
     const childrenWithProps = _ => {
-      if (!isOpen) return null;
+      var sidebarIsOpen = this.props.sidebarIsOpen
+      if (!isOpen) return null
+      if (!sidebarIsOpen) return null
       return React.Children.map(this.props.children,
-        child => cloneElement(child, { sidebarIsOpen: this.state.isOpen }))
+        child => cloneElement(child, { sidebarIsOpen }))
     }
 
     return (

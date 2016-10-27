@@ -13,6 +13,8 @@
   border-left: 1px solid $zorroa-lightgray;
   border-right: 1px solid $zorroa-lightgray;
 
+  overflow: hidden;
+
   &.open {
     width: $zorroa-sidebar-width;
     max-width: $zorroa-sidebar-width;
