@@ -1,8 +1,7 @@
 import React, { Component, PropTypes, cloneElement } from 'react'
-import { connect } from 'react-redux';
 import classnames from 'classnames'
 
-class Collapsible extends Component {
+export default class Collapsible extends Component {
   static get displayName () {
     return 'Collapsible'
   }
@@ -57,15 +56,3 @@ class Collapsible extends Component {
     )
   }
 }
-
-function mapStateToProps(state) {
-  // whatever is returned will show up as props
-  return { sidebar: state.sidebar};
-}
-
-// Promote BookList from a component to a container-
-// it needs to knwo about this new dispatch method, selectBook.
-// Make it available as a prop.
-export default connect(mapStateToProps
-  // , mapDispatchToProps
-)(Collapsible);

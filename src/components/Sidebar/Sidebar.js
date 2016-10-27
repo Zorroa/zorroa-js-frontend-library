@@ -1,6 +1,4 @@
 import React, { Component, PropTypes, cloneElement } from 'react'
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 export default class Sidebar extends Component {
@@ -11,7 +9,7 @@ export default class Sidebar extends Component {
   static get propTypes () {
     return {
       isRightEdge: PropTypes.bool,
-      children: PropTypes.node,
+      children: PropTypes.node
     }
   }
 
