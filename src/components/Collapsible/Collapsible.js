@@ -34,13 +34,19 @@ class Collapsible extends Component {
     const { isOpen } = this.state
     const { children, header } = this.props
 
+    const childrenWithProps = _ => {
+      if (!isOpen) return null;
+      return React.Children.map(this.props.children,
+        child => cloneElement(child, { sidebarKey: this.props.sidebarKey }))
+    }
+
     return (
       <div className={classnames('collapsible', 'flexCol', {'parent': children, 'open': open})}>
         <div className="collapsible-header flexCenter" onClick={this.handleClick.bind(this)}>
           { cloneElement(header, { isOpen, isParent: children && children.length > 0 }) }
         </div>
         <div style={{marginLeft: '16px'}} className="collapsible-body">
-          { isOpen && (children) }
+          { childrenWithProps() }
         </div>
       </div>
     )
@@ -49,7 +55,7 @@ class Collapsible extends Component {
 
 function mapStateToProps(state) {
   // whatever is returned will show up as props
-  return state.sidebar;
+  return { sidebar: state.sidebar};
 }
 
 // Promote BookList from a component to a container-

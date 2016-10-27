@@ -10,14 +10,16 @@ import Racetrack from '../../components/Racetrack'
 import Metadata from '../../components/Metadata'
 
 class Sidebar extends Component {
-  static displayName () {
+  static get displayName () {
     return 'Sidebar'
   }
 
   static get propTypes () {
     return {
       isRightEdge: PropTypes.bool,
-      children: PropTypes.node
+      children: PropTypes.node,
+      sidebarKey: PropTypes.string.isRequired,
+      sidebar: PropTypes.object.isRequired
     }
   }
 
@@ -35,6 +37,11 @@ class Sidebar extends Component {
   handleClick () {
     // this.setState({ open: !this.state.open })
 
+    debugger
+    const sidebarState = this.props.sidebar
+    const sidebarKey = this.props.sidebarKey
+    const open = sidebarState[sidebarKey].open
+    setSidebarFoldersOpen(!open)
   }
 
   buttonChar () {
@@ -68,14 +75,14 @@ class Sidebar extends Component {
   }
 }
 
-export const SidebarWithFolders = () =>
-  <Sidebar>
+const SidebarWithFoldersFn = () =>
+  <Sidebar sidebarKey={'folders'}>
     <Folders/>
     <Metadata/>
   </Sidebar>
 
-export const SidebarWithRacetrack = () =>
-  <Sidebar isRightEdge={true}>
+const SidebarWithRacetrackFn = () =>
+  <Sidebar sidebarKey={'racetrack'} isRightEdge={true}>
     <Racetrack/>
   </Sidebar>
 
@@ -84,20 +91,22 @@ export const SidebarWithRacetrack = () =>
 function mapStateToProps(state) {
   // whatever is returned will show up as props
   // inside of Component
-  console.log('sidebar mapStateToProps', state.sidebar)
-  return state.sidebar
+  return { sidebar: state.sidebar }
 }
 
-// Anything returned form this func will end up as props
+// Anything returned from this func will end up as props
 // on the Component container
 function mapDispatchToProps(dispatch) {
-  // When selectBook is called, the result should
+  // When action is called, the result should
   // be passed to all our reducers
-  return bindActionCreators(
-    {setSidebarFoldersOpen, setSidebarRacetrackOpen}, dispatch);
+  return bindActionCreators({setSidebarFoldersOpen, setSidebarRacetrackOpen}, dispatch);
 }
 
 // Promote Component from a component to a container-
-// it needs to knwo about this new dispatch method, selectBook.
+// it needs to know about this new dispatch method.
 // Make it available as a prop.
-export default connect(mapStateToProps, mapDispatchToProps)(Sidebar);
+const a = connect(mapStateToProps, mapDispatchToProps)(Sidebar)
+const SidebarWithFolders = connect(mapStateToProps, mapDispatchToProps)(SidebarWithFoldersFn)
+const SidebarWithRacetrack = connect(mapStateToProps, mapDispatchToProps)(SidebarWithRacetrackFn)
+export { a as default, SidebarWithFolders, SidebarWithRacetrack }
+

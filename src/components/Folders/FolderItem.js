@@ -10,7 +10,8 @@ export default class FolderItem extends Component {
     return {
       folders: PropTypes.object.isRequired,     // Can this be mapOf(Folder)?
       folderId: PropTypes.number.isRequired,
-      loadChildren: PropTypes.func.isRequired
+      loadChildren: PropTypes.func.isRequired,
+      sidebarKey: PropTypes.string.isRequired
     }
   }
 
@@ -22,7 +23,7 @@ export default class FolderItem extends Component {
   renderHeader (folder) {
     return (
       <CollapsibleHeader label={folder.name} isCollapsed={false}
-                         openIcon="icon-folder2" closeIcon="icon-folder" sidebarOpenKey="sidebarLeft"/>
+                         openIcon="icon-folder2" closeIcon="icon-folder"/>
     )
   }
 
@@ -30,7 +31,7 @@ export default class FolderItem extends Component {
     const { folders, folderId, loadChildren } = this.props
     const folder = folders.get(folderId)
     return (
-      <Collapsible header={this.renderHeader(folder)} sidebarOpenKey="sidebarLeft">
+      <Collapsible header={this.renderHeader(folder)} sidebarKey={this.props.sidebarKey}>
         { folder.children !== undefined && folder.children.map(child => (
           <FolderItem key={child.id} folders={folders} folderId={child.id} loadChildren={loadChildren} />)
         )}
