@@ -1,28 +1,18 @@
 import React, { Component, PropTypes, Children } from 'react'
 
 export default class DropdownMenu extends Component {
-  static get displayName () {
-    return 'DropdownMenu'
+  static propTypes = {
+    children: PropTypes.node,
+    label: PropTypes.string,
+    style: PropTypes.object
   }
 
-  static get propTypes () {
-    return {
-      children: PropTypes.node,
-      label: PropTypes.string,
-      style: PropTypes.object
-    }
+  state: {
+    isVisible: false
   }
 
-  constructor (props) {
-    super(props)
-
-    this.state = {
-      isVisible: false
-    }
-
-    this.show = this.show.bind(this)
-    this.hide = this.hide.bind(this)
-  }
+  show = this.show.bind(this)
+  hide = this.hide.bind(this)
 
   componentWillUnmount () {
     document.removeEventListener('click', this.hide)

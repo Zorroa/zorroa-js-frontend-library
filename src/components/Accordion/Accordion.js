@@ -2,14 +2,8 @@ import React, { Component, PropTypes } from 'react'
 import classnames from 'classnames'
 
 export default class Accordion extends Component {
-  static get displayName () {
-    return 'Accordion'
-  }
-
-  static get propTypes () {
-    return {
-      children: PropTypes.node
-    }
+  static propTypes = {
+    children: PropTypes.node
   }
 
   constructor (props) {

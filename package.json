@@ -3,8 +3,9 @@
   "version": "0.1.1",
   "description": "this is a front end template using react, redux, and webpack built by jordan with love",
   "scripts": {
-    "prestart": "npm run build",
+    "postinstall": "rm -rf bin; npm run build",
     "start": "./node_modules/.bin/serve ./bin",
+    "dev": "./node_modules/.bin/webpack-dev-server --config ./build/webpack.dev.js --progress --inline --hot --colors --no-info --history-api-fallback",
     "build": "npm test && ./node_modules/.bin/webpack --config ./build/webpack.prod.js --progress --colors",
     "deploy": "sh ./build/build-prod.sh",
     "pretest": "npm run test:lint",
@@ -13,16 +14,22 @@
     "test:watch": "./node_modules/.bin/jest --verbose --watch",
     "test:lint": "./node_modules/.bin/eslint . --color; exit 0",
     "test:coverage": "echo 'todo: coverage tests'",
-    "dev": "./node_modules/.bin/webpack-dev-server --config ./build/webpack.dev.js --progress --inline --hot --colors --no-info --history-api-fallback",
     "purge": "rm -rf node_modules; npm cache clean; npm install"
   },
   "author": "Jordan Papaleo",
   "license": "",
+  "engines": {
+    "node": "6.3.1",
+    "npm": "3.10.7"
+  },
   "devDependencies": {
-    "axios-mock-adapter": "^1.6.1",
+    "axios-mock-adapter": "1.6.1",
     "babel-core": "6.14.0",
+    "babel-eslint": "7.0.0",
     "babel-jest": "15.0.0",
     "babel-loader": "6.2.5",
+    "babel-plugin-transform-class-properties": "6.11.5",
+    "babel-plugin-transform-decorators-legacy": "1.3.4",
     "babel-polyfill": "6.13.0",
     "babel-preset-es2015": "6.14.0",
     "babel-preset-react": "6.11.1",
