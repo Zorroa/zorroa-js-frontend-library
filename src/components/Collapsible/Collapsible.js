@@ -12,7 +12,8 @@ class Collapsible extends Component {
       children: PropTypes.node,
       style: PropTypes.object,
       header: PropTypes.element.isRequired,
-      sidebarOpenKey: PropTypes.string.isRequired
+      sidebarKey: PropTypes.string.isRequired,
+      sidebar: PropTypes.object.isRequired
     }
   }
 
