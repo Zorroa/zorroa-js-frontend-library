@@ -3,14 +3,12 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 import domUtils from '../../services/domUtils'
 
 export default class Modal extends Component {
-  static get propTypes () {
-    return {
-      children: PropTypes.node,
-      content: PropTypes.string,
-      footer: PropTypes.node,
-      dismiss: PropTypes.func,
-      title: PropTypes.string
-    }
+  static propTypes = {
+    children: PropTypes.node,
+    content: PropTypes.string,
+    footer: PropTypes.node,
+    dismiss: PropTypes.func,
+    title: PropTypes.string
   }
 
   componentWillReceiveProps (nextProps) {
