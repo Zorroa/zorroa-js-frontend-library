@@ -29,7 +29,7 @@ class Sidebar extends Component {
   isOpen () {
     const sidebarState = this.props.sidebar
     const sidebarKey = this.props.sidebarKey
-    return sidebarState[sidebarKey].open
+    return sidebarState[sidebarKey].isOpen
   }
 
   // constructor (props) {
@@ -59,7 +59,7 @@ class Sidebar extends Component {
 
   sidebarClassNames () {
     return classnames('sidebar', {
-      'open': this.isOpen()
+      'isOpen': this.isOpen()
     })
   }
 

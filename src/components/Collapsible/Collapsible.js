@@ -31,7 +31,7 @@ class Collapsible extends Component {
     super(props)
 
     const { Collapsible, isOpenKey } = this.props
-    let isOpen = !!(isOpenKey && Collapsible[isOpenKey])
+    const isOpen = !!(isOpenKey && Collapsible[isOpenKey])
     this.state = { isOpen }
   }
 
@@ -64,7 +64,7 @@ class Collapsible extends Component {
     }
 
     return (
-      <div className={classnames('collapsible', 'flexCol', {'parent': children, 'open': open})}>
+      <div className={classnames('collapsible', 'flexCol', { 'parent': children, isOpen })}>
         <div className="collapsible-header flexCenter" onClick={this.handleClick.bind(this)}>
           { cloneElement(header, { isOpen, isParent: children && children.length > 0 }) }
         </div>
