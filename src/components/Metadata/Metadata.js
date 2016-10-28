@@ -60,7 +60,7 @@ class Metadata extends Component {
     }
     console.log('Selected assets: ' + selectedAssets.size + ' ' + JSON.stringify(selectedAssets))
     return (
-      <Collapsible style={{marginLeft: '16px'}} header={this.renderHeader()} sidebarIsOpen={this.props.sidebarIsOpen}>
+      <Collapsible style={{marginLeft: '16px'}} header={this.renderHeader()} sidebarIsOpen={this.props.sidebarIsOpen} isOpenKey={'Metadata'}>
         { fields.map(field => (<DisplayPropertieItem key={field.name} field={field.name} selectedAssets={selectedAssets} displayProperties={field} sidebarIsOpen={this.props.sidebarIsOpen}/>)) }
       </Collapsible>
     )

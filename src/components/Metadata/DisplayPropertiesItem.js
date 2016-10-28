@@ -36,6 +36,7 @@ export default class DisplayPropertiesItem extends Component {
     if (displayProperties.children && displayProperties.children.length) {
       return (
         <Collapsible style={{marginLeft: '16px'}}
+                     isOpenKey={`DisplayPropertiesItem|${field}`}
                      sidebarIsOpen={this.props.sidebarIsOpen}
                      header={
                        <CollapsibleHeader label={displayProperties.name}

@@ -5,10 +5,6 @@ import classnames from 'classnames'
 
 import setSidebarOpen from '../../actions/sidebarAction'
 
-import Folders from '../../components/Folders'
-import Racetrack from '../../components/Racetrack'
-import Metadata from '../../components/Metadata'
-
 class Sidebar extends Component {
   static get displayName () {
     return 'Sidebar'
@@ -36,9 +32,9 @@ class Sidebar extends Component {
     return sidebarState[sidebarKey].open
   }
 
-  constructor (props) {
-    super(props)
-  }
+  // constructor (props) {
+  //   super(props)
+  // }
 
   toggleOpenClosed () {
     this.props.actions.setSidebarOpen(this.props.sidebarKey, !this.isOpen())
@@ -85,9 +81,9 @@ class Sidebar extends Component {
   }
 }
 
-//----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 
-function mapStateToProps(state) {
+function mapStateToProps (state) {
   // whatever is returned will show up as props
   // inside of Component
   return { sidebar: state.sidebar }
@@ -95,7 +91,7 @@ function mapStateToProps(state) {
 
 // Anything returned from this func will end up as props
 // on the Component container
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps (dispatch) {
   // When action is called, the result should
   // be passed to all our reducers
   return {

@@ -10,8 +10,9 @@ import { resetSlivers } from '../../actions/sliversAction'
 class Racetrack extends Component {
   static propTypes = {
     query: PropTypes.instanceOf(AssetSearch),
-      actions: PropTypes.object.isRequired
-    }
+    sidebarIsOpen: PropTypes.bool.isRequired,
+    actions: PropTypes.object.isRequired
+  }
 
   constructor (props) {
     super(props)
