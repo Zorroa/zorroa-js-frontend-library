@@ -15,6 +15,7 @@ class SimpleSearch extends Component {
   static propTypes = {
     query: PropTypes.instanceOf(AssetSearch).isRequired,
     actions: PropTypes.object,
+    sidebarIsOpen: PropTypes.bool.isRequired,
     id: PropTypes.number.isRequired
   }
 
@@ -55,6 +56,8 @@ class SimpleSearch extends Component {
   }
 
   render () {
+    const { id, sidebarIsOpen } = this.props;
+
     const collapsibleStyle = {
       display: 'flex',
       justifyContent: 'space-between',
@@ -63,8 +66,9 @@ class SimpleSearch extends Component {
       backgroundColor: '#74b618',
       borderRadius: '3px'
     }
+
     return (
-      <Collapsible style={collapsibleStyle} header={this.header()} >
+      <Collapsible style={collapsibleStyle} header={this.header()} isOpenKey={id} sidebarIsOpen={sidebarIsOpen}>
         <div className="simple-search">
           <div>
             <input type="text" placeholder="Search..." value={this.state.queryString}

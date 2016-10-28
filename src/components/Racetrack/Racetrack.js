@@ -62,10 +62,10 @@ class Racetrack extends Component {
   }
 
   render () {
-    const { query } = this.props
+    const { query, sidebarIsOpen } = this.props
     // Construct an array of search widgets to control the search
     // FIXME: faked as a single SimpleSearch for now, later parse full query.
-    const widgets = (query && query.query && query.query.length) ? [ <SimpleSearch key={1} id={1} /> ] : []
+    const widgets = (query && query.query && query.query.length) ? [ <SimpleSearch key={1} id={1} sidebarIsOpen={sidebarIsOpen}/> ] : []
     return (
       <div className="racetrack">
         <Searcher/>
