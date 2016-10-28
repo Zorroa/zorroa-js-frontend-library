@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react'
 
 const FilterHeader = (props) => (
   <div className="filter-header flexRow fullWidth">
-    <div>{props.icon}</div>
+    <span className={props.icon} />
     <div className='flexOn'/>
     <div>{props.label}</div>
     <div className='flexOn'/>

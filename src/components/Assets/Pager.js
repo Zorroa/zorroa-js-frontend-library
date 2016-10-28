@@ -4,17 +4,15 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import AssetCounter from './AssetCounter'
-
+import AssetSearch from '../../models/AssetSearch'
 import { searchAssets } from '../../actions/assetsAction'
 
 class Pager extends Component {
-  static get propTypes () {
-    return {
-      loaded: PropTypes.number.isRequired,
-      total: PropTypes.number.isRequired,
-      actions: PropTypes.object.isRequired,
-      query: PropTypes.object
-    }
+  static propTypes = {
+    loaded: PropTypes.number.isRequired,
+    total: PropTypes.number.isRequired,
+    actions: PropTypes.object.isRequired,
+    query: PropTypes.instanceOf(AssetSearch).isRequired
   }
 
   constructor (props) {
@@ -32,12 +30,10 @@ class Pager extends Component {
     })
   }
 
-  // FIXME: This does NOT work correctly if you change the page size
-  //        after starting a search because pages are specified by index
   handleLoadPage () {
     const { query, loaded } = this.props
     const { pageSize } = this.state
-    var nextPageQuery = query ? JSON.parse(JSON.stringify(query)) : {}
+    var nextPageQuery = new AssetSearch(query)
     nextPageQuery.from = loaded
     nextPageQuery.size = pageSize
     console.log('Loading ' + nextPageQuery.size + ' from ' + nextPageQuery.from)

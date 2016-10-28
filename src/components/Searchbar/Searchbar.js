@@ -1,69 +1,66 @@
 import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { reduxForm, Field } from 'redux-form'
 
-import { searchAssets } from '../../actions/assetsAction'
+import { resetSlivers } from '../../actions/sliversAction'
+import AssetSearch from '../../models/AssetSearch'
 
 class Searchbar extends Component {
-  static get propTypes () {
-    return {
-      submitting: PropTypes.bool,
-      handleSubmit: PropTypes.func.isRequired,
-      actions: PropTypes.object.isRequired,
-      totalCount: PropTypes.number
+  static propTypes = {
+    actions: PropTypes.object.isRequired,
+    query: PropTypes.instanceOf(AssetSearch),
+    totalCount: PropTypes.number
+  }
+
+  constructor (props) {
+    super(props)
+    this.state = { queryString: props.query ? props.query.query : '' }
+  }
+
+  // Update local state whenever the global query changes
+  componentWillReceiveProps (nextProps) {
+    this.setState({ queryString: nextProps.query && nextProps.query.query ? nextProps.query.query : '' })
+  }
+
+  // Update state in <input> onChange
+  updateQueryString (event) {
+    this.setState({ queryString: event.target.value })
+  }
+
+  // Submit a new search for <input> submit
+  modifySliver (event) {
+    if (event.key === 'Enter') {
+      let slivers = {}
+      let id = 1
+      slivers[id] = new AssetSearch({query: this.state.queryString})
+      this.props.actions.resetSlivers(slivers)
     }
-  }
-
-  componentWillMount () {
-    // Search if we haven't loaded any assets.
-    // TODO: Consider using the current query?
-    const { actions, totalCount } = this.props
-    if (!totalCount) {
-      actions.searchAssets()
-    }
-  }
-
-  handleFormSubmit (query) {
-    this.props.actions.searchAssets(query)
-  }
-
-  renderSearch ({ input, label, type, meta: { touched, error } }) {
-    return (
-      <div>
-        <input {...input} name="search" placeholder={label} type={type} width="70%" className="searchbar"/>
-        {touched && error && <div className="error">{error}</div> }
-      </div>
-    )
   }
 
   render () {
-    const { handleSubmit, submitting } = this.props
     return (
       <div>
-        <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))}>
-          <div className="searchbar-group flexCenter">
-            <Field name="query" label="Search" component={this.renderSearch} type="text" />
-            <button htmlFor="query" action="submit" disabled={submitting} className="searchbar-submit searchbar-button icon-search"></button>
-          </div>
-        </form>
+        <div className="searchbar-group flexCenter">
+          <input value={this.state.queryString}
+                 onChange={this.updateQueryString.bind(this)}
+                 onKeyPress={this.modifySliver.bind(this)}
+                 placeholder="Search..." type="text" width="70%" className="searchbar" />
+          <button action={this.modifySliver.bind(this, {key: 'Enter'})} className="searchbar-submit searchbar-button icon-search"></button>
+        </div>
       </div>
     )
   }
 }
 
-const form = reduxForm({
-  form: 'search'
-})
-
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({ searchAssets }, dispatch)
+  actions: bindActionCreators({ resetSlivers }, dispatch)
 })
 
 const mapStateToProps = state => ({
+  query: state.assets ? state.assets.query : null,
   totalCount: state.assets ? state.assets.totalCount : null
 })
 
 export default connect(
   mapStateToProps, mapDispatchToProps
-)(form(Searchbar))
+)(Searchbar)

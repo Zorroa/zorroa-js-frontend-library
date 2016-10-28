@@ -1,38 +1,21 @@
 import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { reduxForm, Field } from 'redux-form'
 
-import Filter from './Filter'
-import FilterHeader from './FilterHeader'
-import Collapsible from '../Collapsible'
-import { searchAssets } from '../../actions/assetsAction'
+import Searcher from './Searcher'
+import SimpleSearch from './SimpleSearch'
+import AssetSearch from '../../models/AssetSearch'
+import { resetSlivers } from '../../actions/sliversAction'
 
 class Racetrack extends Component {
-  static get propTypes () {
-    return {
-      query: PropTypes.object,
-      handleSubmit: PropTypes.func.isRequired,
-      actions: PropTypes.object.isRequired
-    }
+  static propTypes = {
+    query: PropTypes.instanceOf(AssetSearch),
+    actions: PropTypes.object.isRequired
   }
 
   constructor (props) {
     super(props)
-    this.state = { filters: Filter.filtersForQuery() }
-  }
-
-  componentWillReceiveProps (nextProps) {
-    const { query } = nextProps
-    const filters = query ? Filter.filtersForQuery(query) : []
-    this.setState({ filters })
-  }
-
-  handleCloseFilter (filter) {
-    const { filters } = this.state
-    const idx = filters.indexOf(filter)
-    const removed = idx >= 0 ? filters.slice(idx, idx + 1) : filters
-    this.setState({ filters: removed })
+    this.state = { emptySearch: '' }
   }
 
   handleSave () {
@@ -40,7 +23,7 @@ class Racetrack extends Component {
   }
 
   handleClear () {
-    this.props.actions.searchAssets({})
+    this.props.actions.resetSlivers()
   }
 
   handleAddWidget () {
@@ -51,24 +34,16 @@ class Racetrack extends Component {
     console.log('Quick Add keypress')
   }
 
-  handleFormSubmit (query) {
-    this.props.actions.searchAssets(query)
+  submitEmptySearch (event) {
+    event.preventDefault()
+    this.props.actions.resetSlivers({1: {query: this.state.emptySearch}})
   }
 
-  renderFilterHeader (filter) {
-    return (
-      <FilterHeader icon={filter.icon} label={filter.label} onClose={this.handleCloseFilter.bind(this, filter)} />
-    )
-  }
-
-  renderSearch ({ input, label, type }) {
-    return (
-      <input {...input} name="racetrack-search" placeholder={label} type={type} className="searchbar" />
-    )
+  changeEmptySearch (event) {
+    this.setState({ emptySearch: event.target.value })
   }
 
   renderEmpty () {
-    const { handleSubmit } = this.props
     return (
       <div className="racetrack-empty">
         <div className="racetrack-empty-mag icon-search" />
@@ -76,34 +51,28 @@ class Racetrack extends Component {
           GET STARTED WITH A SIMPLE SEARCH<br/>
           OR ADD SEARCH WIDGETS
         </div>
-        <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))}>
-          <Field name="query" label="Search..." component={this.renderSearch} type="text" />
+        <form onSubmit={this.submitEmptySearch.bind(this)}>
+          <input type="text" placeholder="Search..."
+                 value={this.state.emptySearch}
+                 onChange={this.changeEmptySearch.bind(this)} />
         </form>
       </div>
     )
   }
 
   render () {
-    const { filters } = this.state
-    const collapsibleStyle = {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'stretch',
-      color: '#ededed',
-      backgroundColor: '#74b618',
-      borderRadius: '3px'
-    }
+    const { query } = this.props
+    // Construct an array of search widgets to control the search
+    // FIXME: faked as a single SimpleSearch for now, later parse full query.
+    const widgets = (query && query.query && query.query.length) ? [ <SimpleSearch key={1} id={1} /> ] : []
     return (
       <div className="racetrack">
+        <Searcher/>
         <div className="racetrack-body">
-          { (!filters || filters.length === 0) && this.renderEmpty() }
-          { filters && filters.length > 0 && (
+          { (!widgets || widgets.length === 0) && this.renderEmpty() }
+          { widgets && widgets.length > 0 && (
           <div className="racetrack-filters">
-            { filters.map((filter, i) => (
-              <Collapsible key={i} style={collapsibleStyle} header={this.renderFilterHeader(filter)} isRacetrack={true}>
-                {filter.body}
-              </Collapsible>)
-            )}
+            {(widgets)}
           </div>
           )}
           <div className="racetrack-add-filter">
@@ -122,12 +91,8 @@ class Racetrack extends Component {
   }
 }
 
-const form = reduxForm({
-  form: 'racetrack-search'
-})
-
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({ searchAssets }, dispatch)
+  actions: bindActionCreators({ resetSlivers }, dispatch)
 })
 
 const mapStateToProps = state => ({
@@ -136,4 +101,4 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps, mapDispatchToProps
-)(form(Racetrack))
+)(Racetrack)
