@@ -29,19 +29,40 @@
   // padding-left: 0;
 }
 
-// Convert a list item into a nav-item
+.header-menu-icon {
+  font-size: 10px;
+  color: $zorroa-gray;
+  padding: 5px;
+}
+
 .header-menu-item {
   display: list-item;
   text-align: -webkit-match-parent;
   text-align: match-parent;
   text-transform: uppercase;
-  padding-left: 1em;
-  font-size: 14px;
+  text-decoration: none;
+  font-size: 14px !important;
   white-space: nowrap;
+
+  button {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    -webkit-appearance: button;
+    background-color: #fff;
+    border: 1px solid transparent;
+    box-sizing: border-box;
+    cursor: pointer;
+    &:focus {
+      outline: none;
+    }
+  }
 }
 
-.header-menu-icon {
-  font-size: 10px;
-  color: $zorroa-gray;
-  padding: 5px;
+.header-menu-separator {
+  height: 2px;
+  margin: 8px 0;
+  background-color: $zorroa-nearwhite;
 }

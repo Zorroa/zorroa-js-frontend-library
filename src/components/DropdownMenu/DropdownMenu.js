@@ -1,14 +1,16 @@
 import React, { Component, PropTypes, Children } from 'react'
+import classnames from 'classnames'
 
 export default class DropdownMenu extends Component {
   static propTypes = {
     children: PropTypes.node,
-    label: PropTypes.string,
+    label: PropTypes.node,
     style: PropTypes.object
   }
 
-  state: {
-    isVisible: false
+  constructor (props) {
+    super(props)
+    this.state = { isVisible: false }
   }
 
   show = this.show.bind(this)
@@ -33,9 +35,9 @@ export default class DropdownMenu extends Component {
   render () {
     return (
       <div className="dropdown-menu" style={this.props.style}>
-        <button type="button" className="btn" role="button" onClick={this.show}>
+        <button type="button" className="button flexRow flexAlignItemsCenter" role="button" onClick={this.show}>
           {this.props.label}
-          <span className="dropdown-caret"></span>
+          <div className={classnames('dropdown-caret', 'icon-arrow-down', { 'rot180': this.state.isVisible })} />
         </button>
         { this.state.isVisible &&
           (<ul>

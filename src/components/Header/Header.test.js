@@ -3,6 +3,7 @@ import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { Link } from 'react-router'
 import Header from './Header'
+import User from '../../models/User'
 
 const storeFake = (state) => {
   return {
@@ -19,7 +20,8 @@ describe('<Header/>', () => {
   let header
 
   beforeEach(() => {
-    const store = storeFake({ auth: { authenticated: true } })
+    const user = new User({id: 1, username: 'admin', firstName: 'Joe', lastName: 'Blow', enabled: true})
+    const store = storeFake({ auth: { authenticated: true, user } })
     const wrapper = mount(
       <Provider store={store}>
         <Header/>

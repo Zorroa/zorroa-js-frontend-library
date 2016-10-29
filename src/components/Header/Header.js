@@ -1,39 +1,67 @@
-import React from 'react'
+import React, { Component, PropTypes } from 'react'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
 import { Link } from 'react-router'
 
+import User from '../../models/User'
 import Logo from '../../components/Logo'
 import Searchbar from '../../components/Searchbar'
+import DropdownMenu from '../../components/DropdownMenu'
+import Preferences from '../../components/Preferences'
+import { updateModal } from '../../actions/appActions'
 
-const Header = () => (
-  <nav className="header flexCenter fullWidth">
-    <Link to="/" className='header-logo'><Logo/></Link>
-    <Searchbar/>
-    <div className="flexOn"></div>
-    <div className="header-menu fullHeight flexCenter">
-      <div id="header-menu-imports" className="header-menu-item">
-        <span>Imports</span>
-      </div>
-      <div id="header-menu-layouts" className="header-menu-item">
-        <span>Layouts</span>
-        <span className='header-menu-icon icon-arrow-down'></span>
-      </div>
-      <div id="header-menu-exports" className="header-menu-item">
-        <span>Exports</span>
-        <span className='header-menu-icon icon-arrow-down'></span>
-      </div>
-      <div id="header-menu-admin" className="header-menu-item">
-        <span>Admin</span>
-        <span className='header-menu-icon icon-arrow-down'></span>
-      </div>
-      <div id="header-menu-help" className="header-menu-item">
-        <span>Help</span>
-        <span className='header-menu-icon icon-arrow-down'></span>
-      </div>
-      <div id="header-menu-signout" className="header-menu-item">
-        <Link className="nav-link" to="/signout">Sign Out</Link>
-      </div>
-    </div>
-  </nav>
-)
+class Header extends Component {
+  static propTypes = {
+    user: PropTypes.instanceOf(User).isRequired,
+    actions: PropTypes.object.isRequired
+  }
 
-export default Header
+  dismissPreferences () {
+    this.props.actions.updateModal({content: null})
+  }
+
+  showPreferences () {
+    const { user, actions } = this.props
+    actions.updateModal({
+      title: 'Preferences',
+      content: (<Preferences user={user}/>),
+      footer: (<button onClick={this.dismissPreferences.bind(this)}>Close</button>)})
+  }
+
+  render () {
+    const { user } = this.props
+    return (
+      <nav className="header flexCenter fullWidth">
+        <Link to="/" className='header-logo'><Logo/></Link>
+        <Searchbar/>
+        <div className="flexOn"></div>
+        <div className="header-menu fullHeight flexCenter">
+          <DropdownMenu label="Imports">
+          </DropdownMenu>
+          <DropdownMenu label="Exports">
+          </DropdownMenu>
+          <DropdownMenu label="Help">
+            <a href="http://zorroa.com/docs/help" className="header-menu-item" >Help</a>
+            <div className="header-menu-separator" />
+            <a href="http://zorroa.com/docs/tutorials" className="header-menu-item" >Tutorials</a>
+            <div className="header-menu-separator" />
+            <a href="http://zorroa.com/docs/release-notes" className="header-menu-item" >Release Notes</a>
+          </DropdownMenu>
+          <DropdownMenu label={(<div><span className="icon-cog"/>&nbsp;{user.username}</div>)} >
+            <div className="header-menu-item">
+              <button onClick={this.showPreferences.bind(this)}>Preferences</button>
+            </div>
+            <div className="header-menu-separator" />
+            <Link className="header-menu-item" to="/signout">Logout</Link>
+          </DropdownMenu>
+        </div>
+      </nav>
+    )
+  }
+}
+
+export default connect(state => ({
+  user: state.auth.user
+}), dispatch => ({
+  actions: bindActionCreators({ updateModal }, dispatch)
+}))(Header)

@@ -40,7 +40,7 @@ export default class Modal extends Component {
             <header className="modal-header">{title}</header>
             <div className="modal-body">{children}{content}</div>
             <footer className="modal-footer">{footer}</footer>
-            <button className="modal-dismiss" onClick={dismiss}><div>X</div></button>
+            <button className="modal-dismiss" onClick={dismiss}><span className="icon-cross2"/></button>
           </div>
         </ReactCSSTransitionGroup>
       </div>
