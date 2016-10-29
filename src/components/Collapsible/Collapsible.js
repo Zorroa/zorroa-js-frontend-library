@@ -20,10 +20,10 @@ class Collapsible extends Component {
 
       // props defined by intstantiation
       children: PropTypes.node,
-      style: PropTypes.object,
       header: PropTypes.element.isRequired,
       sidebarIsOpen: PropTypes.bool.isRequired,
-      isOpenKey: PropTypes.string
+      isOpenKey: PropTypes.string,
+      extraClasses: PropTypes.string
     }
   }
 
@@ -52,7 +52,7 @@ class Collapsible extends Component {
   }
 
   render () {
-    const { children, header } = this.props
+    const { children, header, style, extraClasses } = this.props
     const { isOpen } = this.state
 
     const childrenWithProps = _ => {
@@ -63,8 +63,10 @@ class Collapsible extends Component {
         child => cloneElement(child, { sidebarIsOpen }))
     }
 
+
+
     return (
-      <div className={classnames('collapsible', 'flexCol', { 'parent': children, isOpen })}>
+      <div className={classnames('collapsible', 'flexCol', { 'parent': children, isOpen }) + ' ' + extraClasses||''}>
         <div className="collapsible-header flexCenter" onClick={this.handleClick.bind(this)}>
           { cloneElement(header, { isOpen, isParent: children && children.length > 0 }) }
         </div>

@@ -1,0 +1,33 @@
+@import '../../styles/core-mixins.scss';
+
+.simple-search {
+  & .collapsible-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    color: $zorroa-nearwhite;
+    background-color: $zorroa-sickly-green;
+    border-radius: 3px 3px 0 0;
+  }
+}
+
+.simple-search-body {
+  background-color: white;
+  color: $zorroa-gray;
+  display: flex;
+  flex-direction: column;
+
+  input {
+    flex: 1;
+    outline: none;
+    background: none;
+    border: 1px solid $zorroa-gray;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 2em;
+    margin: 12px;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
