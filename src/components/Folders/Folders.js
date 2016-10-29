@@ -20,13 +20,16 @@ class Folders extends Component {
   }
 
   loadChildren (id) {
-    this.props.actions.getFolderChildren(id)
+    this.props.actions.getFolderChildren(id < 0 ? 0 : id)
   }
 
   render () {
     const { folders } = this.props
     return (
-      <FolderItem folders={folders} folderId={0} loadChildren={this.loadChildren.bind(this)}/>
+      <div>
+        <FolderItem folders={folders} folderId={-1} loadChildren={this.loadChildren.bind(this)}/>
+        <FolderItem folders={folders} folderId={0} loadChildren={this.loadChildren.bind(this)}/>
+      </div>
     )
   }
 }

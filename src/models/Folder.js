@@ -15,4 +15,8 @@ export default class Folder {
       this.search = json.search
     }
   }
+
+  isDyhi () {
+    return this.dyhiId || this.dyhiRoot
+  }
 }

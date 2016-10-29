@@ -14,4 +14,17 @@ describe('foldersReducer', () => {
     expect(foldersReducer({ all: orig }, { type: GET_FOLDER_CHILDREN, payload: [child] }))
       .toEqual({ all: expected })
   })
+
+  it('GET_FOLDER_CHILDREN creates both collections and browsing', () => {
+    const browsing = new Folder({ id: -1, name: 'Browsing', dyhiRoot: true })
+    const collections = new Folder({ id: 0, name: 'Collections' })
+    const parent = new Folder({ id: 1, name: 'Parent', parentId: 0, dyhiRoot: false })
+    const dyhi = new Folder({ id: 3, name: 'Dyhi', parentId: 0, dyhiRoot: true })
+    collections.children = [parent]
+    browsing.children = [dyhi]
+    let expected = new Map([[collections.id, collections], [browsing.id, browsing], [parent.id, parent], [dyhi.id, dyhi]])
+    let payload = [parent, dyhi]
+    expect(foldersReducer(undefined, { type: GET_FOLDER_CHILDREN, payload }))
+      .toEqual({ all: expected })
+  })
 })
