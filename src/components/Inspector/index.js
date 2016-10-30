@@ -1,5 +1,5 @@
 import Inspector from './Inspector'
-import './inspector.scss'
+import './Inspector.scss'
 export default Inspector
 
 /*

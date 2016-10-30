@@ -1,3 +1,3 @@
 import Signup from './Signup'
-import '../auth.scss'
+import '../Auth.scss'
 export default Signup

@@ -1,6 +1,6 @@
 import Lightbox from './Lightbox'
-import './lightbox.scss'
-import './lightbar.scss'
+import './Lightbox.scss'
+import './Lightbar.scss'
 export default Lightbox
 
 /*

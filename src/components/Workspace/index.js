@@ -1,3 +1,3 @@
 import Workspace from './Workspace'
-import './workspace.scss'
+import './Workspace.scss'
 export default Workspace
