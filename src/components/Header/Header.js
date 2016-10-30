@@ -49,7 +49,7 @@ class Header extends Component {
             <div className="header-menu-separator" />
             <a href="http://zorroa.com/docs/release-notes" className="header-menu-item" >Release Notes</a>
           </DropdownMenu>
-          <DropdownMenu label={(<div><span className="icon-cog"/>&nbsp;{user.username}</div>)} >
+          <DropdownMenu label={(<div><span className="icon-cog"/>&nbsp;{user.username}</div>)} rightAlign={true}>
             <div className="header-menu-item">
               <button onClick={this.showPreferences.bind(this)}>Preferences</button>
             </div>
