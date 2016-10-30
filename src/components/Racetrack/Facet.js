@@ -13,12 +13,13 @@ import DropdownMenu from '../DropdownMenu'
 
 export const FacetHeader = (props) => (
   <FilterHeader icon="icon-bar-graph rotN90Flip" label={`Facet: ${props.field}`}
-                onClose={props.onClose} />
+                onClose={props.onClose} isIconified={props.isIconified} />
 )
 
 FacetHeader.propTypes = {
   field: PropTypes.string.isRequired,
-  onClose: PropTypes.func
+  onClose: PropTypes.func,
+  isIconified: PropTypes.bool.isRequired
 }
 
 const BAR_CHART = 'BAR'
@@ -29,7 +30,8 @@ const COL_CHART = 'COL'
 class Facet extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
-    id: PropTypes.number.isRequired
+    id: PropTypes.number.isRequired,
+    isIconified: PropTypes.bool.isRequired
   }
 
   state = {
@@ -67,9 +69,22 @@ class Facet extends Component {
     }
   }
 
-  render () {
+  renderHeader (isIconified) {
     return (
-      <Collapsible header={<FacetHeader field={this.state.field} onClose={this.removeFilter.bind(this)}/>} >
+      <FacetHeader field={this.state.field} isIconified={isIconified}
+                   onClose={this.removeFilter.bind(this)}/>
+    )
+  }
+
+  render () {
+    const { isIconified } = this.props
+    if (isIconified) {
+      // Never render the body when iconified
+      return this.renderHeader(isIconified)
+    }
+
+    return (
+      <Collapsible header={this.renderHeader(isIconified)} >
         <div className="facet flexCol">
           <div className="facet-controls flexRow flexJustifySpaceBetween">
             <DropdownMenu>

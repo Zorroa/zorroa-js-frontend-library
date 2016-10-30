@@ -15,7 +15,8 @@ class Racetrack extends Component {
   static propTypes = {
     query: PropTypes.instanceOf(AssetSearch),
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
-    actions: PropTypes.object.isRequired
+    actions: PropTypes.object.isRequired,
+    isIconified: PropTypes.bool.isRequired
   }
 
   state = {
@@ -49,7 +50,10 @@ class Racetrack extends Component {
     this.props.actions.modifyRacetrackWidget(new Widget({type}))
   }
 
-  renderEmpty () {
+  renderEmpty (isIconified) {
+    if (isIconified) {
+      return <div className="racetrack-empty-icon-mag icon-search"></div>
+    }
     return (
       <div className="racetrack-empty">
         <div className="racetrack-empty-mag icon-search" />
@@ -66,61 +70,75 @@ class Racetrack extends Component {
     )
   }
 
-  renderWidgetTypeHeader (widgetType) {
+  renderWidgetTypeHeader (widgetType, isIconified) {
     switch (widgetType) {
       case widgetTypes.SIMPLE_SEARCH_WIDGET:
-        return <SimpleSearchHeader/>
+        return <SimpleSearchHeader isIconified={isIconified} />
       case widgetTypes.FACET_WIDGET:
-        return <FacetHeader field="Keyword"/>
+        return <FacetHeader field="Keyword" isIconified={isIconified} />
       default:
         return <div/>
     }
   }
 
-  renderWidget (widget) {
+  renderWidget (widget, isIconified) {
     switch (widget.type) {
       case widgetTypes.SIMPLE_SEARCH_WIDGET:
-        return <SimpleSearch id={widget.id}/>
+        return <SimpleSearch id={widget.id} isIconified={isIconified} />
       case widgetTypes.FACET_WIDGET:
-        return <Facet id={widget.id}/>
+        return <Facet id={widget.id} isIconified={isIconified} />
       default:
         return <div/>
     }
+  }
+
+  renderFooter (isIconified) {
+    if (isIconified) return null
+    return (
+      <div className="racetrack-footer">
+        <div className="racetrack-footer-group">
+          <button onClick={this.handleSave.bind(this)} className="racetrack-footer-save-button">Save</button>
+          <button onClick={this.handleClear.bind(this)}>Clear</button>
+        </div>
+      </div>
+    )
+  }
+
+  renderAddWidgets (isIconified) {
+    if (isIconified) return null
+    return (
+      <div className="racetrack-add-filter">
+        <DropdownMenu label="+ ADD WIDGET">
+          { Object.values(widgetTypes).map(widgetType => (
+            <div className="racetrack-add-filter-item" key={widgetType} onClick={this.pushWidgetType.bind(this, widgetType)}>
+              { this.renderWidgetTypeHeader(widgetType, isIconified) }
+            </div>
+          ))}
+        </DropdownMenu>
+        <input onKeyPress={this.handleQuickAddKeyPress.bind(this)} placeholder="Quick Add - Widget"/>
+      </div>
+    )
   }
 
   render () {
-    const { widgets } = this.props
+    const { widgets, isIconified } = this.props
     return (
       <div className="racetrack">
         <Searcher/>
         <div className="racetrack-body">
-          { (!widgets || widgets.length === 0) && this.renderEmpty() }
+          { (!widgets || widgets.length === 0) && this.renderEmpty(isIconified) }
           { widgets && widgets.length > 0 && (
           <div className="racetrack-filters">
             {widgets.map((widget, i) => (
               <div key={i} className="racetrack-widget">
-                { this.renderWidget(widget) }
+                { this.renderWidget(widget, isIconified) }
               </div>
             ))}
           </div>
           )}
-          <div className="racetrack-add-filter">
-            <DropdownMenu label="+ ADD WIDGET">
-              { Object.values(widgetTypes).map(widgetType => (
-                <div className="racetrack-add-filter-item" key={widgetType} onClick={this.pushWidgetType.bind(this, widgetType)}>
-                  { this.renderWidgetTypeHeader(widgetType) }
-                </div>
-              ))}
-            </DropdownMenu>
-            <input onKeyPress={this.handleQuickAddKeyPress.bind(this)} placeholder="Quick Add - Widget"/>
-          </div>
+          { this.renderAddWidgets(isIconified) }
         </div>
-        <div className="racetrack-footer">
-          <div className="racetrack-footer-group">
-            <button onClick={this.handleSave.bind(this)} className="racetrack-footer-save-button">Save</button>
-            <button onClick={this.handleClear.bind(this)}>Clear</button>
-          </div>
-        </div>
+        { this.renderFooter(isIconified) }
       </div>
     )
   }

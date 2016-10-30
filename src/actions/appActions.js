@@ -1,8 +1,22 @@
-import { MODAL } from '../constants/actionTypes'
+import { MODAL, ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR } from '../constants/actionTypes'
 
 export function updateModal ({title, footer, content}) {
   return {
     type: MODAL,
     payload: {title, footer, content}
+  }
+}
+
+export function iconifyLeftSidebar (isIconified) {
+  return {
+    type: ICONIFY_LEFT_SIDEBAR,
+    payload: isIconified
+  }
+}
+
+export function iconifyRightSidebar (isIconified) {
+  return {
+    type: ICONIFY_RIGHT_SIDEBAR,
+    payload: isIconified
   }
 }

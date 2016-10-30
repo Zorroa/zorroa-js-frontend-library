@@ -8,11 +8,10 @@ import FolderItem from './FolderItem'
 // Display all folders, starting with the root.
 // Later this will be broken into Collections and Smart Folders.
 class Folders extends Component {
-  static get propTypes () {
-    return {
-      folders: PropTypes.object.isRequired,
-      actions: PropTypes.object.isRequired
-    }
+  static propTypes = {
+    folders: PropTypes.object.isRequired,
+    isIconified: PropTypes.bool.isRequired,
+    actions: PropTypes.object.isRequired
   }
 
   componentWillMount () {
@@ -24,11 +23,11 @@ class Folders extends Component {
   }
 
   render () {
-    const { folders } = this.props
+    const { folders, isIconified } = this.props
     return (
       <div>
-        <FolderItem folders={folders} folderId={-1} loadChildren={this.loadChildren.bind(this)}/>
-        <FolderItem folders={folders} folderId={0} loadChildren={this.loadChildren.bind(this)}/>
+        <FolderItem folders={folders} folderId={-1} isIconified={isIconified} loadChildren={this.loadChildren.bind(this)}/>
+        <FolderItem folders={folders} folderId={0} isIconified={isIconified} loadChildren={this.loadChildren.bind(this)}/>
       </div>
     )
   }

@@ -10,11 +10,12 @@ import FilterHeader from './FilterHeader'
 import Collapsible from '../Collapsible'
 
 export const SimpleSearchHeader = (props) => (
-  <FilterHeader icon="icon-search" label="Simple Search" onClose={props.onClose} />
+  <FilterHeader icon="icon-search" isIconified={props.isIconified} label="Simple Search" onClose={props.onClose} />
 )
 
 SimpleSearchHeader.propTypes = {
-  onClose: PropTypes.func
+  onClose: PropTypes.func,
+  isIconified: PropTypes.bool.isRequired
 }
 
 // Manage the query string for the current AssetSearch.
@@ -25,7 +26,8 @@ class SimpleSearch extends Component {
   static propTypes = {
     query: PropTypes.instanceOf(AssetSearch).isRequired,
     actions: PropTypes.object.isRequired,
-    id: PropTypes.number.isRequired
+    id: PropTypes.number.isRequired,
+    isIconified: PropTypes.bool.isRequired
   }
 
   constructor (props) {
@@ -61,7 +63,17 @@ class SimpleSearch extends Component {
     }
   }
 
+  renderHeader (isIconified) {
+    return (
+      <SimpleSearchHeader isIconified={isIconified} onClose={this.removeFilter.bind(this)}/>
+    )
+  }
+
   render () {
+    const { isIconified } = this.props
+    if (isIconified) {
+      return this.renderHeader(isIconified)
+    }
     const collapsibleStyle = {
       display: 'flex',
       justifyContent: 'space-between',
@@ -71,7 +83,7 @@ class SimpleSearch extends Component {
       borderRadius: '3px'
     }
     return (
-      <Collapsible style={collapsibleStyle} header={<SimpleSearchHeader onClose={this.removeFilter.bind(this)}/>} >
+      <Collapsible style={collapsibleStyle} header={this.renderHeader(isIconified)} >
         <div className="simple-search">
           <div>
             <input type="text" placeholder="Search..." value={this.state.queryString}
