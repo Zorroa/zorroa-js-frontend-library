@@ -33,7 +33,9 @@ class Header extends Component {
     return (
       <nav className="header flexCenter fullWidth">
         <Link to="/" className='header-logo'><Logo/></Link>
-        <Searchbar/>
+        <div className='header-searchbar flexOn'>
+          <Searchbar/>
+        </div>
         <div className="flexOn"></div>
         <div className="header-menu fullHeight flexCenter">
           <DropdownMenu label="Imports">
