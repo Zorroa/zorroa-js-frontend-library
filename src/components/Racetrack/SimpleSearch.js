@@ -2,10 +2,20 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
+import Widget from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
-import { modifySlivers, removeSlivers } from '../../actions/sliversAction'
+import { SIMPLE_SEARCH_WIDGET } from '../../constants/widgetTypes'
+import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
 import FilterHeader from './FilterHeader'
 import Collapsible from '../Collapsible'
+
+export const SimpleSearchHeader = (props) => (
+  <FilterHeader icon="icon-search" label="Simple Search" onClose={props.onClose} />
+)
+
+SimpleSearchHeader.propTypes = {
+  onClose: PropTypes.func
+}
 
 // Manage the query string for the current AssetSearch.
 // Monitors the global query and updates slivers when the search is changed.
@@ -14,7 +24,7 @@ import Collapsible from '../Collapsible'
 class SimpleSearch extends Component {
   static propTypes = {
     query: PropTypes.instanceOf(AssetSearch).isRequired,
-    actions: PropTypes.object,
+    actions: PropTypes.object.isRequired,
     id: PropTypes.number.isRequired
   }
 
@@ -22,22 +32,18 @@ class SimpleSearch extends Component {
     super(props)
     this.updateQueryString = this.updateQueryString.bind(this)
     this.modifySliver = this.modifySliver.bind(this)
-    this.state = { queryString: props.query.query }
+    this.state = { queryString: queryString(props) }
   }
 
   // If the query is changed elsewhere, e.g. from the Searchbar,
   // capture the new props and update our local state to match.
   componentWillReceiveProps (nextProps) {
-    this.setState({ queryString: nextProps.query.query })
+    this.setState({ queryString: queryString(nextProps) })
   }
 
   // Remove our sliver if the close button in our header is clicked
   removeFilter () {
-    this.props.actions.removeSlivers([this.props.id])
-  }
-
-  header () {
-    return <FilterHeader icon="icon-search" label="Simple Search" onClose={this.removeFilter.bind(this)} />
+    this.props.actions.removeRacetrackWidgetIds([this.props.id])
   }
 
   // Manage the <input> without a form, using onChange to update local state
@@ -48,9 +54,10 @@ class SimpleSearch extends Component {
   // ...and onKeyPress to monitor for the Enter key to submit the new query
   modifySliver (event) {
     if (event.key === 'Enter') {
-      let slivers = {}
-      slivers[this.props.id] = new AssetSearch({query: this.state.queryString})
-      this.props.actions.modifySlivers(slivers)
+      const type = SIMPLE_SEARCH_WIDGET
+      const sliver = new AssetSearch({query: this.state.queryString})
+      const widget = new Widget({id: this.props.id, type, sliver})
+      this.props.actions.modifyRacetrackWidget(widget)
     }
   }
 
@@ -64,7 +71,7 @@ class SimpleSearch extends Component {
       borderRadius: '3px'
     }
     return (
-      <Collapsible style={collapsibleStyle} header={this.header()} >
+      <Collapsible style={collapsibleStyle} header={<SimpleSearchHeader onClose={this.removeFilter.bind(this)}/>} >
         <div className="simple-search">
           <div>
             <input type="text" placeholder="Search..." value={this.state.queryString}
@@ -82,8 +89,12 @@ class SimpleSearch extends Component {
   }
 }
 
+const queryString = props => (
+  props && props.query && props.query.query ? props.query.query : ''
+)
+
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({ modifySlivers, removeSlivers }, dispatch)
+  actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds }, dispatch)
 })
 
 const mapStateToProps = state => ({

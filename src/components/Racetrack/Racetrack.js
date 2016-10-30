@@ -3,19 +3,23 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import Searcher from './Searcher'
-import SimpleSearch from './SimpleSearch'
+import SimpleSearch, { SimpleSearchHeader } from './SimpleSearch'
+import Facet, { FacetHeader } from './Facet'
+import DropdownMenu from '../DropdownMenu'
+import Widget from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
-import { resetSlivers } from '../../actions/sliversAction'
+import { resetRacetrackWidgets, modifyRacetrackWidget } from '../../actions/racetrackAction'
+import * as widgetTypes from '../../constants/widgetTypes'
 
 class Racetrack extends Component {
   static propTypes = {
     query: PropTypes.instanceOf(AssetSearch),
+    widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
     actions: PropTypes.object.isRequired
   }
 
-  constructor (props) {
-    super(props)
-    this.state = { emptySearch: '' }
+  state = {
+    emptySearch: ''
   }
 
   handleSave () {
@@ -23,11 +27,7 @@ class Racetrack extends Component {
   }
 
   handleClear () {
-    this.props.actions.resetSlivers()
-  }
-
-  handleAddWidget () {
-    console.log('Show ADD WIDGET modal')
+    this.props.actions.resetRacetrackWidgets()
   }
 
   handleQuickAddKeyPress () {
@@ -36,11 +36,17 @@ class Racetrack extends Component {
 
   submitEmptySearch (event) {
     event.preventDefault()
-    this.props.actions.resetSlivers({1: {query: this.state.emptySearch}})
+    const type = widgetTypes.SIMPLE_SEARCH_WIDGET
+    const sliver = new AssetSearch({ query: this.state.emptySearch })
+    this.props.actions.resetRacetrackWidgets([new Widget({ type, sliver })])
   }
 
   changeEmptySearch (event) {
     this.setState({ emptySearch: event.target.value })
+  }
+
+  pushWidgetType (type) {
+    this.props.actions.modifyRacetrackWidget(new Widget({type}))
   }
 
   renderEmpty () {
@@ -60,11 +66,30 @@ class Racetrack extends Component {
     )
   }
 
+  renderWidgetTypeHeader (widgetType) {
+    switch (widgetType) {
+      case widgetTypes.SIMPLE_SEARCH_WIDGET:
+        return <SimpleSearchHeader/>
+      case widgetTypes.FACET_WIDGET:
+        return <FacetHeader field="Keyword"/>
+      default:
+        return <div/>
+    }
+  }
+
+  renderWidget (widget) {
+    switch (widget.type) {
+      case widgetTypes.SIMPLE_SEARCH_WIDGET:
+        return <SimpleSearch id={widget.id}/>
+      case widgetTypes.FACET_WIDGET:
+        return <Facet id={widget.id}/>
+      default:
+        return <div/>
+    }
+  }
+
   render () {
-    const { query } = this.props
-    // Construct an array of search widgets to control the search
-    // FIXME: faked as a single SimpleSearch for now, later parse full query.
-    const widgets = (query && query.query && query.query.length) ? [ <SimpleSearch key={1} id={1} /> ] : []
+    const { widgets } = this.props
     return (
       <div className="racetrack">
         <Searcher/>
@@ -72,11 +97,21 @@ class Racetrack extends Component {
           { (!widgets || widgets.length === 0) && this.renderEmpty() }
           { widgets && widgets.length > 0 && (
           <div className="racetrack-filters">
-            {(widgets)}
+            {widgets.map((widget, i) => (
+              <div key={i} className="racetrack-widget">
+                { this.renderWidget(widget) }
+              </div>
+            ))}
           </div>
           )}
           <div className="racetrack-add-filter">
-            <button onClick={this.handleAddWidget.bind(this)}>+ ADD WIDGET</button>
+            <DropdownMenu label="+ ADD WIDGET">
+              { Object.values(widgetTypes).map(widgetType => (
+                <div className="racetrack-add-filter-item" key={widgetType} onClick={this.pushWidgetType.bind(this, widgetType)}>
+                  { this.renderWidgetTypeHeader(widgetType) }
+                </div>
+              ))}
+            </DropdownMenu>
             <input onKeyPress={this.handleQuickAddKeyPress.bind(this)} placeholder="Quick Add - Widget"/>
           </div>
         </div>
@@ -92,11 +127,12 @@ class Racetrack extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({ resetSlivers }, dispatch)
+  actions: bindActionCreators({ modifyRacetrackWidget, resetRacetrackWidgets }, dispatch)
 })
 
 const mapStateToProps = state => ({
-  query: state.assets.query
+  query: state.assets.query,
+  widgets: state.racetrack.widgets
 })
 
 export default connect(

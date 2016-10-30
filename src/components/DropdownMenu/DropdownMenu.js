@@ -8,9 +8,8 @@ export default class DropdownMenu extends Component {
     style: PropTypes.object
   }
 
-  constructor (props) {
-    super(props)
-    this.state = { isVisible: false }
+  state = {
+    isVisible: false
   }
 
   show = this.show.bind(this)

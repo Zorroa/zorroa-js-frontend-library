@@ -10,10 +10,14 @@ export default class AssetSearch {
       this.size = json.size       // int:              Number of assets to return
       this.from = json.from       // int:              First asset index to return
       this.fuzzy = json.fuzzy     // bool:             Enable fuzzy search
+      this.aggs = json.aggs       // {string, {string, object}}
     }
   }
 
   merge (assetSearch) {
+    if (!assetSearch) {
+      return
+    }
     // FIXME: How should we merge order, scroll, from & size?
     if (assetSearch.query) {
       this.query = this.query ? `(${this.query}) AND (${assetSearch.query})` : assetSearch.query
