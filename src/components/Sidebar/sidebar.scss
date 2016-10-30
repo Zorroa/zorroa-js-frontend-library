@@ -2,18 +2,15 @@
 
 // Sidebars use flex-basis to toggle between open and close
 .sidebar {
+  max-height: 100%;
+
   width: 70px;
   max-width: 70px;
   min-width: 70px;
 
   padding-left: 20px;
-  padding-right: 10px;
 
   background-color: $zorroa-nearwhite;
-  border-left: 1px solid $zorroa-lightgray;
-  border-right: 1px solid $zorroa-lightgray;
-
-  overflow: hidden;
 
   &.isOpen {
     width: $zorroa-sidebar-width;
@@ -26,6 +23,7 @@
   height: 21px;
   font-size: 9px;
   color: $zorroa-lightgray;
+  padding-right: 10px;
 
   @include flexRow;
   @include flexAlignItemsCenter;
@@ -33,4 +31,16 @@
   &.left {
     @include flexJustifyEnd;
   }
+}
+
+.sidebar-scroll {
+  max-height: 100%;
+  width: 100%;
+  max-width: 100%;
+
+  overflow-x: hidden;
+  overflow-y: visible;
+
+  padding-bottom: 10px;
+  padding-right: 10px;
 }

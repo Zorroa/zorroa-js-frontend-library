@@ -51,26 +51,14 @@ class Sidebar extends Component {
     return this.isOpen() !== this.props.isRightEdge ? '\u25C0' : '\u25B6'
   }
 
-  buttonClassNames () {
-    return classnames('sidebar-button', {
-      'left': !this.props.isRightEdge
-    })
-  }
-
-  sidebarClassNames () {
-    return classnames('sidebar', {
-      'isOpen': this.isOpen()
-    })
-  }
-
   render () {
     const arrow = this.buttonChar()
     return (
-      <div className={this.sidebarClassNames()}>
-        <div className={this.buttonClassNames()}>
+      <div className={classnames('sidebar flexCol fullHeight', { 'isOpen': this.isOpen() })}>
+        <div className={classnames('sidebar-button', { 'left': !this.props.isRightEdge })}>
           <label onClick={this.toggleOpenClosed.bind(this)}>{arrow}{arrow}</label>
         </div>
-        <div onClick={this.openWhenClosed.bind(this)}>
+        <div className={'sidebar-scroll fullheight'} onClick={this.openWhenClosed.bind(this)}>
           {
             React.Children.map(this.props.children,
               child => cloneElement(child, { sidebarIsOpen: this.isOpen() }))
