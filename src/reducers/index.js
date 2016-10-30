@@ -6,6 +6,8 @@ import assets from './assetsReducer'
 import folders from './foldersReducer'
 import app from './appReducer'
 import slivers from './sliversReducer'
+import sidebar from './sidebarReducer'
+import Collapsible from './collapsibleReducer'
 
 export default combineReducers({
   app,
@@ -13,5 +15,7 @@ export default combineReducers({
   assets,
   folders,
   slivers,
-  form: formReducer
+  form: formReducer,
+  sidebar,
+  Collapsible
 })

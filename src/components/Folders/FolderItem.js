@@ -10,7 +10,8 @@ export default class FolderItem extends Component {
     return {
       folders: PropTypes.object.isRequired,     // Can this be mapOf(Folder)?
       folderId: PropTypes.number.isRequired,
-      loadChildren: PropTypes.func.isRequired
+      loadChildren: PropTypes.func.isRequired,
+      sidebarIsOpen: PropTypes.bool.isRequired
     }
   }
 
@@ -24,7 +25,8 @@ export default class FolderItem extends Component {
     const closeIcon = folder.isDyhi() ? 'icon-cube' : 'icon-folder'
     return (
       <CollapsibleHeader label={folder.name} isCollapsed={false}
-                         openIcon={openIcon} closeIcon={closeIcon} />
+                         openIcon={openIcon} closeIcon={closeIcon}
+                         sidebarIsOpen={this.props.sidebarIsOpen}/>
     )
   }
 
@@ -32,9 +34,10 @@ export default class FolderItem extends Component {
     const { folders, folderId, loadChildren } = this.props
     const folder = folders.get(folderId)
     return (
-      <Collapsible header={this.renderHeader(folder)}>
+      <Collapsible header={this.renderHeader(folder)} sidebarIsOpen={this.props.sidebarIsOpen}
+                   isOpenKey={`FolderItem|${folderId}`}>
         { folder.children !== undefined && folder.children.map(child => (
-          <FolderItem key={child.id} folders={folders} folderId={child.id} loadChildren={loadChildren} />)
+          <FolderItem key={child.id} folders={folders} folderId={child.id} loadChildren={loadChildren} sidebarIsOpen={this.props.sidebarIsOpen}/>)
         )}
       </Collapsible>
     )

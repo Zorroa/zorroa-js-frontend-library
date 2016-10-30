@@ -15,6 +15,7 @@ class SimpleSearch extends Component {
   static propTypes = {
     query: PropTypes.instanceOf(AssetSearch).isRequired,
     actions: PropTypes.object,
+    sidebarIsOpen: PropTypes.bool.isRequired,
     id: PropTypes.number.isRequired
   }
 
@@ -37,7 +38,7 @@ class SimpleSearch extends Component {
   }
 
   header () {
-    return <FilterHeader icon="icon-search" label="Simple Search" onClose={this.removeFilter.bind(this)} />
+    return <FilterHeader icon="icon-search" label="Simple Search" onClose={this.removeFilter.bind(this)}/>
   }
 
   // Manage the <input> without a form, using onChange to update local state
@@ -55,17 +56,11 @@ class SimpleSearch extends Component {
   }
 
   render () {
-    const collapsibleStyle = {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'stretch',
-      color: '#ededed',
-      backgroundColor: '#74b618',
-      borderRadius: '3px'
-    }
+    const { id, sidebarIsOpen } = this.props;
+
     return (
-      <Collapsible style={collapsibleStyle} header={this.header()} >
-        <div className="simple-search">
+      <Collapsible extraClasses={'simple-search'} header={this.header()} isOpenKey={`SimpleSearch|${id}`} sidebarIsOpen={sidebarIsOpen}>
+        <div className="simple-search-body">
           <div>
             <input type="text" placeholder="Search..." value={this.state.queryString}
                    onKeyPress={this.modifySliver} onChange={this.updateQueryString} />

@@ -11,7 +11,8 @@ class Metadata extends Component {
   static get propTypes () {
     return {
       assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
-      selectedIds: PropTypes.object
+      selectedIds: PropTypes.object,
+      sidebarIsOpen: PropTypes.bool.isRequired
     }
   }
 
@@ -25,7 +26,9 @@ class Metadata extends Component {
     return (<CollapsibleHeader
       label={metadataLabel}
       isCollapsed={false}
-      openIcon="icon-register" closeIcon="icon-register" />)
+      openIcon="icon-register"
+      closeIcon="icon-register"
+      sidebarIsOpen={this.props.sidebarIsOpen}/>)
   }
 
   render () {
@@ -57,8 +60,8 @@ class Metadata extends Component {
     }
     console.log('Selected assets: ' + selectedAssets.size + ' ' + JSON.stringify(selectedAssets))
     return (
-      <Collapsible style={{marginLeft: '16px'}} header={this.renderHeader()}>
-        { fields.map(field => (<DisplayPropertieItem key={field.name} field={field.name} selectedAssets={selectedAssets} displayProperties={field} />)) }
+      <Collapsible style={{marginLeft: '16px'}} header={this.renderHeader()} sidebarIsOpen={this.props.sidebarIsOpen} isOpenKey={'Metadata'}>
+        { fields.map(field => (<DisplayPropertieItem key={field.name} field={field.name} selectedAssets={selectedAssets} displayProperties={field} sidebarIsOpen={this.props.sidebarIsOpen}/>)) }
       </Collapsible>
     )
   }

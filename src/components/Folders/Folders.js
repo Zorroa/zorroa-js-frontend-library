@@ -11,7 +11,8 @@ class Folders extends Component {
   static get propTypes () {
     return {
       folders: PropTypes.object.isRequired,
-      actions: PropTypes.object.isRequired
+      actions: PropTypes.object.isRequired,
+      sidebarIsOpen: PropTypes.bool.isRequired
     }
   }
 
@@ -27,8 +28,8 @@ class Folders extends Component {
     const { folders } = this.props
     return (
       <div>
-        <FolderItem folders={folders} folderId={-1} loadChildren={this.loadChildren.bind(this)}/>
-        <FolderItem folders={folders} folderId={0} loadChildren={this.loadChildren.bind(this)}/>
+        <FolderItem folders={folders} folderId={-1} loadChildren={this.loadChildren.bind(this)} sidebarIsOpen={this.props.sidebarIsOpen}/>
+        <FolderItem folders={folders} folderId={0} loadChildren={this.loadChildren.bind(this)} sidebarIsOpen={this.props.sidebarIsOpen}/>
       </div>
     )
   }
