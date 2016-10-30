@@ -5,7 +5,6 @@
 // the menu right justified
 .header {
   padding: 0;
-  padding-right: 22px;
   height: 60px;
 }
 
@@ -17,16 +16,15 @@
 .header-logo {
   padding-top: 6px;
   padding-left: 22px;
-  width: $zorroa-sidebar-width;
-  min-width: $zorroa-sidebar-width;
+
+  // This matches the folder sidebar width
+  width: 25%;
   max-width: $zorroa-sidebar-width;
 }
 
 // Simple menu text for now
 .header-menu {
   list-style: none;
-  // margin-bottom: 0;
-  // padding-left: 0;
 }
 
 .header-menu-icon {

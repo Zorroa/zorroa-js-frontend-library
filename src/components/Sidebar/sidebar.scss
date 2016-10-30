@@ -13,9 +13,9 @@
   background-color: $zorroa-nearwhite;
 
   &.isOpen {
-    width: $zorroa-sidebar-width;
+    // This matches the header logo width
+    width: 25%;
     max-width: $zorroa-sidebar-width;
-    min-width: $zorroa-sidebar-width;
   }
 }
 

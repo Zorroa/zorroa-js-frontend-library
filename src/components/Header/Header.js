@@ -55,6 +55,9 @@ class Header extends Component {
             <Link className="header-menu-item" to="/signout">Logout</Link>
           </DropdownMenu>
         </div>
+
+        {/*this is stupid/ugly, but neede to keep sidebar & header logo widths in sync */}
+        <div className='header-padding' style={{width:'22px'}}></div>
       </nav>
     )
   }
