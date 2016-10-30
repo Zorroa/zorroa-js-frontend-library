@@ -1,0 +1,9 @@
+// Accordion items in sidebars
+.accordion-item {
+  border: 1px solid black;
+  padding: 20px;
+
+  &.accordion-open {
+    height: 200px;
+  }
+}

@@ -34,16 +34,6 @@
 }
 
 
-// Accordion items in sidebars
-.accordion-item {
-  border: 1px solid black;
-  padding: 20px;
-
-  &.accordion-open {
-    height: 200px;
-  }
-}
-
 // Footers use flex-basis to toggle between open and close
 .footer {
   flex: 0 0 20px;
