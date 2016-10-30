@@ -59,20 +59,22 @@ class SimpleSearch extends Component {
     const { id, sidebarIsOpen } = this.props;
 
     return (
-      <Collapsible extraClasses={'simple-search'} header={this.header()} isOpenKey={`SimpleSearch|${id}`} sidebarIsOpen={sidebarIsOpen}>
-        <div className="simple-search-body">
-          <div>
-            <input type="text" placeholder="Search..." value={this.state.queryString}
-                   onKeyPress={this.modifySliver} onChange={this.updateQueryString} />
+      <div className='simple-search-box'>
+        <Collapsible header={this.header()} isOpenKey={`SimpleSearch|${id}`} sidebarIsOpen={sidebarIsOpen}>
+          <div className="simple-search-body">
+            <div>
+              <input type="text" placeholder="Search..." value={this.state.queryString}
+                     onKeyPress={this.modifySliver} onChange={this.updateQueryString} />
+            </div>
+            <div className="simple-search-radio">
+              <form>
+                <input type="radio" name="all-fields" value="all" />All fields
+                <input type="radio" name="all-fields" value="some" />Some fields
+              </form>
+            </div>
           </div>
-          <div className="simple-search-radio">
-            <form>
-              <input type="radio" name="all-fields" value="all" />All fields
-              <input type="radio" name="all-fields" value="some" />Some fields
-            </form>
-          </div>
-        </div>
-      </Collapsible>
+        </Collapsible>
+      </div>
     )
   }
 }
