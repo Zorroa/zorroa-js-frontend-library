@@ -16,7 +16,7 @@ export function getFolderChildren (id) {
         })
       })
       .catch(error => {
-        console.log('Error getting folder: ' + error)
+        console.error('Error getting folder: ' + error)
       })
   }
 }

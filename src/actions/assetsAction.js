@@ -25,7 +25,7 @@ export function searchAssets (query) {
         })
       })
       .catch(error => {
-        console.log('Error searching for assets: ' + error)
+        console.error('Error searching for assets: ' + error)
         if (error.response && error.response.status === 401) {
           dispatch({
             type: UNAUTH_USER,
@@ -36,13 +36,6 @@ export function searchAssets (query) {
           type: ASSET_SEARCH_ERROR,
           payload: error
         })
-
-        // re-throw any caught errors, since they might not be API errors.
-        // I ran into this with a run-time error in the JS code being caught here
-        // If we don't re-throw then we can't see the actual error message or call stack
-        // TODO: check 'error' and only re-throw if it is not a
-        // response error from the post call to the server
-        throw error
       })
   }
 }
