@@ -165,6 +165,12 @@ $zorroa-sidebar-width : 320px;
   @include flexJustifyCenter;
 }
 
+@mixin flexRowCenter {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include flexJustifyCenter;
+}
+
 @mixin flexColCenter {
   @include flexCol;
   @include flexAlignItemsCenter;
