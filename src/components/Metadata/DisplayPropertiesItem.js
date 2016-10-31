@@ -5,13 +5,11 @@ import Collapsible from '../Collapsible'
 import CollapsibleHeader from '../CollapsibleHeader'
 
 export default class DisplayPropertiesItem extends Component {
-  static get propTypes () {
-    return {
-      field: PropTypes.string.isRequired,
-      displayProperties: PropTypes.instanceOf(DisplayProperties).isRequired,
-      selectedAssets: PropTypes.object,
-      sidebarIsOpen: PropTypes.bool.isRequired
-    }
+  static propTypes = {
+    field: PropTypes.string.isRequired,
+    displayProperties: PropTypes.instanceOf(DisplayProperties).isRequired,
+    selectedAssets: PropTypes.object,
+    isIconified: PropTypes.bool.isRequired
   }
 
   value () {
@@ -32,25 +30,22 @@ export default class DisplayPropertiesItem extends Component {
   }
 
   render () {
-    const { field, selectedAssets, displayProperties } = this.props
+    const { field, selectedAssets, displayProperties, isIconified } = this.props
     if (displayProperties.children && displayProperties.children.length) {
       return (
         <Collapsible style={{marginLeft: '16px'}}
                      isOpenKey={`DisplayPropertiesItem|${field}`}
-                     sidebarIsOpen={this.props.sidebarIsOpen}
                      header={
                        <CollapsibleHeader label={displayProperties.name}
-                                          isCollapsed={false}
+                                          isCollapsed={false} isIconified={isIconified}
                                           openIcon="icon-register"
                                           closeIcon="icon-register"
-                                          sidebarIsOpen={this.props.sidebarIsOpen}
                        /> } >
           { displayProperties.children.map(child => (
             <DisplayPropertiesItem field={`${field}.${child.name}`}
                                    selectedAssets={selectedAssets}
-                                   key={child.name} displayProperties={child}
-                                   sidebarIsOpen={this.props.sidebarIsOpen}
-            />
+                                   isIconified={isIconified}
+                                   key={child.name} displayProperties={child} />
           ))}
         </Collapsible>
       )

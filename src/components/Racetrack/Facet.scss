@@ -1,0 +1,38 @@
+@import '../../styles/core-mixins.scss';
+
+.facet-box .collapsible {
+  & .collapsible-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    color: $zorroa-nearwhite;
+    background-color: #a11d77;
+    border-radius: 3px 3px 0 0;
+  }
+}
+
+.facet-icon {
+  width: 30px;
+  height: 30px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  border-radius: 3px;
+}
+
+.facet-min-value {
+  font-size: 13px;
+  color: $zorroa-lightgray;
+  margin-top: 22px;
+  margin-bottom: 14px;
+}
+
+.facet-footer {
+  border-top: 1px solid $zorroa-nearwhite;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.rotN90Flip {
+  transform: rotate(-90deg) scaleY(-1);
+}

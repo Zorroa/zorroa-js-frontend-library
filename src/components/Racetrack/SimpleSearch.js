@@ -2,10 +2,21 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
+import Widget from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
-import { modifySlivers, removeSlivers } from '../../actions/sliversAction'
+import { SIMPLE_SEARCH_WIDGET } from '../../constants/widgetTypes'
+import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
 import FilterHeader from './FilterHeader'
 import Collapsible from '../Collapsible'
+
+export const SimpleSearchHeader = (props) => (
+  <FilterHeader icon="icon-search" isIconified={props.isIconified} label="Simple Search" onClose={props.onClose} />
+)
+
+SimpleSearchHeader.propTypes = {
+  onClose: PropTypes.func,
+  isIconified: PropTypes.bool.isRequired
+}
 
 // Manage the query string for the current AssetSearch.
 // Monitors the global query and updates slivers when the search is changed.
@@ -14,31 +25,27 @@ import Collapsible from '../Collapsible'
 class SimpleSearch extends Component {
   static propTypes = {
     query: PropTypes.instanceOf(AssetSearch).isRequired,
-    actions: PropTypes.object,
-    sidebarIsOpen: PropTypes.bool.isRequired,
-    id: PropTypes.number.isRequired
+    actions: PropTypes.object.isRequired,
+    id: PropTypes.number.isRequired,
+    isIconified: PropTypes.bool.isRequired
   }
 
   constructor (props) {
     super(props)
     this.updateQueryString = this.updateQueryString.bind(this)
     this.modifySliver = this.modifySliver.bind(this)
-    this.state = { queryString: props.query.query }
+    this.state = { queryString: queryString(props) }
   }
 
   // If the query is changed elsewhere, e.g. from the Searchbar,
   // capture the new props and update our local state to match.
   componentWillReceiveProps (nextProps) {
-    this.setState({ queryString: nextProps.query.query })
+    this.setState({ queryString: queryString(nextProps) })
   }
 
   // Remove our sliver if the close button in our header is clicked
   removeFilter () {
-    this.props.actions.removeSlivers([this.props.id])
-  }
-
-  header () {
-    return <FilterHeader icon="icon-search" label="Simple Search" onClose={this.removeFilter.bind(this)}/>
+    this.props.actions.removeRacetrackWidgetIds([this.props.id])
   }
 
   // Manage the <input> without a form, using onChange to update local state
@@ -49,20 +56,29 @@ class SimpleSearch extends Component {
   // ...and onKeyPress to monitor for the Enter key to submit the new query
   modifySliver (event) {
     if (event.key === 'Enter') {
-      let slivers = {}
-      slivers[this.props.id] = new AssetSearch({query: this.state.queryString})
-      this.props.actions.modifySlivers(slivers)
+      const type = SIMPLE_SEARCH_WIDGET
+      const sliver = new AssetSearch({query: this.state.queryString})
+      const widget = new Widget({id: this.props.id, type, sliver})
+      this.props.actions.modifyRacetrackWidget(widget)
     }
   }
 
-  render () {
-    const { id, sidebarIsOpen } = this.props;
+  renderHeader (isIconified) {
+    return (
+      <SimpleSearchHeader isIconified={isIconified} onClose={this.removeFilter.bind(this)}/>
+    )
+  }
 
+  render () {
+    const { isIconified } = this.props
+    if (isIconified) {
+      return this.renderHeader(isIconified)
+    }
     return (
       <div className='simple-search-box'>
-        <Collapsible header={this.header()} isOpenKey={`SimpleSearch|${id}`} sidebarIsOpen={sidebarIsOpen}>
-          <div className="simple-search-body">
-            <div>
+        <Collapsible header={this.renderHeader(isIconified)} >
+          <div className="simple-search">
+            <div className="flexRow">
               <input type="text" placeholder="Search..." value={this.state.queryString}
                      onKeyPress={this.modifySliver} onChange={this.updateQueryString} />
             </div>
@@ -79,8 +95,12 @@ class SimpleSearch extends Component {
   }
 }
 
+const queryString = props => (
+  props && props.query && props.query.query ? props.query.query : ''
+)
+
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({ modifySlivers, removeSlivers }, dispatch)
+  actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds }, dispatch)
 })
 
 const mapStateToProps = state => ({

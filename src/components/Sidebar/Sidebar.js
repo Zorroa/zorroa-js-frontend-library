@@ -1,23 +1,20 @@
-import React, { Component, PropTypes, cloneElement } from 'react'
-import { bindActionCreators } from 'redux'
+import React, { Component, PropTypes, Children, cloneElement } from 'react'
 import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import classnames from 'classnames'
 
-import setSidebarOpen from '../../actions/sidebarAction'
+import { iconifyLeftSidebar, iconifyRightSidebar } from '../../actions/appActions'
 
 class Sidebar extends Component {
-  static get displayName () {
+  static displayName () {
     return 'Sidebar'
   }
 
-  static get propTypes () {
-    return {
-      actions: PropTypes.object.isRequired,
-      isRightEdge: PropTypes.bool,
-      children: PropTypes.node,
-      sidebarKey: PropTypes.string.isRequired,
-      sidebar: PropTypes.object.isRequired
-    }
+  static propTypes = {
+    isRightEdge: PropTypes.bool,
+    children: PropTypes.node,
+    app: PropTypes.object.isRequired,
+    actions: PropTypes.object.isRequired
   }
 
   static get defaultProps () {
@@ -26,68 +23,44 @@ class Sidebar extends Component {
     }
   }
 
-  isOpen () {
-    const sidebarState = this.props.sidebar
-    const sidebarKey = this.props.sidebarKey
-    return sidebarState[sidebarKey].isOpen
-  }
-
-  // constructor (props) {
-  //   super(props)
-  // }
-
-  toggleOpenClosed () {
-    this.props.actions.setSidebarOpen(this.props.sidebarKey, !this.isOpen())
-  }
-
-  openWhenClosed () {
-    if (!this.isOpen()) {
-      this.props.actions.setSidebarOpen(this.props.sidebarKey, true)
+  handleClick () {
+    const { app, isRightEdge, actions } = this.props
+    const isIconified = isRightEdge ? app.rightSidebarIsIconified : app.leftSidebarIsIconified
+    if (isRightEdge) {
+      actions.iconifyRightSidebar(!isIconified)
+    } else {
+      actions.iconifyLeftSidebar(!isIconified)
     }
+  }
+
+  isIconified () {
+    const { app, isRightEdge } = this.props
+    return isRightEdge ? app.rightSidebarIsIconified : app.leftSidebarIsIconified
   }
 
   buttonChar () {
     // Select the right or left facing triangle unicode char using XOR
-    return this.isOpen() !== this.props.isRightEdge ? '\u25C0' : '\u25B6'
+    return this.isIconified() === this.props.isRightEdge ? '\u25C0' : '\u25B6'
   }
 
   render () {
     const arrow = this.buttonChar()
+    const isIconified = this.isIconified()
     return (
-      <div className={classnames('sidebar flexCol fullHeight', { 'isOpen': this.isOpen() })}>
+      <div className={classnames('sidebar flexCol fullHeight', { 'isOpen': !this.isIconified() })}>
         <div className={classnames('sidebar-button', { 'left': !this.props.isRightEdge })}>
-          <label onClick={this.toggleOpenClosed.bind(this)}>{arrow}{arrow}</label>
+          <label onClick={this.handleClick.bind(this)}>{arrow}{arrow}</label>
         </div>
-        <div className={'sidebar-scroll fullheight'} onClick={this.openWhenClosed.bind(this)}>
-          {
-            React.Children.map(this.props.children,
-              child => cloneElement(child, { sidebarIsOpen: this.isOpen() }))
-          }
+        <div className={'sidebar-scroll fullheight'} >
+          { Children.map(this.props.children, child => cloneElement(child, {isIconified})) }
         </div>
       </div>
     )
   }
 }
 
-// ----------------------------------------------------------------------
-
-function mapStateToProps (state) {
-  // whatever is returned will show up as props
-  // inside of Component
-  return { sidebar: state.sidebar }
-}
-
-// Anything returned from this func will end up as props
-// on the Component container
-function mapDispatchToProps (dispatch) {
-  // When action is called, the result should
-  // be passed to all our reducers
-  return {
-    actions: bindActionCreators({setSidebarOpen}, dispatch)
-  }
-}
-
-// Promote Component from a component to a container-
-// it needs to know about this new dispatch method.
-// Make it available as a prop.
-export default connect(mapStateToProps, mapDispatchToProps)(Sidebar)
+export default connect(state => ({
+  app: state.app
+}), dispatch => ({
+  actions: bindActionCreators({ iconifyLeftSidebar, iconifyRightSidebar }, dispatch)
+}))(Sidebar)

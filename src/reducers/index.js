@@ -5,17 +5,13 @@ import auth from './authReducer'
 import assets from './assetsReducer'
 import folders from './foldersReducer'
 import app from './appReducer'
-import slivers from './sliversReducer'
-import sidebar from './sidebarReducer'
-import Collapsible from './collapsibleReducer'
+import racetrack from './racetrackReducer'
 
 export default combineReducers({
   app,
   auth,
   assets,
   folders,
-  slivers,
-  form: formReducer,
-  sidebar,
-  Collapsible
+  racetrack,
+  form: formReducer
 })

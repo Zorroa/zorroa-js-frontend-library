@@ -8,12 +8,10 @@ import DisplayProperties from '../../models/DisplayProperties'
 import DisplayPropertieItem from './DisplayPropertiesItem'
 
 class Metadata extends Component {
-  static get propTypes () {
-    return {
-      assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
-      selectedIds: PropTypes.object,
-      sidebarIsOpen: PropTypes.bool.isRequired
-    }
+  static propTypes = {
+    assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+    selectedIds: PropTypes.object,
+    isIconified: PropTypes.bool.isRequired
   }
 
   renderHeader () {
@@ -25,10 +23,8 @@ class Metadata extends Component {
     )
     return (<CollapsibleHeader
       label={metadataLabel}
-      isCollapsed={false}
-      openIcon="icon-register"
-      closeIcon="icon-register"
-      sidebarIsOpen={this.props.sidebarIsOpen}/>)
+      isCollapsed={false} isIconified={this.props.isIconified}
+      openIcon="icon-register" closeIcon="icon-register" />)
   }
 
   render () {
@@ -51,7 +47,7 @@ class Metadata extends Component {
     ]
 
     const fields = json.map(item => (new DisplayProperties(item)))
-    const { assets, selectedIds } = this.props
+    const { assets, selectedIds, isIconified } = this.props
     var selectedAssets = new Set()
     if (selectedIds) {
       for (const id of selectedIds) {
@@ -60,8 +56,8 @@ class Metadata extends Component {
     }
     console.log('Selected assets: ' + selectedAssets.size + ' ' + JSON.stringify(selectedAssets))
     return (
-      <Collapsible style={{marginLeft: '16px'}} header={this.renderHeader()} sidebarIsOpen={this.props.sidebarIsOpen} isOpenKey={'Metadata'}>
-        { fields.map(field => (<DisplayPropertieItem key={field.name} field={field.name} selectedAssets={selectedAssets} displayProperties={field} sidebarIsOpen={this.props.sidebarIsOpen}/>)) }
+      <Collapsible style={{marginLeft: '16px'}} header={this.renderHeader()}>
+        { !isIconified && fields.map(field => (<DisplayPropertieItem key={field.name} isIconified={isIconified} field={field.name} selectedAssets={selectedAssets} displayProperties={field} />)) }
       </Collapsible>
     )
   }

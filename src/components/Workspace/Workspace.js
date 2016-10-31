@@ -12,7 +12,7 @@ const Workspace = () => (
     <Header/>
     <div className="workspace flexRow fullWidth fullHeight">
 
-      <Sidebar sidebarKey={'folders'}>
+      <Sidebar>
         <Folders/>
         <Metadata/>
       </Sidebar>
@@ -25,7 +25,7 @@ const Workspace = () => (
 
       <div className="workspace-vertical-separator"/>
 
-      <Sidebar sidebarKey={'racetrack'} isRightEdge={true}>
+      <Sidebar isRightEdge={true}>
         <Racetrack/>
       </Sidebar>
 

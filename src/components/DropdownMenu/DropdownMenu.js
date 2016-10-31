@@ -9,9 +9,8 @@ export default class DropdownMenu extends Component {
     rightAlign: PropTypes.bool
   }
 
-  constructor (props) {
-    super(props)
-    this.state = { isVisible: false }
+  state = {
+    isVisible: false
   }
 
   show = this.show.bind(this)

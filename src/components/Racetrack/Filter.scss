@@ -8,6 +8,13 @@
   height: 40px;
   margin-right: 8px;
   margin-left: 8px;
+  min-width: 200px;           // Force wide header for Add Widget dropdown
+  text-transform: uppercase;
+  font-size: 14px;
+
+  &.iconified {
+    min-width: 0;             // Allow iconified
+  }
 
   button {
     border: none;
