@@ -42,6 +42,9 @@ export default class AssetSearch {
         }
       }
     }
+    if (assetSearch.aggs) {
+      this.aggs = this.aggs ? { ...this.aggs, ...assetSearch.aggs } : assetSearch.aggs
+    }
   }
 
   equals (assetSearch) {

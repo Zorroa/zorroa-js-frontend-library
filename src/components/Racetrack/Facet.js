@@ -31,24 +31,27 @@ class Facet extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
     id: PropTypes.number.isRequired,
-    isIconified: PropTypes.bool.isRequired
+    isIconified: PropTypes.bool.isRequired,
+    buckets: PropTypes.arrayOf(PropTypes.object)
   }
 
   state = {
     field: 'Disney.film.name.raw',
-    buckets: [],
     selectedIndexes: [],
-    maxValue: 0,
-    minValue: 0,
     chartType: BAR_CHART
   }
 
   modifySliver = this.modifySliver.bind(this)
 
-  modifySliver (event) {
+  componentWillMount () {
+    this.modifySliver()
+  }
+
+  modifySliver (term) {
     const type = FACET_WIDGET
-    let sliver = new AssetSearch()
-    sliver.filter = new AssetFilter({ terms: [this.state.field] })
+    const aggs = { facet: { terms: { field: this.state.field } } }
+    let sliver = new AssetSearch({aggs})
+    sliver.filter = new AssetFilter(term ? { terms: {[this.state.field]: [term]} } : {})
     const widget = new Widget({id: this.props.id, type, sliver})
     this.props.actions.modifyRacetrackWidget(widget)
   }
@@ -69,6 +72,11 @@ class Facet extends Component {
     }
   }
 
+  selectTerm (term) {
+    console.log('Select term: ' + term)
+    this.modifySliver(term)
+  }
+
   renderHeader (isIconified) {
     return (
       <FacetHeader field={this.state.field} isIconified={isIconified}
@@ -77,25 +85,31 @@ class Facet extends Component {
   }
 
   render () {
-    const { isIconified } = this.props
+    const { isIconified, buckets } = this.props
     if (isIconified) {
       // Never render the body when iconified
       return this.renderHeader(isIconified)
     }
+    let maxCount = 0
+    let minCount = Number.MAX_SAFE_INTEGER
+    buckets.forEach(bucket => {
+      maxCount = Math.max(maxCount, bucket.doc_count)
+      minCount = Math.min(minCount, bucket.doc_count)
+    })
 
     return (
       <Collapsible header={this.renderHeader(isIconified)} >
         <div className="facet flexCol">
           <div className="facet-controls flexRow flexJustifySpaceBetween">
-            <DropdownMenu>
+            <DropdownMenu label={this.state.field}>
               <div>Filename</div>
               <div>Film</div>
               <div>Character</div>
             </DropdownMenu>
             <div className="facet-value-range flexRow flexJustifySpaceBetween">
               <div>1</div>
-              <input type="range" min="1" max={this.state.maxValue} />
-              <div>{this.state.maxValue}</div>
+              <input type="range" min="1" max={maxCount} />
+              <div>{maxCount}</div>
             </div>
           </div>
           <div className="facet-value-table flexOn">
@@ -107,17 +121,17 @@ class Facet extends Component {
               </tr>
               </thead>
               <tbody>
-              { this.state.buckets.map(bucket => (
-                <tr>
-                  <td>{bucket.name}</td>
-                  <td>{bucket.value}</td>
+              { buckets && buckets.map(bucket => (
+                <tr className="facet-value-table-row" key={bucket.key} onClick={this.selectTerm.bind(this, bucket.key)}>
+                  <td>{bucket.key}</td>
+                  <td>{bucket.doc_count}</td>
                 </tr>
               ))}
               </tbody>
             </table>
           </div>
-          <div className="facet-min-value">
-            {this.state.minValue !== this.state.maxValue ? `Search is limited to >${this.state.minValue} results per keyword` : '' }
+          <div className="facet-min-value flexRow flexJustifyCenter">
+            {minCount !== maxCount ? `Search is limited to >${minCount} results per keyword` : '' }
           </div>
           <div className="facet-footer flexRow flexJustifyCenter">
             <button style={{color: this.state.chartType === BAR_CHART ? '#fff' : '#808080', background: this.state.chartType === BAR_CHART ? '#a11d77' : '#fff'}} className="facet-icon icon-list" onClick={this.selectGraph.bind(this, 1)} />
@@ -132,7 +146,7 @@ class Facet extends Component {
 
 export default connect(
   state => ({
-
+    buckets: state.assets && state.assets.aggs && state.assets.aggs.facet ? state.assets.aggs.facet.buckets : []
   }), dispatch => ({
     actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds }, dispatch)
   })

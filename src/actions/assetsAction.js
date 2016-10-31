@@ -19,9 +19,10 @@ export function searchAssets (query) {
         console.log(response)
         const page = new Page(response.data.page)
         const assets = response.data.list.map(asset => (new Asset(asset)))
+        const aggs = response.data.aggregations
         dispatch({
           type: ASSET_SEARCH,
-          payload: { query, assets, page }
+          payload: { query, assets, page, aggs }
         })
       })
       .catch(error => {

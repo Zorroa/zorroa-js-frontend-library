@@ -85,7 +85,7 @@ class SimpleSearch extends Component {
     return (
       <Collapsible style={collapsibleStyle} header={this.renderHeader(isIconified)} >
         <div className="simple-search">
-          <div>
+          <div className="flexRow">
             <input type="text" placeholder="Search..." value={this.state.queryString}
                    onKeyPress={this.modifySliver} onChange={this.updateQueryString} />
           </div>
