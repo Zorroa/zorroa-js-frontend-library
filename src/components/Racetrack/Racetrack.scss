@@ -71,8 +71,14 @@
     padding: 0;
     margin: 40px 0;
 
+    .racetrack-add-filter-item {
+      margin-top: 4px;
+    }
+
     .racetrack-add-filter-item:hover {
-      background-color: $zorroa-sickly-green;
+      background-color: #fff;
+      opacity: 0.75;
+      z-index: 2;
     }
 
     button {

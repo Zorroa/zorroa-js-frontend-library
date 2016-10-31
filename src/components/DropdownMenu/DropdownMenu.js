@@ -40,7 +40,7 @@ export default class DropdownMenu extends Component {
           <div className={classnames('dropdown-caret', 'icon-arrow-down', { 'rot180': this.state.isVisible })} />
         </button>
         { this.state.isVisible &&
-          (<ul style={this.props.rightAlign ? {right:0} : {}}>
+          (<ul style={this.props.rightAlign ? {right: 0} : {}}>
             {Children.map(this.props.children, (child, i) => {
               return (<li key={i}>{child}</li>)
             })}

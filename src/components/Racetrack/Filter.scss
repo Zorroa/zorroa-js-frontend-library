@@ -6,8 +6,8 @@
   justify-content: space-between;
   align-items: center;
   height: 40px;
-  margin-right: 8px;
-  margin-left: 8px;
+  margin-right: 4px;
+  margin-left: 4px;
   min-width: 200px;           // Force wide header for Add Widget dropdown
   text-transform: uppercase;
   font-size: 14px;
@@ -21,4 +21,9 @@
     outline: none;
     background: none;
   }
+}
+
+.filter-header-icon {
+  font-size: 30px;
+  margin-right: 4px;
 }

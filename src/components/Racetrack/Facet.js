@@ -12,8 +12,10 @@ import Collapsible from '../Collapsible'
 import DropdownMenu from '../DropdownMenu'
 
 export const FacetHeader = (props) => (
-  <FilterHeader icon="icon-bar-graph rotN90Flip" label="Facet: Keyword"
-                onClose={props.onClose} isIconified={props.isIconified} />
+  <div className="flexRow fullWidth" style={{backgroundColor: '#a11d77', color: '#ededed'}}>
+    <FilterHeader icon="icon-bar-graph rotN90Flip" label="Facet: Keyword"
+                  onClose={props.onClose} isIconified={props.isIconified} />
+  </div>
 )
 
 FacetHeader.propTypes = {
@@ -107,9 +109,10 @@ class Facet extends Component {
                 <div>Film</div>
                 <div>Character</div>
               </DropdownMenu>
+              <div className="flexOn" />
               <div className="facet-value-range flexRow flexJustifySpaceBetween">
                 <div>1</div>
-                <input type="range" min="1" max={maxCount} />
+                <input type="range" min="1" max={maxCount} style={{width: '60px'}} />
                 <div>{maxCount}</div>
               </div>
             </div>

@@ -10,7 +10,9 @@ import FilterHeader from './FilterHeader'
 import Collapsible from '../Collapsible'
 
 export const SimpleSearchHeader = (props) => (
-  <FilterHeader icon="icon-search" isIconified={props.isIconified} label="Simple Search" onClose={props.onClose} />
+  <div className="flexRow fullWidth" style={{backgroundColor: '#73b61c', color: '#ededed'}}>
+    <FilterHeader icon="icon-search" isIconified={props.isIconified} label="Simple Search" onClose={props.onClose} />
+  </div>
 )
 
 SimpleSearchHeader.propTypes = {
@@ -77,7 +79,7 @@ class SimpleSearch extends Component {
     return (
       <div className='simple-search-box'>
         <Collapsible header={this.renderHeader(isIconified)} >
-          <div className="simple-search">
+          <div className="simple-search-body">
             <div className="flexRow">
               <input type="text" placeholder="Search..." value={this.state.queryString}
                      onKeyPress={this.modifySliver} onChange={this.updateQueryString} />
