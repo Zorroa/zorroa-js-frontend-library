@@ -18,6 +18,9 @@ import User from './models/User'
 
 // Include all our app-wide style classes
 require('./styles/core-globals.scss')
+// The custom icon set Amber made for us
+// To update icons, see /src/assets/fonts/zorroa-icons/how-to-update.txt
+require('./assets/fonts/zorroa-icons/style.css')
 
 // We can require the custom fonts if we want to serve the font files separately.
 // The reason to do that would be to allow caching of the font files.
