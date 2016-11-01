@@ -26,18 +26,29 @@ build() {
   npm run build
 }
 
-deploy() {
+deployCheck() {
   CUR_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  GITSTATUS=$(git status -s)
+  GITHASHLOCAL=$(git rev-parse HEAD)
+  GITHASHREMOTE=$(git rev-parse origin/$CUR_BRANCH)
+
+  if [ ! -z "$GITSTATUS" ] || [ "$GITHASHLOCAL" != "$GITHASHREMOTE" ]; then
+    echo ""
+    echo "You have uncommitted changes; bailing out."
+    exit 1
+  fi
 
   if [ "$CUR_BRANCH" != "master" ]; then
     echo "Deploying from branch $CUR_BRANCH"
     read -p "Type $CUR_BRANCH to continue deploying from a custom branch, or Ctrl-C to cancel: " p
     if [ "$p" != "$CUR_BRANCH" ]; then
-      echo "Name doesn't match; bailing out.";
-      exit 1;
-    fi;
+      echo "Name doesn't match; bailing out."
+      exit 1
+    fi
   fi
+}
 
+deploy() {
   TAG=deploy_prod_$(date "+%Y_%m_%d_%H_%M_%S")
   git tag -a $TAG -m "Production Distribution Build from $USER on $date" &&
   bumpVersion $1
@@ -46,4 +57,4 @@ deploy() {
   # add your own deployments
 }
 
-build && deploy
+deployCheck && build && deploy
