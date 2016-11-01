@@ -99,58 +99,6 @@ This is a product from AirBnB to allow us to do assertions on our react componen
 
 ## Deploying the project
 
-### Manually
-
-- Make sure your working tree is clean and all commits are pushed
-
-##### Minor version
-
-
-```
-# create a new branch
-git checkout -b minor_$(date +%s%3N)
-# bump the version number, creates a commit & tag
-npm version minor -m "$USER deployed %s on $(date +%Y-%m-%d@%H:%M)"
-# get the new version number
-VERSION_PATCH=$(npm version | grep zorroa-js-curator | egrep -o '\d+\.\d+\.\d+')
-VERSION_MAJMIN=$(echo $VERSION_PATCH | cut -f -2 -d.)
-# rename our branch to version name
-git branch -m v$VERSION_MAJMIN
-# push our new branch
-git push -u origin HEAD
-# push the new tag that npm version created
-git push origin v$VERSION_PATCH
-# create a pull request (asks for github username/password first time)
-hub pull-request
-```
-
-##### Patch (hotfix)
-
-First make sure you're in the branch you want to patch.
-
-```
-git checkout <version-branch>
-# e.g. v0.1 - the major.minor branch you want to patch
-```
-
-Now update the version number:
-
-```
-# bump the version number, creates a commit & tag
-npm version patch -m "$USER deployed %s on $(date +%Y-%m-%d@%H:%M)"
-# get the new version number
-VERSION_PATCH=$(npm version | grep zorroa-js-curator | egrep -o '\d+\.\d+\.\d+')
-VERSION_MAJMIN=$($VERSION_PATCH | cut -f -2 -d.)
-# rename our branch to version name
-git branch -m v$VERSION_MAJMIN
-# push our new branch
-git push -u origin HEAD
-# push the new tag that npm version created
-git push origin v$VERSION_PATCH
-```
-
-### Automated (in progress, may not work as expected yet)
-
 ```
 # rebuild & publish the project
 npm run deploy <version-type>
