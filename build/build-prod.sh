@@ -16,7 +16,7 @@ bumpVersion() {
   fi
   VERSION=$(npm version $bumpType -m "$USER bumped the version to %s for deployment to production on $date")
   echo "Version bumped to" $VERSION
-  git push origin --tag
+  git push origin $VERSION
 }
 
 build() {
@@ -27,9 +27,11 @@ build() {
 }
 
 deploy() {
-  git commit -am "Production Distribution Build from $USER on $date" &&
+  TAG=deploy_prod_$(date "+%Y_%m_%d_%H_%M_%S")
+  git tag -a $TAG -m "Production Distribution Build from $USER on $date" &&
   bumpVersion $1
-  # git push origin master
+  git push origin $TAG
+
   # add your own deployments
 }
 
