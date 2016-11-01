@@ -1,41 +1,45 @@
-#!/bin/sh
+#!/bin/bash
 
 # Example bump uses
-# Patch: sh build-prod.sh
-# Minor: sh build-prod.sh minor
-# Major: sh build-prod.sh major
+# patch: sh build-prod.sh patch
+# minor: sh build-prod.sh minor
+# major: sh build-prod.sh major
 
-date=`date +%Y-%m-%d@%H:%M`
+versionType="$1"
 
 bumpVersion() {
-  bumpType="patch"
-  # Potential Types: [prepatch, preminor, premajor, prerelease]
-  # Available Types: [patch, minor, major] patch is the default so it is not passed
-  if test "$1" = "minor" || test "$1" = "major"; then
-    bumpType=$1
-  fi
-  VERSION=$(npm version $bumpType -m "$USER bumped the version to %s for deployment to production on $date")
+  VERSION=$(npm version $versionType -m "$USER bumped the version to %s for deployment to production on $(date +%Y-%m-%d@%H:%M)")
   echo "Version bumped to" $VERSION
+  git tag $VERSION -am "Production Distribution Build from $USER on $date"
   git push origin $VERSION
 }
 
 build() {
   git pull origin master &&
   rm -rf node_modules &&
+  npm cache clean &&
   npm install &&
   npm run build
 }
 
 deployCheck() {
+  # Potential Types: [prepatch, preminor, premajor, prerelease]
+  # Available Types: [patch, minor, major] patch is the default so it is not passed
+  ALLOWED_VERSIONS="patch minor major"
+  if [[ ! " $ALLOWED_VERSIONS " =~ " $versionType " ]]; then
+    echo "Unknown version type \"$versionType\""
+    echo "Known version types: $ALLOWED_VERSIONS"
+    exit 0
+  fi
+
   CUR_BRANCH=$(git rev-parse --abbrev-ref HEAD)
   GITSTATUS=$(git status -s)
   GITHASHLOCAL=$(git rev-parse HEAD)
   GITHASHREMOTE=$(git rev-parse origin/$CUR_BRANCH)
 
   if [ ! -z "$GITSTATUS" ] || [ "$GITHASHLOCAL" != "$GITHASHREMOTE" ]; then
-    echo ""
     echo "You have uncommitted changes; bailing out."
-    exit 1
+    exit 0
   fi
 
   if [ "$CUR_BRANCH" != "master" ]; then
@@ -43,18 +47,13 @@ deployCheck() {
     read -p "Type $CUR_BRANCH to continue deploying from a custom branch, or Ctrl-C to cancel: " p
     if [ "$p" != "$CUR_BRANCH" ]; then
       echo "Name doesn't match; bailing out."
-      exit 1
+      exit 0
     fi
   fi
 }
 
 deploy() {
-  TAG=deploy_prod_$(date "+%Y_%m_%d_%H_%M_%S")
-  git tag -a $TAG -m "Production Distribution Build from $USER on $date" &&
-  bumpVersion $1
-  git push origin $TAG
-
-  # add your own deployments
+  echo "deploying ... TODO: push static build in bin/ to server"
 }
 
-deployCheck && build && deploy
+deployCheck && build && bumpVersion && deploy
