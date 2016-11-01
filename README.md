@@ -46,20 +46,27 @@ $ npm run test:lint
 
 In order to run the project you must do the previous steps for dependency installations.
 
-There are two different mode this project can be run in: a static mode and dev mode.  The static mode will bundle all the code using our production settings into the bin directory, then serve that directory using a node server.  The bin directory is the final product and can be deployed to and could server.  Dev mode does not actually build into a directory but runs the project though a dev server which has live reloading enabled.  This basically required for development.
+There are two different modes this project can be run in: __dev mode__ and __static mode__.
 
-Run one of the following commands from your server
+### Dev mode
 
 ```
-npm start # will run a build then serve the static content
 npm run dev # will run with hot reloading on a special server
 ```
 
+Dev mode is for the typical daily workflow and has live reloading enabled. It does not actually build into a directory, it runs the project though a dev server that uses the files in your working tree.
+
+### Static mode
+
+```
+npm start # will run a build then serve the static content
+```
+
+Static mode is for testing the static build before submitting pull requests or deploying. Static mode bundles code & assets using our production settings into the bin directory, then serves that directory using a node server.  The bin directory is the final product and can be deployed to a server.
+
 It is highly recommended that you run `npm run build` and test on the static server before submitting a pull requests.
 
-The deploy script, `npm run deploy`, will run a shell script to do some npm and git versioning then do a build.  This script will need the actual deployment you wish to perform added.
-
-### Possible errors
+### Troubleshooting & possible errors
 
 ##### Server Hang
 
@@ -89,6 +96,77 @@ This is a product from AirBnB to allow us to do assertions on our react componen
 #### Helpful links
 
 - [Writing react tests](https://github.com/reactjs/redux/blob/master/docs/recipes/WritingTests.md)
+
+## Deploying the project
+
+### Manually
+
+- Make sure your working tree is clean and all commits are pushed
+
+##### Minor version
+
+
+```
+# create a new branch
+git checkout -b minor_$(date +%s%3N)
+# bump the version number, creates a commit & tag
+npm version minor -m "$USER deployed %s on $(date +%Y-%m-%d@%H:%M)"
+# get the new version number
+VERSION_PATCH=$(npm version | grep zorroa-js-curator | egrep -o '\d+\.\d+\.\d+')
+VERSION_MAJMIN=$(echo $VERSION_PATCH | cut -f -2 -d.)
+# rename our branch to version name
+git branch -m v$VERSION_MAJMIN
+# push our new branch
+git push -u origin HEAD
+# push the new tag that npm version created
+git push origin v$VERSION_PATCH
+# create a pull request (asks for github username/password first time)
+hub pull-request
+```
+
+##### Patch (hotfix)
+
+First make sure you're in the branch you want to patch.
+
+```
+git checkout <version-branch>
+# e.g. v0.1 - the major.minor branch you want to patch
+```
+
+Now update the version number:
+
+```
+# bump the version number, creates a commit & tag
+npm version patch -m "$USER deployed %s on $(date +%Y-%m-%d@%H:%M)"
+# get the new version number
+VERSION_PATCH=$(npm version | grep zorroa-js-curator | egrep -o '\d+\.\d+\.\d+')
+VERSION_MAJMIN=$($VERSION_PATCH | cut -f -2 -d.)
+# rename our branch to version name
+git branch -m v$VERSION_MAJMIN
+# push our new branch
+git push -u origin HEAD
+# push the new tag that npm version created
+git push origin v$VERSION_PATCH
+```
+
+### Automated (in progress, may not work as expected yet)
+
+```
+# rebuild & publish the project
+npm run deploy <version-type>
+
+Where <version-type> is: "patch", "minor", or "major"
+```
+
+This command will perform a clean build, tag it with a new version number, and (TODO) push the build to the server.
+
+Deploy automatically updates and stores the build's version number using the "npm version" command. The git repo will also be tagged with the version number for future reference, hotfixes, etc..
+
+**NOTE**: Deploy is designed to be safe & reproducible, it has some safety precautions to be aware of.
+
+- Your working tree *must* be clean, with any changes to your current branch pushed. Deploy will fail if you have pending changes.
+- Deploy will git pull - it may modify your working tree.
+- Deploy will nuke & re-install all your npm packages, and also rebuild. This may take some time.
 
 ## Development Tools
 
@@ -122,4 +200,3 @@ code back to the original source files.
 - [ ] Test: Unit tests for redux reducers
 - [ ] Test: Test coverage
 - [ ] Document the planet
-- [ ] Discuss pulling bin from version control
