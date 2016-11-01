@@ -1,4 +1,5 @@
 import Assets from './Assets'
-import './assets.scss'
-import './pager.scss'
+import './Assets.scss'
+import './AssetCounter.scss'
+import './Pager.scss'
 export default Assets

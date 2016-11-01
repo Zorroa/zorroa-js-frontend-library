@@ -1,0 +1,26 @@
+@import '../../styles/core-mixins.scss';
+
+.asset-counter {
+  font-size: 14px;
+  color: #777;
+  white-space: nowrap;
+
+  .asset-counter-count {
+    font-weight: bold;
+    color: $zorroa-greyish-brown;
+  }
+
+  .asset-counter-of {
+    &:after {
+      content: ' of ';
+      @media screen and (max-width: 1300px) { content: ' / '; }
+    }
+  }
+
+  .asset-counter-results {
+    &:after {
+      content: ' RESULTS';
+      @media screen and (max-width: 1300px) { content: ''; }
+    }
+  }
+}

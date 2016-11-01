@@ -1,3 +1,3 @@
 import Header from './Header'
-import './header.scss'
+import './Header.scss'
 export default Header

@@ -11,16 +11,24 @@ const Workspace = () => (
   <div className="app">
     <Header/>
     <div className="workspace flexRow fullWidth fullHeight">
+
       <Sidebar>
         <Folders/>
         <Metadata/>
       </Sidebar>
+
+      <div className="workspace-vertical-separator"/>
+
       <div className="workspace-body flexOn fullHeight">
         <Assets/>
       </div>
+
+      <div className="workspace-vertical-separator"/>
+
       <Sidebar isRightEdge={true}>
         <Racetrack/>
       </Sidebar>
+
     </div>
   </div>
 )

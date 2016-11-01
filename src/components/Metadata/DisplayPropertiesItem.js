@@ -5,12 +5,11 @@ import Collapsible from '../Collapsible'
 import CollapsibleHeader from '../CollapsibleHeader'
 
 export default class DisplayPropertiesItem extends Component {
-  static get propTypes () {
-    return {
-      field: PropTypes.string.isRequired,
-      displayProperties: PropTypes.instanceOf(DisplayProperties).isRequired,
-      selectedAssets: PropTypes.object
-    }
+  static propTypes = {
+    field: PropTypes.string.isRequired,
+    displayProperties: PropTypes.instanceOf(DisplayProperties).isRequired,
+    selectedAssets: PropTypes.object,
+    isIconified: PropTypes.bool.isRequired
   }
 
   value () {
@@ -31,18 +30,21 @@ export default class DisplayPropertiesItem extends Component {
   }
 
   render () {
-    const { field, selectedAssets, displayProperties } = this.props
+    const { field, selectedAssets, displayProperties, isIconified } = this.props
     if (displayProperties.children && displayProperties.children.length) {
       return (
         <Collapsible style={{marginLeft: '16px'}}
+                     isOpenKey={`DisplayPropertiesItem|${field}`}
                      header={
                        <CollapsibleHeader label={displayProperties.name}
-                                          isCollapsed={false}
+                                          isCollapsed={false} isIconified={isIconified}
                                           openIcon="icon-register"
-                                          closeIcon="icon-register" /> } >
+                                          closeIcon="icon-register"
+                       /> } >
           { displayProperties.children.map(child => (
             <DisplayPropertiesItem field={`${field}.${child.name}`}
                                    selectedAssets={selectedAssets}
+                                   isIconified={isIconified}
                                    key={child.name} displayProperties={child} />
           ))}
         </Collapsible>

@@ -2,7 +2,9 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import { resetSlivers } from '../../actions/sliversAction'
+import { resetRacetrackWidgets } from '../../actions/racetrackAction'
+import { SIMPLE_SEARCH_WIDGET } from '../../constants/widgetTypes'
+import Widget from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
 
 class Searchbar extends Component {
@@ -30,10 +32,9 @@ class Searchbar extends Component {
   // Submit a new search for <input> submit
   modifySliver (event) {
     if (event.key === 'Enter') {
-      let slivers = {}
-      let id = 1
-      slivers[id] = new AssetSearch({query: this.state.queryString})
-      this.props.actions.resetSlivers(slivers)
+      const sliver = new AssetSearch({ query: this.state.queryString })
+      const widget = new Widget({ type: SIMPLE_SEARCH_WIDGET, sliver })
+      this.props.actions.resetRacetrackWidgets([widget])
     }
   }
 
@@ -53,7 +54,7 @@ class Searchbar extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({ resetSlivers }, dispatch)
+  actions: bindActionCreators({ resetRacetrackWidgets }, dispatch)
 })
 
 const mapStateToProps = state => ({

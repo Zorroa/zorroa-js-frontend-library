@@ -1,3 +1,5 @@
+@import '../../styles/core-mixins.scss';
+
 .assets-table,th, td {
   width: 100%;
   border-bottom: 1px solid #aaa;
@@ -6,6 +8,10 @@
 
 tr:nth-child(even) {
   background-color: #f6f6f6;
+}
+
+tbody tr:hover {
+  background-color: $zorroa-sickly-green;
 }
 
 .assets-table-scroll {

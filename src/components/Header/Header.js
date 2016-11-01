@@ -33,28 +33,41 @@ class Header extends Component {
     return (
       <nav className="header flexCenter fullWidth">
         <Link to="/" className='header-logo'><Logo/></Link>
-        <Searchbar/>
-        <div className="flexOn"></div>
-        <div className="header-menu fullHeight flexCenter">
-          <DropdownMenu label="Imports">
-          </DropdownMenu>
-          <DropdownMenu label="Exports">
-          </DropdownMenu>
-          <DropdownMenu label="Help">
-            <a href="http://zorroa.com/docs/help" className="header-menu-item" >Help</a>
-            <div className="header-menu-separator" />
-            <a href="http://zorroa.com/docs/tutorials" className="header-menu-item" >Tutorials</a>
-            <div className="header-menu-separator" />
-            <a href="http://zorroa.com/docs/release-notes" className="header-menu-item" >Release Notes</a>
-          </DropdownMenu>
-          <DropdownMenu label={(<div><span className="icon-cog"/>&nbsp;{user.username}</div>)} >
-            <div className="header-menu-item">
-              <button onClick={this.showPreferences.bind(this)}>Preferences</button>
-            </div>
-            <div className="header-menu-separator" />
-            <Link className="header-menu-item" to="/signout">Logout</Link>
-          </DropdownMenu>
+        <div className='header-searchbar flexOn'>
+          <Searchbar/>
         </div>
+        <div className="flexOn"></div>
+        <div className="header-menu-bar fullHeight flexCenter">
+          <div className="header-menu">
+            <DropdownMenu label="Imports">
+            </DropdownMenu>
+          </div>
+          <div className="header-menu">
+            <DropdownMenu label="Exports">
+            </DropdownMenu>
+          </div>
+          <div className="header-menu">
+            <DropdownMenu label="Help">
+              <a href="http://zorroa.com/docs/help" className="header-menu-item" >Help</a>
+              <div className="header-menu-separator" />
+              <a href="http://zorroa.com/docs/tutorials" className="header-menu-item" >Tutorials</a>
+              <div className="header-menu-separator" />
+              <a href="http://zorroa.com/docs/release-notes" className="header-menu-item" >Release Notes</a>
+            </DropdownMenu>
+          </div>
+          <div className="header-menu">
+            <DropdownMenu label={(<div><span className="icon-cog"/>&nbsp;{user.username}</div>)} rightAlign={true}>
+              <div className="header-menu-item">
+                <button onClick={this.showPreferences.bind(this)}>Preferences</button>
+              </div>
+              <div className="header-menu-separator" />
+              <Link className="header-menu-item" to="/signout">Logout</Link>
+            </DropdownMenu>
+          </div>
+        </div>
+
+        {/* this is stupid/ugly, but neede to keep sidebar & header logo widths in sync */}
+        <div className='header-padding' style={{width: '22px'}}></div>
       </nav>
     )
   }

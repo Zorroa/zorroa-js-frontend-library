@@ -1,3 +1,3 @@
 import Table from './Table'
-import './table.scss'
+import './Table.scss'
 export default Table

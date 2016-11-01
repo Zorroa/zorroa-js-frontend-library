@@ -43,19 +43,25 @@ class Pager extends Component {
   render () {
     const { pageSize } = this.state
     const { loaded, total } = this.props
-    const pageSizes = [ 100, 1000, 5000, 10000 ]
+    const pageSizes = [ 100, 1000, 10000 ]
     if (total <= 25000) {
       pageSizes.push(0)
     }
     return (
-      <div className="pager">
+      <div className="pager flexRowCenter">
         <div className="pager-showing-page">
-          SHOWING&nbsp;<AssetCounter loaded={loaded} total={total} />
+          <span className='pager-showing'></span><AssetCounter loaded={loaded} total={total} />
         </div>
-        <div className="pager-spacer" />
-        <button onClick={this.handleLoadPage.bind(this)}>LOAD&nbsp;{ pageSize <= 0 || loaded + pageSize >= total ? 'ALL' : 'NEXT ' + pageSize.toLocaleString() }</button>
-        <div className="pager-spacer" />
-        <div className="pager-page-size">
+
+        <div className="flexOn"/>
+
+        <button onClick={this.handleLoadPage.bind(this)}>
+          LOAD&nbsp;{ pageSize <= 0 || loaded + pageSize >= total ? 'ALL' : 'NEXT ' + pageSize.toLocaleString() }
+        </button>
+
+        <div className="flexOn"/>
+
+        <div className="pager-page-size flexRowCenter">
           <div>LOAD SETS OF</div>
           { pageSizes.map(dim => (
             <button key={dim} onClick={this.handlePageSize.bind(this, dim)} className={classnames('pager-page-size', { 'pager-page-size-selected': dim === pageSize })}>

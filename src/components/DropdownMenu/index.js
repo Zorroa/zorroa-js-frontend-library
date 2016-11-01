@@ -1,4 +1,4 @@
-import './dropdown-menu.scss'
+import './DropdownMenu.scss'
 import DropdownMenu from './DropdownMenu'
 export default DropdownMenu
 

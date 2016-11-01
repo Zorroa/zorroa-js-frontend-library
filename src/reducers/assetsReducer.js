@@ -35,11 +35,11 @@ function inject (src, idx, arr) {
 export default function (state = {}, action) {
   switch (action.type) {
     case ASSET_SEARCH:
-      const { query, assets, page } = action.payload
+      const { query, assets, page, aggs } = action.payload
       const all = state.all && page && page.from ? inject(state.all, page.from, assets) : assets
       const totalCount = page && page.totalCount ? page.totalCount : 0
       const selectedIds = page && page.from ? state.selectedIds : null
-      return { ...state, all, query, totalCount, selectedIds, isolatedId: null }
+      return { ...state, all, aggs, query, totalCount, selectedIds, isolatedId: null }
     case ASSET_SEARCH_ERROR:
       return { ...state, error: action.payload }
     case ISOLATE_ASSET:

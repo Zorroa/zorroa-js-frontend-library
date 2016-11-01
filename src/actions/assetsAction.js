@@ -19,13 +19,14 @@ export function searchAssets (query) {
         console.log(response)
         const page = new Page(response.data.page)
         const assets = response.data.list.map(asset => (new Asset(asset)))
+        const aggs = response.data.aggregations
         dispatch({
           type: ASSET_SEARCH,
-          payload: { query, assets, page }
+          payload: { query, assets, page, aggs }
         })
       })
       .catch(error => {
-        console.log('Error searching for assets: ' + error)
+        console.error('Error searching for assets: ' + error)
         if (error.response && error.response.status === 401) {
           dispatch({
             type: UNAUTH_USER,
@@ -36,13 +37,6 @@ export function searchAssets (query) {
           type: ASSET_SEARCH_ERROR,
           payload: error
         })
-
-        // re-throw any caught errors, since they might not be API errors.
-        // I ran into this with a run-time error in the JS code being caught here
-        // If we don't re-throw then we can't see the actual error message or call stack
-        // TODO: check 'error' and only re-throw if it is not a
-        // response error from the post call to the server
-        throw error
       })
   }
 }

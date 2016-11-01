@@ -136,7 +136,7 @@ class Assets extends Component {
             const height = lastPos.y + lastPos.height
             return (
               <div className={`assets-layout ${layout}`}
-              style={{'width': width, 'height': height}}>
+              style={{'width': '100%', 'height': height}}>
                 { assets.map((asset, index) => (
                   <Thumb selected={selectedIds && selectedIds.has(asset.id)}
                     dim={positions[index]}

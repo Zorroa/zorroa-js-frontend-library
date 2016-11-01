@@ -1,5 +1,5 @@
 import CollapsibleHeader from './CollapsibleHeader'
-import './collapsibleheader.scss'
+import './CollapsibleHeader.scss'
 export default CollapsibleHeader
 
 /*

@@ -42,7 +42,7 @@ $zorroa-transparent: transparent;
 
 /* shared metrics */
 
-$zorroa-sidebar-width : 320px;
+$zorroa-sidebar-width : 340px;
 
 
 /* Button classes */
@@ -160,6 +160,12 @@ $zorroa-sidebar-width : 320px;
 @mixin flexAlignItemsCenter { -webkit-align-items: center     ; -moz-align-items: center     ; -ms-align-items: center     ; align-items: center     ; }
 
 @mixin flexCenter {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include flexJustifyCenter;
+}
+
+@mixin flexRowCenter {
   @include flexRow;
   @include flexAlignItemsCenter;
   @include flexJustifyCenter;

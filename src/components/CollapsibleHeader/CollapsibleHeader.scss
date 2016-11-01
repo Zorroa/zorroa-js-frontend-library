@@ -16,6 +16,10 @@
   color: $zorroa-gray;
   margin-right: 14px;
   padding-bottom: 3px;
+
+  &.isIconified {
+    margin-right: 0;
+  }
 }
 
 .collapsibleheader-caret {

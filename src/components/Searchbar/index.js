@@ -1,3 +1,3 @@
 import Searchbar from './Searchbar'
-import './searchbar.scss'
+import './Searchbar.scss'
 export default Searchbar

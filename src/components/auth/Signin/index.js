@@ -1,3 +1,3 @@
 import Signin from './Signin'
-import '../auth.scss'
+import '../Auth.scss'
 export default Signin
