@@ -37,7 +37,7 @@ export default class DisplayPropertiesItem extends Component {
                      isOpenKey={`DisplayPropertiesItem|${field}`}
                      header={
                        <CollapsibleHeader label={displayProperties.name}
-                                          isCollapsed={false} isIconified={isIconified}
+                                          isIconified={isIconified}
                                           openIcon="icon-register"
                                           closeIcon="icon-register"
                        /> } >
