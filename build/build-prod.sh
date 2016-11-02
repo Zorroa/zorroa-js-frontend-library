@@ -90,7 +90,7 @@ bumpVersion() {
   # if we just made a new branch, let's make a PR, then go back to the branch we started in
   if [ "$versionType" != "patch" ]; then
     echo "Creating a pull request. hub will request a username & password the first time only."
-    hub pull-request
+    hub pull-request -m "Version $VERSION_PATCH by $USER" &&
     git checkout $CUR_BRANCH
   fi
 }
