@@ -1,7 +1,7 @@
 @import '../../styles/core-mixins.scss';
 
 // Sidebars use flex-basis to toggle between open and close
-.sidebar {
+.Sidebar {
   max-height: 100%;
 
   width: 60px;
@@ -16,11 +16,11 @@
   &.isOpen {
     // This matches the header logo width
     width: 25%;
-    max-width: $zorroa-sidebar-width;
+    max-width: $zorroa-Sidebar-width;
   }
 }
 
-.sidebar-button {
+.Sidebar-button {
   height: 21px;
   font-size: 9px;
   color: $zorroa-lightgray;
@@ -34,7 +34,7 @@
   }
 }
 
-.sidebar-scroll {
+.Sidebar-scroll {
   max-height: 100%;
   width: 100%;
   max-width: 100%;

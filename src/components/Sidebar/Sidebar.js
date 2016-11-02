@@ -47,11 +47,11 @@ class Sidebar extends Component {
     const arrow = this.buttonChar()
     const isIconified = this.isIconified()
     return (
-      <div className={classnames('sidebar flexCol fullHeight', { 'isOpen': !this.isIconified() })}>
-        <div className={classnames('sidebar-button', { 'left': !this.props.isRightEdge })}>
+      <div className={classnames('Sidebar flexCol fullHeight', { 'isOpen': !this.isIconified() })}>
+        <div className={classnames('Sidebar-button', { 'left': !this.props.isRightEdge })}>
           <label onClick={this.handleClick.bind(this)}>{arrow}{arrow}</label>
         </div>
-        <div className={'sidebar-scroll fullheight'} >
+        <div className={'Sidebar-scroll fullheight'} >
           { Children.map(this.props.children, child => cloneElement(child, {isIconified})) }
         </div>
       </div>
