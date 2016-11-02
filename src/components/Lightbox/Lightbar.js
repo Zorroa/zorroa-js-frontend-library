@@ -1,14 +1,10 @@
 import React, { Component, PropTypes } from 'react'
 
 export default class Lightbar extends Component {
-  static get displayName () {
-    return 'Lightbar'
-  }
+  static displayName = 'Lightbar'
 
-  static get contextTypes () {
-    return {
-      router: PropTypes.object
-    }
+  static contextTypes = {
+    router: PropTypes.object
   }
 
   closeLightbox () {
