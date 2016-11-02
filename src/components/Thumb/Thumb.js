@@ -1,8 +1,18 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
-
+import { DragSource } from '../../services/DragDrop'
 import Asset from '../../models/Asset'
 
+const source = {
+  dragStart (props, type, se) {
+    se.dataTransfer.setData('text/plain', type)
+  },
+  dragEnd (props, type, se) {
+    se.preventDefault()
+  }
+}
+
+@DragSource('FOLDER', source)
 class Thumb extends Component {
   static get propTypes () {
     return {
@@ -11,12 +21,13 @@ class Thumb extends Component {
       dim: PropTypes.object.isRequired,
       selected: PropTypes.bool,
       onClick: PropTypes.func.isRequired,
-      onDoubleClick: PropTypes.func.isRequired
+      onDoubleClick: PropTypes.func.isRequired,
+      dragparams: PropTypes.object
     }
   }
 
   render () {
-    const { asset, host, dim, selected, onClick, onDoubleClick } = this.props
+    const { asset, host, dim, selected, onClick, onDoubleClick, dragparams } = this.props
     if (!asset.proxies) {
       return <div className="thumb" style={{ backgroundColor: asset.backgroundColor() }} />
     }
@@ -35,6 +46,7 @@ class Thumb extends Component {
         }}
         onDoubleClick={onDoubleClick}
         onClick={onClick}
+        {...dragparams}
       />
     )
   }
