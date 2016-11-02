@@ -17,7 +17,7 @@ export default class Lightbar extends Component {
 
   renderAttribute (label, value) {
     return (
-      <div key={label} className="lightbar-attr">
+      <div key={label} className="lightbar-attr flexRowCenter">
         <div className="lightbar-attr-label">{label}</div>
         <div className="lightbar-attr-value">{value}</div>
       </div>
@@ -27,14 +27,16 @@ export default class Lightbar extends Component {
   render () {
     const attrs = { 'Character Name': 'Elephants', 'File Name': 'Dumbo-disneyscreencaps.com-907.jpg' }
     return (
-      <div className="lightbar">
-        <button className="icon-cog" />
+      <div className="lightbar flexRowCenter">
+        <button className="lightbar-settings icon-cog" />
         { Object.keys(attrs).map((key) => (this.renderAttribute(key, attrs[key])))}
         <div className="flexOn" />
-        <button>DOWNLOAD</button>
-        <button>GET LINK</button>
-        <button>ADD TO COLLECTION</button>
-        <button className="icon-cross2" onClick={this.closeLightbox.bind(this)} />
+
+        <button className='flexRowCenter'>Download<i className='lightbar-btn-icon icon-download2'/></button>
+        <button className='flexRowCenter'>Get Link<i className='lightbar-btn-icon icon-link2'/></button>
+        <button className='flexRowCenter'>Add to Collection<i className='lightbar-btn-icon icon-chevron-down'/></button>
+
+        <button className="icon-cross2" style={{fontSize:'20px',marginLeft:'2em'}} onClick={this.closeLightbox.bind(this)} />
       </div>
     )
   }
