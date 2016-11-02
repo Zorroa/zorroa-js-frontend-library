@@ -106,27 +106,47 @@ npm run deploy <version-type>
 Where <version-type> is: "patch", "minor", or "major"
 ```
 
-This command will perform a clean build, tag it with a new version number, and (TODO) push the build to the server.
+#### Details of the deploy process
 
-Deploy automatically updates and stores the build's version number using the "npm version" command. The git repo will also be tagged with the full version number for future reference, hotfixes, etc.. The tag will be prefixed with a 'v', e.g., v0.1.2
+Deploy is designed to be safe & reproducible, but it has some side effects and safety precautions to be aware of.
+
+Before you deploy:
+
+- Your working tree should be clean, with any changes to your current branch pushed. Deploy will fail if you have pending changes.
+- Deploy will git pull - it may modify your working tree.
+- Deploy will nuke & re-install all your npm packages, and also rebuild. This may take some time.
+
+The **npm run deploy** command will:
+
+- Rebuild
+  - Run tests
+  - Clean & rebuild
+  - Clean & re-install npm packages
+- Update the version number based on the given <version-type>
+  - 'npm version' changes package.json
+- Tag and push a commit
+  - Tag is the patch version number prefixed with 'v', e.g., v0.1.2
+  - Commit is pushed to the maj.min branch
+- Deploy (not yet working)
+  - [TODO] upload the static build in bin/ to the web server
+
+##### Patch versions
 
 A "patch" deploy must go into an existing minor version branch, which will be named with the major & minor version numbers only, e.g., "0.1". For example, if your current version is 0.1.2, then running "npm run deploy patch" will do the following:
+
 - fail if you're not already sitting in branch "0.1"
 - update the version number to 0.1.3
 - create and push a new tag named "v0.1.3"
 - push the version number change (in package.json) to the branch "0.1"
 
-A "minor" or "major" deploy will increment the minor version number, and create a new maj.min branch during the deploy process. The changes will be submitted as a pull request on master. You will have to enter your github username and password the first time. For example, if your current version is 0.1.2, then running "npm run deploy minor" will do the following steps:
+##### Minor versions
+
+A "minor" or "major" deploy will increment the minor version number, and create a new maj.min branch during the deploy process. The changes will be submitted as a pull request on master. You will have to enter your github username and password the first time. For example, if your current version is 0.1.2, then running "npm run deploy minor" will do the following:
+
 - update the version number to 0.2.0
 - create and push a new branch named "0.2"
 - create and push a new tag named "v0.2.0"
 - create a pull request to merge branch 0.2 with master
-
-**NOTE**: Deploy is designed to be safe & reproducible, it has some safety precautions to be aware of.
-
-- Your working tree *must* be clean, with any changes to your current branch pushed. Deploy will fail if you have pending changes.
-- Deploy will git pull - it may modify your working tree.
-- Deploy will nuke & re-install all your npm packages, and also rebuild. This may take some time.
 
 ## Development Tools
 
