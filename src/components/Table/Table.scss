@@ -1,22 +1,36 @@
 @import '../../styles/core-mixins.scss';
 
-.assets-table,th, td {
-  width: 100%;
-  border-bottom: 1px solid #aaa;
-  padding: 2px 8px 2px 2px;
-}
-
-tr:nth-child(even) {
-  background-color: #f6f6f6;
-}
-
-tbody tr:hover {
-  background-color: $zorroa-sickly-green;
-}
-
 .assets-table-scroll {
   border-top: 1px solid #ddd;
   border-bottom: 1px solid #ddd;
   overflow:auto;
   max-height: 300px;
+}
+
+.assets-table {
+  width: 100%;
+  max-width: 100%;
+  border-bottom: 1px solid #aaa;
+  border-spacing: 0;
+  padding: 2px 8px 2px 2px;
+
+  th, td {
+    padding: 8px;
+    max-width: 0; // This looks weird, but is important! It allows cells to chop content
+    @include clampText;
+  }
+
+  /* TODO: column widths will be handled in code, and they must sum to 100% */
+  .assets-table-col-id     { text-align: left; width: 40%; }
+  .assets-table-col-source { text-align: left; width: 60%; }
+
+  tr {
+    height: 30px;
+  }
+  thead,tr:nth-child(even) {
+    background-color: white;
+  }
+  tbody tr:hover {
+    background-color: $zorroa-sickly-green;
+  }
 }

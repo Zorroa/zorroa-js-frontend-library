@@ -14,8 +14,8 @@ class Table extends Component {
     }
     return (
       <tr key={asset.id} className="assets-table-row">
-        <td>{asset.id}</td>
-        <td>{asset.source()}</td>
+        <td className='assets-table-col-id'>{asset.id}</td>
+        <td className='assets-table-col-source'>{asset.source()}</td>
       </tr>
     )
   }
@@ -28,14 +28,14 @@ class Table extends Component {
     return (
       <div className="assets-table-scroll">
         <table className="assets-table">
-          <thead>
-          <tr>
-            <th>ID</th>
-            <th>Source</th>
-          </tr>
-          </thead>
+            <thead>
+              <tr>
+                <th className='assets-table-col-id'>ID</th>
+                <th className='assets-table-col-source'>Source</th>
+              </tr>
+            </thead>
           <tbody>
-          { assets.map(asset => (this.renderRow(asset))) }
+            { assets.map(asset => (this.renderRow(asset))) }
           </tbody>
         </table>
       </div>
