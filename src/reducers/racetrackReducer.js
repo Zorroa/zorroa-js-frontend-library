@@ -3,8 +3,7 @@ import Widget from '../models/Widget'
 import * as assert from 'assert'
 
 const initialState = {
-  widgets: [],
-  isOpen: true
+  widgets: []
 }
 
 export default function (state = initialState, action) {
