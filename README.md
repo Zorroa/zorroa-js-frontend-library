@@ -46,20 +46,27 @@ $ npm run test:lint
 
 In order to run the project you must do the previous steps for dependency installations.
 
-There are two different mode this project can be run in: a static mode and dev mode.  The static mode will bundle all the code using our production settings into the bin directory, then serve that directory using a node server.  The bin directory is the final product and can be deployed to and could server.  Dev mode does not actually build into a directory but runs the project though a dev server which has live reloading enabled.  This basically required for development.
+There are two different modes this project can be run in: __dev mode__ and __static mode__.
 
-Run one of the following commands from your server
+### Dev mode
 
 ```
-npm start # will run a build then serve the static content
 npm run dev # will run with hot reloading on a special server
 ```
 
+Dev mode is for the typical daily workflow and has live reloading enabled. It does not actually build into a directory, it runs the project though a dev server that uses the files in your working tree.
+
+### Static mode
+
+```
+npm start # will run a build then serve the static content
+```
+
+Static mode is for testing the static build before submitting pull requests or deploying. Static mode bundles code & assets using our production settings into the bin directory, then serves that directory using a node server.  The bin directory is the final product and can be deployed to a server.
+
 It is highly recommended that you run `npm run build` and test on the static server before submitting a pull requests.
 
-The deploy script, `npm run deploy`, will run a shell script to do some npm and git versioning then do a build.  This script will need the actual deployment you wish to perform added.
-
-### Possible errors
+### Troubleshooting & possible errors
 
 ##### Server Hang
 
@@ -89,6 +96,57 @@ This is a product from AirBnB to allow us to do assertions on our react componen
 #### Helpful links
 
 - [Writing react tests](https://github.com/reactjs/redux/blob/master/docs/recipes/WritingTests.md)
+
+## Deploying the project
+
+```
+# rebuild & publish the project
+npm run deploy <version-type>
+
+Where <version-type> is: "patch", "minor", or "major"
+```
+
+#### Details of the deploy process
+
+Deploy is designed to be safe & reproducible, but it has some side effects and safety precautions to be aware of.
+
+Before you deploy:
+
+- Your working tree should be clean, with any changes to your current branch pushed. Deploy will fail if you have pending changes.
+- Deploy will git pull - it may modify your working tree.
+- Deploy will nuke & re-install all your npm packages, and also rebuild. This may take some time.
+
+The **npm run deploy** command will:
+
+- Rebuild
+  - Run tests
+  - Clean & rebuild
+  - Clean & re-install npm packages
+- Update the version number based on the given <version-type>
+  - 'npm version' changes package.json
+- Tag and push a commit
+  - Tag is the patch version number prefixed with 'v', e.g., v0.1.2
+  - Commit is pushed to the maj.min branch
+- Deploy (not yet working)
+  - [TODO] upload the static build in bin/ to the web server
+
+##### Patch versions
+
+A "patch" deploy must go into an existing minor version branch, which will be named with the major & minor version numbers only, e.g., "0.1". For example, if your current version is 0.1.2, then running "npm run deploy patch" will do the following:
+
+- fail if you're not already sitting in branch "0.1"
+- update the version number to 0.1.3
+- create and push a new tag named "v0.1.3"
+- push the version number change (in package.json) to the branch "0.1"
+
+##### Minor versions
+
+A "minor" or "major" deploy will increment the minor version number, and create a new maj.min branch during the deploy process. The changes will be submitted as a pull request on master. You will have to enter your github username and password the first time. For example, if your current version is 0.1.2, then running "npm run deploy minor" will do the following:
+
+- update the version number to 0.2.0
+- create and push a new branch named "0.2"
+- create and push a new tag named "v0.2.0"
+- create a pull request to merge branch 0.2 with master
 
 ## Development Tools
 
@@ -122,4 +180,3 @@ code back to the original source files.
 - [ ] Test: Unit tests for redux reducers
 - [ ] Test: Test coverage
 - [ ] Document the planet
-- [ ] Discuss pulling bin from version control

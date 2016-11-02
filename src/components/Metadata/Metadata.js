@@ -23,7 +23,7 @@ class Metadata extends Component {
     )
     return (<CollapsibleHeader
       label={metadataLabel}
-      isCollapsed={false} isIconified={this.props.isIconified}
+      isIconified={this.props.isIconified}
       openIcon="icon-register" closeIcon="icon-register" />)
   }
 
