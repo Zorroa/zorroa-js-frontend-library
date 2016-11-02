@@ -1,6 +1,6 @@
 @import '../../styles/core-mixins.scss';
 
-.collapsibleheader {
+.CollapsibleHeader {
   @include nowrap;
   height: 40px;
   padding: 5px;
@@ -12,7 +12,7 @@
   font-weight: 100;
 }
 
-.collapsibleheader-icon {
+.CollapsibleHeader-icon {
   color: $zorroa-gray;
   margin-right: 14px;
   padding-bottom: 3px;
@@ -22,7 +22,7 @@
   }
 }
 
-.collapsibleheader-caret {
+.CollapsibleHeader-caret {
   font-size: 15px;
   width: 16px;
   min-width: 16px;
