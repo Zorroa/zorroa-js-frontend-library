@@ -27,7 +27,7 @@
   padding-right: 10px;
 
   @include flexRow;
-  //@include flexAlignItemsCenter;
+  @include flexAlignItemsCenter;
 
   &.left {
     @include flexJustifyEnd;
