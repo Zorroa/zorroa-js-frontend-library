@@ -30,6 +30,7 @@
     width: 40px;
     height: 40px;
     background-color: $zorroa-sickly-green;
+    &:hover { background-color: darken($zorroa-sickly-green, 15%); }
   }
 
   .lightbar-btn-icon {
@@ -39,6 +40,8 @@
 
   .lightbar-action {
     margin: 10px;
+    &:hover  { color: $zorroa-sickly-green; }
+    &:active { color: chartreuse; }
   }
   .lightbar-action-text {
     text-transform: uppercase;
@@ -57,14 +60,5 @@
     border: none;
     background: none;
     outline: none;
-  }
-
-  // Standin for whatever we should use here...
-  button:hover {
-    color: $zorroa-sickly-green;
-  }
-
-  button:active {
-    color: chartreuse;
   }
 }
