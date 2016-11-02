@@ -22,7 +22,7 @@ export default class FolderItem extends Component {
     const openIcon = folder.isDyhi() ? 'icon-cube' : 'icon-folder2'
     const closeIcon = folder.isDyhi() ? 'icon-cube' : 'icon-folder'
     return (
-      <CollapsibleHeader label={folder.name} isCollapsed={false} isIconified={this.props.isIconified}
+      <CollapsibleHeader label={folder.name} isIconified={this.props.isIconified}
                          openIcon={openIcon} closeIcon={closeIcon} />
     )
   }
