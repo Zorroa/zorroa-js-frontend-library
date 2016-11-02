@@ -37,14 +37,26 @@
     margin-left: 10px;
   }
 
+  .lightbar-action {
+    margin: 10px;
+  }
+  .lightbar-action-text {
+    text-transform: uppercase;
+    @media screen and (max-width: 1000px) { display: none; }
+  }
+
+  .lightbar-close {
+    margin-right: 12px;
+    margin-left: 32px;
+    font-size: 20px;
+  }
+
   button {
     color: white;
     padding: 0;
-    margin: 10px;
     border: none;
     background: none;
     outline: none;
-    text-transform: uppercase;
   }
 
   // Standin for whatever we should use here...

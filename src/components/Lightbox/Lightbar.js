@@ -31,12 +31,19 @@ export default class Lightbar extends Component {
         <button className="lightbar-settings icon-cog" />
         { Object.keys(attrs).map((key) => (this.renderAttribute(key, attrs[key])))}
         <div className="flexOn" />
-
-        <button className='flexRowCenter'>Download<i className='lightbar-btn-icon icon-download2'/></button>
-        <button className='flexRowCenter'>Get Link<i className='lightbar-btn-icon icon-link2'/></button>
-        <button className='flexRowCenter'>Add to Collection<i className='lightbar-btn-icon icon-chevron-down'/></button>
-
-        <button className="icon-cross2" style={{fontSize:'20px',marginLeft:'2em'}} onClick={this.closeLightbox.bind(this)} />
+        <button className='lightbar-action flexRowCenter'>
+          <span className='lightbar-action-text'>Download</span>
+          <i className='lightbar-btn-icon icon-download2'/>
+        </button>
+        <button className='lightbar-action flexRowCenter'>
+          <span className='lightbar-action-text'>Get Link</span>
+          <i className='lightbar-btn-icon icon-link2'/>
+        </button>
+        <button className='lightbar-action flexRowCenter'>
+          <span className='lightbar-action-text'>Add to Collection</span>
+          <i className='lightbar-btn-icon icon-chevron-down'/>
+        </button>
+        <button className="lightbar-close icon-cross2" onClick={this.closeLightbox.bind(this)} />
       </div>
     )
   }
