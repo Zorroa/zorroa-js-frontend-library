@@ -2,9 +2,9 @@ import React, { PropTypes } from 'react'
 import classnames from 'classnames'
 
 const CollapsibleHeader = ({ isOpen, isParent, isIconified, label, openIcon, closeIcon }) => (
-  <div className='CollapsibleHeader flexCenter fullWidth'>
+  <div className='CollapsibleHeader flexRow flexAlignItemsCenter fullWidth'>
     <span className={classnames('CollapsibleHeader-icon', isOpen ? openIcon : closeIcon, {isOpen, isIconified})} />
-    { !isIconified && label}
+    { !isIconified && <div className='CollapsibleHeader-label'>{label}</div>}
     <div className='flexOn'/>
     { isParent && !isIconified && <div className={classnames('CollapsibleHeader-caret', 'icon-chevron-down', { 'rot180': isOpen })}/> }
   </div>

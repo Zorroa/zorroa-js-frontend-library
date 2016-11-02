@@ -24,7 +24,6 @@
   height: 21px;
   font-size: 9px;
   color: $zorroa-lightgray;
-  padding-right: 10px;
 
   @include flexRow;
   @include flexAlignItemsCenter;
@@ -39,9 +38,8 @@
   width: 100%;
   max-width: 100%;
 
-  //overflow-x: hidden;
-  overflow-y: visible;
+  overflow-x: hidden;
+  overflow-y: auto;
 
   padding-bottom: 10px;
-  //padding-right: 10px;
 }

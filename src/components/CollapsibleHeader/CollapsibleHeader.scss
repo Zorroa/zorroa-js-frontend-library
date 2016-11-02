@@ -6,10 +6,11 @@
   padding: 5px;
   padding-left: 10px;
   background-color: #d8d8d8;
-  margin-top: 5px;
+  margin-bottom: 5px;
   text-transform: uppercase;
   color: $zorroa-gray;
   font-weight: 100;
+  overflow: hidden;
 }
 
 .CollapsibleHeader-icon {
@@ -22,11 +23,16 @@
   }
 }
 
+.CollapsibleHeader-label {
+  @include clampText;
+}
+
 .CollapsibleHeader-caret {
   font-size: 15px;
   width: 16px;
   min-width: 16px;
   max-width: 16px;
   margin-right: 1em;
+  margin-left: 8px;
   color: $zorroa-gray;
 }
