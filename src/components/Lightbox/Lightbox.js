@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
+import keydown from 'react-keydown'
 
 import Asset from '../../models/Asset'
 import Lightbar from './Lightbar'
@@ -15,6 +16,17 @@ class Lightbox extends Component {
       assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
       isolatedId: PropTypes.string.isRequired
     }
+  }
+
+  static get contextTypes () {
+    return {
+      router: PropTypes.object
+    }
+  }
+
+  @keydown('esc') // http://glortho.github.io/react-keydown/example/index.html
+  closeLightbox (event) {
+    this.context.router.push('/')
   }
 
   render () {
