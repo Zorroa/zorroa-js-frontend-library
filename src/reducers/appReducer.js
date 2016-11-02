@@ -3,7 +3,7 @@ import { MODAL, ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR } from '../constants
 const initialState = {
   modal: {},
   leftSidebarIsIconified: false,
-  rightSidebarIsIconified: false
+  rightSidebarIsIconified: true
 }
 
 export default function app (state = initialState, action) {
