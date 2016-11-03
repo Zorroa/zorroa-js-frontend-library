@@ -9,10 +9,8 @@ export default function (ComposedComponent, url = '/') {
       }
     }
 
-    static get propTypes () {
-      return {
-        authenticated: PropTypes.bool
-      }
+    static propTypes = {
+      authenticated: PropTypes.bool
     }
 
     componentWillMount () {

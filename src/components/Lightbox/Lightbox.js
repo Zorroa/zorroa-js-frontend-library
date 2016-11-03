@@ -11,11 +11,9 @@ class Lightbox extends Component {
     return 'Lightbox'
   }
 
-  static get propTypes () {
-    return {
-      assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
-      isolatedId: PropTypes.string.isRequired
-    }
+  static propTypes = {
+    assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+    isolatedId: PropTypes.string.isRequired
   }
 
   static get contextTypes () {

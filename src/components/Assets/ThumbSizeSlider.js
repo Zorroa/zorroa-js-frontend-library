@@ -1,11 +1,9 @@
 import React, { Component, PropTypes } from 'react'
 
 export default class ThumbSizeSlider extends Component {
-  static get propTypes () {
-    return {
-      value: PropTypes.number.isRequired,
-      onChange: PropTypes.func.isRequired
-    }
+  static propTypes = {
+    value: PropTypes.number.isRequired,
+    onChange: PropTypes.func.isRequired
   }
 
   handleChange (event) {

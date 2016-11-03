@@ -14,16 +14,14 @@ const source = {
 
 @DragSource('FOLDER', source)
 class Thumb extends Component {
-  static get propTypes () {
-    return {
-      asset: PropTypes.instanceOf(Asset).isRequired,
-      host: PropTypes.string,
-      dim: PropTypes.object.isRequired,
-      selected: PropTypes.bool,
-      onClick: PropTypes.func.isRequired,
-      onDoubleClick: PropTypes.func.isRequired,
-      dragparams: PropTypes.object
-    }
+  static propTypes = {
+    asset: PropTypes.instanceOf(Asset).isRequired,
+    host: PropTypes.string,
+    dim: PropTypes.object.isRequired,
+    selected: PropTypes.bool,
+    onClick: PropTypes.func.isRequired,
+    onDoubleClick: PropTypes.func.isRequired,
+    dragparams: PropTypes.object
   }
 
   render () {

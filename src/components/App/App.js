@@ -5,12 +5,10 @@ import Modal from '../Modal'
 import { updateModal } from '../../actions/appActions'
 
 class App extends Component {
-  static get propTypes () {
-    return {
-      updateModal: PropTypes.func.isRequired,
-      children: PropTypes.object,
-      modal: PropTypes.object
-    }
+  static propTypes = {
+    updateModal: PropTypes.func.isRequired,
+    children: PropTypes.object,
+    modal: PropTypes.object
   }
 
   constructor (props) {
