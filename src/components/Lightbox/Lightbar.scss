@@ -1,51 +1,65 @@
 @import '../../styles/core-mixins.scss';
 
-.lightbar {
+.Lightbar {
   color: white;
   background-color: black;
   justify-content: space-between;
   display: flex;
   width: 100%;
+  height: 60px;
 
-  .lightbar-attr {
+  .Lightbar-attr {
     display: flex;
-    margin-top: 22px;
-    margin-bottom: 22px;
+    margin-left: 22px;
 
-    .lightbar-attr-label {
+    .Lightbar-attr-label {
       margin-right: 10px;
       font-size: 12px;
-      font-weight: 300;
+      font-weight: 100;
       text-align: right;
       color: $zorroa-nearwhite;
     }
 
-    .lightbar-attr-value {
+    .Lightbar-attr-value {
       font-size: 14px;
       color: white;
     }
   }
 
-  .lightbar-settings {
-    margin: 22px 40px 22px 12px;
+  .Lightbar-settings {
+    width: 40px;
+    height: 40px;
+    background-color: $zorroa-sickly-green;
+    &:hover { background-color: darken($zorroa-sickly-green, 15%); }
+  }
+
+  .Lightbar-btn-icon {
+    font-size: 20px;
+    margin-left: 10px;
+  }
+
+  .Lightbar-action {
+    margin: 10px;
+    &:hover  { color: $zorroa-sickly-green; }
+    &:active { color: chartreuse; }
+  }
+  .Lightbar-action-text {
+    text-transform: uppercase;
+    @media screen and (max-width: 1000px) { display: none; }
+  }
+
+  .Lightbar-close {
+    margin-right: 12px;
+    margin-left: 32px;
+    font-size: 20px;
+    &:hover { color: $zorroa-sickly-green; }
   }
 
   button {
     color: white;
     padding: 0;
-    margin: 10px;
     border: none;
     background: none;
     outline: none;
-
-  }
-
-  // Standin for whatever we should use here...
-  button:hover {
-    color: #71b623;
-  }
-
-  button:active {
-    color: chartreuse;
   }
 }

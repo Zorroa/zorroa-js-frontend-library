@@ -1,14 +1,10 @@
 import React, { Component, PropTypes } from 'react'
 
 export default class Lightbar extends Component {
-  static get displayName () {
-    return 'Lightbar'
-  }
+  static displayName = 'Lightbar'
 
-  static get contextTypes () {
-    return {
-      router: PropTypes.object
-    }
+  static contextTypes = {
+    router: PropTypes.object
   }
 
   closeLightbox () {
@@ -17,9 +13,9 @@ export default class Lightbar extends Component {
 
   renderAttribute (label, value) {
     return (
-      <div key={label} className="lightbar-attr">
-        <div className="lightbar-attr-label">{label}</div>
-        <div className="lightbar-attr-value">{value}</div>
+      <div key={label} className="Lightbar-attr flexRowCenter">
+        <div className="Lightbar-attr-label">{label}</div>
+        <div className="Lightbar-attr-value">{value}</div>
       </div>
     )
   }
@@ -27,14 +23,23 @@ export default class Lightbar extends Component {
   render () {
     const attrs = { 'Character Name': 'Elephants', 'File Name': 'Dumbo-disneyscreencaps.com-907.jpg' }
     return (
-      <div className="lightbar">
-        <button className="icon-cog" />
+      <div className="Lightbar flexRowCenter">
+        <button className="Lightbar-settings icon-cog" />
         { Object.keys(attrs).map((key) => (this.renderAttribute(key, attrs[key])))}
         <div className="flexOn" />
-        <button>DOWNLOAD</button>
-        <button>GET LINK</button>
-        <button>ADD TO COLLECTION</button>
-        <button className="icon-cross2" onClick={this.closeLightbox.bind(this)} />
+        <button className='Lightbar-action flexRowCenter'>
+          <span className='Lightbar-action-text'>Download</span>
+          <i className='Lightbar-btn-icon icon-download2'/>
+        </button>
+        <button className='Lightbar-action flexRowCenter'>
+          <span className='Lightbar-action-text'>Get Link</span>
+          <i className='Lightbar-btn-icon icon-link2'/>
+        </button>
+        <button className='Lightbar-action flexRowCenter'>
+          <span className='Lightbar-action-text'>Add to Collection</span>
+          <i className='Lightbar-btn-icon icon-chevron-down'/>
+        </button>
+        <button className="Lightbar-close icon-cross2" onClick={this.closeLightbox.bind(this)} />
       </div>
     )
   }
