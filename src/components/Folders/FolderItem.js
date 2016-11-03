@@ -19,7 +19,7 @@ const target = {
 
     // allows us to match drop targets to drag sources
     if (data === type) {
-      console.log(props.selectedIds)
+      console.log(props.selectedAssetIds)
       // props.dispatch()
     }
   }
@@ -33,7 +33,7 @@ class FolderItem extends Component {
     isIconified: PropTypes.bool.isRequired,
     loadChildren: PropTypes.func.isRequired,
     dropparams: PropTypes.object,
-    selectedIds: PropTypes.any
+    selectedAssetIds: PropTypes.any
   }
 
   componentWillMount () {
@@ -69,7 +69,7 @@ function mapDispatchToProps (dispatch) {
 
 function mapStateToProps (state) {
   return {
-    selectedIds: state.assets.selectedIds
+    selectedAssetIds: state.assets.selectedIds
   }
 }
 
