@@ -45,6 +45,24 @@ input,input:focus,button,button:focus,.form-control,.form-control:focus {
   box-shadow: none;
 }
 
+// Custom scrollbar styles from Amber
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: $zorroa-lightgray;
+  // box-shadow: inset 0px 1px 3px 0px rgba(0,0,0,0.50);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb {
+  background: $zorroa-gray;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: $zorroa-sickly-green;
+  border-radius: 3px;
+}
+
 .hide { @include hide; }
 
 .animate { @include animate; }
