@@ -12,24 +12,39 @@ export default class AssetFilter {
   merge (filter) {
     // Combine each array, removing duplicates and merging terms.
     if (filter.missing) {
-      this.missing = this.missing ? union([this.missing, filter.missing]) : filter.missing
+      this.missing = this.missing ? union([this.missing, filter.missing]) : [ ...filter.missing ]
     }
     if (filter.exists) {
-      this.exists = this.exists ? union([this.exists, filter.exists]) : filter.exists
+      this.exists = this.exists ? union([this.exists, filter.exists]) : [ ...filter.exists ]
     }
-    if (filter.terms) {
-      if (this.terms) {
-        for (var key in filter.terms) {
-          if (key in filter.terms) {
-            if (key in this.terms) {
-              this.terms[key] = union([this.terms[key], filter.terms[key]])
+    if (filter.links) {
+      if (this.links) {
+        for (let key in filter.links) {
+          if (key in filter.links) {
+            if (key in this.links) {
+              this.links[key] = union([this.links[key], filter.links[key]])
             } else {
-              this.terms[key] = filter.terms[key]
+              this.links[key] = [ ...filter.links[key] ]
             }
           }
         }
       } else {
-        this.terms = filter.terms
+        this.links = { ...filter.links }
+      }
+    }
+    if (filter.terms) {
+      if (this.terms) {
+        for (let key in filter.terms) {
+          if (key in filter.terms) {
+            if (key in this.terms) {
+              this.terms[key] = union([this.terms[key], filter.terms[key]])
+            } else {
+              this.terms[key] = [ ...filter.terms[key] ]
+            }
+          }
+        }
+      } else {
+        this.terms = [ ...filter.terms ]
       }
     }
   }

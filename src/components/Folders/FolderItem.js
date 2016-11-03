@@ -1,10 +1,11 @@
 import React, { Component, PropTypes } from 'react'
-import { testDragDrop } from '../../actions/assetsAction'
 import { DropTarget } from '../../services/DragDrop'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+
 import Collapsible from '../Collapsible'
 import CollapsibleHeader from '../CollapsibleHeader'
+import { selectFolderIds } from '../../actions/folderAction'
 
 // Recursively renders folder children as Collapsible elements.
 // Loads children of displayed items on-demand to display open caret.
@@ -33,7 +34,9 @@ class FolderItem extends Component {
     isIconified: PropTypes.bool.isRequired,
     loadChildren: PropTypes.func.isRequired,
     dropparams: PropTypes.object,
-    selectedAssetIds: PropTypes.any
+    selectedAssetIds: PropTypes.any,
+    selectedFolderIds: PropTypes.object,
+    actions: PropTypes.object
   }
 
   componentWillMount () {
@@ -41,36 +44,46 @@ class FolderItem extends Component {
     loadChildren(folderId)
   }
 
+  select (event) {
+    event.stopPropagation()
+    const { selectedFolderIds, folderId } = this.props
+    const ids = new Set(selectedFolderIds)
+    if (ids.has(folderId)) {
+      ids.delete(folderId)
+    } else {
+      ids.add(folderId)
+    }
+    this.props.actions.selectFolderIds(ids)
+  }
+
   renderHeader (folder) {
+    const isSelected = this.props.selectedFolderIds && this.props.selectedFolderIds.has(this.props.folderId)
     const openIcon = folder.isDyhi() ? 'icon-cube' : 'icon-folder2'
     const closeIcon = folder.isDyhi() ? 'icon-cube' : 'icon-folder'
     return (
-      <CollapsibleHeader label={folder.name} isIconified={this.props.isIconified}
-                         openIcon={openIcon} closeIcon={closeIcon} />
+      <CollapsibleHeader label={folder.name} isIconified={this.props.isIconified} isSelected={isSelected}
+                         openIcon={openIcon} closeIcon={closeIcon} onSelect={this.select.bind(this)} />
     )
   }
 
   render () {
-    const { folders, folderId, isIconified, loadChildren, dropparams } = this.props
+    const { folders, folderId, isIconified, loadChildren, selectedFolderIds, dropparams, actions } = this.props
     const folder = folders.get(folderId)
     return (
-      <Collapsible header={this.renderHeader(folder)} dropparams={dropparams}>
+      <Collapsible header={this.renderHeader(folder)} dropparams={dropparams} onSelect={this.select.bind(this)} >
         { !isIconified && folder.children !== undefined && folder.children.map(child => (
-          <FolderItem key={child.id} isIconified={isIconified} folders={folders} folderId={child.id} loadChildren={loadChildren} />)
+          <FolderItem key={child.id} isIconified={isIconified} folders={folders}
+                      folderId={child.id} loadChildren={loadChildren}
+                      actions={actions} selectedFolderIds={selectedFolderIds} />)
         )}
       </Collapsible>
     )
   }
 }
 
-function mapDispatchToProps (dispatch) {
-  return bindActionCreators({dispatch}, dispatch)
-}
-
-function mapStateToProps (state) {
-  return {
-    selectedAssetIds: state.assets.selectedIds
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(FolderItem)
+export default connect(state => ({
+  selectedAssetIds: state.assets.selectedIds,
+  selectedFolderIds: state.folders.selectedIds
+}), dispatch => ({
+  actions: bindActionCreators({ selectFolderIds, dispatch }, dispatch)
+}))(FolderItem)

@@ -6,7 +6,7 @@ import * as assert from 'assert'
 
 import Thumb from '../Thumb'
 import Asset from '../../models/Asset'
-import { isolateAsset, selectAssets } from '../../actions/assetsAction'
+import { isolateAssetId, selectAssetIds } from '../../actions/assetsAction'
 import Pager from './Pager'
 import Footer from './Footer'
 import Table from '../Table'
@@ -86,11 +86,11 @@ class Assets extends Component {
       ids = new Set([asset.id])
       this.setState({...this.state, lastSelectedId: asset.id})
     }
-    actions.selectAssets(ids)
+    actions.selectAssetIds(ids)
   }
 
   isolateToLightbox (asset) {
-    this.props.actions.isolateAsset(asset.id)
+    this.props.actions.isolateAssetId(asset.id)
     this.context.router.push('/lightbox')
   }
 
@@ -181,5 +181,5 @@ export default connect(state => ({
   selectedIds: state.assets.selectedIds,
   totalCount: state.assets.totalCount
 }), dispatch => ({
-  actions: bindActionCreators({ isolateAsset, selectAssets }, dispatch)
+  actions: bindActionCreators({ isolateAssetId, selectAssetIds }, dispatch)
 }))(Assets)

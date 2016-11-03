@@ -53,7 +53,9 @@ class Facet extends Component {
     const type = FACET_WIDGET
     const aggs = { facet: { terms: { field: this.state.field } } }
     let sliver = new AssetSearch({aggs})
-    sliver.filter = new AssetFilter(term ? { terms: {[this.state.field]: [term]} } : {})
+    if (term) {
+      sliver.filter = new AssetFilter({terms: {[this.state.field]: [term]}})
+    }
     const widget = new Widget({id: this.props.id, type, sliver})
     this.props.actions.modifyRacetrackWidget(widget)
   }

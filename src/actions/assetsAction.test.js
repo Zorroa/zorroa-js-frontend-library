@@ -3,7 +3,7 @@ import MockAdapter from 'axios-mock-adapter'
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 
-import { searchAssets, isolateAsset, selectAssets } from './assetsAction'
+import { searchAssets, isolateAssetId, selectAssetIds } from './assetsAction'
 import Asset from '../models/Asset'
 import { ISOLATE_ASSET, SELECT_ASSETS } from '../constants/actionTypes'
 import Page from '../models/Page'
@@ -43,7 +43,7 @@ describe('assetsActions', () => {
       type: ISOLATE_ASSET,
       payload: id
     }
-    expect(isolateAsset(id)).toEqual(expectedAction)
+    expect(isolateAssetId(id)).toEqual(expectedAction)
   })
 
   it('should select assets', () => {
@@ -53,6 +53,6 @@ describe('assetsActions', () => {
       type: SELECT_ASSETS,
       payload: ids
     }
-    expect(selectAssets(ids)).toEqual(expectedAction)
+    expect(selectAssetIds(ids)).toEqual(expectedAction)
   })
 })

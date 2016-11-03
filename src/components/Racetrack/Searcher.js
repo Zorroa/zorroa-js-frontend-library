@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 
 import Widget from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
+import AssetFilter from '../../models/AssetFilter'
 import { searchAssets } from '../../actions/assetsAction'
 
 // Searcher is a singleton. It combines AssetSearches from the Racetrack
@@ -12,14 +13,20 @@ class Searcher extends Component {
   static propTypes = {
     query: PropTypes.instanceOf(AssetSearch),
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
+    selectedFolders: PropTypes.object,
     actions: PropTypes.object.isRequired
   }
 
   render () {
-    const { widgets, actions, query } = this.props
+    const { widgets, actions, selectedFolders, query } = this.props
     let assetSearch = new AssetSearch()
     for (let widget of widgets) {
       assetSearch.merge(widget.sliver)
+    }
+
+    if (selectedFolders && selectedFolders.size) {
+      const filter = new AssetFilter({links: {folder: [...selectedFolders]}})
+      assetSearch.merge(new AssetSearch({filter}))
     }
 
     // Do not send the query unless it is different than the last returned query
@@ -37,7 +44,8 @@ const mapDispatchToProps = dispatch => ({
 
 const mapStateToProps = state => ({
   query: state.assets.query,
-  widgets: state.racetrack.widgets
+  widgets: state.racetrack.widgets,
+  selectedFolders: state.folders.selectedIds
 })
 
 export default connect(

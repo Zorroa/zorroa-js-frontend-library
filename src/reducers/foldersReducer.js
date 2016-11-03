@@ -1,4 +1,4 @@
-import { GET_FOLDER_CHILDREN } from '../constants/actionTypes'
+import { GET_FOLDER_CHILDREN, SELECT_FOLDERS } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import * as assert from 'assert'
 
@@ -40,6 +40,9 @@ export default function (state = { all: new Map([[0, browsing], [-1, collections
         updatedFolders.set(0, collections)
       }
       return { ...state, all: updatedFolders }
+
+    case SELECT_FOLDERS:
+      return { ...state, selectedIds: action.payload }
   }
 
   return state

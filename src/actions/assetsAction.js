@@ -41,14 +41,14 @@ export function searchAssets (query) {
   }
 }
 
-export function isolateAsset (id) {
+export function isolateAssetId (id) {
   return ({
     type: ISOLATE_ASSET,
     payload: id
   })
 }
 
-export function selectAssets (ids) {
+export function selectAssetIds (ids) {
   return ({
     type: SELECT_ASSETS,
     payload: ids

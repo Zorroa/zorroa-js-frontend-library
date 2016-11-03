@@ -3,7 +3,8 @@ import MockAdapter from 'axios-mock-adapter'
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 
-import { getFolderChildren } from './folderAction'
+import { SELECT_FOLDERS } from '../constants/actionTypes'
+import { getFolderChildren, selectFolderIds } from './folderAction'
 import Folder from '../models/Folder'
 
 const middlewares = [ thunk ]
@@ -16,7 +17,7 @@ const archivist = axios.create({
 })
 
 // FIXME: Figure out how to test promise-based axios mock adapters!
-describe('assetsActions', () => {
+describe('folderActions', () => {
   const folder = new Folder({ id: 1, name: 'Parent' })
   const child = new Folder({ id: 2, name: 'Child' })
 
@@ -35,5 +36,15 @@ describe('assetsActions', () => {
       .then(() => {
         expect(true).toBeTruthy()
       })
+  })
+
+  it('should select folder', () => {
+    const id = 3
+    const ids = new Set([id])
+    const expectedAction = {
+      type: SELECT_FOLDERS,
+      payload: ids
+    }
+    expect(selectFolderIds(ids)).toEqual(expectedAction)
   })
 })

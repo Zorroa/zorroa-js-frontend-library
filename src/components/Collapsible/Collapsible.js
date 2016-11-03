@@ -9,17 +9,21 @@ export default class Collapsible extends Component {
   static propTypes = {
     children: PropTypes.node,
     header: PropTypes.element.isRequired,
-    dropparams: PropTypes.object
+    dropparams: PropTypes.object,
+    onSelect: PropTypes.func
   }
+
+  handleClick = this.handleClick.bind(this)
 
   constructor (props) {
     super(props)
     this.state = { isOpen: false }
   }
 
-  handleClick () {
+  handleClick (event) {
     const { isOpen } = this.state
     const { children } = this.props
+    event.stopPropagation()
     if (children) {
       this.setState({ ...this.state, isOpen: !isOpen })
     }
@@ -27,12 +31,12 @@ export default class Collapsible extends Component {
 
   render () {
     const { isOpen } = this.state
-    const { children, header, dropparams } = this.props
+    const { children, header, dropparams, onSelect } = this.props
 
     return (
       <div className={classnames('collapsible', 'flexCol', {'parent': children, 'open': open})} {...dropparams}>
-        <div className="collapsible-header flexCenter" onClick={this.handleClick.bind(this)}>
-          { cloneElement(header, { isOpen, isParent: children && children.length > 0 }) }
+        <div className="collapsible-header flexCenter" onClick={onSelect ? undefined : this.handleClick}>
+          { cloneElement(header, { isOpen, onSelect: onSelect, onOpen: this.handleClick, isParent: children && children.length > 0 }) }
         </div>
         <div style={{marginLeft: '16px'}} className="collapsible-body">
           { isOpen && (children) }

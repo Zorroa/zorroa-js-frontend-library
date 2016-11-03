@@ -1,3 +1,5 @@
+import AssetFilter from './AssetFilter'
+
 export default class AssetSearch {
   constructor (json) {
     if (json) {
@@ -23,27 +25,31 @@ export default class AssetSearch {
       this.query = this.query ? `(${this.query}) AND (${assetSearch.query})` : assetSearch.query
     }
     if (assetSearch.fields) {
-      this.fields = this.fields ? union([this.fields, assetSearch.fields]) : assetSearch.fields
+      this.fields = this.fields ? union([this.fields, assetSearch.fields]) : [ ...assetSearch.fields ]
     }
     if (assetSearch.filter) {
-      this.filter = this.filter ? this.filter.merge(assetSearch.filter) : assetSearch.filter
+      if (this.filter) {
+        this.filter.merge(assetSearch.filter)
+      } else {
+        this.filter = new AssetFilter(assetSearch.filter)
+      }
     }
     if (assetSearch.fuzzy) {
       this.fuzzy = this.fuzzy || assetSearch.fuzzy
     }
     if (assetSearch.queryFields) {
-      for (var key in assetSearch.queryFields) {
+      for (let key in assetSearch.queryFields) {
         if (assetSearch.queryFields.hasOwnProperty(key)) {
           if (this.queryFields.hasOwnProperty(key)) {
             this.queryFields[key] = union([this.queryFields[key], assetSearch.queryFields[key]])
           } else {
-            this.queryFields[key] = assetSearch.queryFields[key]
+            this.queryFields[key] = { ...assetSearch.queryFields[key] }
           }
         }
       }
     }
     if (assetSearch.aggs) {
-      this.aggs = this.aggs ? { ...this.aggs, ...assetSearch.aggs } : assetSearch.aggs
+      this.aggs = this.aggs ? { ...this.aggs, ...assetSearch.aggs } : { ...assetSearch.aggs }
     }
   }
 

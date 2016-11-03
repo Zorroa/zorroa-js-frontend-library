@@ -1,4 +1,4 @@
-import { GET_FOLDER_CHILDREN } from '../constants/actionTypes'
+import { GET_FOLDER_CHILDREN, SELECT_FOLDERS } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import { getArchivist } from './authAction'
 
@@ -19,4 +19,11 @@ export function getFolderChildren (id) {
         console.error('Error getting folder: ' + error)
       })
   }
+}
+
+export function selectFolderIds (ids) {
+  return ({
+    type: SELECT_FOLDERS,
+    payload: ids
+  })
 }
