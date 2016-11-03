@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'zorroa-icons';
-  src:  url('fonts/zorroa-icons.eot?f0szkc');
-  src:  url('fonts/zorroa-icons.eot?f0szkc#iefix') format('embedded-opentype'),
-    url('fonts/zorroa-icons.woff2?f0szkc') format('woff2'),
-    url('fonts/zorroa-icons.ttf?f0szkc') format('truetype'),
-    url('fonts/zorroa-icons.woff?f0szkc') format('woff'),
-    url('fonts/zorroa-icons.svg?f0szkc#zorroa-icons') format('svg');
+  src:  url('fonts/zorroa-icons.eot?69hc22');
+  src:  url('fonts/zorroa-icons.eot?69hc22#iefix') format('embedded-opentype'),
+    url('fonts/zorroa-icons.woff2?69hc22') format('woff2'),
+    url('fonts/zorroa-icons.ttf?69hc22') format('truetype'),
+    url('fonts/zorroa-icons.woff?69hc22') format('woff'),
+    url('fonts/zorroa-icons.svg?69hc22#zorroa-icons') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -45,6 +45,12 @@
 }
 .icon-cog:before {
   content: "\e907";
+}
+.icon-menu:before {
+  content: "\e920";
+}
+.icon-grid:before {
+  content: "\e91f";
 }
 .icon-plus:before {
   content: "\e91e";
@@ -133,8 +139,17 @@
 .icon-pen2:before {
   content: "\e60f";
 }
+.icon-palette:before {
+  content: "\e626";
+}
 .icon-trash2:before {
   content: "\e681";
+}
+.icon-game:before {
+  content: "\e684";
+}
+.icon-folder3:before {
+  content: "\e6ba";
 }
 .icon-register:before {
   content: "\e6d1";
@@ -144,6 +159,12 @@
 }
 .icon-picture2:before {
   content: "\e70f";
+}
+.icon-pictures:before {
+  content: "\e711";
+}
+.icon-contacts:before {
+  content: "\e71a";
 }
 .icon-window:before {
   content: "\e7b2";
@@ -213,6 +234,18 @@
 }
 .icon-menu-square:before {
   content: "\e99b";
+}
+.icon-sort-alpha-asc:before {
+  content: "\e9b5";
+}
+.icon-sort-alpha-desc:before {
+  content: "\e9b6";
+}
+.icon-sort-time-asc:before {
+  content: "\e9bb";
+}
+.icon-sort-time-desc:before {
+  content: "\e9bc";
 }
 .icon-layout:before {
   content: "\e900";
