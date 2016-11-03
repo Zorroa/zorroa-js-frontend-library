@@ -6,12 +6,10 @@ export default class Collapsible extends Component {
     return 'Collapsible'
   }
 
-  static get propTypes () {
-    return {
-      children: PropTypes.node,
-      header: PropTypes.element.isRequired,
-      dropparams: PropTypes.object
-    }
+  static propTypes = {
+    children: PropTypes.node,
+    header: PropTypes.element.isRequired,
+    dropparams: PropTypes.object
   }
 
   constructor (props) {

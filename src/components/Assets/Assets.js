@@ -13,13 +13,11 @@ import Table from '../Table'
 import * as ComputeLayout from './ComputeLayout.js'
 
 class Assets extends Component {
-  static get propTypes () {
-    return {
-      assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
-      selectedIds: PropTypes.object,
-      totalCount: PropTypes.number,
-      actions: PropTypes.object
-    }
+  static propTypes = {
+    assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+    selectedIds: PropTypes.object,
+    totalCount: PropTypes.number,
+    actions: PropTypes.object
   }
 
   static get contextTypes () {

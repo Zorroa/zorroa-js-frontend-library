@@ -6,11 +6,9 @@ import Logo from '../../../components/Logo'
 import * as actions from '../../../actions/authAction'
 
 class Signout extends Component {
-  static get propTypes () {
-    return {
-      signoutUser: PropTypes.func.isRequired,
-      user: PropTypes.instanceOf(User)
-    }
+  static propTypes = {
+    signoutUser: PropTypes.func.isRequired,
+    user: PropTypes.instanceOf(User)
   }
 
   static get contextTypes () {
