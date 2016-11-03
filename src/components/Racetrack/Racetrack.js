@@ -55,7 +55,7 @@ class Racetrack extends Component {
       return <div className="racetrack-empty-icon-mag icon-search"></div>
     }
     return (
-      <div className="racetrack-empty">
+      <div className="racetrack-empty flexColCenter">
         <div className="racetrack-empty-mag icon-search" />
         <div className="racetrack-empty-text">
           GET STARTED WITH A SIMPLE SEARCH<br/>
@@ -95,7 +95,7 @@ class Racetrack extends Component {
   renderFooter (isIconified) {
     if (isIconified) return null
     return (
-      <div className="racetrack-footer">
+      <div className="racetrack-footer flexOff">
         <div className="racetrack-footer-group">
           <button onClick={this.handleSave.bind(this)} className="racetrack-footer-save-button">Save</button>
           <button onClick={this.handleClear.bind(this)}>Clear</button>
@@ -107,15 +107,17 @@ class Racetrack extends Component {
   renderAddWidgets (isIconified) {
     if (isIconified) return null
     return (
-      <div className="racetrack-add-filter">
-        <DropdownMenu label="+ ADD WIDGET" rightAlign={true} >
+      <div className="racetrack-add-filter flexRow flexAlignItemsCenter flexJustifySpaceBetween">
+        <DropdownMenu label="+ ADD WIDGET">
           { Object.values(widgetTypes).map(widgetType => (
             <div className="racetrack-add-filter-item" key={widgetType} onClick={this.pushWidgetType.bind(this, widgetType)}>
               { this.renderWidgetTypeHeader(widgetType, isIconified) }
             </div>
           ))}
         </DropdownMenu>
-        <input onKeyPress={this.handleQuickAddKeyPress.bind(this)} placeholder="Quick Add - Widget"/>
+        <input className='Racetrack-add-quick'
+               onKeyPress={this.handleQuickAddKeyPress.bind(this)}
+               placeholder="Quick Add - Widget"/>
       </div>
     )
   }
@@ -123,9 +125,9 @@ class Racetrack extends Component {
   render () {
     const { widgets, isIconified } = this.props
     return (
-      <div className="racetrack">
+      <div className="racetrack flexCol fullHeight">
         <Searcher/>
-        <div className="racetrack-body">
+        <div className="racetrack-body flexOff flexCol">
           { (!widgets || widgets.length === 0) && this.renderEmpty(isIconified) }
           { widgets && widgets.length > 0 && (
           <div className="racetrack-filters">
@@ -138,6 +140,7 @@ class Racetrack extends Component {
           )}
           { this.renderAddWidgets(isIconified) }
         </div>
+        <div className='flexOn'/>
         { this.renderFooter(isIconified) }
       </div>
     )
