@@ -1,28 +1,28 @@
 @import '../../styles/core-mixins.scss';
 
-.racetrack {
+.Racetrack {
   height: 100%;
 
-  .racetrack-body {
+  .Racetrack-body {
   }
 
-  .racetrack-empty {
+  .Racetrack-empty {
     background: none;
     text-shadow: -1px -1px 0px rgba(200,200,200,0.8), 1px 1px 0px rgba(255,255,255,0.3);
     color: rgba(220,220,220, 0.5);
 
-    .racetrack-empty-mag:before {
+    .Racetrack-empty-mag:before {
       width: 48px;
       height: 48px;
       font-size: 48pt;
     }
 
-    .racetrack-empty-mag {
+    .Racetrack-empty-mag {
       padding: 12px;
       margin-bottom: 30px;
     }
 
-    .racetrack-empty-text {
+    .Racetrack-empty-text {
       text-align: center;
       font-size: 12px;
       font-weight: 300;
@@ -45,20 +45,20 @@
     }
   }
 
-  .racetrack-filters {
+  .Racetrack-filters {
     flex: 0.8;
   }
 
-  .racetrack-widget {
+  .Racetrack-widget {
     margin-top: 2px;
     background-color: #fff;
   }
 
-  .racetrack-add-filter {
+  .Racetrack-add-filter {
     padding: 0;
     margin: 40px 0;
 
-    .racetrack-add-filter-item {
+    .Racetrack-add-filter-item {
       margin-top: 4px;
 
       &:hover {
@@ -100,16 +100,16 @@
     }
   }
 
-  .racetrack-footer {
+  .Racetrack-footer {
     display: flex;
     justify-content: center;
     border-top: 1px solid #ccc;
 
-    .racetrack-footer-group {
+    .Racetrack-footer-group {
       display: flex;
     }
 
-    .racetrack-footer-save-button {
+    .Racetrack-footer-save-button {
       background-color: #a5a5a5;
       color: $zorroa-nearwhite;
     }
@@ -139,11 +139,11 @@
   }
 }
 
-.racetrack-add-menu {
+.Racetrack-add-menu {
   width: 300px;
 }
 
-.racetrack-empty-icon-mag {
+.Racetrack-empty-icon-mag {
   font-size: 30px;
   color: $zorroa-gray;
   padding: 5px 8px;
