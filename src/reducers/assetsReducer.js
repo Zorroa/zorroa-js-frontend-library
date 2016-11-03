@@ -1,4 +1,4 @@
-import { ASSET_SEARCH, ASSET_SEARCH_ERROR, PAGE_SIZE, ISOLATE_ASSET, SELECT_ASSETS } from '../constants/actionTypes'
+import { ASSET_SEARCH, ASSET_SEARCH_ERROR, PAGE_SIZE,  ISOLATE_ASSET, SELECT_ASSETS, SUGGEST_COMPLETIONS } from '../constants/actionTypes'
 
 const initialState = {
   pageSize: 100
@@ -43,7 +43,7 @@ export default function (state = initialState, action) {
       const all = state.all && page && page.from ? inject(state.all, page.from, assets) : assets
       const totalCount = page && page.totalCount ? page.totalCount : 0
       const selectedIds = page && page.from ? state.selectedIds : null
-      return { ...state, all, aggs, query, totalCount, selectedIds, isolatedId: null }
+      return { ...state, all, aggs, query, totalCount, selectedIds, isolatedId: null, suggestions: null }
     case ASSET_SEARCH_ERROR:
       return { ...state, error: action.payload }
     case ISOLATE_ASSET:
@@ -52,6 +52,8 @@ export default function (state = initialState, action) {
       return { ...state, selectedIds: action.payload }
     case PAGE_SIZE:
       return { ...state, pageSize: action.payload }
+    case SUGGEST_COMPLETIONS:
+      return { ...state, suggestions: action.payload }
   }
 
   return state

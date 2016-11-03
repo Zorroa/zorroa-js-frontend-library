@@ -1,6 +1,6 @@
 import * as assert from 'assert'
 
-import { UNAUTH_USER, ASSET_SEARCH, ASSET_SEARCH_ERROR, ISOLATE_ASSET, SELECT_ASSETS, PAGE_SIZE } from '../constants/actionTypes'
+import { UNAUTH_USER, ASSET_SEARCH, ASSET_SEARCH_ERROR, ISOLATE_ASSET, SELECT_ASSETS, PAGE_SIZE, SUGGEST_COMPLETIONS } from '../constants/actionTypes'
 import Asset from '../models/Asset'
 import Page from '../models/Page'
 import AssetSearch from '../models/AssetSearch'
@@ -36,6 +36,22 @@ export function searchAssets (query) {
           type: ASSET_SEARCH_ERROR,
           payload: error
         })
+      })
+  }
+}
+
+export function suggestQueryStrings (text) {
+  return dispatch => {
+    getArchivist().post('/api/v2/assets/_suggest', {text})
+      .then(response => {
+        const suggestions = response.data.completions[0].options
+        dispatch({
+          type: SUGGEST_COMPLETIONS,
+          payload: suggestions
+        })
+      })
+      .catch(error => {
+        console.error('Error requesting suggestions for ' + text + ': ' + error)
       })
   }
 }

@@ -14,7 +14,8 @@ describe('assetsReducer', () => {
       all: assets,
       totalCount: 1,
       selectedIds: null,
-      isolatedId: null
+      isolatedId: null,
+      suggestions: null
     }
     expect(assetsReducer([], { type: ASSET_SEARCH, payload }))
       .toEqual(result)
@@ -37,7 +38,8 @@ describe('assetsReducer', () => {
       all: concatAssets,
       totalCount: 2,
       selectedIds: null,
-      isolatedId: null
+      isolatedId: null,
+      suggestions: null
     }
     expect(assetsReducer(state1, { type: ASSET_SEARCH, payload: payload2 }))
       .toEqual(result)
