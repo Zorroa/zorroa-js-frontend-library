@@ -1,10 +1,12 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import keydown from 'react-keydown'
 
 import Asset from '../../models/Asset'
 import Lightbar from './Lightbar'
 import Inspector from '../Inspector'
+import { isolateAssetId } from '../../actions/assetsAction'
 
 class Lightbox extends Component {
   static get displayName () {
@@ -13,7 +15,8 @@ class Lightbox extends Component {
 
   static propTypes = {
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
-    isolatedId: PropTypes.string.isRequired
+    isolatedId: PropTypes.string.isRequired,
+    actions: PropTypes.object
   }
 
   static get contextTypes () {
@@ -25,6 +28,24 @@ class Lightbox extends Component {
   @keydown('esc') // http://glortho.github.io/react-keydown/example/index.html
   closeLightbox (event) {
     this.context.router.push('/')
+  }
+
+  @keydown('right')
+  nextAsset (event) {
+    this.isolateIndexOffset(1)
+  }
+
+  @keydown('left')
+  previousAsset (event) {
+    this.isolateIndexOffset(-1)
+  }
+
+  isolateIndexOffset (offset) {
+    const { assets, isolatedId, actions } = this.props
+    const index = assets.findIndex(asset => (asset.id === isolatedId))
+    if (index + offset >= 0 && index + offset < assets.length - 1) {
+      actions.isolateAssetId(assets[index + offset].id)
+    }
   }
 
   render () {
@@ -44,4 +65,6 @@ class Lightbox extends Component {
 export default connect(state => ({
   assets: state.assets.all,
   isolatedId: state.assets.isolatedId
+}), dispatch => ({
+  actions: bindActionCreators({ isolateAssetId }, dispatch)
 }))(Lightbox)
