@@ -3,9 +3,9 @@ import MockAdapter from 'axios-mock-adapter'
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 
-import { searchAssets, isolateAssetId, selectAssetIds } from './assetsAction'
+import { searchAssets, isolateAssetId, selectAssetIds, setPageSize } from './assetsAction'
 import Asset from '../models/Asset'
-import { ISOLATE_ASSET, SELECT_ASSETS } from '../constants/actionTypes'
+import { ISOLATE_ASSET, SELECT_ASSETS, PAGE_SIZE } from '../constants/actionTypes'
 import Page from '../models/Page'
 
 const middlewares = [ thunk ]
@@ -54,5 +54,14 @@ describe('assetsActions', () => {
       payload: ids
     }
     expect(selectAssetIds(ids)).toEqual(expectedAction)
+  })
+
+  it('should set page size', () => {
+    const pageSize = 19
+    const expectedAction = {
+      type: PAGE_SIZE,
+      payload: pageSize
+    }
+    expect(setPageSize(pageSize)).toEqual(expectedAction)
   })
 })

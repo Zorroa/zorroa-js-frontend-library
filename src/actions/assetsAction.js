@@ -1,16 +1,15 @@
 import * as assert from 'assert'
 
-import { UNAUTH_USER, ASSET_SEARCH, ASSET_SEARCH_ERROR, ISOLATE_ASSET, SELECT_ASSETS } from '../constants/actionTypes'
+import { UNAUTH_USER, ASSET_SEARCH, ASSET_SEARCH_ERROR, ISOLATE_ASSET, SELECT_ASSETS, PAGE_SIZE } from '../constants/actionTypes'
 import Asset from '../models/Asset'
 import Page from '../models/Page'
+import AssetSearch from '../models/AssetSearch'
 import { getArchivist } from './authAction'
 
 export function searchAssets (query) {
+  assert.ok(query instanceof AssetSearch)
+  assert.ok(query.size)
   return dispatch => {
-    // Wrap undefined or simple string queries as an AssetSearch
-    if (!query || typeof query === 'string' || query instanceof String) {
-      query = { query }
-    }
     console.log('Search: ' + JSON.stringify(query))
     assert.ok(typeof query.from === 'undefined' || query.from >= 0)
     getArchivist().post('/api/v3/assets/_search', query)
@@ -52,5 +51,12 @@ export function selectAssetIds (ids) {
   return ({
     type: SELECT_ASSETS,
     payload: ids
+  })
+}
+
+export function setPageSize (count) {
+  return ({
+    type: PAGE_SIZE,
+    payload: count
   })
 }

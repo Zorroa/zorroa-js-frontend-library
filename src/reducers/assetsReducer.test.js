@@ -1,5 +1,5 @@
 import assetsReducer from './assetsReducer'
-import { ASSET_SEARCH, ASSET_SEARCH_ERROR, ISOLATE_ASSET, SELECT_ASSETS } from '../constants/actionTypes'
+import { ASSET_SEARCH, ASSET_SEARCH_ERROR, PAGE_SIZE, ISOLATE_ASSET, SELECT_ASSETS } from '../constants/actionTypes'
 import Page from '../models/Page'
 
 describe('assetsReducer', () => {
@@ -61,5 +61,10 @@ describe('assetsReducer', () => {
     const ids = new Set([id0, id1])
     expect(assetsReducer([], {type: SELECT_ASSETS, payload: ids}))
       .toEqual({ selectedIds: ids })
+  })
+
+  it('PAGE_SIZE sets page size', () => {
+    expect(assetsReducer([], {type: PAGE_SIZE, payload: 17}))
+      .toEqual({ pageSize: 17 })
   })
 })

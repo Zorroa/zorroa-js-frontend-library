@@ -12,13 +12,14 @@ import { searchAssets } from '../../actions/assetsAction'
 class Searcher extends Component {
   static propTypes = {
     query: PropTypes.instanceOf(AssetSearch),
+    pageSize: PropTypes.number.isRequired,
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
     selectedFolders: PropTypes.object,
     actions: PropTypes.object.isRequired
   }
 
   render () {
-    const { widgets, actions, selectedFolders, query } = this.props
+    const { widgets, actions, selectedFolders, query, pageSize } = this.props
     let assetSearch = new AssetSearch()
     for (let widget of widgets) {
       assetSearch.merge(widget.sliver)
@@ -31,6 +32,7 @@ class Searcher extends Component {
 
     // Do not send the query unless it is different than the last returned query
     if (!query || !assetSearch.equals(query)) {
+      assetSearch.size = pageSize
       actions.searchAssets(assetSearch)
     }
 
@@ -44,6 +46,7 @@ const mapDispatchToProps = dispatch => ({
 
 const mapStateToProps = state => ({
   query: state.assets.query,
+  pageSize: state.assets.pageSize,
   widgets: state.racetrack.widgets,
   selectedFolders: state.folders.selectedIds
 })

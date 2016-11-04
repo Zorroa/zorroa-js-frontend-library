@@ -5,34 +5,23 @@ import { connect } from 'react-redux'
 
 import AssetCounter from './AssetCounter'
 import AssetSearch from '../../models/AssetSearch'
-import { searchAssets } from '../../actions/assetsAction'
+import { searchAssets, setPageSize } from '../../actions/assetsAction'
 
 class Pager extends Component {
   static propTypes = {
     loaded: PropTypes.number.isRequired,
     total: PropTypes.number.isRequired,
+    pageSize: PropTypes.number.isRequired,
     actions: PropTypes.object.isRequired,
     query: PropTypes.instanceOf(AssetSearch).isRequired
   }
 
-  constructor (props) {
-    super(props)
-    this.state = {
-      pageSize: 100
-    }
-  }
-
   handlePageSize (dim) {
-    this.setState({
-      pageSize: dim
-    }, () => {
-      console.info('Set page size to ' + this.state.pageSize)
-    })
+    this.props.actions.setPageSize(dim)
   }
 
   handleLoadPage () {
-    const { query, loaded } = this.props
-    const { pageSize } = this.state
+    const { query, loaded, pageSize } = this.props
     var nextPageQuery = new AssetSearch(query)
     nextPageQuery.from = loaded
     nextPageQuery.size = pageSize
@@ -41,8 +30,7 @@ class Pager extends Component {
   }
 
   render () {
-    const { pageSize } = this.state
-    const { loaded, total } = this.props
+    const { loaded, total, pageSize } = this.props
     const pageSizes = [ 100, 1000, 10000 ]
     if (total <= 25000) {
       pageSizes.push(0)
@@ -75,11 +63,12 @@ class Pager extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({ searchAssets }, dispatch)
+  actions: bindActionCreators({ searchAssets, setPageSize }, dispatch)
 })
 
 const mapStateToProps = state => ({
-  query: state.assets.query
+  query: state.assets.query,
+  pageSize: state.assets.pageSize
 })
 
 export default connect(

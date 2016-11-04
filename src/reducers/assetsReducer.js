@@ -1,4 +1,8 @@
-import { ASSET_SEARCH, ASSET_SEARCH_ERROR, ISOLATE_ASSET, SELECT_ASSETS } from '../constants/actionTypes'
+import { ASSET_SEARCH, ASSET_SEARCH_ERROR, PAGE_SIZE, ISOLATE_ASSET, SELECT_ASSETS } from '../constants/actionTypes'
+
+const initialState = {
+  pageSize: 100
+}
 
 function inject (src, idx, arr) {
   if (!window.DEBUG) {
@@ -32,7 +36,7 @@ function inject (src, idx, arr) {
   return injected
 }
 
-export default function (state = {}, action) {
+export default function (state = initialState, action) {
   switch (action.type) {
     case ASSET_SEARCH:
       const { query, assets, page, aggs } = action.payload
@@ -46,6 +50,8 @@ export default function (state = {}, action) {
       return { ...state, isolatedId: action.payload }
     case SELECT_ASSETS:
       return { ...state, selectedIds: action.payload }
+    case PAGE_SIZE:
+      return { ...state, pageSize: action.payload }
   }
 
   return state
