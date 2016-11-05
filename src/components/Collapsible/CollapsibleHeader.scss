@@ -3,33 +3,31 @@
 .CollapsibleHeader {
   @include nowrap;
   height: 40px;
-  padding: 5px;
-  padding-left: 10px;
-  background-color: #d8d8d8;
-  margin-bottom: 5px;
   text-transform: uppercase;
-  color: $zorroa-gray;
   font-weight: 100;
   overflow: hidden;
 
-  // FIXME: Is there a way to share the isSelected subclass?
+  color: $zorroa-gray;
+  background-color: #d8d8d8;
   &.isSelected {
     color: white;
     background-color: $zorroa-water-blue;
   }
+
+  // Hover rules were removed so that Metadata & FolderItem can easily customize
+}
+
+.CollapsibleHeader-select {
+  padding: 5px;
+  padding-left: 10px;
 }
 
 .CollapsibleHeader-icon {
-  color: $zorroa-gray;
   margin-right: 14px;
   padding-bottom: 3px;
 
   &.isIconified {
     margin-right: 0;
-  }
-
-  &.isSelected {
-    color: white;
   }
 }
 
@@ -37,16 +35,13 @@
   @include clampText;
 }
 
+.CollapsibleHeader-open {
+  width: 40px;
+}
+
 .CollapsibleHeader-caret {
   font-size: 15px;
   width: 16px;
   min-width: 16px;
   max-width: 16px;
-  margin-right: 1em;
-  margin-left: 8px;
-  color: $zorroa-gray;
-
-  &.isSelected {
-    color: white;
-  }
 }

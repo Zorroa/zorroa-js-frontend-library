@@ -3,8 +3,8 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import Searcher from './Searcher'
-import SimpleSearch, { SimpleSearchHeader } from './SimpleSearch'
-import Facet, { FacetHeader } from './Facet'
+import SimpleSearch from './SimpleSearch'
+import Facet from './Facet'
 import DropdownMenu from '../DropdownMenu'
 import Widget from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
@@ -71,14 +71,20 @@ class Racetrack extends Component {
   }
 
   renderWidgetTypeHeader (widgetType, isIconified) {
-    switch (widgetType) {
-      case widgetTypes.SIMPLE_SEARCH_WIDGET:
-        return <SimpleSearchHeader isIconified={isIconified} />
-      case widgetTypes.FACET_WIDGET:
-        return <FacetHeader field="Keyword" isIconified={isIconified} />
-      default:
-        return <div/>
+    const icons = {
+      [widgetTypes.SIMPLE_SEARCH_WIDGET]: 'icon-search',
+      [widgetTypes.FACET_WIDGET]: 'icon-bar-graph'
     }
+    const names = {
+      [widgetTypes.SIMPLE_SEARCH_WIDGET]: 'Simple Search',
+      [widgetTypes.FACET_WIDGET]: 'Facet: Keyword'
+    }
+    return (
+      <div className={`Racetrack-add-widget Racetrack-add-${widgetType} flexRow flexAlignItemsCenter`}>
+        <i className={`Racetrack-add-icon ${icons[widgetType]}`}></i>
+        <span>{names[widgetType]}</span>
+      </div>
+    )
   }
 
   renderWidget (widget, isIconified) {

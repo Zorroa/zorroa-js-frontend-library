@@ -25,7 +25,7 @@ class Folders extends Component {
   render () {
     const { folders, isIconified } = this.props
     return (
-      <div>
+      <div className='Folders'>
         <FolderItem folders={folders} folderId={-1} isIconified={isIconified} loadChildren={this.loadChildren.bind(this)}/>
         <FolderItem folders={folders} folderId={0} isIconified={isIconified} loadChildren={this.loadChildren.bind(this)}/>
       </div>

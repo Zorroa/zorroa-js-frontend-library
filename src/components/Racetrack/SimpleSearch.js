@@ -2,23 +2,11 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import Widget from '../../models/Widget'
+import WidgetModel from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
 import { SIMPLE_SEARCH_WIDGET } from '../../constants/widgetTypes'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
-import FilterHeader from './FilterHeader'
-import Collapsible from '../Collapsible'
-
-export const SimpleSearchHeader = (props) => (
-  <div className="flexRow fullWidth" style={{backgroundColor: '#73b61c', color: '#ededed'}}>
-    <FilterHeader icon="icon-search" isIconified={props.isIconified} label="Simple Search" onClose={props.onClose} />
-  </div>
-)
-
-SimpleSearchHeader.propTypes = {
-  onClose: PropTypes.func,
-  isIconified: PropTypes.bool.isRequired
-}
+import Widget from './Widget'
 
 // Manage the query string for the current AssetSearch.
 // Monitors the global query and updates slivers when the search is changed.
@@ -60,39 +48,32 @@ class SimpleSearch extends Component {
     if (event.key === 'Enter') {
       const type = SIMPLE_SEARCH_WIDGET
       const sliver = new AssetSearch({query: this.state.queryString})
-      const widget = new Widget({id: this.props.id, type, sliver})
+      const widget = new WidgetModel({id: this.props.id, type, sliver})
       this.props.actions.modifyRacetrackWidget(widget)
     }
   }
 
-  renderHeader (isIconified) {
-    return (
-      <SimpleSearchHeader isIconified={isIconified} onClose={this.removeFilter.bind(this)}/>
-    )
-  }
-
   render () {
     const { isIconified } = this.props
-    if (isIconified) {
-      return this.renderHeader(isIconified)
-    }
     return (
-      <div className='simple-search-box'>
-        <Collapsible header={this.renderHeader(isIconified)} >
-          <div className="simple-search-body">
-            <div className="flexRow">
-              <input type="text" placeholder="Search..." value={this.state.queryString}
-                     onKeyPress={this.modifySliver} onChange={this.updateQueryString} />
-            </div>
-            <div className="simple-search-radio">
-              <form>
-                <input type="radio" name="all-fields" value="all" />All fields
-                <input type="radio" name="all-fields" value="some" />Some fields
-              </form>
-            </div>
+      <Widget className='SimpleSearch'
+              header={(<span>Simple Search</span>)}
+              isIconified={isIconified}
+              icon="icon-search"
+              onClose={this.removeFilter.bind(this)}>
+        <div className="SimpleSearch-body">
+          <div className="flexRow">
+            <input type="text" placeholder="Search..." value={this.state.queryString}
+                   onKeyPress={this.modifySliver} onChange={this.updateQueryString} />
           </div>
-        </Collapsible>
-      </div>
+          <div className="SimpleSearch-radio">
+            <form>
+              <input type="radio" name="all-fields" value="all" />All fields
+              <input type="radio" name="all-fields" value="some" />Some fields
+            </form>
+          </div>
+        </div>
+      </Widget>
     )
   }
 }

@@ -1,7 +1,16 @@
 @import '../../styles/core-mixins.scss';
 
-.metadata-icon {
-  margin-left: 6px;
-  font-size: 10px;
-  color: $zorroa-warm-grey-60;
+.Metadata {
+  .Metadata-icon {
+    margin-left: 6px;
+    font-size: 10px;
+    color: $zorroa-warm-grey-60;
+  }
+
+  // Metadata don't select, so we toggle them when clicking the label or caret
+  // So, hover on the whole header
+  .CollapsibleHeader {
+    &:hover { background-color: darken(#d8d8d8, 15%); }
+    &.isSelected { background-color: darken($zorroa-water-blue, 15%); }
+  }
 }
