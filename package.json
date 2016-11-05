@@ -27,8 +27,7 @@
       "^.+\\.(css|less|scss)$": "<rootDir>/tests/StyleStub.js",
       "^.+\\.(jpg|png|jpeg|svg)$": "<rootDir>/tests/MediaStub.js"
     },
-    "collectCoverage": true,
-    "rootDir": "./src"
+    "collectCoverage": true
   },
   "devDependencies": {
     "axios-mock-adapter": "1.6.1",
