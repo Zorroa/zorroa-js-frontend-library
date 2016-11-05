@@ -10,10 +10,9 @@
     "deploy": "sh ./build/build-prod.sh",
     "pretest": "npm run test:lint",
     "test": "./node_modules/.bin/jest",
-    "posttest": "npm run test:coverage",
     "test:watch": "./node_modules/.bin/jest --verbose --watch",
     "test:lint": "./node_modules/.bin/eslint . --color; exit 0",
-    "test:coverage": "./node_modules/.bin/serve ./coverage/lcov-report & open http://localhost:3000",
+    "test:coverage": "npm test; ./node_modules/.bin/serve ./coverage/lcov-report & open http://localhost:3000",
     "purge": "rm -rf node_modules; npm cache clean; npm install"
   },
   "author": "Jordan Papaleo",
