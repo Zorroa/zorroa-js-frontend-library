@@ -24,7 +24,9 @@
     "expect": true,
     "beforeEach": true,
     "afterEach": true,
-    "React": true
+    "React": true,
+    "DEBUG": true,
+    "PROD": true
   },
   "rules": {}
 }

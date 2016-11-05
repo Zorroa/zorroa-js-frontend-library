@@ -2,6 +2,11 @@ import assetsReducer from './assetsReducer'
 import { ASSET_SEARCH, ASSET_SEARCH_ERROR, PAGE_SIZE, ISOLATE_ASSET, SELECT_ASSETS } from '../constants/actionTypes'
 import Page from '../models/Page'
 
+// These are defined by webpack
+// TODO: figure out how to have the webpack config define these for tests
+window.DEBUG = false
+window.PROD = true
+
 describe('assetsReducer', () => {
   const query = 'foo'
   const assets = [{id: 'a'}]
@@ -21,7 +26,7 @@ describe('assetsReducer', () => {
       .toEqual(result)
   })
 
-  it('ASSET_SEARCH for second page concats assets', () => {
+  it('ASSET_SEARCH for second page concats assets DEBUG', () => {
     // Reduce the first page of assets
     const payload1 = { query, assets, page }
     const state1 = assetsReducer({}, { type: ASSET_SEARCH, payload: payload1 })

@@ -5,7 +5,7 @@ const initialState = {
 }
 
 function inject (src, idx, arr) {
-  if (!window.DEBUG) {
+  if (PROD) {
     return src.slice(0, idx).concat(arr).concat(src.slice(idx))
   }
 
