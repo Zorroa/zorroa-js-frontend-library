@@ -1,4 +1,4 @@
-import { ASSET_SEARCH, ASSET_SEARCH_ERROR, PAGE_SIZE,  ISOLATE_ASSET, SELECT_ASSETS, SUGGEST_COMPLETIONS } from '../constants/actionTypes'
+import { ASSET_SEARCH, ASSET_SEARCH_ERROR, PAGE_SIZE, ISOLATE_ASSET, SELECT_ASSETS, SUGGEST_COMPLETIONS } from '../constants/actionTypes'
 
 const initialState = {
   pageSize: 100
