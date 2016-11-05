@@ -1,5 +1,6 @@
-import React, { Component, PropTypes, cloneElement } from 'react'
+import React, { Component, PropTypes } from 'react'
 import classnames from 'classnames'
+import CollapsibleHeader from './CollapsibleHeader'
 
 export default class Collapsible extends Component {
   static get displayName () {
@@ -8,9 +9,16 @@ export default class Collapsible extends Component {
 
   static propTypes = {
     children: PropTypes.node,
-    header: PropTypes.element.isRequired,
+    closeIcon: PropTypes.string,
     dropparams: PropTypes.object,
-    onSelect: PropTypes.func
+    header: PropTypes.element.isRequired,
+    isIconified: PropTypes.bool.isRequired,
+    isOpen: PropTypes.bool,
+    isSelected: PropTypes.bool,
+    onOpen: PropTypes.func,
+    onSelect: PropTypes.func,
+    openIcon: PropTypes.string,
+    className: PropTypes.string
   }
 
   handleClick = this.handleClick.bind(this)
@@ -22,25 +30,41 @@ export default class Collapsible extends Component {
 
   handleClick (event) {
     const { isOpen } = this.state
-    const { children } = this.props
-    event.stopPropagation()
+    const { children, onOpen } = this.props
     if (children) {
       this.setState({ ...this.state, isOpen: !isOpen })
     }
+    onOpen && onOpen(!isOpen)
+    return false
   }
 
   render () {
     const { isOpen } = this.state
-    const { children, header, dropparams, onSelect } = this.props
+    const { children, closeIcon, dropparams, header, isIconified, isSelected, onSelect, openIcon } = this.props
+
+    const CollapsibleHeaderParams = {
+      closeIcon,
+      header,
+      isIconified,
+      isOpen,
+      isSelected,
+      onSelect,
+      openIcon,
+      isParent: children && !!children.length,
+      onOpen: this.handleClick.bind(this)
+    }
+
+    const { className } = this.props
+    const collapsibleClasses = classnames('Collapsible', 'flexCol', {'parent': children, open, [className]: !!className})
 
     return (
-      <div className={classnames('collapsible', 'flexCol', {'parent': children, 'open': open})} {...dropparams}>
-        <div className="collapsible-header flexCenter" onClick={onSelect ? undefined : this.handleClick}>
-          { cloneElement(header, { isOpen, onSelect: onSelect, onOpen: this.handleClick, isParent: children && children.length > 0 }) }
-        </div>
-        <div style={{marginLeft: '16px'}} className="collapsible-body">
-          { isOpen && (children) }
-        </div>
+      <div className={collapsibleClasses} {...dropparams}>
+        <CollapsibleHeader {...CollapsibleHeaderParams}/>
+        { !isIconified && isOpen && (
+          <div className="Collapsible-body">
+            { children }
+          </div>
+        )}
       </div>
     )
   }

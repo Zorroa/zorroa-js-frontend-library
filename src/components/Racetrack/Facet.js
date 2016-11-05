@@ -2,27 +2,13 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import Widget from '../../models/Widget'
+import WidgetModel from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import { FACET_WIDGET } from '../../constants/widgetTypes'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
-import FilterHeader from './FilterHeader'
-import Collapsible from '../Collapsible'
+import Widget from './Widget'
 import DropdownMenu from '../DropdownMenu'
-
-export const FacetHeader = (props) => (
-  <div className="flexRow fullWidth" style={{backgroundColor: '#a11d77', color: '#ededed'}}>
-    <FilterHeader icon="icon-bar-graph rotN90Flip" label="Facet: Keyword"
-                  onClose={props.onClose} isIconified={props.isIconified} />
-  </div>
-)
-
-FacetHeader.propTypes = {
-  field: PropTypes.string.isRequired,
-  onClose: PropTypes.func,
-  isIconified: PropTypes.bool.isRequired
-}
 
 const BAR_CHART = 'BAR'
 const PIE_CHART = 'PIE'
@@ -56,7 +42,7 @@ class Facet extends Component {
     if (term) {
       sliver.filter = new AssetFilter({terms: {[this.state.field]: [term]}})
     }
-    const widget = new Widget({id: this.props.id, type, sliver})
+    const widget = new WidgetModel({id: this.props.id, type, sliver})
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
@@ -81,19 +67,8 @@ class Facet extends Component {
     this.modifySliver(term)
   }
 
-  renderHeader (isIconified) {
-    return (
-      <FacetHeader field={this.state.field} isIconified={isIconified}
-                   onClose={this.removeFilter.bind(this)}/>
-    )
-  }
-
   render () {
     const { isIconified, buckets } = this.props
-    if (isIconified) {
-      // Never render the body when iconified
-      return this.renderHeader(isIconified)
-    }
     let maxCount = 0
     let minCount = Number.MAX_SAFE_INTEGER
     buckets.forEach(bucket => {
@@ -102,51 +77,55 @@ class Facet extends Component {
     })
 
     return (
-      <div className="facet-box">
-        <Collapsible header={this.renderHeader(isIconified)} >
-          <div className="facet flexCol">
-            <div className="facet-controls flexRow flexJustifySpaceBetween">
+      <Widget className="Facet"
+              header={(<span>Facet: Keyword</span>)}
+              isIconified={isIconified}
+              icon='icon-bar-graph'
+              onClose={this.removeFilter.bind(this)}>
+        <div className="Facet-body flexCol">
+          <div className="Facet-controls flexRow flexJustifySpaceBetween">
+            <div className='Facet-sort'>
               <DropdownMenu label={this.state.field}>
                 <div>Filename</div>
                 <div>Film</div>
                 <div>Character</div>
               </DropdownMenu>
-              <div className="flexOn" />
-              <div className="facet-value-range flexRow flexJustifySpaceBetween">
-                <div>1</div>
-                <input type="range" min="1" max={maxCount} style={{width: '60px'}} />
-                <div>{maxCount}</div>
-              </div>
             </div>
-            <div className="facet-value-table flexOn">
-              <table>
-                <thead>
-                <tr>
-                  <td>Keyword</td>
-                  <td>Count</td>
-                </tr>
-                </thead>
-                <tbody>
-                { buckets && buckets.map(bucket => (
-                  <tr className="facet-value-table-row" key={bucket.key} onClick={this.selectTerm.bind(this, bucket.key)}>
-                    <td>{bucket.key}</td>
-                    <td>{bucket.doc_count}</td>
-                  </tr>
-                ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="facet-min-value flexRow flexJustifyCenter">
-              {minCount !== maxCount ? `Search is limited to >${minCount} results per keyword` : '' }
-            </div>
-            <div className="facet-footer flexRow flexJustifyCenter">
-              <button style={{color: this.state.chartType === BAR_CHART ? '#fff' : '#808080', background: this.state.chartType === BAR_CHART ? '#a11d77' : '#fff'}} className="facet-icon icon-list" onClick={this.selectGraph.bind(this, 1)} />
-              <button style={{color: this.state.chartType === PIE_CHART ? '#fff' : '#808080', background: this.state.chartType === PIE_CHART ? '#a11d77' : '#fff'}} className="facet-icon icon-pie-chart" onClick={this.selectGraph.bind(this, 2)} />
-              <button style={{color: this.state.chartType === COL_CHART ? '#fff' : '#808080', background: this.state.chartType === COL_CHART ? '#a11d77' : '#fff'}} className="facet-icon icon-chart-growth" onClick={this.selectGraph.bind(this, 3)} />
+            <div className="flexOn" />
+            <div className="Facet-value-range flexRow flexJustifySpaceBetween">
+              <div>1</div>
+              <input type="range" min="1" max={maxCount} style={{width: '60px'}} />
+              <div>{maxCount}</div>
             </div>
           </div>
-        </Collapsible>
-      </div>
+          <div className="Facet-value-table flexOn">
+            <table>
+              <thead>
+              <tr>
+                <td>Keyword</td>
+                <td>Count</td>
+              </tr>
+              </thead>
+              <tbody>
+              { buckets && buckets.map(bucket => (
+                <tr className="Facet-value-table-row" key={bucket.key} onClick={this.selectTerm.bind(this, bucket.key)}>
+                  <td>{bucket.key}</td>
+                  <td>{bucket.doc_count}</td>
+                </tr>
+              ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="Facet-min-value flexRow flexJustifyCenter">
+            {minCount !== maxCount ? `Search is limited to >${minCount} results per keyword` : '' }
+          </div>
+          <div className="Facet-footer flexRow flexJustifyCenter">
+            <button style={{color: this.state.chartType === BAR_CHART ? '#fff' : '#808080', background: this.state.chartType === BAR_CHART ? '#a11d77' : '#fff'}} className="Facet-icon icon-list" onClick={this.selectGraph.bind(this, 1)} />
+            <button style={{color: this.state.chartType === PIE_CHART ? '#fff' : '#808080', background: this.state.chartType === PIE_CHART ? '#a11d77' : '#fff'}} className="Facet-icon icon-pie-chart" onClick={this.selectGraph.bind(this, 2)} />
+            <button style={{color: this.state.chartType === COL_CHART ? '#fff' : '#808080', background: this.state.chartType === COL_CHART ? '#a11d77' : '#fff'}} className="Facet-icon icon-chart-growth" onClick={this.selectGraph.bind(this, 3)} />
+          </div>
+        </div>
+      </Widget>
     )
   }
 }

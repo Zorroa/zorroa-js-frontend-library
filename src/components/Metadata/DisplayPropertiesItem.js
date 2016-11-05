@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react'
 
 import DisplayProperties from '../../models/DisplayProperties'
 import Collapsible from '../Collapsible'
-import CollapsibleHeader from '../CollapsibleHeader'
 
 export default class DisplayPropertiesItem extends Component {
   static propTypes = {
@@ -33,14 +32,14 @@ export default class DisplayPropertiesItem extends Component {
     const { field, selectedAssets, displayProperties, isIconified } = this.props
     if (displayProperties.children && displayProperties.children.length) {
       return (
-        <Collapsible style={{marginLeft: '16px'}}
+        <Collapsible className='DisplayPropertiesItem'
+                     style={{marginLeft: '16px'}}
                      isOpenKey={`DisplayPropertiesItem|${field}`}
-                     header={
-                       <CollapsibleHeader label={displayProperties.name}
-                                          isIconified={isIconified}
-                                          openIcon="icon-register"
-                                          closeIcon="icon-register"
-                       /> } >
+                     isIconified={isIconified}
+                     openIcon="icon-register"
+                     closeIcon="icon-register"
+                     header={(<span>{displayProperties.name}</span>)}
+                     >
           { displayProperties.children.map(child => (
             <DisplayPropertiesItem field={`${field}.${child.name}`}
                                    selectedAssets={selectedAssets}

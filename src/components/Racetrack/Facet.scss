@@ -1,46 +1,61 @@
 @import '../../styles/core-mixins.scss';
 
-.facet-box .collapsible {
-  & .collapsible-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: stretch;
-    color: $zorroa-nearwhite;
-    background-color: #a11d77;
+.Facet {
+  .WidgetHeader {
     border-radius: 3px 3px 0 0;
+
+    color: $zorroa-nearwhite;
+    background-color: $zorroa-darkish-purple;
+    & > *:hover { background-color: darken($zorroa-darkish-purple, 15%); }
   }
-}
 
-.facet-icon {
-  width: 30px;
-  height: 30px;
-  border: none;
-  outline: none;
-  font-size: 16px;
-  border-radius: 3px;
-}
+  .WidgetHeader-icon {
+    transform: rotate(-90deg) scaleY(-1);
+  }
 
-.facet-min-value {
-  font-size: 13px;
-  color: $zorroa-lightgray;
-  margin-top: 22px;
-  margin-bottom: 14px;
-}
+  .Widget-icon {
+    font-size: 20px;
+  }
 
-.facet-value-range {
-  flex: 1;
-}
+  .Facet-body {
+    padding: 10px;
+  }
 
-.facet-controls {
-  color: $zorroa-gray;
-}
+  .Facet-sort {
+    table {}
+  }
 
-.facet-footer {
-  border-top: 1px solid $zorroa-nearwhite;
-  padding-top: 4px;
-  padding-bottom: 4px;
-}
+  .Facet-icon {
+    width: 30px;
+    height: 30px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    border-radius: 3px;
+  }
 
-.rotN90Flip {
-  transform: rotate(-90deg) scaleY(-1);
+  .Facet-min-value {
+    font-size: 13px;
+    color: $zorroa-lightgray;
+    margin-top: 22px;
+    margin-bottom: 14px;
+  }
+
+  .Facet-value-range {
+    flex: 1;
+  }
+
+  .Facet-controls {
+    color: $zorroa-gray;
+  }
+
+  .Facet-footer {
+    border-top: 1px solid $zorroa-nearwhite;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .rotN90Flip {
+    transform: rotate(-90deg) scaleY(-1);
+  }
 }

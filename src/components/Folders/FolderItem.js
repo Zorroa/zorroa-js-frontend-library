@@ -4,7 +4,6 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import Collapsible from '../Collapsible'
-import CollapsibleHeader from '../CollapsibleHeader'
 import { selectFolderIds } from '../../actions/folderAction'
 
 // Recursively renders folder children as Collapsible elements.
@@ -57,24 +56,41 @@ class FolderItem extends Component {
   }
 
   renderHeader (folder) {
-    const isSelected = this.props.selectedFolderIds && this.props.selectedFolderIds.has(this.props.folderId)
-    const openIcon = folder.isDyhi() ? 'icon-cube' : 'icon-folder2'
-    const closeIcon = folder.isDyhi() ? 'icon-cube' : 'icon-folder'
     return (
-      <CollapsibleHeader label={folder.name} isIconified={this.props.isIconified} isSelected={isSelected}
-                         openIcon={openIcon} closeIcon={closeIcon} onSelect={this.select.bind(this)} />
+      <div className='FolderItem-header fullWidth'>
+        {folder.name}
+      </div>
     )
   }
 
   render () {
     const { folders, folderId, isIconified, loadChildren, selectedFolderIds, dropparams, actions } = this.props
     const folder = folders.get(folderId)
+    const isSelected = this.props.selectedFolderIds && this.props.selectedFolderIds.has(this.props.folderId)
+    const openIcon = folder.isDyhi() ? 'icon-cube' : 'icon-folder2'
+    const closeIcon = folder.isDyhi() ? 'icon-cube' : 'icon-folder'
+    const isParent = this.props.folders && (this.props.folders.size > 0)
+    const CollapsibleParams = {
+      closeIcon: closeIcon,
+      dropparams: dropparams,
+      header: this.renderHeader(folder),
+      isIconified: this.props.isIconified,
+      isParent: isParent,
+      isSelected: isSelected,
+      onSelect: this.select.bind(this),
+      openIcon: openIcon
+    }
+    const FolderItemParams = {
+      actions: actions,
+      folders: folders,
+      isIconified: isIconified,
+      loadChildren: loadChildren,
+      selectedFolderIds: selectedFolderIds
+    }
     return (
-      <Collapsible header={this.renderHeader(folder)} dropparams={dropparams} onSelect={this.select.bind(this)} >
+      <Collapsible className='FolderItem' {...CollapsibleParams}>
         { !isIconified && folder.children !== undefined && folder.children.map(child => (
-          <FolderItem key={child.id} isIconified={isIconified} folders={folders}
-                      folderId={child.id} loadChildren={loadChildren}
-                      actions={actions} selectedFolderIds={selectedFolderIds} />)
+          <FolderItem key={child.id} folderId={child.id} {...FolderItemParams} />)
         )}
       </Collapsible>
     )
