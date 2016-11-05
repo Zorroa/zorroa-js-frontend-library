@@ -13,7 +13,7 @@
     "posttest": "npm run test:coverage",
     "test:watch": "./node_modules/.bin/jest --verbose --watch",
     "test:lint": "./node_modules/.bin/eslint . --color; exit 0",
-    "test:coverage": "echo 'todo: coverage tests'",
+    "test:coverage": "echo 'here'; ./node_modules/.bin/serve ./coverage/lcov-report & open http://localhost:3000",
     "purge": "rm -rf node_modules; npm cache clean; npm install"
   },
   "author": "Jordan Papaleo",
@@ -21,6 +21,14 @@
   "engines": {
     "node": "6.3.1",
     "npm": "3.10.7"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "^.+\\.(css|less|scss)$": "<rootDir>/tests/StyleStub.js",
+      "^.+\\.(jpg|png|jpeg|svg)$": "<rootDir>/tests/MediaStub.js"
+    },
+    "collectCoverage": true,
+    "rootDir": "./src"
   },
   "devDependencies": {
     "axios-mock-adapter": "1.6.1",
@@ -60,12 +68,6 @@
     "style-loader": "0.13.1",
     "webpack": "1.13.2",
     "webpack-dev-server": "1.15.1"
-  },
-  "jest": {
-    "moduleNameMapper": {
-      "^.+\\.(css|less|scss)$": "<rootDir>/tests/StyleStub.js",
-      "^.+\\.(jpg|png|jpeg|svg)$": "<rootDir>/tests/MediaStub.js"
-    }
   },
   "dependencies": {
     "axios": "0.14.0",
