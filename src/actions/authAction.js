@@ -13,13 +13,20 @@ var archivist
 // Note this is not an action creator, so it should probably
 // be in another file, but we need access to archivist global.
 export function createArchivist (dispatch, host) {
-  const baseURL = 'https://' + host + ':8066'
+  let protocol = 'https:'
+  if (!host || PROD) {
+    host = window.location.hostname
+    protocol = window.location.protocol
+  }
+  const baseURL = protocol + '//' + host + ':8066'
   if (!archivist || archivist.baseURL !== baseURL) {
     // Use withCredentials to handle CORS certification.
     archivist = axios.create({baseURL, withCredentials: true})
   }
   dispatch({ type: AUTH_HOST, payload: host })
-  localStorage.setItem(HOST_ITEM, host)
+  if (DEBUG) {
+    localStorage.setItem(HOST_ITEM, host)
+  }
 }
 
 // Return the axios connection for other action creators

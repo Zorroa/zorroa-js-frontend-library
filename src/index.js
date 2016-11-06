@@ -43,11 +43,10 @@ const applicationNode = (
 )
 
 // If we have a token, consider the user to be signed in, and update local state
-// FIXME: Remove localStorage
 console.log('loading token')
 const userItem = JSON.parse(localStorage.getItem(USER_ITEM))
 const user = userItem ? new User(userItem) : null
-const host = localStorage.getItem(HOST_ITEM)
+const host = DEBUG ? localStorage.getItem(HOST_ITEM) : undefined
 if (user && host) {
   store.dispatch(validateUser(user, host))
 }
