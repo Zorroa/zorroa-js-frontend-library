@@ -25,17 +25,6 @@ class Thumb extends Component {
     index: PropTypes.number.isRequired
   }
 
-  constructor (props) {
-    super(props)
-
-    const { asset, host } = this.props
-    const tproxy = asset.tinyProxy()
-    const rects = tproxy.map((color,index) => {
-      return `<rect x="${index%3}" y="${Math.floor(index/3)}" height="1" width="1" style="fill:${color}"/>`
-    })
-    this.url = `<svg viewBox="0 0 3 3" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">${rects.join('')}</svg>`
-  }
-
   render () {
     const { asset, host, dim, selected, onClick, onDoubleClick, dragparams, index } = this.props
     if (!asset.proxies) {
@@ -50,13 +39,14 @@ class Thumb extends Component {
       if (thumb) {
         thumb.style['background-image'] = `url(${thumbURL})`
       }
-    }, Math.round(index * 250))
+    }, Math.round(index * 15))
 
-    const proxyURL = `url(data:image/svg+xml,${encodeURIComponent(this.url)})`
-    console.log(proxyURL)
+    const tproxy = asset.tinyProxy()
+    const proxySvgUrl = `<svg viewBox="0 0 1 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><rect x="0" y="0" height="1" width="1" style="fill:${tproxy[4]}"/></svg>`
+    const proxyDataURL = `url(data:image/svg+xml,${encodeURIComponent(proxySvgUrl)})`
 
     const thumbStyle={
-      'backgroundImage': proxyURL,
+      'backgroundImage': proxyDataURL,
       'backgroundSize': 'cover',
       'width': dim.width,
       'height': dim.height,
