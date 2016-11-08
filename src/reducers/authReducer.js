@@ -7,7 +7,7 @@ export default function (state = {}, action) {
     case UNAUTH_USER:
       return { ...state, authenticated: false }
     case AUTH_HOST:
-      return { ...state, host: action.payload }
+      return { ...state, host: action.payload.host, protocol: action.payload.protocol }
     case AUTH_ERROR:
       return { ...state, error: action.payload }
   }

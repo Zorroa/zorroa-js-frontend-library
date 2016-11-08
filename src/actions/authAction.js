@@ -13,7 +13,9 @@ var archivist
 // Note this is not an action creator, so it should probably
 // be in another file, but we need access to archivist global.
 export function createArchivist (dispatch, host) {
-  let protocol = 'https:'
+  // Set the default protocol for development.
+  // Change or provide a UI to set it for development testing.
+  let protocol = 'http:'
   if (!host || PROD) {
     host = window.location.hostname
     protocol = window.location.protocol
@@ -23,7 +25,7 @@ export function createArchivist (dispatch, host) {
     // Use withCredentials to handle CORS certification.
     archivist = axios.create({baseURL, withCredentials: true})
   }
-  dispatch({ type: AUTH_HOST, payload: host })
+  dispatch({ type: AUTH_HOST, payload: {host, protocol} })
   if (DEBUG) {
     localStorage.setItem(HOST_ITEM, host)
   }

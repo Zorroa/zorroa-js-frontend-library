@@ -16,6 +16,7 @@ const source = {
 class Thumb extends Component {
   static propTypes = {
     asset: PropTypes.instanceOf(Asset).isRequired,
+    protocol: PropTypes.string,
     host: PropTypes.string,
     dim: PropTypes.object.isRequired,
     selected: PropTypes.bool,
@@ -25,7 +26,7 @@ class Thumb extends Component {
   }
 
   render () {
-    const { asset, host, dim, selected, onClick, onDoubleClick, dragparams } = this.props
+    const { asset, protocol, host, dim, selected, onClick, onDoubleClick, dragparams } = this.props
     if (!asset.proxies) {
       return <div className="thumb" style={{ backgroundColor: asset.backgroundColor() }} />
     }
@@ -34,7 +35,7 @@ class Thumb extends Component {
       <div
         className='assets-thumb'
         style={{
-          'backgroundImage': `url(${proxy.url(host)})`,
+          'backgroundImage': `url(${proxy.url(protocol, host)})`,
           'backgroundSize': 'cover',
           'width': dim.width,
           'height': dim.height,
@@ -51,5 +52,6 @@ class Thumb extends Component {
 }
 
 export default connect(state => ({
+  protocol: state.auth.protocol,
   host: state.auth.host
 }))(Thumb)
