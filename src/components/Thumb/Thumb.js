@@ -12,6 +12,8 @@ const source = {
   }
 }
 
+let ThumbCache = new Set()
+
 @DragSource('FOLDER', source)
 class Thumb extends Component {
   static propTypes = {
@@ -25,6 +27,13 @@ class Thumb extends Component {
     index: PropTypes.number.isRequired
   }
 
+  loadImage (thumbURL) {
+    const thumb = document.getElementsByClassName(this.thumbClass)[0]
+    if (thumb) thumb.style['background-image'] = `url(${thumbURL})`
+    this.loadTimer = null
+    ThumbCache.add(thumbURL)
+  }
+
   componentWillMount () {
     const { asset, host, dim, index } = this.props
     this.proxy = asset.closestProxy(dim.width, dim.height)
@@ -36,11 +45,8 @@ class Thumb extends Component {
     // 15ms per image seemed about right in Chrome to balance
     // seeing the color swatch for the longest possible time,
     // without overall load taking longer.
-    this.loadTimer = setTimeout(_ => {
-      const thumb = document.getElementsByClassName(this.thumbClass)[0]
-      if (thumb) thumb.style['background-image'] = `url(${thumbURL})`
-      this.loadTimer = null
-    }, Math.round(index * 15))
+    const delay = (ThumbCache.has(thumbURL)) ? 0 : 250 + index * 15 // NB: we do need the delay 0 (our div doesn't yet exist)
+    this.loadTimer = setTimeout(this.loadImage.bind(this, thumbURL), delay)
   }
 
   componentWillUnmount () {
