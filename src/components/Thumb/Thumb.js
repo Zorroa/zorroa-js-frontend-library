@@ -25,28 +25,39 @@ class Thumb extends Component {
     index: PropTypes.number.isRequired
   }
 
+  componentWillMount () {
+    const { asset, host, dim, index } = this.props
+    this.proxy = asset.closestProxy(dim.width, dim.height)
+    const thumbURL = this.proxy.url(host)
+    this.thumbClass = `assets-thumb-${thumbURL}`
+
+    // Delay the image load by a small amount, in order to show images loading in order.
+    // (Otherwise browsers will decide for us, and you won't like it)
+    // 15ms per image seemed about right in Chrome to balance
+    // seeing the color swatch for the longest possible time,
+    // without overall load taking longer.
+    this.loadTimer = setTimeout(_ => {
+      const thumb = document.getElementsByClassName(this.thumbClass)[0]
+      if (thumb) thumb.style['background-image'] = `url(${thumbURL})`
+      this.loadTimer = null
+    }, Math.round(index * 15))
+  }
+
+  componentWillUnmount () {
+    // if we started a load timer in render() that hasn't finished, cancel it
+    if (this.loadTimer) clearTimeout(this.loadTimer)
+  }
+
   render () {
-    const { asset, host, dim, selected, onClick, onDoubleClick, dragparams, index } = this.props
+    const { asset, dim, selected, onClick, onDoubleClick, dragparams } = this.props
     if (!asset.proxies) {
       return <div className="thumb" style={{ backgroundColor: asset.backgroundColor() }} />
     }
-    const proxy = asset.closestProxy(dim.width, dim.height)
-    const thumbURL = proxy.url(host)
-    const thumbClass = `assets-thumb-${thumbURL}`
-
-    setTimeout(_ => {
-      const thumb = document.getElementsByClassName(thumbClass)[0]
-      if (thumb) {
-        thumb.style['background-image'] = `url(${thumbURL})`
-      }
-    }, Math.round(index * 15))
 
     const tproxy = asset.tinyProxy()
-    const proxySvgUrl = `<svg viewBox="0 0 1 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><rect x="0" y="0" height="1" width="1" style="fill:${tproxy[4]}"/></svg>`
-    const proxyDataURL = `url(data:image/svg+xml,${encodeURIComponent(proxySvgUrl)})`
 
-    const thumbStyle={
-      'backgroundImage': proxyDataURL,
+    const thumbStyle = {
+      'backgroundColor': tproxy[4],
       'backgroundSize': 'cover',
       'width': dim.width,
       'height': dim.height,
@@ -57,7 +68,7 @@ class Thumb extends Component {
 
     return (
       <div
-        className={`assets-thumb ${thumbClass}`}
+        className={`assets-thumb ${this.thumbClass}`}
         style={thumbStyle}
         onDoubleClick={onDoubleClick}
         onClick={onClick}
