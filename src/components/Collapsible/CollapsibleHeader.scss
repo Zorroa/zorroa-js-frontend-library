@@ -20,12 +20,16 @@
 .CollapsibleHeader-select {
   padding: 5px;
   padding-left: 10px;
+
+  // reset padding when iconified so the icon can center
+  &.isIconified {
+    padding: 5px;
+  }
 }
 
 .CollapsibleHeader-icon {
   margin-right: 14px;
   padding-bottom: 3px;
-
   &.isIconified {
     margin-right: 0;
   }
@@ -44,4 +48,10 @@
   width: 16px;
   min-width: 16px;
   max-width: 16px;
+
+  // icon-chevron-down doesn't line up exactly when rotated, so adjust
+  &.isOpen {
+    transform: rotate(180deg);
+    transform-origin: 44% 50%;
+  }
 }
