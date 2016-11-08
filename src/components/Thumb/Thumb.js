@@ -21,20 +21,31 @@ class Thumb extends Component {
     selected: PropTypes.bool,
     onClick: PropTypes.func.isRequired,
     onDoubleClick: PropTypes.func.isRequired,
-    dragparams: PropTypes.object
+    dragparams: PropTypes.object,
+    index: PropTypes.number.isRequired
   }
 
   render () {
-    const { asset, host, dim, selected, onClick, onDoubleClick, dragparams } = this.props
+    const { asset, host, dim, selected, onClick, onDoubleClick, dragparams, index } = this.props
     if (!asset.proxies) {
       return <div className="thumb" style={{ backgroundColor: asset.backgroundColor() }} />
     }
     const proxy = asset.closestProxy(dim.width, dim.height)
+    const thumbURL = proxy.url(host)
+    const thumbClass = `assets-thumb-${thumbURL}`
+
+    setTimeout(_ => {
+      const thumb = document.getElementsByClassName(thumbClass)[0]
+      if (thumb) thumb.style['background-image'] = `url(${thumbURL})`
+    }, Math.round(index * 15))
+
+    var file = require('./loading.gif')
+
     return (
       <div
-        className='assets-thumb'
+        className={`assets-thumb ${thumbClass}`}
         style={{
-          'backgroundImage': `url(${proxy.url(host)})`,
+          'backgroundImage': `url(${file})`,
           'backgroundSize': 'cover',
           'width': dim.width,
           'height': dim.height,
