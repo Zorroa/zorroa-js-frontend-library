@@ -12,7 +12,7 @@ import ReduxPromise from 'redux-promise'
 
 import routes from './routes'
 import reducers from './reducers'
-import { USER_ITEM, HOST_ITEM } from './constants/localStorageItems'
+import { USER_ITEM, HOST_ITEM, PROTOCOL_ITEM } from './constants/localStorageItems'
 import { validateUser } from './actions/authAction'
 import User from './models/User'
 
@@ -47,8 +47,9 @@ console.log('loading token')
 const userItem = JSON.parse(localStorage.getItem(USER_ITEM))
 const user = userItem ? new User(userItem) : null
 const host = DEBUG ? localStorage.getItem(HOST_ITEM) : undefined
+const protocol = DEBUG ? localStorage.getItem(PROTOCOL_ITEM) : undefined
 if (user && host) {
-  store.dispatch(validateUser(user, host))
+  store.dispatch(validateUser(user, protocol, host))
 }
 
 log('creating dom node')

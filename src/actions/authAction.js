@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { browserHistory } from 'react-router'
 import { AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR } from '../constants/actionTypes'
-import { USER_ITEM, HOST_ITEM } from '../constants/localStorageItems'
+import { USER_ITEM, HOST_ITEM, PROTOCOL_ITEM } from '../constants/localStorageItems'
 
 import User from '../models/User'
 
@@ -12,10 +12,12 @@ var archivist
 // Create the global axios connection, on login or refresh.
 // Note this is not an action creator, so it should probably
 // be in another file, but we need access to archivist global.
-export function createArchivist (dispatch, host) {
+export function createArchivist (dispatch, protocol, host) {
   // Set the default protocol for development.
   // Change or provide a UI to set it for development testing.
-  let protocol = 'http:'
+  if (!protocol) {
+    protocol = 'http:'
+  }
   if (!host || PROD) {
     host = window.location.hostname
     protocol = window.location.protocol
@@ -28,6 +30,7 @@ export function createArchivist (dispatch, host) {
   dispatch({ type: AUTH_HOST, payload: {host, protocol} })
   if (DEBUG) {
     localStorage.setItem(HOST_ITEM, host)
+    localStorage.setItem(PROTOCOL_ITEM, protocol)
   }
 }
 
@@ -36,13 +39,13 @@ export function getArchivist () {
   return archivist
 }
 
-export function validateUser (user, host) {
+export function validateUser (user, protocol, host) {
   return dispatch => {
     // Set the user state for the login form, but authenticated=false if user.id < 0
     dispatch({type: AUTH_USER, payload: user})
 
     // Create a new archivist, if needed for a new host
-    createArchivist(dispatch, host)
+    createArchivist(dispatch, protocol, host)
     if (user.id > 0) {
       archivist.get('/api/v1/users/' + user.id)
         .then(response => {
@@ -62,11 +65,11 @@ export function validateUser (user, host) {
   }
 }
 
-export function signinUser ({ username, password, host }) {
+export function signinUser ({ username, password, protocol, host }) {
   // Submit username+password to server
   return dispatch => {
     // Create a new archivist, if needed for a new host
-    createArchivist(dispatch, host)
+    createArchivist(dispatch, protocol, host)
     archivist.post('/api/v1/login', {}, {
       withCredentials: true,
       auth: { username, password }
