@@ -55,7 +55,8 @@ export default class Collapsible extends Component {
     }
 
     const { className } = this.props
-    const collapsibleClasses = classnames('Collapsible', 'flexCol', {'parent': children, open, [className]: !!className})
+    const collapsibleClasses = classnames('Collapsible', 'flexCol',
+      { isParent: children, isOpen, isIconified, [className]: !!className })
 
     return (
       <div className={collapsibleClasses} {...dropparams}>

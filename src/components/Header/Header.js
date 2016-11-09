@@ -58,7 +58,7 @@ class Header extends Component {
           <div className="header-menu">
             <DropdownMenu label={(<div><span className="icon-cog"/>&nbsp;{user.username}</div>)} rightAlign={true}>
               <div className="header-menu-item">
-                <button onClick={this.showPreferences.bind(this)}>Preferences</button>
+                <button className='dropdown-button' onClick={this.showPreferences.bind(this)}>Preferences</button>
               </div>
               <div className="header-menu-separator" />
               <Link className="header-menu-item" to="/signout">Logout</Link>

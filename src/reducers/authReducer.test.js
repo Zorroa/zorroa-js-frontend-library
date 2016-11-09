@@ -15,8 +15,9 @@ describe('authReducer', () => {
   })
 
   it('AUTH_HOST sets host', () => {
-    expect(authReducer([], { type: AUTH_HOST, payload: 'localhost' }))
-      .toEqual({ host: 'localhost' })
+    const payload = { host: 'localhost', protocol: 'piglatin' }
+    expect(authReducer([], { type: AUTH_HOST, payload }))
+      .toEqual(payload)
   })
 
   it('AUTH_ERROR sets message', () => {

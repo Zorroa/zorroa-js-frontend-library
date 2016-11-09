@@ -3,6 +3,9 @@
 // Give all children FolderItems some indentation, but not the top-level FolderItem
 .Collapsible .FolderItem {
   margin-left: 16px;
+  .CollapsibleHeader {
+    height: 30px;
+  }
 }
 
 .FolderItem {
@@ -11,49 +14,7 @@
   }
 
   .CollapsibleHeader {
-    @include nowrap;
-    height: 40px;
-    text-transform: uppercase;
-    font-weight: 100;
-    overflow: hidden;
-
-    color: $zorroa-gray;
-    background-color: #d8d8d8;
-    &.isSelected {
-      color: white;
-      background-color: $zorroa-water-blue;
-    }
-
     & > *:hover { background-color: darken(#d8d8d8, 15%); }
     &.isSelected > *:hover { background-color: darken($zorroa-water-blue, 15%); }
-  }
-
-  .CollapsibleHeader-select {
-    padding: 5px;
-    padding-left: 10px;
-  }
-
-  .CollapsibleHeader-icon {
-    margin-right: 14px;
-    padding-bottom: 3px;
-
-    &.isIconified {
-      margin-right: 0;
-    }
-  }
-
-  .CollapsibleHeader-label {
-    @include clampText;
-  }
-
-  .CollapsibleHeader-open {
-    width: 40px;
-  }
-
-  .CollapsibleHeader-caret {
-    font-size: 15px;
-    width: 16px;
-    min-width: 16px;
-    max-width: 16px;
   }
 }

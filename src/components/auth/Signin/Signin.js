@@ -15,8 +15,9 @@ class Signin extends Component {
     errorMessage: PropTypes.string
   }
 
-  handleFormSubmit ({ username, password, host }) {
-    this.props.signinUser({ username, password, host })
+  handleFormSubmit ({ username, password, ssl, host }) {
+    const protocol = ssl ? 'https:' : 'http:'
+    this.props.signinUser({ username, password, protocol, host })
   }
 
   renderAlert () {
@@ -54,6 +55,7 @@ class Signin extends Component {
             <Field name="username" label="Username" component={this.renderField} type="text" />
             <Field name="password" label="Password" component={this.renderField} type="password"/>
             { DEBUG && <Field name="host" label="Host" component={this.renderField} type="text" /> }
+            { DEBUG && <div className="auth-field"><Field name="ssl" label="SSL" component="input" type="checkbox" /><label className="auth-label">Use SSL (HTTPS) for HOST</label></div>}
             <button action="submit" disabled={pristine || submitting} className="auth-button-primary">LOGIN</button>
           </form>
           <Link className="auth-forgot" to="/signup">Forgot Password?</Link>
@@ -84,7 +86,7 @@ const form = reduxForm({
 
 export default connect(
   state => ({
-    initialValues: { host: state.auth.host, username: state.auth.user ? state.auth.user.username : null },
+    initialValues: { host: state.auth.host, username: state.auth.user ? state.auth.user.username : null, ssl: true },
     errorMessage: state.auth.error
   }), actions
 )(form(Signin))

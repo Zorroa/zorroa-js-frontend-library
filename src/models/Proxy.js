@@ -6,7 +6,7 @@ export default class Proxy {
     this.format = format
   }
 
-  url (host) {
-    return `https://${host}:8066/api/v1/ofs/${this.id}`
+  url (protocol, host) {
+    return `${protocol}//${host}:8066/api/v1/ofs/${this.id}`
   }
 }

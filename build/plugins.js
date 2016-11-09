@@ -2,8 +2,18 @@ const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const paths = require('./paths.js')
 
+function BuildFinishedOutputPlugin (options) {
+  this.apply = function (compiler) {
+    compiler.plugin('emit', function (compilation, callback) {
+      console.log(`\r${new Date().toLocaleString()} build finished`)
+      callback()
+    })
+  }
+}
+
 module.exports = function getPlugins (env) {
   let plugins = [
+    new BuildFinishedOutputPlugin({}),
     new webpack.optimize.OccurenceOrderPlugin(),
     new HtmlWebpackPlugin({
       inject: true,

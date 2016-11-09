@@ -18,6 +18,7 @@ let ThumbCache = new Set()
 class Thumb extends Component {
   static propTypes = {
     asset: PropTypes.instanceOf(Asset).isRequired,
+    protocol: PropTypes.string,
     host: PropTypes.string,
     dim: PropTypes.object.isRequired,
     selected: PropTypes.bool,
@@ -35,9 +36,9 @@ class Thumb extends Component {
   }
 
   componentWillMount () {
-    const { asset, host, dim, index } = this.props
+    const { asset, protocol, host, dim, index } = this.props
     this.proxy = asset.closestProxy(dim.width, dim.height)
-    const thumbURL = this.proxy.url(host)
+    const thumbURL = this.proxy.url(protocol, host)
     this.thumbClass = `assets-thumb-${thumbURL}`
 
     // Delay the image load by a small amount, in order to show images loading in order.
@@ -85,5 +86,6 @@ class Thumb extends Component {
 }
 
 export default connect(state => ({
+  protocol: state.auth.protocol,
   host: state.auth.host
 }))(Thumb)
