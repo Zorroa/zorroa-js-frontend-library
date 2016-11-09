@@ -138,6 +138,7 @@ class Assets extends Component {
                 { assets.map((asset, index) => (
                   <Thumb selected={selectedIds && selectedIds.has(asset.id)}
                     dim={positions[index]}
+                    index={index}
                     key={asset.id}
                     asset={asset}
                     onClick={this.select.bind(this, asset)}
