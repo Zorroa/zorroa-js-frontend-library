@@ -14,19 +14,19 @@ class Searcher extends Component {
     query: PropTypes.instanceOf(AssetSearch),
     pageSize: PropTypes.number.isRequired,
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
-    selectedFolders: PropTypes.object,
+    selectedFolderIds: PropTypes.object,
     actions: PropTypes.object.isRequired
   }
 
   render () {
-    const { widgets, actions, selectedFolders, query, pageSize } = this.props
+    const { widgets, actions, selectedFolderIds, query, pageSize } = this.props
     let assetSearch = new AssetSearch()
     for (let widget of widgets) {
       assetSearch.merge(widget.sliver)
     }
 
-    if (selectedFolders && selectedFolders.size) {
-      const filter = new AssetFilter({links: {folder: [...selectedFolders]}})
+    if (selectedFolderIds && selectedFolderIds.size) {
+      const filter = new AssetFilter({links: {folder: [...selectedFolderIds]}})
       assetSearch.merge(new AssetSearch({filter}))
     }
 
@@ -48,7 +48,7 @@ const mapStateToProps = state => ({
   query: state.assets.query,
   pageSize: state.assets.pageSize,
   widgets: state.racetrack.widgets,
-  selectedFolders: state.folders.selectedIds
+  selectedFolderIds: state.folders.selectedFolderIds
 })
 
 export default connect(

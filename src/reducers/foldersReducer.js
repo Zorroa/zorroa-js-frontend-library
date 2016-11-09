@@ -1,102 +1,93 @@
-import { GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, DELETE_FOLDER } from '../constants/actionTypes'
+import { GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, DELETE_FOLDER, TOGGLE_FOLDER } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import * as assert from 'assert'
 
 // Folders are stored in the all map indexed by id.
 // Each entry in the map is a Folder object.
-// A "children" field is added if the folder has children.
+// A "childIds" field is added if the folder has children.
 
-const browsing = new Folder({ id: -1, name: 'Browsing', dyhiRoot: true })
-const collections = new Folder({ id: -2, name: 'Collections' })
-const smart = new Folder({ id: -3, name: 'Smart Collections' })
-const simple = new Folder({ id: -4, name: 'Simple Collections' })
-export const initialState = {
-  all: new Map([
-    [browsing.id, browsing],
-    [collections.id, collections],
-    [smart.id, smart],
-    [simple.id, simple]
-  ])
-}
+const root = new Folder({ id: Folder.ROOT_ID, name: 'Root' })
+
+export var createInitialState = () => ({
+  // Folder model data from the server
+  all: new Map([[ root.id, root ]]),
+
+  // a set of folder ids. items in the set are "open", meaning visible & un-collapsed in the UI
+  openFolderIds : new Set([Folder.ROOT_ID]),
+
+  // a set of folder ids, indicating which folders are user-selected
+  selectedFolderIds : new Set()
+})
+export const initialState = createInitialState()
 
 export default function (state = initialState, action) {
   switch (action.type) {
+    case TOGGLE_FOLDER:
+      const { folderId, isOpen } = action.payload
+      assert.ok(folderId >= Folder.ROOT_ID)
+      let openFolderIds = new Set(state.openFolderIds)
+      openFolderIds[ isOpen ? 'add' : 'delete' ](folderId)
+      return { ...state, openFolderIds }
+
     case GET_FOLDER_CHILDREN:
-      const folders = action.payload
-      if (folders && folders.length) {
-        let updatedFolders = new Map(state.all)
-        folders.map(folder => {       // Add to top-level map
-          updatedFolders.set(folder.id, folder)
+      const { parentId, children } = action.payload
+      if (children) {
+        let all = new Map(state.all) // copy previous state
+
+        // Add children to app state, preserve existing grandchildren
+        children.forEach(child => {
+          const prevChild = all.get(child.id)
+          if (prevChild && prevChild.childIds && !child.childIds) {
+            child.childIds = new Set(prevChild.childIds)
+          }
+          all.set(child.id, child)
         })
-        const parentId = folders[0].parentId
-        if (parentId) {
-          let parent = state.all.get(folders[0].parentId)
+
+        // Update parent's childIds list
+        if (parentId >= Folder.ROOT_ID) {
+          let parent = all.get(parentId)
           assert.ok(parent instanceof Folder)
-          parent.children = folders     // Add children
-          updatedFolders.set(parent.id, parent)
-        } else {
-          // Special case the root folders, splitting out dyhi
-          let dyhis = []
-          let smartKids = []
-          let simpleKids = []
-          folders.map(folder => {
-            if (folder.isDyhi()) {
-              dyhis.push(folder)
-            } else if (folder.search) {
-              smartKids.push(folder)
-            } else {
-              simpleKids.push(folder)
-            }
-          })
-          browsing.children = dyhis
-          smart.children = smartKids
-          simple.children = simpleKids
-          collections.children = [ simple, smart ]
-          updatedFolders.set(browsing.id, browsing)
-          updatedFolders.set(collections.id, collections)
-          updatedFolders.set(smart.id, smart)
-          updatedFolders.set(simple.id, simple)
+          // Add children
+          parent.childIds = new Set(children.map(child => child.id))
+          all.set(parent.id, parent)
         }
-        return {...state, all: updatedFolders}
+
+        return { ...state, all }
       }
       break
+
     case SELECT_FOLDERS:
-      return { ...state, selectedIds: action.payload }
+      return { ...state, selectedFolderIds: action.payload }
+
     case CREATE_FOLDER:
       const folder = action.payload
       if (folder.id) {
         let all = new Map(state.all)
         all.set(folder.id, folder)
         const parent = state.all.get(folder.parentId)
-        let mom = new Folder(parent)
-        if (mom.children) {
-          mom.children = [ ...mom.children, folder ]
-        } else {
-          mom.children = [folder]
-        }
-        all.set(mom.id, mom)
+        console.log('CREATE_FOLDER', 'folder.id', folder.id, 'folder.parentId', folder.parentId)
+        if (!parent.childIds) parent.childIds = new Set()
+        parent.childIds.add(folder.id)
+        all.set(parent.id, parent)
         return { ...state, all }
       }
       break
+
     case DELETE_FOLDER:
       const id = action.payload
       if (id) {
         let all = new Map(state.all)
+        let openFolderIds = new Set(state.openFolderIds)
+        let selectedFolderIds = new Set(state.selectedFolderIds)
         const folder = state.all.get(id)
         if (folder) {
           const parent = state.all.get(folder.parentId)
-          let mom = new Folder(parent)
-          if (parent.children) {
-            const index = parent.children.findIndex(folder => (folder.id === id))
-            if (index >= 0) {
-              mom.children = [ ...parent.children ]
-              mom.children.splice(index, 1)
-              all.set(mom.id, mom)
-            }
-          }
+          if (parent.childIds) parent.childIds.delete(folder.id)
+          all.delete(id)
+          openFolderIds.delete(id)
+          selectedFolderIds.delete(id)
         }
-        all.delete(id)
-        return { ...state, all }
+        return { ...state, all, openFolderIds, selectedFolderIds }
       }
       break
   }

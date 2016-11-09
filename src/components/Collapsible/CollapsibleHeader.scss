@@ -18,6 +18,7 @@
 }
 
 .CollapsibleHeader-select {
+  @include clampText;
   padding: 5px;
   padding-left: 10px;
 
@@ -25,6 +26,8 @@
   &.isIconified {
     padding: 5px;
   }
+  &:hover { background-color: darken(#d8d8d8, 15%); }
+  &.isSelected { background-color: $zorroa-water-blue; }
 }
 
 .CollapsibleHeader-icon {
@@ -41,6 +44,8 @@
 
 .CollapsibleHeader-open {
   width: 40px;
+  &:hover { background-color: darken(#d8d8d8, 15%); }
+  &.isSelected { background-color: $zorroa-water-blue; }
 }
 
 .CollapsibleHeader-caret {

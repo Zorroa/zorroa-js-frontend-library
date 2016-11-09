@@ -1,4 +1,4 @@
-import { MODAL, ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR } from '../constants/actionTypes'
+import { MODAL, ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE } from '../constants/actionTypes'
 
 export function updateModal ({title, footer, content}) {
   return {
@@ -20,3 +20,11 @@ export function iconifyRightSidebar (isIconified) {
     payload: isIconified
   }
 }
+
+export function toggleCollapsible (collapsibleName, isOpen) {
+  return {
+    type: TOGGLE_COLLAPSIBLE,
+    payload: { collapsibleName, isOpen }
+  }
+}
+

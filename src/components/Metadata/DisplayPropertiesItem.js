@@ -1,14 +1,25 @@
 import React, { Component, PropTypes } from 'react'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import * as assert from 'assert'
 
 import DisplayProperties from '../../models/DisplayProperties'
 import Collapsible from '../Collapsible'
+import { toggleCollapsible } from '../../actions/appActions'
 
-export default class DisplayPropertiesItem extends Component {
+class DisplayPropertiesItem extends Component {
   static propTypes = {
+    // input props
     field: PropTypes.string.isRequired,
     displayProperties: PropTypes.instanceOf(DisplayProperties).isRequired,
     selectedAssets: PropTypes.object,
-    isIconified: PropTypes.bool.isRequired
+    isIconified: PropTypes.bool.isRequired,
+
+    // connect props
+    actions: PropTypes.object.isRequired,
+
+    // state props
+    app: PropTypes.object.isRequired
   }
 
   value () {
@@ -28,23 +39,33 @@ export default class DisplayPropertiesItem extends Component {
     return value
   }
 
+  static validCollapsibleNames = new Set(['source', 'proxies', 'proxies.proxies'])
+  toggleCollapsible = (name) => {
+    assert.ok(DisplayPropertiesItem.validCollapsibleNames.has(name))
+    const { actions, app } = this.props
+    actions.toggleCollapsible(name, !app.collapsibleOpen[name])
+  }
+
   render () {
-    const { field, selectedAssets, displayProperties, isIconified } = this.props
+    const { app, field, selectedAssets, displayProperties, isIconified } = this.props
     if (displayProperties.children && displayProperties.children.length) {
       return (
         <Collapsible className='DisplayPropertiesItem'
                      style={{marginLeft: '16px'}}
-                     isOpenKey={`DisplayPropertiesItem|${field}`}
+                     isOpen={app.collapsibleOpen[field]}
                      isIconified={isIconified}
-                     openIcon="icon-register"
                      closeIcon="icon-register"
                      header={(<span>{displayProperties.name}</span>)}
+                     onOpen={this.toggleCollapsible.bind(this, field)}
                      >
           { displayProperties.children.map(child => (
-            <DisplayPropertiesItem field={`${field}.${child.name}`}
-                                   selectedAssets={selectedAssets}
-                                   isIconified={isIconified}
-                                   key={child.name} displayProperties={child} />
+            <DisplayPropertiesItemContainer
+              field={`${field}.${child.name}`}
+              selectedAssets={selectedAssets}
+              isIconified={isIconified}
+              key={child.name}
+              displayProperties={child}
+            />
           ))}
         </Collapsible>
       )
@@ -62,3 +83,11 @@ export default class DisplayPropertiesItem extends Component {
     )
   }
 }
+
+const DisplayPropertiesItemContainer = connect(state => ({
+  app: state.app
+}), dispatch => ({
+  actions: bindActionCreators({ toggleCollapsible }, dispatch)
+}))(DisplayPropertiesItem)
+
+export default DisplayPropertiesItemContainer

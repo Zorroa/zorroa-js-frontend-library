@@ -176,3 +176,6 @@ $zorroa-Sidebar-width : 340px;
   @include flexAlignItemsCenter;
   @include flexJustifyCenter;
 }
+
+@mixin fullWidth { width  : 100%; max-width: 100%; }
+@mixin fullHeight { height : 100%; }

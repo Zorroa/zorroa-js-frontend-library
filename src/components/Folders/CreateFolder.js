@@ -6,9 +6,15 @@ import { createFolder } from '../../actions/folderAction'
 
 class CreateFolder extends Component {
   static propTypes = {
-    isIconified: PropTypes.bool.isRequired,
     parentId: PropTypes.number,
     actions: PropTypes.object.isRequired
+  }
+
+  constructor (props) {
+    super(props)
+
+    // be careful to allow a parent id of 0 (Folder.ROOT_ID)
+    this.parentIdValid = (typeof props.parentId === 'number') && (props.parentId >= 0)
   }
 
   state = { name: '', showForm: false }
@@ -18,7 +24,7 @@ class CreateFolder extends Component {
   }
 
   submitName (event) {
-    if (event.key === 'Enter' && this.state.name && this.state.name.length && this.props.parentId) {
+    if (event.key === 'Enter' && this.state.name && this.state.name.length && this.parentIdValid) {
       this.props.actions.createFolder(this.state.name, this.props.parentId)
       this.hideForm(event)
     } else if (event.key === 'Escape') {
@@ -37,8 +43,8 @@ class CreateFolder extends Component {
   render () {
     return (
       <div className="CreateFolder flexRow flexAlignItemsCenter">
-        <button disabled={!this.props.parentId} onClick={this.showForm.bind(this)}><span className="icon-plus-square"/>&nbsp;New Folder</button>
-        { this.state.showForm && this.props.parentId && (
+        <button disabled={!this.parentIdValid} onClick={this.showForm.bind(this)}><span className="icon-plus-square"/>&nbsp;New</button>
+        { this.state.showForm && this.parentIdValid && (
           <div>
             <div className="CreateFolder-background" />
             <div className="CreateFolder-form flexRow flexAlignItemsCenter">
