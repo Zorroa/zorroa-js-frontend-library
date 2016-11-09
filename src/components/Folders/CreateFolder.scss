@@ -1,0 +1,41 @@
+@import '../../styles/core-mixins.scss';
+
+.CreateFolder {
+  .CreateFolder-form {
+    position: absolute;
+    padding: 1em 4px 1em 10px;
+    margin: 0;
+    background-color: $zorroa-nearwhite;
+    z-index: 1001;
+    border-radius: 3px;
+    border: 1px solid $zorroa-darkgray;
+    box-shadow: 10px 10px 32px -10px rgba(1,0,0,0.75);
+
+    button {
+      margin: 0 4px 0 8px;
+      padding: 0;
+    }
+
+    input {
+      font-size: 14px;
+      margin-left: 12px;
+      padding: 4px;
+      background: none;
+      border: 2px solid $zorroa-lightgray;
+      border-radius: 3px;
+      height: 40px;
+      width: 200px;
+    }
+  }
+}
+
+.CreateFolder-background {
+  background-color: rgba(0,0,0, .5);
+  box-sizing: border-box;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  z-index: 1000;
+}
