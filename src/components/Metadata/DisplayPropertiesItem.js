@@ -6,6 +6,7 @@ import * as assert from 'assert'
 import DisplayProperties from '../../models/DisplayProperties'
 import Collapsible from '../Collapsible'
 import { toggleCollapsible } from '../../actions/appActions'
+import { unCamelCase } from '../../services/jsUtil'
 
 class DisplayPropertiesItem extends Component {
   static propTypes = {
@@ -39,9 +40,7 @@ class DisplayPropertiesItem extends Component {
     return value
   }
 
-  static validCollapsibleNames = new Set(['source', 'proxies', 'proxies.proxies'])
   toggleCollapsible = (name) => {
-    assert.ok(DisplayPropertiesItem.validCollapsibleNames.has(name))
     const { actions, app } = this.props
     actions.toggleCollapsible(name, !app.collapsibleOpen[name])
   }
@@ -72,11 +71,12 @@ class DisplayPropertiesItem extends Component {
     }
 
     return (
-      <div style={{marginLeft: '40px'}}>
-        <div style={{width: '64px'}}>
-          {displayProperties.name}
+      <div className="DisplayPropertiesItem flexRow">
+        <div className="DisplayPropertiesItem label">
+          {unCamelCase(displayProperties.name)}
         </div>
-        <div style={{marginLeft: '12px'}}>
+        <div className="DisplayPropertiesItem search icon-binoculars" />
+        <div className="DisplayPropertiesItem value">
           {this.value()}
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { MODAL, ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE } from '../constants/actionTypes'
+import { MODAL, ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE, METADATA_FIELDS, TABLE_FIELDS } from '../constants/actionTypes'
 
 export function updateModal ({title, footer, content}) {
   return {
@@ -28,3 +28,16 @@ export function toggleCollapsible (collapsibleName, isOpen) {
   }
 }
 
+export function updateMetadataFields (fields) {
+  return ({
+    type: METADATA_FIELDS,
+    payload: fields
+  })
+}
+
+export function updateTableFields (fields) {
+  return ({
+    type: TABLE_FIELDS,
+    payload: fields
+  })
+}

@@ -1,0 +1,36 @@
+@import '../../styles/core-mixins.scss';
+
+.DisplayPropertiesItem {
+  margin-left: 8px;
+  font-size: 12px;
+  line-height: 2em;
+
+  &.label {
+    margin-left: 4px;
+    width: 120px;
+    min-width: 120px;
+    text-align: right;
+    color: $zorroa-gray;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &.value {
+    margin-left: 6px;
+    padding-left: 6px;
+    text-align: left;
+    max-width: 164px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &.search {
+    font-size: 10px;
+    margin-left: 8px;
+    margin-right: 8px;
+    margin-top: 7px;          // ick, match bottom text line for 12pt above?
+    color: $zorroa-light-green;
+  }
+}

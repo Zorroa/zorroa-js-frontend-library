@@ -17,6 +17,12 @@
     font-size: 20px;
   }
 
+  .Facet-header {
+    flex-shrink: 1;
+    span {
+    }
+  }
+
   .Facet-body {
     padding: 10px;
   }
@@ -43,6 +49,77 @@
 
   .Facet-value-range {
     flex: 1;
+  }
+
+  .Facet-value-table {
+    width: 100%;
+    max-width: 100%;
+    max-height: 300px;
+    border-bottom: 1px solid #aaa;
+    border-spacing: 0;
+    padding: 2px 0 2px 2px;
+    overflow: hidden;
+    overflow-y: auto;
+
+  }
+
+  // Custom scrollbar styles from Amber
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  table {
+    width: 100%;
+    border: 0;
+    border-spacing: 0;
+  }
+
+  th, td {
+    padding: 8px;
+    max-width: 0; // This looks weird, but is important! It allows cells to chop content
+    @include clampText;
+  }
+
+  .assets-table-header {
+    text-align: left;
+    //width: 40%;
+  }
+
+  .assets-table-row {
+    text-align: left;
+    //width: 60%;
+  }
+
+  .asset-table-settings {
+    width: 24px;
+    color: $zorroa-gray;
+  }
+
+  tr {
+    color: $zorroa-greyish-brown;
+  }
+
+  td:last-child {
+    text-align: right;
+    width: 60px;
+  }
+
+  tr:nth-child(odd) {
+    background-color: $zorroa-nearwhite;
+  }
+
+  thead tr td {
+    font-size: 12px;
+    text-transform: uppercase;
+    font-stretch: condensed;
+    line-height: 1;
+    color: $zorroa-gray;
+    background-color: white;
+  }
+
+  tbody tr:hover {
+    color: white;
+    background-color: $zorroa-sickly-green;
   }
 
   .Facet-controls {

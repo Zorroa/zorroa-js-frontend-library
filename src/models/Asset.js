@@ -40,6 +40,17 @@ export default class Asset {
     return bestProxy
   }
 
+  static lastNamespace (field) {
+    if (field && field.length) {
+      const namespaces = field.split('.')
+      let index = namespaces.length - 1
+      if (namespaces[index] === 'raw' && index > 0) {
+        index -= 1
+      }
+      return namespaces[index]
+    }
+  }
+
   // Return the value for a metadata field specified using dot-notation
   // as a path through the JSON-structured asset document. Recursively
   // invokes _field to navigate through the JSON and then uses

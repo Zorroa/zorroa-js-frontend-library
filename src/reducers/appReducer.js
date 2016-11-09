@@ -1,4 +1,4 @@
-import { MODAL, ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE } from '../constants/actionTypes'
+import { MODAL, ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE, METADATA_FIELDS, TABLE_FIELDS } from '../constants/actionTypes'
 
 const initialState = {
   modal: {},
@@ -14,6 +14,8 @@ const initialState = {
     proxies: false,
     'proxies.proxies': false
   }
+  metadataFields: [ 'source.filename', 'source.date', 'source.fileSize' ],
+  tableFields: [ 'source.filename', 'source.date', 'source.fileSize' ]
 }
 
 export default function app (state = initialState, action) {
@@ -40,6 +42,10 @@ export default function app (state = initialState, action) {
         ...state,
         collapsibleOpen: { ...collapsibleOpen, [collapsibleName]: isOpen }
       }
+    case METADATA_FIELDS:
+      return { ...state, metadataFields: action.payload }
+    case TABLE_FIELDS:
+      return { ...state, tableFields: action.payload }
     default:
       return state
   }

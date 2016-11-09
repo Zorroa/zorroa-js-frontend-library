@@ -12,7 +12,7 @@
   max-width: 100%;
   border-bottom: 1px solid #aaa;
   border-spacing: 0;
-  padding: 2px 8px 2px 2px;
+  padding: 2px 0 2px 2px;
 
   th, td {
     padding: 8px;
@@ -20,17 +20,36 @@
     @include clampText;
   }
 
-  /* TODO: column widths will be handled in code, and they must sum to 100% */
-  .assets-table-col-id     { text-align: left; width: 40%; }
-  .assets-table-col-source { text-align: left; width: 60%; }
+  .assets-table-header {
+    text-align: left;
+    //width: 40%;
+  }
+
+  .assets-table-row {
+    text-align: left;
+    //width: 60%;
+  }
+
+  .asset-table-settings {
+    width: 24px;
+    color: $zorroa-gray;
+  }
 
   tr {
+    color: $zorroa-greyish-brown;
     height: 30px;
   }
+
   thead,tr:nth-child(even) {
     background-color: white;
   }
+
+  thead th {
+    color: $zorroa-gray;
+  }
+
   tbody tr:hover {
+    color: white;
     background-color: $zorroa-sickly-green;
   }
 }
