@@ -1,6 +1,15 @@
 import React, { Component, PropTypes } from 'react'
 import { DropTarget } from '../../services/DragDrop'
 import classnames from 'classnames'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+
+import { selectFolderIds, addAssetIdsToFolderId } from '../../actions/folderAction'
+
+// Recursively renders folder children as Collapsible elements.
+// Loads children of displayed items on-demand to display open caret.
+
+// BUG! DnD target events are never invoked!
 
 const target = {
   dragOver (props, type, se) {
@@ -8,18 +17,17 @@ const target = {
   },
   drop (props, type, se) {
     se.preventDefault()
-    // const data = se.dataTransfer.getData('text/plain')
-
-    // // allows us to match drop targets to drag sources
-    // if (data === type) {
-    //   console.log(props.selectedAssetIds)
-    //   // props.dispatch()
-    // }
+    // allows us to match drop targets to drag sources
+    const data = se.dataTransfer.getData('text/plain')
+    if (data === type) {
+      console.log('Drop ' + props.selectedAssetIds + ' on ' + props.folderId)
+      props.actions.addAssetIdsToFolderId([...props.selectedAssetIds], props.folderId)
+    }
   }
 }
 
 @DropTarget('FOLDER', target)
-export default class FolderItem extends Component {
+class FolderItem extends Component {
   static propTypes = {
     // input props
     folder: PropTypes.object.isRequired,
@@ -56,3 +64,10 @@ export default class FolderItem extends Component {
     )
   }
 }
+
+export default connect(state => ({
+  selectedAssetIds: state.assets.selectedIds,
+  selectedFolderIds: state.folders.selectedIds
+}), dispatch => ({
+  actions: bindActionCreators({ selectFolderIds, addAssetIdsToFolderId, dispatch }, dispatch)
+}))(FolderItem)

@@ -1,4 +1,4 @@
-import { GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, DELETE_FOLDER, TOGGLE_FOLDER } from '../constants/actionTypes'
+import { GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, DELETE_FOLDER, ADD_ASSETS_TO_FOLDER, TOGGLE_FOLDER } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import * as assert from 'assert'
 
@@ -89,6 +89,8 @@ export default function (state = initialState, action) {
         }
         return { ...state, all, openFolderIds, selectedFolderIds }
       }
+      break
+    case ADD_ASSETS_TO_FOLDER:
       break
   }
 
