@@ -7,6 +7,7 @@ import * as assert from 'assert'
 import Thumb from '../Thumb'
 import Asset from '../../models/Asset'
 import { isolateAssetId, selectAssetIds } from '../../actions/assetsAction'
+import { resetRacetrackWidgets } from '../../actions/racetrackAction'
 import Pager from './Pager'
 import Footer from './Footer'
 import Table from '../Table'
@@ -111,12 +112,21 @@ class Assets extends Component {
     }
   }
 
+  clearSearch () {
+    this.props.actions.resetRacetrackWidgets()
+  }
+
   renderAssets () {
     const { assets, selectedIds, totalCount } = this.props
     const { layout, thumbSize } = this.state
 
     if (!assets || !assets.length) {
-      return (<div className="assets-layout-empty">No asset proxies</div>)
+      return (
+        <div className="assets-layout-empty flexCol flexJustifyCenter flexAlignItemsCenter">
+          <div className="assets-layout-icon icon-search"/>
+          <div>No results</div>
+          <button onClick={this.clearSearch.bind(this)}>Clear Search</button>
+        </div>)
     }
 
     return (
@@ -161,7 +171,7 @@ class Assets extends Component {
       <div className="assets-container flexOff flexCol fullHeight fullWidth">
         {this.renderAssets()}
         { showTable && <Table/> }
-        { totalCount &&
+        { totalCount > 0 &&
         <Footer
           total={totalCount}
           loaded={assets.length}
@@ -182,5 +192,5 @@ export default connect(state => ({
   selectedIds: state.assets.selectedIds,
   totalCount: state.assets.totalCount
 }), dispatch => ({
-  actions: bindActionCreators({ isolateAssetId, selectAssetIds }, dispatch)
+  actions: bindActionCreators({ isolateAssetId, selectAssetIds, resetRacetrackWidgets }, dispatch)
 }))(Assets)

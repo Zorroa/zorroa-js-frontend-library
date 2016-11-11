@@ -16,6 +16,55 @@
   position: relative;
 }
 
+.assets-layout-empty {
+  font-size: 24px;
+  background-color: rgba(200,200,200,1);
+  color: transparent;
+  text-shadow: 0px 2px 3px rgba(255,255,255,0.5);
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+  background-clip: text;
+  line-height: 1.5em;
+
+  /* Copied from Racetrack.scss. Should we share? */
+  button {
+    font-size: 14pt;
+    text-transform: uppercase;
+    height: 40px;
+    padding: 0 30px;
+    margin-top: 40px;
+    font-weight: 500;
+    background-color: $zorroa-greyish-brown;
+    color: $zorroa-nearwhite;
+    border-radius: 3px;
+    border: none;
+
+    &:hover {
+      background-color: #a5a5a5;
+      color: $zorroa-nearwhite;
+      font-weight: 500;
+    }
+
+    &:active {
+      background-color: $zorroa-sickly-green;
+      color: $zorroa-nearwhite;
+      font-weight: 500;
+    }
+  }
+
+  .assets-layout-icon {
+    margin-top: 100px;
+    margin-bottom: 40px;
+    font-size: 64px;
+    background-color: rgba(200,200,200,1);
+    color: transparent;
+    text-shadow: 0px 2px 3px rgba(255,255,255,0.5);
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    background-clip: text;
+  }
+}
+
 .assets-footer {
   padding-left: 8px;
   padding-right: 8px;
