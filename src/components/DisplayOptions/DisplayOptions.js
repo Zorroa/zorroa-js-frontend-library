@@ -14,6 +14,7 @@ class DisplayOptions extends Component {
     singleSelection: PropTypes.bool,
     title: PropTypes.string.isRequired,
     syncLabel: PropTypes.string,
+    fieldTypes: PropTypes.arrayOf(PropTypes.string),
     fields: PropTypes.object,
     actions: PropTypes.object
   }
@@ -77,9 +78,12 @@ class DisplayOptions extends Component {
   // Return the field names for the specified namespace
   namesForNamespace (namespace) {
     let names = new Set()
-    const { fields } = this.props
+    const { fields, fieldTypes } = this.props
     const length = namespace ? namespace.length : 0
     for (let key in fields) {
+      if (fieldTypes && fieldTypes.indexOf(key) < 0) {
+        continue
+      }
       const typeFields = fields[key]
       for (let field of typeFields) {
         if (!length || field.startsWith(namespace)) {
@@ -136,8 +140,9 @@ class DisplayOptions extends Component {
 
   render () {
     const { openedNamespace } = this.state
-    const { title, syncLabel, singleSelection } = this.props
-    const disabled = singleSelection && this.state.checkedNamespaces.length !== 1
+    const { title, syncLabel, singleSelection, fieldTypes } = this.props
+    const names = this.namesForNamespace()
+    const disabled = (singleSelection && this.state.checkedNamespaces.length !== 1) || (!names || names.length === 0)
     const openedNamespaces = openedNamespace && openedNamespace.length ? openedNamespace.split('.') : []
     return (
       <div>
@@ -166,7 +171,17 @@ class DisplayOptions extends Component {
           </div>
           <div className="DisplayOptions-body fullWidth flexRow flexOn">
             <div className="DisplayOptions-body-col flexCol">
-              { this.namesForNamespace().map(name => (this.renderName(name))) }
+              { (names && names.length) || !fieldTypes ? (
+                names.map(name => (this.renderName(name)))
+              ) : (
+                <div className="DisplayOptions-body-empty flexCol flexAlignItemsCenter">
+                  <div className="icon-thumbs-up" />
+                  <div>No fields match the required types:</div>
+                  <div className="flexRow">
+                    { fieldTypes.map(type => (<div key={type} className="DisplayOptions-body-field-type">{type}</div>)) }
+                  </div>
+                </div>
+              ) }
             </div>
             { openedNamespaces.map((name, i) => {
               const namespace = openedNamespaces.slice(0, i + 1).join('.')
@@ -178,7 +193,7 @@ class DisplayOptions extends Component {
             })}
           </div>
           <div className="DisplayOptions-footer flexRow fullWidth flexJustifyCenter">
-            <button className={classnames('default', { disabled })} onClick={this.update.bind(this)}>Update</button>
+            <button className={classnames('default', { disabled })} onClick={!disabled && this.update.bind(this)}>Update</button>
             <button onClick={this.cancel.bind(this)}>Cancel</button>
           </div>
         </div>

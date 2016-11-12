@@ -219,6 +219,24 @@
         }
       }
     }
+
+    .DisplayOptions-body-empty {
+      color: $zorroa-lightgray;
+
+      .icon-thumbs-up {
+        transform: scaleY(-1);
+        font-size: 40px;
+        margin-top: 12px;
+        margin-bottom: 24px;
+      }
+
+      .DisplayOptions-body-field-type {
+        color: $zorroa-gray;
+        margin-top: 1em;
+        margin-left: 8px;
+        margin-right: 8px;
+      }
+    }
   }
 
   .DisplayOptions-footer {
@@ -226,6 +244,7 @@
     border-top: 1px solid $zorroa-lightgray;
     min-height: 72px;
     max-height: 72px;
+
     button {
       margin: 12px;
       padding: 12px 30px;
@@ -252,7 +271,11 @@
       }
 
       &.disabled {
-        background-color: $zorroa-lightgray
+        background-color: $zorroa-lightgray;
+
+        &:hover {
+          color: $zorroa-nearwhite;
+        }
       }
     }
   }

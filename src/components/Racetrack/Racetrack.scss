@@ -104,13 +104,20 @@
       border-radius: 2px;
       padding: 6px;
     }
+
     .Racetrack-add-SIMPLE_SEARCH {
       background-color: $zorroa-sickly-green;
       &:hover { background-color: darken($zorroa-sickly-green, 15%); }
     }
+
     .Racetrack-add-FACET {
       background-color: $zorroa-darkish-purple;
       &:hover { background-color: darken($zorroa-darkish-purple, 15%); }
+    }
+
+    .Racetrack-add-MAP {
+      background-color: $zorroa-water-blue;
+      &:hover { background-color: darken($zorroa-water-blue, 15%); }
     }
 
     .Racetrack-add-icon {

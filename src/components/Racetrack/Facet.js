@@ -36,7 +36,6 @@ class Facet extends Component {
 
   componentWillMount () {
     this.setState({ showDisplayOptions: true })
-    event.stopPropagation()
   }
 
   modifySliver (field, term) {
@@ -81,7 +80,7 @@ class Facet extends Component {
     const base = state.checkedNamespaces && state.checkedNamespaces.length && state.checkedNamespaces[0]
     if (base && base.length) {
       const field = base + '.raw'
-      this.setState({...this.state, field})
+      this.setState({ ...this.state, field })
       this.modifySliver(field)
     }
   }

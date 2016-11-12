@@ -44,10 +44,11 @@ export default class Asset {
     if (field && field.length) {
       const namespaces = field.split('.')
       let index = namespaces.length - 1
-      if (namespaces[index] === 'raw' && index > 0) {
-        index -= 1
+      let name = namespaces[index]
+      if (index > 0 && (name === 'raw' || name === 'point')) {
+        name = namespaces[index - 1]
       }
-      return namespaces[index]
+      return name
     }
   }
 
@@ -65,6 +66,9 @@ export default class Asset {
       const namespace = key.slice(0, idx)
       const nextkey = key.slice(idx + 1)
       const value = obj[namespace]
+      if (!value) {
+        return
+      }
       assert.ok(typeof value === 'object', 'non-object namespace')
       return Asset._field(value, nextkey)
     }
