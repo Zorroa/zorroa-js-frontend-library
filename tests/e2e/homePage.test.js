@@ -30,8 +30,8 @@ describe('Home Page', () => {
   it('should have a header', () => {
     driver.findElement(By.css('.header-logo'))
       .then(el => el.getAttribute('class'))
-      .then(attribute => {
-        expect(attribute).toBe('header-logo')
+      .then(attr => {
+        expect(attr).toBe('header-logo')
       })
   })
 })
