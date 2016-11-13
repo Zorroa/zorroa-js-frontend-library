@@ -6,7 +6,7 @@ $FolderItemHeight : 25px;
 .FolderItem {
   @include flexRow;
   @include flexAlignItemsCenter;
-  @linclude fullWidth;
+  @include fullWidth;
 
   height: $FolderItemHeight;
 
