@@ -2,24 +2,17 @@ import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 
 import Asset from '../../models/Asset'
-import Collapsible from '../Collapsible'
 import DisplayProperties from '../../models/DisplayProperties'
-import DisplayPropertieItem from './DisplayPropertiesItem'
+import DisplayPropertiesItem from './DisplayPropertiesItem'
 
 class Metadata extends Component {
   static propTypes = {
-    assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
-    selectedIds: PropTypes.object,
-    isIconified: PropTypes.bool.isRequired
-  }
+    // input props
+    isIconified: PropTypes.bool.isRequired,
 
-  renderHeader () {
-    return (
-      <div className='flexCenter'>
-        <span>Metadata</span>
-        <i className='Metadata-icon icon-cog'></i>
-      </div>
-    )
+    // state props
+    assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+    selectedIds: PropTypes.object
   }
 
   render () {
@@ -51,18 +44,17 @@ class Metadata extends Component {
     }
     console.log('Selected assets: ' + selectedAssets.size + ' ' + JSON.stringify(selectedAssets))
     return (
-      <Collapsible className='Metadata'
-                   header={this.renderHeader()}
-                   isIconified={this.props.isIconified}
-                   closeIcon="icon-register">
+      <div className='Metadata'>
         { fields.map(field =>
-          (<DisplayPropertieItem key={field.name}
-                                 isIconified={isIconified}
-                                 field={field.name}
-                                 selectedAssets={selectedAssets}
-                                 displayProperties={field} />))
+          (<DisplayPropertiesItem
+            key={field.name}
+            isIconified={isIconified}
+            field={field.name}
+            selectedAssets={selectedAssets}
+            displayProperties={field}
+          />))
         }
-      </Collapsible>
+      </div>
     )
   }
 }

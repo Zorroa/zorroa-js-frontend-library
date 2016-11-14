@@ -1,34 +1,41 @@
-import { GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, DELETE_FOLDER } from '../constants/actionTypes'
+import { GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, DELETE_FOLDER, TOGGLE_FOLDER } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import { getArchivist } from './authAction'
 
 const rootEndpoint = '/api/v1/folders'
 
-export function getFolderChildren (id) {
-  if (id < 0) {             // Catch "fake" folders, if used
+export function toggleFolder (folderId, isOpen) {
+  return dispatch => {
+    console.log('Toggle Folder', folderId, isOpen)
+    dispatch({
+      type: TOGGLE_FOLDER,
+      payload: { folderId, isOpen }
+    })
+  }
+}
+
+export function getFolderChildren (parentId) {
+  if (parentId < Folder.ROOT_ID) {             // Catch "fake" folders, if used
     return dispatch => {}
   }
   return dispatch => {
-    console.log('Load folder ' + id)
-    getArchivist().get(`${rootEndpoint}/${id}/_children`)
+    console.log('Load folder ' + parentId)
+    getArchivist().get(`${rootEndpoint}/${parentId}/_children`)
       .then(response => {
         const children = response.data.map(folder => (new Folder(folder)))
         dispatch({
           type: GET_FOLDER_CHILDREN,
-          payload: children
+          payload: { parentId, children }
         })
-      })
-      .catch(error => {
-        console.error('Error getting folder: ' + error)
       })
   }
 }
 
 export function selectFolderIds (ids) {
-  return ({
+  return {
     type: SELECT_FOLDERS,
     payload: ids
-  })
+  }
 }
 
 export function createFolder (name, parentId) {

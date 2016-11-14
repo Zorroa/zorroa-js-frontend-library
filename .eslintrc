@@ -28,5 +28,13 @@
     "DEBUG": true,
     "PROD": true
   },
-  "rules": {}
+  "rules": {
+    // NB: Only disabling rules that have no effect on code safety
+    "comma-spacing": 0,
+    "key-spacing": 0,
+    "no-multi-spaces": 0,
+    "no-multiple-empty-lines": 0,
+    "standard/array-bracket-even-spacing": 0,
+    "standard/object-curly-even-spacing": 0
+  }
 }

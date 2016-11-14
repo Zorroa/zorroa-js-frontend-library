@@ -8,39 +8,26 @@ export default class Collapsible extends Component {
   }
 
   static propTypes = {
-    children: PropTypes.node,
-    closeIcon: PropTypes.string,
-    dropparams: PropTypes.object,
+    // input props
     header: PropTypes.element.isRequired,
     isIconified: PropTypes.bool.isRequired,
-    isOpen: PropTypes.bool,
+    isOpen: PropTypes.bool.isRequired,
+
+    closeIcon: PropTypes.string,
+    dropparams: PropTypes.object,
     isSelected: PropTypes.bool,
     onOpen: PropTypes.func,
     onSelect: PropTypes.func,
     openIcon: PropTypes.string,
-    className: PropTypes.string
-  }
+    className: PropTypes.string,
 
-  handleClick = this.handleClick.bind(this)
-
-  constructor (props) {
-    super(props)
-    this.state = { isOpen: false }
-  }
-
-  handleClick (event) {
-    const { isOpen } = this.state
-    const { children, onOpen } = this.props
-    if (children) {
-      this.setState({ ...this.state, isOpen: !isOpen })
-    }
-    onOpen && onOpen(!isOpen)
-    return false
+    // child props
+    children: PropTypes.node
   }
 
   render () {
-    const { isOpen } = this.state
-    const { children, closeIcon, dropparams, header, isIconified, isSelected, onSelect, openIcon } = this.props
+    const { dropparams, header, isIconified, isSelected, isOpen, onOpen, onSelect } = this.props
+    const { children, openIcon, closeIcon } = this.props
 
     const CollapsibleHeaderParams = {
       closeIcon,
@@ -50,8 +37,8 @@ export default class Collapsible extends Component {
       isSelected,
       onSelect,
       openIcon,
-      isParent: children && !!children.length,
-      onOpen: this.handleClick.bind(this)
+      isParent: !!children,
+      onOpen
     }
 
     const { className } = this.props

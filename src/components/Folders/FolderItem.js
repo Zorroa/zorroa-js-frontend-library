@@ -1,13 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import { DropTarget } from '../../services/DragDrop'
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
-
-import Collapsible from '../Collapsible'
-import { selectFolderIds } from '../../actions/folderAction'
-
-// Recursively renders folder children as Collapsible elements.
-// Loads children of displayed items on-demand to display open caret.
+import classnames from 'classnames'
 
 const target = {
   dragOver (props, type, se) {
@@ -15,91 +8,52 @@ const target = {
   },
   drop (props, type, se) {
     se.preventDefault()
-    const data = se.dataTransfer.getData('text/plain')
+    // const data = se.dataTransfer.getData('text/plain')
 
-    // allows us to match drop targets to drag sources
-    if (data === type) {
-      console.log(props.selectedAssetIds)
-      // props.dispatch()
-    }
+    // // allows us to match drop targets to drag sources
+    // if (data === type) {
+    //   console.log(props.selectedAssetIds)
+    //   // props.dispatch()
+    // }
   }
 }
 
 @DropTarget('FOLDER', target)
-class FolderItem extends Component {
+export default class FolderItem extends Component {
   static propTypes = {
-    folders: PropTypes.object.isRequired,     // Can this be mapOf(Folder)?
-    folderId: PropTypes.number.isRequired,
-    isIconified: PropTypes.bool.isRequired,
-    loadChildren: PropTypes.func.isRequired,
+    // input props
+    folder: PropTypes.object.isRequired,
+    depth: PropTypes.number.isRequired,
     dropparams: PropTypes.object,
-    selectedAssetIds: PropTypes.any,
-    selectedFolderIds: PropTypes.object,
-    actions: PropTypes.object
-  }
-
-  componentWillMount () {
-    const { folderId, loadChildren } = this.props
-    loadChildren(folderId)
-  }
-
-  select (event) {
-    event.stopPropagation()
-    const { selectedFolderIds, folderId } = this.props
-    const ids = new Set(selectedFolderIds)
-    if (ids.has(folderId)) {
-      ids.delete(folderId)
-    } else {
-      ids.add(folderId)
-    }
-    this.props.actions.selectFolderIds(ids)
-  }
-
-  renderHeader (folder) {
-    return (
-      <div className='FolderItem-header fullWidth'>
-        {folder.name}
-      </div>
-    )
+    isOpen: PropTypes.bool.isRequired,
+    hasChildren: PropTypes.bool.isRequired,
+    isSelected: PropTypes.bool.isRequired,
+    onToggle: PropTypes.func,
+    onSelect: PropTypes.func
   }
 
   render () {
-    const { folders, folderId, isIconified, loadChildren, selectedFolderIds, dropparams, actions } = this.props
-    const folder = folders.get(folderId)
-    const isSelected = this.props.selectedFolderIds && this.props.selectedFolderIds.has(this.props.folderId)
-    const openIcon = folder.isDyhi() ? 'icon-cube' : 'icon-folder2'
-    const closeIcon = folder.isDyhi() ? 'icon-cube' : 'icon-folder'
-    const isParent = this.props.folders && (this.props.folders.size > 0)
-    const CollapsibleParams = {
-      closeIcon: closeIcon,
-      dropparams: dropparams,
-      header: this.renderHeader(folder),
-      isIconified: this.props.isIconified,
-      isParent: isParent,
-      isSelected: isSelected,
-      onSelect: this.select.bind(this),
-      openIcon: openIcon
-    }
-    const FolderItemParams = {
-      actions: actions,
-      folders: folders,
-      isIconified: isIconified,
-      loadChildren: loadChildren,
-      selectedFolderIds: selectedFolderIds
-    }
+    const { folder, depth, isOpen, hasChildren, isSelected, onToggle, onSelect } = this.props
+    const icon = 'icon-cube'
+    // const icon = folder.isDyhi() ? 'icon-cube' : 'icon-folder'
+
     return (
-      <Collapsible className='FolderItem' {...CollapsibleParams}>
-        { !isIconified && folder.children !== undefined && folder.children.map(child => (
-          <FolderItem key={child.id} folderId={child.id} {...FolderItemParams} />)
-        )}
-      </Collapsible>
+      <div className={classnames('FolderItem', { isOpen, hasChildren, isSelected })}
+           style={{ paddingLeft:`${(depth - 1) * 10}px` }}>
+        <div className='FolderItem-toggle'
+             onClick={event => { onToggle(folder); return false }}
+        >
+          {(hasChildren) ? <i className='FolderItem-toggleArrow icon-triangle-down'/> : null}
+        </div>
+        <div className='FolderItem-select'
+            onClick={event => { onSelect(folder); return false }}
+        >
+          <i className={`FolderItem-icon ${icon}`}/>
+          <div className='FolderItem-text' key={folder.id}>
+            {folder.name}
+          </div>
+        </div>
+      </div>
     )
   }
 }
-
-export default connect(state => ({
-  selectedAssetIds: state.assets.selectedIds,
-  selectedFolderIds: state.folders.selectedIds
-}), dispatch => ({
-  actions: bindActionCreators({ selectFolderIds, dispatch }, dispatch)
-}))(FolderItem)

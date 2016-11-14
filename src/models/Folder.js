@@ -1,4 +1,12 @@
 export default class Folder {
+  static ROOT_ID = 0
+
+  static Filters = {
+    browsing : folder => { return folder.isDyhi() },
+    smart    : folder => { return !folder.isDyhi() && folder.search },
+    simple   : folder => { return !folder.isDyhi() && !folder.search }
+  }
+
   constructor (json) {
     if (json) {
       this.id = json.id
@@ -13,6 +21,7 @@ export default class Folder {
       this.dyhiRoot = json.dyhiRoot
       this.acl = json.acl
       this.search = json.search
+      this.childIds = null // set of childIds.
     }
   }
 
