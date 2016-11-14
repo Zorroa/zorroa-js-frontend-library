@@ -38,7 +38,7 @@ export default class FolderItem extends Component {
 
     return (
       <div className={classnames('FolderItem', { isOpen, hasChildren, isSelected })}
-           style={{ paddingLeft:`${(depth - 1) * 10}px` }}>
+           style={{ paddingLeft: `${(depth - 1) * 10}px` }}>
         <div className='FolderItem-toggle'
              onClick={event => { onToggle(folder); return false }}
         >

@@ -13,10 +13,10 @@ export var createInitialState = () => ({
   all: new Map([[ root.id, root ]]),
 
   // a set of folder ids. items in the set are "open", meaning visible & un-collapsed in the UI
-  openFolderIds : new Set([Folder.ROOT_ID]),
+  openFolderIds: new Set([Folder.ROOT_ID]),
 
   // a set of folder ids, indicating which folders are user-selected
-  selectedFolderIds : new Set()
+  selectedFolderIds: new Set()
 })
 export const initialState = createInitialState()
 
