@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import * as assert from 'assert'
 
 import DisplayProperties from '../../models/DisplayProperties'
 import Collapsible from '../Collapsible'

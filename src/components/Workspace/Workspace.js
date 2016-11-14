@@ -11,7 +11,7 @@ import Racetrack from '../../components/Racetrack'
 import Metadata from '../../components/Metadata'
 import Collapsible from '../Collapsible'
 
-import { iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible } from '../../actions/appActions'
+import { iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible, displayOptions, METADATA_DISPLAY_OPTIONS } from '../../actions/appActions'
 
 class Workspace extends Component {
   static displayName () {
@@ -43,6 +43,11 @@ class Workspace extends Component {
     assert.ok(Workspace.collapsibleNames.has(name))
     const { actions, app } = this.props
     actions.toggleCollapsible(name, !app.collapsibleOpen[name])
+  }
+
+  showDisplayOptions = (mode, event) => {
+    this.props.actions.displayOptions(mode)
+    // event.stopPropagation()
   }
 
   render () {
@@ -80,7 +85,7 @@ class Workspace extends Component {
       header: (
         <div className='flexCenter'>
           <span>Metadata</span>
-          <i className='Metadata-icon icon-cog'></i>
+          <div onClick={this.showDisplayOptions.bind(this, METADATA_DISPLAY_OPTIONS)} className='Metadata-icon icon-cog' />
         </div>
       ),
       isOpen: app.collapsibleOpen.metadata,
@@ -138,5 +143,5 @@ class Workspace extends Component {
 export default connect(state => ({
   app: state.app
 }), dispatch => ({
-  actions: bindActionCreators({ iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible }, dispatch)
+  actions: bindActionCreators({ iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible, displayOptions }, dispatch)
 }))(Workspace)

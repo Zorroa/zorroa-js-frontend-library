@@ -6,7 +6,7 @@ import Asset from '../../models/Asset'
 import DisplayProperties from '../../models/DisplayProperties'
 import DisplayPropertiesItem from './DisplayPropertiesItem'
 import DisplayOptions from '../DisplayOptions'
-import { updateMetadataFields, updateTableFields } from '../../actions/appActions'
+import { updateMetadataFields, updateTableFields, displayOptions, METADATA_DISPLAY_OPTIONS, HIDE_DISPLAY_OPTIONS } from '../../actions/appActions'
 
 class Metadata extends Component {
   static propTypes = {
@@ -17,14 +17,8 @@ class Metadata extends Component {
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     selectedIds: PropTypes.object,
     fields: PropTypes.arrayOf(PropTypes.string).isRequired,
+    displayOptions: PropTypes.string,
     actions: PropTypes.object
-  }
-
-  state = { showDisplayOptions: false }
-
-  editDisplayOptions (event) {
-    this.setState({ showDisplayOptions: true })
-    event.stopPropagation()
   }
 
   updateDisplayOptions (event, state) {
@@ -36,7 +30,7 @@ class Metadata extends Component {
   }
 
   dismissDisplayOptions () {
-    this.setState({ showDisplayOptions: false })
+    this.props.actions.displayOptions(HIDE_DISPLAY_OPTIONS)
   }
 
   // Return existing or create a new propertry in th passed-in array
@@ -68,17 +62,8 @@ class Metadata extends Component {
     return displayProperties
   }
 
-  renderHeader () {
-    return (
-      <div className='flexCenter'>
-        <span>Metadata</span>
-        <div onClick={this.editDisplayOptions.bind(this)} className='Metadata-icon icon-cog'/>
-      </div>
-    )
-  }
-
   render () {
-    const { assets, selectedIds, isIconified, fields } = this.props
+    const { assets, selectedIds, isIconified, fields, displayOptions } = this.props
     const displayProperties = this.displayPropertiesForFields(fields)
     var selectedAssets = new Set()
     if (selectedIds) {
@@ -88,7 +73,7 @@ class Metadata extends Component {
     }
     return (
       <div className="Metadata">
-        { this.state.showDisplayOptions && (
+        { displayOptions === METADATA_DISPLAY_OPTIONS && (
           <DisplayOptions selectedFields={fields}
                           title="Metadata Display Options"
                           syncLabel="Table"
@@ -112,7 +97,8 @@ class Metadata extends Component {
 export default connect(state => ({
   assets: state.assets.all,
   selectedIds: state.assets.selectedIds,
-  fields: state.app.metadataFields
+  fields: state.app.metadataFields,
+  displayOptions: state.app.displayOptions
 }), dispatch => ({
-  actions: bindActionCreators({ updateMetadataFields, updateTableFields }, dispatch)
+  actions: bindActionCreators({ updateMetadataFields, updateTableFields, displayOptions }, dispatch)
 }))(Metadata)

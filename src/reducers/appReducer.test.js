@@ -1,5 +1,6 @@
-import { MODAL, ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, METADATA_FIELDS, TABLE_FIELDS } from '../constants/actionTypes'
+import { MODAL, ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, METADATA_FIELDS, TABLE_FIELDS, DISPLAY_OPTIONS } from '../constants/actionTypes'
 import appReducer from './appReducer'
+import { METADATA_DISPLAY_OPTIONS } from '../actions/appActions'
 
 describe('appReducer', () => {
   describe(`${MODAL}`, () => {
@@ -53,6 +54,14 @@ describe('appReducer', () => {
       const action = { type: TABLE_FIELDS, payload: fields }
       expect(appReducer({}, action)
       ).toEqual({ tableFields: fields })
+    })
+  })
+
+  describe('DISPLAY_OPTIONS', () => {
+    it('set display options', () => {
+      const action = { type: DISPLAY_OPTIONS, payload: METADATA_DISPLAY_OPTIONS }
+      expect(appReducer({}, action)
+      ).toEqual({ displayOptions: METADATA_DISPLAY_OPTIONS })
     })
   })
 })

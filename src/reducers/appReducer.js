@@ -1,4 +1,4 @@
-import { MODAL, ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE, METADATA_FIELDS, TABLE_FIELDS } from '../constants/actionTypes'
+import { MODAL, ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE, METADATA_FIELDS, TABLE_FIELDS, DISPLAY_OPTIONS } from '../constants/actionTypes'
 
 const initialState = {
   modal: {},
@@ -13,7 +13,7 @@ const initialState = {
     source: false,
     proxies: false,
     'proxies.proxies': false
-  }
+  },
   metadataFields: [ 'source.filename', 'source.date', 'source.fileSize' ],
   tableFields: [ 'source.filename', 'source.date', 'source.fileSize' ]
 }
@@ -46,6 +46,8 @@ export default function app (state = initialState, action) {
       return { ...state, metadataFields: action.payload }
     case TABLE_FIELDS:
       return { ...state, tableFields: action.payload }
+    case DISPLAY_OPTIONS:
+      return { ...state, displayOptions: action.payload }
     default:
       return state
   }
