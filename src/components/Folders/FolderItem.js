@@ -34,8 +34,7 @@ export default class FolderItem extends Component {
 
   render () {
     const { folder, depth, isOpen, hasChildren, isSelected, onToggle, onSelect } = this.props
-    const icon = 'icon-cube'
-    // const icon = folder.isDyhi() ? 'icon-cube' : 'icon-folder'
+    const icon = folder.isDyhi() ? 'icon-cube' : 'icon-folder'
 
     return (
       <div className={classnames('FolderItem', { isOpen, hasChildren, isSelected })}
