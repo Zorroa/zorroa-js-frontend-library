@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'zorroa-icons';
-  src:  url('fonts/zorroa-icons.eot?69hc22');
-  src:  url('fonts/zorroa-icons.eot?69hc22#iefix') format('embedded-opentype'),
-    url('fonts/zorroa-icons.woff2?69hc22') format('woff2'),
-    url('fonts/zorroa-icons.ttf?69hc22') format('truetype'),
-    url('fonts/zorroa-icons.woff?69hc22') format('woff'),
-    url('fonts/zorroa-icons.svg?69hc22#zorroa-icons') format('svg');
+  src:  url('fonts/zorroa-icons.eot?g6c3ru');
+  src:  url('fonts/zorroa-icons.eot?g6c3ru#iefix') format('embedded-opentype'),
+    url('fonts/zorroa-icons.woff2?g6c3ru') format('woff2'),
+    url('fonts/zorroa-icons.ttf?g6c3ru') format('truetype'),
+    url('fonts/zorroa-icons.woff?g6c3ru') format('woff'),
+    url('fonts/zorroa-icons.svg?g6c3ru#zorroa-icons') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -25,6 +25,15 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-checkbox-indetermined:before {
+  content: "\e923";
+}
+.icon-checkbox-empty:before {
+  content: "\e924";
+}
+.icon-checkbox-checked:before {
+  content: "\e927";
+}
 .icon-text:before {
   content: "\e91a";
 }
@@ -37,6 +46,9 @@
 .icon-question:before {
   content: "\e910";
 }
+.icon-play:before {
+  content: "\e921";
+}
 .icon-calendar:before {
   content: "\e911";
 }
@@ -45,6 +57,9 @@
 }
 .icon-cog:before {
   content: "\e907";
+}
+.icon-file-empty:before {
+  content: "\e922";
 }
 .icon-menu:before {
   content: "\e920";

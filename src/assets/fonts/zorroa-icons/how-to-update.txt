@@ -8,9 +8,16 @@ Download the zip file, and place it in this directory (zorroa-icons/). If there'
 Make sure you don't have any staged git files, then...
 Run these commands (OSX) from the fonts/zorroa-icons directory:
 
+cd src/assets/fonts/zorroa-icons
+git checkout master
+git checkout -b zorroa-icons
 unzip -o zorroa-icons.zip
 git add -- .
 git commit -m "Update zorroa-icons"
+git push -u origin
+hub pull-request -m "Update zorroa-icons"
+
+Once the pull request is merged, delete the branch
 
 ----------------------------------------------------------------------
 
