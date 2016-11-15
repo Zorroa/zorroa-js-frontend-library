@@ -8,6 +8,7 @@ import Thumb from '../Thumb'
 import Asset from '../../models/Asset'
 import { isolateAssetId, selectAssetIds } from '../../actions/assetsAction'
 import { resetRacetrackWidgets } from '../../actions/racetrackAction'
+import { selectFolderIds } from '../../actions/folderAction'
 import Pager from './Pager'
 import Footer from './Footer'
 import Table from '../Table'
@@ -112,8 +113,9 @@ class Assets extends Component {
     }
   }
 
-  clearSearch () {
+  clearSearch = () => {
     this.props.actions.resetRacetrackWidgets()
+    this.props.actions.selectFolderIds()
   }
 
   renderAssets () {
@@ -125,7 +127,7 @@ class Assets extends Component {
         <div className="assets-layout-empty flexCol flexJustifyCenter flexAlignItemsCenter">
           <div className="assets-layout-icon icon-search"/>
           <div>No results</div>
-          <button onClick={this.clearSearch.bind(this)}>Clear Search</button>
+          <button onClick={this.clearSearch}>Clear Search</button>
         </div>)
     }
 
@@ -192,5 +194,10 @@ export default connect(state => ({
   selectedIds: state.assets.selectedIds,
   totalCount: state.assets.totalCount
 }), dispatch => ({
-  actions: bindActionCreators({ isolateAssetId, selectAssetIds, resetRacetrackWidgets }, dispatch)
+  actions: bindActionCreators({
+    isolateAssetId,
+    selectAssetIds,
+    resetRacetrackWidgets,
+    selectFolderIds
+  }, dispatch)
 }))(Assets)
