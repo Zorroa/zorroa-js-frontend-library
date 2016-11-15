@@ -6,11 +6,9 @@ import * as assert from 'assert'
 // Each entry in the map is a Folder object.
 // A "childIds" field is added if the folder has children.
 
-const root = new Folder({ id: Folder.ROOT_ID, name: 'Root' })
-
 export var createInitialState = () => ({
   // Folder model data from the server
-  all: new Map([[ root.id, root ]]),
+  all: new Map([[ Folder.ROOT_ID, new Folder({ id: Folder.ROOT_ID, name: 'Root' }) ]]),
 
   // a set of folder ids. items in the set are "open", meaning visible & un-collapsed in the UI
   openFolderIds: new Set([Folder.ROOT_ID]),
@@ -36,20 +34,24 @@ export default function (state = initialState, action) {
 
         // Add children to app state, preserve existing grandchildren
         children.forEach(child => {
+          let newChild = new Folder(child)
           const prevChild = all.get(child.id)
           if (prevChild && prevChild.childIds && !child.childIds) {
-            child.childIds = new Set(prevChild.childIds)
+            newChild.childIds = new Set(prevChild.childIds)
+          } else if (child.childIds) {
+            newChild.childIds = new Set(child.childIds)
           }
-          all.set(child.id, child)
+          all.set(newChild.id, newChild)
         })
 
         // Update parent's childIds list
         if (parentId >= Folder.ROOT_ID) {
-          let parent = all.get(parentId)
+          const parent = all.get(parentId)
           assert.ok(parent instanceof Folder)
+          let newParent = new Folder(parent)
           // Add children
-          parent.childIds = new Set(children.map(child => child.id))
-          all.set(parent.id, parent)
+          newParent.childIds = new Set(children.map(child => child.id))
+          all.set(newParent.id, newParent)
         }
 
         return { ...state, all }
@@ -65,10 +67,15 @@ export default function (state = initialState, action) {
         let all = new Map(state.all)
         all.set(folder.id, folder)
         const parent = state.all.get(folder.parentId)
+        let newParent = new Folder(parent)
         console.log('CREATE_FOLDER', 'folder.id', folder.id, 'folder.parentId', folder.parentId)
-        if (!parent.childIds) parent.childIds = new Set()
-        parent.childIds.add(folder.id)
-        all.set(parent.id, parent)
+        if (!parent.childIds) {
+          newParent.childIds = new Set()
+        } else {
+          newParent.childIds = new Set(parent.childIds) // copy; about to modify
+        }
+        newParent.childIds.add(folder.id)
+        all.set(newParent.id, newParent)
         return { ...state, all }
       }
       break
@@ -82,7 +89,13 @@ export default function (state = initialState, action) {
         const folder = state.all.get(id)
         if (folder) {
           const parent = state.all.get(folder.parentId)
-          if (parent.childIds) parent.childIds.delete(folder.id)
+          let newParent = new Folder(parent)
+          if (parent.childIds) {
+            var childIds = new Set(parent.childIds)
+            childIds.delete(folder.id)
+            if (childIds.size > 0) newParent.childIds = childIds
+          }
+          all.set(newParent.id, newParent)
           all.delete(id)
           openFolderIds.delete(id)
           selectedFolderIds.delete(id)
