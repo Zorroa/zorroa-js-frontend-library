@@ -16,10 +16,6 @@ class CreateFolder extends Component {
     actions: PropTypes.object.isRequired
   }
 
-  constructor (props) {
-    super(props)
-  }
-
   state = { name: '', showForm: false, isShared: false, selectedPermissions: new Set() }
 
   componentWillMount () {

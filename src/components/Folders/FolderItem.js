@@ -23,8 +23,8 @@ const target = {
       var selectedAssetIds = new Set(props.selectedAssetIds)
       selectedAssetIds.add(data.id)
       props.actions.addAssetIdsToFolderId([...selectedAssetIds], props.folder.id)
-    }
   }
+}
 }
 
 @DropTarget('FOLDER', target)
