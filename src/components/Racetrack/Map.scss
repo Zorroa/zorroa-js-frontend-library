@@ -20,4 +20,11 @@
   .Facet-body {
     padding: 10px;
   }
+
+  .Map-header {
+    div[class*="icon-"] {
+      margin-left: 4px;
+      margin-right: 4px;
+    }
+  }
 }

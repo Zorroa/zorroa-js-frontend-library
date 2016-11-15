@@ -28,8 +28,15 @@ class Map extends Component {
     locationField: 'petrol.location.point',
     searchField: 'petrol.WellName',
     term: undefined,
-    showDisplayOptions: false
+    showDisplayOptions: false,
+    selectSearchField: false
   }
+
+  // Store the map location as class properties, but not component state
+  // because we don't want to update the map when these change. Instead
+  // we simply need to retain the current values to use in the render JSX
+  center = { lng: -122.268, lat: 37.872 }    // Zorroa Berkeley!
+  zoom = 0
 
   componentWillMount () {
     this.setState({ showDisplayOptions: true })
@@ -46,15 +53,31 @@ class Map extends Component {
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
-  selectField (event) {
-    this.setState({ showDisplayOptions: true })
+  selectLocation = (event) => {
+    this.setState({ showDisplayOptions: true, selectSearchField: false })
     event.stopPropagation()
   }
 
+  selectSearch = (event) => {
+    this.setState({ showDisplayOptions: true, selectSearchField: true })
+    event.stopPropagation()
+  }
+
+  onMove = (map, event) => {
+    this.center = map.getCenter()
+  }
+
+  onZoom = (map, event) => {
+    this.zoom = map.getZoom()
+  }
+
   updateDisplayOptions (event, state) {
-    console.log('Update map fields:\n' + JSON.stringify(state.checkedNamespaces))
-    const locationField = state.checkedNamespaces && state.checkedNamespaces.length && state.checkedNamespaces[0]
-    this.setState({ ...this.state, locationField })
+    const field = state.checkedNamespaces && state.checkedNamespaces.length && state.checkedNamespaces[0]
+    if (this.state.selectSearchField) {
+      this.setState({...this.state, searchField: field})
+    } else {
+      this.setState({...this.state, locationField: field})
+    }
     this.modifySliver(this.state.term)
   }
 
@@ -77,9 +100,11 @@ class Map extends Component {
 
   render () {
     const { isIconified, assets } = this.props
-    const { locationField } = this.state
+    const { locationField, searchField, selectSearchField } = this.state
     const title = Asset.lastNamespace(unCamelCase(this.state.field))
     const locationAssets = assets.filter(asset => (asset.value(locationField)))
+    const fieldTypes = selectSearchField ? null : ['point']
+    const selectedFields = selectSearchField ? [ searchField ] : [ locationField ]
     const layoutProperties = {
       'symbol-spacing': 50,
       'icon-allow-overlap': true,
@@ -92,21 +117,27 @@ class Map extends Component {
               header={(
                 <div className="Map-header flexRow flexJustifySpaceBetween fullWidth">
                   <span>Map: {title}</span>
-                  <div onClick={this.selectField.bind(this)} className="icon-cog"></div>
+                  <div className="flexRow flexAlignItemsCenter">
+                    <div onClick={this.selectSearch} className="icon-search" />
+                    <div onClick={this.selectLocation} className="icon-cog" />
+                  </div>
                 </div>
               )}
               isIconified={isIconified}
               onClose={this.removeFilter.bind(this)}>
         { this.state.showDisplayOptions && (
-          <DisplayOptions selectedFields={[]}
+          <DisplayOptions selectedFields={selectedFields}
                           title="Facet Fields"
                           singleSelection={true}
-                          fieldTypes={['point']}
+                          fieldTypes={fieldTypes}
                           onUpdate={this.updateDisplayOptions.bind(this)}
                           onDismiss={this.dismissDisplayOptions.bind(this)}/>
         )}
         <ReactMapboxGl containerStyle={{height: '300px'}}
-                       style={mapboxStyle} zoom={[0]}
+                       style={mapboxStyle}
+                       center={[this.center.lng, this.center.lat]}
+                       zoom={[this.zoom]}
+                       onMove={this.onMove} onZoom={this.onZoom}
                        accessToken={accessToken} >
           { locationAssets && (
             <Layer type="symbol" id="marker" layout={layoutProperties}>
