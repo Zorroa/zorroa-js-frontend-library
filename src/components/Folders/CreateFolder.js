@@ -80,6 +80,7 @@ class CreateFolder extends Component {
 
   deleteFolder (event) {
     console.log('Delete folder ' + this.props.folderId)
+    this.props.actions.deleteFolderIds(new Set(this.props.folderId))
   }
 
   render () {

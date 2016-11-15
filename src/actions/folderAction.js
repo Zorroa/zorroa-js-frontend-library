@@ -59,7 +59,13 @@ export function deleteFolderIds (ids) {
   return dispatch => {
     for (let id of ids) {
       console.log('Delete folder ' + id)
-      getArchivist().delete(`${rootEndpoint}/${id}`)
+      // Workaround CORS issue in OPTIONS preflight request for axios.delete
+      const request = {
+        method: 'delete',
+        url: `${rootEndpoint}/${id}`,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      }
+      getArchivist()(request)
         .then(response => {
           dispatch({
             type: DELETE_FOLDER,
