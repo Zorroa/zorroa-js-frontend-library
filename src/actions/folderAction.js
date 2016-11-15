@@ -32,6 +32,7 @@ export function getFolderChildren (parentId) {
 }
 
 export function selectFolderIds (ids) {
+  if (!(ids instanceof Set)) ids = new Set(ids)
   return {
     type: SELECT_FOLDERS,
     payload: ids

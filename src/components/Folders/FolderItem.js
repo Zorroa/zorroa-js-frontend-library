@@ -6,10 +6,7 @@ import { connect } from 'react-redux'
 
 import { selectFolderIds, addAssetIdsToFolderId } from '../../actions/folderAction'
 
-// Recursively renders folder children as Collapsible elements.
-// Loads children of displayed items on-demand to display open caret.
-
-// BUG! DnD target events are never invoked!
+// Renders folder children as Collapsible elements.
 
 const target = {
   dragOver (props, type, se) {
@@ -18,10 +15,14 @@ const target = {
   drop (props, type, se) {
     se.preventDefault()
     // allows us to match drop targets to drag sources
-    const data = se.dataTransfer.getData('text/plain')
-    if (data === type) {
-      console.log('Drop ' + props.selectedAssetIds + ' on ' + props.folderId)
-      props.actions.addAssetIdsToFolderId([...props.selectedAssetIds], props.folderId)
+    const dataStr = se.dataTransfer.getData('text/plain')
+    const data = JSON.parse(dataStr) //
+    if (data && data.type === type) {
+      console.log('Drop ' + props.selectedAssetIds + ' on ' + props.folder.id)
+      // Make sure the asset being dragged is added, even if it isn't selected
+      var selectedAssetIds = new Set(props.selectedAssetIds)
+      selectedAssetIds.add(data.id)
+      props.actions.addAssetIdsToFolderId([...selectedAssetIds], props.folder.id)
     }
   }
 }
@@ -41,12 +42,13 @@ class FolderItem extends Component {
   }
 
   render () {
-    const { folder, depth, isOpen, hasChildren, isSelected, onToggle, onSelect } = this.props
+    const { folder, depth, isOpen, hasChildren, isSelected, onToggle, onSelect, dropparams } = this.props
     const icon = folder.isDyhi() ? 'icon-cube' : 'icon-folder'
 
     return (
       <div className={classnames('FolderItem', { isOpen, hasChildren, isSelected })}
-           style={{ paddingLeft:`${(depth - 1) * 10}px` }}>
+           style={{ paddingLeft:`${(depth - 1) * 10}px` }}
+           {...dropparams}>
         <div className='FolderItem-toggle'
              onClick={event => { onToggle(folder); return false }}
         >

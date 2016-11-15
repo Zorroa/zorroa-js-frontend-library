@@ -5,7 +5,7 @@ import Asset from '../../models/Asset'
 
 const source = {
   dragStart (props, type, se) {
-    se.dataTransfer.setData('text/plain', type)
+    se.dataTransfer.setData('text/plain', JSON.stringify({type, id:props.asset.id}))
   },
   dragEnd (props, type, se) {
     se.preventDefault()
