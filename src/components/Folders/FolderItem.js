@@ -1,6 +1,12 @@
 import React, { Component, PropTypes } from 'react'
 import { DropTarget } from '../../services/DragDrop'
 import classnames from 'classnames'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+
+import { selectFolderIds, addAssetIdsToFolderId } from '../../actions/folderAction'
+
+// Renders folder children as Collapsible elements.
 
 const target = {
   dragOver (props, type, se) {
@@ -8,18 +14,21 @@ const target = {
   },
   drop (props, type, se) {
     se.preventDefault()
-    // const data = se.dataTransfer.getData('text/plain')
-
-    // // allows us to match drop targets to drag sources
-    // if (data === type) {
-    //   console.log(props.selectedAssetIds)
-    //   // props.dispatch()
-    // }
+    // allows us to match drop targets to drag sources
+    const dataStr = se.dataTransfer.getData('text/plain')
+    const data = JSON.parse(dataStr) //
+    if (data && data.type === type) {
+      console.log('Drop ' + props.selectedAssetIds + ' on ' + props.folder.id)
+      // Make sure the asset being dragged is added, even if it isn't selected
+      var selectedAssetIds = new Set(props.selectedAssetIds)
+      selectedAssetIds.add(data.id)
+      props.actions.addAssetIdsToFolderId([...selectedAssetIds], props.folder.id)
   }
+}
 }
 
 @DropTarget('FOLDER', target)
-export default class FolderItem extends Component {
+class FolderItem extends Component {
   static propTypes = {
     // input props
     folder: PropTypes.object.isRequired,
@@ -33,12 +42,13 @@ export default class FolderItem extends Component {
   }
 
   render () {
-    const { folder, depth, isOpen, hasChildren, isSelected, onToggle, onSelect } = this.props
+    const { folder, depth, isOpen, hasChildren, isSelected, onToggle, onSelect, dropparams } = this.props
     const icon = folder.isDyhi() ? 'icon-cube' : 'icon-folder'
 
     return (
       <div className={classnames('FolderItem', { isOpen, hasChildren, isSelected })}
-           style={{ paddingLeft: `${(depth - 1) * 10}px` }}>
+           style={{ paddingLeft:`${(depth - 1) * 10}px` }}
+           {...dropparams}>
         <div className='FolderItem-toggle'
              onClick={event => { onToggle(folder); return false }}
         >
@@ -56,3 +66,10 @@ export default class FolderItem extends Component {
     )
   }
 }
+
+export default connect(state => ({
+  selectedAssetIds: state.assets.selectedIds,
+  selectedFolderIds: state.folders.selectedIds
+}), dispatch => ({
+  actions: bindActionCreators({ selectFolderIds, addAssetIdsToFolderId, dispatch }, dispatch)
+}))(FolderItem)

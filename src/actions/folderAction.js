@@ -1,4 +1,4 @@
-import { GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, DELETE_FOLDER, TOGGLE_FOLDER } from '../constants/actionTypes'
+import { GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, DELETE_FOLDER, ADD_ASSETS_TO_FOLDER, TOGGLE_FOLDER } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import { getArchivist } from './authAction'
 
@@ -32,6 +32,7 @@ export function getFolderChildren (parentId) {
 }
 
 export function selectFolderIds (ids) {
+  if (!(ids instanceof Set)) ids = new Set(ids)
   return {
     type: SELECT_FOLDERS,
     payload: ids
@@ -76,5 +77,21 @@ export function deleteFolderIds (ids) {
           console.error('Error deleting folder ' + id + ': ' + error)
         })
     }
+  }
+}
+
+export function addAssetIdsToFolderId (assetIds, folderId) {
+  return dispatch => {
+    console.log('Add assets ' + JSON.stringify(assetIds) + ' to folder ' + folderId)
+    getArchivist().post(`${rootEndpoint}/${folderId}/assets`, assetIds)
+      .then(response => {
+        dispatch({
+          type: ADD_ASSETS_TO_FOLDER,
+          payload: response.data
+        })
+      })
+      .catch(error => {
+        console.error('Error adding assets ' + JSON.stringify(assetIds) + ' to folder ' + folderId + ': ' + error)
+      })
   }
 }

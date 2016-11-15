@@ -14,7 +14,6 @@ export default class Collapsible extends Component {
     isOpen: PropTypes.bool.isRequired,
 
     closeIcon: PropTypes.string,
-    dropparams: PropTypes.object,
     isSelected: PropTypes.bool,
     onOpen: PropTypes.func,
     onSelect: PropTypes.func,
@@ -26,7 +25,7 @@ export default class Collapsible extends Component {
   }
 
   render () {
-    const { dropparams, header, isIconified, isSelected, isOpen, onOpen, onSelect } = this.props
+    const { header, isIconified, isSelected, isOpen, onOpen, onSelect } = this.props
     const { children, openIcon, closeIcon } = this.props
 
     const CollapsibleHeaderParams = {
@@ -46,7 +45,7 @@ export default class Collapsible extends Component {
       { isParent: children, isOpen, isIconified, [className]: !!className })
 
     return (
-      <div className={collapsibleClasses} {...dropparams}>
+      <div className={collapsibleClasses}>
         <CollapsibleHeader {...CollapsibleHeaderParams}/>
         { !isIconified && isOpen && (
           <div className="Collapsible-body">
