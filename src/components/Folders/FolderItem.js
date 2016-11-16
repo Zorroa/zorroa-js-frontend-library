@@ -3,8 +3,9 @@ import { DropTarget } from '../../services/DragDrop'
 import classnames from 'classnames'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import Folder from '../../models/Folder'
 
-import { selectFolderIds, addAssetIdsToFolderId } from '../../actions/folderAction'
+import { getFolderChildren, selectFolderIds, addAssetIdsToFolderId } from '../../actions/folderAction'
 
 // Renders folder children as Collapsible elements.
 
@@ -31,14 +32,17 @@ const target = {
 class FolderItem extends Component {
   static propTypes = {
     // input props
-    folder: PropTypes.object.isRequired,
+    folder: PropTypes.instanceOf(Folder).isRequired,
     depth: PropTypes.number.isRequired,
     dropparams: PropTypes.object,
     isOpen: PropTypes.bool.isRequired,
     hasChildren: PropTypes.bool.isRequired,
     isSelected: PropTypes.bool.isRequired,
     onToggle: PropTypes.func,
-    onSelect: PropTypes.func
+    onSelect: PropTypes.func,
+
+    // state props
+    folders: PropTypes.object.isRequired
   }
 
   render () {
@@ -69,7 +73,7 @@ class FolderItem extends Component {
 
 export default connect(state => ({
   selectedAssetIds: state.assets.selectedIds,
-  selectedFolderIds: state.folders.selectedIds
+  folders: state.folders
 }), dispatch => ({
-  actions: bindActionCreators({ selectFolderIds, addAssetIdsToFolderId, dispatch }, dispatch)
+  actions: bindActionCreators({ getFolderChildren, selectFolderIds, addAssetIdsToFolderId, dispatch }, dispatch)
 }))(FolderItem)

@@ -36,9 +36,9 @@ class Table extends Component {
   renderRow (asset) {
     const { fields } = this.props
     return (
-      <tr key={asset.id} className="assets-table-row">
+      <tr key={asset.id} className="Table-row">
         { fields.map(field => (
-          <td key={field} className="assets-table-value">{asset.value(field)}</td>
+          <td key={field} className="Table-value">{asset.value(field)}</td>
         ))}
         <td><div key={'cog'}/></td>
       </tr>
@@ -51,7 +51,7 @@ class Table extends Component {
       return
     }
     return (
-      <div className="assets-table-scroll">
+      <div className="Table-scroll">
         { this.state.showDisplayOptions && (
           <DisplayOptions selectedFields={fields}
                           title="Table Display Options"
@@ -59,15 +59,15 @@ class Table extends Component {
                           onUpdate={this.updateDisplayOptions.bind(this)}
                           onDismiss={this.dismissDisplayOptions.bind(this)}/>
         )}
-        <table className="assets-table">
+        <table className="Table">
           <thead>
           <tr>
             { fields.map((field, i) => (
-              <th key={i} className="assets-table-header">
+              <th key={i} className="Table-header">
                 { unCamelCase(Asset.lastNamespace(field)) }
               </th>
             ))}
-            <th key={'cog'} className="asset-table-settings"><div onClick={this.editDisplayOptions.bind(this)} className="icon-cog"/></th>
+            <th key={'cog'} className="Table-settings"><div onClick={this.editDisplayOptions.bind(this)} className="icon-cog"/></th>
           </tr>
           </thead>
           <tbody>

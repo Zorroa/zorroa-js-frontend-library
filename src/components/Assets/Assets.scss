@@ -83,18 +83,20 @@
 
   .thumb-layout-button {
     color: #000;
-    background-color: #fff;
     width: 40px;
     height: 40px;
     border-radius: 3px;
     border: none;
     outline: none;
     font-size: 20px;
+    background-color: #fff;
+    &:hover { background-color: $zorroa-lightgray; }
   }
 
   .thumb-layout-enabled {
     color: #fff;
     background-color: $zorroa-sickly-green;
+    &:hover { background-color: darken($zorroa-sickly-green, 15%); }
   }
 }
 
@@ -104,17 +106,20 @@
 
   .table-toggle-button {
     color: #000;
-    background-color: #fff;
     width: 40px;
     height: 40px;
     border-radius: 3px;
     border: none;
     outline: none;
     font-size: 20px;
+    background-color: #fff;
+    &:hover { background-color: $zorroa-lightgray; }
   }
 
   .table-toggle-enabled {
     color: #fff;
     background-color: $zorroa-sickly-green;
+    &:hover { background-color: darken($zorroa-sickly-green, 15%); }
   }
+
 }

@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { DragSource } from '../../services/DragDrop'
 import Asset from '../../models/Asset'
+import classnames from 'classnames'
 
 const source = {
   dragStart (props, type, se) {
@@ -21,7 +22,7 @@ class Thumb extends Component {
     protocol: PropTypes.string,
     host: PropTypes.string,
     dim: PropTypes.object.isRequired,
-    selected: PropTypes.bool,
+    isSelected: PropTypes.bool,
     onClick: PropTypes.func.isRequired,
     onDoubleClick: PropTypes.func.isRequired,
     dragparams: PropTypes.object,
@@ -56,7 +57,7 @@ class Thumb extends Component {
   }
 
   render () {
-    const { asset, dim, selected, onClick, onDoubleClick, dragparams } = this.props
+    const { asset, dim, isSelected, onClick, onDoubleClick, dragparams } = this.props
     if (!asset.proxies) {
       return <div className="thumb" style={{ backgroundColor: asset.backgroundColor() }} />
     }
@@ -69,13 +70,12 @@ class Thumb extends Component {
       'width': dim.width,
       'height': dim.height,
       'left': dim.x,
-      'top': dim.y,
-      'border': selected ? '3px solid #73b61c' : 'none'
+      'top': dim.y
     }
 
     return (
       <div
-        className={`assets-thumb ${this.thumbClass}`}
+        className={classnames('Thumb', this.thumbClass, {isSelected})}
         style={thumbStyle}
         onDoubleClick={onDoubleClick}
         onClick={onClick}

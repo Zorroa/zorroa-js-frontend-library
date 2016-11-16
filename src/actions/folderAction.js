@@ -14,16 +14,20 @@ export function toggleFolder (folderId, isOpen) {
   }
 }
 
-export function getFolderChildren (parentId) {
+// Queue a load of the children for folder <parentId>
+// pass optOnDoneFn optionally to receive a callback when the request is returned
+// the request will be passed the list of children loaded
+export function getFolderChildren (parentId, optOnDoneFn) {
   if (parentId < Folder.ROOT_ID) {             // Catch "fake" folders, if used
-    return dispatch => {}
+    return dispatch => { if (optOnDoneFn) optOnDoneFn() }
   }
   return dispatch => {
     console.log('Load folder ' + parentId)
     getArchivist().get(`${rootEndpoint}/${parentId}/_children`)
       .then(response => {
         const children = response.data.map(folder => (new Folder(folder)))
-        dispatch({
+        if (optOnDoneFn) optOnDoneFn(children)
+        return dispatch({
           type: GET_FOLDER_CHILDREN,
           payload: { parentId, children }
         })

@@ -25,6 +25,7 @@
   // reset padding when iconified so the icon can center
   &.isIconified {
     padding: 5px;
+    @include flexJustifyCenter;
   }
   &:hover { background-color: darken(#d8d8d8, 15%); }
   &.isSelected { background-color: $zorroa-water-blue; }

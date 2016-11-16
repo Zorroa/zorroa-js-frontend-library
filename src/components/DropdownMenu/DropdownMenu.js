@@ -13,37 +13,38 @@ export default class DropdownMenu extends Component {
     isVisible: false
   }
 
-  show = this.show.bind(this)
-  hide = this.hide.bind(this)
-
   componentWillUnmount () {
     document.removeEventListener('click', this.hide)
   }
 
-  show () {
+  show = () => {
     this.setState({ isVisible: true }, () => {
       document.addEventListener('click', this.hide)
     })
   }
 
-  hide () {
+  hide = () => {
     this.setState({ isVisible: false }, () => {
       document.removeEventListener('click', this.hide)
     })
   }
 
   render () {
+    let menuList = []
+    Children.forEach(this.props.children, (child, i) => {
+      if (i) { menuList.push((<div className="DropdownMenu-separator" key={`${i}s`}/>)) }
+      menuList.push((<li className="DropdownMenu-item" key={`${i}i`}>{child}</li>))
+    })
+
     return (
-      <div className="dropdown-menu" style={this.props.style}>
-        <button className="dropdown-button flexRow flexAlignItemsCenter" type="button" role="button" onClick={this.show}>
+      <div className="DropdownMenu" style={this.props.style}>
+        <button className="DropdownMenu-button flexRow flexAlignItemsCenter" type="button" role="button" onClick={this.show}>
           {this.props.label}
-          <div className={classnames('dropdown-caret', 'icon-arrow-down', { 'rot180': this.state.isVisible })} />
+          <div className={classnames('DropdownMenu-caret', 'icon-arrow-down', { 'rot180': this.state.isVisible })} />
         </button>
         { this.state.isVisible &&
-          (<ul style={this.props.rightAlign ? {right: 0} : {}}>
-            {Children.map(this.props.children, (child, i) => {
-              return (<li key={i}>{child}</li>)
-            })}
+          (<ul className="DropdownMenu-list" style={this.props.rightAlign ? {right: 0} : {}}>
+            {menuList}
           </ul>)
         }
       </div>

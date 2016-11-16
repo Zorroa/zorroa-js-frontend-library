@@ -1,10 +1,17 @@
 @import '../../styles/core-mixins.scss';
 
-.assets-thumb {
+.Thumb {
   background-repeat: no-repeat;
   background-position: center;
   background-origin: border-box;
   // margin: 5px;
 
   position: absolute;
+
+  &:hover {
+    border: 3px solid $zorroa-lightgray;
+  }
+  &.isSelected {
+    border: 3px solid $zorroa-sickly-green;
+  }
 }

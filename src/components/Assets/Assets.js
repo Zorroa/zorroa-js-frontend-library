@@ -148,7 +148,7 @@ class Assets extends Component {
               <div className={`assets-layout ${layout}`}
               style={{'width': '100%', 'height': height}}>
                 { assets.map((asset, index) => (
-                  <Thumb selected={selectedIds && selectedIds.has(asset.id)}
+                  <Thumb isSelected={selectedIds && selectedIds.has(asset.id)}
                     dim={positions[index]}
                     index={index}
                     key={asset.id}

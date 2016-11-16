@@ -25,11 +25,26 @@ class Folders extends Component {
   componentWillMount () {
     assert.ok(this.props.filterName in Folder.Filters) // make sure filter is valid
 
-    this.loadChildren(Folder.ROOT_ID)
+    const rootFolder = this.props.folders.all.get(Folder.ROOT_ID)
+    if (!rootFolder.childIds || !rootFolder.childIds.size) {
+      this.loadChildren(Folder.ROOT_ID)
+    }
   }
 
   loadChildren (id) {
-    this.props.actions.getFolderChildren(id)
+    const { folders } = this.props
+    var maybeLoadGrandchildren = (children) => {
+      // If I've never loaded these children before, do it once now
+      // This is to find out whether the children have children, so we can
+      // show or hide UI for toggling folders
+      if (children) children.forEach(child => {
+        // only load child's children if we haven't loaded this child before
+        if (!folders.all.get(child.id)) {
+          this.props.actions.getFolderChildren(child.id)
+        }
+      })
+    }
+    this.props.actions.getFolderChildren(id, maybeLoadGrandchildren)
   }
 
   deleteFolder = () => {
@@ -37,9 +52,11 @@ class Folders extends Component {
   }
 
   toggleFolder = (folder) => {
-    const isOpen = this.props.folders.openFolderIds.has(folder.id)
-    this.props.actions.toggleFolder(folder.id, !isOpen)
-    this.loadChildren(folder.id)
+    const { folders } = this.props
+    const isOpen = folders.openFolderIds.has(folder.id)
+    const doOpen = !isOpen
+    this.props.actions.toggleFolder(folder.id, doOpen)
+    if (doOpen) this.loadChildren(folder.id)
   }
 
   selectFolder (folder) {

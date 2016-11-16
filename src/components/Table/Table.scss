@@ -1,13 +1,13 @@
 @import '../../styles/core-mixins.scss';
 
-.assets-table-scroll {
+.Table-scroll {
   border-top: 1px solid #ddd;
   border-bottom: 1px solid #ddd;
   overflow:auto;
   max-height: 300px;
 }
 
-.assets-table {
+.Table {
   width: 100%;
   max-width: 100%;
   border-bottom: 1px solid #aaa;
@@ -20,17 +20,17 @@
     @include clampText;
   }
 
-  .assets-table-header {
+  .Table-header {
     text-align: left;
     //width: 40%;
   }
 
-  .assets-table-row {
+  .Table-row {
     text-align: left;
     //width: 60%;
   }
 
-  .asset-table-settings {
+  .Table-settings {
     width: 24px;
     color: $zorroa-gray;
   }

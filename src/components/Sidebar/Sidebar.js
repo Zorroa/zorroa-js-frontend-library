@@ -32,8 +32,10 @@ export default class Sidebar extends Component {
     const { isIconified, children, onToggle } = this.props
     return (
       <div className={classnames('Sidebar flexCol fullHeight', { 'isOpen': !isIconified })}>
-        <div className={classnames('Sidebar-button flexOff', { 'left': !this.props.isRightEdge })}>
-          <label onClick={onToggle}>{arrow}{arrow}</label>
+        <div className={classnames('Sidebar-button flexOff', { 'left': !this.props.isRightEdge })}
+             onClick={onToggle}
+        >
+          <label>{arrow}{arrow}</label>
         </div>
         <div className={'Sidebar-scroll flexOn fullHeight'} >
           { children }
