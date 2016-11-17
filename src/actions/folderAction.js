@@ -43,10 +43,9 @@ export function selectFolderIds (ids) {
   }
 }
 
-export function createFolder (name, parentId) {
+export function createFolder (folder) {
   return dispatch => {
-    console.log('Create folder ' + name + ' + parent=' + parentId)
-    const folder = new Folder({ name, parentId })
+    console.log('Create folder: ' + JSON.stringify(folder))
     getArchivist().post(`${rootEndpoint}`, folder)
       .then(response => {
         dispatch({
@@ -55,7 +54,7 @@ export function createFolder (name, parentId) {
         })
       })
       .catch(error => {
-        console.error('Error creating folder ' + name + ' parent=' + parentId + ': ' + error)
+        console.error('Error creating folder ' + folder.name + ': ' + error)
       })
   }
 }

@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import * as assert from 'assert'
 
 import Folder from '../../models/Folder'
-import { getFolderChildren, deleteFolderIds, selectFolderIds, toggleFolder } from '../../actions/folderAction'
+import { getFolderChildren, createFolder, deleteFolderIds, selectFolderIds, toggleFolder } from '../../actions/folderAction'
 import FolderItem from './FolderItem'
 import CreateFolder from './CreateFolder'
 
@@ -21,6 +21,8 @@ class Folders extends Component {
     // state props
     folders: PropTypes.object.isRequired
   }
+
+  state = { showCreateFolder: false }
 
   componentWillMount () {
     assert.ok(this.props.filterName in Folder.Filters) // make sure filter is valid
@@ -97,23 +99,41 @@ class Folders extends Component {
     return folderList
   }
 
+  addFolder = () => {
+    this.setState({ ...this.state, showCreateFolder: true })
+  }
+
+  dismissCreateFolder = () => {
+    this.setState({ ...this.state, showCreateFolder: false })
+  }
+
+  createFolder = (name, acl) => {
+    const selectedFolderIds = this.props.folders.selectedFolderIds
+    assert.ok(selectedFolderIds && selectedFolderIds.size === 1)
+    const parentId = selectedFolderIds.values().next().value
+    const folder = new Folder({ name, parentId, acl })
+    this.props.actions.createFolder(folder)
+    this.dismissCreateFolder()
+  }
+
   render () {
     const { folders } = this.props
+    const { showCreateFolder } = this.state
     const selectedFolderIds = folders.selectedFolderIds
     const rootLoaded = folders.all.has(Folder.ROOT_ID)
     if (!rootLoaded) return null
     const isFolderSelected = selectedFolderIds && selectedFolderIds.size > 0
-    const parentId = (selectedFolderIds && selectedFolderIds.size === 1)
-      ? selectedFolderIds.values().next().value
-      : null
-
+    const isDisabled = !selectedFolderIds || selectedFolderIds.size !== 1
     const rootFolder = folders.all.get(Folder.ROOT_ID)
     let folderList = this.getFolderList(rootFolder, 0)
 
     return (
       <div className='Folders'>
         <div className="Folders-controls">
-          <CreateFolder parentId={parentId}/>
+          <button disabled={isDisabled} onClick={this.addFolder}>
+            <span className="icon-plus-square"/>&nbsp;New Folder
+          </button>
+          { showCreateFolder && <CreateFolder title="Create Simple Collection" onDismiss={this.dismissCreateFolder} onCreate={this.createFolder} /> }
           <button disabled={!isFolderSelected} onClick={this.deleteFolder}>
             <span className="icon-trash2"/>&nbsp;Delete
           </button>
@@ -129,5 +149,5 @@ class Folders extends Component {
 export default connect(state => ({
   folders: state.folders
 }), dispatch => ({
-  actions: bindActionCreators({ getFolderChildren, deleteFolderIds, selectFolderIds, toggleFolder }, dispatch)
+  actions: bindActionCreators({ getFolderChildren, createFolder, deleteFolderIds, selectFolderIds, toggleFolder }, dispatch)
 }))(Folders)

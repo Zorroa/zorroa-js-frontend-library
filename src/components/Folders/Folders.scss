@@ -5,6 +5,7 @@
 
 .Folders-controls {
   @include flexRow;
+  position: relative;         // important for CreateFolder position:absolute
 
   button {
     color: $zorroa-darkgray;

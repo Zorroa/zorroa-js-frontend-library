@@ -4,7 +4,18 @@
 
   .CreateFolder-form {
     width: 300px;
+
+    /* WARNING: Crud ahead. refactor CreateFolder into Workspace?
+     *   Position CreateFolder "below" relative position of parent, but
+     *   for save search, this results in the viewport origin, which is
+     *   unintended but perhaps justifiable as it is in the folder sidebar?
+     *   We cannot center in screen because create simple collection is
+     *   inside the Sidebar which has overflow-x:hidden.
+     */
     position: absolute;
+    top: 1.5em;
+    left: 8px;
+
     background-color: $zorroa-nearwhite;
     z-index: 1001;
     border-radius: 3px;

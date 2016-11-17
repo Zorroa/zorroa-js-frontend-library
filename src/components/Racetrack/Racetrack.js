@@ -8,26 +8,45 @@ import Facet from './Facet'
 import Map from './Map'
 import DropdownMenu from '../DropdownMenu'
 import Widget from '../../models/Widget'
+import Folder from '../../models/Folder'
 import AssetSearch from '../../models/AssetSearch'
+import CreateFolder from '../Folders/CreateFolder'
 import { resetRacetrackWidgets, modifyRacetrackWidget } from '../../actions/racetrackAction'
+import { createFolder } from '../../actions/folderAction'
 import * as widgetTypes from '../../constants/widgetTypes'
 
 class Racetrack extends Component {
   static propTypes = {
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
+    query: PropTypes.instanceOf(AssetSearch),
     actions: PropTypes.object.isRequired,
     isIconified: PropTypes.bool.isRequired
   }
 
   state = {
-    emptySearch: ''
+    emptySearch: '',
+    showSaveSearch: false
   }
 
-  handleSave () {
-    console.log(`Save racetrack with ${this.state.filters.length} filters`)
+  saveRacetrack = () => {
+    this.setState({ ...this.state, showSaveSearch: true })
   }
 
-  handleClear () {
+  dismissSaveSearch = () => {
+    this.setState({ ...this.state, showSaveSearch: false })
+  }
+
+  saveSearch = (name, acl) => {
+    const { query } = this.props
+    const parentId = Folder.ROOT_ID     // FIXME: Private folders under <user>
+    const search = new AssetSearch(query)
+    search.aggs = undefined             // Remove widget aggs
+    const folder = new Folder({ name, acl, parentId, search: query })
+    this.props.actions.createFolder(folder)
+    this.dismissSaveSearch()
+  }
+
+  clearRacetrack = () => {
     this.props.actions.resetRacetrackWidgets()
   }
 
@@ -35,15 +54,15 @@ class Racetrack extends Component {
     console.log('Quick Add keypress')
   }
 
-  submitEmptySearch (event) {
+  submitEmptySearch = (event) => {
     event.preventDefault()
     const type = widgetTypes.SIMPLE_SEARCH_WIDGET
     const sliver = new AssetSearch({ query: this.state.emptySearch })
     this.props.actions.resetRacetrackWidgets([new Widget({ type, sliver })])
   }
 
-  changeEmptySearch (event) {
-    this.setState({ emptySearch: event.target.value })
+  changeEmptySearch = (event) => {
+    this.setState({ ...this.state, emptySearch: event.target.value })
   }
 
   pushWidgetType (type) {
@@ -61,10 +80,10 @@ class Racetrack extends Component {
           GET STARTED WITH A SIMPLE SEARCH<br/>
           OR ADD SEARCH WIDGETS
         </div>
-        <form onSubmit={this.submitEmptySearch.bind(this)}>
+        <form onSubmit={this.submitEmptySearch}>
           <input type="text" placeholder="Search..."
                  value={this.state.emptySearch}
-                 onChange={this.changeEmptySearch.bind(this)} />
+                 onChange={this.changeEmptySearch} />
         </form>
       </div>
     )
@@ -104,11 +123,13 @@ class Racetrack extends Component {
 
   renderFooter (isIconified) {
     if (isIconified) return null
+    const { showSaveSearch } = this.state
     return (
       <div className="Racetrack-footer flexOff">
         <div className="Racetrack-footer-group">
-          <button onClick={this.handleSave.bind(this)} className="Racetrack-footer-save-button">Save</button>
-          <button onClick={this.handleClear.bind(this)}>Clear</button>
+          { showSaveSearch && <CreateFolder title="Create Smart Collection" onDismiss={this.dismissSaveSearch} onCreate={this.saveSearch} />}
+          <button onClick={this.saveRacetrack} className="Racetrack-footer-save-button">Save</button>
+          <button onClick={this.clearRacetrack}>Clear</button>
         </div>
       </div>
     )
@@ -158,11 +179,12 @@ class Racetrack extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({ modifyRacetrackWidget, resetRacetrackWidgets }, dispatch)
+  actions: bindActionCreators({ modifyRacetrackWidget, resetRacetrackWidgets, createFolder }, dispatch)
 })
 
 const mapStateToProps = state => ({
-  widgets: state.racetrack.widgets
+  widgets: state.racetrack.widgets,
+  query: state.assets.query
 })
 
 export default connect(
