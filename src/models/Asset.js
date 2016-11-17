@@ -14,7 +14,10 @@ export default class Asset {
   }
 
   source () { return this.document.source.filename }
-
+  url (protocol, host) {
+    return `${protocol}//${host}:8066/api/v1/assets/${this.id}/_stream`
+  }
+  mediaType () { return this.document.source.mediaType }
   tinyProxy () { return this.document.proxies ? this.document.proxies.tinyProxy : null }
 
   width () { return this.document.image && this.document.image.width ? this.document.image.width : 0 }

@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import Measure from 'react-measure'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import keydown from 'react-keydown'
 import * as assert from 'assert'
 
 import Thumb from '../Thumb'
@@ -89,6 +90,18 @@ class Assets extends Component {
       this.setState({...this.state, lastSelectedId: asset.id})
     }
     actions.selectAssetIds(ids)
+  }
+
+  @keydown('space')
+  isolateSelected () {
+    const { assets, selectedIds } = this.props
+    if (selectedIds && selectedIds.size === 1) {
+      const id = selectedIds.values().next().value
+      const index = assets.findIndex(a => (a.id === id))
+      if (index >= 0) {
+        this.isolateToLightbox(assets[index])
+      }
+    }
   }
 
   isolateToLightbox (asset) {
