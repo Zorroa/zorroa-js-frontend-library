@@ -23,18 +23,31 @@ class Facet extends Component {
     actions: PropTypes.object.isRequired,
     id: PropTypes.number.isRequired,
     isIconified: PropTypes.bool.isRequired,
-    aggs: PropTypes.object
+    aggs: PropTypes.object,
+    widgets: PropTypes.arrayOf(PropTypes.instanceOf(WidgetModel))
   }
 
   state = {
-    field: 'Disney.film.name.raw',
+    field: '',
     terms: [],
     chartType: BAR_CHART,
     showDisplayOptions: false
   }
 
   componentWillMount () {
-    this.setState({ showDisplayOptions: true })
+    const { id, widgets } = this.props
+    const index = widgets && widgets.findIndex(widget => (id === widget.id))
+    const widget = widgets[index]
+    if (widget && widget.sliver) {
+      const field = widget.sliver.aggs.facet.terms.field
+      this.setState({field})
+      if (widget.sliver.filter) {
+        const terms = widget.sliver.filter.terms[field]
+        this.setState({terms})
+      }
+    } else {
+      this.setState({showDisplayOptions: true})
+    }
   }
 
   modifySliver = (field, terms) => {
@@ -159,7 +172,8 @@ class Facet extends Component {
 
 export default connect(
   state => ({
-    aggs: state.assets && state.assets.aggs
+    aggs: state.assets && state.assets.aggs,
+    widgets: state.racetrack && state.racetrack.widgets
   }), dispatch => ({
     actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds }, dispatch)
   })
