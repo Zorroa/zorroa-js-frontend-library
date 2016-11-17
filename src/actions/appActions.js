@@ -1,4 +1,4 @@
-import { MODAL, ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE, METADATA_FIELDS, TABLE_FIELDS, DISPLAY_OPTIONS } from '../constants/actionTypes'
+import { MODAL, ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE, METADATA_FIELDS, TABLE_FIELDS, DISPLAY_OPTIONS, SET_DRAGGING } from '../constants/actionTypes'
 
 export function updateModal ({title, footer, content}) {
   return {
@@ -39,6 +39,13 @@ export function updateTableFields (fields) {
   return ({
     type: TABLE_FIELDS,
     payload: fields
+  })
+}
+
+export function setIsDragging (isDragging) {
+  return ({
+    type: SET_DRAGGING,
+    payload: isDragging
   })
 }
 

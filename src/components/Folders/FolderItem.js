@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import Folder from '../../models/Folder'
 
-import { getFolderChildren, selectFolderIds, addAssetIdsToFolderId } from '../../actions/folderAction'
+import { addAssetIdsToFolderId } from '../../actions/folderAction'
 
 // Renders folder children as Collapsible elements.
 
@@ -24,8 +24,8 @@ const target = {
       var selectedAssetIds = new Set(props.selectedAssetIds)
       selectedAssetIds.add(data.id)
       props.actions.addAssetIdsToFolderId([...selectedAssetIds], props.folder.id)
+    }
   }
-}
 }
 
 @DropTarget('FOLDER', target)
@@ -40,40 +40,35 @@ class FolderItem extends Component {
     isSelected: PropTypes.bool.isRequired,
     onToggle: PropTypes.func,
     onSelect: PropTypes.func,
-
-    // state props
-    folders: PropTypes.object.isRequired
+    dragHover: PropTypes.bool.isRequired
   }
 
   render () {
-    const { folder, depth, isOpen, hasChildren, isSelected, onToggle, onSelect, dropparams } = this.props
+    const { folder, depth, isOpen, hasChildren, isSelected, onToggle, onSelect, dropparams, dragHover } = this.props
     const icon = folder.isDyhi() ? 'icon-cube' : 'icon-folder'
 
     return (
-      <div className={classnames('FolderItem', { isOpen, hasChildren, isSelected })}
-           style={{ paddingLeft:`${(depth - 1) * 10}px` }}
-           {...dropparams}>
+      <div className={classnames('FolderItem', { isOpen, hasChildren, isSelected: isSelected || dragHover })}
+           style={{ paddingLeft: `${(depth - 1) * 10}px` }}>
         <div className='FolderItem-toggle'
-             onClick={event => { onToggle(folder); return false }}
-        >
+             onClick={event => { onToggle(folder); return false }}>
           {(hasChildren) ? <i className='FolderItem-toggleArrow icon-triangle-down'/> : null}
         </div>
-        <div className='FolderItem-select'
-            onClick={event => { onSelect(folder); return false }}
-        >
+        <div className={classnames('FolderItem-select', {dragHover})}
+             onClick={event => { onSelect(folder); return false }}>
           <i className={`FolderItem-icon ${icon}`}/>
           <div className='FolderItem-text' key={folder.id}>
             {folder.name}
           </div>
         </div>
+        <div className={classnames('FolderItem-dropzone', {dragHover})} {...dropparams}/>
       </div>
     )
   }
 }
 
 export default connect(state => ({
-  selectedAssetIds: state.assets.selectedIds,
-  folders: state.folders
+  selectedAssetIds: state.assets.selectedIds
 }), dispatch => ({
-  actions: bindActionCreators({ getFolderChildren, selectFolderIds, addAssetIdsToFolderId, dispatch }, dispatch)
+  actions: bindActionCreators({ addAssetIdsToFolderId }, dispatch)
 }))(FolderItem)

@@ -2,13 +2,14 @@ import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as assert from 'assert'
+import classnames from 'classnames'
 
-import Header from '../../components/Header'
-import Sidebar from '../../components/Sidebar'
-import Assets from '../../components/Assets'
-import Folders from '../../components/Folders'
-import Racetrack from '../../components/Racetrack'
-import Metadata from '../../components/Metadata'
+import Header from '../Header'
+import Sidebar from '../Sidebar'
+import Assets from '../Assets'
+import Folders from '../Folders'
+import Racetrack from '../Racetrack'
+import Metadata from '../Metadata'
 import Collapsible from '../Collapsible'
 
 import { iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible, displayOptions, METADATA_DISPLAY_OPTIONS } from '../../actions/appActions'
@@ -95,7 +96,7 @@ class Workspace extends Component {
     })
 
     return (
-      <div className="app">
+      <div className={classnames('App', {isDragging: app.isDragging})}>
         <Header/>
         <div className="Workspace flexRow fullWidth fullHeight">
 

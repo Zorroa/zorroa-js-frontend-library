@@ -35,18 +35,33 @@ class Folders extends Component {
 
   loadChildren (id) {
     const { folders } = this.props
-    var maybeLoadGrandchildren = (children) => {
-      // If I've never loaded these children before, do it once now
+
+    this.props.actions.getFolderChildren(id)
+    .then(action => {
+      if (!action || !action.payload || !action.payload.children) return
+
+      const children = action.payload.children
+      let proms = []
+
+      // If we never loaded these children before, do it once now
       // This is to find out whether the children have children, so we can
       // show or hide UI for toggling folders
-      if (children) children.forEach(child => {
-        // only load child's children if we haven't loaded this child before
-        if (!folders.all.get(child.id)) {
-          this.props.actions.getFolderChildren(child.id)
-        }
-      })
-    }
-    this.props.actions.getFolderChildren(id, maybeLoadGrandchildren)
+      // TODO: the grandchildren requests are network-heavy, and
+      // can be removed if/when we have an API call to query folder counts
+      if (children) {
+        children.forEach(child => {
+          // only load child's children if we haven't loaded this child before
+          // or if the child has no children, so empty folders have a chance to update
+          const childFolder = folders.all.get(child.id)
+          if (!childFolder || !childFolder.childIds || !childFolder.childIds.size) {
+            proms.push(this.props.actions.getFolderChildren(child.id))
+          }
+        })
+      }
+
+      Promise.all(proms)
+      .then(() => { console.log(`Folder children all done loading for ${id}`) })
+    })
   }
 
   deleteFolder = () => {
@@ -68,7 +83,7 @@ class Folders extends Component {
     this.props.actions.selectFolderIds(selectedFolderIds)
   }
 
-  getFolderList (folder, depth) {
+  renderFolderList (folder, depth) {
     const { folders } = this.props
     const isOpen = folders.openFolderIds.has(folder.id)
     const isSelected = folders.selectedFolderIds.has(folder.id)
@@ -78,7 +93,7 @@ class Folders extends Component {
     let folderList = (depth > 0) ? [
       (<FolderItem {...{depth, folder, isOpen, isSelected}}
         key={folder.id}
-        hasChildren={!childIds || childIds.size > 0 /* pretend there are children when we have no information */}
+        hasChildren={childIds && childIds.size > 0}
         onToggle={this.toggleFolder.bind(this, folder)}
         onSelect={this.selectFolder.bind(this, folder)}
       />)
@@ -92,7 +107,7 @@ class Folders extends Component {
         children = children.filter(Folder.Filters[this.props.filterName])
       }
       children.forEach(child => {
-        folderList = folderList.concat(this.getFolderList(child, depth + 1))
+        folderList = folderList.concat(this.renderFolderList(child, depth + 1))
       })
     }
 
@@ -125,7 +140,7 @@ class Folders extends Component {
     const isFolderSelected = selectedFolderIds && selectedFolderIds.size > 0
     const isDisabled = !selectedFolderIds || selectedFolderIds.size !== 1
     const rootFolder = folders.all.get(Folder.ROOT_ID)
-    let folderList = this.getFolderList(rootFolder, 0)
+    let folderList = this.renderFolderList(rootFolder, 0)
 
     return (
       <div className='Folders'>

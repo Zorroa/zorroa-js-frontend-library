@@ -8,6 +8,8 @@ $FolderItemHeight : 25px;
   @include flexAlignItemsCenter;
   @include fullWidth;
 
+  position: relative; // fbo .FolderItem-dropzone, who's position: absolute
+
   height: $FolderItemHeight;
 
   &:not(.isOpen) .FolderItem-toggleArrow {
@@ -51,4 +53,20 @@ $FolderItemHeight : 25px;
 .FolderItem-text {
   @include clampText;
   margin-left: 10px;
+}
+
+.FolderItem-dropzone {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: none;
+  border: 1px solid $zorroa-gray;
+  border-radius: 2px;
+
+  .App.isDragging & {
+    display: block;
+  }
 }

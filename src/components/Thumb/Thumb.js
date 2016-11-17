@@ -6,7 +6,7 @@ import classnames from 'classnames'
 
 const source = {
   dragStart (props, type, se) {
-    se.dataTransfer.setData('text/plain', JSON.stringify({type, id:props.asset.id}))
+    se.dataTransfer.setData('text/plain', JSON.stringify({type, id: props.asset.id}))
   },
   dragEnd (props, type, se) {
     se.preventDefault()

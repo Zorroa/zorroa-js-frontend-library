@@ -64,11 +64,12 @@ export default function (state = initialState, action) {
     case CREATE_FOLDER:
       const folder = action.payload
       if (folder.id) {
-        let all = new Map(state.all)
+        folder.childIds = new Set() // new folder has no children
+        let all = new Map(state.all) // copy folder map
+        let openFolderIds = new Set(state.openFolderIds)
         all.set(folder.id, folder)
-        const parent = state.all.get(folder.parentId)
+        const parent = state.all.get(folder.parentId) // copy folder's parent
         let newParent = new Folder(parent)
-        console.log('CREATE_FOLDER', 'folder.id', folder.id, 'folder.parentId', folder.parentId)
         if (!parent.childIds) {
           newParent.childIds = new Set()
         } else {
@@ -76,7 +77,8 @@ export default function (state = initialState, action) {
         }
         newParent.childIds.add(folder.id)
         all.set(newParent.id, newParent)
-        return { ...state, all }
+        openFolderIds.add(newParent.id) // make sure we can see the new folder immediately
+        return { ...state, all, openFolderIds }
       }
       break
 

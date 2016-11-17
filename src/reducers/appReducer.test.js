@@ -1,4 +1,4 @@
-import { MODAL, ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, METADATA_FIELDS, TABLE_FIELDS, DISPLAY_OPTIONS } from '../constants/actionTypes'
+import { MODAL, ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, METADATA_FIELDS, TABLE_FIELDS, DISPLAY_OPTIONS, SET_DRAGGING } from '../constants/actionTypes'
 import appReducer from './appReducer'
 import { METADATA_DISPLAY_OPTIONS } from '../actions/appActions'
 
@@ -62,6 +62,15 @@ describe('appReducer', () => {
       const action = { type: DISPLAY_OPTIONS, payload: METADATA_DISPLAY_OPTIONS }
       expect(appReducer({}, action)
       ).toEqual({ displayOptions: METADATA_DISPLAY_OPTIONS })
+    })
+  })
+
+  describe('DRAGDROP', () => {
+    it('set DnD dragging on', () => {
+      const dragAction = { type: SET_DRAGGING, payload: true }
+      expect(appReducer({}, dragAction)).toEqual({ isDragging: true })
+      const dropAction = { type: SET_DRAGGING, payload: false }
+      expect(appReducer({}, dropAction)).toEqual({ isDragging: false })
     })
   })
 })
