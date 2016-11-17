@@ -137,6 +137,16 @@
     .Racetrack-footer-save-button {
       background-color: #a5a5a5;
       color: $zorroa-nearwhite;
+
+      &:disabled {
+        cursor: not-allowed;
+        background-color: $zorroa-lightgray;
+      }
+
+      &:hover:enabled {
+        color: white;
+        background-color: $zorroa-sickly-green;
+      }
     }
 
     button {
@@ -149,7 +159,7 @@
       background: none;
       border: none;
 
-      &:hover {
+      &:hover:enabled {
         background-color: #a5a5a5;
         color: $zorroa-nearwhite;
         font-weight: 500;

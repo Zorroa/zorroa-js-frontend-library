@@ -123,13 +123,15 @@ class Racetrack extends Component {
 
   renderFooter (isIconified) {
     if (isIconified) return null
+    const { widgets } = this.props
     const { showSaveSearch } = this.state
+    const disabled = !widgets || !widgets.length
     return (
       <div className="Racetrack-footer flexOff">
         <div className="Racetrack-footer-group">
           { showSaveSearch && <CreateFolder title="Create Smart Collection" onDismiss={this.dismissSaveSearch} onCreate={this.saveSearch} />}
-          <button onClick={this.saveRacetrack} className="Racetrack-footer-save-button">Save</button>
-          <button onClick={this.clearRacetrack}>Clear</button>
+          <button disabled={disabled} onClick={this.saveRacetrack} className="Racetrack-footer-save-button">Save</button>
+          <button disabled={disabled} onClick={this.clearRacetrack}>Clear</button>
         </div>
       </div>
     )
