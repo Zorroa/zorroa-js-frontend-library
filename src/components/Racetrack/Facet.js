@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import classnames from 'classnames'
 
 import WidgetModel from '../../models/Widget'
 import Asset from '../../models/Asset'
@@ -22,28 +23,26 @@ class Facet extends Component {
     actions: PropTypes.object.isRequired,
     id: PropTypes.number.isRequired,
     isIconified: PropTypes.bool.isRequired,
-    buckets: PropTypes.arrayOf(PropTypes.object)
+    aggs: PropTypes.object
   }
 
   state = {
     field: 'Disney.film.name.raw',
-    selectedIndexes: [],
+    terms: [],
     chartType: BAR_CHART,
     showDisplayOptions: false
   }
-
-  modifySliver = this.modifySliver.bind(this)
 
   componentWillMount () {
     this.setState({ showDisplayOptions: true })
   }
 
-  modifySliver (field, term) {
+  modifySliver = (field, terms) => {
     const type = FACET_WIDGET
     const aggs = { facet: { terms: { field } } }
     let sliver = new AssetSearch({aggs})
-    if (term) {
-      sliver.filter = new AssetFilter({terms: {[field]: [term]}})
+    if (terms.length) {
+      sliver.filter = new AssetFilter({terms: {[field]: terms}})
     }
     const widget = new WidgetModel({id: this.props.id, type, sliver})
     this.props.actions.modifyRacetrackWidget(widget)
@@ -66,8 +65,15 @@ class Facet extends Component {
   }
 
   selectTerm (term) {
-    console.log('Select term: ' + term)
-    this.modifySliver(this.state.field, term)
+    let terms = [ ...this.state.terms ]
+    const index = terms.indexOf(term)
+    if (index >= 0) {
+      terms.splice(index, 1)
+    } else {
+      terms.push(term)
+    }
+    this.setState({ ...this.state, terms })
+    this.modifySliver(this.state.field, terms)
   }
 
   selectField (event) {
@@ -76,12 +82,12 @@ class Facet extends Component {
   }
 
   updateDisplayOptions (event, state) {
-    console.log('Update facet fields:\n' + JSON.stringify(state.checkedNamespaces))
     const base = state.checkedNamespaces && state.checkedNamespaces.length && state.checkedNamespaces[0]
     if (base && base.length) {
       const field = base + '.raw'
-      this.setState({ ...this.state, field })
-      this.modifySliver(field)
+      const terms = []
+      this.setState({ ...this.state, field, terms })
+      this.modifySliver(field, terms)
     }
   }
 
@@ -90,9 +96,11 @@ class Facet extends Component {
   }
 
   render () {
-    const { isIconified, buckets } = this.props
+    const { isIconified, aggs } = this.props
     let maxCount = 0
     let minCount = Number.MAX_SAFE_INTEGER
+    // Extract the buckets for this widget from the global query using id
+    const buckets = aggs && (this.props.id in aggs) ? aggs[this.props.id].facet.buckets : []
     buckets.forEach(bucket => {
       maxCount = Math.max(maxCount, bucket.doc_count)
       minCount = Math.min(minCount, bucket.doc_count)
@@ -127,7 +135,7 @@ class Facet extends Component {
               </thead>
               <tbody>
               { buckets && buckets.map(bucket => (
-                <tr className="Facet-value-table-row" key={bucket.key} onClick={this.selectTerm.bind(this, bucket.key)}>
+                <tr className={classnames('Facet-value-table-row', {selected: this.state.terms.indexOf(bucket.key) >= 0})} key={bucket.key} onClick={this.selectTerm.bind(this, bucket.key)}>
                   <td>{bucket.key}</td>
                   <td>{bucket.doc_count}</td>
                 </tr>
@@ -151,7 +159,7 @@ class Facet extends Component {
 
 export default connect(
   state => ({
-    buckets: state.assets && state.assets.aggs && state.assets.aggs.facet ? state.assets.aggs.facet.buckets : []
+    aggs: state.assets && state.assets.aggs
   }), dispatch => ({
     actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds }, dispatch)
   })

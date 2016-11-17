@@ -61,6 +61,13 @@
     overflow: hidden;
     overflow-y: auto;
 
+    .Facet-value-table-row {
+
+      &.selected {
+        color: white;
+        background-color: $zorroa-water-blue;
+      }
+    }
   }
 
   // Custom scrollbar styles from Amber
@@ -82,12 +89,10 @@
 
   .Table-header {
     text-align: left;
-    //width: 40%;
   }
 
   .Table-row {
     text-align: left;
-    //width: 60%;
   }
 
   .Table-settings {
