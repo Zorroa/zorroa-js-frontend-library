@@ -31,15 +31,6 @@
     table {}
   }
 
-  .Facet-icon {
-    width: 30px;
-    height: 30px;
-    border: none;
-    outline: none;
-    font-size: 16px;
-    border-radius: 3px;
-  }
-
   .Facet-min-value {
     font-size: 13px;
     color: $zorroa-lightgray;
@@ -52,6 +43,7 @@
   }
 
   .Facet-value-table {
+    @include flexOn;
     width: 100%;
     max-width: 100%;
     max-height: 300px;
@@ -67,6 +59,23 @@
         color: white;
         background-color: $zorroa-water-blue;
       }
+    }
+  }
+
+  .Facet-pie-chart {
+    @include flexOn;
+    @include fullWidth;
+    height: 240px;
+    max-height: 240px;
+
+    .Facet-pie-pct {
+      font-size: 10px;
+      color: $zorroa-nearwhite;
+    }
+
+    .Facet-pie-label {
+      font-size: 10px;
+      color: $zorroa-lightgray;
     }
   }
 
@@ -135,6 +144,23 @@
     border-top: 1px solid $zorroa-nearwhite;
     padding-top: 4px;
     padding-bottom: 4px;
+
+    .Facet-icon {
+      width: 30px;
+      height: 30px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      border-radius: 3px;
+      margin: 4px;
+      counter-reset: $zorroa-greyish-brown;
+      background: transparent;
+
+      &.selected {
+        color: white;
+        background-color: #a11d77;
+      }
+    }
   }
 
   .rotN90Flip {
