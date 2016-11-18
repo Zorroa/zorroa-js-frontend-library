@@ -28,7 +28,7 @@ export function DropTarget (type, params) {
           },
           onDrop: (event) => {
             this.setState({dragHover: false})
-            drop.bind(this, props, type)
+            drop(props, type, event)
             event.preventDefault()
           }
         }
