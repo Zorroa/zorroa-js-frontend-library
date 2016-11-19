@@ -70,3 +70,67 @@ $FolderItemHeight : 25px;
     display: block;
   }
 }
+
+.FolderItem-context-menu {
+  @include flexCol;
+  background-color: white;
+  border-radius: 3px;
+  position: absolute;
+  top: 24px;
+  left: 28px;
+  width: 180px;
+  z-index: 1000;
+  color: $zorroa-greyish-brown;
+  box-shadow: 0 0 4px 4px rgba(0,0,0,0.15);
+  font-size: 12px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+
+  .FolderItem-context-item {
+    @include flexRow;
+    @include flexAlignItemsCenter;
+
+    max-width: 100%;
+    border-bottom: 1px solid $zorroa-nearwhite;
+    margin-left: 4px;
+    margin-right: 4px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 4px;
+    padding-bottom: 8px;
+
+    &:hover {
+      background-color: $zorroa-lightgray;
+    }
+
+    &.disabled:hover {
+      background-color: white;
+    }
+
+    div[class^="icon-"]:before {
+      margin-right: 8px;
+      margin-left: 4px;
+      padding-left: 0;
+      font-size: 14px;
+      color: $zorroa-gray;
+    }
+  }
+
+  .FolderItem-context-item:last-child {
+    border-bottom: none;
+  }
+}
+
+
+.FolderItem-context-menu-background {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  background-color: transparent;
+  box-sizing: border-box;
+}

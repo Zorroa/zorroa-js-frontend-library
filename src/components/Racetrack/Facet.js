@@ -10,9 +10,9 @@ import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import { FACET_WIDGET } from '../../constants/widgetTypes'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
+import { showDisplayOptionsModal } from '../../actions/appActions'
 import Widget from './Widget'
 import { unCamelCase } from '../../services/jsUtil'
-import DisplayOptions from '../DisplayOptions'
 
 const BAR_CHART = 'icon-list'
 const PIE_CHART = 'icon-pie-chart'
@@ -32,8 +32,7 @@ class Facet extends Component {
   state = {
     field: '',
     terms: [],
-    chartType: BAR_CHART,
-    showDisplayOptions: false
+    chartType: BAR_CHART
   }
 
   componentWillMount () {
@@ -43,7 +42,7 @@ class Facet extends Component {
   componentWillReceiveProps (nextProps) {
     const { id, widgets } = nextProps
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
-    const widget = widgets[index]
+    const widget = widgets && widgets[index]
     if (widget && widget.sliver) {
       const field = widget.sliver.aggs.facet.terms.field
       if (field !== this.state.field) {
@@ -56,7 +55,7 @@ class Facet extends Component {
         }
       }
     } else {
-      this.setState({showDisplayOptions: true})
+      this.selectField()
     }
   }
 
@@ -71,7 +70,7 @@ class Facet extends Component {
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
-  removeFilter () {
+  removeFilter = () => {
     this.props.actions.removeRacetrackWidgetIds([this.props.id])
   }
 
@@ -98,8 +97,13 @@ class Facet extends Component {
   }
 
   selectField = (event) => {
-    this.setState({ showDisplayOptions: true })
-    event.stopPropagation()
+    const syncLabel = null
+    const singleSelection = true
+    const selectedFields = []
+    const fieldTypes = null
+    this.props.actions.showDisplayOptionsModal('Facet Fields', syncLabel,
+      selectedFields, singleSelection, fieldTypes, this.updateDisplayOptions)
+    event && event.stopPropagation()
   }
 
   updateDisplayOptions = (event, state) => {
@@ -109,10 +113,6 @@ class Facet extends Component {
       const terms = []
       this.modifySliver(field, terms)
     }
-  }
-
-  dismissDisplayOptions = () => {
-    this.setState({ showDisplayOptions: false })
   }
 
   renderPieLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name, fill }) => {
@@ -286,7 +286,7 @@ class Facet extends Component {
 
   render () {
     const { isIconified } = this.props
-    const { field, minCount, showDisplayOptions } = this.state
+    const { field, minCount } = this.state
     const title = Asset.lastNamespace(unCamelCase(field))
     return (
       <Widget className="Facet"
@@ -299,13 +299,6 @@ class Facet extends Component {
               isIconified={isIconified}
               icon='icon-bar-graph'
               onClose={this.removeFilter.bind(this)}>
-        { showDisplayOptions && (
-          <DisplayOptions selectedFields={[]}
-                          title="Facet Fields"
-                          singleSelection={true}
-                          onUpdate={this.updateDisplayOptions}
-                          onDismiss={this.dismissDisplayOptions}/>
-        )}
         <div className="Facet-body flexCol">
           { this.renderChart() }
           <div className="Facet-min-value flexRow flexJustifyCenter">
@@ -325,6 +318,6 @@ export default connect(
     aggs: state.assets && state.assets.aggs,
     widgets: state.racetrack && state.racetrack.widgets
   }), dispatch => ({
-    actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds }, dispatch)
+    actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds, showDisplayOptionsModal }, dispatch)
   })
 )(Facet)

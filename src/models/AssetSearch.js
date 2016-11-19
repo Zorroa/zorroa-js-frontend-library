@@ -64,6 +64,19 @@ export default class AssetSearch {
   equals (assetSearch) {
     return JSON.stringify(this, equalsReplacer) === JSON.stringify(assetSearch, equalsReplacer)
   }
+
+  empty () {
+    if (this.query && this.query.length) {
+      return false
+    }
+    if (this.filter && !this.filter.empty()) {
+      return false
+    }
+    if (this.postFilter && !this.postFilter.empty()) {
+      return false
+    }
+    return true
+  }
 }
 
 // Combine an array of arrays into an array with unique elements

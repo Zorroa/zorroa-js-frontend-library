@@ -11,8 +11,10 @@ import Folders from '../Folders'
 import Racetrack from '../Racetrack'
 import Metadata from '../Metadata'
 import Collapsible from '../Collapsible'
+import DisplayOptions from '../DisplayOptions'
+import CreateFolder from '../Folders/CreateFolder'
 
-import { iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible, displayOptions, METADATA_DISPLAY_OPTIONS } from '../../actions/appActions'
+import { iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible } from '../../actions/appActions'
 
 class Workspace extends Component {
   static displayName () {
@@ -44,11 +46,6 @@ class Workspace extends Component {
     assert.ok(Workspace.collapsibleNames.has(name))
     const { actions, app } = this.props
     actions.toggleCollapsible(name, !app.collapsibleOpen[name])
-  }
-
-  showDisplayOptions = (mode, event) => {
-    this.props.actions.displayOptions(mode)
-    // event.stopPropagation()
   }
 
   render () {
@@ -83,12 +80,7 @@ class Workspace extends Component {
       closeIcon: 'icon-folder2'
     })
     const MetadataParams = () => ({
-      header: (
-        <div className='flexCenter'>
-          <span>Metadata</span>
-          <div onClick={this.showDisplayOptions.bind(this, METADATA_DISPLAY_OPTIONS)} className='Metadata-icon icon-cog' />
-        </div>
-      ),
+      header: (<span>Metadata</span>),
       isOpen: app.collapsibleOpen.metadata,
       isIconified: app.leftSidebarIsIconified,
       onOpen: this.toggleCollapsible.bind(this, 'metadata'),
@@ -97,6 +89,8 @@ class Workspace extends Component {
 
     return (
       <div className={classnames('App', {isDragging: app.isDragging})}>
+        { app.displayOptions && <DisplayOptions {...app.displayOptions} /> }
+        { app.createFolder && <CreateFolder {...app.createFolder} /> }
         <Header/>
         <div className="Workspace flexRow fullWidth fullHeight">
 
@@ -144,5 +138,5 @@ class Workspace extends Component {
 export default connect(state => ({
   app: state.app
 }), dispatch => ({
-  actions: bindActionCreators({ iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible, displayOptions }, dispatch)
+  actions: bindActionCreators({ iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible }, dispatch)
 }))(Workspace)

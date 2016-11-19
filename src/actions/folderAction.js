@@ -1,4 +1,7 @@
-import { GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, DELETE_FOLDER, ADD_ASSETS_TO_FOLDER, TOGGLE_FOLDER } from '../constants/actionTypes'
+import {
+  GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, UPDATE_FOLDER,
+  DELETE_FOLDER, ADD_ASSETS_TO_FOLDER, TOGGLE_FOLDER
+} from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import { getArchivist } from './authAction'
 
@@ -55,6 +58,22 @@ export function createFolder (folder) {
       })
       .catch(error => {
         console.error('Error creating folder ' + folder.name + ': ' + error)
+      })
+  }
+}
+
+export function updateFolder (folder) {
+  return dispatch => {
+    console.log('Update folder: ' + JSON.stringify(folder))
+    getArchivist().post(`${rootEndpoint}/${folder.id}`, folder)
+      .then(response => {
+        dispatch({
+          type: UPDATE_FOLDER,
+          payload: new Folder(response.data)
+        })
+      })
+      .catch(error => {
+        console.error('Error updating folder ' + folder.name + ': ' + error)
       })
   }
 }

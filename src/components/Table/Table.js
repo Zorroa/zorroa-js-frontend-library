@@ -3,9 +3,8 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import Asset from '../../models/Asset'
-import DisplayOptions from '../DisplayOptions'
 import { unCamelCase } from '../../services/jsUtil'
-import { updateMetadataFields, updateTableFields } from '../../actions/appActions'
+import { updateMetadataFields, updateTableFields, showDisplayOptionsModal } from '../../actions/appActions'
 
 class Table extends Component {
   static propTypes = {
@@ -14,23 +13,20 @@ class Table extends Component {
     actions: PropTypes.object
   }
 
-  state = { showDisplayOptions: false }
-
-  editDisplayOptions (event) {
-    this.setState({ showDisplayOptions: true })
+  showDisplayOptions = (event) => {
+    const singleSelection = false
+    const fieldTypes = null
+    this.props.actions.showDisplayOptionsModal('Table Display Options', 'Metadata',
+      this.props.fields, singleSelection, fieldTypes, this.updateDisplayOptions)
     event.stopPropagation()
   }
 
-  updateDisplayOptions (event, state) {
+  updateDisplayOptions = (event, state) => {
     console.log('Update table display options to:\n' + JSON.stringify(state.checkedNamespaces))
     this.props.actions.updateTableFields(state.checkedNamespaces)
     if (state.syncedViews) {
       this.props.actions.updateMetadataFields(state.checkedNamespaces)
     }
-  }
-
-  dismissDisplayOptions () {
-    this.setState({ showDisplayOptions: false })
   }
 
   renderRow (asset) {
@@ -52,13 +48,6 @@ class Table extends Component {
     }
     return (
       <div className="Table flexOff">
-        { this.state.showDisplayOptions && (
-          <DisplayOptions selectedFields={fields}
-                          title="Table Display Options"
-                          syncLabel="Metadata"
-                          onUpdate={this.updateDisplayOptions.bind(this)}
-                          onDismiss={this.dismissDisplayOptions.bind(this)}/>
-        )}
         <table className="Table-table">
           <thead>
           <tr>
@@ -68,7 +57,7 @@ class Table extends Component {
               </th>
             ))}
             <th key={'cog'} className="Table-settings">
-              <div onClick={this.editDisplayOptions.bind(this)} className="icon-cog"/>
+              <div onClick={this.this.showDisplayOptions} className="icon-cog"/>
             </th>
           </tr>
           </thead>
@@ -85,5 +74,5 @@ export default connect(state => ({
   assets: state.assets.all,
   fields: state.app.tableFields
 }), dispatch => ({
-  actions: bindActionCreators({ updateMetadataFields, updateTableFields }, dispatch)
+  actions: bindActionCreators({ updateMetadataFields, updateTableFields, showDisplayOptionsModal }, dispatch)
 }))(Table)

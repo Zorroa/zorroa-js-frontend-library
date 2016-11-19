@@ -5,8 +5,7 @@ import { connect } from 'react-redux'
 import Asset from '../../models/Asset'
 import DisplayProperties from '../../models/DisplayProperties'
 import DisplayPropertiesItem from './DisplayPropertiesItem'
-import DisplayOptions from '../DisplayOptions'
-import { updateMetadataFields, updateTableFields, displayOptions, METADATA_DISPLAY_OPTIONS, HIDE_DISPLAY_OPTIONS } from '../../actions/appActions'
+import { updateMetadataFields, updateTableFields, showDisplayOptionsModal } from '../../actions/appActions'
 
 class Metadata extends Component {
   static propTypes = {
@@ -17,20 +16,26 @@ class Metadata extends Component {
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     selectedIds: PropTypes.object,
     fields: PropTypes.arrayOf(PropTypes.string).isRequired,
-    displayOptions: PropTypes.string,
     actions: PropTypes.object
   }
 
-  updateDisplayOptions (event, state) {
+  state = {
+    filterString: ''
+  }
+
+  showDisplayOptions = () => {
+    const singleSelection = false
+    const fieldTypes = null
+    this.props.actions.showDisplayOptionsModal('Metadata Display Options', 'Table',
+      this.props.fields, singleSelection, fieldTypes, this.updateDisplayOptions)
+  }
+
+  updateDisplayOptions = (event, state) => {
     console.log('Update metadata display options to:\n' + JSON.stringify(state.checkedNamespaces))
     this.props.actions.updateMetadataFields(state.checkedNamespaces)
     if (state.syncedViews) {
       this.props.actions.updateTableFields(state.checkedNamespaces)
     }
-  }
-
-  dismissDisplayOptions () {
-    this.props.actions.displayOptions(HIDE_DISPLAY_OPTIONS)
   }
 
   // Return existing or create a new propertry in th passed-in array
@@ -63,8 +68,9 @@ class Metadata extends Component {
   }
 
   render () {
-    const { assets, selectedIds, isIconified, fields, displayOptions } = this.props
-    const displayProperties = this.displayPropertiesForFields(fields)
+    const { assets, selectedIds, isIconified, fields } = this.props
+    const { filterString } = this.state
+    const displayProperties = this.displayPropertiesForFields(fields).filter(field => (field.name.includes(filterString)))
     var selectedAssets = new Set()
     if (selectedIds) {
       for (const id of selectedIds) {
@@ -73,22 +79,21 @@ class Metadata extends Component {
     }
     return (
       <div className="Metadata">
-        { displayOptions === METADATA_DISPLAY_OPTIONS && (
-          <DisplayOptions selectedFields={fields}
-                          title="Metadata Display Options"
-                          syncLabel="Table"
-                          onUpdate={this.updateDisplayOptions.bind(this)}
-                          onDismiss={this.dismissDisplayOptions.bind(this)}/>
-        )}
-        { displayProperties.map(field =>
-          (<DisplayPropertiesItem
-            key={field.name}
-            isIconified={isIconified}
-            field={field.name}
-            selectedAssets={selectedAssets}
-            displayProperties={field}
-          />))
-        }
+        <div className="header">
+          <input type="text" onChange={this.filterFields} value={this.state.filterString} placeholder="Filter Metadata" />
+          <div className="icon-cog" onClick={this.showDisplayOptions} />
+        </div>
+        <div className="body">
+          { displayProperties.map(field =>
+            (<DisplayPropertiesItem
+              key={field.name}
+              isIconified={isIconified}
+              field={field.name}
+              selectedAssets={selectedAssets}
+              displayProperties={field}
+            />))
+          }
+        </div>
       </div>
     )
   }
@@ -97,8 +102,7 @@ class Metadata extends Component {
 export default connect(state => ({
   assets: state.assets.all,
   selectedIds: state.assets.selectedIds,
-  fields: state.app.metadataFields,
-  displayOptions: state.app.displayOptions
+  fields: state.app.metadataFields
 }), dispatch => ({
-  actions: bindActionCreators({ updateMetadataFields, updateTableFields, displayOptions }, dispatch)
+  actions: bindActionCreators({ updateMetadataFields, updateTableFields, showDisplayOptionsModal }, dispatch)
 }))(Metadata)

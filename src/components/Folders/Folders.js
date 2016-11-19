@@ -4,9 +4,10 @@ import { connect } from 'react-redux'
 import * as assert from 'assert'
 
 import Folder from '../../models/Folder'
-import { getFolderChildren, createFolder, deleteFolderIds, selectFolderIds, toggleFolder } from '../../actions/folderAction'
+import { getFolderChildren, createFolder, selectFolderIds, toggleFolder } from '../../actions/folderAction'
+import { showCreateFolderModal } from '../../actions/appActions'
 import FolderItem from './FolderItem'
-import CreateFolder from './CreateFolder'
+import AssetSearch from '../../models/AssetSearch'
 
 // Display all folders, starting with the root.
 // Later this will be broken into Collections and Smart Folders.
@@ -19,10 +20,11 @@ class Folders extends Component {
     actions: PropTypes.object.isRequired,
 
     // state props
-    folders: PropTypes.object.isRequired
+    folders: PropTypes.object.isRequired,
+    query: PropTypes.instanceOf(AssetSearch)
   }
 
-  state = { showCreateFolder: false }
+  state = { filterString: '' }
 
   componentWillMount () {
     assert.ok(this.props.filterName in Folder.Filters) // make sure filter is valid
@@ -64,10 +66,6 @@ class Folders extends Component {
     })
   }
 
-  deleteFolder = () => {
-    this.props.actions.deleteFolderIds(this.props.folders.selectedFolderIds)
-  }
-
   toggleFolder = (folder) => {
     const { folders } = this.props
     const isOpen = folders.openFolderIds.has(folder.id)
@@ -83,8 +81,80 @@ class Folders extends Component {
     this.props.actions.selectFolderIds(selectedFolderIds)
   }
 
+  filterFolders = (event) => {
+    const filterString = event.target.value
+    this.setState({ filterString })
+  }
+
+  addFolder = () => {
+    const isEditing = false
+    this.props.actions.showCreateFolderModal(this.addFolderTitle(),
+      isEditing, this.addFolderCallback())
+  }
+
+  addFolderTitle () {
+    switch (this.props.filterName) {
+      case 'browsing': return 'Create Browsing Folder'
+      case 'smart': return 'Create Smart Collection'
+      case 'simple': return 'Create Simple Collection'
+    }
+  }
+
+  addFolderCallback () {
+    switch (this.props.filterName) {
+      case 'browsing': return this.createBrowsingFolder
+      case 'smart': return this.createSmartFolder
+      case 'simple': return this.createSimpleFolder
+    }
+  }
+
+  createBrowsingFolder = (name, acl) => {
+    console.log('Create browsing folder')
+  }
+
+  createSmartFolder = (name, acl) => {
+    const search = new AssetSearch(this.props.query)
+    search.aggs = null
+    this.createFolder(name, acl, search)
+  }
+
+  createSimpleFolder = (name, acl) => {
+    this.createFolder(name, acl, undefined)
+  }
+
+  createFolder (name, acl, search) {
+    const parentId = this.selectedParentId()
+    const folder = new Folder({ name, parentId, acl, search })
+    this.props.actions.createFolder(folder)
+  }
+
+  selectedParentId () {
+    const selectedFolderIds = this.props.folders.selectedFolderIds
+    assert.ok(selectedFolderIds && selectedFolderIds.size === 1)
+    return selectedFolderIds.values().next().value
+  }
+
+  addFolderIcon () {
+    switch (this.props.filterName) {
+      case 'browsing': return 'icon-folder'
+      case 'smart': return 'icon-cube'
+      case 'simple': return 'icon-cube'
+    }
+  }
+
+  isAddFolderEnabled () {
+    const { folders, query } = this.props
+    const selectedFolderIds = folders.selectedFolderIds
+    switch (this.props.filterName) {
+      case 'browsing': return true
+      case 'smart': return !query.empty()
+      case 'simple': return selectedFolderIds && selectedFolderIds.size === 1
+    }
+  }
+
   renderFolderList (folder, depth) {
-    const { folders } = this.props
+    const { folders, filterName } = this.props
+    const { filterString } = this.state
     const isOpen = folders.openFolderIds.has(folder.id)
     const isSelected = folders.selectedFolderIds.has(folder.id)
     const childIds = folder.childIds
@@ -99,58 +169,39 @@ class Folders extends Component {
       />)
     ] : []
 
+    let grandkids = []
     if (childIds && isOpen) {
       let children = []
-      childIds.forEach(childId => children.push(this.props.folders.all.get(childId)))
+      childIds.forEach(childId => children.push(folders.all.get(childId)))
       // Filter the tree at the root by the filter type passed in from Workspace
       if (depth === 0) {
-        children = children.filter(Folder.Filters[this.props.filterName])
+        children = children.filter(Folder.Filters[filterName])
       }
       children.forEach(child => {
-        folderList = folderList.concat(this.renderFolderList(child, depth + 1))
+        grandkids = grandkids.concat(this.renderFolderList(child, depth + 1))
       })
     }
 
-    return folderList
-  }
+    // Filter the list, showing parent if any descendents match
+    if (grandkids.length || folder.name.toLowerCase().includes(filterString.toLowerCase())) {
+      return folderList.concat(grandkids)
+    }
 
-  addFolder = () => {
-    this.setState({ ...this.state, showCreateFolder: true })
-  }
-
-  dismissCreateFolder = () => {
-    this.setState({ ...this.state, showCreateFolder: false })
-  }
-
-  createFolder = (name, acl) => {
-    const selectedFolderIds = this.props.folders.selectedFolderIds
-    assert.ok(selectedFolderIds && selectedFolderIds.size === 1)
-    const parentId = selectedFolderIds.values().next().value
-    const folder = new Folder({ name, parentId, acl })
-    this.props.actions.createFolder(folder)
-    this.dismissCreateFolder()
+    return []
   }
 
   render () {
     const { folders } = this.props
-    const { showCreateFolder } = this.state
-    const selectedFolderIds = folders.selectedFolderIds
     const rootLoaded = folders.all.has(Folder.ROOT_ID)
     if (!rootLoaded) return null
-    const isFolderSelected = selectedFolderIds && selectedFolderIds.size > 0
-    const isDisabled = !selectedFolderIds || selectedFolderIds.size !== 1
     const rootFolder = folders.all.get(Folder.ROOT_ID)
-    let folderList = this.renderFolderList(rootFolder, 0)
-
+    const folderList = this.renderFolderList(rootFolder, 0)
     return (
       <div className='Folders'>
         <div className="Folders-controls">
-          <button disabled={isDisabled} onClick={this.addFolder}>
-            <span className="icon-plus-square"/>&nbsp;New Folder
-          </button>
-          { showCreateFolder && <CreateFolder title="Create Simple Collection" onDismiss={this.dismissCreateFolder} onCreate={this.createFolder} /> }
-          <button disabled={!isFolderSelected} onClick={this.deleteFolder}>
-            <span className="icon-trash2"/>&nbsp;Delete
+          <input type="text" value={this.state.filterString} onChange={this.filterFolders} placeholder="Filter Collections" />
+          <button disabled={!this.isAddFolderEnabled()} onClick={this.addFolder}>
+            <span className={this.addFolderIcon()}/>
           </button>
         </div>
         <div>
@@ -162,7 +213,14 @@ class Folders extends Component {
 }
 
 export default connect(state => ({
-  folders: state.folders
+  folders: state.folders,
+  query: state.assets.query
 }), dispatch => ({
-  actions: bindActionCreators({ getFolderChildren, createFolder, deleteFolderIds, selectFolderIds, toggleFolder }, dispatch)
+  actions: bindActionCreators({
+    getFolderChildren,
+    createFolder,
+    selectFolderIds,
+    toggleFolder,
+    showCreateFolderModal
+  }, dispatch)
 }))(Folders)

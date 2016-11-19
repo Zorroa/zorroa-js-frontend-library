@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import ReactMapboxGl, { Layer, Feature } from 'react-mapbox-gl'
-import DisplayOptions from '../DisplayOptions'
 
 import Widget from './Widget'
 import WidgetModel from '../../models/Widget'
@@ -11,6 +10,7 @@ import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import { MAP_WIDGET } from '../../constants/widgetTypes'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
+import { showDisplayOptionsModal } from '../../actions/appActions'
 import { unCamelCase } from '../../services/jsUtil'
 
 const accessToken = 'pk.eyJ1IjoiZGFud2V4bGVyIiwiYSI6IldaWnNGM28ifQ.e18uSb539LjXseysIC7KSw'
@@ -21,15 +21,14 @@ class Map extends Component {
     actions: PropTypes.object.isRequired,
     id: PropTypes.number.isRequired,
     isIconified: PropTypes.bool.isRequired,
-    assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset))
+    assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+    widgets: PropTypes.arrayOf(PropTypes.instanceOf(WidgetModel))
   }
 
   state = {
-    locationField: 'petrol.location.point',
-    searchField: 'petrol.WellName',
-    term: undefined,
-    showDisplayOptions: false,
-    selectSearchField: false
+    locationField: '',
+    searchField: '',
+    term: undefined
   }
 
   // Store the map location as class properties, but not component state
@@ -39,7 +38,16 @@ class Map extends Component {
   zoom = 0
 
   componentWillMount () {
-    this.setState({ showDisplayOptions: true })
+    const { id, widgets } = this.props
+    const index = widgets && widgets.findIndex(widget => (id === widget.id))
+    const widget = widgets && widgets[index]
+    if (widget && widget.sliver) {
+      const fieldRaw = widget.sliver.filter && widget.sliver.filter.terms.keys()[0]
+      const field = fieldRaw && fieldRaw.slice(0, fieldRaw.length - 4)
+      this.setState({field})
+    } else {
+      this.selectLocation()
+    }
   }
 
   modifySliver (term) {
@@ -53,16 +61,6 @@ class Map extends Component {
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
-  selectLocation = (event) => {
-    this.setState({ showDisplayOptions: true, selectSearchField: false })
-    event.stopPropagation()
-  }
-
-  selectSearch = (event) => {
-    this.setState({ showDisplayOptions: true, selectSearchField: true })
-    event.stopPropagation()
-  }
-
   onMove = (map, event) => {
     this.center = map.getCenter()
   }
@@ -71,23 +69,41 @@ class Map extends Component {
     this.zoom = map.getZoom()
   }
 
-  updateDisplayOptions (event, state) {
-    const field = state.checkedNamespaces && state.checkedNamespaces.length && state.checkedNamespaces[0]
-    if (this.state.selectSearchField) {
-      this.setState({...this.state, searchField: field})
-    } else {
-      this.setState({...this.state, locationField: field})
-    }
+  selectLocation = (event) => {
+    const syncLabel = null
+    const selectedFields = [this.state.locationField]
+    const fieldTypes = ['point']
+    const singleSelection = true
+    this.props.actions.showDisplayOptionsModal('Map Location Field', syncLabel,
+      selectedFields, singleSelection, fieldTypes, this.updateLocationField)
+    event && event.stopPropagation()
+  }
+
+  selectSearch = (event) => {
+    const syncLabel = null
+    const selectedFields = [this.state.searchField]
+    const fieldTypes = null
+    const singleSelection = true
+    this.props.actions.showDisplayOptionsModal('Map Search Field', syncLabel,
+      selectedFields, singleSelection, fieldTypes, this.updateSearchField)
+    event.stopPropagation()
+  }
+
+  updateLocationField = (event, state) => {
+    const locationField = state.checkedNamespaces && state.checkedNamespaces.length && state.checkedNamespaces[0]
+    this.setState({locationField})
     this.modifySliver(this.state.term)
   }
 
-  dismissDisplayOptions () {
-    this.setState({ showDisplayOptions: false })
+  updateSearchField = (event, state) => {
+    const searchField = state.checkedNamespaces && state.checkedNamespaces.length && state.checkedNamespaces[0]
+    this.setState({searchField})
+    this.modifySliver(this.state.term)
   }
 
   selectAsset (asset) {
     const term = asset.value(this.state.searchField)
-    this.setState({ ...this.state, term })
+    this.setState({term})
     console.log('Select marker for asset ' + asset.id + ' with ' + term)
     if (term) {
       this.modifySliver(term)
@@ -100,11 +116,9 @@ class Map extends Component {
 
   render () {
     const { isIconified, assets } = this.props
-    const { locationField, searchField, selectSearchField } = this.state
+    const { locationField } = this.state
     const title = Asset.lastNamespace(unCamelCase(this.state.field))
     const locationAssets = assets.filter(asset => (asset.value(locationField)))
-    const fieldTypes = selectSearchField ? null : ['point']
-    const selectedFields = selectSearchField ? [ searchField ] : [ locationField ]
     const layoutProperties = {
       'symbol-spacing': 50,
       'icon-allow-overlap': true,
@@ -125,14 +139,6 @@ class Map extends Component {
               )}
               isIconified={isIconified}
               onClose={this.removeFilter.bind(this)}>
-        { this.state.showDisplayOptions && (
-          <DisplayOptions selectedFields={selectedFields}
-                          title="Facet Fields"
-                          singleSelection={true}
-                          fieldTypes={fieldTypes}
-                          onUpdate={this.updateDisplayOptions.bind(this)}
-                          onDismiss={this.dismissDisplayOptions.bind(this)}/>
-        )}
         <ReactMapboxGl containerStyle={{height: '300px'}}
                        style={mapboxStyle}
                        center={[this.center.lng, this.center.lat]}
@@ -162,6 +168,6 @@ export default connect(
   state => ({
     assets: state.assets.all
   }), dispatch => ({
-    actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds }, dispatch)
+    actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds, showDisplayOptionsModal }, dispatch)
   })
 )(Map)

@@ -4,12 +4,13 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 import { getAssetFields } from '../../actions/assetsAction'
+import { dismissDisplayOptionsModal } from '../../actions/appActions'
 import { unCamelCase } from '../../services/jsUtil'
 
 class DisplayOptions extends Component {
   static propTypes = {
     selectedFields: PropTypes.arrayOf(PropTypes.string).isRequired, // Pre-selected fields
-    onDismiss: PropTypes.func.isRequired,
+    onDismiss: PropTypes.func,
     onUpdate: PropTypes.func.isRequired,
     singleSelection: PropTypes.bool,                  // true forces radio mode
     title: PropTypes.string.isRequired,               // E.g. 'Metadata Display Options'
@@ -36,17 +37,20 @@ class DisplayOptions extends Component {
   // Update clicked, invoked callbacks to apply state and dismiss
   update (event) {
     this.props.onUpdate(event, this.state)
-    this.props.onDismiss(event)
+    this.cancel(event)
   }
 
   // Cancel or close clicked, dismiss without update
   cancel (event) {
-    this.props.onDismiss(event)
+    this.props.actions.dismissDisplayOptionsModal()
+    if (this.props.onDismiss) {
+      this.props.onDismiss(event)
+    }
   }
 
   filter = (event) => {
     const fieldFilter = event.target.value ? event.target.value : ''
-    this.setState({ ...this.state, fieldFilter })
+    this.setState({ fieldFilter })
   }
 
   viewAllMetadata = () => {
@@ -55,7 +59,7 @@ class DisplayOptions extends Component {
 
   // Unfold the namespace to show children
   openNamespace (openedNamespace) {
-    this.setState({ ...this.state, openedNamespace })
+    this.setState({ openedNamespace })
   }
 
   // Select the namespace and update state.checkedNamespaces
@@ -86,12 +90,12 @@ class DisplayOptions extends Component {
         })
       }
     }
-    this.setState({ ...this.state, checkedNamespaces })
+    this.setState({ checkedNamespaces })
   }
 
   // Update the state of the syncView toggle
   syncViews (event) {
-    this.setState({ ...this.state, syncedViews: event.target.checked })
+    this.setState({ syncedViews: event.target.checked })
   }
 
   // Return the field names for the specified namespace
@@ -276,5 +280,5 @@ class DisplayOptions extends Component {
 export default connect(state => ({
   fields: state.assets.fields
 }), dispatch => ({
-  actions: bindActionCreators({ getAssetFields }, dispatch)
+  actions: bindActionCreators({ getAssetFields, dismissDisplayOptionsModal }, dispatch)
 }))(DisplayOptions)

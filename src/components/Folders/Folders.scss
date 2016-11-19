@@ -5,23 +5,38 @@
 
 .Folders-controls {
   @include flexRow;
-  position: relative;         // important for CreateFolder position:absolute
+  @include flexJustifySpaceBetween;
+  @include flexAlignItemsCenter;
+  height: auto;
+
+  input {
+    @include flexOn;
+    height: 20px;
+    margin: 8px 12px 8px 4px;
+    border-radius: 3px;
+    background: none;
+    border: 1px solid $zorroa-lightgray;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
 
   button {
-    color: $zorroa-darkgray;
-    background-color: transparent;
-    margin: 0 12px 8px 4px;
-    font-size: 14px;
-    text-transform: uppercase;
+    color: white;
+    background-color: $zorroa-sickly-green;
     border: none;
-    border-radius: 3px;
+    border-radius: 15px;
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+    margin: 4px;
 
     &:disabled {
-      color: $zorroa-lightgray
+      background-color: $zorroa-lightgray;
     }
 
     &:hover:enabled {
-      color: $zorroa-sickly-green;
+      border: 1px solid $zorroa-gray;
     }
 
     &:active:enabled {

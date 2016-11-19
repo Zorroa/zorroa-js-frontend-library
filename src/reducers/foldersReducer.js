@@ -1,4 +1,7 @@
-import { GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, DELETE_FOLDER, ADD_ASSETS_TO_FOLDER, TOGGLE_FOLDER, UNAUTH_USER } from '../constants/actionTypes'
+import {
+  GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, UPDATE_FOLDER,
+  DELETE_FOLDER, ADD_ASSETS_TO_FOLDER, TOGGLE_FOLDER, UNAUTH_USER
+} from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import * as assert from 'assert'
 
@@ -61,7 +64,7 @@ export default function (state = initialState, action) {
     case SELECT_FOLDERS:
       return { ...state, selectedFolderIds: action.payload }
 
-    case CREATE_FOLDER:
+    case CREATE_FOLDER: {
       const folder = action.payload
       if (folder.id) {
         folder.childIds = new Set() // new folder has no children
@@ -78,9 +81,26 @@ export default function (state = initialState, action) {
         newParent.childIds.add(folder.id)
         all.set(newParent.id, newParent)
         openFolderIds.add(newParent.id) // make sure we can see the new folder immediately
-        return { ...state, all, openFolderIds }
+        return {...state, all, openFolderIds}
       }
       break
+    }
+
+    case UPDATE_FOLDER: {
+      const folder = action.payload
+      const oldFolder = state.all[folder.id]
+      if (folder.id) {
+        folder.childIds = oldFolder ? oldFolder.childIds : new Set()
+        let all = new Map(state.all) // copy folder map
+        let openFolderIds = new Set(state.openFolderIds)
+        all.set(folder.id, folder)
+        const parent = state.all.get(folder.parentId) // copy folder's parent
+        assert.ok(parent.childIds.has(folder.id))
+        openFolderIds.add(parent.id) // make sure we can see the updated folder immediately
+        return {...state, all, openFolderIds}
+      }
+      break
+    }
 
     case DELETE_FOLDER:
       const id = action.payload

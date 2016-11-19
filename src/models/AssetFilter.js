@@ -11,6 +11,20 @@ export default class AssetFilter {
     }
   }
 
+  empty () {
+    if (
+      (this.missing && this.missing.length) ||
+      (this.terms && Object.keys(this.terms).length) ||
+      (this.exists && this.exists.length) ||
+      (this.range && Object.keys(this.range).length) ||
+      (this.scripts && this.scripts.length) ||
+      (this.colors && Object.keys(this.colors).length) ||
+      (this.links && Object.keys(this.links).length)) {
+      return false
+    }
+    return true
+  }
+
   merge (filter) {
     // Combine each array, removing duplicates and merging terms.
     if (!filter) {

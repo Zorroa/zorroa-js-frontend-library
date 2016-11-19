@@ -1,75 +1,13 @@
-import React, { Component, PropTypes } from 'react'
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
-import Modal from '../Modal'
-import { updateModal } from '../../actions/appActions'
+import React, { PropTypes } from 'react'
 
-class App extends Component {
-  static propTypes = {
-    updateModal: PropTypes.func.isRequired,
-    children: PropTypes.object,
-    modal: PropTypes.object
-  }
+const App = (props) => (
+  <div>
+    {props.children}
+  </div>
+)
 
-  constructor (props) {
-    super(props)
-    this.dismissModal = this.dismissModal.bind(this)
-  }
-
-  componentDidMount () {
-    /*
-    // Example usage of opening a modal
-    this.props.updateModal({
-      title: 'test',
-      content: (<Logo />),
-      footer: (
-        <div>
-          <button className="zorroa-btn">Footer button</button>
-        </div>
-      )
-    })
-    */
-  }
-
-  dismissModal () {
-    this.props.updateModal({})
-  }
-
-  render () {
-    const {modal, children} = this.props
-
-    return (
-      <div>
-        {this.renderModal(modal)}
-        {children}
-      </div>
-    )
-  }
-
-  renderModal (modal) {
-    if (!modal) {
-      return false
-    }
-
-    const { title, content, children, footer } = modal
-
-    return (
-      <Modal title={title} content={content} dismiss={this.dismissModal} footer={footer}>{children}</Modal>
-    )
-  }
+App.propTypes = {
+  children: PropTypes.object
 }
 
-function mapDispatchToProps (dispatch) {
-  return bindActionCreators({
-    updateModal
-  }, dispatch)
-}
-
-function mapStateToProps (state) {
-  console.info(state)
-  return {
-    modal: state.app.modal
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(App)
+export default App

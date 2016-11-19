@@ -1,29 +1,35 @@
-import { MODAL, ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, METADATA_FIELDS, TABLE_FIELDS, DISPLAY_OPTIONS, SET_DRAGGING } from '../constants/actionTypes'
+import {
+  SHOW_DISPLAY_OPTIONS_MODAL, HIDE_DISPLAY_OPTIONS_MODAL,
+  SHOW_CREATE_FOLDER_MODAL, HIDE_CREATE_FOLDER_MODAL,
+  ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
+  METADATA_FIELDS, TABLE_FIELDS, SET_DRAGGING
+} from '../constants/actionTypes'
 import appReducer from './appReducer'
-import { METADATA_DISPLAY_OPTIONS } from '../actions/appActions'
 
 describe('appReducer', () => {
-  describe(`${MODAL}`, () => {
-    it('should update the modal state', () => {
-      const action = {
-        type: MODAL,
-        payload: {
-          title: 'Test',
-          footer: 'footer stuff',
-          content: 'Blar Plop'
-        }
-      }
-
-      expect(
-        appReducer({}, action)
-      ).toEqual({ 'modal': action.payload })
+  describe('Modals', () => {
+    it('SHOW_DISPLAY_OPTIONS_MODAL should set displayOptions', () => {
+      const payload = { bar: 'bam' }
+      expect(appReducer({}, { type: SHOW_DISPLAY_OPTIONS_MODAL, payload }))
+        .toEqual({ displayOptions: payload })
     })
 
-    it('should be an empty object when reset', () => {
-      const action = { type: MODAL, payload: {} }
-      expect(
-        appReducer({}, action)
-      ).toEqual({ 'modal': {} })
+    it('HIDE_DISPLAY_OPTIONS_MODAL should clear displayOptions', () => {
+      const displayOptions = { bar: 'bam' }
+      expect(appReducer({displayOptions}, { type: HIDE_DISPLAY_OPTIONS_MODAL, payload: null }))
+        .toEqual({ displayOptions: null })
+    })
+
+    it('SHOW_CREATE_FOLDER_MODAL should set createFolder', () => {
+      const payload = { bar: 'bam' }
+      expect(appReducer({}, { type: SHOW_CREATE_FOLDER_MODAL, payload }))
+        .toEqual({ createFolder: payload })
+    })
+
+    it('HIDE_CREATE_FOLDER_MODAL should clear createFolder', () => {
+      const createFolder = { bar: 'bam' }
+      expect(appReducer({createFolder}, { type: HIDE_CREATE_FOLDER_MODAL, payload: null }))
+        .toEqual({ createFolder: null })
     })
   })
 
@@ -38,6 +44,14 @@ describe('appReducer', () => {
       const action = { type: ICONIFY_RIGHT_SIDEBAR, payload: true }
       expect(appReducer({}, action)
       ).toEqual({ rightSidebarIsIconified: true })
+    })
+
+    it('TOGGLE_COLLAPSIBLE should set collapsibleOpen', () => {
+      const collapsibleName = 'foo'
+      const isOpen = true
+      const payload = { collapsibleName, isOpen }
+      expect(appReducer({}, { type: TOGGLE_COLLAPSIBLE, payload }))
+        .toEqual({ collapsibleOpen: {[collapsibleName]: isOpen} })
     })
   })
 
@@ -54,14 +68,6 @@ describe('appReducer', () => {
       const action = { type: TABLE_FIELDS, payload: fields }
       expect(appReducer({}, action)
       ).toEqual({ tableFields: fields })
-    })
-  })
-
-  describe('DISPLAY_OPTIONS', () => {
-    it('set display options', () => {
-      const action = { type: DISPLAY_OPTIONS, payload: METADATA_DISPLAY_OPTIONS }
-      expect(appReducer({}, action)
-      ).toEqual({ displayOptions: METADATA_DISPLAY_OPTIONS })
     })
   })
 

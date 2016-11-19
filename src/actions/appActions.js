@@ -1,9 +1,53 @@
-import { MODAL, ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE, METADATA_FIELDS, TABLE_FIELDS, DISPLAY_OPTIONS, SET_DRAGGING } from '../constants/actionTypes'
+import {
+  SHOW_DISPLAY_OPTIONS_MODAL, HIDE_DISPLAY_OPTIONS_MODAL,
+  SHOW_CREATE_FOLDER_MODAL, HIDE_CREATE_FOLDER_MODAL,
+  ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
+  METADATA_FIELDS, TABLE_FIELDS, SET_DRAGGING
+} from '../constants/actionTypes'
 
-export function updateModal ({title, footer, content}) {
+export function showDisplayOptionsModal (title, syncLabel, selectedFields,
+                                         singleSelection, fieldTypes,
+                                         onUpdate, onDismiss) {
   return {
-    type: MODAL,
-    payload: {title, footer, content}
+    type: SHOW_DISPLAY_OPTIONS_MODAL,
+    payload: {
+      title,
+      syncLabel,
+      selectedFields,
+      singleSelection,
+      fieldTypes,
+      onUpdate,
+      onDismiss
+    }
+  }
+}
+
+export function dismissDisplayOptionsModal () {
+  return {
+    type: HIDE_DISPLAY_OPTIONS_MODAL,
+    payload: null
+  }
+}
+
+export function showCreateFolderModal (title, isEditing,
+                                       onCreate, onDelete, onLink, onDismiss) {
+  return {
+    type: SHOW_CREATE_FOLDER_MODAL,
+    payload: {
+      title,          // required
+      onDismiss,      // required
+      onCreate,       // required
+      isEditing,      // optional
+      onDelete,       // isEditing is true
+      onLink          // isEditing is true
+    }
+  }
+}
+
+export function dismissCreateFolderModal () {
+  return {
+    type: HIDE_CREATE_FOLDER_MODAL,
+    payload: null
   }
 }
 
@@ -46,17 +90,5 @@ export function setIsDragging (isDragging) {
   return ({
     type: SET_DRAGGING,
     payload: isDragging
-  })
-}
-
-export const HIDE_DISPLAY_OPTIONS = 'HIDE_DISPLAY_OPTIONS'
-export const METADATA_DISPLAY_OPTIONS = 'METADATA_DISPLAY_OPTIONS'
-export const TABLE_DISPLAY_OPTIONS = 'TABLE_DISPLAY_OPTIONS'
-export const FIELD_DISPLAY_OPTIONS = 'FIELD_DISPLAY_OPTIONS'
-
-export function displayOptions (mode) {
-  return ({
-    type: DISPLAY_OPTIONS,
-    payload: mode
   })
 }

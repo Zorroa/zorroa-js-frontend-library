@@ -10,9 +10,9 @@ import DropdownMenu from '../DropdownMenu'
 import Widget from '../../models/Widget'
 import Folder from '../../models/Folder'
 import AssetSearch from '../../models/AssetSearch'
-import CreateFolder from '../Folders/CreateFolder'
 import { resetRacetrackWidgets, modifyRacetrackWidget } from '../../actions/racetrackAction'
 import { createFolder } from '../../actions/folderAction'
+import { showCreateFolderModal } from '../../actions/appActions'
 import * as widgetTypes from '../../constants/widgetTypes'
 
 class Racetrack extends Component {
@@ -24,16 +24,12 @@ class Racetrack extends Component {
   }
 
   state = {
-    emptySearch: '',
-    showSaveSearch: false
+    emptySearch: ''
   }
 
   saveRacetrack = () => {
-    this.setState({ ...this.state, showSaveSearch: true })
-  }
-
-  dismissSaveSearch = () => {
-    this.setState({ ...this.state, showSaveSearch: false })
+    const isEditing = false
+    this.props.actions.showCreateFolderModal('Create Smart Collection', isEditing, this.saveSearch)
   }
 
   saveSearch = (name, acl) => {
@@ -43,14 +39,13 @@ class Racetrack extends Component {
     search.aggs = undefined             // Remove widget aggs
     const folder = new Folder({ name, acl, parentId, search })
     this.props.actions.createFolder(folder)
-    this.dismissSaveSearch()
   }
 
   clearRacetrack = () => {
     this.props.actions.resetRacetrackWidgets()
   }
 
-  handleQuickAddKeyPress () {
+  quickAddKeyPress = (event) => {
     console.log('Quick Add keypress')
   }
 
@@ -62,7 +57,7 @@ class Racetrack extends Component {
   }
 
   changeEmptySearch = (event) => {
-    this.setState({ ...this.state, emptySearch: event.target.value })
+    this.setState({ emptySearch: event.target.value })
   }
 
   pushWidgetType (type) {
@@ -124,12 +119,10 @@ class Racetrack extends Component {
   renderFooter (isIconified) {
     if (isIconified) return null
     const { widgets } = this.props
-    const { showSaveSearch } = this.state
     const disabled = !widgets || !widgets.length
     return (
       <div className="Racetrack-footer flexOff">
         <div className="Racetrack-footer-group">
-          { showSaveSearch && <CreateFolder title="Create Smart Collection" onDismiss={this.dismissSaveSearch} onCreate={this.saveSearch} />}
           <button disabled={disabled} onClick={this.saveRacetrack} className="Racetrack-footer-save-button">Save</button>
           <button disabled={disabled} onClick={this.clearRacetrack}>Clear</button>
         </div>
@@ -149,7 +142,7 @@ class Racetrack extends Component {
           ))}
         </DropdownMenu>
         <input className='Racetrack-add-quick'
-               onKeyPress={this.handleQuickAddKeyPress.bind(this)}
+               onKeyPress={this.quickAddKeyPress}
                placeholder="Quick Add - Widget"/>
       </div>
     )
@@ -181,7 +174,12 @@ class Racetrack extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({ modifyRacetrackWidget, resetRacetrackWidgets, createFolder }, dispatch)
+  actions: bindActionCreators({
+    modifyRacetrackWidget,
+    resetRacetrackWidgets,
+    createFolder,
+    showCreateFolderModal
+  }, dispatch)
 })
 
 const mapStateToProps = state => ({

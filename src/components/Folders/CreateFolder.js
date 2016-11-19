@@ -5,13 +5,14 @@ import classnames from 'classnames'
 
 import { createFolder } from '../../actions/folderAction'
 import { getAllPermissions } from '../../actions/permissionsAction'
+import { dismissCreateFolderModal } from '../../actions/appActions'
 import AclEntry from '../../models/Acl'
 import Permission from '../../models/Permission'
 
 class CreateFolder extends Component {
   static propTypes = {
     title: PropTypes.string.isRequired,   // Title bar
-    onDismiss: PropTypes.func.isRequired, // unmount
+    onDismiss: PropTypes.func,            // unmount
     onCreate: PropTypes.func.isRequired,  // passed Folder
 
     // Edit Mode adds an extra footer with info and controls
@@ -32,13 +33,20 @@ class CreateFolder extends Component {
   }
 
   changeName = (event) => {
-    this.setState({ ...this.state, name: event.target.value })
+    this.setState({ name: event.target.value })
   }
 
   checkForSubmit = (event) => {
     if (event.key === 'Enter' && this.state.name && this.state.name.length) {
       this.saveFolder(event)
     } else if (event.key === 'Escape') {
+      this.dismiss()
+    }
+  }
+
+  dismiss = () => {
+    this.props.actions.dismissCreateFolderModal()
+    if (this.props.onDismiss) {
       this.props.onDismiss(event)
     }
   }
@@ -52,10 +60,11 @@ class CreateFolder extends Component {
         new AclEntry({ permissionId: permission.id, access })
       )) : undefined
     this.props.onCreate(name, acl)
+    this.props.actions.dismissCreateFolderModal()
   }
 
   togglePublic = (event) => {
-    this.setState({ ...this.state, isShared: event.target.checked })
+    this.setState({ isShared: event.target.checked })
   }
 
   togglePermission (permission, event) {
@@ -65,13 +74,13 @@ class CreateFolder extends Component {
     } else {
       selectedPermissions.delete(permission)
     }
-    this.setState({ ...this.state, selectedPermissions })
+    this.setState({ selectedPermissions })
   }
 
   removePermission (permission) {
     let selectedPermissions = new Set(this.state.selectedPermissions)
     selectedPermissions.delete(permission)
-    this.setState({ ...this.state, selectedPermissions })
+    this.setState({ selectedPermissions })
   }
 
   render () {
@@ -86,7 +95,7 @@ class CreateFolder extends Component {
               <div className="icon-cube"/>
               <div>{title}</div>
             </div>
-            <div onClick={this.props.onDismiss} className="icon-cross2" />
+            <div onClick={this.dismiss} className="icon-cross2" />
           </div>
           <div className="CreateFolder-body">
             <div className="CreateFolder-input-title">Title</div>
@@ -121,7 +130,7 @@ class CreateFolder extends Component {
           </div>
           <div className="CreateFolder-footer flexRow flexJustifyCenter">
             <button className={classnames('default', {disabled: (!name || !name.length)})} onClick={this.saveFolder}>Save</button>
-            <button onClick={this.props.onDismiss}>Cancel</button>
+            <button onClick={this.dismiss}>Cancel</button>
           </div>
           { isEditing && (
             <div className="CreateFolder-editing flexRow flexJustifySpaceBetween flexAlignItemsCenter">
@@ -146,5 +155,5 @@ class CreateFolder extends Component {
 export default connect(state => ({
   permissions: state.permissions && state.permissions.all
 }), dispatch => ({
-  actions: bindActionCreators({ createFolder, getAllPermissions }, dispatch)
+  actions: bindActionCreators({ createFolder, getAllPermissions, dismissCreateFolderModal }, dispatch)
 }))(CreateFolder)
