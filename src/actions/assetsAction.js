@@ -41,6 +41,9 @@ export function searchAssets (query) {
 }
 
 export function suggestQueryStrings (text) {
+  if (!text) {
+    return ({ type: SUGGEST_COMPLETIONS, payload: null })
+  }
   return dispatch => {
     getArchivist().post('/api/v2/assets/_suggest', {text})
       .then(response => {
