@@ -1,4 +1,4 @@
-import { MODAL, ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE, METADATA_FIELDS, TABLE_FIELDS, DISPLAY_OPTIONS, SET_DRAGGING } from '../constants/actionTypes'
+import { MODAL, ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE, METADATA_FIELDS, TABLE_FIELDS, DISPLAY_OPTIONS, SET_DRAGGING, UNAUTH_USER } from '../constants/actionTypes'
 
 const initialState = {
   modal: {},
@@ -50,6 +50,8 @@ export default function app (state = initialState, action) {
       return { ...state, displayOptions: action.payload }
     case SET_DRAGGING:
       return { ...state, isDragging: action.payload }
+    case UNAUTH_USER:
+      return initialState
     default:
       return state
   }

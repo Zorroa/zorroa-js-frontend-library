@@ -29,12 +29,12 @@ export default class Video extends Component {
   }
 
   onSeekChange = e => {
-    this.setState({ played: parseFloat(e.target.value) })
+    const t = parseFloat(e.target.value)
+    this.scrub(t)
   }
 
   onSeekMouseUp = e => {
     this.setState({ seeking: false })
-    this.player.seekTo(parseFloat(e.target.value))
   }
 
   onProgress = state => {
@@ -45,32 +45,34 @@ export default class Video extends Component {
   }
 
   rewind = () => {
-    this.player.seekTo(0)
+    this.scrub(0)
   }
 
   fastForward = () => {
-    this.player.seekTo(this.state.duration)
+    const { duration } = this.state
+    this.scrub(duration)
   }
 
   frameBack = () => {
-    const t = this.state.played - 1 / 30
-    this.player.seekTo(t)
+    const t = this.state.played - 1 / (30.0 * this.state.duration)
+    this.scrub(t)
   }
 
   frameForward = () => {
-    const t = this.state.played + 1 / 30
-    this.player.seekTo(t)
+    const t = this.state.played + 1 / (30.0 * this.state.duration)
+    this.scrub(t)
+  }
+
+  scrub (played) {
+    this.setState({ played })
+    this.player.seekTo(played)
   }
 
   render () {
     const { url } = this.props
     const {
       playing, volume,
-      played, loaded, duration,
-      soundcloudConfig,
-      vimeoConfig,
-      youtubeConfig,
-      fileConfig
+      played, loaded, duration
     } = this.state
 
     return (
@@ -83,10 +85,6 @@ export default class Video extends Component {
           height="100%"
           playing={playing}
           volume={volume}
-          soundcloudConfig={soundcloudConfig}
-          vimeoConfig={vimeoConfig}
-          youtubeConfig={youtubeConfig}
-          fileConfig={fileConfig}
           onReady={() => console.log('onReady')}
           onStart={() => console.log('onStart')}
           onPlay={() => this.setState({ playing: true })}
@@ -102,7 +100,7 @@ export default class Video extends Component {
                  type='range' min={0} max={1} step='any'
                  value={played}
                  onMouseDown={this.onSeekMouseDown}
-                 onChange={this.onSeekChange}
+                 onInput={this.onSeekChange}
                  onMouseUp={this.onSeekMouseUp}
           />
           <progress className="loaded" max={1} value={loaded} />

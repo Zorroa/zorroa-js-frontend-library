@@ -1,38 +1,61 @@
 @import '../../styles/core-mixins.scss';
 
-.Table-scroll {
+.Table {
+  position: relative;
+
+  min-height: 300px;
+  height: 300px;
+  max-height: 300px;
+
+  overflow: auto;
+
   border-top: 1px solid #ddd;
   border-bottom: 1px solid #ddd;
-  overflow:auto;
-  max-height: 300px;
 }
 
-.Table {
+.Table-table {
+  position: absolute;
+
   width: 100%;
   max-width: 100%;
+  min-width: 100%;
+
   border-bottom: 1px solid #aaa;
   border-spacing: 0;
   padding: 2px 0 2px 2px;
 
   th, td {
     padding: 8px;
-    max-width: 0; // This looks weird, but is important! It allows cells to chop content
+
+    // This looks weird, but is important! It allows cells to chop content
+    // Commented temporarily; we'll need it later
+    //max-width: 0;
+
     @include clampText;
   }
 
   .Table-header {
     text-align: left;
-    //width: 40%;
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 100;
   }
 
   .Table-row {
     text-align: left;
-    //width: 60%;
   }
 
   .Table-settings {
-    width: 24px;
-    color: $zorroa-gray;
+    width: 26px; // same as thead height
+
+    color: $zorroa-lightgray;
+    background-color: #fff;
+    border-radius: 2px;
+
+    &:hover {
+      color: $zorroa-gray;
+      background-color: $zorroa-lightgray;
+    }
   }
 
   tr {
@@ -45,6 +68,7 @@
   }
 
   thead th {
+    height: 26px;
     color: $zorroa-gray;
   }
 

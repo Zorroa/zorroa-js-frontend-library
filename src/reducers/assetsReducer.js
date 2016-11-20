@@ -1,4 +1,4 @@
-import { ASSET_SEARCH, ASSET_SEARCH_ERROR, ASSET_FIELDS, PAGE_SIZE, ISOLATE_ASSET, SELECT_ASSETS, SUGGEST_COMPLETIONS } from '../constants/actionTypes'
+import { ASSET_SEARCH, ASSET_SEARCH_ERROR, ASSET_FIELDS, PAGE_SIZE, ISOLATE_ASSET, SELECT_ASSETS, SUGGEST_COMPLETIONS, UNAUTH_USER } from '../constants/actionTypes'
 
 const initialState = {
   pageSize: 100
@@ -56,6 +56,8 @@ export default function (state = initialState, action) {
       return { ...state, pageSize: action.payload }
     case SUGGEST_COMPLETIONS:
       return { ...state, suggestions: action.payload }
+    case UNAUTH_USER:
+      return initialState
   }
 
   return state

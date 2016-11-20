@@ -19,12 +19,9 @@
 
 .CollapsibleHeader-select {
   @include clampText;
-  padding: 5px;
-  padding-left: 10px;
 
   // reset padding when iconified so the icon can center
   &.isIconified {
-    padding: 5px;
     @include flexJustifyCenter;
   }
   &:hover { background-color: darken(#d8d8d8, 15%); }
@@ -32,11 +29,8 @@
 }
 
 .CollapsibleHeader-icon {
-  margin-right: 14px;
-  padding-bottom: 3px;
-  &.isIconified {
-    margin-right: 0;
-  }
+  height: 40px;
+  width: 40px;
 }
 
 .CollapsibleHeader-label {

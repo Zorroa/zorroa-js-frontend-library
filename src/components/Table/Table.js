@@ -51,7 +51,7 @@ class Table extends Component {
       return
     }
     return (
-      <div className="Table-scroll">
+      <div className="Table flexOff">
         { this.state.showDisplayOptions && (
           <DisplayOptions selectedFields={fields}
                           title="Table Display Options"
@@ -59,7 +59,7 @@ class Table extends Component {
                           onUpdate={this.updateDisplayOptions.bind(this)}
                           onDismiss={this.dismissDisplayOptions.bind(this)}/>
         )}
-        <table className="Table">
+        <table className="Table-table">
           <thead>
           <tr>
             { fields.map((field, i) => (
@@ -67,7 +67,9 @@ class Table extends Component {
                 { unCamelCase(Asset.lastNamespace(field)) }
               </th>
             ))}
-            <th key={'cog'} className="Table-settings"><div onClick={this.editDisplayOptions.bind(this)} className="icon-cog"/></th>
+            <th key={'cog'} className="Table-settings">
+              <div onClick={this.editDisplayOptions.bind(this)} className="icon-cog"/>
+            </th>
           </tr>
           </thead>
           <tbody>
