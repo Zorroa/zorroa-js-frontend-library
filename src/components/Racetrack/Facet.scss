@@ -71,6 +71,8 @@
     .Facet-pie-pct {
       font-size: 9px;
       fill: white;
+      @include nosel;
+      pointer-events: none;
     }
 
     .Facet-pie-label {
