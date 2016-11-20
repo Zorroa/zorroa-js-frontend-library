@@ -42,13 +42,13 @@
     // Clear text button
     .clear-button {
       position: absolute;
-      left: 94%;
       top: 4px;
+      right: -5px;
       border: none;
       background: none;
       color: $zorroa-gray;
 
-      &:hover:active {
+      &:hover {
         color: $zorroa-sickly-green;
       }
 
