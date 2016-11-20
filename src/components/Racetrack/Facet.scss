@@ -69,14 +69,22 @@
     max-height: 240px;
 
     .Facet-pie-pct {
-      font-size: 10px;
-      color: $zorroa-nearwhite;
+      font-size: 9px;
+      fill: white;
     }
 
     .Facet-pie-label {
       font-size: 10px;
-      color: $zorroa-lightgray;
+      fill: $zorroa-lightgray;
+      font-stretch: condensed;
+
+      &.active {
+        fill: $zorroa-water-blue;
+        font-weight: 900;
+        font-size: 11px;
+      }
     }
+
   }
 
   // Custom scrollbar styles from Amber

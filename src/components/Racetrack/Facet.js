@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Text } from 'recharts'
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Text, Sector } from 'recharts'
 
 import WidgetModel from '../../models/Widget'
 import Asset from '../../models/Asset'
@@ -37,15 +37,23 @@ class Facet extends Component {
   }
 
   componentWillMount () {
-    const { id, widgets } = this.props
+    this.componentWillReceiveProps(this.props)
+  }
+
+  componentWillReceiveProps (nextProps) {
+    const { id, widgets } = nextProps
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets[index]
     if (widget && widget.sliver) {
       const field = widget.sliver.aggs.facet.terms.field
-      this.setState({field})
+      if (field !== this.state.field) {
+        this.setState({field})
+      }
       if (widget.sliver.filter) {
         const terms = widget.sliver.filter.terms[field]
-        this.setState({terms})
+        if (terms !== this.state.terms) {
+          this.setState({terms})
+        }
       }
     } else {
       this.setState({showDisplayOptions: true})
@@ -68,7 +76,10 @@ class Facet extends Component {
   }
 
   selectGraph (chartType) {
-    this.setState({ chartType })
+    if (chartType !== this.state.chartType) {
+      this.setState({chartType})
+      this.buckets = null
+    }
   }
 
   selectTerm (term) {
@@ -79,8 +90,11 @@ class Facet extends Component {
     } else {
       terms.push(term)
     }
-    this.setState({ ...this.state, terms })
     this.modifySliver(this.state.field, terms)
+  }
+
+  selectPieSection = ({ name }) => {
+    this.selectTerm(name)
   }
 
   selectField = (event) => {
@@ -93,7 +107,6 @@ class Facet extends Component {
     if (base && base.length) {
       const field = base + '.raw'
       const terms = []
-      this.setState({ ...this.state, field, terms })
       this.modifySliver(field, terms)
     }
   }
@@ -102,38 +115,92 @@ class Facet extends Component {
     this.setState({ showDisplayOptions: false })
   }
 
-  renderPieLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name }) => {
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5
+  renderPieLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name, fill }) => {
+    const { terms } = this.state
     const RADIAN = Math.PI / 180
-    const s = radius * Math.cos(-midAngle * RADIAN)
-    const t = radius * Math.sin(-midAngle * RADIAN)
-    const r0 = 0.9
-    const x0 = cx + r0 * s
-    const y0 = cy + r0 * t
-    const r1 = 1.7
-    const x1 = cx + r1 * s
-    const y1 = cy + r1 * t
+    const sin = Math.sin(-RADIAN * midAngle)
+    const cos = Math.cos(-RADIAN * midAngle)
+    const r0 = 15
+    const r1 = 10
+    const r2 = 20
+    const x0 = cx + (innerRadius + r0) * cos
+    const y0 = cy + (innerRadius + r0) * sin
+    const sx = cx + (outerRadius + r1) * cos
+    const sy = cy + (outerRadius + r1) * sin
+    const mx = cx + (outerRadius + r2) * cos
+    const my = cy + (outerRadius + r2) * sin
+    const ox = 5
+    const ex = mx + (cos >= 0 ? 1 : -1) * ox
+    const ey = my
+    const textAnchor = cos >= 0 ? 'start' : 'end'
+
     return (
       <svg>
         <svg>
           {
             percent > 0.05 &&
-            <text x={x0} y={y0} fill="white"
-                  textAnchor={x0 > cx ? 'start' : 'end'}
+            <text x={x0} y={y0}
+                  textAnchor="middle"
                   className="Facet-pie-pct" dominantBaseline="central">
               {`${(percent * 100).toFixed(0)}%`}
             </text>
           }
           {
-            percent > 0.025 &&
-            <text x={x1} y={y1} fill="black"
-                  textAnchor={x1 > cx ? 'start' : 'end'}
-                  className="Facet-pie-label" dominantBaseline="central">
-              { name }
-            </text>
+            percent > 0.025 && terms.indexOf(name) < 0 &&
+            <svg>
+              <text x={ex} y={ey}
+                    textAnchor={textAnchor}
+                    className="Facet-pie-label" dominantBaseline="central">
+                { name }
+              </text>
+              <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none"/>
+            </svg>
           }
         </svg>
       </svg>
+    )
+  }
+
+  renderActivePieSectionShape = ({ cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle,
+    fill, payload, percent, value, name }) => {
+    const RADIAN = Math.PI / 180
+    const sin = Math.sin(-RADIAN * midAngle)
+    const cos = Math.cos(-RADIAN * midAngle)
+    const r0 = 10
+    const r1 = 20
+    const ox = 5
+    const sx = cx + (outerRadius + r0) * cos
+    const sy = cy + (outerRadius + r0) * sin
+    const mx = cx + (outerRadius + r1) * cos
+    const my = cy + (outerRadius + r1) * sin
+    const ex = mx + (cos >= 0 ? 1 : -1) * ox
+    const ey = my
+    const textAnchor = cos >= 0 ? 'start' : 'end'
+
+    return (
+      <g>
+        <Sector
+          cx={cx}
+          cy={cy}
+          innerRadius={innerRadius}
+          outerRadius={outerRadius}
+          startAngle={startAngle}
+          endAngle={endAngle}
+          fill={fill}
+        />
+        <Sector
+          cx={cx}
+          cy={cy}
+          startAngle={startAngle}
+          endAngle={endAngle}
+          innerRadius={outerRadius + 6}
+          outerRadius={outerRadius + 10}
+          fill={fill}
+        />
+        <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none"/>
+        <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none"/>
+        <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} className="Facet-pie-label active" dominantBaseline="central">{name}</text>
+      </g>
     )
   }
 
@@ -148,6 +215,9 @@ class Facet extends Component {
       maxCount = Math.max(maxCount, bucket.doc_count)
       minCount = Math.min(minCount, bucket.doc_count)
     })
+    // Only animate when the buckets change, cached in class variable, not state
+    const animate = JSON.stringify(buckets) !== JSON.stringify(this.buckets)
+    this.buckets = buckets
     const data = buckets.map(bucket => ({name: bucket.key, value: bucket.doc_count}))
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042',
       '#ce2d3f', '#fc6c2c', ' #a11e77', '#b7df4d', '#1875d1' ]
@@ -177,15 +247,18 @@ class Facet extends Component {
         )
 
       case PIE_CHART:
+        const activeIndex = terms.map((term, index) => (buckets.findIndex(bucket => (bucket.key === term))))
         return (
           <div className="Facet-pie-chart">
             <ResponsiveContainer>
               <PieChart width={300} height={300}>
-                <Pie innerRadius={40} outerRadius={80} paddingAngle={0}
+                <Pie innerRadius={30} outerRadius={60} paddingAngle={0}
+                     isAnimationActive={animate}
                      animationBegin={100}
                      animationDuration={500}
-                     label={this.renderPieLabel}
-                     data={data} onClick={this.selectTerm.bind(this)}>
+                     activeIndex={activeIndex} activeShape={this.renderActivePieSectionShape}
+                     label={this.renderPieLabel} labelLine={false}
+                     data={data} onClick={this.selectPieSection}>
                   { data.map((entry, index) => <Cell key={index} fill={COLORS[index % COLORS.length]}/>) }
                   <Tooltip/>
                 </Pie>
