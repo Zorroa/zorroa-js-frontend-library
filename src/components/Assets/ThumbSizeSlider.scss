@@ -1,0 +1,46 @@
+@import '../../styles/core-mixins.scss';
+
+.ThumbSizeSlider {
+  color: #000;
+  background-color: #fff;
+  padding: 5px 8px;
+  border-radius: 3px;
+}
+
+.ThumbSizeSlider-slider {
+  position: relative;
+  padding-left: 5px;
+  padding-right: 5px;
+  background: none;
+}
+
+.ThumbSizeSlider-smaller {
+  width: 30px;
+  height: 30px;
+  border-radius: 3px;
+  &:hover { background-color: $zorroa-lightgray; }
+}
+
+.ThumbSizeSlider-bigger {
+  width: 30px;
+  height: 30px;
+  border-radius: 3px;
+  &:hover { background-color: $zorroa-lightgray; }
+}
+
+.ThumbSizeSlider-box {
+  position: relative;
+}
+.ThumbSizeSlider-line-box {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+.ThumbSizeSlider-line {
+  width: 120px;
+  height: 1px;
+  background-color: $zorroa-sickly-green;
+}
