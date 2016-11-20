@@ -76,6 +76,17 @@ $zorroa-Sidebar-width : 340px;
   text-overflow: ellipsis;
 }
 
+@mixin nosel {
+  /* Prevent selection */
+  -webkit-user-select : none;
+  -moz-user-select    : none;
+  -ms-user-select     : none;
+  user-select         : none;
+
+  /* Prevent dragging too */
+  -webkit-user-drag : none;
+  user-drag         : none;
+}
 
 /* Flexbox classes */
 

@@ -41,7 +41,7 @@ class Racetrack extends Component {
     const parentId = Folder.ROOT_ID     // FIXME: Private folders under <user>
     const search = new AssetSearch(query)
     search.aggs = undefined             // Remove widget aggs
-    const folder = new Folder({ name, acl, parentId, search: query })
+    const folder = new Folder({ name, acl, parentId, search })
     this.props.actions.createFolder(folder)
     this.dismissSaveSearch()
   }

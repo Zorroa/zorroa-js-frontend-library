@@ -8,6 +8,7 @@ export default class AssetSearch {
       this.queryFields = json.queryFields // {string, number}: Map of fields and boost values
       this.fields = json.fields   // [string]:         Fields to return for each asset
       this.filter = json.filter   // AssetFilter:      Filter applied to keyword search
+      this.postFilter = json.postFilter   // AssetFilter: Filter for assets after aggs
       this.order = json.order     // {string field, bool ascending}
       this.size = json.size       // int:              Number of assets to return
       this.from = json.from       // int:              First asset index to return
@@ -32,6 +33,13 @@ export default class AssetSearch {
         this.filter.merge(assetSearch.filter)
       } else {
         this.filter = new AssetFilter(assetSearch.filter)
+      }
+    }
+    if (assetSearch.postFilter) {
+      if (this.postFilter) {
+        this.postFilter.merge(assetSearch.postFilter)
+      } else {
+        this.postFilter = new AssetFilter(assetSearch.postFilter)
       }
     }
     if (assetSearch.fuzzy) {

@@ -4,13 +4,12 @@ import classnames from 'classnames'
 const CollapsibleHeader = ({ isOpen, isParent, isIconified, isSelected, header, openIcon, closeIcon, onOpen, onSelect }) => {
   const iconClass = (isOpen && openIcon) ? openIcon : closeIcon
   const hasIcon = !!iconClass
-  const iconClassNames = classnames('CollapsibleHeader-icon', 'flexOff', iconClass,
-    { isOpen, isIconified, isSelected })
+  const iconClassNames = classnames('CollapsibleHeader-icon', 'flexOff', 'flexRowCenter', { isOpen, isIconified, isSelected })
 
   return (
     <div className={classnames('CollapsibleHeader', 'flexRow', 'flexAlignItemsCenter', 'fullWidth', { isSelected })}>
       <div className={classnames('CollapsibleHeader-select', 'flexOn', 'flexRow', 'flexAlignItemsCenter', 'fullWidth', 'fullHeight', { isIconified })} onClick={onSelect || onOpen}>
-        { hasIcon && (<div className={iconClassNames}/>) }
+        { hasIcon && (<div className={iconClassNames}><i className={iconClass}/></div>) }
         { !isIconified && (<div className='CollapsibleHeader-label'>{header}</div>) }
         { !isIconified && (<div className='flexOn'/>) }
       </div>

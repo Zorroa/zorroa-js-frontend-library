@@ -70,13 +70,6 @@
   padding-right: 8px;
 }
 
-.thumb-size-slider {
-  color: #000;
-  background-color: #fff;
-  padding: 5px 8px;
-  border-radius: 3px;
-}
-
 .thumb-layout {
   margin: 10px;
   white-space: nowrap;
@@ -100,11 +93,11 @@
   }
 }
 
-.table-toggle {
+.TableToggle {
   background-color: #fff;
   margin: 10px;
 
-  .table-toggle-button {
+  .TableToggle-button {
     color: #000;
     width: 40px;
     height: 40px;
@@ -116,7 +109,7 @@
     &:hover { background-color: $zorroa-lightgray; }
   }
 
-  .table-toggle-enabled {
+  .TableToggle-enabled {
     color: #fff;
     background-color: $zorroa-sickly-green;
     &:hover { background-color: darken($zorroa-sickly-green, 15%); }
