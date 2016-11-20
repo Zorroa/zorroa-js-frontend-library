@@ -119,14 +119,14 @@ class Workspace extends Component {
             </Collapsible>
           </Sidebar>
 
-          <div className="Workspace-vertical-separator"/>
+          <div className="Workspace-vertical-separator flexOff"/>
 
           {/*  center panel - thumbnails */}
           <div className="Workspace-body flexOn fullHeight">
             <Assets/>
           </div>
 
-          <div className="Workspace-vertical-separator"/>
+          <div className="Workspace-vertical-separator flexOff"/>
 
           {/*  right panel - racetrack (search filters) */}
           <Sidebar onToggle={this.toggleRightSidebar}
