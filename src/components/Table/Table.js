@@ -57,7 +57,7 @@ class Table extends Component {
               </th>
             ))}
             <th key={'cog'} className="Table-settings">
-              <div onClick={this.this.showDisplayOptions} className="icon-cog"/>
+              <div onClick={this.showDisplayOptions} className="icon-cog"/>
             </th>
           </tr>
           </thead>
