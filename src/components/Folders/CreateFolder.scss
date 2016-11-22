@@ -1,30 +1,180 @@
 @import '../../styles/core-mixins.scss';
 
 .CreateFolder {
+
   .CreateFolder-form {
+    width: 300px;
+
+    /* WARNING: Crud ahead. refactor CreateFolder into Workspace?
+     *   Position CreateFolder "below" relative position of parent, but
+     *   for save search, this results in the viewport origin, which is
+     *   unintended but perhaps justifiable as it is in the folder sidebar?
+     *   We cannot center in screen because create simple collection is
+     *   inside the Sidebar which has overflow-x:hidden.
+     */
     position: absolute;
-    padding: 1em 4px 1em 10px;
-    margin: 0;
+    top: 1.5em;
+    left: 8px;
+
     background-color: $zorroa-nearwhite;
     z-index: 1001;
     border-radius: 3px;
     border: 1px solid $zorroa-darkgray;
-    box-shadow: 10px 10px 32px -10px rgba(1,0,0,0.75);
+    box-shadow: 10px 10px 32px -10px rgba(0,0,0,0.75);
 
-    button {
-      margin: 0 4px 0 8px;
-      padding: 0;
+    .CreateFolder-header {
+      color: white;
+      background-color: black;
+      height: 40px;
+      min-height: 40px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+
+      .icon-cube {
+        padding: 8px;
+      }
+
+      .icon-cross2 {
+        padding: 8px;
+      }
     }
 
-    input {
-      font-size: 14px;
-      margin-left: 12px;
-      padding: 4px;
-      background: none;
-      border: 2px solid $zorroa-lightgray;
-      border-radius: 3px;
-      height: 40px;
-      width: 200px;
+    .CreateFolder-body {
+      margin: 12px;
+
+      .CreateFolder-input-title {
+        color: $zorroa-gray;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+        font-size: 12px;
+      }
+
+      input {
+        font-size: 14px;
+        padding: 8px;
+        background: none;
+        border: 2px solid $zorroa-lightgray;
+        border-radius: 3px;
+        height: 40px;
+        width: 100%;
+        margin-bottom: 30px;
+      }
+
+      .CreateFolder-public-private {
+        color: $zorroa-greyish-brown;
+
+        &.disabled {
+          color: $zorroa-lightgray;
+        }
+
+        input {
+          width: auto;
+          height: auto;
+          padding: 0;
+          margin: 0 8px;
+        }
+      }
+
+      .CreateFolder-sharing {
+        margin-top: 8px;
+
+        input[type=text] {
+          margin-top: 8px;
+          margin-bottom: 8px;
+          height: 30px;
+          font-size: 12px;
+          border: 1px solid $zorroa-lightgray;
+        }
+
+        ::-webkit-scrollbar {
+          width: 5px;
+        }
+
+        .CreateFolder-shared-with {
+          max-width: 100%;
+          .CreateFolder-selected-permission {
+            color: $zorroa-greyish-brown;
+            background-color: $zorroa-lightgray;
+            border-radius: 3px;
+            padding: 4px;
+            margin: 4px;
+
+            .icon-cross {
+              font-size: 12px;
+              margin-left: 4px;
+              color: $zorroa-gray
+            }
+          }
+        }
+        .CreateFolder-permissions {
+          max-height: 300px;
+          overflow-y: auto;
+          margin-top: 8px;
+
+          input[type=checkbox] {
+            width: auto;
+            height: auto;
+            padding: 0;
+            margin: 4px 8px;
+          }
+
+          .CreateFolder-permission {
+            color: $zorroa-gray;
+            font-size: 12px;
+            min-height: 20px;
+          }
+        }
+      }
+    }
+
+    .CreateFolder-footer {
+      border-top: 1px solid $zorroa-lightgray;
+      margin-top: 20px;
+
+      button {
+        background: none;
+        border: none;
+        padding: 10px 30px;
+        margin: 18px 8px;
+        border-radius: 3px;
+        font-size: 14px;
+        text-transform: uppercase;
+        font-weight: 500;
+
+        &:hover {
+          color: white;
+          background-color: $zorroa-gray;
+        }
+
+        &.default {
+          color: $zorroa-nearwhite;
+          background-color: $zorroa-sickly-green;
+
+          &:hover {
+            color: white;
+          }
+
+          &.disabled {
+            background-color: $zorroa-lightgray;
+          }
+        }
+      }
+    }
+
+    .CreateFolder-editing {
+      padding: 12px;
+      border-top: 1px solid $zorroa-lightgray;
+      height: 30px;
+      color: $zorroa-gray;
+
+      .CreateFolder-editing-owner {
+        padding-left: 4px;
+        color: $zorroa-sickly-green;
+      }
+
+      .icon-trash2 {
+        color: red;
+      }
     }
   }
 }

@@ -1,20 +1,136 @@
 @import '../../styles/core-mixins.scss';
 
+$FolderItemHeight : 25px;
+
 // Give all children FolderItems some indentation, but not the top-level FolderItem
-.Collapsible .FolderItem {
-  margin-left: 16px;
-  .CollapsibleHeader {
-    height: 30px;
+.FolderItem {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include fullWidth;
+
+  position: relative; // fbo .FolderItem-dropzone, who's position: absolute
+
+  height: $FolderItemHeight;
+
+  &:not(.isOpen) .FolderItem-toggleArrow {
+    transform: rotate(-90deg);
+  }
+  &:not(.hasChildren) .FolderItem-toggleArrow {
+    display: none;
+  }
+
+  &:nth-child(even) {
+    background-color: white;
+    &.isSelected { color: white; background-color: $zorroa-gray; }
+  }
+  &.isSelected { color: white; background-color: $zorroa-gray; }
+}
+
+.FolderItem-toggle {
+  @include flexOff;
+  @include flexRowCenter;
+
+  width: $FolderItemHeight;
+  height: $FolderItemHeight;
+  &:hover { color: white; background-color: darken(#d8d8d8, 15%); }
+  .FolderItem.isSelected &       { color: white; background-color: $zorroa-gray; }
+  .FolderItem.isSelected &:hover { color: white; background-color: darken($zorroa-gray, 15%); }
+}
+
+.FolderItem-select {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include fullHeight;
+  @include fullWidth;
+
+  padding-left: 5px;
+  &:hover { color: white; background-color: darken(#d8d8d8, 15%); }
+  .FolderItem.isSelected &       { color: white; background-color: $zorroa-gray; }
+  .FolderItem.isSelected &:hover { color: white; background-color: darken($zorroa-gray, 15%); }
+}
+
+
+.FolderItem-text {
+  @include clampText;
+  margin-left: 10px;
+}
+
+.FolderItem-dropzone {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: none;
+  border: 1px solid $zorroa-gray;
+  border-radius: 2px;
+
+  .App.isDragging & {
+    display: block;
   }
 }
 
-.FolderItem {
-  .FolderItem-header {
-    @include clampText;
+.FolderItem-context-menu {
+  @include flexCol;
+  background-color: white;
+  border-radius: 3px;
+  position: absolute;
+  top: 24px;
+  left: 28px;
+  width: 180px;
+  z-index: 1000;
+  color: $zorroa-greyish-brown;
+  box-shadow: 0 0 4px 4px rgba(0,0,0,0.15);
+  font-size: 12px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+
+  .FolderItem-context-item {
+    @include flexRow;
+    @include flexAlignItemsCenter;
+
+    max-width: 100%;
+    border-bottom: 1px solid $zorroa-nearwhite;
+    margin-left: 4px;
+    margin-right: 4px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 4px;
+    padding-bottom: 8px;
+
+    &:hover {
+      background-color: $zorroa-lightgray;
+    }
+
+    &.disabled:hover {
+      background-color: white;
+    }
+
+    div[class^="icon-"]:before {
+      margin-right: 8px;
+      margin-left: 4px;
+      padding-left: 0;
+      font-size: 14px;
+      color: $zorroa-gray;
+    }
   }
 
-  .CollapsibleHeader {
-    & > *:hover { background-color: darken(#d8d8d8, 15%); }
-    &.isSelected > *:hover { background-color: darken($zorroa-water-blue, 15%); }
+  .FolderItem-context-item:last-child {
+    border-bottom: none;
   }
+}
+
+
+.FolderItem-context-menu-background {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  background-color: transparent;
+  box-sizing: border-box;
 }

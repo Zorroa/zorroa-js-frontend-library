@@ -29,6 +29,8 @@ $zorroa-water-blue     : #1875d1;
 $zorroa-darkish-purple : #a11e77;
 $zorroa-medium-pink    : #ee4688;
 $zorroa-warm-grey-60   : rgba(128, 128, 128, 0.6);
+$zorroa-slategray      : #787a77;
+$zorroa-light-green    : #b7df4d;
 
 
 // A few extra useful colors Amber didn't specify
@@ -74,6 +76,17 @@ $zorroa-Sidebar-width : 340px;
   text-overflow: ellipsis;
 }
 
+@mixin nosel {
+  /* Prevent selection */
+  -webkit-user-select : none;
+  -moz-user-select    : none;
+  -ms-user-select     : none;
+  user-select         : none;
+
+  /* Prevent dragging too */
+  -webkit-user-drag : none;
+  user-drag         : none;
+}
 
 /* Flexbox classes */
 
@@ -176,3 +189,6 @@ $zorroa-Sidebar-width : 340px;
   @include flexAlignItemsCenter;
   @include flexJustifyCenter;
 }
+
+@mixin fullWidth { width  : 100%; max-width: 100%; }
+@mixin fullHeight { height : 100%; }

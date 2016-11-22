@@ -1,0 +1,293 @@
+@import '../../styles/core-mixins.scss';
+
+.DisplayOptions {
+  position: fixed;
+  top: 15vh;
+  left: 20vw;
+  width: 60vw;
+  height: 60vh;
+  background-color: white;
+  z-index: 1001;
+  border-radius: 3px;
+  border: 1px solid $zorroa-darkgray;
+  box-shadow: 10px 10px 32px -10px rgba(0,0,0,0.75);
+
+  // Thin scrollbars
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  .DisplayOptions-header {
+    color: white;
+    background-color: black;
+    padding: 5px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    margin-right: 4px;
+    min-height: 40px;
+    max-height: 40px;
+
+    span {
+      margin: 12px 0px 12px 0px;
+
+      &:hover {
+        color: $zorroa-sickly-green;
+      }
+    }
+
+    label {
+      margin-right: 10px;
+    }
+
+    .DisplayOptions-title {
+      margin-left: 5px;
+    }
+
+    .DisplayOptions-sync {
+      color: white;
+      text-transform: none;
+      margin-right: 50px;
+      margin-left: 6px;
+    }
+
+    /* The switch - the box around the slider */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 30px;
+      height: 4px;
+    }
+
+    /* Hide default HTML checkbox */
+    .switch input {display:none;}
+
+    $animation-duration: 0.25s;
+
+    /* The slider */
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: $zorroa-gray;
+      -webkit-transition: $animation-duration;
+      transition: $animation-duration;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 10px;
+      width: 10px;
+      left: 0;
+      bottom: -2.5px;
+      background-color: $zorroa-sickly-green;
+      box-shadow: 0px 0px 0px 2px black;
+      -webkit-transition: $animation-duration;
+      transition: $animation-duration;
+
+    }
+
+    input:checked + .slider {
+      background-color: $zorroa-sickly-green;
+    }
+
+    input:focus + .slider {
+      box-shadow: 0 0 1px $zorroa-sickly-green;
+    }
+
+    input:checked + .slider:before {
+      -webkit-transform: translateX(26px);
+      -ms-transform: translateX(26px);
+      transform: translateX(26px);
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+      border-radius: 34px;
+    }
+
+    .slider.round:before {
+      border-radius: 50%;
+    }
+  }
+
+  .DisplayOptions-subheader {
+    background-color: rgba(215, 215, 215, 0.5);
+    padding-bottom: 16px;
+    padding-top: 16px;
+    min-height: 60px;
+    max-height: 60px;
+
+    .DisplayOptions-subheader-viewall {
+      margin-left: 38px;
+      font-size: 12px;
+      font-weight: 300;
+      color: $zorroa-slategray;
+      text-transform: uppercase;
+
+      span {
+        margin: 0;
+        margin-left: 4px;
+      }
+    }
+
+    input {
+      color: $zorroa-gray;
+      font-size: 14px;
+      margin-left: 26px;
+      background: transparent;
+      border: none;
+      width: 240px;
+      border-bottom: 2px solid $zorroa-gray;
+    }
+
+    button {
+      color: $zorroa-gray;
+      background: transparent;
+      font-size: 15px;
+      padding: 0;
+      margin: 2px;
+      border: none;
+    }
+  }
+
+  .DisplayOptions-body {
+    overflow-x: auto;
+    padding: 4px;
+
+    .DisplayOptions-body-col {
+      overflow-y: auto;
+      min-width: 280px;
+      max-width: 280px;
+      border-right: 1px solid $zorroa-nearwhite;
+      padding-left: 16px;
+      padding-right: 16px;
+
+      &.div:not(:last-child) {
+        border-right: none
+      }
+    }
+
+    .DisplayOptions-namespace {
+      height: 40px;
+      min-height: 40px;
+      max-height: 40px;
+      border-bottom: 1px solid $zorroa-lightgray;
+      color: $zorroa-darkgray;
+
+      &.disable {
+        opacity: 0.4;
+      }
+
+      &.hasChildren:hover {
+        background-color: $zorroa-lightgray;
+      }
+
+      &.selected {
+        opacity: 1;
+        background-color: $zorroa-nearwhite;
+      }
+
+      &.icon-arrow-down2 {
+        max-height:20px;
+        color: $zorroa-darkgray;
+        transform: rotate(-90deg);
+        border: none;
+
+        &.selected {
+          background-color: transparent;
+        }
+      }
+
+      input[type=checkbox] {
+        margin-left: 8px;
+        margin-right: 8px;
+
+        /* Horrible indeterminate style placeholder */
+        &.indeterminate:after {
+          position: relative;
+          bottom: 14px;
+          left: 2px;
+          font-size: 32px;
+          content: "-";
+          color: royalblue;
+        }
+      }
+    }
+
+    .DisplayOptions-body-empty {
+      color: $zorroa-lightgray;
+
+      .icon-thumbs-up {
+        transform: scaleY(-1);
+        font-size: 40px;
+        margin-top: 12px;
+        margin-bottom: 24px;
+      }
+
+      .DisplayOptions-body-field-type {
+        color: $zorroa-gray;
+        margin-top: 1em;
+        margin-left: 8px;
+        margin-right: 8px;
+      }
+    }
+  }
+
+  .DisplayOptions-footer {
+    border: none;
+    border-top: 1px solid $zorroa-lightgray;
+    min-height: 72px;
+    max-height: 72px;
+
+    button {
+      margin: 12px;
+      padding: 12px 30px;
+      font-size: 14px;
+      border: none;
+      border-radius: 3px;
+      background: none;
+      text-transform: uppercase;
+      font-size: 16px;
+      color: $zorroa-lightgray;
+
+      &:hover {
+        color: $zorroa-darkgray;
+        background-color: $zorroa-lightgray;
+      }
+
+      &.default {
+        color: $zorroa-nearwhite;
+        background-color: $zorroa-sickly-green;
+
+        &:hover {
+          color: white;
+        }
+      }
+
+      &.disabled {
+        background-color: $zorroa-lightgray;
+
+        &:hover {
+          color: $zorroa-nearwhite;
+        }
+      }
+    }
+  }
+}
+
+.DisplayOptions-background {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  background-color: rgba(0,0,0, .5);
+  box-sizing: border-box;
+}

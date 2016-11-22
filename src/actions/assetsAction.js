@@ -1,6 +1,6 @@
 import * as assert from 'assert'
 
-import { UNAUTH_USER, ASSET_SEARCH, ASSET_SEARCH_ERROR, ISOLATE_ASSET, SELECT_ASSETS, PAGE_SIZE, SUGGEST_COMPLETIONS } from '../constants/actionTypes'
+import { UNAUTH_USER, ASSET_SEARCH, ASSET_SEARCH_ERROR, ASSET_FIELDS, ISOLATE_ASSET, SELECT_ASSETS, PAGE_SIZE, SUGGEST_COMPLETIONS } from '../constants/actionTypes'
 import Asset from '../models/Asset'
 import Page from '../models/Page'
 import AssetSearch from '../models/AssetSearch'
@@ -41,6 +41,9 @@ export function searchAssets (query) {
 }
 
 export function suggestQueryStrings (text) {
+  if (!text) {
+    return ({ type: SUGGEST_COMPLETIONS, payload: null })
+  }
   return dispatch => {
     getArchivist().post('/api/v2/assets/_suggest', {text})
       .then(response => {
@@ -75,4 +78,19 @@ export function setPageSize (count) {
     type: PAGE_SIZE,
     payload: count
   })
+}
+
+export function getAssetFields () {
+  return dispatch => {
+    getArchivist().get('/api/v1/assets/_fields')
+      .then(response => {
+        dispatch({
+          type: ASSET_FIELDS,
+          payload: response.data
+        })
+      })
+      .catch(error => {
+        console.error('Error getting asset fields: ' + error)
+      })
+  }
 }

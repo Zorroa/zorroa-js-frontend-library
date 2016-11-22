@@ -25,7 +25,7 @@ class Lightbox extends Component {
     }
   }
 
-  @keydown('esc') // http://glortho.github.io/react-keydown/example/index.html
+  @keydown(['esc', 'space'])
   closeLightbox (event) {
     this.context.router.push('/')
   }

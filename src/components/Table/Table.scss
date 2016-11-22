@@ -1,36 +1,79 @@
 @import '../../styles/core-mixins.scss';
 
-.assets-table-scroll {
+.Table {
+  position: relative;
+
+  min-height: 300px;
+  height: 300px;
+  max-height: 300px;
+
+  overflow: auto;
+
   border-top: 1px solid #ddd;
   border-bottom: 1px solid #ddd;
-  overflow:auto;
-  max-height: 300px;
 }
 
-.assets-table {
+.Table-table {
+  position: absolute;
+
   width: 100%;
   max-width: 100%;
+  min-width: 100%;
+
   border-bottom: 1px solid #aaa;
   border-spacing: 0;
-  padding: 2px 8px 2px 2px;
+  padding: 2px 0 2px 2px;
 
   th, td {
     padding: 8px;
-    max-width: 0; // This looks weird, but is important! It allows cells to chop content
+
+    // This looks weird, but is important! It allows cells to chop content
+    // Commented temporarily; we'll need it later
+    //max-width: 0;
+
     @include clampText;
   }
 
-  /* TODO: column widths will be handled in code, and they must sum to 100% */
-  .assets-table-col-id     { text-align: left; width: 40%; }
-  .assets-table-col-source { text-align: left; width: 60%; }
+  .Table-header {
+    text-align: left;
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 100;
+  }
+
+  .Table-row {
+    text-align: left;
+  }
+
+  .Table-settings {
+    width: 26px; // same as thead height
+
+    color: $zorroa-lightgray;
+    background-color: #fff;
+    border-radius: 2px;
+
+    &:hover {
+      color: $zorroa-gray;
+      background-color: $zorroa-lightgray;
+    }
+  }
 
   tr {
+    color: $zorroa-greyish-brown;
     height: 30px;
   }
+
   thead,tr:nth-child(even) {
     background-color: white;
   }
+
+  thead th {
+    height: 26px;
+    color: $zorroa-gray;
+  }
+
   tbody tr:hover {
+    color: white;
     background-color: $zorroa-sickly-green;
   }
 }

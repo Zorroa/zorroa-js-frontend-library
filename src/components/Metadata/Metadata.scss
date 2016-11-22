@@ -1,16 +1,37 @@
 @import '../../styles/core-mixins.scss';
 
 .Metadata {
-  .Metadata-icon {
-    margin-left: 6px;
-    font-size: 10px;
-    color: $zorroa-warm-grey-60;
-  }
 
   // Metadata don't select, so we toggle them when clicking the label or caret
   // So, hover on the whole header
   .CollapsibleHeader {
     &:hover { background-color: darken(#d8d8d8, 15%); }
     &.isSelected { background-color: darken($zorroa-water-blue, 15%); }
+  }
+
+  .header {
+    @include flexRow;
+    @include flexJustifySpaceBetween;
+    @include flexAlignItemsCenter;
+    height: auto;
+
+    input {
+      @include flexOn;
+      height: 20px;
+      margin: 8px 12px 8px 4px;
+      border-radius: 3px;
+      background: none;
+      border: 1px solid $zorroa-lightgray;
+      padding-left: 4px;
+      padding-right: 4px;
+    }
+
+    .icon-cog {
+      color: $zorroa-gray;
+
+      :hover {
+        color: $zorroa-sickly-green;
+      }
+    }
   }
 }

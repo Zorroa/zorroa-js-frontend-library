@@ -1,16 +1,35 @@
 export default class AssetFilter {
   constructor (json) {
-    this.missing = json.missing   // [string]
-    this.terms = json.terms       // {string, [object]}
-    this.exists = json.exists     // [string]
-    this.range = json.range       // {string, RangeQuery}
-    this.scripts = json.scripts   // [AssetScript]
-    this.colors = json.colors     // {string, [ColorFilters]
-    this.links = json.links       // {string, [object]}
+    if (json) {
+      this.missing = json.missing   // [string]
+      this.terms = json.terms       // {string, [object]}
+      this.exists = json.exists     // [string]
+      this.range = json.range       // {string, RangeQuery}
+      this.scripts = json.scripts   // [AssetScript]
+      this.colors = json.colors     // {string, [ColorFilters]
+      this.links = json.links       // {string, [object]}
+    }
+  }
+
+  empty () {
+    if (
+      (this.missing && this.missing.length) ||
+      (this.terms && Object.keys(this.terms).length) ||
+      (this.exists && this.exists.length) ||
+      (this.range && Object.keys(this.range).length) ||
+      (this.scripts && this.scripts.length) ||
+      (this.colors && Object.keys(this.colors).length) ||
+      (this.links && Object.keys(this.links).length)) {
+      return false
+    }
+    return true
   }
 
   merge (filter) {
     // Combine each array, removing duplicates and merging terms.
+    if (!filter) {
+      return
+    }
     if (filter.missing) {
       this.missing = this.missing ? union([this.missing, filter.missing]) : [ ...filter.missing ]
     }
@@ -44,7 +63,7 @@ export default class AssetFilter {
           }
         }
       } else {
-        this.terms = [ ...filter.terms ]
+        this.terms = { ...filter.terms }
       }
     }
   }

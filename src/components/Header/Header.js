@@ -40,27 +40,26 @@ class Header extends Component {
         <div className="header-menu-bar fullHeight flexCenter">
           <div className="header-menu">
             <DropdownMenu label="Imports">
+              Imports
             </DropdownMenu>
           </div>
           <div className="header-menu">
             <DropdownMenu label="Exports">
+              Exports
             </DropdownMenu>
           </div>
           <div className="header-menu">
             <DropdownMenu label="Help">
-              <a href="http://zorroa.com/docs/help" className="header-menu-item" >Help</a>
-              <div className="header-menu-separator" />
-              <a href="http://zorroa.com/docs/tutorials" className="header-menu-item" >Tutorials</a>
-              <div className="header-menu-separator" />
-              <a href="http://zorroa.com/docs/release-notes" className="header-menu-item" >Release Notes</a>
+              <a href="http://zorroa.com/docs/help" target="_blank" className="header-menu-item" >Help</a>
+              <a href="http://zorroa.com/docs/tutorials" target="_blank" className="header-menu-item" >Tutorials</a>
+              <a href="http://zorroa.com/docs/release-notes" target="_blank" className="header-menu-item" >Release Notes</a>
             </DropdownMenu>
           </div>
           <div className="header-menu">
-            <DropdownMenu label={(<div><span className="icon-cog"/>&nbsp;{user.username}</div>)} rightAlign={true}>
-              <div className="header-menu-item">
-                <button className='dropdown-button' onClick={this.showPreferences.bind(this)}>Preferences</button>
+            <DropdownMenu label={(<div>{user.username}</div>)} rightAlign={true}>
+              <div className="header-menu-item" onClick={this.showPreferences.bind(this)}>
+                Preferences
               </div>
-              <div className="header-menu-separator" />
               <Link className="header-menu-item" to="/signout">Logout</Link>
             </DropdownMenu>
           </div>

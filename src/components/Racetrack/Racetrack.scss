@@ -7,9 +7,12 @@
   }
 
   .Racetrack-empty {
-    background: none;
-    text-shadow: -1px -1px 0px rgba(200,200,200,0.8), 1px 1px 0px rgba(255,255,255,0.3);
-    color: rgba(220,220,220, 0.5);
+    background-color: rgba(200,200,200,1);
+    color: transparent;
+    text-shadow: 0px 2px 3px rgba(255,255,255,0.5);
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    background-clip: text;
 
     .Racetrack-empty-mag:before {
       width: 48px;
@@ -24,8 +27,8 @@
 
     .Racetrack-empty-text {
       text-align: center;
-      font-size: 12px;
-      font-weight: 300;
+      font-size: 14px;
+      font-weight: 700;
     }
 
     form {
@@ -101,13 +104,20 @@
       border-radius: 2px;
       padding: 6px;
     }
+
     .Racetrack-add-SIMPLE_SEARCH {
       background-color: $zorroa-sickly-green;
       &:hover { background-color: darken($zorroa-sickly-green, 15%); }
     }
+
     .Racetrack-add-FACET {
       background-color: $zorroa-darkish-purple;
       &:hover { background-color: darken($zorroa-darkish-purple, 15%); }
+    }
+
+    .Racetrack-add-MAP {
+      background-color: $zorroa-water-blue;
+      &:hover { background-color: darken($zorroa-water-blue, 15%); }
     }
 
     .Racetrack-add-icon {
@@ -127,6 +137,16 @@
     .Racetrack-footer-save-button {
       background-color: #a5a5a5;
       color: $zorroa-nearwhite;
+
+      &:disabled {
+        cursor: not-allowed;
+        background-color: $zorroa-lightgray;
+      }
+
+      &:hover:enabled {
+        color: white;
+        background-color: $zorroa-sickly-green;
+      }
     }
 
     button {
@@ -139,7 +159,7 @@
       background: none;
       border: none;
 
-      &:hover {
+      &:hover:enabled {
         background-color: #a5a5a5;
         color: $zorroa-nearwhite;
         font-weight: 500;

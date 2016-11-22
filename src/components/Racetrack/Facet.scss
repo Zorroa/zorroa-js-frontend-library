@@ -17,21 +17,18 @@
     font-size: 20px;
   }
 
+  .Facet-header {
+    flex-shrink: 1;
+    span {
+    }
+  }
+
   .Facet-body {
     padding: 10px;
   }
 
   .Facet-sort {
     table {}
-  }
-
-  .Facet-icon {
-    width: 30px;
-    height: 30px;
-    border: none;
-    outline: none;
-    font-size: 16px;
-    border-radius: 3px;
   }
 
   .Facet-min-value {
@@ -45,6 +42,110 @@
     flex: 1;
   }
 
+  .Facet-value-table {
+    @include flexOn;
+    width: 100%;
+    max-width: 100%;
+    max-height: 300px;
+    border-bottom: 1px solid #aaa;
+    border-spacing: 0;
+    padding: 2px 0 2px 2px;
+    overflow: hidden;
+    overflow-y: auto;
+
+    .Facet-value-table-row {
+
+      &.selected {
+        color: white;
+        background-color: $zorroa-water-blue;
+      }
+    }
+  }
+
+  .Facet-pie-chart {
+    @include flexOn;
+    @include fullWidth;
+    height: 240px;
+    max-height: 240px;
+
+    .Facet-pie-pct {
+      font-size: 9px;
+      fill: white;
+      @include nosel;
+      pointer-events: none;
+    }
+
+    .Facet-pie-label {
+      font-size: 10px;
+      fill: $zorroa-lightgray;
+      font-stretch: condensed;
+
+      &.active {
+        fill: $zorroa-water-blue;
+        font-weight: 900;
+        font-size: 11px;
+      }
+    }
+
+  }
+
+  // Custom scrollbar styles from Amber
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  table {
+    width: 100%;
+    border: 0;
+    border-spacing: 0;
+  }
+
+  th, td {
+    padding: 8px;
+    max-width: 0; // This looks weird, but is important! It allows cells to chop content
+    @include clampText;
+  }
+
+  .Table-header {
+    text-align: left;
+  }
+
+  .Table-row {
+    text-align: left;
+  }
+
+  .Table-settings {
+    width: 24px;
+    color: $zorroa-gray;
+  }
+
+  tr {
+    color: $zorroa-greyish-brown;
+  }
+
+  td:last-child {
+    text-align: right;
+    width: 60px;
+  }
+
+  tr:nth-child(odd) {
+    background-color: $zorroa-nearwhite;
+  }
+
+  thead tr td {
+    font-size: 12px;
+    text-transform: uppercase;
+    font-stretch: condensed;
+    line-height: 1;
+    color: $zorroa-gray;
+    background-color: white;
+  }
+
+  tbody tr:hover {
+    color: white;
+    background-color: $zorroa-sickly-green;
+  }
+
   .Facet-controls {
     color: $zorroa-gray;
   }
@@ -53,6 +154,23 @@
     border-top: 1px solid $zorroa-nearwhite;
     padding-top: 4px;
     padding-bottom: 4px;
+
+    .Facet-icon {
+      width: 30px;
+      height: 30px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      border-radius: 3px;
+      margin: 4px;
+      counter-reset: $zorroa-greyish-brown;
+      background: transparent;
+
+      &.selected {
+        color: white;
+        background-color: #a11d77;
+      }
+    }
   }
 
   .rotN90Flip {

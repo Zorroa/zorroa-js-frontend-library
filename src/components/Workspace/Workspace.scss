@@ -1,7 +1,7 @@
 @import '../../styles/core-mixins.scss';
 
 // App class, containing header and workspace in columns
-.app {
+.App {
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -16,13 +16,24 @@
 }
 
 // Allow the workspace to fill the full height of App
-.workspace {
+.Workspace {
   background-color: $zorroa-nearwhite;
 
-  & .workspace-vertical-separator {
+  & .Workspace-vertical-separator {
     height: 100%;
     width: 1px;
     border-right: 1px solid $zorroa-lightgray;
+  }
+
+  .Metadata-icon {
+    margin-left: 0;
+    font-size: 10px;
+    color: $zorroa-warm-grey-60;
+    padding: 6px;
+
+    &:hover {
+      color: $zorroa-sickly-green;
+    }
   }
 }
 

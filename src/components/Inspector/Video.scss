@@ -1,0 +1,135 @@
+@import '../../styles/core-mixins.scss';
+
+.Video {
+  @include flexCol;
+  @include flexAlignItemsCenter;
+  @include fullWidth;
+  @include fullHeight;
+  color: white;
+  background-color: black;
+  z-index: -4;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+
+  .player {
+    @include flexOn;
+    @include fullWidth;
+    overflow: hidden;
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  .progress-bar {
+    @include fullWidth;
+    position: relative;
+    top: 0;
+    left: 0;
+    height: auto;
+
+    .scrub {
+      @include fullWidth;
+      z-index: 10;
+      position: relative;
+    }
+
+    input[type=range] {
+      -webkit-appearance: none;
+      height: 4px;
+      background-color: rgba(64,64,64,0.05);
+    }
+
+    input.scrub[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      border: none;
+      height: 8px;
+      width: 8px;
+      border-radius: 25%;
+      background: $zorroa-nearwhite;
+      margin-top: -4px;
+    }
+
+    progress[value] {
+      @include fullWidth;
+      -webkit-appearance: none;
+      height: 4px;
+      background: none;
+    }
+
+    progress[value]::-webkit-progress-bar {
+      background-color: transparent;
+    }
+
+    progress.loaded[value]::-webkit-progress-value {
+      color: transparent;
+      background-color: $zorroa-gray;
+    }
+
+    progress.played[value]::-webkit-progress-value {
+      color: transparent;
+      background-color: $zorroa-sickly-green;
+      opacity: 0.75;
+    }
+
+    .loaded {
+      @include fullWidth;
+      position: absolute;
+      top: 7px;
+      z-index: 1;
+    }
+
+    .played {
+      @include fullWidth;
+      position: absolute;
+      top: 7px;
+      z-index: 2;
+    }
+  }
+
+  .control-bar {
+    @include fullWidth;
+    @include flexRow;
+    @include flexJustifySpaceBetween;
+    @include flexAlignItemsCenter;
+    box-shadow: 0 0 3px 3px rgba(0,0,0,0.25);
+    border-radius: 3px;
+    height: 40px;
+    background: none;
+
+    .time {
+      margin-left: 10px;
+
+      .duration {
+        padding: 8px;
+      }
+    }
+
+    .controls {
+      @include flexRow;
+      @include flexJustifyCenter;
+
+      div {
+        text-align: center;
+        width: 40px;
+
+        &:hover {
+          color: $zorroa-sickly-green;
+        }
+      }
+    }
+
+    .misc {
+      @include flexRow;
+      @include flexAlignItemsCenter;
+
+      .icon-cross2 {
+        color: white;
+        background: none;
+        border: none;
+      }
+    }
+  }
+
+  &.ProgressBar {
+    @include fullWidth;
+  }
+}

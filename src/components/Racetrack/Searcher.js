@@ -14,19 +14,51 @@ class Searcher extends Component {
     query: PropTypes.instanceOf(AssetSearch),
     pageSize: PropTypes.number.isRequired,
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
-    selectedFolders: PropTypes.object,
+    selectedFolderIds: PropTypes.object,
     actions: PropTypes.object.isRequired
   }
 
+  // Return a filter comprised of all widget filters except one
+  allOtherFilters (widget) {
+    const { widgets } = this.props
+    let allOther = new AssetFilter()
+    for (let w of widgets) {
+      if (w !== widget && w.sliver && w.sliver.filter) {
+        allOther.merge(w.sliver.filter)
+      }
+    }
+    return allOther
+  }
+
+  // The Searcher does not render any JSX, and is purely reactive.
+  // Each query returns the assets and aggs for all search widgets.
+  // The AsseSearch contains search and folders in the main query,
+  // and a post-filter for all the racetrack facets. Aggs for each
+  // facet are placed in a filter-bucket with the allOtherFilter so
+  // they show the results that do not include their own filter.
+  // Note that post-filter is less efficient than a standard filter.
   render () {
-    const { widgets, actions, selectedFolders, query, pageSize } = this.props
+    const { widgets, actions, selectedFolderIds, query, pageSize } = this.props
     let assetSearch = new AssetSearch()
+    let postFilter = new AssetFilter()
     for (let widget of widgets) {
-      assetSearch.merge(widget.sliver)
+      if (!widget || !widget.sliver) {
+        continue
+      }
+      let sliver = widget.sliver
+      if (sliver.aggs) {
+        const allOthers = this.allOtherFilters(widget)
+        let aggs = { [widget.id]: { filter: allOthers, aggs: sliver.aggs } }
+        sliver = new AssetSearch({ aggs })
+      }
+      postFilter.merge(widget.sliver.filter)
+      assetSearch.merge(sliver)
     }
 
-    if (selectedFolders && selectedFolders.size) {
-      const filter = new AssetFilter({links: {folder: [...selectedFolders]}})
+    assetSearch.postFilter = postFilter
+
+    if (selectedFolderIds && selectedFolderIds.size) {
+      const filter = new AssetFilter({links: {folder: [...selectedFolderIds]}})
       assetSearch.merge(new AssetSearch({filter}))
     }
 
@@ -48,7 +80,7 @@ const mapStateToProps = state => ({
   query: state.assets.query,
   pageSize: state.assets.pageSize,
   widgets: state.racetrack.widgets,
-  selectedFolders: state.folders.selectedIds
+  selectedFolderIds: state.folders.selectedFolderIds
 })
 
 export default connect(

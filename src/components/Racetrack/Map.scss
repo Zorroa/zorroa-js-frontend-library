@@ -1,0 +1,30 @@
+@import '../../styles/core-mixins.scss';
+
+.Map {
+
+  .WidgetHeader {
+    border-radius: 3px 3px 0 0;
+
+    color: $zorroa-nearwhite;
+    background-color: $zorroa-water-blue;
+    & > *:hover { background-color: darken($zorroa-water-blue, 15%); }
+  }
+
+  .WidgetHeader-icon {
+  }
+
+  .Widget-icon {
+    font-size: 20px;
+  }
+
+  .Facet-body {
+    padding: 10px;
+  }
+
+  .Map-header {
+    div[class*="icon-"] {
+      margin-left: 4px;
+      margin-right: 4px;
+    }
+  }
+}

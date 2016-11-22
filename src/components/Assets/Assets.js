@@ -2,11 +2,14 @@ import React, { Component, PropTypes } from 'react'
 import Measure from 'react-measure'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import keydown from 'react-keydown'
 import * as assert from 'assert'
 
 import Thumb from '../Thumb'
 import Asset from '../../models/Asset'
 import { isolateAssetId, selectAssetIds } from '../../actions/assetsAction'
+import { resetRacetrackWidgets } from '../../actions/racetrackAction'
+import { selectFolderIds } from '../../actions/folderAction'
 import Pager from './Pager'
 import Footer from './Footer'
 import Table from '../Table'
@@ -89,6 +92,18 @@ class Assets extends Component {
     actions.selectAssetIds(ids)
   }
 
+  @keydown('space')
+  isolateSelected () {
+    const { assets, selectedIds } = this.props
+    if (selectedIds && selectedIds.size === 1) {
+      const id = selectedIds.values().next().value
+      const index = assets.findIndex(a => (a.id === id))
+      if (index >= 0) {
+        this.isolateToLightbox(assets[index])
+      }
+    }
+  }
+
   isolateToLightbox (asset) {
     this.props.actions.isolateAssetId(asset.id)
     this.context.router.push('/lightbox')
@@ -111,12 +126,22 @@ class Assets extends Component {
     }
   }
 
+  clearSearch = () => {
+    this.props.actions.resetRacetrackWidgets()
+    this.props.actions.selectFolderIds()
+  }
+
   renderAssets () {
     const { assets, selectedIds, totalCount } = this.props
     const { layout, thumbSize } = this.state
 
     if (!assets || !assets.length) {
-      return (<div className="assets-layout-empty">No asset proxies</div>)
+      return (
+        <div className="assets-layout-empty flexCol flexJustifyCenter flexAlignItemsCenter">
+          <div className="assets-layout-icon icon-search"/>
+          <div>No results</div>
+          <button onClick={this.clearSearch}>Clear Search</button>
+        </div>)
     }
 
     return (
@@ -136,7 +161,7 @@ class Assets extends Component {
               <div className={`assets-layout ${layout}`}
               style={{'width': '100%', 'height': height}}>
                 { assets.map((asset, index) => (
-                  <Thumb selected={selectedIds && selectedIds.has(asset.id)}
+                  <Thumb isSelected={selectedIds && selectedIds.has(asset.id)}
                     dim={positions[index]}
                     index={index}
                     key={asset.id}
@@ -161,7 +186,7 @@ class Assets extends Component {
       <div className="assets-container flexOff flexCol fullHeight fullWidth">
         {this.renderAssets()}
         { showTable && <Table/> }
-        { totalCount &&
+        { totalCount > 0 &&
         <Footer
           total={totalCount}
           loaded={assets.length}
@@ -182,5 +207,10 @@ export default connect(state => ({
   selectedIds: state.assets.selectedIds,
   totalCount: state.assets.totalCount
 }), dispatch => ({
-  actions: bindActionCreators({ isolateAssetId, selectAssetIds }, dispatch)
+  actions: bindActionCreators({
+    isolateAssetId,
+    selectAssetIds,
+    resetRacetrackWidgets,
+    selectFolderIds
+  }, dispatch)
 }))(Assets)

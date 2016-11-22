@@ -1,4 +1,4 @@
-import { MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS } from '../constants/actionTypes'
+import { MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS, UNAUTH_USER } from '../constants/actionTypes'
 import Widget from '../models/Widget'
 import * as assert from 'assert'
 
@@ -33,6 +33,8 @@ export default function (state = initialState, action) {
       assert.ok(!widgets.length || widgets[0] instanceof Widget)
       return { ...state, widgets }
     }
+    case UNAUTH_USER:
+      return initialState
   }
 
   return state

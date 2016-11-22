@@ -18,21 +18,19 @@
 }
 
 .CollapsibleHeader-select {
-  padding: 5px;
-  padding-left: 10px;
+  @include clampText;
 
   // reset padding when iconified so the icon can center
   &.isIconified {
-    padding: 5px;
+    @include flexJustifyCenter;
   }
+  &:hover { background-color: darken(#d8d8d8, 15%); }
+  &.isSelected { background-color: $zorroa-water-blue; }
 }
 
 .CollapsibleHeader-icon {
-  margin-right: 14px;
-  padding-bottom: 3px;
-  &.isIconified {
-    margin-right: 0;
-  }
+  height: 40px;
+  width: 40px;
 }
 
 .CollapsibleHeader-label {
@@ -41,6 +39,8 @@
 
 .CollapsibleHeader-open {
   width: 40px;
+  &:hover { background-color: darken(#d8d8d8, 15%); }
+  &.isSelected { background-color: $zorroa-water-blue; }
 }
 
 .CollapsibleHeader-caret {

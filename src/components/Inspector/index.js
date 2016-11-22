@@ -1,5 +1,7 @@
 import Inspector from './Inspector'
 import './Inspector.scss'
+import './Video.scss'
+import './Pdf.scss'
 export default Inspector
 
 /*

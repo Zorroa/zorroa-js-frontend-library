@@ -1,10 +1,152 @@
 @import '../../styles/core-mixins.scss';
 
-.assets-thumb {
-  background-repeat: no-repeat;
-  background-position: center;
+.ImageThumb {
+  background: no-repeat center;
   background-origin: border-box;
-  // margin: 5px;
 
   position: absolute;
+
+  .time-badge {
+    position: absolute;
+    right: 4px;
+    bottom: 4px;
+    color: $zorroa-greyish-brown;
+    background: none;
+
+    @include flexRow;
+    @include flexAlignItemsCenter;
+
+    .duration {
+      padding: 2px;
+      line-height: 2em;
+      height: 28px;
+      background-color: rgba(256,256,256, 0.75);
+
+      &.small {
+        height: 14px;
+        font-size: 10px;
+        line-height: 1.25em;
+      }
+    }
+
+    .play-badge {
+      padding: 4px;
+      margin: 1px;
+      background-color: rgba(256,256,256, 0.75);
+      width: 28px;
+      height: 28px;
+
+      &.small {
+        width: 14PX;
+        height: 14px;
+      }
+
+      @include flexRow;
+      @include flexAlignItemsCenter;
+      @include flexJustifyCenter;
+
+      @media (max-width: 56px) { visibility: hidden }
+
+      .arrow-right {
+        width: 0;
+        height: 0;
+        border-top: 8px solid transparent;
+        border-bottom: 8px solid transparent;
+        border-left: 12px solid $zorroa-greyish-brown;
+
+        &.small {
+          border-top: 4px solid transparent;
+          border-bottom: 4px solid transparent;
+          border-left: 6px solid $zorroa-greyish-brown;
+        }
+      }
+    }
+  }
+}
+
+.Thumb {
+  position: absolute;
+
+  &:hover {
+    outline: 3px solid $zorroa-lightgray;
+  }
+  &.isSelected {
+    outline: 3px solid $zorroa-sickly-green;
+  }
+
+  .Thumb:hover {
+    border: none;
+  }
+
+  &.Thumb.isSelected {
+    border: none;
+  }
+
+  .stack-front {
+    position: absolute;
+    //width: 90%;
+    //height: 90%;
+    top: 0;
+    left: 0;
+    border: solid 1px $zorroa-lightgray;
+
+    .multipage-badge {
+      position: absolute;
+      right: 4px;
+      bottom: 4px;
+
+      @include flexRow;
+      @include flexAlignItemsCenter;
+      @media screen and (max-width: 56px) { hidden: true; }
+
+      .icon {
+        width: 30px;
+        height: 30px;
+
+        &.small {
+          width: 15px;
+          height: 15px;
+        }
+
+        img {
+          width: 100%;
+          height: 100%;
+        }
+      }
+
+      .pages {
+        color: $zorroa-greyish-brown;
+        background-color: rgba(256, 256, 256, 0.75);
+        padding: 2px;
+        line-height: 2em;
+        height: 28px;
+
+        &.small {
+          font-size: 10px;
+          height: 16px;
+          line-height: 1.5em;
+        }
+      }
+    }
+  }
+
+  .stack-middle {
+    width: 90%;
+    height: 90%;
+    position: absolute;
+    right: 5%;
+    bottom: 5%;
+    background-color: white;
+    border: solid 1px $zorroa-lightgray;
+  }
+
+  .stack-back {
+    width: 90%;
+    height: 90%;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    background-color: white;
+    border: solid 1px $zorroa-lightgray;
+  }
 }

@@ -1,6 +1,8 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 
+import Pdf from './Pdf'
+import Video from './Video'
 import Asset from '../../models/Asset'
 
 class Inspector extends Component {
@@ -12,13 +14,24 @@ class Inspector extends Component {
 
   render () {
     const { asset, protocol, host } = this.props
-    const proxy = asset ? asset.closestProxy(1024, 1024) : null
+    const mediaType = asset.mediaType().toLowerCase()
+    let isVideo = false
+    let isPdf = false
+    const url = asset.url(protocol, host)
     const inspectorStyle = { 'backgroundSize': 'fit' }
-    if (proxy) inspectorStyle['backgroundImage'] = `url(${proxy.url(protocol, host)})`
-
+    if (mediaType.startsWith('image')) {
+      if (url) inspectorStyle['backgroundImage'] = `url(${url})`
+    } else if (mediaType.startsWith('video')) {
+      isVideo = true
+    } else if (mediaType === 'application/pdf') {
+      isPdf = true
+    }
     return (
       <div className="inspector fullWidth fullHeight flexCenter">
-        <div className='inspector-content flexOn' style={inspectorStyle}/><div/>
+        <div className='inspector-content flexOn' style={inspectorStyle}>
+          { isVideo && <Video url={url} /> }
+          { isPdf && <Pdf documentInitParameters={{url, withCredentials: true}} />}
+        </div>
       </div>
     )
   }

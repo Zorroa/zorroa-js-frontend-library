@@ -14,7 +14,10 @@ export default class Asset {
   }
 
   source () { return this.document.source.filename }
-
+  url (protocol, host) {
+    return `${protocol}//${host}:8066/api/v1/assets/${this.id}/_stream`
+  }
+  mediaType () { return this.document.source.mediaType }
   tinyProxy () { return this.document.proxies ? this.document.proxies.tinyProxy : null }
 
   width () { return this.document.image && this.document.image.width ? this.document.image.width : 0 }
@@ -40,6 +43,18 @@ export default class Asset {
     return bestProxy
   }
 
+  static lastNamespace (field) {
+    if (field && field.length) {
+      const namespaces = field.split('.')
+      let index = namespaces.length - 1
+      let name = namespaces[index]
+      if (index > 0 && (name === 'raw' || name === 'point')) {
+        name = namespaces[index - 1]
+      }
+      return name
+    }
+  }
+
   // Return the value for a metadata field specified using dot-notation
   // as a path through the JSON-structured asset document. Recursively
   // invokes _field to navigate through the JSON and then uses
@@ -54,6 +69,9 @@ export default class Asset {
       const namespace = key.slice(0, idx)
       const nextkey = key.slice(idx + 1)
       const value = obj[namespace]
+      if (!value) {
+        return
+      }
       assert.ok(typeof value === 'object', 'non-object namespace')
       return Asset._field(value, nextkey)
     }

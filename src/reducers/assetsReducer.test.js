@@ -1,5 +1,5 @@
 import assetsReducer from './assetsReducer'
-import { ASSET_SEARCH, ASSET_SEARCH_ERROR, PAGE_SIZE, ISOLATE_ASSET, SELECT_ASSETS } from '../constants/actionTypes'
+import { ASSET_SEARCH, ASSET_SEARCH_ERROR, ASSET_FIELDS, PAGE_SIZE, ISOLATE_ASSET, SELECT_ASSETS } from '../constants/actionTypes'
 import Page from '../models/Page'
 
 // These are defined by webpack
@@ -54,6 +54,12 @@ describe('assetsReducer', () => {
     const a = 'a'
     expect(assetsReducer([], { type: ASSET_SEARCH_ERROR, payload: a }))
       .toEqual({ error: a })
+  })
+
+  it('ASSET_FIELDS returns fields', () => {
+    const fields = ['some.thing.important']
+    expect(assetsReducer([], { type: ASSET_FIELDS, payload: fields }))
+      .toEqual({ fields })
   })
 
   it('ISOLATE_ASSET returns isolated asset id', () => {

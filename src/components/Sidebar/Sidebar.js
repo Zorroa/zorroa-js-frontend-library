@@ -1,66 +1,71 @@
-import React, { Component, PropTypes, Children, cloneElement } from 'react'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
+import React, { Component, PropTypes } from 'react'
 import classnames from 'classnames'
 
-import { iconifyLeftSidebar, iconifyRightSidebar } from '../../actions/appActions'
-
-class Sidebar extends Component {
+export default class Sidebar extends Component {
   static displayName () {
     return 'Sidebar'
   }
 
   static propTypes = {
+    // input props
     isRightEdge: PropTypes.bool,
-    children: PropTypes.node,
-    app: PropTypes.object.isRequired,
-    actions: PropTypes.object.isRequired
+    isIconified: PropTypes.bool,
+    onToggle: PropTypes.func,
+
+    // children props
+    children: PropTypes.node
   }
 
-  static get defaultProps () {
-    return {
-      isRightEdge: false
+  static defaultProps = {
+    isRightEdge: false
+  }
+
+  state = {
+    startx: 0,
+    startw: 0,
+    width: 340    // Tricky ref stuff needed in componentDidMount to get width
+  }
+
+  startDrag = (event) => {
+    const { width } = this.state
+    this.setState({ startx: event.pageX, startw: width })
+  }
+
+  drag = (event) => {
+    const { isRightEdge } = this.props
+    const { startx, startw } = this.state
+    if (!event.pageX) return
+    const dx = (event.pageX - startx) * (isRightEdge ? -1 : 1)
+    const width = Math.min(1020, Math.max(340, startw + dx))
+    const threshold = 4   // Minimize redraws
+    if (Math.abs(width - this.state.width) > threshold) {
+      this.setState({width})
     }
-  }
-
-  handleClick () {
-    const { app, isRightEdge, actions } = this.props
-    const isIconified = isRightEdge ? app.rightSidebarIsIconified : app.leftSidebarIsIconified
-    if (isRightEdge) {
-      actions.iconifyRightSidebar(!isIconified)
-    } else {
-      actions.iconifyLeftSidebar(!isIconified)
-    }
-  }
-
-  isIconified () {
-    const { app, isRightEdge } = this.props
-    return isRightEdge ? app.rightSidebarIsIconified : app.leftSidebarIsIconified
   }
 
   buttonChar () {
     // Select the right or left facing triangle unicode char using XOR
-    return this.isIconified() === this.props.isRightEdge ? '\u25C0' : '\u25B6'
+    return this.props.isIconified === this.props.isRightEdge ? '\u25C0' : '\u25B6'
   }
 
   render () {
     const arrow = this.buttonChar()
-    const isIconified = this.isIconified()
+    const { isIconified, children, onToggle, isRightEdge } = this.props
+    const { width } = this.state
+    const isOpen = !isIconified
     return (
-      <div className={classnames('Sidebar flexCol fullHeight', { 'isOpen': !this.isIconified() })}>
-        <div className={classnames('Sidebar-button flexOff', { 'left': !this.props.isRightEdge })}>
-          <label onClick={this.handleClick.bind(this)}>{arrow}{arrow}</label>
+      <div style={{width}} className={classnames('Sidebar', { isOpen })}>
+        <div className={classnames('open-close-button', { isRightEdge })}
+             onClick={onToggle}
+        >
+          <label>{arrow}{arrow}</label>
         </div>
-        <div className={'Sidebar-scroll flexOn fullHeight'} >
-          { Children.map(this.props.children, child => cloneElement(child, {isIconified})) }
+        <div className={'scroller'} >
+          { children }
         </div>
+        { isOpen && <div draggable={true} onDragStart={this.startDrag} onDrag={this.drag}
+                         className={classnames('resize-thumb', { isRightEdge })} /> }
       </div>
     )
   }
 }
-
-export default connect(state => ({
-  app: state.app
-}), dispatch => ({
-  actions: bindActionCreators({ iconifyLeftSidebar, iconifyRightSidebar }, dispatch)
-}))(Sidebar)
