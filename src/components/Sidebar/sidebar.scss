@@ -2,6 +2,11 @@
 
 // Sidebars use flex-basis to toggle between open and close
 .Sidebar {
+  @include flexCol;
+  @include fullHeight;
+  @include flexOff;
+
+  position: relative;   // For resize-thumb absolute
   max-height: 100%;
 
   width: 60px;
@@ -14,36 +19,56 @@
   background-color: $zorroa-nearwhite;
 
   &.isOpen {
-    // This matches the header logo width
-    width: 25%;
-    max-width: $zorroa-Sidebar-width;
+    min-width: $zorroa-Sidebar-width;
+    max-width: 3 * $zorroa-Sidebar-width;
   }
-}
 
-.Sidebar-button {
-  height: 21px;
-  font-size: 9px;
-  color: $zorroa-lightgray;
+  .open-close-button {
+    height: 21px;
+    font-size: 9px;
+    color: $zorroa-lightgray;
 
-  @include flexRow;
-  @include flexAlignItemsCenter;
-
-  &.left {
+    @include flexRow;
+    @include flexAlignItemsCenter;
     @include flexJustifyEnd;
+    @include flexOff;
+
+    &.isRightEdge {
+      @include flexJustifyStart;
+    }
+
+    &:hover {
+      color: $zorroa-gray;
+    }
   }
 
-  &:hover {
-    color: $zorroa-gray;
+  .scroller {
+    max-height: 100%;
+    width: 100%;
+    max-width: 100%;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    padding-bottom: 10px;
+
+    @include flexOn;
+    @include fullHeight;
   }
-}
 
-.Sidebar-scroll {
-  max-height: 100%;
-  width: 100%;
-  max-width: 100%;
+  .resize-thumb {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    cursor: ew-resize;
+    background: none;
+    border: none;
 
-  overflow-x: hidden;
-  overflow-y: auto;
-
-  padding-bottom: 10px;
+    &.isRightEdge {
+      left: 0;
+      right: auto;
+    }
+  }
 }
