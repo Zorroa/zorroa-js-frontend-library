@@ -7,3 +7,26 @@ export function unCamelCase (str) {
     // uppercase the first character
     .replace(/^./, function (str) { return str.toUpperCase() })
 }
+
+export function formatDuration (seconds) {
+  const date = new Date(seconds * 1000)
+  const hh = date.getUTCHours()
+  const mm = date.getUTCMinutes()
+  const ss = pad(date.getUTCSeconds())
+  if (hh) {
+    return `${hh}:${pad(mm)}:${ss}`
+  }
+  return `${mm}:${ss}`
+}
+
+function pad (string) {
+  return ('0' + string).slice(-2)
+}
+
+export function parseFormattedFloat (obj) {
+  if (!obj) return
+  if (typeof obj === 'number') return obj
+  if (typeof obj === 'string') {
+    return parseFloat(obj.replace(',', ''))
+  }
+}

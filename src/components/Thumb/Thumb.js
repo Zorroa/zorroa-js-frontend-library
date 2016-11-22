@@ -4,6 +4,8 @@ import { DragSource } from '../../services/DragDrop'
 import Asset from '../../models/Asset'
 import classnames from 'classnames'
 
+import { formatDuration, parseFormattedFloat } from '../../services/jsUtil'
+
 const source = {
   dragStart (props, type, se) {
     se.dataTransfer.setData('text/plain', JSON.stringify({type, id: props.asset.id}))
@@ -15,6 +17,39 @@ const source = {
 
 let ThumbCache = new Set()
 
+const ImageThumb = (props) => {
+  const { asset, dim, onClick, onDoubleClick, dragparams, thumbClass, children } = props
+  const tproxy = asset.tinyProxy()
+  const style = {
+    'backgroundColor': tproxy[4],
+    'backgroundSize': 'cover',
+    'width': dim.width,
+    'height': dim.height,
+    'left': dim.x,
+    'top': dim.y
+  }
+  return (
+    <div
+      className={classnames('ImageThumb', thumbClass)}
+      style={style}
+      onDoubleClick={onDoubleClick}
+      onClick={onClick}
+      {...dragparams} >
+      { children }
+    </div>
+  )
+}
+
+ImageThumb.propTypes = {
+  asset: PropTypes.instanceOf(Asset).isRequired,
+  dim: PropTypes.object.isRequired,
+  onClick: PropTypes.func.isRequired,
+  onDoubleClick: PropTypes.func.isRequired,
+  dragparams: PropTypes.object,
+  thumbClass: PropTypes.string.isRequired,
+  children: React.PropTypes.element
+}
+
 @DragSource('FOLDER', source)
 class Thumb extends Component {
   static propTypes = {
@@ -23,9 +58,6 @@ class Thumb extends Component {
     host: PropTypes.string,
     dim: PropTypes.object.isRequired,
     isSelected: PropTypes.bool,
-    onClick: PropTypes.func.isRequired,
-    onDoubleClick: PropTypes.func.isRequired,
-    dragparams: PropTypes.object,
     index: PropTypes.number.isRequired
   }
 
@@ -56,31 +88,67 @@ class Thumb extends Component {
     if (this.loadTimer) clearTimeout(this.loadTimer)
   }
 
+  renderBadges = (pages, duration, icon) => {
+    const { width, height } = this.props.dim
+    const hideText = (!pages && !duration) || width < 50 || height < 50
+    const textStyle = hideText ? { display: 'none' } : {}
+    const small = width < 80 || height < 80
+
+    if (pages || icon) {
+      return (
+        <div className="multipage-badge">
+          <div className={classnames('icon', {small})}><img src={icon}/></div>
+          <div style={textStyle} className={classnames('pages', {small})}>
+            {pages}
+          </div>
+        </div>
+      )
+    } else if (duration) {
+      return (
+        <div className="time-badge">
+          <div className={classnames('play-badge', {small})}>
+            <div className={classnames('arrow-right', {small})} />
+          </div>
+          <div style={textStyle} className={classnames('duration', {small})}>
+            { formatDuration(parseFormattedFloat(duration) / 1000.0) }
+          </div>
+        </div>
+      )
+    }
+  }
+
   render () {
-    const { asset, dim, isSelected, onClick, onDoubleClick, dragparams } = this.props
+    const { asset, isSelected } = this.props
     if (!asset.proxies) {
-      return <div className="thumb" style={{ backgroundColor: asset.backgroundColor() }} />
+      return <div className="Thumb-proxy" style={{ backgroundColor: asset.backgroundColor() }} />
     }
-
-    const tproxy = asset.tinyProxy()
-
-    const thumbStyle = {
-      'backgroundColor': tproxy[4],
-      'backgroundSize': 'cover',
-      'width': dim.width,
-      'height': dim.height,
-      'left': dim.x,
-      'top': dim.y
+    let pages, duration, icon
+    const mediaType = asset.mediaType().toLowerCase()
+    if (mediaType.startsWith('image') && asset.value('image.subimages')) {
+      pages = asset.value('image.subimages')
+    } else if (mediaType.includes('video') || mediaType.includes('sequence')) {
+      duration = asset.value('video.duration')
+    } else if (mediaType === 'application/pdf' || asset.value('document.pages')) {
+      icon = require('./pdf-icon.png')
+      pages = asset.value('document.pages')
     }
-
+    const { width, height, x, y } = this.props.dim      // Original thumb rect
+    const style = { width, height, left: x, top: y }    // Dim -> left, right
+    const ninetyDim = { width: '90%', height: '90%' }   // When multipaged
+    const fullDim = { width: '100%', height: '100%' }   // Single thumb
+    const frontDim = pages ? ninetyDim : fullDim        // stack-front dim
+    const props = { ...this.props, dim: {width: '100%', height: '100%', x: 0, y: 0} }
+    const hideMultipageStyle = pages ? { display: 'none' } : {}
     return (
-      <div
-        className={classnames('Thumb', this.thumbClass, {isSelected})}
-        style={thumbStyle}
-        onDoubleClick={onDoubleClick}
-        onClick={onClick}
-        {...dragparams}
-      />
+      <div className={classnames('Thumb', {isSelected})} style={style} >
+        <div style={hideMultipageStyle} className="stack-back"/>
+        <div style={hideMultipageStyle} className="stack-middle"/>
+        <div className="stack-front" style={frontDim}>
+          <ImageThumb {...props} thumbClass={this.thumbClass}>
+            { this.renderBadges(pages, duration, icon) }
+          </ImageThumb>
+        </div>
+      </div>
     )
   }
 }
