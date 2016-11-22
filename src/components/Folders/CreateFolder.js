@@ -88,7 +88,7 @@ class CreateFolder extends Component {
     const { isShared, selectedPermissions, name } = this.state
     return (
       <div className="CreateFolder flexRow flexAlignItemsCenter">
-        <div className="CreateFolder-background" />
+        <div className="CreateFolder-background flexRowCenter" onClick={this.dismiss}>
         <div className="CreateFolder-form">
           <div className="CreateFolder-header flexRow flexJustifySpaceBetween flexAlignItemsCenter">
             <div className="flexRow flexAlignItemsCenter">
@@ -146,6 +146,7 @@ class CreateFolder extends Component {
               <div onClick={this.props.onDelete} className="icon-trash2"/>
             </div>
           )}
+        </div>
         </div>
       </div>
     )
