@@ -63,9 +63,7 @@ class Facet extends Component {
     const type = FACET_WIDGET
     const aggs = { facet: { terms: { field, size: 100 } } }
     let sliver = new AssetSearch({aggs})
-    if (terms.length) {
-      sliver.filter = new AssetFilter({terms: {[field]: terms}})
-    }
+    sliver.filter = new AssetFilter({terms: {[field]: terms}})
     const widget = new WidgetModel({id: this.props.id, type, sliver})
     this.props.actions.modifyRacetrackWidget(widget)
   }
