@@ -9,7 +9,7 @@ const webdriver = require('selenium-webdriver')
 const chrome = require('selenium-webdriver/chrome')
 // const firefox = require('selenium-webdriver/firefox')
 const path = require('chromedriver').path
-const { By, until } = webdriver
+const { By } = webdriver
 
 const service = new chrome.ServiceBuilder(path).build()
 chrome.setDefaultService(service)
