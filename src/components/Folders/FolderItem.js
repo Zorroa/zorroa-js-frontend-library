@@ -148,7 +148,7 @@ class FolderItem extends Component {
           {(hasChildren) ? <i className='FolderItem-toggleArrow icon-triangle-down'/> : null}
         </div>
         <div className={classnames('FolderItem-select', {dragHover})}
-             onClick={event => { onSelect(folder); return false }}
+             onClick={event => { onSelect(event, folder); return false }}
              onContextMenu={this.showContextMenu}>
           <i className={`FolderItem-icon ${icon}`}/>
           <div className='FolderItem-text' key={folder.id}>

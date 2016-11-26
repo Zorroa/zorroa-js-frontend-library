@@ -98,10 +98,30 @@ class Folders extends Component {
     if (doOpen) this.loadChildren(folder.id)
   }
 
-  selectFolder (folder) {
+  // WTF? The order of these arguments must be the reverse of FolderItem invocation
+  selectFolder (folder, event) {
     console.log('selectFolder')
-    const selectedFolderIds = new Set(this.props.folders.selectedFolderIds)
-    selectedFolderIds[ selectedFolderIds.has(folder.id) ? 'delete' : 'add' ](folder.id)
+    let selectedFolderIds = null
+    if (event.shiftKey) {
+      const { folders } = this.props
+      const rootFolder = folders.all.get(Folder.ROOT_ID)
+      const folderList = this.folderList(rootFolder)
+      const firstSelectedIndex = folderList.findIndex(folder => (folders.selectedFolderIds.has(folder.id)))
+      if (firstSelectedIndex >= 0) {
+        const selectedIndex = folderList.findIndex(f => (folder.id === f.id))
+        const minIndex = Math.min(selectedIndex, firstSelectedIndex)
+        const maxIndex = Math.max(selectedIndex, firstSelectedIndex)
+        const contigIds = folderList.slice(minIndex, maxIndex + 1).map(folder => (folder.id))
+        selectedFolderIds = new Set(contigIds)
+      } else {
+        selectedFolderIds = new Set([folder.id])
+      }
+    } else if (event.metaKey) {
+      selectedFolderIds = new Set(this.props.folders.selectedFolderIds)
+      selectedFolderIds[selectedFolderIds.has(folder.id) ? 'delete' : 'add'](folder.id)
+    } else {
+      selectedFolderIds = new Set([folder.id])
+    }
     this.props.actions.selectFolderIds(selectedFolderIds)
   }
 
@@ -176,33 +196,25 @@ class Folders extends Component {
     }
   }
 
-  renderFolderList (folder, depth) {
+  folderList (folder) {
     const { folders, filterName } = this.props
     const { filterString } = this.state
     const isOpen = folders.openFolderIds.has(folder.id)
-    const isSelected = folders.selectedFolderIds.has(folder.id)
     const childIds = folder.childIds
 
     // Show this folder, except for root, we don't need to see root
-    let folderList = (depth > 0) ? [
-      (<FolderItem {...{depth, folder, isOpen, isSelected}}
-        key={folder.id}
-        hasChildren={childIds && childIds.size > 0}
-        onToggle={this.toggleFolder.bind(this, folder)}
-        onSelect={this.selectFolder.bind(this, folder)}
-      />)
-    ] : []
+    let folderList = (folder.id !== Folder.ROOT_ID) ? [folder] : []
 
     let grandkids = []
     if (childIds && isOpen) {
       let children = []
       childIds.forEach(childId => children.push(folders.all.get(childId)))
       // Filter the tree at the root by the filter type passed in from Workspace
-      if (depth === 0) {
+      if (folder.id === Folder.ROOT_ID) {
         children = children.filter(Folder.Filters[filterName])
       }
       children.forEach(child => {
-        grandkids = grandkids.concat(this.renderFolderList(child, depth + 1))
+        grandkids = grandkids.concat(this.folderList(child))
       })
     }
 
@@ -214,12 +226,34 @@ class Folders extends Component {
     return []
   }
 
+  depth (folder) {
+    if (folder.id === Folder.ROOT_ID) return 0
+    const { folders } = this.props
+    const parent = folders.all.get(folder.parentId)
+    return this.depth(parent) + 1
+  }
+
+  renderFolderList = (rootFolder) => (
+    this.folderList(rootFolder).map(folder => {
+      const key = folder.id
+      const { folders } = this.props
+      const depth = this.depth(folder)
+      const isOpen = folders.openFolderIds.has(folder.id)
+      const isSelected = folders.selectedFolderIds.has(folder.id)
+      const hasChildren = folder.childIds && folder.childIds.size > 0
+      return (
+        <FolderItem {...{key, depth, folder, isOpen, isSelected, hasChildren}}
+                    onToggle={this.toggleFolder.bind(this, folder)}
+                    onSelect={this.selectFolder.bind(this, folder)} />
+      )
+    })
+  )
+
   render () {
     const { folders } = this.props
     const rootLoaded = folders.all.has(Folder.ROOT_ID)
     if (!rootLoaded) return null
-    const rootFolder = folders.all.get(Folder.ROOT_ID)
-    const folderList = this.renderFolderList(rootFolder, 0)
+    const folderList = this.renderFolderList(folders.all.get(Folder.ROOT_ID))
     return (
       <div className='Folders'>
         <div className="Folders-controls">
