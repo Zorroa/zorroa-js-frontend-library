@@ -25,7 +25,7 @@ const target = {
       // Make sure the asset being dragged is added, even if it isn't selected
       var selectedAssetIds = new Set(props.selectedAssetIds)
       selectedAssetIds.add(data.id)
-      props.actions.addAssetIdsToFolderId([...selectedAssetIds], props.folder.id)
+      props.actions.addAssetIdsToFolderId(selectedAssetIds, props.folder.id)
     }
   }
 }
