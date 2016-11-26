@@ -1,5 +1,11 @@
 @import '../../styles/core-mixins.scss';
 
+.Collapsible {
+  .scroller > & {
+    margin-bottom: 3px;
+  }
+}
+
 .CollapsibleHeader {
   @include nowrap;
   height: 40px;

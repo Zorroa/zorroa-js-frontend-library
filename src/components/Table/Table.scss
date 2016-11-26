@@ -1,79 +1,122 @@
 @import '../../styles/core-mixins.scss';
 
+$tableHeight: 300;
+$tableHeaderHeight: 26;
+
 .Table {
-  position: relative;
+  @include flexOff;
+  @include flexCol;
 
-  min-height: 300px;
-  height: 300px;
-  max-height: 300px;
+  position: relative; // for Table-settings
 
-  overflow: auto;
+  min-height: $tableHeight + px;
+  height: $tableHeight + px;
+  max-height: $tableHeight + px;
+
+  overflow: hidden;
 
   border-top: 1px solid #ddd;
   border-bottom: 1px solid #ddd;
 }
 
-.Table-table {
+.Table-settings {
+  @include flexRowCenter;
+
+  // settings button is always visible, top right corner
   position: absolute;
+  top: 0;
+  right: 0;
 
-  width: 100%;
-  max-width: 100%;
-  min-width: 100%;
+  width: $tableHeaderHeight + px;
+  height: $tableHeaderHeight + px;
 
-  border-bottom: 1px solid #aaa;
-  border-spacing: 0;
-  padding: 2px 0 2px 2px;
+  color: $zorroa-lightgray;
+  background-color: #fff;
+  border-radius: 2px;
 
-  th, td {
-    padding: 8px;
-
-    // This looks weird, but is important! It allows cells to chop content
-    // Commented temporarily; we'll need it later
-    //max-width: 0;
-
-    @include clampText;
+  &:hover {
+    color: $zorroa-sickly-green;
+    background-color: $zorroa-nearwhite;
   }
+}
 
-  .Table-header {
+.Table-header {
+  @include flexOff;
+
+  position: absolute; // Allow width to respect children not parent (enable horiz scrolling)
+  height: $tableHeaderHeight + px;
+  min-width: 100%;
+  background-color: #fff;
+
+  .Table-cell {
     text-align: left;
     text-transform: uppercase;
     font-size: 12px;
     font-weight: 100;
   }
+}
 
-  .Table-row {
-    text-align: left;
-  }
+.Table-scroll-clip {
+  @include flexOn;
+  position: relative;
 
-  .Table-settings {
-    width: 26px; // same as thead height
+  top: 26px; // height of Table-header
 
-    color: $zorroa-lightgray;
-    background-color: #fff;
-    border-radius: 2px;
+  // Height of Table minus height of Table-header
+  // NB this SUCKS. But I tried so many ways, its the best I've found so far.
+  height: ($tableHeight - $tableHeaderHeight) + px;
+  max-height: ($tableHeight - $tableHeaderHeight) + px;
 
-    &:hover {
-      color: $zorroa-gray;
-      background-color: $zorroa-lightgray;
-    }
-  }
+  overflow: hidden;
+}
 
-  tr {
-    color: $zorroa-greyish-brown;
-    height: 30px;
-  }
+.Table-scroll {
+  height: 100%;
+  width: 100%;
+  position: relative;
+  overflow: auto;
+}
 
-  thead,tr:nth-child(even) {
-    background-color: white;
-  }
+.Table-body {
+  position: absolute; // Allow width to respect children not parent (enable horiz scrolling)
+  min-width: 100%;
 
-  thead th {
-    height: 26px;
-    color: $zorroa-gray;
-  }
+  border-bottom: 1px solid #aaa;
+  border-spacing: 0;
+  padding: 2px 0 2px 2px;
+}
 
-  tbody tr:hover {
-    color: white;
-    background-color: $zorroa-sickly-green;
-  }
+.Table-row {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include flexNoWrap;
+
+  height: 30px;
+  min-width: 100%;
+
+  text-align: left;
+  color: $zorroa-greyish-brown;
+}
+
+.Table-row:nth-child(even) {
+  background-color: #fff;
+}
+
+.Table-header {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include flexNoWrap;
+
+  height: $tableHeaderHeight + px;
+  color: $zorroa-gray;
+}
+
+.Table-body .Table-row:hover {
+  color: #fff;
+  background-color: $zorroa-sickly-green;
+}
+
+.Table-cell {
+  @include clampText;
+  padding: 8px;
 }

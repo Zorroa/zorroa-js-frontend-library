@@ -8,8 +8,12 @@ import { updateMetadataFields, updateTableFields, showDisplayOptionsModal } from
 
 class Table extends Component {
   static propTypes = {
+    // app state
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     fields: PropTypes.arrayOf(PropTypes.string).isRequired,
+    fieldWidth: PropTypes.objectOf(PropTypes.number).isRequired,
+
+    // connect actions
     actions: PropTypes.object
   }
 
@@ -29,42 +33,58 @@ class Table extends Component {
     }
   }
 
-  renderRow (asset) {
-    const { fields } = this.props
-    return (
-      <tr key={asset.id} className="Table-row">
-        { fields.map(field => (
-          <td key={field} className="Table-value">{asset.value(field)}</td>
-        ))}
-        <td><div key={'cog'}/></td>
-      </tr>
-    )
+  syncScroll = (event) => {
+    // Horizontal scrolling for the table header,
+    // keep the header in perfect sync with the table body's horiz scroll
+    document.getElementsByClassName('Table-header')[0].style.left =
+      `-${event.target.scrollLeft}px`
   }
 
   render () {
-    const { assets, fields } = this.props
+    const { assets, fields, fieldWidth } = this.props
     if (!assets || !assets.length) {
       return
     }
+
+    var fieldClass = fields.map(field => `Table-field-${field.replace('.', '_')}`)
+
+    var mkWidthStyle = width => ({
+      width: `${width}px`,
+      maxWidth: `${width}px`,
+      minWidth: `${width}px`
+    })
+
     return (
-      <div className="Table flexOff">
-        <table className="Table-table">
-          <thead>
-          <tr>
-            { fields.map((field, i) => (
-              <th key={i} className="Table-header">
-                { unCamelCase(Asset.lastNamespace(field)) }
-              </th>
-            ))}
-            <th key={'cog'} className="Table-settings">
-              <div onClick={this.showDisplayOptions} className="icon-cog"/>
-            </th>
-          </tr>
-          </thead>
-          <tbody>
-          { assets.map(asset => (this.renderRow(asset))) }
-          </tbody>
-        </table>
+      <div className="Table">
+        <div className='Table-header'>
+          { fields.map((field, i) => (
+            <div className={`Table-cell ${fieldClass[field]}`}
+                 style={mkWidthStyle(fieldWidth[field])}
+                 key={i}>
+              { unCamelCase(Asset.lastNamespace(field)) }
+            </div>
+          ))}
+        </div>
+        <div className='Table-scroll-clip'>
+          <div className='Table-scroll' onScroll={this.syncScroll}>
+            <div className='Table-body'>
+            { assets.map(asset => (
+              <div key={asset.id} className="Table-row">
+                { fields.map(field => (
+                  <div className={`Table-cell ${fieldClass[field]}`}
+                       style={mkWidthStyle(fieldWidth[field])}
+                       key={field}>
+                    {asset.value(field)}
+                  </div>
+                ))}
+              </div>)) }
+            </div>
+          </div>
+        </div>
+
+        <div className="Table-settings">
+          <div onClick={this.showDisplayOptions} className="icon-cog"/>
+        </div>
       </div>
     )
   }
@@ -72,7 +92,8 @@ class Table extends Component {
 
 export default connect(state => ({
   assets: state.assets.all,
-  fields: state.app.tableFields
+  fields: state.app.tableFields,
+  fieldWidth: state.app.tableFieldWidth
 }), dispatch => ({
   actions: bindActionCreators({ updateMetadataFields, updateTableFields, showDisplayOptionsModal }, dispatch)
 }))(Table)

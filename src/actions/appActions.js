@@ -2,7 +2,7 @@ import {
   SHOW_DISPLAY_OPTIONS_MODAL, HIDE_DISPLAY_OPTIONS_MODAL,
   SHOW_CREATE_FOLDER_MODAL, HIDE_CREATE_FOLDER_MODAL,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
-  METADATA_FIELDS, TABLE_FIELDS, SET_DRAGGING
+  METADATA_FIELDS, TABLE_FIELDS, SET_DRAGGING, SET_TABLE_FIELD_WIDTH
 } from '../constants/actionTypes'
 
 export function showDisplayOptionsModal (title, syncLabel, selectedFields,
@@ -90,5 +90,13 @@ export function setIsDragging (isDragging) {
   return ({
     type: SET_DRAGGING,
     payload: isDragging
+  })
+}
+
+// newFieldWidths should be an object of one or more [field]: width pairs
+export function setTableFieldWidth (newFieldWidths) {
+  return ({
+    type: SET_TABLE_FIELD_WIDTH,
+    payload: newFieldWidths
   })
 }

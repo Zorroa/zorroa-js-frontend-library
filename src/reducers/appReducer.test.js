@@ -2,9 +2,9 @@ import {
   SHOW_DISPLAY_OPTIONS_MODAL, HIDE_DISPLAY_OPTIONS_MODAL,
   SHOW_CREATE_FOLDER_MODAL, HIDE_CREATE_FOLDER_MODAL,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
-  METADATA_FIELDS, TABLE_FIELDS, SET_DRAGGING
+  METADATA_FIELDS, TABLE_FIELDS, SET_TABLE_FIELD_WIDTH, SET_DRAGGING
 } from '../constants/actionTypes'
-import appReducer from './appReducer'
+import appReducer, { defaultTableFields, defaultTableFieldWidth } from './appReducer'
 
 describe('appReducer', () => {
   describe('Modals', () => {
@@ -64,10 +64,30 @@ describe('appReducer', () => {
     })
 
     it('set table fields', () => {
-      const fields = [ 'some.important.thing' ]
-      const action = { type: TABLE_FIELDS, payload: fields }
+      const tableFields = [ 'some.important.thing' ]
+      const action = { type: TABLE_FIELDS, payload: tableFields }
+      const tableFieldWidth = Object.assign({},
+        ...tableFields.map(f => ({[f]: defaultTableFieldWidth})))
       expect(appReducer({}, action)
-      ).toEqual({ tableFields: fields })
+      ).toEqual({ tableFields, tableFieldWidth })
+    })
+
+    it('set table field widths', () => {
+      // Test setting all default fields to non-default widths
+      const tableFields = [ ...defaultTableFields ]
+      const tableFieldWidth = Object.assign({},
+        ...tableFields.map(f => ({[f]: 101})))
+      const action = { type: SET_TABLE_FIELD_WIDTH, payload: tableFieldWidth }
+      expect(appReducer({}, action))
+      .toEqual({ tableFieldWidth })
+
+      // Test overriding 2 fields with new widths & other fields should stay put
+      const tableFields2 = [ defaultTableFields[0], 'some.important.thing' ]
+      const tableFieldWidth2 = Object.assign({},
+        ...tableFields2.map(f => ({[f]: 102})))
+      const action2 = { type: SET_TABLE_FIELD_WIDTH, payload: tableFieldWidth2 }
+      expect(appReducer({tableFieldWidth}, action2))
+      .toEqual({ tableFieldWidth: { ...tableFieldWidth, ...tableFieldWidth2 } })
     })
   })
 

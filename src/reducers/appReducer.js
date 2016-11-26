@@ -2,8 +2,11 @@ import {
   SHOW_DISPLAY_OPTIONS_MODAL, HIDE_DISPLAY_OPTIONS_MODAL,
   SHOW_CREATE_FOLDER_MODAL, HIDE_CREATE_FOLDER_MODAL,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
-  METADATA_FIELDS, TABLE_FIELDS, SET_DRAGGING, UNAUTH_USER
+  METADATA_FIELDS, TABLE_FIELDS, SET_DRAGGING, SET_TABLE_FIELD_WIDTH, UNAUTH_USER
 } from '../constants/actionTypes'
+
+export const defaultTableFieldWidth = 100
+export const defaultTableFields = [ 'source.filename', 'source.date', 'source.fileSize' ]
 
 const initialState = {
   modal: {},
@@ -19,8 +22,10 @@ const initialState = {
     proxies: false,
     'proxies.proxies': false
   },
-  metadataFields: [ 'source.filename', 'source.date', 'source.fileSize' ],
-  tableFields: [ 'source.filename', 'source.date', 'source.fileSize' ]
+  metadataFields: [ ...defaultTableFields ],
+  tableFields: [ ...defaultTableFields ],
+  tableFieldWidth: Object.assign({},
+    ...defaultTableFields.map(field => ({ [field]: defaultTableFieldWidth })))
 }
 
 export default function app (state = initialState, action) {
@@ -44,9 +49,18 @@ export default function app (state = initialState, action) {
     case METADATA_FIELDS:
       return { ...state, metadataFields: action.payload }
     case TABLE_FIELDS:
-      return { ...state, tableFields: action.payload }
+      // set default table widths for all new fields we haven't seen or set yet
+      const tableFieldWidth = {
+        // Start with the default width for all fields in response.
+        ...Object.assign({}, ...action.payload.map(field => ({ [field]: defaultTableFieldWidth }))),
+        // Override with all values we already have. Any new ones will be left at default width.
+        ...state.tableFieldWidth
+      }
+      return { ...state, tableFields: action.payload, tableFieldWidth }
     case SET_DRAGGING:
       return { ...state, isDragging: action.payload }
+    case SET_TABLE_FIELD_WIDTH:
+      return { ...state, tableFieldWidth: { ...state.tableFieldWidth, ...action.payload } }
     case UNAUTH_USER:
       return initialState
     default:
