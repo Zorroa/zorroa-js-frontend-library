@@ -105,6 +105,9 @@
       padding: 6px;
     }
 
+    & .DropdownMenu-item {
+      &:hover { background-color: unset; }
+    }
     .Racetrack-add-SIMPLE_SEARCH {
       background-color: $zorroa-sickly-green;
       &:hover { background-color: darken($zorroa-sickly-green, 15%); }

@@ -69,6 +69,30 @@ class Folders extends Component {
   toggleFolder = (folder) => {
     const { folders } = this.props
     const isOpen = folders.openFolderIds.has(folder.id)
+    const hasChildren = folder.childIds && folder.childIds.size > 0
+
+    // If any descendants of the current folder are currently selected,
+    // and user is trying to close the current folder,
+    // then prevent closing the current folder
+    if (isOpen && hasChildren && folders.selectedFolderIds.size) {
+      // Start with the parents of all selected folders.
+      var selectedFolders = Array.from(folders.selectedFolderIds).map(id => folders.all.get(id))
+      var selectedParentIds = selectedFolders.map(f => f.parentId)
+      // Filter out any invalid ids (which means parent of root)
+      var parentFolders = selectedParentIds.map(id => folders.all.get(id)).filter(f => !!f)
+
+      // Transitive closure of parents - we'll compute parents and parents of parents
+      // until we've exhausted all parents. We're done when we run out of parents.
+      // NB this loop depends on ROOT's parent Id being undefined. Update if ROOT points to itself.
+      while (parentFolders.length) {
+        // If this folder is in the current parent set, bail out now to prevent close
+        if (parentFolders.filter(f => f.id === folder.id).length) return
+
+        // Find all grandparents - parents of the current parents
+        parentFolders = parentFolders.map(f => folders.all.get(f.parentId)).filter(f => !!f)
+      }
+    }
+
     const doOpen = !isOpen
     this.props.actions.toggleFolder(folder.id, doOpen)
     if (doOpen) this.loadChildren(folder.id)

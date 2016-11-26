@@ -10,7 +10,9 @@
   color: $zorroa-gray;
   background-color: #d8d8d8;
 
-  & > *:hover { background-color: darken(#d8d8d8, 15%); }
+  border-radius: 3px;
+  .Widget.isOpen & { border-radius: 3px 3px 0 0; }
+  .Widget.isOpen.isIconified & { border-radius: 3px; }
 }
 
 .WidgetHeader-toggle {

@@ -291,7 +291,7 @@ class Facet extends Component {
               header={(
                 <div className="Facet-header flexRow flexJustifySpaceBetween fullWidth">
                   <span>Facet: {title}</span>
-                  <div onClick={this.selectField} className="icon-cog"></div>
+                  <div onClick={this.selectField} className="Facet-settings icon-cog"></div>
                 </div>
               )}
               isIconified={isIconified}

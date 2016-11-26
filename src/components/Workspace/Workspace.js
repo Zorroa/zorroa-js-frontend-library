@@ -43,8 +43,10 @@ class Workspace extends Component {
 
   static collapsibleNames = new Set(['browsing', 'collection', 'simple', 'smart', 'metadata'])
   toggleCollapsible = (name) => {
-    assert.ok(Workspace.collapsibleNames.has(name))
     const { actions, app } = this.props
+    // If the Sidebar is iconified, ignore the click, the sidebar will open itself instead
+    if (app.leftSidebarIsIconified) return
+    assert.ok(Workspace.collapsibleNames.has(name))
     actions.toggleCollapsible(name, !app.collapsibleOpen[name])
   }
 

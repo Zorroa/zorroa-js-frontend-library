@@ -23,7 +23,9 @@ export default class Widget extends Component {
 
   handleClick (event) {
     const { isOpen } = this.state
-    const { children, onToggle } = this.props
+    const { children, onToggle, isIconified } = this.props
+    // If the Sidebar is iconified, ignore the click, the sidebar will open itself instead
+    if (isIconified) return
     if (children) {
       this.setState({ ...this.state, isOpen: !isOpen })
     }
@@ -45,7 +47,7 @@ export default class Widget extends Component {
     }
 
     const { className } = this.props
-    const widgetClasses = classnames('Widget', 'flexCol', {'parent': children, open, [className]: !!className})
+    const widgetClasses = classnames('Widget', 'flexCol', {'parent': children, isOpen, isIconified, [className]: !!className})
 
     return (
       <div className={widgetClasses}>

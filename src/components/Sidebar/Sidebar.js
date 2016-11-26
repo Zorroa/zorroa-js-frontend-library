@@ -29,6 +29,12 @@ export default class Sidebar extends Component {
   startDrag = (event) => {
     const { width } = this.state
     this.setState({ startx: event.pageX, startw: width })
+
+    var dragIcon = document.createElement('img')
+    // hide the drag element using a transparent 1x1 pixel image as a proxy
+    dragIcon.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
+    dragIcon.width = 1
+    event.dataTransfer.setDragImage(dragIcon, 0, 0)
   }
 
   drag = (event) => {
@@ -48,6 +54,12 @@ export default class Sidebar extends Component {
     return this.props.isIconified === this.props.isRightEdge ? '\u25C0' : '\u25B6'
   }
 
+  toggleIfNotIconified = (event) => {
+    if (!this.props.isIconified) return
+    this.props.onToggle()
+    return false
+  }
+
   render () {
     const arrow = this.buttonChar()
     const { isIconified, children, onToggle, isRightEdge } = this.props
@@ -60,7 +72,7 @@ export default class Sidebar extends Component {
         >
           <label>{arrow}{arrow}</label>
         </div>
-        <div className={'scroller'} >
+        <div className={'scroller'} onClick={this.toggleIfNotIconified}>
           { children }
         </div>
         { isOpen && <div draggable={true} onDragStart={this.startDrag} onDrag={this.drag}

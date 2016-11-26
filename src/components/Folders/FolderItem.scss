@@ -32,9 +32,9 @@ $FolderItemHeight : 25px;
 
   width: $FolderItemHeight;
   height: $FolderItemHeight;
-  &:hover { color: white; background-color: darken(#d8d8d8, 15%); }
-  .FolderItem.isSelected &       { color: white; background-color: $zorroa-gray; }
-  .FolderItem.isSelected &:hover { color: white; background-color: darken($zorroa-gray, 15%); }
+  &:hover { color: $zorroa-sickly-green; }
+  .FolderItem.isSelected & { color: white; }
+  .FolderItem.isSelected &:hover { color: $zorroa-sickly-green; }
 }
 
 .FolderItem-select {

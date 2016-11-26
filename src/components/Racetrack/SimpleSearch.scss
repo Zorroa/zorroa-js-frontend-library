@@ -2,8 +2,6 @@
 
 .SimpleSearch {
   .WidgetHeader {
-    border-radius: 3px 3px 0 0;
-
     color: $zorroa-nearwhite;
     background-color: $zorroa-sickly-green;
     & > *:hover { background-color: darken($zorroa-sickly-green, 15%); }

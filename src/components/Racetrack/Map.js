@@ -132,8 +132,8 @@ class Map extends Component {
                 <div className="Map-header flexRow flexJustifySpaceBetween fullWidth">
                   <span>Map: {title}</span>
                   <div className="flexRow flexAlignItemsCenter">
-                    <div onClick={this.selectSearch} className="icon-search" />
-                    <div onClick={this.selectLocation} className="icon-cog" />
+                    <div onClick={this.selectSearch} className="Map-search icon-search" />
+                    <div onClick={this.selectLocation} className="Map-settings icon-cog" />
                   </div>
                 </div>
               )}

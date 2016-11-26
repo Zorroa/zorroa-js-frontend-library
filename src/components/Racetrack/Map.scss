@@ -3,8 +3,6 @@
 .Map {
 
   .WidgetHeader {
-    border-radius: 3px 3px 0 0;
-
     color: $zorroa-nearwhite;
     background-color: $zorroa-water-blue;
     & > *:hover { background-color: darken($zorroa-water-blue, 15%); }
@@ -12,6 +10,9 @@
 
   .WidgetHeader-icon {
   }
+
+  .Map-search:hover { color: $zorroa-sickly-green; }
+  .Map-settings:hover { color: $zorroa-sickly-green; }
 
   .Widget-icon {
     font-size: 20px;

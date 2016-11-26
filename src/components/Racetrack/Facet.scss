@@ -2,8 +2,6 @@
 
 .Facet {
   .WidgetHeader {
-    border-radius: 3px 3px 0 0;
-
     color: $zorroa-nearwhite;
     background-color: $zorroa-darkish-purple;
     & > *:hover { background-color: darken($zorroa-darkish-purple, 15%); }
@@ -21,6 +19,10 @@
     flex-shrink: 1;
     span {
     }
+  }
+
+  .Facet-settings:hover {
+    color: $zorroa-sickly-green;
   }
 
   .Facet-body {
@@ -165,6 +167,9 @@
       margin: 4px;
       counter-reset: $zorroa-greyish-brown;
       background: transparent;
+      &:hover {
+        background: $zorroa-lightgray;
+      }
 
       &.selected {
         color: white;
