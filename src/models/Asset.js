@@ -43,6 +43,16 @@ export default class Asset {
     return bestProxy
   }
 
+  memberOfFolderIds (folderIds) {
+    const folders = this.document && this.document.links && this.document.links.folder
+    if (!folders || !folders.length) return false
+    for (const folderId of folderIds) {
+      const index = folders.findIndex(id => (id === folderId))
+      if (index >= 0) return true
+    }
+    return false
+  }
+
   static lastNamespace (field) {
     if (field && field.length) {
       const namespaces = field.split('.')
