@@ -1,4 +1,5 @@
 import {
+  SHOW_MODAL, HIDE_MODAL,
   SHOW_DISPLAY_OPTIONS_MODAL, HIDE_DISPLAY_OPTIONS_MODAL,
   SHOW_CREATE_FOLDER_MODAL, HIDE_CREATE_FOLDER_MODAL,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
@@ -30,6 +31,10 @@ const initialState = {
 
 export default function app (state = initialState, action) {
   switch (action.type) {
+    case SHOW_MODAL:
+      return { ...state, modal: action.payload }
+    case HIDE_MODAL:
+      return { ...state, modal: null }
     case SHOW_DISPLAY_OPTIONS_MODAL:
       return { ...state, displayOptions: action.payload }
     case HIDE_DISPLAY_OPTIONS_MODAL:

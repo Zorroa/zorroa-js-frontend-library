@@ -4,6 +4,7 @@ import { bindActionCreators } from 'redux'
 import * as assert from 'assert'
 import classnames from 'classnames'
 
+import Modal from '../Modal'
 import Header from '../Header'
 import Sidebar from '../Sidebar'
 import Assets from '../Assets'
@@ -99,6 +100,7 @@ class Workspace extends Component {
 
     return (
       <div className={classnames('App', {isDragging: app.isDragging})}>
+        { app.modal && <Modal {...app.modal} /> }
         { app.displayOptions && <DisplayOptions {...app.displayOptions} /> }
         { app.createFolder && <CreateFolder {...app.createFolder} /> }
         <Header/>

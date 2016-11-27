@@ -4,8 +4,12 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 import AssetSearch from '../../models/AssetSearch'
+import AssetFilter from '../../models/AssetFilter'
+import CreateExport from '../Folders/CreateExport'
 import { selectAssetIds } from '../../actions/assetsAction'
 import { removeAssetIdsFromFolderId } from '../../actions/folderAction'
+import { exportAssets } from '../../actions/jobActions'
+import { showModal } from '../../actions/appActions'
 
 class Editbar extends Component {
   static propTypes = {
@@ -20,13 +24,19 @@ class Editbar extends Component {
     this.props.actions.selectAssetIds(null)
   }
 
-  exportSelected = () => {
-    const { selectedAssetIds, selectedFolderIds } = this.props
+  exportAssets = () => {
+    const width = '340px'
+    const body = <CreateExport onCreate={this.createExport} />
+    this.props.actions.showModal({body, width})
+  }
+
+  createExport = (event, name, exportImages, exportMetadata) => {
+    const { selectedAssetIds, query } = this.props
+    let search = query
     if (selectedAssetIds && selectedAssetIds.size) {
-      console.log('Export ' + JSON.stringify([...selectedAssetIds]))
-    } else {
-      console.log('Export all folders ' + JSON.stringify([...selectedFolderIds]))
+      search = new AssetSearch({ filter: new AssetFilter({ terms: {'_id': [...selectedAssetIds]} }) })
     }
+    this.props.actions.exportAssets(name, search)
   }
 
   removeSelected = () => {
@@ -74,7 +84,7 @@ class Editbar extends Component {
                 <span onClick={this.deselectAll} className={classnames('icon-cancel-circle', {disabled})} />
               </div>
               )}
-          <div onClick={this.exportSelected} className="export">
+          <div onClick={this.exportAssets} className="export">
             { disabled ? 'Export All' : 'Export' }
             <span onClick={this.exportSelected} className="icon-download2" />
           </div>
@@ -98,6 +108,8 @@ export default connect(state => ({
 }), dispatch => ({
   actions: bindActionCreators({
     selectAssetIds,
-    removeAssetIdsFromFolderId
+    removeAssetIdsFromFolderId,
+    showModal,
+    exportAssets
   }, dispatch)
 }))(Editbar)
