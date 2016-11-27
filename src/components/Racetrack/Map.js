@@ -116,8 +116,8 @@ class Map extends Component {
 
   render () {
     const { isIconified, assets } = this.props
-    const { locationField } = this.state
-    const title = Asset.lastNamespace(unCamelCase(this.state.field))
+    const { locationField, searchField } = this.state
+    const title = Asset.lastNamespace(unCamelCase(searchField || locationField || '<Select Fields>'))
     const locationAssets = assets.filter(asset => (asset.value(locationField)))
     const layoutProperties = {
       'symbol-spacing': 50,
