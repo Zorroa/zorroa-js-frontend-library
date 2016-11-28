@@ -14,6 +14,7 @@ class QuickAddWidget extends Component {
 
   state = {
     filterText: '',
+    focused: false,
     selectedWidgetType: null
   }
 
@@ -73,31 +74,43 @@ class QuickAddWidget extends Component {
     }
   }
 
+  focus = () => {
+    this.setState({focused: true})
+  }
+
+  blur = () => {
+    this.setState({focused: false})
+  }
+
   widgetInfos () {
-    const { filterText } = this.state
+    const { filterText, focused } = this.state
     const filter = filterText.toLowerCase()
-    return filter.length ? Object.values(WidgetInfo).filter(widgetInfo => (
+    return focused || filter.length ? Object.values(WidgetInfo).filter(widgetInfo => (
       widgetInfo.title.toLowerCase().includes(filter)
     )) : []
   }
 
   render () {
     const { selectedWidgetType } = this.state
+    const widgetInfos = this.widgetInfos()
     return (
       <div className="QuickAddWidget">
         <input value={this.state.filterText} onChange={this.changeFilterText}
-               onKeyDown={this.keyDown} placeholder="Quick Add - Widget"/>
-        <div className="add-quick-list">
-          { this.widgetInfos().map(widgetInfo => (
-            <div className={classnames('add-quick-item', {selected: widgetInfo.type === selectedWidgetType})} key={widgetInfo.type}
-                 onClick={this.pushWidgetType.bind(this, widgetInfo.type)}>
-              <div className={classnames('Racetrack-add-widget', `Racetrack-add-${widgetInfo.type}`)}>
-                <i className={`Racetrack-add-icon ${widgetInfo.icon}`}></i>
-                <span>{widgetInfo.title}</span>
+               onKeyDown={this.keyDown} onFocus={this.focus} onBlur={this.blur}
+               placeholder="Quick Add - Widget"/>
+        { widgetInfos.length ? (
+          <div className="add-quick-list">
+            { widgetInfos.map(widgetInfo => (
+              <div className={classnames('add-quick-item', {selected: widgetInfo.type === selectedWidgetType})} key={widgetInfo.type}
+                   onClick={this.pushWidgetType.bind(this, widgetInfo.type)}>
+                <div className={classnames('Racetrack-add-widget', `Racetrack-add-${widgetInfo.type}`)}>
+                  <i className={`Racetrack-add-icon ${widgetInfo.icon}`}></i>
+                  <span>{widgetInfo.title}</span>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : <div/> }
       </div>
     )
   }
