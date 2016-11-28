@@ -46,8 +46,8 @@ const applicationNode = (
 console.log('loading token')
 const userItem = JSON.parse(localStorage.getItem(USER_ITEM))
 const user = userItem ? new User(userItem) : null
-const host = DEBUG ? localStorage.getItem(HOST_ITEM) : undefined
-const protocol = DEBUG ? localStorage.getItem(PROTOCOL_ITEM) : undefined
+const host = localStorage.getItem(HOST_ITEM)
+const protocol = localStorage.getItem(PROTOCOL_ITEM)
 if (user && host) {
   store.dispatch(validateUser(user, protocol, host))
 }

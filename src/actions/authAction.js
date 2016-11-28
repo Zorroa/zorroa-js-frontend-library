@@ -28,10 +28,8 @@ export function createArchivist (dispatch, protocol, host) {
     archivist = axios.create({baseURL, withCredentials: true})
   }
   dispatch({ type: AUTH_HOST, payload: {host, protocol} })
-  if (DEBUG) {
-    localStorage.setItem(HOST_ITEM, host)
-    localStorage.setItem(PROTOCOL_ITEM, protocol)
-  }
+  localStorage.setItem(HOST_ITEM, host)
+  localStorage.setItem(PROTOCOL_ITEM, protocol)
 }
 
 // Return the axios connection for other action creators
