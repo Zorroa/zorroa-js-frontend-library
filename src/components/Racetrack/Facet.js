@@ -53,6 +53,8 @@ class Facet extends Component {
         if (terms !== this.state.terms) {
           this.setState({terms})
         }
+      } else {
+        this.setState({terms: []})
       }
     } else {
       this.selectField()
@@ -63,7 +65,9 @@ class Facet extends Component {
     const type = FACET_WIDGET
     const aggs = { facet: { terms: { field, size: 100 } } }
     let sliver = new AssetSearch({aggs})
-    sliver.filter = new AssetFilter({terms: {[field]: terms}})
+    if (terms && terms.length) {
+      sliver.filter = new AssetFilter({terms: {[field]: terms}})
+    }
     const widget = new WidgetModel({id: this.props.id, type, sliver})
     this.props.actions.modifyRacetrackWidget(widget)
   }
