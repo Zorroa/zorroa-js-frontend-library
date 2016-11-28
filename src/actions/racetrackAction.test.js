@@ -1,3 +1,5 @@
+jest.mock('../components/Racetrack/WidgetInfo')
+
 import { modifyRacetrackWidget, removeRacetrackWidgetIds, resetRacetrackWidgets } from './racetrackAction'
 import { MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS } from '../constants/actionTypes'
 import Widget from '../models/Widget'

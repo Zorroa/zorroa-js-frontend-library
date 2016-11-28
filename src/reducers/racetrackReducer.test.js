@@ -1,3 +1,5 @@
+jest.mock('../components/Racetrack/WidgetInfo')
+
 import racetrackReducer from './racetrackReducer'
 import { MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS } from '../constants/actionTypes'
 import { SimpleSearchWidgetInfo } from '../components/Racetrack/WidgetInfo'

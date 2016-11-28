@@ -2,6 +2,9 @@ import React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { Link } from 'react-router'
+
+jest.mock('../Racetrack/WidgetInfo')
+
 import Header from './Header'
 import User from '../../models/User'
 
