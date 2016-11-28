@@ -53,7 +53,7 @@ module.exports = function getPlugins (env) {
           negate_iife: true,
           properties: true,
           sequences: true,
-          unsafe: true,
+          unsafe: false,
           unused: true,
           warnings: false
         },
