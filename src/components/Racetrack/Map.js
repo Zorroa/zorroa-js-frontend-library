@@ -8,7 +8,7 @@ import WidgetModel from '../../models/Widget'
 import Asset from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
-import { MAP_WIDGET } from '../../constants/widgetTypes'
+import { MapWidgetInfo } from './WidgetInfo'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
 import { showDisplayOptionsModal } from '../../actions/appActions'
 import { unCamelCase } from '../../services/jsUtil'
@@ -52,7 +52,7 @@ class Map extends Component {
 
   modifySliver (term) {
     const { searchField } = this.state
-    const type = MAP_WIDGET
+    const type = MapWidgetInfo.type
     let sliver = new AssetSearch()
     if (term && term.length) {
       sliver.filter = new AssetFilter({terms: {[searchField + '.raw']: [term]}})
