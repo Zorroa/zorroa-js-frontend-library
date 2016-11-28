@@ -1,0 +1,80 @@
+@import '../../styles/core-mixins.scss';
+
+.Editbar {
+  @include flexRow;
+  @include fullWidth;
+  @include flexJustifySpaceBetween;
+  @include flexAlignItemsCenter;
+
+  color: $zorroa-gray;
+  background-color: transparent;
+
+  span[class*="icon-"] {
+    margin-left: 6px;
+    margin-right: 6px;
+  }
+
+  .title {
+    margin-left: 8px;
+    text-transform: uppercase;
+    margin-top: 20px;
+    margin-bottom: 12px;
+  }
+
+  .right-side {
+    @include flexRow;
+    margin-right: 12px;
+    margin-top: 20px;
+    margin-bottom: 12px;
+  }
+
+  .selected {
+    margin-left: 12px;
+    margin-right: 12px;
+    font-size: 12px;
+    @include flexRow;
+    @include flexAlignItemsCenter;
+
+    &.disabled {
+      color: $zorroa-lightgray;
+    }
+    .icon-cancel-circle {
+      font-size: 10px;
+
+      &:not(.disabled):hover {
+        color: $zorroa-sickly-green;
+      }
+
+      &.disabled {
+        color: $zorroa-lightgray;
+      }
+    }
+  }
+
+  .export {
+    margin-left: 12px;
+    margin-right: 12px;
+    text-transform: uppercase;
+    @include flexRow;
+    @include flexAlignItemsCenter;
+
+    &:not(.disabled):hover {
+      color: $zorroa-sickly-green;
+    }
+  }
+
+  .remove {
+    margin-left: 12px;
+    text-transform: uppercase;
+    @include flexRow;
+    @include flexAlignItemsCenter;
+
+    &:not(.disabled):hover {
+      color: $zorroa-sickly-green;
+    }
+
+    &.disabled {
+      color: $zorroa-lightgray;
+    }
+  }
+}

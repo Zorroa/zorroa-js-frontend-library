@@ -7,6 +7,7 @@ import folders from './foldersReducer'
 import app from './appReducer'
 import racetrack from './racetrackReducer'
 import permissions from './permissionsReducer'
+import jobs from './jobsReducer'
 
 export default combineReducers({
   app,
@@ -15,5 +16,6 @@ export default combineReducers({
   folders,
   racetrack,
   permissions,
+  jobs,
   form: formReducer
 })

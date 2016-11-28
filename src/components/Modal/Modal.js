@@ -1,31 +1,17 @@
 import React, { Component, PropTypes } from 'react'
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
-import domUtils from '../../services/domUtils'
 
 export default class Modal extends Component {
   static propTypes = {
-    children: PropTypes.node,
-    content: PropTypes.string,
-    footer: PropTypes.node,
-    dismiss: PropTypes.func,
-    title: PropTypes.string
+    body: PropTypes.node,
+    width: PropTypes.node
   }
 
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.content) {
-      domUtils.disableScroll()
-    } else {
-      domUtils.enableScroll()
-    }
-  }
+  static defaultProps = { width: '75%' }
 
   render () {
-    if (!this.props.content && !this.props.children) {
-      return null
-    }
-
-    const {dismiss, title, content, children, footer} = this.props
-
+    const {body, width} = this.props
+    if (!body) return null
     return (
       <div className="modal-container">
         <ReactCSSTransitionGroup
@@ -34,13 +20,9 @@ export default class Modal extends Component {
           transitionEnterTimeout={500}
           transitionAppearTimeout={500}
           transitionLeaveTimeout={300}
-          component="div"
-        >
-          <div className="modal" key="modal">
-            <header className="modal-header">{title}</header>
-            <div className="modal-body">{children}{content}</div>
-            <footer className="modal-footer">{footer}</footer>
-            <button className="modal-dismiss" onClick={dismiss}><span className="icon-cross2"/></button>
+          component="div" >
+          <div className="modal" key="modal" style={{width}}>
+            <div className="modal-body">{body}</div>
           </div>
         </ReactCSSTransitionGroup>
       </div>

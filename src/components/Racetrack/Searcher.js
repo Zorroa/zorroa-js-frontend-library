@@ -6,6 +6,7 @@ import Widget from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import { searchAssets } from '../../actions/assetsAction'
+import { clearFoldersModified } from '../../actions/folderAction'
 
 // Searcher is a singleton. It combines AssetSearches from the Racetrack
 // and Folders and submits a new query to the Archivist server.
@@ -15,7 +16,12 @@ class Searcher extends Component {
     pageSize: PropTypes.number.isRequired,
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
     selectedFolderIds: PropTypes.object,
+    foldersModified: PropTypes.bool,
     actions: PropTypes.object.isRequired
+  }
+
+  componentDidUpdate () {
+    this.props.actions.clearFoldersModified()
   }
 
   // Return a filter comprised of all widget filters except one
@@ -38,7 +44,7 @@ class Searcher extends Component {
   // they show the results that do not include their own filter.
   // Note that post-filter is less efficient than a standard filter.
   render () {
-    const { widgets, actions, selectedFolderIds, query, pageSize } = this.props
+    const { widgets, actions, selectedFolderIds, query, pageSize, foldersModified } = this.props
     let assetSearch = new AssetSearch()
     let postFilter = new AssetFilter()
     for (let widget of widgets) {
@@ -63,7 +69,7 @@ class Searcher extends Component {
     }
 
     // Do not send the query unless it is different than the last returned query
-    if (!query || !assetSearch.equals(query)) {
+    if (!query || !assetSearch.equals(query) || foldersModified) {
       assetSearch.size = pageSize
       actions.searchAssets(assetSearch)
     }
@@ -73,14 +79,15 @@ class Searcher extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({ searchAssets }, dispatch)
+  actions: bindActionCreators({ searchAssets, clearFoldersModified }, dispatch)
 })
 
 const mapStateToProps = state => ({
   query: state.assets.query,
   pageSize: state.assets.pageSize,
   widgets: state.racetrack.widgets,
-  selectedFolderIds: state.folders.selectedFolderIds
+  selectedFolderIds: state.folders.selectedFolderIds,
+  foldersModified: state.folders.modified
 })
 
 export default connect(

@@ -1,6 +1,7 @@
 import {
   GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, UPDATE_FOLDER,
-  DELETE_FOLDER, ADD_ASSETS_TO_FOLDER, TOGGLE_FOLDER
+  DELETE_FOLDER, TOGGLE_FOLDER, ADD_ASSETS_TO_FOLDER,
+  REMOVE_ASSETS_FROM_FOLDER, CLEAR_FOLDERS_MODIFIED
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import { getArchivist } from './authAction'
@@ -104,6 +105,7 @@ export function deleteFolderIds (ids) {
 
 export function addAssetIdsToFolderId (assetIds, folderId) {
   return dispatch => {
+    if (assetIds instanceof Set) assetIds = [...assetIds]
     console.log('Add assets ' + JSON.stringify(assetIds) + ' to folder ' + folderId)
     getArchivist().post(`${rootEndpoint}/${folderId}/assets`, assetIds)
       .then(response => {
@@ -115,5 +117,36 @@ export function addAssetIdsToFolderId (assetIds, folderId) {
       .catch(error => {
         console.error('Error adding assets ' + JSON.stringify(assetIds) + ' to folder ' + folderId + ': ' + error)
       })
+  }
+}
+
+export function removeAssetIdsFromFolderId (assetIds, folderId) {
+  return dispatch => {
+    if (assetIds instanceof Set) assetIds = [...assetIds]
+    console.log('Remove assets ' + JSON.stringify(assetIds) + ' from folder ' + folderId)
+    // Workaround CORS issue in OPTIONS preflight request for axios.delete
+    const request = {
+      method: 'delete',
+      url: `${rootEndpoint}/${folderId}/assets`,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      data: assetIds
+    }
+    getArchivist()(request)
+      .then(response => {
+        dispatch({
+          type: REMOVE_ASSETS_FROM_FOLDER,
+          payload: response.data
+        })
+      })
+      .catch(error => {
+        console.error('Error removing assets ' + JSON.stringify(assetIds) + ' from folder ' + folderId + ': ' + error)
+      })
+  }
+}
+
+export function clearFoldersModified () {
+  return {
+    type: CLEAR_FOLDERS_MODIFIED,
+    payload: true
   }
 }

@@ -6,7 +6,8 @@ export default class DropdownMenu extends Component {
     children: PropTypes.node,
     label: PropTypes.node,
     style: PropTypes.object,
-    rightAlign: PropTypes.bool
+    rightAlign: PropTypes.bool,
+    onChange: PropTypes.func
   }
 
   state = {
@@ -17,16 +18,22 @@ export default class DropdownMenu extends Component {
     document.removeEventListener('click', this.hide)
   }
 
-  show = () => {
+  show = (event) => {
+    const { isVisible } = this.state
+    if (isVisible) return
     this.setState({ isVisible: true }, () => {
       document.addEventListener('click', this.hide)
     })
+    if (this.props.onChange) this.props.onChange(event, true)
   }
 
-  hide = () => {
+  hide = (event) => {
+    const { isVisible } = this.state
+    if (!isVisible) return
     this.setState({ isVisible: false }, () => {
       document.removeEventListener('click', this.hide)
     })
+    if (this.props.onChange) this.props.onChange(event, false)
   }
 
   render () {

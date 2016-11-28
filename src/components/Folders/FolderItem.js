@@ -3,11 +3,15 @@ import { DropTarget } from '../../services/DragDrop'
 import classnames from 'classnames'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+
 import User from '../../models/User'
 import Folder from '../../models/Folder'
-
+import AssetSearch from '../../models/AssetSearch'
+import AssetFilter from '../../models/AssetFilter'
+import CreateExport from './CreateExport'
 import { addAssetIdsToFolderId, deleteFolderIds, updateFolder } from '../../actions/folderAction'
-import { showCreateFolderModal } from '../../actions/appActions'
+import { showModal, showCreateFolderModal } from '../../actions/appActions'
+import { exportAssets } from '../../actions/jobActions'
 
 // Renders folder children as Collapsible elements.
 
@@ -25,7 +29,7 @@ const target = {
       // Make sure the asset being dragged is added, even if it isn't selected
       var selectedAssetIds = new Set(props.selectedAssetIds)
       selectedAssetIds.add(data.id)
-      props.actions.addAssetIdsToFolderId([...selectedAssetIds], props.folder.id)
+      props.actions.addAssetIdsToFolderId(selectedAssetIds, props.folder.id)
     }
   }
 }
@@ -103,6 +107,19 @@ class FolderItem extends Component {
       this.editFolder, this.props.folder.name, this.deleteFolder, this.getLink)
   }
 
+  exportFolder = (event) => {
+    const width = '340px'
+    const body = <CreateExport onCreate={this.createExport}/>
+    this.props.actions.showModal({body, width})
+  }
+
+  createExport = (event, name, exportImages, exportTable) => {
+    const { selectedFolderIds } = this.props
+    const filter = new AssetFilter({links: {folder: [...selectedFolderIds]}})
+    const search = new AssetSearch({filter})
+    this.props.actions.exportAssets(name, search)
+  }
+
   // Count direct folder descendents, which is known, unlike recursive,
   // which only includes folders that have been opened and thier children
   subfolderCount (folderId) {
@@ -131,6 +148,7 @@ class FolderItem extends Component {
         <div className="FolderItem-context-menu" onContextMenu={this.dismissContextMenu}>
           { singleFolderSelected && <div className="FolderItem-context-item disabled" onContextMenu={this.dismissContextMenu}><div className="icon-folder3"/><div>{subfolderLabel}</div></div> }
           { singleFolderSelected && <div onClick={this.getLink} className="FolderItem-context-item disabled" onContextMenu={this.dismissContextMenu}><div className="icon-link2"/><div>Get link</div></div> }
+          { singleFolderSelected && <div onClick={this.exportFolder} className="FolderItem-context-item" onContextMenu={this.dismissContextMenu}><div className="icon-plus-square"/><div>Export folder</div></div> }
           <div onClick={this.moveTo} className="FolderItem-context-item disabled" onContextMenu={this.dismissContextMenu}><div className="icon-browse"/><div>Move to...</div></div>
           <div onClick={this.favorite} className="FolderItem-context-item disabled" onContextMenu={this.dismissContextMenu}><div className="icon-game"/><div>Favorite</div></div>
           { singleFolderSelected && <div onClick={this.edit} className="FolderItem-context-item" onContextMenu={this.dismissContextMenu}><div className="icon-pencil"/><div>Edit...</div></div> }
@@ -174,6 +192,8 @@ export default connect(state => ({
 }), dispatch => ({
   actions: bindActionCreators({
     addAssetIdsToFolderId,
+    exportAssets,
+    showModal,
     showCreateFolderModal,
     deleteFolderIds,
     updateFolder

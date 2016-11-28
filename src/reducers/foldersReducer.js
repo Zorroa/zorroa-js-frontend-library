@@ -1,6 +1,7 @@
 import {
   GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, UPDATE_FOLDER,
-  DELETE_FOLDER, ADD_ASSETS_TO_FOLDER, TOGGLE_FOLDER, UNAUTH_USER
+  DELETE_FOLDER, ADD_ASSETS_TO_FOLDER, REMOVE_ASSETS_FROM_FOLDER,
+  CLEAR_FOLDERS_MODIFIED, TOGGLE_FOLDER, UNAUTH_USER
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import * as assert from 'assert'
@@ -127,7 +128,13 @@ export default function (state = initialState, action) {
       break
 
     case ADD_ASSETS_TO_FOLDER:
-      break
+      return { ...state, modified: true }
+
+    case REMOVE_ASSETS_FROM_FOLDER:
+      return { ...state, modified: true }
+
+    case CLEAR_FOLDERS_MODIFIED:
+      return { ...state, modified: false }
 
     case UNAUTH_USER:
       return initialState

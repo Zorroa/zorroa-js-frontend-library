@@ -2,9 +2,8 @@
 
 .modal-container {
   $BACKGROUND_COLOR: white;
-  $BORDER_RADIUS: 4px;
-  $DIVIDE_BORDER: 1px solid #e1e8ed;
-  $HF_COLOR: #8899a6;
+  $BORDER_RADIUS: 3px;
+  $DIVIDE_BORDER: 1px solid $zorroa-nearwhite;
 
   background-color: rgba(0,0,0, .5);
   box-sizing: border-box;
@@ -19,9 +18,8 @@
     background-color: $BACKGROUND_COLOR;
     border-radius: $BORDER_RADIUS;
     box-shadow: 10px 10px 32px -10px rgba(0,0,0,0.75);
-    max-width: 600px;
     position: relative;
-    width: 75%;
+    overflow: hidden;
 
     &.modal-appear {
       opacity: 0.01;
@@ -43,16 +41,7 @@
   }
 
   .modal-header {
-    background: black;
-    border-bottom: $DIVIDE_BORDER;
-    border-radius: $BORDER_RADIUS $BORDER_RADIUS 0 0;
-    box-sizing: border-box;
-    color: white;
     line-height: 2;
-    font-size: 80%;
-    padding-bottom: 6px;
-    padding-top: 6px;
-    padding-left: 15px;
     text-align: left;
     text-transform: uppercase;;
     z-index: 1;
@@ -60,27 +49,7 @@
 
   .modal-footer {
     background: $BACKGROUND_COLOR;
-    border-radius: 0 0 $BORDER_RADIUS $BORDER_RADIUS;
     border-top: $DIVIDE_BORDER;
-    color: $HF_COLOR;
     min-height: 20px;
-    padding: 15px;
-    text-align: center;
-  }
-
-  .modal-dismiss {
-    background-color: rgba(255,255,255,0);
-    border: none;
-    box-shadow: none;
-    color: $HF_COLOR;
-    cursor: pointer;
-    height: 20px;
-    padding: 0;
-    position: absolute;
-    right: 10px;
-    top: 9px;
-    transition: none;
-    width: 20px;
-    z-index: 2;
   }
 }

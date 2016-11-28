@@ -13,6 +13,7 @@ import { selectFolderIds } from '../../actions/folderAction'
 import Pager from './Pager'
 import Footer from './Footer'
 import Table from '../Table'
+import Editbar from './Editbar'
 import * as ComputeLayout from './ComputeLayout.js'
 
 class Assets extends Component {
@@ -184,6 +185,7 @@ class Assets extends Component {
     const { showTable, layout, thumbSize } = this.state
     return (
       <div className="assets-container flexOff flexCol fullHeight fullWidth">
+        <Editbar/>
         {this.renderAssets()}
         { showTable && <Table/> }
         { totalCount > 0 &&

@@ -1,9 +1,24 @@
 import {
+  SHOW_MODAL, HIDE_MODAL,
   SHOW_DISPLAY_OPTIONS_MODAL, HIDE_DISPLAY_OPTIONS_MODAL,
   SHOW_CREATE_FOLDER_MODAL, HIDE_CREATE_FOLDER_MODAL,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
   METADATA_FIELDS, TABLE_FIELDS, SET_DRAGGING, SET_TABLE_FIELD_WIDTH
 } from '../constants/actionTypes'
+
+export function showModal (props) {
+  return {
+    type: SHOW_MODAL,
+    payload: props
+  }
+}
+
+export function hideModal () {
+  return {
+    type: HIDE_MODAL,
+    payload: null
+  }
+}
 
 export function showDisplayOptionsModal (title, syncLabel, selectedFields,
                                          singleSelection, fieldTypes,
