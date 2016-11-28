@@ -105,9 +105,12 @@ class Map extends Component {
     const term = asset.value(this.state.searchField)
     this.setState({term})
     console.log('Select marker for asset ' + asset.id + ' with ' + term)
-    if (term) {
-      this.modifySliver(term)
-    }
+    this.modifySliver(term)
+  }
+
+  clearTerm = (event) => {
+    this.setState({term: null})
+    this.modifySliver(null)
   }
 
   removeFilter () {
@@ -116,7 +119,7 @@ class Map extends Component {
 
   render () {
     const { isIconified, assets } = this.props
-    const { locationField, searchField } = this.state
+    const { locationField, searchField, term } = this.state
     const title = Asset.lastNamespace(unCamelCase(searchField || locationField || '<Select Fields>'))
     const locationAssets = assets.filter(asset => (asset.value(locationField)))
     const layoutProperties = {
@@ -159,6 +162,12 @@ class Map extends Component {
             </Layer>
           )}
         </ReactMapboxGl>
+        { term ? (
+          <div onClick={this.clearTerm} className="selected-term">
+            <div>{term} selected</div>
+            <span className="icon-cancel-circle"/>
+          </div>) : <div/>
+        }
       </Widget>
     )
   }
