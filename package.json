@@ -4,7 +4,7 @@
   "description": "this is a front end template using react, redux, and webpack built by jordan with love",
   "scripts": {
     "postinstall": "rm -rf bin; npm run build",
-    "start": "./node_modules/.bin/serve ./bin",
+    "start": "./node_modules/.bin/serve ./bin -p 8080",
     "dev": "./node_modules/.bin/webpack-dev-server --config ./build/webpack.dev.js --progress --inline --hot --colors --no-info --history-api-fallback",
     "build-only": "./node_modules/.bin/webpack --config ./build/webpack.prod.js --progress --colors",
     "build": "npm test && npm run build-only",
@@ -14,7 +14,7 @@
     "test:watch": "./node_modules/.bin/jest --verbose --watch",
     "test:e2e": "./node_modules/.bin/jest ./tests/e2e/homePage.test.js",
     "test:lint": "./node_modules/.bin/eslint . --color; exit 0",
-    "test:coverage": "npm test; ./node_modules/.bin/serve ./coverage/lcov-report & open http://localhost:3000",
+    "test:coverage": "npm test; ./node_modules/.bin/serve ./coverage/lcov-report & open http://localhost:8080",
     "purge": "rm -rf node_modules; npm cache clean; npm install"
   },
   "author": "Jordan Papaleo",
