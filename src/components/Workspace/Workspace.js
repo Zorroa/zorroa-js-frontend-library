@@ -74,21 +74,21 @@ class Workspace extends Component {
       isOpen: app.collapsibleOpen.collection,
       isIconified: app.leftSidebarIsIconified,
       onOpen: this.toggleCollapsible.bind(this, 'collection'),
-      closeIcon: 'icon-folder2'
+      closeIcon: 'icon-folder3'
     })
     const SmartCollectionParams = () => ({
       header: (<span>Smart Collections</span>),
       isOpen: app.collapsibleOpen.smart,
       isIconified: app.leftSidebarIsIconified,
       onOpen: this.toggleCollapsible.bind(this, 'smart'),
-      closeIcon: 'icon-folder2'
+      closeIcon: 'icon-folder3'
     })
     const SimpleCollectionParams = () => ({
       header: (<span>Simple Collections</span>),
       isOpen: app.collapsibleOpen.simple,
       isIconified: app.leftSidebarIsIconified,
       onOpen: this.toggleCollapsible.bind(this, 'simple'),
-      closeIcon: 'icon-folder2'
+      closeIcon: 'icon-folder3'
     })
     const MetadataParams = () => ({
       header: (<span>Metadata</span>),
