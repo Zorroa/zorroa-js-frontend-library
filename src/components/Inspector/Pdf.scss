@@ -4,10 +4,14 @@
   @include fullHeight;
   @include flexCol;
   @include flexAlignItemsCenter;
+  @include flexJustifyCenter;
 
   img.loading {
-    @include flexOn;
-    align-self: center;
+  }
+
+  .error {
+    color: $zorroa-faded-red;
+    font-size: 18px;
   }
 
   .body {
