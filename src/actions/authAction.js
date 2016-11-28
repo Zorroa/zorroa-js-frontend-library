@@ -1,9 +1,10 @@
 import axios from 'axios'
 import { browserHistory } from 'react-router'
-import { AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR } from '../constants/actionTypes'
+import { AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR, AUTH_PERMISSIONS } from '../constants/actionTypes'
 import { USER_ITEM, HOST_ITEM, PROTOCOL_ITEM } from '../constants/localStorageItems'
 
 import User from '../models/User'
+import Permission from '../models/Permission'
 
 // Global variable to hold axios connection
 // FIXME: Should this be state?
@@ -110,5 +111,17 @@ export function authError (error) {
   return {
     type: AUTH_ERROR,
     payload: error
+  }
+}
+
+export function getUserPermissions (user) {
+  return dispatch => {
+    archivist.get('/api/v1/users/' + user.id + '/permissions')
+      .then(response => {
+        dispatch({ type: AUTH_PERMISSIONS, payload: response.data.map(json => (new Permission(json))) })
+      })
+      .catch(error => {
+        console.error('Cannot get user permissions ' + error)
+      })
   }
 }

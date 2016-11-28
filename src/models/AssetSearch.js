@@ -7,8 +7,8 @@ export default class AssetSearch {
       this.query = json.query     // string:           Keyword search string
       this.queryFields = json.queryFields // {string, number}: Map of fields and boost values
       this.fields = json.fields   // [string]:         Fields to return for each asset
-      this.filter = json.filter   // AssetFilter:      Filter applied to keyword search
-      this.postFilter = json.postFilter   // AssetFilter: Filter for assets after aggs
+      this.filter = json.filter && new AssetFilter(json.filter) // pre-agg (fast)
+      this.postFilter = json.postFilter && new AssetFilter(json.postFilter) // post-agg (slow)
       this.order = json.order     // {string field, bool ascending}
       this.size = json.size       // int:              Number of assets to return
       this.from = json.from       // int:              First asset index to return

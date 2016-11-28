@@ -29,17 +29,17 @@ export function dismissDisplayOptionsModal () {
   }
 }
 
-export function showCreateFolderModal (title, isEditing,
-                                       onCreate, onDelete, onLink, onDismiss) {
+export function showCreateFolderModal (title, acl, onCreate, name, onDelete, onLink, onDismiss) {
   return {
     type: SHOW_CREATE_FOLDER_MODAL,
     payload: {
       title,          // required
-      onDismiss,      // required
+      acl,            // required
       onCreate,       // required
-      isEditing,      // optional
-      onDelete,       // isEditing is true
-      onLink          // isEditing is true
+      name,           // optional folder name
+      onDelete,       // optional delete button
+      onLink,         // optional link button
+      onDismiss       // not used?
     }
   }
 }

@@ -15,6 +15,8 @@ import DisplayOptions from '../DisplayOptions'
 import CreateFolder from '../Folders/CreateFolder'
 
 import { iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible } from '../../actions/appActions'
+import { getUserPermissions } from '../../actions/authAction'
+import User from '../../models/User'
 
 class Workspace extends Component {
   static displayName () {
@@ -29,7 +31,13 @@ class Workspace extends Component {
     actions: PropTypes.object.isRequired,
 
     // state props
-    app: PropTypes.object.isRequired
+    app: PropTypes.object.isRequired,
+    user: PropTypes.instanceOf(User)
+  }
+
+  componentWillMount () {
+    const { actions, user } = this.props
+    actions.getUserPermissions(user)
   }
 
   toggleLeftSidebar = () => {
@@ -138,7 +146,8 @@ class Workspace extends Component {
 }
 
 export default connect(state => ({
-  app: state.app
+  app: state.app,
+  user: state.auth.user
 }), dispatch => ({
-  actions: bindActionCreators({ iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible }, dispatch)
+  actions: bindActionCreators({ iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible, getUserPermissions }, dispatch)
 }))(Workspace)

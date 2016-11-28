@@ -15,10 +15,13 @@ export default class AclEntry {
 }
 
 // Utility method to check for permission
-// FIXME: Untested code, copied from Java!!
 export function hasAccess (acl, permission, access) {
+  // Empty Acl gets read access?
+  if (acl && !acl.length && access === AclEntry.ReadAccess) {
+    return true
+  }
   for (let entry of acl) {
-    if (entry.permissionId === permission &&
+    if (entry.permissionId === permission.id &&
       (access & entry.access) === access) {
       return true
     }

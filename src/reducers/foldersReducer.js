@@ -88,13 +88,13 @@ export default function (state = initialState, action) {
 
     case UPDATE_FOLDER: {
       const folder = action.payload
-      const oldFolder = state.all[folder.id]
+      const oldFolder = state.all.get(folder.id)
       if (folder.id) {
-        folder.childIds = oldFolder ? oldFolder.childIds : new Set()
+        folder.childIds = oldFolder && oldFolder.childIds ? new Set(oldFolder.childIds) : new Set()
         let all = new Map(state.all) // copy folder map
         let openFolderIds = new Set(state.openFolderIds)
         all.set(folder.id, folder)
-        const parent = state.all.get(folder.parentId) // copy folder's parent
+        const parent = state.all.get(folder.parentId) // get folder's parent to open it
         assert.ok(parent.childIds.has(folder.id))
         openFolderIds.add(parent.id) // make sure we can see the updated folder immediately
         return {...state, all, openFolderIds}

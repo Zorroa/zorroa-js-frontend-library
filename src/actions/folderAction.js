@@ -65,7 +65,7 @@ export function createFolder (folder) {
 export function updateFolder (folder) {
   return dispatch => {
     console.log('Update folder: ' + JSON.stringify(folder))
-    getArchivist().post(`${rootEndpoint}/${folder.id}`, folder)
+    getArchivist().put(`${rootEndpoint}/${folder.id}`, folder)
       .then(response => {
         dispatch({
           type: UPDATE_FOLDER,

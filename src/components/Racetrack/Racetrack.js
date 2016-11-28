@@ -28,8 +28,8 @@ class Racetrack extends Component {
   }
 
   saveRacetrack = () => {
-    const isEditing = false
-    this.props.actions.showCreateFolderModal('Create Smart Collection', isEditing, this.saveSearch)
+    const acl = []
+    this.props.actions.showCreateFolderModal('Create Smart Collection', acl, this.saveSearch)
   }
 
   saveSearch = (name, acl) => {

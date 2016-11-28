@@ -1,6 +1,7 @@
 import authReducer from './authReducer'
 import User from '../models/User'
-import { AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR } from '../constants/actionTypes'
+import Permission from '../models/Permission'
+import { AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR, AUTH_PERMISSIONS } from '../constants/actionTypes'
 
 describe('authReducer', () => {
   it('AUTH_USER sets authenticated', () => {
@@ -24,5 +25,14 @@ describe('authReducer', () => {
     const errmsg = 'bad bits'
     expect(authReducer([], { type: AUTH_ERROR, payload: errmsg }))
       .toEqual({ error: errmsg })
+  })
+
+  it('AUTH_PERMISSIONS set user permissions', () => {
+    const user = new User({ id: 5, name: 'joe' })
+    const permissions = [new Permission({ id: 3, name: 'foo', type: 'bar' })]
+    const outfitted = new User(user)
+    outfitted.permissions = permissions
+    expect(authReducer({ user }, { type: AUTH_PERMISSIONS, payload: permissions }))
+      .toEqual({ user: outfitted })
   })
 })

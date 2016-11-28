@@ -131,9 +131,9 @@ class Folders extends Component {
   }
 
   addFolder = () => {
-    const isEditing = false
+    const acl = []
     this.props.actions.showCreateFolderModal(this.addFolderTitle(),
-      isEditing, this.addFolderCallback())
+      acl, this.addFolderCallback())
   }
 
   addFolderTitle () {

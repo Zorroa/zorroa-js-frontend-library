@@ -3,9 +3,10 @@ import { DropTarget } from '../../services/DragDrop'
 import classnames from 'classnames'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import User from '../../models/User'
 import Folder from '../../models/Folder'
 
-import { addAssetIdsToFolderId, deleteFolderIds } from '../../actions/folderAction'
+import { addAssetIdsToFolderId, deleteFolderIds, updateFolder } from '../../actions/folderAction'
 import { showCreateFolderModal } from '../../actions/appActions'
 
 // Renders folder children as Collapsible elements.
@@ -46,6 +47,7 @@ class FolderItem extends Component {
     // state props
     selectedFolderIds: PropTypes.object,
     folders: PropTypes.arrayOf(PropTypes.instanceOf(Folder)),
+    user: PropTypes.instanceOf(User),
     actions: PropTypes.object
   }
 
@@ -84,18 +86,21 @@ class FolderItem extends Component {
   }
 
   deleteFolder = () => {
-    this.props.actions.deleteFolderIds(new Set(this.props.folder.id))
+    const folderIds = new Set([this.props.folder.id])
+    this.props.actions.deleteFolderIds(folderIds)
   }
 
   editFolder = (name, acl) => {
-
+    const folder = new Folder(this.props.folder)
+    folder.name = name
+    folder.acl = acl
+    this.props.actions.updateFolder(folder)
   }
 
   edit = (event) => {
-    const isEditing = true
     this.dismissContextMenu(event)
-    this.props.actions.showCreateFolderModal('Edit Collection', isEditing,
-      this.editFolder, this.deleteFolder, this.getLink)
+    this.props.actions.showCreateFolderModal('Edit Collection', this.props.folder.acl,
+      this.editFolder, this.props.folder.name, this.deleteFolder, this.getLink)
   }
 
   // Count direct folder descendents, which is known, unlike recursive,
@@ -136,18 +141,18 @@ class FolderItem extends Component {
   }
 
   render () {
-    const { folder, depth, isOpen, hasChildren, isSelected, onToggle, onSelect, dropparams, dragHover } = this.props
+    const { folder, depth, isOpen, hasChildren, isSelected, onToggle, onSelect, dropparams, dragHover, user } = this.props
     const icon = folder.isDyhi() ? 'icon-cube' : 'icon-folder'
-
+    const isDropTarget = folder.isDropTarget(user)
     return (
-      <div className={classnames('FolderItem', { isOpen, hasChildren, isSelected: isSelected || dragHover })}
+      <div className={classnames('FolderItem', { isOpen, hasChildren, isSelected, isDropTarget, dragHover })}
            style={{ paddingLeft: `${(depth - 1) * 10}px` }}>
         { this.renderContextMenu() }
         <div className='FolderItem-toggle'
              onClick={event => { onToggle(folder); return false }}>
           {(hasChildren) ? <i className='FolderItem-toggleArrow icon-triangle-down'/> : null}
         </div>
-        <div className={classnames('FolderItem-select', {dragHover})}
+        <div className={classnames('FolderItem-select')}
              onClick={event => { onSelect(event, folder); return false }}
              onContextMenu={this.showContextMenu}>
           <i className={`FolderItem-icon ${icon}`}/>
@@ -155,7 +160,7 @@ class FolderItem extends Component {
             {folder.name}
           </div>
         </div>
-        <div className={classnames('FolderItem-dropzone', {dragHover})} {...dropparams}/>
+        <div className={classnames('FolderItem-dropzone', {isDropTarget, dragHover})} {...dropparams}/>
       </div>
     )
   }
@@ -164,11 +169,13 @@ class FolderItem extends Component {
 export default connect(state => ({
   selectedAssetIds: state.assets.selectedIds,
   folders: state.folders.all,
-  selectedFolderIds: state.folders.selectedFolderIds
+  selectedFolderIds: state.folders.selectedFolderIds,
+  user: state.auth.user
 }), dispatch => ({
   actions: bindActionCreators({
     addAssetIdsToFolderId,
     showCreateFolderModal,
-    deleteFolderIds
+    deleteFolderIds,
+    updateFolder
   }, dispatch)
 }))(FolderItem)

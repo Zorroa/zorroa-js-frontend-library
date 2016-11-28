@@ -24,6 +24,9 @@ $FolderItemHeight : 25px;
     &.isSelected { color: white; background-color: $zorroa-gray; }
   }
   &.isSelected { color: white; background-color: $zorroa-gray; }
+  &.isDropTarget.dragHover { color: white; background-color: $zorroa-sickly-green; }
+  &.isSelected.isDropTarget.dragHover { color: white; background-color: darken($zorroa-sickly-green, 15%); }
+
 }
 
 .FolderItem-toggle {
@@ -32,9 +35,11 @@ $FolderItemHeight : 25px;
 
   width: $FolderItemHeight;
   height: $FolderItemHeight;
-  &:hover { color: $zorroa-sickly-green; }
-  .FolderItem.isSelected & { color: white; }
-  .FolderItem.isSelected &:hover { color: $zorroa-sickly-green; }
+  &:hover { color: white; background-color: darken(#d8d8d8, 15%); }
+  .FolderItem.isSelected &       { color: white; background-color: $zorroa-gray; }
+  .FolderItem.isSelected &:hover { color: white; background-color: darken($zorroa-gray, 15%); }
+  .FolderItem.isDropTarget.dragHover & { color: white; background-color: $zorroa-sickly-green; }
+  .FolderItem.isSelected.isDropTarget.dragHover & { color: white; background-color: darken($zorroa-sickly-green, 15%); }
 }
 
 .FolderItem-select {
@@ -47,8 +52,9 @@ $FolderItemHeight : 25px;
   &:hover { color: white; background-color: darken(#d8d8d8, 15%); }
   .FolderItem.isSelected &       { color: white; background-color: $zorroa-gray; }
   .FolderItem.isSelected &:hover { color: white; background-color: darken($zorroa-gray, 15%); }
+  .FolderItem.isDropTarget.dragHover & { color: white; background-color: $zorroa-sickly-green; }
+  .FolderItem.isSelected.isDropTarget.dragHover & { color: white; background-color: darken($zorroa-sickly-green, 15%); }
 }
-
 
 .FolderItem-text {
   @include clampText;
@@ -62,9 +68,12 @@ $FolderItemHeight : 25px;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: none;
-  border: 1px solid $zorroa-gray;
-  border-radius: 2px;
+  background-color: transparent;
+
+  &.isDropTarget {
+    border: 1px solid $zorroa-sickly-green;
+    border-radius: 2px;
+  }
 
   .App.isDragging & {
     display: block;
