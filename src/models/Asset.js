@@ -88,7 +88,7 @@ export default class Asset {
 
     // E.g. proxies, an array of objects
     // FIXME: Unify array management with _valueToString
-    if (obj instanceof Array) {
+    if (Array.isArray(obj) || obj instanceof Array) {
       let array = '['
       obj.map((f, i) => {
         array += Asset._field(f, key)
@@ -105,7 +105,7 @@ export default class Asset {
   static _valueToString (value) {
     // E.g. tinyProxy, an array of POD
     // FIXME: Unify array management with _field
-    if (value instanceof Array) {
+    if (Array.isArray(value) || value instanceof Array) {
       let array = '['
       value.map((f, i) => {
         array += Asset._valueToString(f)
@@ -125,11 +125,11 @@ export default class Asset {
     }
   }
 
-  term (field) {
-    return Asset._term(this.document, field)
+  terms (field) {
+    return Asset._terms(this.document, field)
   }
 
-  static _term (obj, key) {
+  static _terms (obj, key) {
     const idx = key.indexOf('.')
     if (idx >= 0) {
       const namespace = key.slice(0, idx)
@@ -139,9 +139,9 @@ export default class Asset {
         return
       }
       assert.ok(typeof value === 'object', 'non-object namespace')
-      return Asset._term(value, nextkey)
+      return Asset._terms(value, nextkey)
     }
-    if (obj instanceof Array) {
+    if (Array.isArray(obj) || obj instanceof Array) {
       return obj
     }
 

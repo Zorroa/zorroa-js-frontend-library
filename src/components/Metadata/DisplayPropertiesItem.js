@@ -27,17 +27,58 @@ class DisplayPropertiesItem extends Component {
 
   value () {
     const { field, selectedAssets } = this.props
-    var value = selectedAssets && selectedAssets.size ? null : '(none)'
+    let allTerms = []
+    let someTerms = []
+    let value = selectedAssets && selectedAssets.size ? null : '(none)'
     for (let asset of selectedAssets) {
-      const v = asset.value(field)
-      if (asset) {
-        if (!value) {
-          value = v
-        } else if (value !== v) {
-          value = '- Multiple Values -'
-          break
+      if (!asset) continue
+
+      // Special handling for string arrays, displayed as keyword tags
+      let terms = asset.terms(field)
+      if (Array.isArray(terms) && terms.length && (typeof terms[0] === 'string' || terms[0] instanceof String)) {
+        if (!allTerms.length) {
+          allTerms = terms
+        } else {
+          // Split up the terms between the "in-all" and "in-some" sets
+          let a = new Set()
+          let s = new Set()
+          allTerms.forEach(t => {
+            if (terms.indexOf(t) < 0) {
+              s.add(t)
+            } else {
+              a.add(t)
+            }
+          })
+          terms.forEach(t => {
+            if (allTerms.indexOf(t) < 0) {
+              s.add(t)
+            } else {
+              a.add(t)
+            }
+          })
+          allTerms = [...a]
+          someTerms = [...s]
         }
       }
+
+      // Check for identical values in multiple selection
+      const v = asset.value(field)
+      if (!value) {
+        value = v
+      } else if (value !== v) {
+        value = '- Multiple Values -'
+        break
+      }
+    }
+
+    // String arrays take precedence
+    if (allTerms.length || someTerms.length) {
+      return (
+        <div className="terms flexRow flexWrap">
+          { allTerms.map(t => (<div className="all">{t}</div>)) }
+          { someTerms.map(t => (<div className="some">{t}</div>))}
+        </div>
+      )
     }
     return value
   }

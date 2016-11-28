@@ -22,10 +22,31 @@
     margin-left: 6px;
     padding-left: 6px;
     text-align: left;
-    max-width: 164px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    .terms {
+      .all {
+        line-height: 1.5em;
+        font-size: 12px;
+        margin: 2px 1px 0px;
+        border-radius: 3px;
+        padding: 2px 6px;
+        color: $zorroa-gray;
+        background-color: $zorroa-nearwhite;
+      }
+
+      .some {
+        line-height: 1.5em;
+        font-size: 12px;
+        margin: 2px 1px 0;
+        border-radius: 3px;
+        padding: 2px 6px;
+        background-color: $zorroa-nearwhite;
+        color: $zorroa-lightgray;
+      }
+    }
   }
 
   .search {
