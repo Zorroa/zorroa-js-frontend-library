@@ -106,6 +106,7 @@ class DisplayOptions extends Component {
     const lcFieldFilter = fieldFilter.toLowerCase()
     this.allFields().forEach(field => {
       if ((!length || field.startsWith(namespace)) &&
+        (!length || (field.length > length && field[length] === '.')) &&
         (field.startsWith(openedNamepsace) ||       // always show selected
         !lcFieldFilter.length || field.toLowerCase().includes(lcFieldFilter))) {
         // Strip off the prefix and slice off any tail past the next dot
