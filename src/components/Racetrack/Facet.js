@@ -117,6 +117,22 @@ class Facet extends Component {
     }
   }
 
+  aggBuckets () {
+    const { id, aggs } = this.props
+    let buckets = aggs && (id in aggs) ? aggs[id].facet.buckets : []
+
+    // Add in any selected terms that are not in the search agg
+    const { terms } = this.state
+    terms && terms.forEach(key => {
+      const index = buckets.findIndex(bucket => (bucket.key === key))
+      if (index < 0) {
+        buckets.unshift({key, doc_count: 1})  // FIXME: Arbitrary doc_count
+      }
+    })
+
+    return buckets
+  }
+
   renderPieLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name, fill }) => {
     const { terms } = this.state
     const RADIAN = Math.PI / 180
@@ -207,12 +223,11 @@ class Facet extends Component {
   }
 
   renderChart () {
-    const { aggs } = this.props
     const { field, terms, chartType } = this.state
     let maxCount = 0
     let minCount = Number.MAX_SAFE_INTEGER
     // Extract the buckets for this widget from the global query using id
-    const buckets = aggs && (this.props.id in aggs) ? aggs[this.props.id].facet.buckets : []
+    const buckets = this.aggBuckets()
     buckets.forEach(bucket => {
       maxCount = Math.max(maxCount, bucket.doc_count)
       minCount = Math.min(minCount, bucket.doc_count)

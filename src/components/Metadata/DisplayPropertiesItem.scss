@@ -5,7 +5,9 @@
   font-size: 12px;
   line-height: 2em;
 
-  &.label {
+  @include flexRow;
+
+  .label {
     margin-left: 4px;
     width: 120px;
     min-width: 120px;
@@ -16,7 +18,7 @@
     text-overflow: ellipsis;
   }
 
-  &.value {
+  .value {
     margin-left: 6px;
     padding-left: 6px;
     text-align: left;
@@ -26,11 +28,15 @@
     text-overflow: ellipsis;
   }
 
-  &.search {
+  .search {
     font-size: 10px;
     margin-left: 8px;
     margin-right: 8px;
     margin-top: 7px;          // ick, match bottom text line for 12pt above?
     color: $zorroa-light-green;
+
+    &.disabled {
+      color: $zorroa-lightgray;
+    }
   }
 }

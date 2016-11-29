@@ -1,10 +1,13 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
+import classnames from 'classnames'
 
 import DisplayProperties from '../../models/DisplayProperties'
 import Collapsible from '../Collapsible'
 import { toggleCollapsible } from '../../actions/appActions'
+import { createFacetWidget } from '../../models/Widget'
+import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import { unCamelCase } from '../../services/jsUtil'
 
 class DisplayPropertiesItem extends Component {
@@ -44,13 +47,28 @@ class DisplayPropertiesItem extends Component {
     actions.toggleCollapsible(name, !app.collapsibleOpen[name])
   }
 
+  searchTerms = (event) => {
+    if (!this.isBinocularsEnabled()) return
+    const { field, selectedAssets, actions } = this.props
+    const facetWidget = createFacetWidget(field, selectedAssets)
+    actions.modifyRacetrackWidget(facetWidget)
+  }
+
+  isBinocularsEnabled () {
+    const { field, selectedAssets } = this.props
+    if (!field || !field.length || !selectedAssets || !selectedAssets.size) {
+      return false
+    }
+    return true
+  }
+
   render () {
     const { app, field, selectedAssets, displayProperties, isIconified } = this.props
     if (displayProperties.children && displayProperties.children.length) {
       return (
         <Collapsible className='DisplayPropertiesItem'
                      style={{marginLeft: '16px'}}
-                     isOpen={app.collapsibleOpen[field]}
+                     isOpen={app.collapsibleOpen[field] || false}
                      isIconified={isIconified}
                      closeIcon="icon-register"
                      header={(<span>{displayProperties.name}</span>)}
@@ -70,12 +88,14 @@ class DisplayPropertiesItem extends Component {
     }
 
     return (
-      <div className="DisplayPropertiesItem flexRow">
-        <div className="DisplayPropertiesItem label">
+      <div className="DisplayPropertiesItem">
+        <div className="label">
           {unCamelCase(displayProperties.name)}
         </div>
-        <div className="DisplayPropertiesItem search icon-binoculars" />
-        <div className="DisplayPropertiesItem value">
+        <div onClick={this.searchTerms}
+             className={classnames('search', 'icon-binoculars',
+               {disabled: !this.isBinocularsEnabled()})} />
+        <div className="value">
           {this.value()}
         </div>
       </div>
@@ -86,7 +106,7 @@ class DisplayPropertiesItem extends Component {
 const DisplayPropertiesItemContainer = connect(state => ({
   app: state.app
 }), dispatch => ({
-  actions: bindActionCreators({ toggleCollapsible }, dispatch)
+  actions: bindActionCreators({ toggleCollapsible, modifyRacetrackWidget }, dispatch)
 }))(DisplayPropertiesItem)
 
 export default DisplayPropertiesItemContainer

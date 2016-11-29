@@ -124,6 +124,29 @@ export default class Asset {
       return value.toLocaleString()
     }
   }
+
+  term (field) {
+    return Asset._term(this.document, field)
+  }
+
+  static _term (obj, key) {
+    const idx = key.indexOf('.')
+    if (idx >= 0) {
+      const namespace = key.slice(0, idx)
+      const nextkey = key.slice(idx + 1)
+      const value = obj[namespace]
+      if (!value) {
+        return
+      }
+      assert.ok(typeof value === 'object', 'non-object namespace')
+      return Asset._term(value, nextkey)
+    }
+    if (obj instanceof Array) {
+      return obj
+    }
+
+    return obj[key]
+  }
 }
 
 function getRandomColor () {
