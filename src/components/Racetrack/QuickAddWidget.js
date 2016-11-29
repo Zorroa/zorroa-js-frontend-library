@@ -14,27 +14,26 @@ class QuickAddWidget extends Component {
 
   state = {
     filterText: '',
-    focused: false,
     selectedWidgetType: null
   }
 
-  pushWidgetType (event, type) {
-    event.preventDefault()
+  pushWidgetType (type) {
     this.props.actions.modifyRacetrackWidget(new Widget({type}))
+    this.setState({ filterText: '', selectedWidgetType: null })
   }
 
   changeFilterText = (event) => {
     this.setState({ filterText: event.target.value, selectedWidgetType: null })
   }
 
-  selectCurrent = (event) => {
+  selectCurrent = () => {
     const { selectedWidgetType } = this.state
     if (selectedWidgetType) {
-      this.pushWidgetType(event, selectedWidgetType)
+      this.pushWidgetType(selectedWidgetType)
     } else {
       const widgetInfos = this.widgetInfos()
       if (!widgetInfos || !widgetInfos.length) return
-      this.pushWidgetType(event, widgetInfos[0].type)
+      this.pushWidgetType(widgetInfos[0].type)
     }
     this.setState({ filterText: '' })
     this.blur()
@@ -68,8 +67,8 @@ class QuickAddWidget extends Component {
 
   keyDown = (event) => {
     switch (event.key) {
-      case 'Enter': return this.selectCurrent(event)
-      case 'Tab': return this.selectCurrent(event)
+      case 'Enter': return this.selectCurrent()
+      case 'Tab': return this.selectCurrent()
       case 'ArrowUp': return this.previous()
       case 'ArrowDown': return this.next()
       default:
@@ -77,17 +76,19 @@ class QuickAddWidget extends Component {
   }
 
   focus = () => {
-    this.setState({focused: true})
+    // FIXME: Storing focus as state breaks clicking on widget items.
+    this.focused = true
+    this.setState({selectedWidgetType: this.state.selectedWidgetType})  // force redraw
   }
 
   blur = () => {
-    this.setState({focused: false, selectedWidgetType: null})
+    this.focused = false
   }
 
   widgetInfos () {
-    const { filterText, focused } = this.state
+    const { filterText } = this.state
     const filter = filterText.toLowerCase()
-    return focused || filter.length ? Object.values(WidgetInfo).filter(widgetInfo => (
+    return this.focused || filter.length ? Object.values(WidgetInfo).filter(widgetInfo => (
       widgetInfo.title.toLowerCase().includes(filter)
     )) : []
   }
