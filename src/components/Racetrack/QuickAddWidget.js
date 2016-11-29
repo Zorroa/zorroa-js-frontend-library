@@ -19,7 +19,7 @@ class QuickAddWidget extends Component {
 
   pushWidgetType (type) {
     this.props.actions.modifyRacetrackWidget(new Widget({type}))
-    this.setState({ filterText: '', selectedWidgetType: null })
+    this.dismiss()
   }
 
   changeFilterText = (event) => {
@@ -71,6 +71,7 @@ class QuickAddWidget extends Component {
       case 'Tab': return this.selectCurrent()
       case 'ArrowUp': return this.previous()
       case 'ArrowDown': return this.next()
+      case 'Escape': return this.dismiss()
       default:
     }
   }
@@ -78,11 +79,16 @@ class QuickAddWidget extends Component {
   focus = () => {
     // FIXME: Storing focus as state breaks clicking on widget items.
     this.focused = true
-    this.setState({selectedWidgetType: this.state.selectedWidgetType})  // force redraw
+    this.setState({selectedWidgetType: null, filterText: ''})
   }
 
   blur = () => {
+    this.dismiss()
+  }
+
+  dismiss = () => {
     this.focused = false
+    this.setState({selectedWidgetType: null, filterText: ''})
   }
 
   widgetInfos () {
@@ -104,7 +110,7 @@ class QuickAddWidget extends Component {
         { widgetInfos.length ? (
           <div className="add-quick-list">
             { widgetInfos.map(widgetInfo => (
-              <div onClick={this.pushWidgetType.bind(this, widgetInfo.type)}
+              <div onMouseDown={this.pushWidgetType.bind(this, widgetInfo.type)}
                    className={classnames('add-quick-item', {selected: widgetInfo.type === selectedWidgetType})}
                    key={widgetInfo.type}>
                 <div className={classnames('Racetrack-add-widget', `Racetrack-add-${widgetInfo.type}`)}>
