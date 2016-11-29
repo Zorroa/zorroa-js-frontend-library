@@ -18,24 +18,26 @@ class QuickAddWidget extends Component {
     selectedWidgetType: null
   }
 
-  pushWidgetType (type) {
+  pushWidgetType (event, type) {
+    event.preventDefault()
     this.props.actions.modifyRacetrackWidget(new Widget({type}))
   }
 
   changeFilterText = (event) => {
-    this.setState({ filterText: event.target.value })
+    this.setState({ filterText: event.target.value, selectedWidgetType: null })
   }
 
-  selectCurrent = () => {
+  selectCurrent = (event) => {
     const { selectedWidgetType } = this.state
     if (selectedWidgetType) {
-      this.pushWidgetType(selectedWidgetType)
+      this.pushWidgetType(event, selectedWidgetType)
     } else {
       const widgetInfos = this.widgetInfos()
       if (!widgetInfos || !widgetInfos.length) return
-      this.pushWidgetType(widgetInfos[0].type)
+      this.pushWidgetType(event, widgetInfos[0].type)
     }
     this.setState({ filterText: '' })
+    this.blur()
   }
 
   previous = () => {
@@ -66,8 +68,8 @@ class QuickAddWidget extends Component {
 
   keyDown = (event) => {
     switch (event.key) {
-      case 'Enter': return this.selectCurrent()
-      case 'Tab': return this.selectCurrent()
+      case 'Enter': return this.selectCurrent(event)
+      case 'Tab': return this.selectCurrent(event)
       case 'ArrowUp': return this.previous()
       case 'ArrowDown': return this.next()
       default:
@@ -79,7 +81,7 @@ class QuickAddWidget extends Component {
   }
 
   blur = () => {
-    this.setState({focused: false})
+    this.setState({focused: false, selectedWidgetType: null})
   }
 
   widgetInfos () {
@@ -101,8 +103,9 @@ class QuickAddWidget extends Component {
         { widgetInfos.length ? (
           <div className="add-quick-list">
             { widgetInfos.map(widgetInfo => (
-              <div className={classnames('add-quick-item', {selected: widgetInfo.type === selectedWidgetType})} key={widgetInfo.type}
-                   onClick={this.pushWidgetType.bind(this, widgetInfo.type)}>
+              <div onClick={this.pushWidgetType.bind(this, widgetInfo.type)}
+                   className={classnames('add-quick-item', {selected: widgetInfo.type === selectedWidgetType})}
+                   key={widgetInfo.type}>
                 <div className={classnames('Racetrack-add-widget', `Racetrack-add-${widgetInfo.type}`)}>
                   <i className={`Racetrack-add-icon ${widgetInfo.icon}`}></i>
                   <span>{widgetInfo.title}</span>

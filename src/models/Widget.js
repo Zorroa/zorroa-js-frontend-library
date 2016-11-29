@@ -1,4 +1,4 @@
-import { FACET_WIDGET } from '../constants/widgetTypes'
+import { FacetWidgetInfo } from '../components/Racetrack/WidgetInfo'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
 
@@ -12,7 +12,7 @@ export default class Widget {
 }
 
 export function createFacetWidget (field, assets) {
-  const type = FACET_WIDGET
+  const type = FacetWidgetInfo.type
   const isOpen = true
   let terms = []
   for (let asset of assets) {
