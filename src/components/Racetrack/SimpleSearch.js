@@ -57,9 +57,10 @@ class SimpleSearch extends Component {
     const { isIconified } = this.props
     return (
       <Widget className='SimpleSearch'
-              header={(<span>Simple Search</span>)}
+              header={(<span>{SimpleSearchWidgetInfo.title}</span>)}
+              backgroundColor={SimpleSearchWidgetInfo.color}
               isIconified={isIconified}
-              icon="icon-search"
+              icon={SimpleSearchWidgetInfo.icon}
               onClose={this.removeFilter.bind(this)}>
         <div className="SimpleSearch-body">
           <div className="flexRow">

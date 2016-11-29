@@ -3,6 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import Searcher from './Searcher'
+import AddWidget from './AddWidget'
 import QuickAddWidget from './QuickAddWidget'
 import Widget from '../../models/Widget'
 import * as WidgetInfo from './WidgetInfo'
@@ -10,7 +11,7 @@ import Folder from '../../models/Folder'
 import AssetSearch from '../../models/AssetSearch'
 import { resetRacetrackWidgets } from '../../actions/racetrackAction'
 import { createFolder } from '../../actions/folderAction'
-import { showCreateFolderModal } from '../../actions/appActions'
+import { showModal, showCreateFolderModal } from '../../actions/appActions'
 
 class Racetrack extends Component {
   static propTypes = {
@@ -51,6 +52,12 @@ class Racetrack extends Component {
 
   changeEmptySearch = (event) => {
     this.setState({ emptySearch: event.target.value })
+  }
+
+  showAddWidget = (event) => {
+    const width = '732px'   // Exactly fits three widgets across
+    const body = <AddWidget/>
+    this.props.actions.showModal({body, width})
   }
 
   renderEmpty (isIconified) {
@@ -98,7 +105,7 @@ class Racetrack extends Component {
     if (isIconified) return null
     return (
       <div className="Racetrack-add-filter">
-        <div className='Racetrack-add-widget flexRow flexAlignItemsCenter'><i className='icon-plus2'/>Add Widget</div>
+        <div onClick={this.showAddWidget} className='Racetrack-add-widget'><i className='icon-plus2'/>Add Widget</div>
         <QuickAddWidget/>
       </div>
     )
@@ -133,6 +140,7 @@ const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators({
     resetRacetrackWidgets,
     createFolder,
+    showModal,
     showCreateFolderModal
   }, dispatch)
 })

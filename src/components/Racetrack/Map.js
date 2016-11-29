@@ -130,9 +130,9 @@ class Map extends Component {
     }
     return (
       <Widget className="Map"
-              icon="icon-location"
+              icon={MapWidgetInfo.icon}
               header={(
-                <div className="Map-header flexRow flexJustifySpaceBetween fullWidth">
+                <div className="Map-header ">
                   <span>Map: {title}</span>
                   <div className="flexRow flexAlignItemsCenter">
                     <div onClick={this.selectSearch} className="Map-search icon-search" />
@@ -140,6 +140,7 @@ class Map extends Component {
                   </div>
                 </div>
               )}
+              backgroundColor={MapWidgetInfo.color}
               isIconified={isIconified}
               onClose={this.removeFilter.bind(this)}>
         <ReactMapboxGl containerStyle={{height: '300px'}}

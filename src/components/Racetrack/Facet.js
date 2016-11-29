@@ -308,13 +308,14 @@ class Facet extends Component {
     return (
       <Widget className="Facet"
               header={(
-                <div className="Facet-header flexRow flexJustifySpaceBetween fullWidth">
+                <div className="Facet-header">
                   <span>Facet: {title}</span>
                   <div onClick={this.selectField} className="Facet-settings icon-cog"></div>
                 </div>
               )}
+              backgroundColor={FacetWidgetInfo.color}
               isIconified={isIconified}
-              icon='icon-bar-graph'
+              icon={FacetWidgetInfo.icon}
               onClose={this.removeFilter.bind(this)}>
         <div className="Facet-body flexCol">
           { this.renderChart() }

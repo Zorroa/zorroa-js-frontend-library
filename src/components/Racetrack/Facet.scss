@@ -3,8 +3,6 @@
 .Facet {
   .WidgetHeader {
     color: $zorroa-nearwhite;
-    background-color: $zorroa-darkish-purple;
-    & > *:hover { background-color: darken($zorroa-darkish-purple, 15%); }
   }
 
   .WidgetHeader-icon {
@@ -16,6 +14,10 @@
   }
 
   .Facet-header {
+    @include flexRow;
+    @include flexJustifySpaceBetween;
+    @include fullWidth;
+
     flex-shrink: 1;
     span {
     }

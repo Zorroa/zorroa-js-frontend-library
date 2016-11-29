@@ -8,7 +8,8 @@ export const SimpleSearchWidgetInfo = {
   icon: 'icon-search',
   title: 'Simple Search',
   description: 'Fuzzy text search on keywords or specific fields',
-  element: <SimpleSearch/>
+  element: <SimpleSearch/>,
+  color: '#74b618'
 }
 
 export const FacetWidgetInfo = {
@@ -16,7 +17,8 @@ export const FacetWidgetInfo = {
   icon: 'icon-bar-graph',
   title: 'Facet: Keyword',
   description: 'Match keywords and specific values for specific fields',
-  element: <Facet/>
+  element: <Facet/>,
+  color: '#a11d77'
 }
 
 export const MapWidgetInfo = {
@@ -24,5 +26,6 @@ export const MapWidgetInfo = {
   icon: 'icon-location',
   title: 'Map: Location',
   description: 'Map GPS locations on a map and select to search for matching fields',
-  element: <Map/>
+  element: <Map/>,
+  color: '#785549'
 }

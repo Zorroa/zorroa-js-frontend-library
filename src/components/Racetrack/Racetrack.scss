@@ -78,11 +78,14 @@
       border-radius: 3px;
       border: none;
       margin-right: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
 
-      div {
-        font-weight: 700;
-        text-transform: uppercase;
-        margin-left: 6px;
+      @include flexRow;
+      @include flexAlignItemsCenter;
+
+      i {
+        margin-right: 6px;
       }
 
       &:hover {

@@ -4,5 +4,6 @@ import './Map.scss'
 import './Facet.scss'
 import './SimpleSearch.scss'
 import './WidgetHeader.scss'
+import './AddWidget.scss'
 import './QuickAddWidget.scss'
 export default Racetrack

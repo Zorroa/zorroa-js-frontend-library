@@ -1,0 +1,188 @@
+@import '../../styles/core-mixins.scss';
+
+.AddWidget {
+  @include flexCol;
+
+  .header {
+    color: white;
+    background-color: black;
+    height: auto;
+    line-height: 2em;
+    text-transform: uppercase;
+
+    @include fullWidth;
+    @include flexRow;
+    @include flexAlignItemsCenter;
+    @include flexJustifySpaceBetween;
+
+    div[class*="icon-"] {
+      margin-left: 12px;
+      margin-right: 8px;
+      margin-top: 8px;
+      margin-bottom: 8px;
+    }
+
+    .icon-search {
+      font-size: 24px;
+    }
+  }
+
+  .controls {
+    @include flexRow;
+    @include flexJustifySpaceBetween;
+    @include fullWidth;
+
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    background-color: $zorroa-nearwhite;
+
+    .filter {
+      width: 300px;
+      @include flexRow;
+
+      .filter-input {
+        position: relative;
+        margin-right: 4px;
+
+        @include flexOn;
+
+        input {
+          @include fullWidth;
+          background: transparent;
+          border: none;
+          border-bottom: 1px solid $zorroa-greyish-brown;
+          color: $zorroa-gray;
+          font-size: 12px;
+        }
+
+        .icon-cancel-circle {
+          position: absolute;
+          top: 0;
+          right: 4px;
+          font-size: 10px;
+          color: $zorroa-gray;
+        }
+
+        .isEmptyFilter {
+          visibility: hidden;
+        }
+      }
+    }
+
+    .protip {
+      text-align: right;
+      color: $zorroa-lightgray;
+
+      @include flexRow;
+      @include flexJustifyEnd;
+
+      .key-equiv {
+        color: $zorroa-gray;
+        margin-left: 0.3em;
+        margin-right: 0.3em;
+      }
+    }
+  }
+
+  .body {
+    @include flexRow;
+    @include flexWrap;
+
+    .search-info {
+      @include fullWidth;
+      @include flexRow;
+      @include flexJustifyEnd;
+
+      text-align: right;
+      margin-top: 8px;
+      margin-bottom: 12px;
+      padding-left: 20px;
+      padding-right: 20px;
+      color: $zorroa-gray;
+
+      .text-val {
+        width: 18px;
+        margin-left: 8px;
+        text-transform: uppercase;
+        color: $zorroa-lightgray;
+      }
+    }
+
+    .widget-grid {
+      @include flexRow;
+      @include flexWrap;
+
+      margin-left: 12px;
+      margin-right: 12px;
+      margin-bottom: 20px;
+
+      .widget {
+        @include flexCol;
+        width: 220px;
+        background-color: white;
+        margin-left: 8px;
+        margin-right: 8px;
+
+        .title-bar {
+          @include flexRow;
+          @include flexAlignItemsCenter;
+          @include flexJustifySpaceBetween;
+
+          height: 40px;
+          text-transform: uppercase;
+          color: white;
+          padding-left: 8px;
+          padding-right: 8px;
+          line-height: 2em;
+          border-top-left-radius: 3px;
+          border-top-right-radius: 3px;
+
+          div[class*="icon-"] {
+            font-size: 24px;
+            margin-right: 8px;
+          }
+
+          div.icon-question {
+            font-size: 12px;
+          }
+        }
+
+        .description {
+          background-color: white;
+          padding: 10px;
+          border-left: solid 1px $zorroa-lightgray;
+          border-right: solid 1px $zorroa-lightgray;
+          border-bottom: solid 1px $zorroa-lightgray;
+
+          @include flexCol;
+
+          .info-text {
+            padding-top: 8px;
+            color: $zorroa-lightgray;
+            height: 5em;
+            max-height: 5em;
+          }
+
+          .add-button {
+            margin-top: 10px;
+            border: none;
+            color: white;
+            border-radius: 3px;
+            text-transform: uppercase;
+            padding-left: 12px;
+            padding-right: 12px;
+            padding-top:6px;
+            padding-bottom: 6px;
+            align-self: center;
+
+            &:hover {
+              background-color: $zorroa-sickly-green;
+            }
+          }
+        }
+      }
+    }
+  }
+}
