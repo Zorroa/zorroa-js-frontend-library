@@ -18,6 +18,7 @@
     "react"
   ],
   "globals": {
+    "jest": true,
     "describe": true,
     "it": true,
     "xit": true,

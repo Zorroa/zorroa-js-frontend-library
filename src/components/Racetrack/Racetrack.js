@@ -1,19 +1,16 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component, PropTypes, cloneElement } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import Searcher from './Searcher'
-import SimpleSearch from './SimpleSearch'
-import Facet from './Facet'
-import Map from './Map'
-import DropdownMenu from '../DropdownMenu'
+import QuickAddWidget from './QuickAddWidget'
 import Widget from '../../models/Widget'
+import * as WidgetInfo from './WidgetInfo'
 import Folder from '../../models/Folder'
 import AssetSearch from '../../models/AssetSearch'
-import { resetRacetrackWidgets, modifyRacetrackWidget } from '../../actions/racetrackAction'
+import { resetRacetrackWidgets } from '../../actions/racetrackAction'
 import { createFolder } from '../../actions/folderAction'
 import { showCreateFolderModal } from '../../actions/appActions'
-import * as widgetTypes from '../../constants/widgetTypes'
 
 class Racetrack extends Component {
   static propTypes = {
@@ -45,23 +42,15 @@ class Racetrack extends Component {
     this.props.actions.resetRacetrackWidgets()
   }
 
-  quickAddKeyPress = (event) => {
-    console.log('Quick Add keypress')
-  }
-
   submitEmptySearch = (event) => {
     event.preventDefault()
-    const type = widgetTypes.SIMPLE_SEARCH_WIDGET
+    const type = WidgetInfo.SimpleSearchWidgetInfo.type
     const sliver = new AssetSearch({ query: this.state.emptySearch })
     this.props.actions.resetRacetrackWidgets([new Widget({ type, sliver })])
   }
 
   changeEmptySearch = (event) => {
     this.setState({ emptySearch: event.target.value })
-  }
-
-  pushWidgetType (type) {
-    this.props.actions.modifyRacetrackWidget(new Widget({type}))
   }
 
   renderEmpty (isIconified) {
@@ -84,36 +73,9 @@ class Racetrack extends Component {
     )
   }
 
-  renderWidgetTypeHeader (widgetType, isIconified) {
-    const icons = {
-      [widgetTypes.SIMPLE_SEARCH_WIDGET]: 'icon-search',
-      [widgetTypes.FACET_WIDGET]: 'icon-bar-graph',
-      [widgetTypes.MAP_WIDGET]: 'icon-location'
-    }
-    const names = {
-      [widgetTypes.SIMPLE_SEARCH_WIDGET]: 'Simple Search',
-      [widgetTypes.FACET_WIDGET]: 'Facet: Keyword',
-      [widgetTypes.MAP_WIDGET]: 'Map: Location'
-    }
-    return (
-      <div className={`Racetrack-add-widget Racetrack-add-${widgetType} flexRow flexAlignItemsCenter`}>
-        <i className={`Racetrack-add-icon ${icons[widgetType]}`}></i>
-        <span>{names[widgetType]}</span>
-      </div>
-    )
-  }
-
   renderWidget (widget, isIconified) {
-    switch (widget.type) {
-      case widgetTypes.SIMPLE_SEARCH_WIDGET:
-        return <SimpleSearch id={widget.id} isIconified={isIconified} />
-      case widgetTypes.FACET_WIDGET:
-        return <Facet id={widget.id} isIconified={isIconified} />
-      case widgetTypes.MAP_WIDGET:
-        return <Map id={widget.id} isIconified={isIconified} />
-      default:
-        return <div/>
-    }
+    const widgetInfo = Object.values(WidgetInfo).find(widgetInfo => (widgetInfo.type === widget.type))
+    return cloneElement(widgetInfo.element, {id: widget.id, isIconified})
   }
 
   renderFooter (isIconified) {
@@ -133,17 +95,9 @@ class Racetrack extends Component {
   renderAddWidgets (isIconified) {
     if (isIconified) return null
     return (
-      <div className="Racetrack-add-filter flexRow flexAlignItemsCenter flexJustifySpaceBetween">
-        <DropdownMenu label="+ ADD WIDGET">
-          { Object.values(widgetTypes).map(widgetType => (
-            <div className="Racetrack-add-filter-item" key={widgetType} onClick={this.pushWidgetType.bind(this, widgetType)}>
-              { this.renderWidgetTypeHeader(widgetType, isIconified) }
-            </div>
-          ))}
-        </DropdownMenu>
-        <input className='Racetrack-add-quick'
-               onKeyPress={this.quickAddKeyPress}
-               placeholder="Quick Add - Widget"/>
+      <div className="Racetrack-add-filter">
+        <button className="icon-plus2 flexRow flexAlignItemsCenter"><div>Add Widget</div></button>
+        <QuickAddWidget/>
       </div>
     )
   }
@@ -175,7 +129,6 @@ class Racetrack extends Component {
 
 const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators({
-    modifyRacetrackWidget,
     resetRacetrackWidgets,
     createFolder,
     showCreateFolderModal

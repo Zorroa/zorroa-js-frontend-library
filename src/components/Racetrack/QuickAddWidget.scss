@@ -1,0 +1,38 @@
+@import '../../styles/core-mixins.scss';
+
+.QuickAddWidget {
+  position: relative;   // For floating list
+
+  .add-quick-list {
+    position: absolute;
+    top: 110%;
+    background-color: white;
+    border-radius: 3px;
+    box-shadow: 0 2px 6px 6px rgba(0,0,0, 0.15);
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 6px;
+    padding-bottom: 12px;
+    z-index: 1000;
+    //right: 100%;
+
+    .add-quick-item {
+      margin-top: 2px;
+      border-radius: 3px;
+      border: 3px solid transparent;
+
+      &.selected {
+        border: 3px solid $zorroa-gray;
+      }
+    }
+  }
+
+  input {
+    height: 40px;
+    padding: 0 8px;
+    border-radius: 3px;
+    border: 1px solid #a5a5a5;
+    font-size: 14px;
+    font-weight: 500;
+  }
+}

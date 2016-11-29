@@ -1,13 +1,15 @@
+jest.mock('../components/Racetrack/WidgetInfo')
+
 import { modifyRacetrackWidget, removeRacetrackWidgetIds, resetRacetrackWidgets } from './racetrackAction'
 import { MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS } from '../constants/actionTypes'
 import Widget from '../models/Widget'
 import AssetSearch from '../models/AssetSearch'
-import * as widgetType from '../constants/widgetTypes'
+import { SimpleSearchWidgetInfo } from '../components/Racetrack/WidgetInfo'
 
 describe('racetrackActions', () => {
   it('should modify widget', () => {
     const sliver = new AssetSearch({query: 'foo'})
-    const widget = new Widget({ sliver, type: widgetType.SIMPLE_SEARCH_WIDGET })
+    const widget = new Widget({ sliver, type: SimpleSearchWidgetInfo.type })
     const expectedAction = {
       type: MODIFY_RACETRACK_WIDGET,
       payload: widget
@@ -27,7 +29,7 @@ describe('racetrackActions', () => {
 
   it('should reset racetrack', () => {
     const sliver = new AssetSearch({query: 'foo'})
-    const widget = new Widget({ sliver, type: widgetType.SIMPLE_SEARCH_WIDGET })
+    const widget = new Widget({ sliver, type: SimpleSearchWidgetInfo.type })
     const widgets = [widget]
     const expectedAction = {
       type: RESET_RACETRACK_WIDGETS,

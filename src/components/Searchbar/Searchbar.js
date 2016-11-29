@@ -5,7 +5,7 @@ import classnames from 'classnames'
 
 import { suggestQueryStrings } from '../../actions/assetsAction'
 import { resetRacetrackWidgets } from '../../actions/racetrackAction'
-import { SIMPLE_SEARCH_WIDGET } from '../../constants/widgetTypes'
+import { SimpleSearchWidgetInfo } from '../Racetrack/WidgetInfo'
 import Widget from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
 
@@ -132,7 +132,7 @@ class Searchbar extends Component {
   // Submit a new search, resetting the racetrack
   resetSearch (query) {
     const sliver = new AssetSearch({ query })
-    const widget = new Widget({ type: SIMPLE_SEARCH_WIDGET, sliver })
+    const widget = new Widget({ type: SimpleSearchWidgetInfo.type, sliver })
     this.props.actions.resetRacetrackWidgets([widget])
   }
 

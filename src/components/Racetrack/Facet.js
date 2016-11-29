@@ -8,7 +8,7 @@ import WidgetModel from '../../models/Widget'
 import Asset from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
-import { FACET_WIDGET } from '../../constants/widgetTypes'
+import { FacetWidgetInfo } from './WidgetInfo'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
 import { showDisplayOptionsModal } from '../../actions/appActions'
 import Widget from './Widget'
@@ -62,7 +62,7 @@ class Facet extends Component {
   }
 
   modifySliver = (field, terms) => {
-    const type = FACET_WIDGET
+    const type = FacetWidgetInfo.type
     const aggs = { facet: { terms: { field, size: 100 } } }
     let sliver = new AssetSearch({aggs})
     if (terms && terms.length) {

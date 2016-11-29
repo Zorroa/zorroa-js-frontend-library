@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 
 import WidgetModel from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
-import { SIMPLE_SEARCH_WIDGET } from '../../constants/widgetTypes'
+import { SimpleSearchWidgetInfo } from './WidgetInfo'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
 import Widget from './Widget'
 
@@ -46,7 +46,7 @@ class SimpleSearch extends Component {
   // ...and onKeyPress to monitor for the Enter key to submit the new query
   modifySliver (event) {
     if (event.key === 'Enter') {
-      const type = SIMPLE_SEARCH_WIDGET
+      const type = SimpleSearchWidgetInfo.type
       const sliver = new AssetSearch({query: this.state.queryString})
       const widget = new WidgetModel({id: this.props.id, type, sliver})
       this.props.actions.modifyRacetrackWidget(widget)
