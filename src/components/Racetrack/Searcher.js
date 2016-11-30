@@ -6,7 +6,7 @@ import Widget from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import { searchAssets } from '../../actions/assetsAction'
-import { clearFoldersModified } from '../../actions/folderAction'
+import { clearFoldersModified, countAssetsInFolderIds } from '../../actions/folderAction'
 
 // Searcher is a singleton. It combines AssetSearches from the Racetrack
 // and Folders and submits a new query to the Archivist server.
@@ -15,9 +15,25 @@ class Searcher extends Component {
     query: PropTypes.instanceOf(AssetSearch),
     pageSize: PropTypes.number.isRequired,
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
+    folders: PropTypes.instanceOf(Map),
     selectedFolderIds: PropTypes.object,
     foldersModified: PropTypes.bool,
+    folderCounts: PropTypes.instanceOf(Map),
+    filteredFolderCounts: PropTypes.instanceOf(Map),
     actions: PropTypes.object.isRequired
+  }
+
+  componentWillMount () {
+    const { folders } = this.props
+    this.countedFolderIds = new Set()
+    folders && folders.forEach(folder => {
+      if (this.isCounted(folder.id)) this.countedFolderIds.add(folder.id)
+    })
+  }
+
+  isCounted (folderId) {
+    const {folderCounts, filteredFolderCounts} = this.props
+    return folderCounts && folderCounts.has(folderId) && filteredFolderCounts && filteredFolderCounts.has(folderId)
   }
 
   componentDidUpdate () {
@@ -44,7 +60,7 @@ class Searcher extends Component {
   // they show the results that do not include their own filter.
   // Note that post-filter is less efficient than a standard filter.
   render () {
-    const { widgets, actions, selectedFolderIds, query, pageSize, foldersModified } = this.props
+    const { widgets, actions, folders, selectedFolderIds, query, pageSize, foldersModified } = this.props
     let assetSearch = new AssetSearch()
     let postFilter = new AssetFilter()
     for (let widget of widgets) {
@@ -69,9 +85,33 @@ class Searcher extends Component {
     }
 
     // Do not send the query unless it is different than the last returned query
+    // FIXME: If assetSearch.empty() filtered counts == total, but tricky to flush cache
+    if (foldersModified) {
+      // FIXME: Update only modified folders, rather than all folders!
+      actions.countAssetsInFolderIds([...folders.keys()])
+    }
     if (!query || !assetSearch.equals(query) || foldersModified) {
       assetSearch.size = pageSize
       actions.searchAssets(assetSearch)
+      if (folders && folders.size > 1) {
+        // New query, get all the filtered folder counts
+        actions.countAssetsInFolderIds([...folders.keys()], assetSearch)
+      }
+    } else if (this.countedFolderIds.size !== folders.size) {
+      // Only count assets in newly added folders
+      let addedFolders = []
+      for (const id of folders.keys()) {
+        if (id && !this.countedFolderIds.has(id)) {
+          addedFolders.push(id)
+          this.countedFolderIds.add(id)
+        }
+      }
+      if (addedFolders.length) {
+        if (!foldersModified) {   // Skip if we're getting all folders above
+          actions.countAssetsInFolderIds(addedFolders)
+        }
+        actions.countAssetsInFolderIds(addedFolders, assetSearch)
+      }
     }
 
     return null   // Just reacting to new slivers
@@ -79,13 +119,19 @@ class Searcher extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({ searchAssets, clearFoldersModified }, dispatch)
+  actions: bindActionCreators({
+    searchAssets,
+    clearFoldersModified,
+    countAssetsInFolderIds }, dispatch)
 })
 
 const mapStateToProps = state => ({
   query: state.assets.query,
   pageSize: state.assets.pageSize,
   widgets: state.racetrack.widgets,
+  folders: state.folders.all,
+  folderCounts: state.folders.counts,
+  filteredFolderCounts: state.folders.filteredCounts,
   selectedFolderIds: state.folders.selectedFolderIds,
   foldersModified: state.folders.modified
 })

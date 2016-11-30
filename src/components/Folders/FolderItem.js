@@ -51,6 +51,8 @@ class FolderItem extends Component {
     // state props
     selectedFolderIds: PropTypes.object,
     folders: PropTypes.arrayOf(PropTypes.instanceOf(Folder)),
+    counts: PropTypes.instanceOf(Map),
+    filteredCounts: PropTypes.instanceOf(Map),
     user: PropTypes.instanceOf(User),
     actions: PropTypes.object
   }
@@ -158,6 +160,24 @@ class FolderItem extends Component {
     )
   }
 
+  renderCount () {
+    const { folder, counts, filteredCounts } = this.props
+    const count = counts && counts.get(folder.id)
+    const filteredCount = filteredCounts && filteredCounts.get(folder.id)
+    if (count === undefined) return <div/>
+    if (filteredCount === undefined || count === filteredCount) {
+      return <div className="FolderItem-count">{count}</div>
+    }
+    const isZero = filteredCount === 0
+    return (
+      <div className="FolderItem-counts">
+        <div className={classnames('FolderItem-filtered-count', {isZero})}>{filteredCount}</div>
+        /
+        <div className="FolderItem-count">{count}</div>
+      </div>
+    )
+  }
+
   render () {
     const { folder, depth, isOpen, hasChildren, isSelected, onToggle, onSelect, dropparams, dragHover, user } = this.props
     const icon = folder.isDyhi() ? 'icon-foldercog' : (folder.search ? 'icon-collections-smart' : 'icon-collections-simple')
@@ -173,10 +193,13 @@ class FolderItem extends Component {
         <div className={classnames('FolderItem-select')}
              onClick={event => { onSelect(event, folder); return false }}
              onContextMenu={this.showContextMenu}>
+          <div className="flexRow">
           <i className={`FolderItem-icon ${icon}`}/>
           <div className='FolderItem-text' key={folder.id}>
             {folder.name}
           </div>
+          </div>
+          { this.renderCount() }
         </div>
         <div className={classnames('FolderItem-dropzone', {isDropTarget, dragHover})} {...dropparams}/>
       </div>
@@ -187,6 +210,8 @@ class FolderItem extends Component {
 export default connect(state => ({
   selectedAssetIds: state.assets.selectedIds,
   folders: state.folders.all,
+  counts: state.folders.counts,
+  filteredCounts: state.folders.filteredCounts,
   selectedFolderIds: state.folders.selectedFolderIds,
   user: state.auth.user
 }), dispatch => ({

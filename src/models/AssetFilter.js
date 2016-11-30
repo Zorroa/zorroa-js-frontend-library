@@ -1,6 +1,8 @@
 export default class AssetFilter {
   constructor (json) {
     if (json) {
+      // Make an extra copy to handle deep clones
+      json = JSON.parse(JSON.stringify(json))
       this.missing = json.missing   // [string]
       this.terms = json.terms       // {string, [object]}
       this.exists = json.exists     // [string]

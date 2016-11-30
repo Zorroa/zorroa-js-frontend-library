@@ -51,6 +51,7 @@ $FolderItemHeight : 25px;
 .FolderItem-select {
   @include flexRow;
   @include flexAlignItemsCenter;
+  @include flexJustifySpaceBetween;
   @include fullHeight;
   @include fullWidth;
 
@@ -65,6 +66,25 @@ $FolderItemHeight : 25px;
   @include clampText;
   @include noSelect;
   margin-left: 10px;
+}
+
+.FolderItem-counts {
+  @include clampText;
+  @include flexRow;
+  color: $zorroa-lightgray;
+}
+
+.FolderItem-count {
+  margin-right: 4px;
+  color: $zorroa-lightgray;
+}
+
+.FolderItem-filtered-count {
+  color: $zorroa-avocado-green;
+
+  &.isZero {
+    opacity: 0.6;
+  }
 }
 
 .FolderItem-dropzone {
