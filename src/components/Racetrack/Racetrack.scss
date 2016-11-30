@@ -69,11 +69,10 @@
       margin-top: 4px;
     }
 
-    button {
+    .Racetrack-add-widget {
       height: 40px;
       padding: 0 12px;
       font-size: 14px;
-      font-weight: 700;
       background-color: $zorroa-greyish-brown;
       color: $zorroa-nearwhite;
       border-radius: 3px;
@@ -89,47 +88,16 @@
       &:hover {
         background-color: #a5a5a5;
         color: $zorroa-nearwhite;
-        font-weight: 500;
       }
 
       &:active {
         background-color: $zorroa-sickly-green;
         color: $zorroa-nearwhite;
-        font-weight: 500;
       }
-    }
-
-    .Racetrack-add-widget {
-      @include clampText;
-      @include flexRow;
-      @include flexAlignItemsCenter;
-      text-transform: uppercase;
-      color: white;
-      height: 30px;
-      border-radius: 2px;
-      padding: 6px;
     }
 
     & .DropdownMenu-item {
       &:hover { background-color: unset; }
-    }
-    .Racetrack-add-SIMPLE_SEARCH {
-      background-color: $zorroa-sickly-green;
-      &:hover { background-color: darken($zorroa-sickly-green, 15%); }
-    }
-
-    .Racetrack-add-FACET {
-      background-color: $zorroa-darkish-purple;
-      &:hover { background-color: darken($zorroa-darkish-purple, 15%); }
-    }
-
-    .Racetrack-add-MAP {
-      background-color: $zorroa-water-blue;
-      &:hover { background-color: darken($zorroa-water-blue, 15%); }
-    }
-
-    .Racetrack-add-icon {
-      margin-right: 6px;
     }
   }
 

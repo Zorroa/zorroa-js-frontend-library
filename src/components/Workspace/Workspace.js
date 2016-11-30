@@ -99,12 +99,12 @@ class Workspace extends Component {
     })
 
     return (
-      <div className={classnames('App', {isDragging: app.isDragging})}>
+      <div className={classnames('App', 'flexCol', 'fullHeight', {isDragging: app.isDragging})}>
         { app.modal && <Modal {...app.modal} /> }
         { app.displayOptions && <DisplayOptions {...app.displayOptions} /> }
         { app.createFolder && <CreateFolder {...app.createFolder} /> }
         <Header/>
-        <div className="Workspace flexRow fullWidth fullHeight">
+        <div className="Workspace flexOn flexRow fullWidth fullHeight">
 
           {/*  left panel - folders */}
           <Sidebar onToggle={this.toggleLeftSidebar}
@@ -128,9 +128,7 @@ class Workspace extends Component {
           <div className="Workspace-vertical-separator flexOff"/>
 
           {/*  center panel - thumbnails */}
-          <div className="Workspace-body flexOn fullHeight">
             <Assets/>
-          </div>
 
           <div className="Workspace-vertical-separator flexOff"/>
 

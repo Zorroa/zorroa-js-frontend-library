@@ -3,7 +3,7 @@
 .QuickAddWidget {
   position: relative;   // For floating list
 
-  .add-quick-list {
+  .QuickAddWidget-list {
     position: absolute;
     top: 110%;
     background-color: white;
@@ -16,10 +16,17 @@
     z-index: 1000;
     //right: 100%;
 
-    .add-quick-item {
+    .QuickAddWidget-item {
+      @include clampText;
+      @include flexRow;
+      @include flexAlignItemsCenter;
+      height: 30px;
+      padding: 6px;
       margin-top: 2px;
       border-radius: 3px;
       border: 3px solid transparent;
+      text-transform: uppercase;
+      color: white;
 
       &.selected {
         border: 3px solid $zorroa-gray;
@@ -35,4 +42,23 @@
     font-size: 14px;
     font-weight: 500;
   }
+}
+
+.QuickAddWidget-SIMPLE_SEARCH {
+  background-color: $zorroa-sickly-green;
+  &:hover { background-color: darken($zorroa-sickly-green, 15%); }
+}
+
+.QuickAddWidget-FACET {
+  background-color: $zorroa-darkish-purple;
+  &:hover { background-color: darken($zorroa-darkish-purple, 15%); }
+}
+
+.QuickAddWidget-MAP {
+  background-color: $zorroa-water-blue;
+  &:hover { background-color: darken($zorroa-water-blue, 15%); }
+}
+
+.QuickAddWidget-item-icon {
+  margin-right: 6px;
 }

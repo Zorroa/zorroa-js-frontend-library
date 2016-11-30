@@ -1,6 +1,7 @@
 @import '../../styles/core-mixins.scss';
 
 .pager {
+  position: relative;
   font-size: 14px;
   color: $zorroa-greyish-brown;
   background-color: #fff;

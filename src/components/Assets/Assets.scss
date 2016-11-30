@@ -1,8 +1,10 @@
 @import '../../styles/core-mixins.scss';
 
-.assets-container {
-  overflow: hidden;
-  max-width: 100%;
+.Assets {
+  @include flexOn;
+  @include flexCol;
+  @include fullHeight;
+  @include fullWidth;
 }
 
 .assets-scroll {

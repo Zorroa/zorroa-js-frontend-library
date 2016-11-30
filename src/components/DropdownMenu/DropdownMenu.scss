@@ -6,10 +6,10 @@
   position:relative;
 
   .DropdownMenu-button {
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+    @include flexRowCenter;
+    flex-wrap: nowrap;
+    @include clampText;
+    @include nosel;
 
     // -webkit-appearance: button;
     background-color: #fff;

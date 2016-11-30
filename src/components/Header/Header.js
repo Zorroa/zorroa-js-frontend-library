@@ -79,7 +79,7 @@ class Header extends Component {
       exportTitle = assetCount > Job.MaxAssets ? 'Export Fewer Assets' : 'Export Assets'
     }
     return (
-      <nav className="header flexCenter fullWidth">
+      <nav className="header flexOff flexCenter fullWidth">
         <Link to="/" className='header-logo'><Logo/></Link>
         <div className='header-searchbar flexOn'>
           <Searchbar/>

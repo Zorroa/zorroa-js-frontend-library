@@ -146,7 +146,7 @@ class Assets extends Component {
     }
 
     return (
-      <div className="assets-scroll fullWidth fullHeight">
+      <div className="assets-scroll fullWidth flexOn">
         <Measure>
           {({width}) => {
             if (!width) return (<div style={{'width': '100%'}}></div>)
@@ -157,10 +157,9 @@ class Assets extends Component {
               }
             })(layout)
             const lastPos = positions[positions.length - 1]
-            const height = lastPos.y + lastPos.height
+            const height = Math.ceil(lastPos.y + lastPos.height)
             return (
-              <div className={`assets-layout ${layout}`}
-              style={{'width': '100%', 'height': height}}>
+              <div className={`assets-layout ${layout}`} style={{'width': '100%'}}>
                 { assets.map((asset, index) => (
                   <Thumb isSelected={selectedIds && selectedIds.has(asset.id)}
                     dim={positions[index]}
@@ -171,11 +170,13 @@ class Assets extends Component {
                     onDoubleClick={this.isolateToLightbox.bind(this, asset)}
                   />
                 ))}
+                <Pager total={totalCount}
+                       loaded={assets.length}
+                       top={height + 12 /* 12 px padding */ }/>
               </div>
             )
           }}
         </Measure>
-        { assets.length < totalCount && (<Pager total={totalCount} loaded={assets.length} />) }
       </div>
     )
   }
@@ -184,7 +185,7 @@ class Assets extends Component {
     const { assets, totalCount } = this.props
     const { showTable, layout, thumbSize } = this.state
     return (
-      <div className="assets-container flexOff flexCol fullHeight fullWidth">
+      <div className="Assets">
         <Editbar/>
         {this.renderAssets()}
         { showTable && <Table/> }

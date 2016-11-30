@@ -45,10 +45,10 @@ export default class DropdownMenu extends Component {
 
     return (
       <div className="DropdownMenu" style={this.props.style}>
-        <button className="DropdownMenu-button flexRow flexAlignItemsCenter" type="button" role="button" onClick={this.show}>
+        <div className="DropdownMenu-button" onClick={this.show}>
           {this.props.label}
-          <div className={classnames('DropdownMenu-caret', 'icon-arrow-down', { 'rot180': this.state.isVisible })} />
-        </button>
+          <i className={classnames('DropdownMenu-caret', 'icon-arrow-down', { 'rot180': this.state.isVisible })} />
+        </div>
         { this.state.isVisible &&
           (<ul className="DropdownMenu-list" style={this.props.rightAlign ? {right: 0} : {}}>
             {menuList}

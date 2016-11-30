@@ -94,7 +94,9 @@ class QuickAddWidget extends Component {
   widgetInfos () {
     const { filterText } = this.state
     const filter = filterText.toLowerCase()
-    return this.focused || filter.length ? Object.values(WidgetInfo).filter(widgetInfo => (
+    return this.focused || filter.length ? Object.keys(WidgetInfo)
+      .map(k => WidgetInfo[k])
+      .filter(widgetInfo => (
       widgetInfo.title.toLowerCase().includes(filter)
     )) : []
   }
@@ -108,16 +110,15 @@ class QuickAddWidget extends Component {
                onKeyDown={this.keyDown} onFocus={this.focus} onBlur={this.blur}
                placeholder="Quick Add - Widget"/>
         { widgetInfos.length ? (
-          <div className="add-quick-list">
+          <div className="QuickAddWidget-list">
             { widgetInfos.map(widgetInfo => (
               <div onMouseDown={this.pushWidgetType.bind(this, widgetInfo.type)}
-                   className={classnames('add-quick-item', {selected: widgetInfo.type === selectedWidgetType})}
+                   className={classnames('QuickAddWidget-item', `QuickAddWidget-${widgetInfo.type}`,
+                    {selected: widgetInfo.type === selectedWidgetType})}
                    key={widgetInfo.type}>
-                <div className={classnames('Racetrack-add-widget', `Racetrack-add-${widgetInfo.type}`)}>
-                  <i className={`Racetrack-add-icon ${widgetInfo.icon}`}></i>
+                <i className={`QuickAddWidget-item-icon ${widgetInfo.icon}`}></i>
                   <span>{widgetInfo.title}</span>
                 </div>
-              </div>
             ))}
           </div>
         ) : <div/> }

@@ -13,6 +13,7 @@ class Pager extends Component {
     total: PropTypes.number.isRequired,
     pageSize: PropTypes.number.isRequired,
     actions: PropTypes.object.isRequired,
+    top: PropTypes.number.isRequired,
     query: PropTypes.instanceOf(AssetSearch).isRequired
   }
 
@@ -36,7 +37,7 @@ class Pager extends Component {
       pageSizes.push(0)
     }
     return (
-      <div className="pager flexRowCenter">
+      <div className="pager flexRowCenter" style={{top: this.props.top + 'px'}}>
         <div className="pager-showing-page">
           <span className='pager-showing'></span><AssetCounter loaded={loaded} total={total} />
         </div>

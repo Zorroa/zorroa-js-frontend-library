@@ -74,7 +74,9 @@ class Racetrack extends Component {
   }
 
   renderWidget (widget, isIconified) {
-    const widgetInfo = Object.values(WidgetInfo).find(widgetInfo => (widgetInfo.type === widget.type))
+    const widgetInfo = Object.keys(WidgetInfo)
+      .map(k => WidgetInfo[k])
+      .find(widgetInfo => (widgetInfo.type === widget.type))
     return cloneElement(widgetInfo.element, {id: widget.id, isIconified})
   }
 
@@ -96,7 +98,7 @@ class Racetrack extends Component {
     if (isIconified) return null
     return (
       <div className="Racetrack-add-filter">
-        <button className="icon-plus2 flexRow flexAlignItemsCenter"><div>Add Widget</div></button>
+        <div className='Racetrack-add-widget flexRow flexAlignItemsCenter'><i className='icon-plus2'/>Add Widget</div>
         <QuickAddWidget/>
       </div>
     )
