@@ -16,7 +16,7 @@ export function createFacetWidget (field, assets) {
   const isOpen = true
   let terms = []
   for (let asset of assets) {
-    const term = asset.term(field)
+    const term = asset.terms(field)
     if (term instanceof Array) {
       terms.concat(term)
     } else {
