@@ -83,19 +83,26 @@ Then refresh your SSH certificate by visiting https://disney-cors:8066/gui. You 
 
 ## Testing
 
-You can run the tests by executing the following command in your terminal: `npm test`.  This will run the entire test suite.  You can also use `npm run test:watch` to run the tests and have them watch for changes.  This is super useful when writing your tests.
+You can run the tests by executing the following command in your terminal: `npm test`.  This will run the entire test suite.
 
-#### [Jest](https://facebook.github.io/jest/) https://github.com/facebook/jest
+Tips for making testing quicker & easier:
 
-We are using Jest to run our tests.  It is newer in the testing realm but it is a product from facebook.  So it all kind was built to play nice with each other.
+- `npm run test:watch`
+  - Run the tests and have them watch for changes. This is super useful when writing your tests.
+- `npm test <name>`
+  - Runs all tests matching `<name>`. For example: "`npm test home`" will run only homePage.test.js
 
-#### [Enzyme](http://airbnb.io/enzyme/)
+### Resources for writing tests:
 
-This is a product from AirBnB to allow us to do assertions on our react components!!!  This is the first good solution that I have really played with.  It is important to note that in the enzyme examples, they are **not** using Jest for their assertions.
-
-#### Helpful links
-
+- Test runner: [Jest](https://facebook.github.io/jest)
+- Browser tests: [Selenium](http://docs.seleniumhq.org/)
+- [Selenium Webdriver API](http://seleniumhq.github.io/selenium/docs/api/javascript/index.html)
+- Continuous Integration: [TravisCI](https://travis-ci.com/Zorroa/zorroa-js-curator/)
+- Cloud browser automation: [SauceLabs](https://saucelabs.com/beta/archives)
+- React component testing: [Enzyme](http://airbnb.io/enzyme/)
 - [Writing react tests](https://github.com/reactjs/redux/blob/master/docs/recipes/WritingTests.md)
+- [End to End (e2e) Testing React Apps With Selenium WebDriver And Node.js is Easier Than You Think](http://marmelab.com/blog/2016/04/19/e2e-testing-with-node-and-es6.html)
+- [Using Sauce Labs with Travis CI](https://docs.travis-ci.com/user/sauce-connect/)
 
 ## Deploying the project
 

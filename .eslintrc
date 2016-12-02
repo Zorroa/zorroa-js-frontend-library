@@ -20,6 +20,7 @@
   "globals": {
     "jest": true,
     "describe": true,
+    "jasmine": true,
     "it": true,
     "xit": true,
     "expect": true,
