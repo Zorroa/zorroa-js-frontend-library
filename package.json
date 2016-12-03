@@ -15,7 +15,8 @@
     "test:e2e": "./node_modules/.bin/jest ./tests/e2e/homePage.test.js",
     "test:lint": "./node_modules/.bin/eslint . --color; exit 0",
     "test:coverage": "npm test; ./node_modules/.bin/serve ./coverage/lcov-report & open http://localhost:8080",
-    "purge": "rm -rf node_modules; npm cache clean; npm install"
+    "purge": "rm -rf node_modules; npm cache clean; npm install",
+    "update-fonts": "src/assets/fonts/zorroa-icons/update-fonts.bash"
   },
   "author": "Jordan Papaleo",
   "license": "",
