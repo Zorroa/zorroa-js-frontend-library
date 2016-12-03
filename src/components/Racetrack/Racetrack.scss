@@ -50,6 +50,8 @@
 
   .Racetrack-filters {
     flex: 0.8;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 
   .Racetrack-widget {
@@ -80,6 +82,8 @@
       margin-right: 12px;
       font-weight: 700;
       text-transform: uppercase;
+      @include noSelect;
+      cursor: pointer;
 
       @include flexRow;
       @include flexAlignItemsCenter;

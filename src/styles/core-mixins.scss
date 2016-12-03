@@ -76,12 +76,14 @@ $zorroa-Sidebar-width : 340px;
   text-overflow: ellipsis;
 }
 
-@mixin nosel {
+@mixin noSelect {
   /* Prevent selection */
   -webkit-user-select : none;
   -moz-user-select    : none;
   -ms-user-select     : none;
   user-select         : none;
+
+  cursor: default;
 
   /* Prevent dragging too */
   -webkit-user-drag : none;

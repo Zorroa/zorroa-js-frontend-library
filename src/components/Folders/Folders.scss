@@ -21,7 +21,8 @@
   }
 
 
-  button {
+  .Folders-controls-add {
+    @include flexRowCenter;
     color: white;
     background-color: $zorroa-sickly-green;
     border: none;
@@ -35,13 +36,15 @@
       background-color: $zorroa-lightgray;
     }
 
-    &:hover:enabled {
-      border: 1px solid $zorroa-gray;
-    }
-
-    &:active:enabled {
-      color: $zorroa-nearwhite;
-      background-color: $zorroa-sickly-green;
+    &:not(disabled) {
+      &:hover {
+        border: 1px solid $zorroa-gray;
+        background-color: darken($zorroa-sickly-green, 15%);
+      }
+      &:active {
+        color: $zorroa-nearwhite;
+        background-color: darken($zorroa-sickly-green, 15%);
+      }
     }
   }
 }

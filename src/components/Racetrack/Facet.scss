@@ -16,15 +16,23 @@
   .Facet-header {
     @include flexRow;
     @include flexJustifySpaceBetween;
+    @include flexAlignItemsCenter;
     @include fullWidth;
+    @include noSelect;
 
     flex-shrink: 1;
     span {
     }
   }
 
-  .Facet-settings:hover {
-    color: $zorroa-sickly-green;
+  .Facet-settings {
+    @include flexRowCenter;
+    width: 40px;
+    height: 40px;
+    &:hover {
+      color: $zorroa-sickly-green;
+      background-color: rgba(0,0,0,0.2);
+    }
   }
 
   .Facet-body {
@@ -75,7 +83,7 @@
     .Facet-pie-pct {
       font-size: 9px;
       fill: white;
-      @include nosel;
+      @include noSelect;
       pointer-events: none;
     }
 

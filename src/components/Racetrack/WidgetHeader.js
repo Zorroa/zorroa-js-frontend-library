@@ -5,19 +5,21 @@ const WidgetHeader = ({ isIconified, header, icon, backgroundColor, onToggle, on
   const iconClassNames = classnames('WidgetHeader-icon', icon, { isIconified })
 
   return (
-    <div style={{backgroundColor}} className={classnames('WidgetHeader', 'flexCenter', 'flexAlignItemsCenter', 'fullWidth')}>
-      <div className='WidgetHeader-toggle flexRowCenter fullWidth fullHeight' onClick={onToggle}>
-        <div className={iconClassNames}/>
-        { !isIconified && header }
-        <div className='flexOn'/>
+    <div style={{backgroundColor}} className='WidgetHeader'>
+      <div className='WidgetHeader-hover'>
+        <div className='WidgetHeader-toggle flexRowCenter fullWidth fullHeight' onClick={onToggle}>
+          <div className={iconClassNames}/>
+          { !isIconified && header }
+          <div className='flexOn'/>
+        </div>
+        {
+          !isIconified && (
+            <div className='WidgetHeader-close flexOff flexCenter fullHeight' onClick={onClose}>
+              <div className='icon-cross2'/>
+            </div>
+          )
+        }
       </div>
-      {
-        !isIconified && (
-          <div className='WidgetHeader-close flexOff flexCenter fullHeight' onClick={onClose}>
-            <div className='icon-cross2'/>
-          </div>
-        )
-      }
     </div>
     )
 }

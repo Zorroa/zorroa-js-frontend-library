@@ -20,6 +20,7 @@
       @include clampText;
       @include flexRow;
       @include flexAlignItemsCenter;
+      @include noSelect;
       height: 30px;
       padding: 6px;
       margin-top: 2px;

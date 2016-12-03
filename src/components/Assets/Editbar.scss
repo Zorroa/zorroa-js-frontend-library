@@ -19,6 +19,7 @@
     text-transform: uppercase;
     margin-top: 20px;
     margin-bottom: 12px;
+    @include noSelect;
   }
 
   .right-side {
@@ -57,6 +58,7 @@
     text-transform: uppercase;
     @include flexRow;
     @include flexAlignItemsCenter;
+    cursor:pointer;
 
     &:not(.disabled):hover {
       color: $zorroa-sickly-green;
@@ -68,6 +70,7 @@
     text-transform: uppercase;
     @include flexRow;
     @include flexAlignItemsCenter;
+    cursor:pointer;
 
     &:not(.disabled):hover {
       color: $zorroa-sickly-green;

@@ -66,13 +66,13 @@ export default class Sidebar extends Component {
     const { width } = this.state
     const isOpen = !isIconified
     return (
-      <div style={{width}} className={classnames('Sidebar', { isOpen })}>
+      <div style={{width}} className={classnames('Sidebar', { isOpen, isRightEdge, isIconified })}>
         <div className={classnames('open-close-button', { isRightEdge })}
              onClick={onToggle}
         >
           <label>{arrow}{arrow}</label>
         </div>
-        <div className={'scroller'} onClick={this.toggleIfNotIconified}>
+        <div className={classnames('scroller', { isRightEdge })} onClick={this.toggleIfNotIconified}>
           { children }
         </div>
         { isOpen && <div draggable={true} onDragStart={this.startDrag} onDrag={this.drag}

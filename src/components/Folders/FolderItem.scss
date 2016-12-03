@@ -23,6 +23,9 @@ $FolderItemHeight : 25px;
     background-color: white;
     &.isSelected { color: white; background-color: $zorroa-gray; }
   }
+
+  &:hover { color: white; background-color: darken(#d8d8d8, 15%); }
+
   &.isSelected { color: white; background-color: $zorroa-gray; }
   &.isDropTarget.dragHover { color: white; background-color: $zorroa-sickly-green; }
   &.isSelected.isDropTarget.dragHover { color: white; background-color: darken($zorroa-sickly-green, 15%); }
@@ -35,9 +38,12 @@ $FolderItemHeight : 25px;
 
   width: $FolderItemHeight;
   height: $FolderItemHeight;
-  &:hover { color: white; background-color: darken(#d8d8d8, 15%); }
+
+  cursor: pointer;
+
+  &:hover { color: white; background-color: $zorroa-darkgray; }
   .FolderItem.isSelected &       { color: white; background-color: $zorroa-gray; }
-  .FolderItem.isSelected &:hover { color: white; background-color: darken($zorroa-gray, 15%); }
+  .FolderItem.isSelected &:hover { color: white; background-color: $zorroa-darkgray; }
   .FolderItem.isDropTarget.dragHover & { color: white; background-color: $zorroa-sickly-green; }
   .FolderItem.isSelected.isDropTarget.dragHover & { color: white; background-color: darken($zorroa-sickly-green, 15%); }
 }
@@ -49,15 +55,15 @@ $FolderItemHeight : 25px;
   @include fullWidth;
 
   padding-left: 5px;
-  &:hover { color: white; background-color: darken(#d8d8d8, 15%); }
   .FolderItem.isSelected &       { color: white; background-color: $zorroa-gray; }
-  .FolderItem.isSelected &:hover { color: white; background-color: darken($zorroa-gray, 15%); }
+  // .FolderItem.isSelected &:hover { color: white; background-color: darken($zorroa-gray, 15%); }
   .FolderItem.isDropTarget.dragHover & { color: white; background-color: $zorroa-sickly-green; }
   .FolderItem.isSelected.isDropTarget.dragHover & { color: white; background-color: darken($zorroa-sickly-green, 15%); }
 }
 
 .FolderItem-text {
   @include clampText;
+  @include noSelect;
   margin-left: 10px;
 }
 

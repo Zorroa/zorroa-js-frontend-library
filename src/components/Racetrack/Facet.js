@@ -310,7 +310,9 @@ class Facet extends Component {
               header={(
                 <div className="Facet-header">
                   <span>Facet: {title}</span>
-                  <div onClick={this.selectField} className="Facet-settings icon-cog"></div>
+                  <div onClick={this.selectField} className="Facet-settings">
+                    <i className='icon-cog'/>
+                  </div>
                 </div>
               )}
               backgroundColor={FacetWidgetInfo.color}

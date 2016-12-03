@@ -220,11 +220,14 @@ class DisplayOptions extends Component {
       <div>
         <div className="DisplayOptions-background" />
         <div className="DisplayOptions flexCol">
-          <div className="DisplayOptions-header flexRow flexAlignItemsCenter flexJustifySpaceBetween fullWidth">
+          <div className="DisplayOptions-header flexRow flexAlignItemsCenter fullWidth">
             <div className="flexRow flexAlignItemsCenter">
-              <span className="icon-cog"/>
+              <div className='DisplayOptions-settings'>
+                <i className="icon-cog"/>
+              </div>
               <div className="DisplayOptions-title">{title}</div>
             </div>
+            <div className='flexOn'/>
             { syncLabel && (
               <div className="flexRow flexAlignItemsCenter">
                 <label className="switch">
@@ -232,7 +235,9 @@ class DisplayOptions extends Component {
                   <div className="slider round"/>
                 </label>
                 <div className="DisplayOptions-sync">Sync with {syncLabel} View</div>
-                <span onClick={this.cancel.bind(this)} className="icon-cross2" />
+                <div className='DisplayOptions-close' onClick={this.cancel.bind(this)}>
+                  <i className="icon-cross2"/>
+                </div>
               </div>
             )}
           </div>

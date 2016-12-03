@@ -10,8 +10,25 @@
   .WidgetHeader-icon {
   }
 
-  .Map-search:hover { color: $zorroa-sickly-green; }
-  .Map-settings:hover { color: $zorroa-sickly-green; }
+  .Map-search {
+    @include flexRowCenter;
+    width: 40px;
+    height: 40px;
+    &:hover {
+      background-color: rgba(0,0,0,0.2);
+      color: $zorroa-sickly-green;
+    }
+  }
+
+  .Map-settings {
+    @include flexRowCenter;
+    width: 40px;
+    height: 40px;
+    &:hover {
+      background-color: rgba(0,0,0,0.2);
+      color: $zorroa-sickly-green;
+    }
+  }
 
   .Widget-icon {
     font-size: 20px;
@@ -24,7 +41,9 @@
   .Map-header {
     @include flexRow;
     @include flexJustifySpaceBetween;
+    @include flexAlignItemsCenter;
     @include fullWidth;
+    @include noSelect;
 
     div[class*="icon-"] {
       margin-left: 4px;

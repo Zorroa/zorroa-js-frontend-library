@@ -49,12 +49,23 @@
     }
   }
 
-  .search {
+  .DisplayPropertiesItem-search {
+    @include flexRowCenter;
+    width: 20px;
+    height: 20px;
+    border-radius: 2px;
     font-size: 10px;
-    margin-left: 8px;
-    margin-right: 8px;
-    margin-top: 7px;          // ick, match bottom text line for 12pt above?
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-top: 3px;          // ick, match bottom text line for 12pt above?
     color: $zorroa-light-green;
+    background-color: transparent;
+
+    &:not(.disabled):hover {
+      font-size: 12px;
+      background-color: $zorroa-lightgray;
+      color: #fff;
+    }
 
     &.disabled {
       color: $zorroa-lightgray;

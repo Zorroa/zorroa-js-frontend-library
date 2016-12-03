@@ -35,10 +35,6 @@
 .header-menu {
   margin-left: 20px;
 
-  a:hover {
-    color: $zorroa-sickly-green;
-  }
-
   .export {
     @include flexRow;
     @include flexAlignItemsCenter;
@@ -48,10 +44,6 @@
 
     div {
       margin-left: 8px;
-    }
-
-    &:not(.disabled):hover {
-      color: $zorroa-sickly-green;
     }
 
     &.disabled {
@@ -88,10 +80,6 @@
 
   .title {
     text-transform: uppercase;
-  }
-
-  &:not(.disabled):hover {
-    color: $zorroa-sickly-green;
   }
 
   &.disabled {

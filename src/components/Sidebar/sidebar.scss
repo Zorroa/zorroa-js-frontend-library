@@ -13,9 +13,6 @@
   max-width: 60px;
   min-width: 60px;
 
-  padding-left: 10px;
-  padding-right: 10px;
-
   background-color: $zorroa-nearwhite;
 
   &.isOpen {
@@ -27,6 +24,8 @@
     height: 21px;
     font-size: 9px;
     color: $zorroa-lightgray;
+    padding-left: 10px;
+    padding-right: 10px;
 
     @include flexRow;
     @include flexAlignItemsCenter;
@@ -51,6 +50,10 @@
     overflow-y: auto;
 
     padding-bottom: 10px;
+    &:not(.isRightEdge) {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
 
     @include flexOn;
     @include fullHeight;

@@ -25,6 +25,13 @@
     .icon-search {
       font-size: 24px;
     }
+
+    .AddWidget-close {
+      @include flexRowCenter;
+      height: 40px;
+      width: 40px;
+      &:hover { background-color: $zorroa-darkgray; }
+    }
   }
 
   .controls {
@@ -129,6 +136,8 @@
           @include flexRow;
           @include flexAlignItemsCenter;
           @include flexJustifySpaceBetween;
+          @include noSelect;
+          @include clampText;
 
           height: 40px;
           text-transform: uppercase;
@@ -138,6 +147,7 @@
           line-height: 2em;
           border-top-left-radius: 3px;
           border-top-right-radius: 3px;
+          cursor: pointer;
 
           div[class*="icon-"] {
             font-size: 24px;
@@ -176,6 +186,7 @@
             padding-top:6px;
             padding-bottom: 6px;
             align-self: center;
+            cursor: pointer;
 
             &:hover {
               background-color: $zorroa-sickly-green;

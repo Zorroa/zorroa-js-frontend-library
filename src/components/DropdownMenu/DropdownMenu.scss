@@ -9,7 +9,7 @@
     @include flexRowCenter;
     flex-wrap: nowrap;
     @include clampText;
-    @include nosel;
+    @include noSelect;
 
     // -webkit-appearance: button;
     background-color: #fff;
@@ -28,7 +28,7 @@
       outline: none;
     }
     &:hover {
-      background-color: $zorroa-lightgray;
+      background-color: $zorroa-nearwhite;
     }
   }
 
@@ -55,8 +55,13 @@
     height: 100%;
     text-transform: uppercase;
     border-radius: 3px;
-    &:hover {
-      background-color: $zorroa-lightgray;
+    @include clampText;
+    @include noSelect;
+    &:not(.DropdownMenu-separator) {
+      cursor: pointer;
+      &:hover {
+        background-color: $zorroa-nearwhite;
+      }
     }
   }
 
@@ -76,9 +81,5 @@
     height: 1px;
     background-color: $zorroa-nearwhite;
     padding: 0;
-    // Cancel DropdownMenu-item hover
-    &:hover {
-      background-color: $zorroa-nearwhite;
-    }
   }
 }

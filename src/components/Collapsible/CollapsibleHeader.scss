@@ -20,8 +20,12 @@
     background-color: $zorroa-water-blue;
   }
 
-  // Hover rules were removed so that Metadata & FolderItem can easily customize
+  &:hover {
+    color: white;
+    background-color: darken(#d8d8d8, 15%);
+  }
 }
+
 
 .CollapsibleHeader-select {
   @include clampText;
@@ -30,7 +34,6 @@
   &.isIconified {
     @include flexJustifyCenter;
   }
-  &:hover { background-color: darken(#d8d8d8, 15%); }
   &.isSelected { background-color: $zorroa-water-blue; }
 }
 
@@ -41,11 +44,12 @@
 
 .CollapsibleHeader-label {
   @include clampText;
+  @include noSelect;
+  cursor: default;
 }
 
 .CollapsibleHeader-open {
   width: 40px;
-  &:hover { background-color: darken(#d8d8d8, 15%); }
   &.isSelected { background-color: $zorroa-water-blue; }
 }
 

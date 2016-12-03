@@ -134,8 +134,10 @@ class DisplayPropertiesItem extends Component {
           {unCamelCase(displayProperties.name)}
         </div>
         <div onClick={this.searchTerms}
-             className={classnames('search', 'icon-binoculars',
-               {disabled: !this.isBinocularsEnabled()})} />
+             className={classnames('DisplayPropertiesItem-search',
+               {disabled: !this.isBinocularsEnabled()})}>
+          <i className='icon-binoculars'/>
+        </div>
         <div className="value">
           {this.value()}
         </div>
