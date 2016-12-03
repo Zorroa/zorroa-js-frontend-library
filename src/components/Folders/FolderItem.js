@@ -146,11 +146,11 @@ class FolderItem extends Component {
       <div>
         <div onClick={this.dismissContextMenu} className="FolderItem-context-menu-background" onContextMenu={this.dismissContextMenu} />
         <div className="FolderItem-context-menu" onContextMenu={this.dismissContextMenu}>
-          { singleFolderSelected && <div className="FolderItem-context-item disabled" onContextMenu={this.dismissContextMenu}><div className="icon-folder3"/><div>{subfolderLabel}</div></div> }
+          { singleFolderSelected && <div className="FolderItem-context-item disabled" onContextMenu={this.dismissContextMenu}><div className="icon-folder-subfolders"/><div>{subfolderLabel}</div></div> }
           { singleFolderSelected && <div onClick={this.getLink} className="FolderItem-context-item disabled" onContextMenu={this.dismissContextMenu}><div className="icon-link2"/><div>Get link</div></div> }
-          { singleFolderSelected && <div onClick={this.exportFolder} className="FolderItem-context-item" onContextMenu={this.dismissContextMenu}><div className="icon-plus-square"/><div>Export folder</div></div> }
-          <div onClick={this.moveTo} className="FolderItem-context-item disabled" onContextMenu={this.dismissContextMenu}><div className="icon-browse"/><div>Move to...</div></div>
-          <div onClick={this.favorite} className="FolderItem-context-item disabled" onContextMenu={this.dismissContextMenu}><div className="icon-game"/><div>Favorite</div></div>
+          { singleFolderSelected && <div onClick={this.exportFolder} className="FolderItem-context-item" onContextMenu={this.dismissContextMenu}><div className="icon-download2"/><div>Export folder</div></div> }
+          <div onClick={this.moveTo} className="FolderItem-context-item disabled" onContextMenu={this.dismissContextMenu}><div className="icon-folder-move"/><div>Move to...</div></div>
+          <div onClick={this.favorite} className="FolderItem-context-item disabled" onContextMenu={this.dismissContextMenu}><div className="icon-star-empty"/><div>Favorite</div></div>
           { singleFolderSelected && <div onClick={this.edit} className="FolderItem-context-item" onContextMenu={this.dismissContextMenu}><div className="icon-pencil"/><div>Edit...</div></div> }
           <div onClick={this.removeFolder} className="FolderItem-context-item" onContextMenu={this.dismissContextMenu}><div className="icon-trash2"/><div>Remove folder</div></div>
         </div>
@@ -160,7 +160,7 @@ class FolderItem extends Component {
 
   render () {
     const { folder, depth, isOpen, hasChildren, isSelected, onToggle, onSelect, dropparams, dragHover, user } = this.props
-    const icon = folder.isDyhi() ? 'icon-cube' : 'icon-folder'
+    const icon = folder.isDyhi() ? 'icon-foldercog' : (folder.search ? 'icon-collections-smart' : 'icon-collections-simple')
     const isDropTarget = folder.isDropTarget(user)
     return (
       <div className={classnames('FolderItem', { isOpen, hasChildren, isSelected, isDropTarget, dragHover })}

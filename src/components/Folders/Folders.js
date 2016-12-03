@@ -180,9 +180,9 @@ class Folders extends Component {
 
   addFolderIcon () {
     switch (this.props.filterName) {
-      case 'browsing': return 'icon-folder'
-      case 'smart': return 'icon-cube'
-      case 'simple': return 'icon-cube'
+      case 'browsing': return 'icon-foldercog'
+      case 'smart': return 'icon-collections-add'
+      case 'simple': return 'icon-collections-add'
     }
   }
 

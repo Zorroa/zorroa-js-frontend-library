@@ -111,7 +111,6 @@ class DisplayPropertiesItem extends Component {
                      style={{marginLeft: '16px'}}
                      isOpen={app.collapsibleOpen[field] || false}
                      isIconified={isIconified}
-                     closeIcon="icon-register"
                      header={(<span>{displayProperties.name}</span>)}
                      onOpen={this.toggleCollapsible.bind(this, field)}
                      >

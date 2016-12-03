@@ -101,7 +101,7 @@ class Editbar extends Component {
           </div>
             <div onClick={this.removeSelected} className={classnames('remove', {disabled: !removable})}>
               Remove
-              <span onClick={this.removeSelected} className={classnames('icon-trash2', {disabled: !removable})} />
+              <span onClick={this.removeSelected} className={classnames('icon-removeasset', {disabled: !removable})} />
             </div>
         </div>
       </div>
