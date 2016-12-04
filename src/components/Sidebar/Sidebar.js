@@ -76,7 +76,7 @@ export default class Sidebar extends Component {
           { children }
         </div>
         { isOpen && <div draggable={true} onDragStart={this.startDrag} onDrag={this.drag}
-                         className={classnames('resize-thumb', { isRightEdge })} /> }
+                         className={classnames('Sidebar-resize-thumb', { isRightEdge })} /> }
       </div>
     )
   }
