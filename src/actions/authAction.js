@@ -1,6 +1,8 @@
 import axios from 'axios'
 import { browserHistory } from 'react-router'
-import { AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR, AUTH_PERMISSIONS } from '../constants/actionTypes'
+import {
+  AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR,
+  AUTH_PERMISSIONS, METADATA_FIELDS, TABLE_FIELDS } from '../constants/actionTypes'
 import { USER_ITEM, HOST_ITEM, PROTOCOL_ITEM } from '../constants/localStorageItems'
 
 import User from '../models/User'
@@ -48,10 +50,7 @@ export function validateUser (user, protocol, host) {
     if (user.id > 0) {
       archivist.get('/api/v1/users/' + user.id)
         .then(response => {
-          const user = new User(response.data)
-          dispatch({type: AUTH_USER, payload: user})
-          localStorage.setItem(USER_ITEM, JSON.stringify(user))
-          browserHistory.push('/')
+          authorize(dispatch, response.data)
         })
         .catch(error => {
           if (error && error.response && error.response.status === 401) {
@@ -75,13 +74,22 @@ export function signinUser ({ username, password, protocol, host }) {
       auth: { username, password }
     })
       .then(response => {
-        const user = new User(response.data)
-        dispatch({ type: AUTH_USER, payload: user })
-        localStorage.setItem(USER_ITEM, JSON.stringify(user))
-        browserHistory.push('/')
+        authorize(dispatch, response.data)
       })
       .catch(error => dispatch(authError('Bad Login Info: ' + error)))
   }
+}
+
+function authorize(dispatch, json) {
+  const user = new User(json)
+  dispatch({ type: AUTH_USER, payload: user })
+  localStorage.setItem(USER_ITEM, JSON.stringify(user))
+  const metadata = json.settings && json.settings.metadata
+  if (metadata) {
+    dispatch({ type: METADATA_FIELDS, payload: metadata.metadataFields })
+    dispatch({ type: TABLE_FIELDS, payload: metadata.tableFields })
+  }
+  browserHistory.push('/')
 }
 
 export function signupUser ({ username, password }) {
@@ -123,6 +131,22 @@ export function getUserPermissions (user) {
       })
       .catch(error => {
         console.error('Cannot get user permissions ' + error)
+      })
+  }
+}
+
+export function saveUserSettings (user, metadataFields, tableFields) {
+  return dispatch => {
+    console.log('Get user settings')
+    const search = {}
+    const metadata = { metadataFields, tableFields }
+    const settings = { metadata, search }
+    archivist.put('/api/v1/users/' + user.id + '/_settings', settings)
+      .then(response => {
+        console.log('Save user settings')
+      })
+      .catch(error => {
+        console.error('Cannot save user settings ' + error)
       })
   }
 }

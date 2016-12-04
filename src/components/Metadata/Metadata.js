@@ -2,11 +2,13 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
+import User from '../../models/User'
 import Asset from '../../models/Asset'
 import { displayPropertiesForFields } from '../../models/DisplayProperties'
 import DisplayPropertiesItem from './DisplayPropertiesItem'
 import DisplayOptions from '../DisplayOptions'
 import { updateMetadataFields, updateTableFields, showModal } from '../../actions/appActions'
+import { saveUserSettings } from '../../actions/authAction'
 
 class Metadata extends Component {
   static propTypes = {
@@ -17,6 +19,8 @@ class Metadata extends Component {
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     selectedIds: PropTypes.object,
     fields: PropTypes.arrayOf(PropTypes.string).isRequired,
+    tableFields: PropTypes.arrayOf(PropTypes.string).isRequired,
+    user: PropTypes.instanceOf(User),
     actions: PropTypes.object
   }
 
@@ -40,11 +44,14 @@ class Metadata extends Component {
   }
 
   updateDisplayOptions = (event, state) => {
+    const { tableFields, user, actions } = this.props
     console.log('Update metadata display options to:\n' + JSON.stringify(state.checkedNamespaces))
-    this.props.actions.updateMetadataFields(state.checkedNamespaces)
+    actions.updateMetadataFields(state.checkedNamespaces)
     if (state.syncedViews) {
-      this.props.actions.updateTableFields(state.checkedNamespaces)
+      actions.updateTableFields(state.checkedNamespaces)
     }
+    actions.saveUserSettings(user, state.checkedNamespaces,
+      state.syncedValues ? state.checkedNamespaces : tableFields)
   }
 
   render () {
@@ -87,7 +94,13 @@ class Metadata extends Component {
 export default connect(state => ({
   assets: state.assets.all,
   selectedIds: state.assets.selectedIds,
-  fields: state.app.metadataFields
+  fields: state.app.metadataFields,
+  tableFields: state.app.tableFields,
+  user: state.auth.user
 }), dispatch => ({
-  actions: bindActionCreators({ updateMetadataFields, updateTableFields, showModal }, dispatch)
+  actions: bindActionCreators({
+    updateMetadataFields,
+    updateTableFields,
+    saveUserSettings,
+    showModal }, dispatch)
 }))(Metadata)
