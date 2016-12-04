@@ -13,6 +13,7 @@ import CreateExport from './CreateExport'
 import { addAssetIdsToFolderId, deleteFolderIds, updateFolder } from '../../actions/folderAction'
 import { showModal, showCreateFolderModal } from '../../actions/appActions'
 import { exportAssets } from '../../actions/jobActions'
+import { restoreSearch } from '../../actions/racetrackAction'
 
 // Renders folder children as Collapsible elements.
 
@@ -71,9 +72,10 @@ class FolderItem extends Component {
     this.setState({ isContextMenuVisible: false })
   }
 
-  getLink = (event) => {
-    console.log('Get link to folder')
-    this.dismissContextMenu(event)
+  restoreSearch = (event) => {
+    event.preventDefault()
+    const { folder, actions } = this.props
+    actions.restoreSearch(folder.search)
   }
 
   moveTo = (event) => {
@@ -171,15 +173,15 @@ class FolderItem extends Component {
               </div>
             ))}
           { singleFolderSelected &&
-          <div onClick={this.getLink}
-               className="FolderItem-context-item disabled"
+          <div onClick={this.restoreSearch}
+               className="FolderItem-context-item"
                onContextMenu={this.dismissContextMenu}>
-            <div className="icon-link2"/><div>Get link</div></div> }
+            <div className="icon-settings_backup_restore"/><div>Restore Widgets</div></div> }
           { singleFolderSelected &&
           <div onClick={this.exportFolder}
                className="FolderItem-context-item"
                onContextMenu={this.dismissContextMenu}>
-            <div className="icon-download2"/>
+            <div className="icon-export"/>
             <div>Export folder</div>
           </div> }
           <div onClick={this.moveTo}
@@ -285,6 +287,7 @@ export default connect(state => ({
     showModal,
     showCreateFolderModal,
     deleteFolderIds,
-    updateFolder
+    updateFolder,
+    restoreSearch
   }, dispatch)
 }))(FolderItem)
