@@ -41,8 +41,12 @@ class Assets extends Component {
       layout: 'masonry',
       showTable: false,
       thumbSize: 128,
-      lastSelectedId: null
+      lastSelectedId: null,
+      tableHeight: 300
     }
+
+    this.tableStartY = 0
+    this.tableStartHeight = 0
   }
 
   // Adjust the selection set for the specified asset using
@@ -132,6 +136,35 @@ class Assets extends Component {
     this.props.actions.selectFolderIds()
   }
 
+  tableDragStart = (event) => {
+    const { tableHeight } = this.state
+    this.tableStartY = event.pageY
+    this.newTableHeight = tableHeight
+    this.tableStartHeight = tableHeight
+
+    // var dragIcon = document.createElement('img')
+    // // hide the drag element using a transparent 1x1 pixel image as a proxy
+    // dragIcon.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
+    // dragIcon.width = 1
+    // event.dataTransfer.setDragImage(dragIcon, 0, 0)
+  }
+
+  tableDragUpdate = (event) => {
+    if (!event.pageY) return
+    const dy = (event.pageY - this.tableStartY)
+    this.newTableHeight = Math.min(600, Math.max(200, this.tableStartHeight - dy))
+    // const threshold = 4   // Minimize redraws
+    // if (Math.abs(newTableHeight - tableHeight) > threshold) {
+    // this.setState({tableHeight: newTableHeight})
+    // }
+  }
+
+  tableDragStop = (event) => {
+    this.setState({
+      tableHeight: this.newTableHeight
+    })
+  }
+
   renderAssets () {
     const { assets, selectedIds, totalCount } = this.props
     const { layout, thumbSize } = this.state
@@ -159,7 +192,7 @@ class Assets extends Component {
             const lastPos = positions[positions.length - 1]
             const height = Math.ceil(lastPos.y + lastPos.height)
             return (
-              <div className={`assets-layout ${layout}`} style={{'width': '100%'}}>
+              <div className={`Assets-layout ${layout}`}>
                 { assets.map((asset, index) => (
                   <Thumb isSelected={selectedIds && selectedIds.has(asset.id)}
                     dim={positions[index]}
@@ -172,7 +205,8 @@ class Assets extends Component {
                 ))}
                 <Pager total={totalCount}
                        loaded={assets.length}
-                       top={height + 12 /* 12 px padding */ }/>
+                       top={height + 12 /* 12 px padding */ }
+                       />
               </div>
             )
           }}
@@ -183,12 +217,19 @@ class Assets extends Component {
 
   render () {
     const { assets, totalCount } = this.props
-    const { showTable, layout, thumbSize } = this.state
+    const { showTable, layout, thumbSize, tableHeight } = this.state
     return (
       <div className="Assets">
         <Editbar/>
         {this.renderAssets()}
-        { showTable && <Table/> }
+        { showTable && (
+          <div className='Assets-tableDrag'
+               draggable={true}
+               onDragStart={this.tableDragStart}
+               onDrag={this.tableDragUpdate}
+               onDragEnd={this.tableDragStop}/>
+        )}
+        { showTable && (<Table height={tableHeight}/>) }
         { totalCount > 0 &&
         <Footer
           total={totalCount}

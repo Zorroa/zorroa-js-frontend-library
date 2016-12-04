@@ -12,6 +12,7 @@ class Table extends Component {
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     fields: PropTypes.arrayOf(PropTypes.string).isRequired,
     fieldWidth: PropTypes.objectOf(PropTypes.number).isRequired,
+    height: PropTypes.number.isRequired,
 
     // connect actions
     actions: PropTypes.object
@@ -41,7 +42,7 @@ class Table extends Component {
   }
 
   render () {
-    const { assets, fields, fieldWidth } = this.props
+    const { assets, fields, fieldWidth, height } = this.props
     if (!assets || !assets.length) {
       return
     }
@@ -54,9 +55,11 @@ class Table extends Component {
       minWidth: `${width}px`
     })
 
+    const tableHeaderHeight = 26;
+
     return (
-      <div className="Table">
-        <div className='Table-header'>
+      <div className="Table" style={{height, minHeight:height, maxHeight:height}}>
+        <div className='Table-header' style={{height: `${tableHeaderHeight}px`}}>
           { fields.map((field, i) => (
             <div className={`Table-cell ${fieldClass[field]}`}
                  style={mkWidthStyle(fieldWidth[field])}
@@ -65,7 +68,12 @@ class Table extends Component {
             </div>
           ))}
         </div>
-        <div className='Table-scroll-clip'>
+        <div className='Table-scroll-clip'
+             style={{
+               top: `${tableHeaderHeight}px`,
+               height: `${height - tableHeaderHeight}px`,
+               maxHeight: `${height - tableHeaderHeight}px`
+             }}>
           <div className='Table-scroll' onScroll={this.syncScroll}>
             <div className='Table-body'>
             { assets.map(asset => (
@@ -82,7 +90,11 @@ class Table extends Component {
           </div>
         </div>
 
-        <div className="Table-settings">
+        <div className="Table-settings"
+             style={{
+               width: `${tableHeaderHeight}px`,
+               height: `${tableHeaderHeight}px`,
+             }}>
           <div onClick={this.showDisplayOptions} className="icon-cog"/>
         </div>
       </div>

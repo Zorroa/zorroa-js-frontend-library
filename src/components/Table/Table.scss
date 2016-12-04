@@ -1,17 +1,12 @@
 @import '../../styles/core-mixins.scss';
 
-$tableHeight: 300;
-$tableHeaderHeight: 26;
-
 .Table {
   @include flexOff;
   @include flexCol;
 
   position: relative; // for Table-settings
 
-  min-height: $tableHeight + px;
-  height: $tableHeight + px;
-  max-height: $tableHeight + px;
+  // height is defined in JSX
 
   overflow: hidden;
 
@@ -27,8 +22,7 @@ $tableHeaderHeight: 26;
   top: 0;
   right: 0;
 
-  width: $tableHeaderHeight + px;
-  height: $tableHeaderHeight + px;
+  // width,height are defined in JSX
 
   color: $zorroa-lightgray;
   background-color: #fff;
@@ -44,7 +38,7 @@ $tableHeaderHeight: 26;
   @include flexOff;
 
   position: absolute; // Allow width to respect children not parent (enable horiz scrolling)
-  height: $tableHeaderHeight + px;
+  // height is defined in JSX
   min-width: 100%;
   background-color: #fff;
 
@@ -60,12 +54,7 @@ $tableHeaderHeight: 26;
   @include flexOn;
   position: relative;
 
-  top: 26px; // height of Table-header
-
-  // Height of Table minus height of Table-header
-  // NB this SUCKS. But I tried so many ways, its the best I've found so far.
-  height: ($tableHeight - $tableHeaderHeight) + px;
-  max-height: ($tableHeight - $tableHeaderHeight) + px;
+  // top & height are defined in JSX
 
   overflow: hidden;
 }
@@ -106,8 +95,7 @@ $tableHeaderHeight: 26;
   @include flexRow;
   @include flexAlignItemsCenter;
   @include flexNoWrap;
-
-  height: $tableHeaderHeight + px;
+  // height is defined in JSX
   color: $zorroa-gray;
 }
 
