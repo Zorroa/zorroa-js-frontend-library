@@ -75,8 +75,8 @@ class DisplayPropertiesItem extends Component {
     if (allTerms.length || someTerms.length) {
       return (
         <div className="terms flexRow flexWrap">
-          { allTerms.map(t => (<div className="all">{t}</div>)) }
-          { someTerms.map(t => (<div className="some">{t}</div>))}
+          { allTerms.map(t => (<div key={t} className="all">{t}</div>)) }
+          { someTerms.map(t => (<div key={t} className="some">{t}</div>))}
         </div>
       )
     }
