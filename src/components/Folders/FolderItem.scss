@@ -87,6 +87,10 @@ $FolderItemHeight : 25px;
   }
 }
 
+.FolderItem-permission {
+  margin-right: 8px;
+}
+
 .FolderItem-dropzone {
   display: none;
   position: absolute;
@@ -138,6 +142,10 @@ $FolderItemHeight : 25px;
 
     &:hover {
       background-color: $zorroa-lightgray;
+    }
+
+    &.disabled {
+      color: $zorroa-lightgray;
     }
 
     &.disabled:hover {

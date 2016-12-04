@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 
 import User from '../../models/User'
 import Folder from '../../models/Folder'
+import Permission from '../../models/Permission'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import CreateExport from './CreateExport'
@@ -54,6 +55,7 @@ class FolderItem extends Component {
     counts: PropTypes.instanceOf(Map),
     filteredCounts: PropTypes.instanceOf(Map),
     user: PropTypes.instanceOf(User),
+    permissions: PropTypes.arrayOf(PropTypes.instanceOf(Permission)),
     actions: PropTypes.object
   }
 
@@ -134,7 +136,7 @@ class FolderItem extends Component {
   }
 
   renderContextMenu () {
-    const { folder, selectedFolderIds } = this.props
+    const { folder, selectedFolderIds, user } = this.props
     if (!this.state.isContextMenuVisible) {
       return
     }
@@ -148,13 +150,63 @@ class FolderItem extends Component {
       <div>
         <div onClick={this.dismissContextMenu} className="FolderItem-context-menu-background" onContextMenu={this.dismissContextMenu} />
         <div className="FolderItem-context-menu" onContextMenu={this.dismissContextMenu}>
-          { singleFolderSelected && <div className="FolderItem-context-item disabled" onContextMenu={this.dismissContextMenu}><div className="icon-folder-subfolders"/><div>{subfolderLabel}</div></div> }
-          { singleFolderSelected && <div onClick={this.getLink} className="FolderItem-context-item disabled" onContextMenu={this.dismissContextMenu}><div className="icon-link2"/><div>Get link</div></div> }
-          { singleFolderSelected && <div onClick={this.exportFolder} className="FolderItem-context-item" onContextMenu={this.dismissContextMenu}><div className="icon-download2"/><div>Export folder</div></div> }
-          <div onClick={this.moveTo} className="FolderItem-context-item disabled" onContextMenu={this.dismissContextMenu}><div className="icon-folder-move"/><div>Move to...</div></div>
-          <div onClick={this.favorite} className="FolderItem-context-item disabled" onContextMenu={this.dismissContextMenu}><div className="icon-star-empty"/><div>Favorite</div></div>
-          { singleFolderSelected && <div onClick={this.edit} className="FolderItem-context-item" onContextMenu={this.dismissContextMenu}><div className="icon-pencil"/><div>Edit...</div></div> }
-          <div onClick={this.removeFolder} className="FolderItem-context-item" onContextMenu={this.dismissContextMenu}><div className="icon-trash2"/><div>Remove folder</div></div>
+          { singleFolderSelected &&
+          <div className="FolderItem-context-item disabled"
+               onContextMenu={this.dismissContextMenu}>
+            <div className="icon-folder-subfolders"/>
+            <div>{subfolderLabel}</div>
+          </div> }
+          { singleFolderSelected && !folder.isDyhi() && (
+            folder.isPrivate(user, user.permissions) ? (
+              <div className="FolderItem-context-item disabled"
+                   onContextMenu={this.dismissContextMenu}>
+                <div className="icon-private"/>
+                <div>Private Collection</div>
+              </div>
+            ) : (
+              <div className="FolderItem-context-item disabled"
+                   onContextMenu={this.dismissContextMenu}>
+                <div className="icon-public"/>
+                <div>Public Collection</div>
+              </div>
+            ))}
+          { singleFolderSelected &&
+          <div onClick={this.getLink}
+               className="FolderItem-context-item disabled"
+               onContextMenu={this.dismissContextMenu}>
+            <div className="icon-link2"/><div>Get link</div></div> }
+          { singleFolderSelected &&
+          <div onClick={this.exportFolder}
+               className="FolderItem-context-item"
+               onContextMenu={this.dismissContextMenu}>
+            <div className="icon-download2"/>
+            <div>Export folder</div>
+          </div> }
+          <div onClick={this.moveTo}
+               className="FolderItem-context-item disabled"
+               onContextMenu={this.dismissContextMenu}>
+            <div className="icon-folder-move"/>
+            <div>Move to...</div>
+          </div>
+          <div onClick={this.favorite}
+               className="FolderItem-context-item disabled"
+               onContextMenu={this.dismissContextMenu}>
+            <div className="icon-star-empty"/>
+            <div>Favorite</div>
+          </div>
+          { singleFolderSelected &&
+          <div onClick={this.edit}
+               className="FolderItem-context-item"
+               onContextMenu={this.dismissContextMenu}>
+            <div className="icon-pencil"/>
+            <div>Edit...</div>
+          </div> }
+          <div onClick={this.removeFolder}
+               className="FolderItem-context-item"
+               onContextMenu={this.dismissContextMenu}>
+            <div className="icon-trash2"/>
+            <div>Remove folder</div>
+          </div>
         </div>
       </div>
     )
@@ -178,6 +230,14 @@ class FolderItem extends Component {
     )
   }
 
+  renderPermission () {
+    const { folder, user } = this.props
+    const permisionIcon = folder.isPublic(user, user.permissions) ? 'icon-public' : undefined
+    if (folder.isPublic(user, user.permissions)) {
+      return <div className={classnames('FolderItem-permission', permisionIcon)}/>
+    }
+  }
+
   render () {
     const { folder, depth, isOpen, hasChildren, isSelected, onToggle, onSelect, dropparams, dragHover, user } = this.props
     const icon = folder.isDyhi() ? 'icon-foldercog' : (folder.search ? 'icon-collections-smart' : 'icon-collections-simple')
@@ -193,13 +253,16 @@ class FolderItem extends Component {
         <div className={classnames('FolderItem-select')}
              onClick={event => { onSelect(event, folder); return false }}
              onContextMenu={this.showContextMenu}>
-          <div className="flexRow">
-          <i className={`FolderItem-icon ${icon}`}/>
-          <div className='FolderItem-text' key={folder.id}>
-            {folder.name}
+          <div className="flexRow flexAlignItemsCenter">
+            <i className={`FolderItem-icon ${icon}`}/>
+            <div className='FolderItem-text' key={folder.id}>
+              {folder.name}
+            </div>
           </div>
+          <div className="flexRow flexAlignItemsCenter">
+            { this.renderPermission() }
+            { this.renderCount() }
           </div>
-          { this.renderCount() }
         </div>
         <div className={classnames('FolderItem-dropzone', {isDropTarget, dragHover})} {...dropparams}/>
       </div>
@@ -213,7 +276,8 @@ export default connect(state => ({
   counts: state.folders.counts,
   filteredCounts: state.folders.filteredCounts,
   selectedFolderIds: state.folders.selectedFolderIds,
-  user: state.auth.user
+  user: state.auth.user,
+  permissions: state.permissions.all
 }), dispatch => ({
   actions: bindActionCreators({
     addAssetIdsToFolderId,

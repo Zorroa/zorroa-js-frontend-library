@@ -28,3 +28,14 @@ export function hasAccess (acl, permission, access) {
   }
   return false
 }
+
+export function isPublic (acl, user, userPermissions) {
+  return acl && userPermissions &&
+    acl.some(aclEntry => {
+      const whitelist = [ 'administrator', 'manager' ]
+      const index = userPermissions.findIndex(permission => (permission.id === aclEntry.permissionId))
+      return index < 0 ||
+        (userPermissions[index].type === 'user' && userPermissions[index].name !== user.username) ||
+        (userPermissions[index].type === 'group' && whitelist.findIndex(name => (name === userPermissions[index].name)) < 0)
+    })
+}
