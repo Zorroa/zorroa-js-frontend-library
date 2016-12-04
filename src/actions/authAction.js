@@ -58,6 +58,7 @@ export function validateUser (user, protocol, host) {
             dispatch({type: UNAUTH_USER, payload: error.response.data})
           } else {
             dispatch(authError('Cannot validate user ' + user.username + ': ' + error))
+            browserHistory.push('/signin')
           }
         })
     }
