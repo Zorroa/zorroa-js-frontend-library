@@ -55,10 +55,10 @@ class Table extends Component {
       minWidth: `${width}px`
     })
 
-    const tableHeaderHeight = 26;
+    const tableHeaderHeight = 26
 
     return (
-      <div className="Table" style={{height, minHeight:height, maxHeight:height}}>
+      <div className="Table" style={{height, minHeight: height, maxHeight: height}}>
         <div className='Table-header' style={{height: `${tableHeaderHeight}px`}}>
           { fields.map((field, i) => (
             <div className={`Table-cell ${fieldClass[field]}`}
@@ -93,7 +93,7 @@ class Table extends Component {
         <div className="Table-settings"
              style={{
                width: `${tableHeaderHeight}px`,
-               height: `${tableHeaderHeight}px`,
+               height: `${tableHeaderHeight}px`
              }}>
           <div onClick={this.showDisplayOptions} className="icon-cog"/>
         </div>
