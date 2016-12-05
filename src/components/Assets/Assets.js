@@ -142,21 +142,21 @@ class Assets extends Component {
     this.newTableHeight = tableHeight
     this.tableStartHeight = tableHeight
 
-    // var dragIcon = document.createElement('img')
-    // // hide the drag element using a transparent 1x1 pixel image as a proxy
-    // dragIcon.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
-    // dragIcon.width = 1
-    // event.dataTransfer.setDragImage(dragIcon, 0, 0)
+    var dragIcon = document.createElement('img')
+    // hide the drag element using a transparent 1x1 pixel image as a proxy
+    dragIcon.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
+    dragIcon.width = 1
+    event.dataTransfer.setDragImage(dragIcon, 0, 0)
   }
 
   tableDragUpdate = (event) => {
     if (!event.pageY) return
     const dy = (event.pageY - this.tableStartY)
     this.newTableHeight = Math.min(600, Math.max(200, this.tableStartHeight - dy))
-    // const threshold = 4   // Minimize redraws
-    // if (Math.abs(newTableHeight - tableHeight) > threshold) {
-    // this.setState({tableHeight: newTableHeight})
-    // }
+    const threshold = 4   // Minimize redraws
+    if (Math.abs(this.newTableHeight - this.state.tableHeight) > threshold) {
+      this.setState({tableHeight: this.newTableHeight})
+    }
   }
 
   tableDragStop = (event) => {
