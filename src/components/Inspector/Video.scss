@@ -11,7 +11,7 @@
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
 
-  .player {
+  .Video-player {
     @include flexOn;
     @include fullWidth;
     overflow: hidden;
@@ -19,14 +19,14 @@
     max-height: 100%;
   }
 
-  .progress-bar {
+  .Video-progress-bar {
     @include fullWidth;
     position: relative;
     top: 0;
     left: 0;
     height: auto;
 
-    .scrub {
+    .Video-scrub {
       @include fullWidth;
       z-index: 10;
       position: relative;
@@ -38,7 +38,7 @@
       background-color: rgba(64,64,64,0.05);
     }
 
-    input.scrub[type=range]::-webkit-slider-thumb {
+    input.Video-scrub[type=range]::-webkit-slider-thumb {
       -webkit-appearance: none;
       border: none;
       height: 8px;
@@ -73,19 +73,21 @@
     .loaded {
       @include fullWidth;
       position: absolute;
-      top: 7px;
+      left:0;
+      top: 2px;
       z-index: 1;
     }
 
     .played {
       @include fullWidth;
       position: absolute;
-      top: 7px;
+      top: 2px;
       z-index: 2;
+      left:0;
     }
   }
 
-  .control-bar {
+  .Video-control-bar {
     @include fullWidth;
     @include flexRow;
     @include flexJustifySpaceBetween;
@@ -95,21 +97,22 @@
     height: 40px;
     background: none;
 
-    .time {
+    .Video-time {
       margin-left: 10px;
-
-      .duration {
+      width: 200px;
+      .Video-duration {
         padding: 8px;
       }
     }
 
-    .controls {
+    .Video-controls {
       @include flexRow;
       @include flexJustifyCenter;
 
       div {
         text-align: center;
         width: 40px;
+        font-size: 18px;
 
         &:hover {
           color: $zorroa-sickly-green;
@@ -117,14 +120,36 @@
       }
     }
 
-    .misc {
+    .Video-misc {
       @include flexRow;
       @include flexAlignItemsCenter;
+      width: 200px;
+
+      .icon-mute {
+        font-size: 18px;
+      }
+
+      .icon-loud {
+        margin-right: 5px;
+      }
 
       .icon-cross2 {
         color: white;
         background: none;
         border: none;
+        margin-right: 10px;
+        margin-left: 5px;
+      }
+
+      input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        border: none;
+        background: none;
+      }
+
+      input {
+        background: none;
+        position: relative;
       }
     }
   }
@@ -132,4 +157,18 @@
   &.ProgressBar {
     @include fullWidth;
   }
+}
+
+.Video-volume {
+  position: relative;
+  @include flexRow;
+  @include flexAlignItemsCenter;
+}
+
+.Video-volume-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
 }

@@ -16,11 +16,10 @@ export default class Pdf extends Component {
     documentInitParameters: PropTypes.shape({
       url: PropTypes.string
     }),
-    page: PropTypes.number,
-    scale: PropTypes.number
+    page: PropTypes.number
   }
 
-  static defaultProps = { page: 1, scale: 1.0 }
+  static defaultProps = { page: 1 }
 
   onDocumentError = (err) => {
     if (err.isCanceled && err.pdf) {
@@ -35,7 +34,9 @@ export default class Pdf extends Component {
     page: null,
     pdf: null,
     rendering: false,
-    error: null
+    error: null,
+    scale: 1,
+    disableZoomOut: false
   }
 
   componentDidMount () {
@@ -54,8 +55,7 @@ export default class Pdf extends Component {
       this.loadPDFDocument(newProps)
     }
 
-    if (pdf && ((newProps.page && newProps.page !== this.props.page) ||
-      (newProps.scale && newProps.scale !== this.props.scale))) {
+    if (pdf && (newProps.page && newProps.page !== this.props.page)) {
       this.setState({ page: null, error: null })
       pdf.getPage(newProps.page).then(this.onPageComplete)
     }
@@ -126,11 +126,24 @@ export default class Pdf extends Component {
     }
   }
 
-  scroll = (event) => {
-    if (event.deltaY > 1) {
-      this.nextPage()
-    } else if (event.deltaY < 1) {
-      this.previousPage()
+  static scaleFactor = 1.5
+  zoomIn = (event) => {
+    const { page, pdf, rendering } = this.state
+    if (rendering) return
+    const scale = this.state.scale * Pdf.scaleFactor
+    this.setState({scale})
+    if (page && page.pageIndex >= 0) {
+      pdf.getPage(page.pageIndex + 1).then(this.onPageComplete)
+    }
+  }
+
+  zoomOut = (event) => {
+    const { page, pdf, rendering } = this.state
+    if (rendering) return
+    const scale = this.state.scale / Pdf.scaleFactor
+    this.setState({scale})
+    if (page && page.pageIndex >= 0) {
+      pdf.getPage(page.pageIndex + 1).then(this.onPageComplete)
     }
   }
 
@@ -140,45 +153,32 @@ export default class Pdf extends Component {
       const { canvas } = this
       if (!canvas) return
       const canvasContext = canvas.getContext('2d')
-      const { scale } = this.props
+      const { scale } = this.state
       let viewport = page.getViewport(scale)
 
       // Adjust the scale so the view exactly fits the parent body element
       const body = canvas.parentElement
       let { width, height } = viewport
       const aspect = width / height
-      if (width > body.clientWidth) {
-        width = body.clientWidth
-        height = width / aspect
-      }
-      if (height > body.clientHeight) {
+      let disableZoomOut = false
+      if (height < body.clientHeight) {
+        disableZoomOut = true
         height = body.clientHeight
         width = height * aspect
-      }
-      if (width === viewport.width) {
-        if (body.clientWidth - width > body.clientHeight - height) {
-          height = body.clientHeight
-          width = height * aspect
-        } else {
-          width = body.clientWidth
-          height = width / aspect
-        }
-      }
-      if (width !== viewport.width) {
         viewport = page.getViewport(scale * width / viewport.width)
       }
       canvas.height = viewport.height
       canvas.width = viewport.width
 
       // https://github.com/mozilla/pdf.js/issues/2923#issuecomment-14715851
-      this.setState({rendering: true, error: null})
+      this.setState({rendering: true, error: null, disableZoomOut})
       page.render({ canvasContext, viewport })
       .then(() => { this.setState({rendering: false}) })
     }
   }
 
   render () {
-    const { page, pdf, progress, error } = this.state
+    const { page, pdf, progress, error, scale, disableZoomOut } = this.state
     const svg = require('./loading-ring.svg')
     if (error) {
       return (<div className="Pdf"><div className="error">{error}</div></div>)
@@ -192,16 +192,28 @@ export default class Pdf extends Component {
     }
     const isPreviousDisabled = page.pageIndex < 1
     const isNextDisabled = page.pageIndex >= pdf.numPages - 1
+    const isZoomInDisabled = scale > 32
+    const isZoomOutDisabled = scale < 0.1 || disableZoomOut
     return (
       <div className="Pdf">
-        <div className="body" onWheel={this.scroll}>
+        <div className="Pdf-body">
           <canvas ref={(c) => { this.canvas = c }} />
         </div>
         { pdf && pdf.numPages && (
-          <div className="controls">
-            <div>Page {page.pageIndex + 1} / {pdf.numPages}</div>
-            <button disabled={isPreviousDisabled} onClick={this.previousPage}>Previous Page</button>
-            <button disabled={isNextDisabled} onClick={this.nextPage}>Next Page</button>
+          <div className="Pdf-controls">
+            <div className="Pdf-controls-group border-right">Page {page.pageIndex + 1} / {pdf.numPages}</div>
+            <div className="Pdf-controls-group">
+              <button className="icon-frame-back" disabled={isPreviousDisabled}
+                      onClick={this.previousPage}/>
+              <button className="icon-frame-forward" disabled={isNextDisabled}
+                      onClick={this.nextPage}/>
+            </div>
+            <div className="Pdf-controls-group">
+              <button className="icon-zoom-in" disabled={isZoomInDisabled}
+                      onClick={this.zoomIn}/>
+              <button className="icon-zoom-out" disabled={isZoomOutDisabled}
+                      onClick={this.zoomOut}/>
+            </div>
           </div>
         )}
       </div>
