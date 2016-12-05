@@ -14,14 +14,13 @@ Zorroa core (shared) css classes
 /*
 tread carefully!!!
 These attributes control full page settings, but they can be brittle in different browsers
-Make sure to
+Make sure to test in all browsers after making changes here.
 */
 html, body {
-//   min-height: 100vh;
-//   width: 100%;
-//   // overflow-x: hidden;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
   font-size: 14px;
-//   font-weight: 300;
   padding:0;
   margin:0;
 }
