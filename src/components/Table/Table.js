@@ -13,9 +13,19 @@ class Table extends Component {
     fields: PropTypes.arrayOf(PropTypes.string).isRequired,
     fieldWidth: PropTypes.objectOf(PropTypes.number).isRequired,
     height: PropTypes.number.isRequired,
+    tableDragging: PropTypes.bool.isRequired,
 
     // connect actions
     actions: PropTypes.object
+  }
+
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      tableScrollTop: 0,
+      tableScrollHeight: 0
+    }
   }
 
   showDisplayOptions = (event) => {
@@ -34,15 +44,17 @@ class Table extends Component {
     }
   }
 
-  syncScroll = (event) => {
+  tableScroll = (event) => {
     // Horizontal scrolling for the table header,
     // keep the header in perfect sync with the table body's horiz scroll
     document.getElementsByClassName('Table-header')[0].style.left =
       `-${event.target.scrollLeft}px`
+
+    this.setState({tableScrollTop: event.target.scrollTop, tableScrollHeight: event.target.clientHeight})
   }
 
   render () {
-    const { assets, fields, fieldWidth, height } = this.props
+    const { assets, fields, fieldWidth, height, tableDragging } = this.props
     if (!assets || !assets.length) {
       return
     }
@@ -74,9 +86,9 @@ class Table extends Component {
                height: `${height - tableHeaderHeight}px`,
                maxHeight: `${height - tableHeaderHeight}px`
              }}>
-          <div className='Table-scroll' onScroll={this.syncScroll}>
+          <div className='Table-scroll' onScroll={this.tableScroll}>
             <div className='Table-body'>
-            { assets.map(asset => (
+            { tableDragging ? null : assets.map(asset => (
               <div key={asset.id} className="Table-row">
                 { fields.map(field => (
                   <div className={`Table-cell ${fieldClass[field]}`}
@@ -85,7 +97,8 @@ class Table extends Component {
                     {asset.value(field)}
                   </div>
                 ))}
-              </div>)) }
+              </div>
+            ))}
             </div>
           </div>
         </div>

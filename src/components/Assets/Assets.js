@@ -283,7 +283,7 @@ class Assets extends Component {
 
   render () {
     const { assets, totalCount } = this.props
-    const { showTable, layout, thumbSize, tableHeight } = this.state
+    const { showTable, layout, thumbSize, tableHeight, tableDragging } = this.state
     return (
       <div className="Assets">
         <Editbar/>
@@ -295,7 +295,7 @@ class Assets extends Component {
                onDrag={this.tableDragUpdate}
                onDragEnd={this.tableDragStop}/>
         )}
-        { showTable && (<Table height={tableHeight}/>) }
+        { showTable && (<Table height={tableHeight} tableDragging={tableDragging}/>) }
         { totalCount > 0 &&
         <Footer
           total={totalCount}
