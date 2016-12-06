@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import classnames from 'classnames'
 
 import Asset from '../../models/Asset'
 import { unCamelCase } from '../../services/jsUtil'
@@ -13,7 +14,6 @@ class Table extends Component {
     fields: PropTypes.arrayOf(PropTypes.string).isRequired,
     fieldWidth: PropTypes.objectOf(PropTypes.number).isRequired,
     height: PropTypes.number.isRequired,
-    tableDragging: PropTypes.bool.isRequired,
 
     // connect actions
     actions: PropTypes.object
@@ -54,7 +54,7 @@ class Table extends Component {
   }
 
   render () {
-    const { assets, fields, fieldWidth, height, tableDragging } = this.props
+    const { assets, fields, fieldWidth, height } = this.props
     if (!assets || !assets.length) {
       return
     }
@@ -68,6 +68,14 @@ class Table extends Component {
     })
 
     const tableHeaderHeight = 26
+    const rowHeight = 30
+    const { tableScrollTop, tableScrollHeight } = this.state
+    const tableScrollBottom = tableScrollTop + tableScrollHeight
+
+    requestAnimationFrame(() => {
+      var tableScrollHeight = document.querySelector('.Table-scroll').clientHeight
+      if (tableScrollHeight !== this.state.tableScrollHeight) this.setState({tableScrollHeight})
+    })
 
     return (
       <div className="Table" style={{height, minHeight: height, maxHeight: height}}>
@@ -87,18 +95,24 @@ class Table extends Component {
                maxHeight: `${height - tableHeaderHeight}px`
              }}>
           <div className='Table-scroll' onScroll={this.tableScroll}>
-            <div className='Table-body'>
-            { tableDragging ? null : assets.map(asset => (
-              <div key={asset.id} className="Table-row">
-                { fields.map(field => (
-                  <div className={`Table-cell ${fieldClass[field]}`}
+            <div className='Table-body' style={{height: `${assets.length * rowHeight}px`}}>
+            { assets.map((asset, index) => {
+              const rowTop = index * rowHeight
+              const rowBottom = rowTop + rowHeight
+              if (rowBottom < tableScrollTop) return null
+              if (rowTop > tableScrollBottom) return null
+              return (<div key={asset.id}
+                           className={classnames('Table-row', { even: !!(index % 2) })}
+                           style={{top: `${rowTop}px`}}>
+                { fields.map(field =>
+                    (<div className={`Table-cell ${fieldClass[field]}`}
                        style={mkWidthStyle(fieldWidth[field])}
                        key={field}>
                     {asset.value(field)}
-                  </div>
-                ))}
-              </div>
-            ))}
+                    </div>)
+                )}
+              </div>)
+            })}
             </div>
           </div>
         </div>

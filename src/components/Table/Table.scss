@@ -80,16 +80,19 @@
   @include flexAlignItemsCenter;
   @include flexNoWrap;
 
+  position: absolute;
+  left: 0;
+  top: 0; // set in code
+
   height: 30px;
   min-width: 100%;
 
   text-align: left;
   color: $zorroa-greyish-brown;
+
+  &.even { background-color: #fff; }
 }
 
-.Table-row:nth-child(even) {
-  background-color: #fff;
-}
 
 .Table-header {
   @include flexRow;
