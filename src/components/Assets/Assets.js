@@ -42,11 +42,16 @@ class Assets extends Component {
       showTable: false,
       thumbSize: 128,
       lastSelectedId: null,
-      tableHeight: 300
+      tableHeight: 300,
+      scrollTop: 0,
+      scrollHeight: 0,
+      tableDragging: false
     }
 
     this.tableStartY = 0
     this.tableStartHeight = 0
+    this.scrollHeight = 0
+    this.positions = []
   }
 
   // Adjust the selection set for the specified asset using
@@ -147,6 +152,15 @@ class Assets extends Component {
     dragIcon.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
     dragIcon.width = 1
     event.dataTransfer.setDragImage(dragIcon, 0, 0)
+
+    this.setState({tableDragging: true})
+
+    this.tableRefs = {
+      table: document.querySelector('.Table'),
+      tableHeader: document.querySelector('.Table-header'),
+      tableScrollClip: document.querySelector('.Table-scroll-clip'),
+      tableSettings: document.querySelector('.Table-settings')
+    }
   }
 
   tableDragUpdate = (event) => {
@@ -155,14 +169,48 @@ class Assets extends Component {
     this.newTableHeight = Math.min(600, Math.max(200, this.tableStartHeight - dy))
     const threshold = 4   // Minimize redraws
     if (Math.abs(this.newTableHeight - this.state.tableHeight) > threshold) {
-      this.setState({tableHeight: this.newTableHeight})
+      const useCrazyFastButSuperHackyUpdate = false
+      if (useCrazyFastButSuperHackyUpdate) {
+        this.updateTableHeight(this.newTableHeight)
+      } else {
+        this.setState({tableHeight: this.newTableHeight})
+      }
     }
+    return false
   }
 
   tableDragStop = (event) => {
     this.setState({
-      tableHeight: this.newTableHeight
+      tableHeight: this.newTableHeight,
+      tableDragging: false
     })
+  }
+
+  updateTableHeight = (height) => {
+    const tableHeaderHeight = 26
+    const tableRefs = this.tableRefs
+    if (!tableRefs) return
+    if (tableRefs.table) {
+      tableRefs.table.style['height'] = height
+      tableRefs.table.style['min-height'] = height
+      tableRefs.table.style['max-height'] = height
+    }
+    // if (tableRefs.tableHeader) {
+    //   tableRefs.tableHeader.style['height'] = `${tableHeaderHeight}px`
+    // }
+    if (tableRefs.tableScrollClip) {
+      // tableRefs.tableScrollClip.style['top'] = `${tableHeaderHeight}px`
+      tableRefs.tableScrollClip.style['height'] = `${height - tableHeaderHeight}px`
+      tableRefs.tableScrollClip.style['max-height'] = `${height - tableHeaderHeight}px`
+    }
+    // if (tableRefs.tableSettings) {
+    //   tableRefs.tableSettings.style['width'] = `${tableHeaderHeight}px`
+    //   tableRefs.tableSettings.style['height'] = `${tableHeaderHeight}px`
+    // }
+  }
+
+  onScroll = (event) => {
+    this.setState({scrollTop: event.target.scrollTop, scrollHeight: event.target.clientHeight})
   }
 
   renderAssets () {
@@ -179,33 +227,51 @@ class Assets extends Component {
     }
 
     return (
-      <div className="assets-scroll fullWidth flexOn">
+      <div className="assets-scroll fullWidth flexOn" onScroll={this.onScroll}>
         <Measure>
-          {({width}) => {
+          {({width, height}) => {
             if (!width) return (<div style={{'width': '100%'}}></div>)
-            const positions = (layout => {
-              switch (layout) {
-                case 'grid': return ComputeLayout.grid(assets, width, thumbSize)
-                case 'masonry': return ComputeLayout.masonry(assets, width, thumbSize)
-              }
-            })(layout)
-            const lastPos = positions[positions.length - 1]
-            const height = Math.ceil(lastPos.y + lastPos.height)
+            if (!this.state.tableDragging) {
+              this.positions = (layout => {
+                switch (layout) {
+                  case 'grid': return ComputeLayout.grid(assets, width, thumbSize)
+                  case 'masonry': return ComputeLayout.masonry(assets, width, thumbSize)
+                }
+              })(layout)
+            }
+
+            requestAnimationFrame(() => {
+              var scrollHeight = document.querySelector('.assets-scroll').clientHeight
+              if (scrollHeight !== this.state.scrollHeight) this.setState({scrollHeight})
+            })
+
+            const lastPos = this.positions[this.positions.length - 1]
+            const layoutHeight = Math.ceil(lastPos.y + lastPos.height)
             return (
               <div className={`Assets-layout ${layout}`}>
-                { assets.map((asset, index) => (
-                  <Thumb isSelected={selectedIds && selectedIds.has(asset.id)}
-                    dim={positions[index]}
-                    index={index}
-                    key={asset.id}
-                    asset={asset}
-                    onClick={this.select.bind(this, asset)}
-                    onDoubleClick={this.isolateToLightbox.bind(this, asset)}
-                  />
-                ))}
+                <div className='Assets-layout-top' style={{top: 0, width: 0, height: 0}}>&nbsp;</div>
+                { assets.map((asset, index) => {
+                  const pos = this.positions[index]
+                  // 8px is Assets-layout padding. This will be named & factored before merge
+                  if ((8 + pos.y > this.state.scrollTop + this.state.scrollHeight) ||
+                      (8 + pos.y + pos.height < this.state.scrollTop) ||
+                      (!this.positions[index])) {
+                    return null
+                  }
+                  return (
+                    <Thumb isSelected={selectedIds && selectedIds.has(asset.id)}
+                      dim={this.positions[index]}
+                      index={index}
+                      key={asset.id}
+                      asset={asset}
+                      onClick={this.select.bind(this, asset)}
+                      onDoubleClick={this.isolateToLightbox.bind(this, asset)}
+                    />
+                  )
+                })}
                 <Pager total={totalCount}
                        loaded={assets.length}
-                       top={height + 12 /* 12 px padding */ }
+                       top={layoutHeight + 12 /* 12 px padding */ }
                        />
               </div>
             )
