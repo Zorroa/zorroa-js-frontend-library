@@ -73,8 +73,11 @@ class Table extends Component {
     const tableScrollBottom = tableScrollTop + tableScrollHeight
 
     requestAnimationFrame(() => {
-      var tableScrollHeight = document.querySelector('.Table-scroll').clientHeight
-      if (tableScrollHeight !== this.state.tableScrollHeight) this.setState({tableScrollHeight})
+      var tableScroll = document.querySelector('.Table-scroll')
+      var tableScrollHeight = tableScroll ? tableScroll.clientHeight : 0
+      if (tableScrollHeight && tableScrollHeight !== this.state.tableScrollHeight) {
+        this.setState({tableScrollHeight})
+      }
     })
 
     return (

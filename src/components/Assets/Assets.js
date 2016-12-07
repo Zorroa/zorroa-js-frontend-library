@@ -241,8 +241,11 @@ class Assets extends Component {
             }
 
             requestAnimationFrame(() => {
-              var scrollHeight = document.querySelector('.assets-scroll').clientHeight
-              if (scrollHeight !== this.state.scrollHeight) this.setState({scrollHeight})
+              var assetsScroll = document.querySelector('.assets-scroll')
+              var scrollHeight = assetsScroll ? assetsScroll.clientHeight : 0
+              if (scrollHeight && scrollHeight !== this.state.scrollHeight) {
+                this.setState({scrollHeight})
+              }
             })
 
             const lastPos = this.positions[this.positions.length - 1]
