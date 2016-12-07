@@ -15,8 +15,6 @@ const source = {
   }
 }
 
-let ThumbCache = new Set()
-
 const ImageThumb = (props) => {
   const { asset, dim, onClick, onDoubleClick, dragparams, thumbClass, children } = props
   const tproxy = asset.tinyProxy()
@@ -57,35 +55,21 @@ class Thumb extends Component {
     protocol: PropTypes.string,
     host: PropTypes.string,
     dim: PropTypes.object.isRequired,
-    isSelected: PropTypes.bool,
-    index: PropTypes.number.isRequired
+    isSelected: PropTypes.bool
   }
 
   loadImage (thumbURL) {
     const thumb = document.getElementsByClassName(this.thumbClass)[0]
     if (thumb) thumb.style['background-image'] = `url(${thumbURL})`
-    this.loadTimer = null
-    ThumbCache.add(thumbURL)
   }
 
   componentWillMount () {
-    const { asset, protocol, host, dim, index } = this.props
+    const { asset, protocol, host, dim } = this.props
     this.proxy = asset.closestProxy(dim.width, dim.height)
     const thumbURL = this.proxy.url(protocol, host)
     this.thumbClass = `assets-thumb-${thumbURL}`
 
-    // Delay the image load by a small amount, in order to show images loading in order.
-    // (Otherwise browsers will decide for us, and you won't like it)
-    // 15ms per image seemed about right in Chrome to balance
-    // seeing the color swatch for the longest possible time,
-    // without overall load taking longer.
-    const delay = (ThumbCache.has(thumbURL)) ? 0 : 250 + index * 15 // NB: we do need the delay 0 (our div doesn't yet exist)
-    this.loadTimer = setTimeout(this.loadImage.bind(this, thumbURL), delay)
-  }
-
-  componentWillUnmount () {
-    // if we started a load timer in render() that hasn't finished, cancel it
-    if (this.loadTimer) clearTimeout(this.loadTimer)
+    requestAnimationFrame(this.loadImage.bind(this, thumbURL))
   }
 
   renderBadges = (pages, duration, icon) => {

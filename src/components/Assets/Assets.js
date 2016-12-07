@@ -264,7 +264,6 @@ class Assets extends Component {
                   return (
                     <Thumb isSelected={selectedIds && selectedIds.has(asset.id)}
                       dim={this.positions[index]}
-                      index={index}
                       key={asset.id}
                       asset={asset}
                       onClick={this.select.bind(this, asset)}
