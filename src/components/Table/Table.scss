@@ -31,6 +31,9 @@
   }
 }
 
+// this is to allow resizing of the rightmost column
+$tableResizeRightPadding: 20px;
+
 .Table-header {
   @include flexOff;
 
@@ -38,6 +41,8 @@
   // height is defined in JSX
   min-width: 100%;
   background-color: #fff;
+
+  padding-right: $tableResizeRightPadding;
 
   .Table-cell {
     text-align: left;
@@ -53,21 +58,20 @@
 
 .Table-header-sort {
   font-size: 12px;
+  cursor: pointer;
 }
 
 .Table-header-resizer {
+  @include flexRowCenter;
   height: 100%;
   width: 10px;
   cursor: col-resize;
+}
 
-  // http://stackoverflow.com/a/39682926/1424242. If this breaks in or slows any browsers, we can always use a 1px wide centered child
-  background: linear-gradient(to right,
-    transparent 0%,
-    transparent calc(50% - 0.51px),
-    $zorroa-nearwhite calc(50% - 0.5px),
-    $zorroa-nearwhite calc(50% + 0.5px),
-    transparent calc(50% + 0.51px),
-    transparent 100%);
+.Table-header-resizer-handle {
+  width: 0;
+  height: 60%;
+  border-right: 1px solid $zorroa-nearwhite;
 }
 
 .Table-scroll-clip {
@@ -106,6 +110,8 @@
 
   height: 30px;
   min-width: 100%;
+
+  padding-right: $tableResizeRightPadding;
 
   text-align: left;
   color: $zorroa-greyish-brown;

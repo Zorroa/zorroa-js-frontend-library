@@ -5,7 +5,12 @@ import classnames from 'classnames'
 
 import Asset from '../../models/Asset'
 import { unCamelCase } from '../../services/jsUtil'
-import { updateMetadataFields, updateTableFields, showDisplayOptionsModal } from '../../actions/appActions'
+import {
+  updateMetadataFields,
+  updateTableFields,
+  showDisplayOptionsModal,
+  setTableFieldWidth
+} from '../../actions/appActions'
 
 class Table extends Component {
   static propTypes = {
@@ -25,8 +30,13 @@ class Table extends Component {
 
     this.state = {
       tableScrollTop: 0,
-      tableScrollHeight: 0
+      tableScrollHeight: 0,
+      columnDragging: false
     }
+
+    this.columnDragFieldName = null,
+    this.columnDragStartX,
+    this.columnDragLastSetWidth
   }
 
   showDisplayOptions = (event) => {
@@ -54,6 +64,39 @@ class Table extends Component {
     this.setState({tableScrollTop: event.target.scrollTop, tableScrollHeight: event.target.clientHeight})
   }
 
+  columnDragStart = (event, field) => {
+    const { columnDragX } = this.state
+    this.columnDragFieldName = field
+    this.columnDragStartX = event.pageX
+    this.columnDragStartWidth = this.props.fieldWidth[field]
+    this.columnDragLastSetWidth = this.props.fieldWidth[field]
+
+    var dragIcon = document.createElement('img')
+    // hide the drag element using a transparent 1x1 pixel image as a proxy
+    dragIcon.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
+    dragIcon.width = 1
+    event.dataTransfer.setDragImage(dragIcon, 0, 0)
+
+    this.setState({ columnDragging: true })
+  }
+
+  columnDragUpdate = (event) => {
+    if (!event.pageX) return
+    const dx = (event.pageX - this.columnDragStartX)
+    var fieldWidth = Math.min(2000, Math.max(50, this.columnDragStartWidth + dx))
+    const threshold = 4   // Minimize redraws
+    if (Math.abs(fieldWidth - this.columnDragLastSetWidth) > threshold) {
+      this.columnDragLastSetWidth = fieldWidth
+      this.props.actions.setTableFieldWidth({[this.columnDragFieldName]: fieldWidth})
+    }
+    return false
+  }
+
+  columnDragStop = (event) => {
+    this.columnDragFieldName = null
+    this.setState({ columnDragging: false })
+  }
+
   render () {
     const { assets, fields, fieldWidth, height, tableIsDragging } = this.props
     if (!assets || !assets.length) {
@@ -64,8 +107,8 @@ class Table extends Component {
 
     var mkWidthStyle = width => ({
       width: `${width}px`,
-      maxWidth: `${width}px`,
-      minWidth: `${width}px`
+      // maxWidth: `${width}px`,
+      // minWidth: `${width}px`
     })
 
     const tableHeaderHeight = 26
@@ -91,12 +134,18 @@ class Table extends Component {
             <div key={i}
                  className='Table-header-cell flexRowCenter'
                  style={mkWidthStyle(fieldWidth[field])}>
-            <div className={`Table-cell ${fieldClass[i]}`}>
-              { unCamelCase(Asset.lastNamespace(field)) }
-            </div>
-            <i className='Table-header-sort icon-chevrons-expand-vertical'/>
-            <div className='flexOn'/>
-            <div className='Table-header-resizer'/>
+              <div className={`Table-cell ${fieldClass[i]}`}>
+                { unCamelCase(Asset.lastNamespace(field)) }
+              </div>
+              <i className='Table-header-sort icon-chevrons-expand-vertical'/>
+              <div className='flexOn'/>
+              <div className='Table-header-resizer'
+                   draggable={true}
+                   onDragStart={event => this.columnDragStart(event, field)}
+                   onDrag={this.columnDragUpdate}
+                   onDragEnd={this.columnDragStop}>
+                <div className='Table-header-resizer-handle'/>
+              </div>
             </div>
           ))}
         </div>
@@ -146,5 +195,5 @@ export default connect(state => ({
   fields: state.app.tableFields,
   fieldWidth: state.app.tableFieldWidth
 }), dispatch => ({
-  actions: bindActionCreators({ updateMetadataFields, updateTableFields, showDisplayOptionsModal }, dispatch)
+  actions: bindActionCreators({ updateMetadataFields, updateTableFields, showDisplayOptionsModal, setTableFieldWidth }, dispatch)
 }))(Table)
