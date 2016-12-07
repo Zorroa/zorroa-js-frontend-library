@@ -88,10 +88,14 @@ class Table extends Component {
       <div className="Table" style={tableStyle}>
         <div className='Table-header' style={{height: `${tableHeaderHeight}px`}}>
           { fields.map((field, i) => (
-            <div className={`Table-cell ${fieldClass[field]}`}
-                 style={mkWidthStyle(fieldWidth[field])}
-                 key={i}>
+            <div key={i}
+                 className='Table-header-cell flexRowCenter'
+                 style={mkWidthStyle(fieldWidth[field])}>
+            <div className={`Table-cell ${fieldClass[i]}`}>
               { unCamelCase(Asset.lastNamespace(field)) }
+            </div>
+            <div className='flexOn'/>
+            <div className='Table-header-resizer'/>
             </div>
           ))}
         </div>
@@ -111,8 +115,8 @@ class Table extends Component {
               return (<div key={asset.id}
                            className={classnames('Table-row', { even: !!(index % 2) })}
                            style={{top: `${rowTop}px`}}>
-                { fields.map(field =>
-                    (<div className={`Table-cell ${fieldClass[field]}`}
+                { fields.map((field, i) =>
+                    (<div className={`Table-cell ${fieldClass[i]}`}
                        style={mkWidthStyle(fieldWidth[field])}
                        key={field}>
                     {asset.value(field)}

@@ -50,6 +50,19 @@
   }
 }
 
+.Table-header-cell {
+  height: 100%;
+}
+
+.Table-header-resizer {
+  height: 100%;
+  width: 7px;
+  border-left: 1px solid $zorroa-lightgray;
+  border-right: 1px solid $zorroa-lightgray;
+  background-color: $zorroa-nearwhite;
+  cursor: col-resize;
+}
+
 .Table-scroll-clip {
   @include flexOn;
   position: relative;
