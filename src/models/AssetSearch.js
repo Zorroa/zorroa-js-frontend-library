@@ -3,6 +3,8 @@ import AssetFilter from './AssetFilter'
 export default class AssetSearch {
   constructor (json) {
     if (json) {
+      // Make an extra copy to handle deep clones
+      json = JSON.parse(JSON.stringify(json))
       this.scroll = json.scroll   // {string timeout="1m", string id}
       this.query = json.query     // string:           Keyword search string
       this.queryFields = json.queryFields // {string, number}: Map of fields and boost values
@@ -86,7 +88,7 @@ function union (arr) {
 
 // Skip over from & size for equality comparison
 function equalsReplacer (key, value) {
-  if (key === 'from' || key === 'size') {
+  if (key === 'from' || key === 'size' || key === 'scroll') {
     return undefined
   }
   return value

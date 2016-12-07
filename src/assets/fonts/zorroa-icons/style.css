@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'zorroa-icons';
-  src:  url('fonts/zorroa-icons.eot?6w8ruz');
-  src:  url('fonts/zorroa-icons.eot?6w8ruz#iefix') format('embedded-opentype'),
-    url('fonts/zorroa-icons.woff2?6w8ruz') format('woff2'),
-    url('fonts/zorroa-icons.ttf?6w8ruz') format('truetype'),
-    url('fonts/zorroa-icons.woff?6w8ruz') format('woff'),
-    url('fonts/zorroa-icons.svg?6w8ruz#zorroa-icons') format('svg');
+  src:  url('fonts/zorroa-icons.eot?fdcv93');
+  src:  url('fonts/zorroa-icons.eot?fdcv93#iefix') format('embedded-opentype'),
+    url('fonts/zorroa-icons.woff2?fdcv93') format('woff2'),
+    url('fonts/zorroa-icons.ttf?fdcv93') format('truetype'),
+    url('fonts/zorroa-icons.woff?fdcv93') format('woff'),
+    url('fonts/zorroa-icons.svg?fdcv93#zorroa-icons') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -30,6 +30,36 @@
 }
 .icon-plus2:before {
   content: "\e928";
+}
+.icon-playonce:before {
+  content: "\e938";
+}
+.icon-playall:before {
+  content: "\e939";
+}
+.icon-public:before {
+  content: "\e93b";
+}
+.icon-private:before {
+  content: "\e93c";
+}
+.icon-pause:before {
+  content: "\e93e";
+}
+.icon-prev-clip:before {
+  content: "\e93f";
+}
+.icon-frame-back:before {
+  content: "\e940";
+}
+.icon-frame-forward:before {
+  content: "\e941";
+}
+.icon-next-clip:before {
+  content: "\e943";
+}
+.icon-play3:before {
+  content: "\e944";
 }
 .icon-foldercog:before {
   content: "\e937";

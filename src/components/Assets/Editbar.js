@@ -97,11 +97,11 @@ class Editbar extends Component {
               ) : <div/> }
           <div onClick={this.exportAssets} className="export">
             Export
-            <span onClick={this.exportSelected} className="icon-download2" />
+            <span onClick={this.exportSelected} className="icon-export" />
           </div>
             <div onClick={this.removeSelected} className={classnames('remove', {disabled: !removable})}>
               Remove
-              <span onClick={this.removeSelected} className={classnames('icon-trash2', {disabled: !removable})} />
+              <span onClick={this.removeSelected} className={classnames('icon-removeasset', {disabled: !removable})} />
             </div>
         </div>
       </div>

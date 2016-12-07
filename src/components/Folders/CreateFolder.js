@@ -6,7 +6,8 @@ import classnames from 'classnames'
 import { createFolder } from '../../actions/folderAction'
 import { getAllPermissions } from '../../actions/permissionsAction'
 import { dismissCreateFolderModal } from '../../actions/appActions'
-import AclEntry from '../../models/Acl'
+import User from '../../models/User'
+import AclEntry, { isPublic } from '../../models/Acl'
 import Permission from '../../models/Permission'
 
 class CreateFolder extends Component {
@@ -20,11 +21,17 @@ class CreateFolder extends Component {
     onLink: PropTypes.func,               // optional link button
 
     // App State
+    user: PropTypes.instanceOf(User),
     permissions: PropTypes.arrayOf(PropTypes.instanceOf(Permission)),
     actions: PropTypes.object.isRequired
   }
 
-  state = { name: this.props.name || '', isShared: false, selectedPermissionIds: new Set() }
+  state = {
+    name: this.props.name || '',
+    isShared: false,
+    selectedPermissionIds: new Map(),
+    filterText: ''
+  }
 
   componentWillMount () {
     // Move to a global location, pending cache invalidation issues
@@ -37,13 +44,14 @@ class CreateFolder extends Component {
   }
 
   updatePermissions (props) {
-    const { permissions, acl, name } = props
-    let selectedPermissionIds = new Set()
+    const { user, permissions, acl, name } = props
+    let selectedPermissionIds = new Map()
     acl.forEach(aclEntry => {
       const permission = permissions.find(permission => (aclEntry.permissionId === permission.id))
-      if (permission) selectedPermissionIds.add(permission.id)
+      if (permission) selectedPermissionIds.set(permission.id, aclEntry.access)
     })
-    this.setState({ selectedPermissionIds, name })
+    const isShared = isPublic(acl, user, permissions)
+    this.setState({ selectedPermissionIds, isShared, name })
   }
 
   changeName = (event) => {
@@ -67,17 +75,23 @@ class CreateFolder extends Component {
 
   deleteFolder = (event) => {
     this.props.onDelete(event)
+    this.props.onDelete(event)
     this.dismiss(event)
   }
 
   saveFolder = (event) => {
-    const { name, selectedPermissionIds } = this.state
-    // Create an acl from the selected permissions, assuming full access?
-    const access = AclEntry.ReadAccess | AclEntry.WriteAccess | AclEntry.ExportAccess
-    const acl = selectedPermissionIds && selectedPermissionIds.size
-      ? Array.from(selectedPermissionIds).map(permissionId => (
-        new AclEntry({ permissionId, access })
-      )) : undefined
+    const { user } = this.props
+    const { name, isShared, selectedPermissionIds } = this.state
+    let acl = null
+    if (isShared) {
+      acl = selectedPermissionIds && selectedPermissionIds.size
+        ? Array.from(selectedPermissionIds).map(([permissionId, access]) => (
+        new AclEntry({ permissionId, access }))) : undefined
+    } else {
+      // Look through this user's permissions for the one with 'user' type
+      const permissionId = user.permissions.find(permission => (permission.type === 'user')).id
+      acl = [ new AclEntry({ permissionId, access: this.permissionsForValue(3) }) ]
+    }
     this.props.onCreate(name, acl)
     this.props.actions.dismissCreateFolderModal()
   }
@@ -87,9 +101,9 @@ class CreateFolder extends Component {
   }
 
   togglePermission (permission, event) {
-    let selectedPermissionIds = new Set(this.state.selectedPermissionIds)
+    let selectedPermissionIds = new Map(this.state.selectedPermissionIds)
     if (event.target.checked) {
-      selectedPermissionIds.add(permission.id)
+      selectedPermissionIds.set(permission.id, AclEntry.ReadAccess)
     } else {
       selectedPermissionIds.delete(permission.id)
     }
@@ -102,15 +116,94 @@ class CreateFolder extends Component {
     }
   }
 
+  permissionIcon (permissionId) {
+    for (let permission of this.props.permissions) {
+      if (permission.id === permissionId) {
+        return permission.type === 'group' ? 'icon-public' : 'icon-private'
+      }
+    }
+  }
+
+  permissionValue (access) {
+    if (access & AclEntry.ExportAccess) return 3
+    if (access & AclEntry.WriteAccess) return 2
+    if (access & AclEntry.ReadAccess) return 1
+  }
+
+  permissionsForValue (value) {
+    switch (value) {
+      case '1': return AclEntry.ReadAccess
+      case '2': return AclEntry.ReadAccess | AclEntry.WriteAccess
+      case '3': return AclEntry.ReadAccess | AclEntry.WriteAccess | AclEntry.ExportAccess
+    }
+  }
+
   removePermission (permissionId) {
-    let selectedPermissionIds = new Set(this.state.selectedPermissionIds)
+    let selectedPermissionIds = new Map(this.state.selectedPermissionIds)
     selectedPermissionIds.delete(permissionId)
     this.setState({ selectedPermissionIds })
   }
 
+  changePermission (permissionId, event) {
+    let selectedPermissionIds = new Map(this.state.selectedPermissionIds)
+    selectedPermissionIds.set(permissionId, this.permissionsForValue(event.target.value))
+    this.setState({ selectedPermissionIds })
+  }
+
+  changeFilterText = (event) => {
+    this.setState({ filterText: event.target.value })
+  }
+
+  renderPermissionSlider (permissionId, access) {
+    return (
+      <div className="flexRow flexAlignItemsCenter">
+        <div className="CreateFolder-perm-slider">
+          <div className="CreateFolder-perms-tick-row">
+            <div className={classnames('CreateFolder-perms-tick', {ticked: access & AclEntry.ReadAccess})} style={{left: '0%'}}/>
+            <div className={classnames('CreateFolder-perms-tick', {ticked: access & AclEntry.WriteAccess})} style={{left: '50%'}}/>
+            <div className={classnames('CreateFolder-perms-tick', {ticked: access & AclEntry.ExportAccess})} style={{left: '100%'}}/>
+          </div>
+          <progress className="CreateFolder-perm-progress" min={0} max={2} value={this.permissionValue(access) - 1} />
+          <input className="CreateFolder-perms-input" type="range" min="1" max="3" step="1" value={this.permissionValue(access)} onChange={this.changePermission.bind(this, permissionId)} />
+        </div>
+        <div onClick={this.removePermission.bind(this, permissionId)} className="icon-cross2"/>
+      </div>
+    )
+  }
+
+  renderPermissions (name, icon, permissions) {
+    if (!permissions || !permissions.length) return
+    const { selectedPermissionIds } = this.state
+    return (
+      <div className="CreateFolder-permissions flexCol">
+        <div className="flexRow flexAlignItemsCenter">
+          <div className={icon}/>
+          <div className="CreateFolder-permission-title">{name}</div>
+        </div>
+        <div className="CreateFolder-permission-items">
+          { permissions.map(permission => (
+            <div key={permission.id} className="CreateFolder-permission flexRow flexAlignItemsCenter">
+              <input type="checkbox" id={permission.id} checked={selectedPermissionIds && selectedPermissionIds.has(permission.id)} onChange={this.togglePermission.bind(this, permission)}/>
+              <label htmlFor={permission.id}>{ permission.name }</label>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
   render () {
     const { title, permissions, onLink, onDelete } = this.props
-    const { isShared, selectedPermissionIds, name } = this.state
+    const { isShared, selectedPermissionIds, name, filterText } = this.state
+    const lcFilterText = filterText.toLowerCase()
+    const groupPermissions = permissions.filter(permission => (
+      permission.type === 'group' &&
+      permission.name.toLowerCase().includes(lcFilterText)
+    ))
+    const userPermissions = permissions.filter(permission => (
+      permission.type === 'user' &&
+      permission.name.toLowerCase().includes(lcFilterText)
+    ))
     return (
       <div className="CreateFolder flexRow flexAlignItemsCenter">
         <div className="CreateFolder-background flexRowCenter">
@@ -124,7 +217,7 @@ class CreateFolder extends Component {
           </div>
           <div className="CreateFolder-body">
             <div className="CreateFolder-input-title">Title</div>
-            <input autoFocus={true} type="text" placeholder="Name" onKeyDown={this.checkForSubmit} value={name} onChange={this.changeName} />
+            <input className="CreateFolder-input-title-input" autoFocus={true} type="text" placeholder="Name" onKeyDown={this.checkForSubmit} value={name} onChange={this.changeName} />
             <div className="CreateFolder-public-private flexRow flexAlignItemsCenter">
               <div>Collection is&nbsp;</div>
               <div className={classnames('CreateFolder-public-private', {disabled: isShared})}>Private</div>
@@ -133,23 +226,36 @@ class CreateFolder extends Component {
             </div>
             { isShared && (
               <div className="CreateFolder-sharing">
-                <div className="CreateFolder-shared-with flexRow flexWrap">
-                  { Array.from(selectedPermissionIds).map(permissionId => (
-                    <div key={permissionId} className="CreateFolder-selected-permission flexRow flexAlignItemsCenter">
-                      {this.permissionName(permissionId)}
-                      <div onClick={this.removePermission.bind(this, permissionId)} className="icon-cross"/>
-                    </div>
-                  ))}
+                <div className="CreateFolder-shared-with">
+                  { selectedPermissionIds.size ? (
+                    <div className="CreateFolder-shared-with-title">
+                      <div>Shared With</div>
+                      <div className="CreateFolder-shared-with-perm-icons">
+                        <div className="icon-eye"/>
+                        <div className="icon-pen"/>
+                        <div className="icon-export"/>
+                      </div>
+                    </div>) : <div/>}
+                  <div className="CreateFolder-shared-with-permissions">
+                    { Array.from(selectedPermissionIds).map(([permissionId, access]) => (
+                      <div key={permissionId} className="CreateFolder-selected-permission">
+                        <div className="flexRow flexAlignItemsCenter">
+                          <div className={this.permissionIcon(permissionId)}/>
+                          {this.permissionName(permissionId)}
+                        </div>
+                        { this.renderPermissionSlider(permissionId, access) }
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <input type="text" placeholder="Filter permissions"/>
-                <div className="CreateFolder-permissions flexCol">
-                  { permissions && permissions.map(permission => (
-                    <div key={permission.id} className="CreateFolder-permission flexRow flexAlignItemsCenter">
-                      <input type="checkbox" id={permission.id} checked={selectedPermissionIds && selectedPermissionIds.has(permission.id)} onChange={this.togglePermission.bind(this, permission)}/>
-                      <label htmlFor={permission.id}>{ permission.name }</label>
-                    </div>
-                  ))}
+                <div className="CreateFolder-filter-permission">
+                  <div className="icon-search"/>
+                  <input type="text"
+                         value={filterText} onChange={this.changeFilterText}
+                         className="CreateFolder-filter-permission-input" placeholder="Filter permissions"/>
                 </div>
+                { this.renderPermissions('Groups', 'icon-public', groupPermissions) }
+                { this.renderPermissions('Individuals', 'icon-private', userPermissions) }
               </div>
             )}
           </div>
@@ -179,6 +285,7 @@ class CreateFolder extends Component {
 }
 
 export default connect(state => ({
+  user: state.auth && state.auth.user,
   permissions: state.permissions && state.permissions.all
 }), dispatch => ({
   actions: bindActionCreators({ createFolder, getAllPermissions, dismissCreateFolderModal }, dispatch)

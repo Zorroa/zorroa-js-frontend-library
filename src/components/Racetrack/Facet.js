@@ -254,7 +254,12 @@ class Facet extends Component {
                 <tr className={classnames('Facet-value-table-row',
                   { selected: terms.indexOf(bucket.key) >= 0 })}
                     key={bucket.key} onClick={this.selectTerm.bind(this, bucket.key)}>
-                  <td>{bucket.key}</td>
+                  <td>
+                    <div className="Facet-value-table-key">
+                      <div className="Facet-value-pct-bar" style={{width: `${100 * bucket.doc_count / maxCount}%`}} />
+                      <div className="Facet-value-key">{bucket.key}</div>
+                    </div>
+                  </td>
                   <td>{bucket.doc_count}</td>
                 </tr>
               )) }

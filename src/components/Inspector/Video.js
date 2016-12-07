@@ -76,12 +76,13 @@ export default class Video extends Component {
       playing, volume,
       played, loaded, duration
     } = this.state
-
+    const volumeX = 130 * volume
+    const volumeY = 30 - (7.5 + 15 * volume)
     return (
       <div className='Video'>
         <ReactPlayer
           ref={player => { this.player = player }}
-          className='player'
+          className='Video-player'
           url={url}
           width="100%"
           height="100%"
@@ -97,8 +98,8 @@ export default class Video extends Component {
           onProgress={this.onProgress}
           onDuration={duration => this.setState({ duration })}
         />
-        <div className="progress-bar">
-          <input className="scrub"
+        <div className="Video-progress-bar">
+          <input className="Video-scrub"
                  type='range' min={0} max={1} step='any'
                  value={played}
                  onMouseDown={this.onSeekMouseDown}
@@ -108,19 +109,29 @@ export default class Video extends Component {
           <progress className="loaded" max={1} value={loaded} />
           <progress className="played" max={1} value={played} />
         </div>
-        <div className="control-bar">
-          <div className="time">
+        <div className="Video-control-bar">
+          <div className="Video-time">
             <Duration seconds={duration * played} />/<Duration seconds={duration}/>
           </div>
-          <div className="controls">
-            <div onClick={this.rewind} className="icon-fast-rewind">&lt;&lt;</div>
-            <div onClick={this.frameBack} className="icon-frame-back">&lt;</div>
-            <div onClick={this.playPause}>{playing ? 'Pause' : 'Play'}</div>
-            <div onClick={this.frameForward} className="icon-frame-forward">&gt;</div>
-            <div onClick={this.fastForward} className="icon-fast-foward">&gt;&gt;</div>
+          <div className="Video-controls">
+            <div onClick={this.rewind} className="icon-prev-clip"/>
+            <div onClick={this.frameBack} className="icon-frame-back"/>
+            <div onClick={this.playPause} className={playing ? 'icon-pause' : 'icon-play3'}></div>
+            <div onClick={this.frameForward} className="icon-frame-forward"/>
+            <div onClick={this.fastForward} className="icon-next-clip"/>
           </div>
-          <div className="misc">
-            <input type='range' min={0} max={1} step='any' value={volume} onChange={this.setVolume} />
+          <div className="Video-misc">
+            <div className="icon-mute"/>
+            <div className="Video-volume">
+              <div className="Video-volume-background">
+                <svg width="100%" height="100%">
+                  <path d="M0 22.5 L130 22.5 L130 7.5 Z" fill="#fff" />
+                  <path d={`M0 22.5 L${volumeX} 22.5 L${volumeX} ${volumeY} Z`} fill="#73b61c"/>
+                </svg>
+              </div>
+              <input type='range' min={0} max={1} step='any' value={volume} onChange={this.setVolume} />
+            </div>
+            <div className="icon-loud"/>
             <button className="icon-cross2" onClick={this.zoom} />
           </div>
         </div>
@@ -131,7 +142,7 @@ export default class Video extends Component {
 
 const Duration = ({ className, seconds }) => {
   return (
-    <time dateTime={`P${Math.round(seconds)}S`} className={'duration' || className}>
+    <time dateTime={`P${Math.round(seconds)}S`} className={'Video-duration' || className}>
       {formatDuration(seconds)}
     </time>
   )

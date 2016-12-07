@@ -31,7 +31,7 @@ CollapsibleHeader.propTypes = {
   isSelected: PropTypes.bool,
   header: PropTypes.element.isRequired,
   openIcon: PropTypes.string,
-  closeIcon: PropTypes.string.isRequired,
+  closeIcon: PropTypes.string,
   onOpen: PropTypes.func,
   onSelect: PropTypes.func
 }

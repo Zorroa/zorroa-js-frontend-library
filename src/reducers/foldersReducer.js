@@ -1,7 +1,7 @@
 import {
   GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, UPDATE_FOLDER,
   DELETE_FOLDER, ADD_ASSETS_TO_FOLDER, REMOVE_ASSETS_FROM_FOLDER,
-  CLEAR_FOLDERS_MODIFIED, TOGGLE_FOLDER, UNAUTH_USER
+  CLEAR_FOLDERS_MODIFIED, TOGGLE_FOLDER, UNAUTH_USER, FOLDER_COUNTS
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import * as assert from 'assert'
@@ -13,6 +13,9 @@ import * as assert from 'assert'
 export var createInitialState = () => ({
   // Folder model data from the server
   all: new Map([[ Folder.ROOT_ID, new Folder({ id: Folder.ROOT_ID, name: 'Root' }) ]]),
+
+  // Counts of folders for current search
+  counts: new Map([[ Folder.ROOT_ID, 0 ]]),
 
   // a set of folder ids. items in the set are "open", meaning visible & un-collapsed in the UI
   openFolderIds: new Set([Folder.ROOT_ID]),
@@ -126,6 +129,19 @@ export default function (state = initialState, action) {
         return { ...state, all, openFolderIds, selectedFolderIds }
       }
       break
+
+    case FOLDER_COUNTS: {
+      const { search, ids, counts } = action.payload
+      if (counts && counts.length && counts.length === ids.length) {
+        let newCounts = new Map(state.counts)
+        for (let i in ids) {
+          newCounts.set(ids[i], counts[i])
+        }
+        if (search) return { ...state, filteredCounts: newCounts }
+        return { ...state, counts: newCounts }
+      }
+      break
+    }
 
     case ADD_ASSETS_TO_FOLDER:
       return { ...state, modified: true }

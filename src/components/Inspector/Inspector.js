@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 
 import Pdf from './Pdf'
 import Video from './Video'
+import Image from './Image'
 import Asset from '../../models/Asset'
 
 class Inspector extends Component {
@@ -15,12 +16,12 @@ class Inspector extends Component {
   render () {
     const { asset, protocol, host } = this.props
     const mediaType = asset.mediaType().toLowerCase()
+    let isImage = false
     let isVideo = false
     let isPdf = false
     const url = asset.url(protocol, host)
-    const inspectorStyle = { 'backgroundSize': 'fit' }
     if (mediaType.startsWith('image')) {
-      if (url) inspectorStyle['backgroundImage'] = `url(${url})`
+      isImage = true
     } else if (mediaType.startsWith('video')) {
       isVideo = true
     } else if (mediaType === 'application/pdf') {
@@ -28,7 +29,8 @@ class Inspector extends Component {
     }
     return (
       <div className="inspector fullWidth fullHeight flexCenter">
-        <div className='inspector-content flexOn' style={inspectorStyle}>
+        <div className='inspector-content flexOn'>
+          { isImage && <Image url={url} /> }
           { isVideo && <Video url={url} /> }
           { isPdf && <Pdf documentInitParameters={{url, withCredentials: true}} />}
         </div>

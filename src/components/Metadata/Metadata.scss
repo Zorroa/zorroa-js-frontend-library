@@ -2,11 +2,24 @@
 
 .Metadata {
 
+  background-color: white;
+
   // Metadata don't select, so we toggle them when clicking the label or caret
   // So, hover on the whole header
   .CollapsibleHeader {
+    padding-left: 8px;
+    background: none;
+    text-transform: capitalize;
+    font-weight: 900;
+    color: $zorroa-darkgray;
+    border-top: 1px solid $zorroa-nearwhite;
+
     &:hover { background-color: darken(#d8d8d8, 15%); }
     &.isSelected { background-color: darken($zorroa-water-blue, 15%); }
+  }
+
+  .Collapsible {
+    margin-left: 0;
   }
 
   .header {
@@ -36,6 +49,17 @@
   }
 
   .body {
-    background-color: white;
+
+    // use smaller chevrons for metadata subfields
+    .CollapsibleHeader {
+      .icon-chevron-down {
+        font-size: 10px;
+
+        // magic lineup ala CollapsibleHeader.scss
+        &.isOpen {
+          transform-origin: 30% 50%;
+        }
+      }
+    }
   }
 }

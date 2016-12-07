@@ -1,7 +1,7 @@
 import {
   GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, UPDATE_FOLDER,
   DELETE_FOLDER, TOGGLE_FOLDER, ADD_ASSETS_TO_FOLDER,
-  REMOVE_ASSETS_FROM_FOLDER, CLEAR_FOLDERS_MODIFIED
+  REMOVE_ASSETS_FROM_FOLDER, CLEAR_FOLDERS_MODIFIED, FOLDER_COUNTS
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import { getArchivist } from './authAction'
@@ -148,5 +148,22 @@ export function clearFoldersModified () {
   return {
     type: CLEAR_FOLDERS_MODIFIED,
     payload: true
+  }
+}
+
+export function countAssetsInFolderIds (ids, search) {
+  return dispatch => {
+    console.log('Count query assets in folders ' + JSON.stringify(ids))
+    getArchivist().post(`${rootEndpoint}/_assetCounts`, { search, ids })
+      .then(response => {
+        const counts = response.data.counts
+        dispatch({
+          type: FOLDER_COUNTS,
+          payload: { search, ids, counts }
+        })
+      })
+      .catch(error => {
+        console.error('Error counting query assets in folders ' + JSON.stringify(ids) + ': ' + error)
+      })
   }
 }

@@ -72,6 +72,25 @@
         background-color: $zorroa-water-blue;
       }
     }
+
+    .Facet-value-table-key {
+      @include fullHeight;
+      @include fullWidth;
+      position: relative;
+      padding: 8px;
+    }
+
+    .Facet-value-pct-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      background-color: rgba(161, 29, 119, 0.2);
+    }
+
+    .Facet-value-key {
+      position: relative;
+    }
   }
 
   .Facet-pie-chart {
@@ -112,8 +131,14 @@
     border-spacing: 0;
   }
 
-  th, td {
+  th {
     padding: 8px;
+    max-width: 0; // This looks weird, but is important! It allows cells to chop content
+    @include clampText;
+  }
+
+  td {
+    padding: 0;
     max-width: 0; // This looks weird, but is important! It allows cells to chop content
     @include clampText;
   }

@@ -12,10 +12,11 @@
     width: 120px;
     min-width: 120px;
     text-align: right;
-    color: $zorroa-gray;
+    color: $zorroa-lightgray;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-weight: 200;
   }
 
   .value {
@@ -25,6 +26,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: $zorroa-gray;
 
     .terms {
       .all {

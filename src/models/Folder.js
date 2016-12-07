@@ -1,4 +1,4 @@
-import AclEntry, { hasAccess } from './Acl'
+import AclEntry, { hasAccess, isPublic } from './Acl'
 import User from './User'
 import AssetSearch from './AssetSearch'
 
@@ -30,6 +30,14 @@ export default class Folder {
 
   isDyhi () {
     return this.dyhiId || this.dyhiRoot
+  }
+
+  isPrivate (user, userPermissions) {
+    return !this.isPublic(user, userPermissions)
+  }
+
+  isPublic (user, userPermissions) {
+    return isPublic(this.acl, user, userPermissions)
   }
 
   hasAccess (user, access) {
