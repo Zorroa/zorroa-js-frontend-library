@@ -154,13 +154,6 @@ class Assets extends Component {
     event.dataTransfer.setDragImage(dragIcon, 0, 0)
 
     this.setState({tableDragging: true})
-
-    this.tableRefs = {
-      table: document.querySelector('.Table'),
-      tableHeader: document.querySelector('.Table-header'),
-      tableScrollClip: document.querySelector('.Table-scroll-clip'),
-      tableSettings: document.querySelector('.Table-settings')
-    }
   }
 
   tableDragUpdate = (event) => {
@@ -169,12 +162,7 @@ class Assets extends Component {
     this.newTableHeight = Math.min(600, Math.max(200, this.tableStartHeight - dy))
     const threshold = 4   // Minimize redraws
     if (Math.abs(this.newTableHeight - this.state.tableHeight) > threshold) {
-      const useCrazyFastButSuperHackyUpdate = false
-      if (useCrazyFastButSuperHackyUpdate) {
-        this.updateTableHeight(this.newTableHeight)
-      } else {
-        this.setState({tableHeight: this.newTableHeight})
-      }
+      this.setState({tableHeight: this.newTableHeight})
     }
     return false
   }
@@ -184,29 +172,6 @@ class Assets extends Component {
       tableHeight: this.newTableHeight,
       tableDragging: false
     })
-  }
-
-  updateTableHeight = (height) => {
-    const tableHeaderHeight = 26
-    const tableRefs = this.tableRefs
-    if (!tableRefs) return
-    if (tableRefs.table) {
-      tableRefs.table.style['height'] = height
-      tableRefs.table.style['min-height'] = height
-      tableRefs.table.style['max-height'] = height
-    }
-    // if (tableRefs.tableHeader) {
-    //   tableRefs.tableHeader.style['height'] = `${tableHeaderHeight}px`
-    // }
-    if (tableRefs.tableScrollClip) {
-      // tableRefs.tableScrollClip.style['top'] = `${tableHeaderHeight}px`
-      tableRefs.tableScrollClip.style['height'] = `${height - tableHeaderHeight}px`
-      tableRefs.tableScrollClip.style['max-height'] = `${height - tableHeaderHeight}px`
-    }
-    // if (tableRefs.tableSettings) {
-    //   tableRefs.tableSettings.style['width'] = `${tableHeaderHeight}px`
-    //   tableRefs.tableSettings.style['height'] = `${tableHeaderHeight}px`
-    // }
   }
 
   onScroll = (event) => {
