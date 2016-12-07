@@ -94,6 +94,7 @@ class Table extends Component {
             <div className={`Table-cell ${fieldClass[i]}`}>
               { unCamelCase(Asset.lastNamespace(field)) }
             </div>
+            <i className='Table-header-sort icon-chevrons-expand-vertical'/>
             <div className='flexOn'/>
             <div className='Table-header-resizer'/>
             </div>
