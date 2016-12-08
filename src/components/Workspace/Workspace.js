@@ -59,6 +59,17 @@ class Workspace extends Component {
     actions.toggleCollapsible(name, !app.collapsibleOpen[name])
   }
 
+  // Hack alert: becase Firefox doesn't get mouse coords in drag events,
+  // we're storing them globally
+  onMouseMove = (event) => {
+    if (event.pageX && event.pageY) {
+      window.zorroa = {
+        mouseX: event.pageX,
+        mouseY: event.pageY
+      }
+    }
+  }
+
   render () {
     const { app } = this.props
 
@@ -99,7 +110,8 @@ class Workspace extends Component {
     })
 
     return (
-      <div className={classnames('App', 'flexCol', 'fullHeight', {isDragging: app.isDragging})}>
+      <div className={classnames('App', 'flexCol', 'fullHeight', {isDragging: app.isDragging})}
+           onMouseMove={this.onMouseMove}>
         { app.modal && <Modal {...app.modal} /> }
         { app.displayOptions && <DisplayOptions {...app.displayOptions} /> }
         { app.createFolder && <CreateFolder {...app.createFolder} /> }
