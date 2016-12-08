@@ -191,7 +191,7 @@ class Folders extends Component {
     const selectedFolderIds = folders.selectedFolderIds
     switch (this.props.filterName) {
       case 'browsing': return true
-      case 'smart': return !query.empty()
+      case 'smart': return query && !query.empty()
       case 'simple': return selectedFolderIds && selectedFolderIds.size === 1
     }
   }
