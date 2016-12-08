@@ -10,7 +10,6 @@
 .assets-scroll {
   overflow-y: scroll;
   overflow-x: hidden;
-  padding: 8px;
   max-width: 100%;
 }
 
@@ -97,6 +96,7 @@
 }
 
 .Assets-tableDrag {
+  @include flexOff;
   position: relative;
   width: 100%;
   height: 10px;

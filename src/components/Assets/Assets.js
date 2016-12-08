@@ -16,6 +16,8 @@ import Table from '../Table'
 import Editbar from './Editbar'
 import * as ComputeLayout from './ComputeLayout.js'
 
+const assetsScrollPadding = 8
+
 class Assets extends Component {
   static propTypes = {
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
@@ -43,16 +45,18 @@ class Assets extends Component {
       thumbSize: 128,
       lastSelectedId: null,
       tableHeight: 300,
-      scrollTop: 0,
-      scrollHeight: 0,
-      tableIsDragging: false
+      assetsScrollTop: 0,
+      assetsScrollHeight: 0,
+      assetsScrollWidth: 0,
+      tableIsDragging: false,
+      positions: []
     }
 
     this.tableStartY = 0
     this.tableStartHeight = 0
     this.tableDragNeedsProcessing = true
-    this.scrollHeight = 0
-    this.positions = []
+    this.assetsScrollHeight = 0
+    this.assetsScrollWidth = 0
   }
 
   // Adjust the selection set for the specified asset using
@@ -170,6 +174,7 @@ class Assets extends Component {
       this.setState({tableHeight: this.newTableHeight}, () => {
         this.tableDragNeedsProcessing = true
       })
+      this.updateAssetsScrollSize()
     })
 
     return false
@@ -181,15 +186,56 @@ class Assets extends Component {
       tableHeight: this.newTableHeight,
       tableIsDragging: false
     })
+    this.queueAssetsLayout()
+    return false
   }
 
-  onScroll = (event) => {
-    this.setState({scrollTop: event.target.scrollTop, scrollHeight: event.target.clientHeight})
+  updateAssetsScrollSize = () => {
+    const assetsScroll = this.refs.assetsScroll
+    if (!assetsScroll) return
+    if (assetsScroll.clientHeight !== this.state.assetsScrollHeight ||
+      assetsScroll.clientWidth !== this.state.assetsScrollWidth) {
+      this.setState({
+        assetsScrollHeight: assetsScroll.clientHeight,
+        assetsScrollWidth: assetsScroll.clientWidth
+      })
+      if (!this.state.tableIsDragging) this.queueAssetsLayout()
+    }
+  }
+
+  onAssetsScrollScroll = (event) => {
+    this.setState({ assetsScrollTop: this.refs.assetsScroll.scrollTop })
+    this.updateAssetsScrollSize()
+  }
+
+  runAssetsLayout = () => {
+    const width = this.state.assetsScrollWidth - 2 * assetsScrollPadding
+    if (!width) return
+
+    const { assets } = this.props
+    const { layout, thumbSize } = this.state
+
+    var positions = (_ => {
+      switch (layout) {
+        case 'grid': return ComputeLayout.grid(assets, width, thumbSize)
+        case 'masonry': return ComputeLayout.masonry(assets, width, thumbSize)
+      }
+    })()
+
+    this.setState({positions})
+
+    if (this.assetsLayoutTimer) clearTimeout(this.assetsLayoutTimer)
+    this.assetsLayoutTimer = null
+  }
+
+  queueAssetsLayout = () => {
+    if (this.assetsLayoutTimer) clearTimeout(this.assetsLayoutTimer)
+    this.assetsLayoutTimer = setTimeout(this.runAssetsLayout, 150)
   }
 
   renderAssets () {
     const { assets, selectedIds, totalCount } = this.props
-    const { layout, thumbSize, tableIsDragging } = this.state
+    const { layout, positions, tableIsDragging } = this.state
 
     if (!assets || !assets.length) {
       return (
@@ -202,51 +248,42 @@ class Assets extends Component {
 
     let assetsScrollParams = {
       className: 'assets-scroll fullWidth flexOn',
-      onScroll: this.onScroll
+      onScroll: this.onAssetsScrollScroll,
+      ref: 'assetsScroll',
+      style: { padding: `${assetsScrollPadding}px` }
     }
     if (tableIsDragging) {
-      // this is to prevent the assets panel from scroll while table resizing (dragging)
-      assetsScrollParams.style = { 'pointerEvents': 'none' }
+      // this is to prevent the assets panel from scrolling while table resizing (dragging)
+      assetsScrollParams.style.pointerEvents = 'none'
     }
 
     return (
       <div {...assetsScrollParams}>
         <Measure>
           {({width, height}) => {
-            if (!width) return (<div style={{'width': '100%'}}></div>)
-            if (!tableIsDragging) {
-              this.positions = (layout => {
-                switch (layout) {
-                  case 'grid': return ComputeLayout.grid(assets, width, thumbSize)
-                  case 'masonry': return ComputeLayout.masonry(assets, width, thumbSize)
-                }
-              })(layout)
+            if (!width || !positions.length) {
+              this.queueAssetsLayout()
+              return (<div style={{'width': '100%'}}></div>)
             }
 
-            requestAnimationFrame(() => {
-              var assetsScroll = document.querySelector('.assets-scroll')
-              var scrollHeight = assetsScroll ? assetsScroll.clientHeight : 0
-              if (scrollHeight && scrollHeight !== this.state.scrollHeight) {
-                this.setState({scrollHeight})
-              }
-            })
+            requestAnimationFrame(this.updateAssetsScrollSize)
 
-            const lastPos = this.positions[this.positions.length - 1]
+            const lastPos = positions[positions.length - 1]
             const layoutHeight = Math.ceil(lastPos.y + lastPos.height)
+
             return (
               <div className={`Assets-layout ${layout}`}>
                 <div className='Assets-layout-top' style={{top: 0, width: 0, height: 0}}>&nbsp;</div>
                 { assets.map((asset, index) => {
-                  const pos = this.positions[index]
-                  // 8px is Assets-layout padding. This will be named & factored before merge
-                  if ((8 + pos.y > this.state.scrollTop + this.state.scrollHeight) ||
-                      (8 + pos.y + pos.height < this.state.scrollTop) ||
-                      (!this.positions[index])) {
+                  const pos = positions[index]
+                  if ((!pos) ||
+                      (assetsScrollPadding + pos.y > this.state.assetsScrollTop + this.state.assetsScrollHeight) ||
+                      (assetsScrollPadding + pos.y + pos.height < this.state.assetsScrollTop)) {
                     return null
                   }
                   return (
                     <Thumb isSelected={selectedIds && selectedIds.has(asset.id)}
-                      dim={this.positions[index]}
+                      dim={positions[index]}
                       key={asset.id}
                       asset={asset}
                       onClick={this.select.bind(this, asset)}
