@@ -259,7 +259,7 @@ class Folders extends Component {
       <div className='Folders'>
         <div className="Folders-controls">
           <input type="text" value={this.state.filterString} onChange={this.filterFolders} placeholder="Filter Collections" />
-          <div className={classnames('Folders-controls-add', {disabled: !this.isAddFolderEnabled()})} onClick={this.addFolder}>
+          <div className={classnames('Folders-controls-add', {disabled: !this.isAddFolderEnabled()})} onClick={this.isAddFolderEnabled() ? this.addFolder : null}>
             <span className={this.addFolderIcon()}/>
           </div>
         </div>
