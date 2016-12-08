@@ -45,7 +45,7 @@ class Assets extends Component {
       tableHeight: 300,
       scrollTop: 0,
       scrollHeight: 0,
-      tableDragging: false
+      tableIsDragging: false
     }
 
     this.tableStartY = 0
@@ -153,7 +153,7 @@ class Assets extends Component {
     dragIcon.width = 1
     event.dataTransfer.setDragImage(dragIcon, 0, 0)
 
-    this.setState({tableDragging: true})
+    this.setState({tableIsDragging: true})
   }
 
   tableDragUpdate = (event) => {
@@ -170,7 +170,7 @@ class Assets extends Component {
   tableDragStop = (event) => {
     this.setState({
       tableHeight: this.newTableHeight,
-      tableDragging: false
+      tableIsDragging: false
     })
   }
 
@@ -180,7 +180,7 @@ class Assets extends Component {
 
   renderAssets () {
     const { assets, selectedIds, totalCount } = this.props
-    const { layout, thumbSize } = this.state
+    const { layout, thumbSize, tableIsDragging } = this.state
 
     if (!assets || !assets.length) {
       return (
@@ -191,12 +191,21 @@ class Assets extends Component {
         </div>)
     }
 
+    let assetsScrollParams = {
+      className: 'assets-scroll fullWidth flexOn',
+      onScroll: this.onScroll
+    }
+    if (tableIsDragging) {
+      // this is to prevent the assets panel from scroll while table resizing (dragging)
+      assetsScrollParams.style = { 'pointerEvents': 'none' }
+    }
+
     return (
-      <div className="assets-scroll fullWidth flexOn" onScroll={this.onScroll}>
+      <div {...assetsScrollParams}>
         <Measure>
           {({width, height}) => {
             if (!width) return (<div style={{'width': '100%'}}></div>)
-            if (!this.state.tableDragging) {
+            if (!tableIsDragging) {
               this.positions = (layout => {
                 switch (layout) {
                   case 'grid': return ComputeLayout.grid(assets, width, thumbSize)
@@ -250,7 +259,7 @@ class Assets extends Component {
 
   render () {
     const { assets, totalCount } = this.props
-    const { showTable, layout, thumbSize, tableHeight } = this.state
+    const { showTable, layout, thumbSize, tableHeight, tableIsDragging } = this.state
     return (
       <div className="Assets">
         <Editbar/>
@@ -262,7 +271,7 @@ class Assets extends Component {
                onDrag={this.tableDragUpdate}
                onDragEnd={this.tableDragStop}/>
         )}
-        { showTable && (<Table height={tableHeight}/>) }
+        { showTable && (<Table height={tableHeight} tableIsDragging={tableIsDragging}/>) }
         { totalCount > 0 &&
         <Footer
           total={totalCount}

@@ -14,6 +14,7 @@ class Table extends Component {
     fields: PropTypes.arrayOf(PropTypes.string).isRequired,
     fieldWidth: PropTypes.objectOf(PropTypes.number).isRequired,
     height: PropTypes.number.isRequired,
+    tableIsDragging: PropTypes.bool.isRequired,
 
     // connect actions
     actions: PropTypes.object
@@ -54,7 +55,7 @@ class Table extends Component {
   }
 
   render () {
-    const { assets, fields, fieldWidth, height } = this.props
+    const { assets, fields, fieldWidth, height, tableIsDragging } = this.props
     if (!assets || !assets.length) {
       return
     }
@@ -80,8 +81,11 @@ class Table extends Component {
       }
     })
 
+    let tableStyle = { height, minHeight: height, maxHeight: height }
+    if (tableIsDragging) tableStyle.pointerEvents = 'none'
+
     return (
-      <div className="Table" style={{height, minHeight: height, maxHeight: height}}>
+      <div className="Table" style={tableStyle}>
         <div className='Table-header' style={{height: `${tableHeaderHeight}px`}}>
           { fields.map((field, i) => (
             <div className={`Table-cell ${fieldClass[field]}`}
