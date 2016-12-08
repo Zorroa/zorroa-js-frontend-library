@@ -172,7 +172,7 @@ class FolderItem extends Component {
                 <div>Public Collection</div>
               </div>
             ))}
-          { singleFolderSelected &&
+          { singleFolderSelected && !folder.isDyhi() && folder.search &&
           <div onClick={this.restoreSearch}
                className="FolderItem-context-item"
                onContextMenu={this.dismissContextMenu}>
