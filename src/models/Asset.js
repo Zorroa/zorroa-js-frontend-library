@@ -28,7 +28,7 @@ export default class Asset {
   backgroundColor () { return this.tinyProxy() ? this.tinyProxy()[5] : getRandomColor() }
 
   closestProxy (width, height) {
-    var bestProxy
+    var bestProxy = this.proxies[0]
     var bestDim = Number.MAX_SAFE_INTEGER
     for (var i in this.proxies) {
       const proxy = this.proxies[i]
