@@ -16,7 +16,7 @@ const source = {
 }
 
 const ImageThumb = (props) => {
-  const { asset, dim, onClick, onDoubleClick, dragparams, thumbClass, children } = props
+  const { asset, dim, onClick, onDoubleClick, dragparams, thumbURL, children } = props
   const tproxy = asset.tinyProxy()
   const style = {
     'backgroundColor': tproxy[4],
@@ -24,11 +24,12 @@ const ImageThumb = (props) => {
     'width': dim.width,
     'height': dim.height,
     'left': dim.x,
-    'top': dim.y
+    'top': dim.y,
+    'backgroundImage': `url(${thumbURL})`
   }
   return (
     <div
-      className={classnames('ImageThumb', thumbClass)}
+      className={classnames('ImageThumb')}
       style={style}
       onDoubleClick={onDoubleClick}
       onClick={onClick}
@@ -44,7 +45,7 @@ ImageThumb.propTypes = {
   onClick: PropTypes.func.isRequired,
   onDoubleClick: PropTypes.func.isRequired,
   dragparams: PropTypes.object,
-  thumbClass: PropTypes.string.isRequired,
+  thumbURL: PropTypes.string.isRequired,
   children: React.PropTypes.element
 }
 
@@ -56,20 +57,6 @@ class Thumb extends Component {
     host: PropTypes.string,
     dim: PropTypes.object.isRequired,
     isSelected: PropTypes.bool
-  }
-
-  loadImage (thumbURL) {
-    const thumb = document.getElementsByClassName(this.thumbClass)[0]
-    if (thumb) thumb.style['background-image'] = `url(${thumbURL})`
-  }
-
-  componentWillMount () {
-    const { asset, protocol, host, dim } = this.props
-    this.proxy = asset.closestProxy(dim.width, dim.height)
-    const thumbURL = this.proxy.url(protocol, host)
-    this.thumbClass = `assets-thumb-${thumbURL}`
-
-    requestAnimationFrame(this.loadImage.bind(this, thumbURL))
   }
 
   renderBadges = (pages, duration, icon) => {
@@ -123,12 +110,17 @@ class Thumb extends Component {
     const frontDim = pages ? ninetyDim : fullDim        // stack-front dim
     const props = { ...this.props, dim: {width: '100%', height: '100%', x: 0, y: 0} }
     const hideMultipageStyle = pages ? { display: 'none' } : {}
+
+    const { protocol, host, dim } = this.props
+    var proxy = asset.closestProxy(dim.width, dim.height)
+    const thumbURL = proxy.url(protocol, host)
+
     return (
       <div className={classnames('Thumb', {isSelected})} style={style} >
         <div style={hideMultipageStyle} className="stack-back"/>
         <div style={hideMultipageStyle} className="stack-middle"/>
         <div className="stack-front" style={frontDim}>
-          <ImageThumb {...props} thumbClass={this.thumbClass}>
+          <ImageThumb {...props} thumbURL={thumbURL}>
             { this.renderBadges(pages, duration, icon) }
           </ImageThumb>
         </div>
