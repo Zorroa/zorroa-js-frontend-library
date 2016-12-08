@@ -148,7 +148,7 @@ class Assets extends Component {
 
   tableDragStart = (event) => {
     const { tableHeight } = this.state
-    this.tableStartY = event.pageY || window.zorroa.mouseY
+    this.tableStartY = event.pageY
     this.newTableHeight = tableHeight
     this.tableStartHeight = tableHeight
 
@@ -157,20 +157,17 @@ class Assets extends Component {
     dragIcon.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
     dragIcon.width = 1
     event.dataTransfer.setDragImage(dragIcon, 0, 0)
-    event.dataTransfer.setData('Text', 'table')
 
     this.setState({tableIsDragging: true})
-    return false
   }
 
   tableDragUpdate = (event) => {
-    var mouseY = event.pageY || window.zorroa.mouseY
-    if (!mouseY) return false
+    if (!event.pageY) return false
 
     // let's just completely skip events that happen while we're busy
     if (!this.tableDragNeedsProcessing) return false
     this.tableDragNeedsProcessing = false
-    const dy = (mouseY - this.tableStartY)
+    const dy = (event.pageY - this.tableStartY)
     this.newTableHeight = Math.min(600, Math.max(200, this.tableStartHeight - dy))
     // wait one frame to handle the event, otherwise events queue up syncronously
     requestAnimationFrame(_ => {
