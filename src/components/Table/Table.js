@@ -34,9 +34,10 @@ class Table extends Component {
       columnDragging: false
     }
 
-    this.columnDragFieldName = null,
-    this.columnDragStartX,
-    this.columnDragLastSetWidth
+    this.columnDragFieldName = null
+    this.columnDragStartX = 0
+    this.columnDragStartWidth = 0
+    this.columnDragLastSetWidth = 0
   }
 
   showDisplayOptions = (event) => {
@@ -65,7 +66,6 @@ class Table extends Component {
   }
 
   columnDragStart = (event, field) => {
-    const { columnDragX } = this.state
     this.columnDragFieldName = field
     this.columnDragStartX = event.pageX
     this.columnDragStartWidth = this.props.fieldWidth[field]
@@ -97,6 +97,32 @@ class Table extends Component {
     this.setState({ columnDragging: false })
   }
 
+  columnAutoResize = (event, field) => {
+    const { assets } = this.props
+    var test = document.getElementById('Table-cell-test')
+    var maxWidth = 0
+
+    // measure the largest cell in this column
+    assets.forEach(asset => {
+      test.innerHTML = asset.value(field)
+      maxWidth = Math.max(maxWidth, test.clientWidth)
+    })
+    // include the header!
+    assets.forEach(asset => {
+      test.innerHTML = unCamelCase(Asset.lastNamespace(field))
+      maxWidth = Math.max(maxWidth, test.clientWidth)
+    })
+    test.innerHTML = '' // clean up
+
+    // A tiny bit of padding, just to be safe
+    maxWidth += 10
+
+    // guarantee the result is sane
+    maxWidth = Math.max(50, Math.min(2000, maxWidth))
+
+    this.props.actions.setTableFieldWidth({[field]: maxWidth})
+  }
+
   render () {
     const { assets, fields, fieldWidth, height, tableIsDragging } = this.props
     if (!assets || !assets.length) {
@@ -106,7 +132,8 @@ class Table extends Component {
     var fieldClass = fields.map(field => `Table-field-${field.replace('.', '_')}`)
 
     var mkWidthStyle = width => ({
-      width: `${width}px`,
+      width: `${width}px`
+      // These might be needed...
       // maxWidth: `${width}px`,
       // minWidth: `${width}px`
     })
@@ -141,6 +168,7 @@ class Table extends Component {
               <div className='flexOn'/>
               <div className='Table-header-resizer'
                    draggable={true}
+                   onDoubleClick={event => this.columnAutoResize(event, field)}
                    onDragStart={event => this.columnDragStart(event, field)}
                    onDrag={this.columnDragUpdate}
                    onDragEnd={this.columnDragStop}>
@@ -157,23 +185,24 @@ class Table extends Component {
              }}>
           <div className='Table-scroll' onScroll={this.tableScroll}>
             <div className='Table-body' style={{height: `${assets.length * rowHeight}px`}}>
-            { assets.map((asset, index) => {
-              const rowTop = index * rowHeight
-              const rowBottom = rowTop + rowHeight
-              if (rowBottom < tableScrollTop) return null
-              if (rowTop > tableScrollBottom) return null
-              return (<div key={asset.id}
-                           className={classnames('Table-row', { even: !!(index % 2) })}
-                           style={{top: `${rowTop}px`}}>
-                { fields.map((field, i) =>
-                    (<div className={`Table-cell ${fieldClass[i]}`}
-                       style={mkWidthStyle(fieldWidth[field])}
-                       key={field}>
-                    {asset.value(field)}
-                    </div>)
-                )}
-              </div>)
-            })}
+              { assets.map((asset, index) => {
+                const rowTop = index * rowHeight
+                const rowBottom = rowTop + rowHeight
+                if (rowBottom < tableScrollTop) return null
+                if (rowTop > tableScrollBottom) return null
+                return (<div key={asset.id}
+                             className={classnames('Table-row', { even: !!(index % 2) })}
+                             style={{top: `${rowTop}px`}}>
+                  { fields.map((field, i) =>
+                      (<div className={`Table-cell ${fieldClass[i]}`}
+                         style={mkWidthStyle(fieldWidth[field])}
+                         key={field}>
+                      {asset.value(field)}
+                      </div>)
+                  )}
+                </div>)
+              })}
+              <div id='Table-cell-test' className='Table-cell'/>
             </div>
           </div>
         </div>

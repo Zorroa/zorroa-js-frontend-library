@@ -137,3 +137,9 @@ $tableResizeRightPadding: 20px;
   @include clampText;
   padding: 8px;
 }
+
+// This is for measure text, for auto column width resizing
+#Table-cell-test {
+  position: absolute;
+  top: -50px;
+}
