@@ -15,12 +15,14 @@ import Footer from './Footer'
 import Table from '../Table'
 import Editbar from './Editbar'
 import * as ComputeLayout from './ComputeLayout.js'
+import AssetSearch from '../../models/AssetSearch'
 
 const assetsScrollPadding = 8
 
 class Assets extends Component {
   static propTypes = {
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+    query: PropTypes.instanceOf(AssetSearch),
     selectedIds: PropTypes.object,
     totalCount: PropTypes.number,
     actions: PropTypes.object
@@ -40,6 +42,7 @@ class Assets extends Component {
     // than passing in global app state, which would also force the
     // otherwise simple sub-components to be Redux containers.
     this.state = {
+      assetsKey: '',
       layout: 'masonry',
       showTable: false,
       thumbSize: 128,
@@ -209,6 +212,11 @@ class Assets extends Component {
     this.updateAssetsScrollSize()
   }
 
+  getAssetsKey = () => {
+    const { assets, query } = this.props
+    return `${assets.length}:${JSON.stringify(query)}`
+  }
+
   runAssetsLayout = () => {
     const width = this.state.assetsScrollWidth - 2 * assetsScrollPadding
     if (!width) return
@@ -223,7 +231,8 @@ class Assets extends Component {
       }
     })()
 
-    this.setState({positions})
+    var assetsKey = this.getAssetsKey()
+    this.setState({positions, assetsKey})
 
     if (this.assetsLayoutTimer) clearTimeout(this.assetsLayoutTimer)
     this.assetsLayoutTimer = null
@@ -266,6 +275,8 @@ class Assets extends Component {
               this.queueAssetsLayout()
               return (<div style={{'width': '100%'}}></div>)
             }
+            // Trigger layout if assets change.
+            if (this.getAssetsKey() !== this.state.assetsKey) this.queueAssetsLayout()
 
             requestAnimationFrame(this.updateAssetsScrollSize)
 
@@ -337,6 +348,7 @@ class Assets extends Component {
 
 export default connect(state => ({
   assets: state.assets.all,
+  query: state.assets.query,
   selectedIds: state.assets.selectedIds,
   totalCount: state.assets.totalCount
 }), dispatch => ({
