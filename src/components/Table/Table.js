@@ -11,6 +11,7 @@ import {
   showDisplayOptionsModal,
   setTableFieldWidth
 } from '../../actions/appActions'
+import TableField from './TableField'
 
 class Table extends Component {
   static propTypes = {
@@ -131,39 +132,6 @@ class Table extends Component {
     this.props.actions.setTableFieldWidth({[field]: maxWidth})
   }
 
-  renderColorArrayFieldValue = () => {
-  }
-
-  renderStringArrayFieldValue = (vals) => {
-    return (
-      <div className='Table-cell-array'>
-        { vals.map(val => (<div className='Table-cell-array-string'>{val}</div>)) }
-      </div>
-    )
-  }
-
-  renderFieldValue = (val) => {
-    return (Asset._valueToString(val))
-  }
-
-  renderField = (field, asset) => {
-    const { fieldWidth } = this.props
-    const val = asset.rawValue(field)
-    let renderValFn = this.renderFieldValue
-
-    if (Array.isArray(val)) {
-      renderValFn = this.renderStringArrayFieldValue
-    }
-
-    return (
-      <div className={`Table-cell`}
-           style={{width: `${fieldWidth[field]}px`}}
-           key={field}>
-        { renderValFn(val) }
-      </div>
-    )
-  }
-
   render () {
     const { assets, fields, fieldWidth, height, tableIsDragging } = this.props
     if (!assets || !assets.length) return
@@ -224,7 +192,7 @@ class Table extends Component {
                   <div key={asset.id}
                        className={classnames('Table-row', { even: !!(index % 2) })}
                        style={{top: `${rowTop}px`}}>
-                    { fields.map((field, i) => this.renderField(field, asset)) }
+                    { fields.map((field, i) => <TableField {...{ asset, field, key: field, width: fieldWidth[field] }}/>)}
                   </div>)
               })}
               <div id='Table-cell-test' className='Table-cell'/>
