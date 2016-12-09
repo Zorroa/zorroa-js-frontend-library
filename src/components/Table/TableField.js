@@ -7,7 +7,7 @@ export default class TableField extends Component {
     // props
     asset: PropTypes.instanceOf(Asset).isRequired,
     field: PropTypes.string.isRequired,
-    width: PropTypes.number.isRequired
+    width: PropTypes.number
   }
 
   constructor (props) {
@@ -16,7 +16,15 @@ export default class TableField extends Component {
     }
   }
 
-  renderColorArray = () => {
+  renderColorArray = (vals) => {
+    return (
+      <div className='TableField-array'>
+        { vals.map(val => (
+          <div className='TableField-color'
+               style={{backgroundColor:val}}/>
+        ))}
+      </div>
+    )
   }
 
   renderStringArray = (vals) => {
@@ -36,16 +44,25 @@ export default class TableField extends Component {
     const val = asset.rawValue(field)
     let renderValFn = this.renderGeneral
 
-    if (Array.isArray(val)) {
-      renderValFn = this.renderStringArray
+    if (Array.isArray(val) && val.length) {
+      // If this is an array of colors, render colors
+      if (val[0] && val[0][0] === '#' &&
+        val.every(v => v[0]==='#' && v.length===7 || v.length === 4)) {
+        renderValFn = this.renderColorArray
+      }
+      // otherwise, render an array of strings
+      else {
+        renderValFn = this.renderStringArray
+      }
     }
 
-    return (
-      <div className={`Table-cell`}
-           style={{width: `${width}px`}}
-           key={field}>
-        { renderValFn(val) }
-      </div>
-    )
+    let style = {}
+    // Use width for visible table cells
+    // Without width is for the .Table-cell-test, auto width for measuring cells
+    if (width) {
+      style.width = `${width}px`
+    }
+
+    return (<div className='Table-cell' style={style}>{renderValFn(val)}</div>)
   }
 }

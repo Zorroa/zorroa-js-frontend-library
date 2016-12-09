@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react'
+import ReactDOMServer from 'react-dom/server'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
@@ -51,7 +52,7 @@ class Table extends Component {
   }
 
   updateDisplayOptions = (event, state) => {
-    console.log('Update table display options to:\n' + JSON.stringify(state.checkedNamespaces))
+    // console.log('Update table display options to:\n' + JSON.stringify(state.checkedNamespaces))
     this.props.actions.updateTableFields(state.checkedNamespaces)
     if (state.syncedViews) {
       this.props.actions.updateMetadataFields(state.checkedNamespaces)
@@ -107,13 +108,13 @@ class Table extends Component {
   }
 
   columnAutoResize = (event, field) => {
-    const { assets } = this.props
+    const { assets, fieldWidth } = this.props
     var test = document.getElementById('Table-cell-test')
     var maxWidth = 0
 
     // measure the largest cell in this column
     assets.forEach(asset => {
-      test.innerHTML = asset.value(field)
+      test.innerHTML = ReactDOMServer.renderToString(<TableField {...{ asset, field }}/>)
       maxWidth = Math.max(maxWidth, test.clientWidth)
     })
     // include the header!

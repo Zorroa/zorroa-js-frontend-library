@@ -6,16 +6,28 @@
 
 .TableField-array {
   @include flexRow;
+  @include flexAlignItemsCenter;
   @include nowrap;
   overflow: hidden;
 }
 
 .TableField-tag {
   @include flexRowCenter;
-  padding: 5px;
+  padding: 5px 3px;
   margin-right: 3px;
   border-radius: 3px;
   color: $zorroa-greyish-brown;
   background-color: $zorroa-nearwhite;
-  &:hover { background-color: $zorroa-lightgray; }
+  cursor: pointer;
+  &:hover {
+    color: #fff;
+    background-color: $zorroa-sickly-green;
+  }
+}
+
+.TableField-color {
+  @include flexOff;
+  width: 16px;
+  height: 16px;
+  margin-right: 1px;
 }
