@@ -192,7 +192,7 @@ class Table extends Component {
                  className='Table-header-cell flexRowCenter'
                  style={{width: `${fieldWidth[field]}px`}}>
               <div className={`Table-cell`}>
-                { field }
+                { field.replace(/\./g, ` \u203a `) }
               </div>
               <i className='Table-header-sort icon-chevrons-expand-vertical'/>
               <div className='flexOn'/>
