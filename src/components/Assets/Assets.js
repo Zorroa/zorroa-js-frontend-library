@@ -54,7 +54,7 @@ class Assets extends Component {
 
     this.tableStartY = 0
     this.tableStartHeight = 0
-    this.tableDragNeedsProcessing = true
+    this.allowTableDrag = true
     this.assetsScrollHeight = 0
     this.assetsScrollWidth = 0
   }
@@ -165,14 +165,15 @@ class Assets extends Component {
     if (!event.pageY) return false
 
     // let's just completely skip events that happen while we're busy
-    if (!this.tableDragNeedsProcessing) return false
-    this.tableDragNeedsProcessing = false
+    if (!this.allowTableDrag) return false
+    this.allowTableDrag = false
+
     const dy = (event.pageY - this.tableStartY)
     this.newTableHeight = Math.min(600, Math.max(200, this.tableStartHeight - dy))
     // wait one frame to handle the event, otherwise events queue up syncronously
     requestAnimationFrame(_ => {
       this.setState({tableHeight: this.newTableHeight}, () => {
-        this.tableDragNeedsProcessing = true
+        this.allowTableDrag = true
       })
       this.updateAssetsScrollSize()
     })
@@ -181,7 +182,7 @@ class Assets extends Component {
   }
 
   tableDragStop = (event) => {
-    this.tableDragNeedsProcessing = true
+    this.allowTableDrag = true
     this.setState({
       tableHeight: this.newTableHeight,
       tableIsDragging: false

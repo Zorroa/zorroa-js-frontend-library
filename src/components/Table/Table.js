@@ -38,6 +38,7 @@ class Table extends Component {
     this.columnDragStartX = 0
     this.columnDragStartWidth = 0
     this.columnDragLastSetWidth = 0
+    this.allowColumnDrag = true
   }
 
   showDisplayOptions = (event) => {
@@ -82,17 +83,24 @@ class Table extends Component {
 
   columnDragUpdate = (event) => {
     if (!event.pageX) return
+
+    // let's just completely skip events that happen while we're busy
+    if (!this.allowColumnDrag) return false
+    this.allowColumnDrag = false
+
     const dx = (event.pageX - this.columnDragStartX)
     var fieldWidth = Math.min(2000, Math.max(50, this.columnDragStartWidth + dx))
-    const threshold = 4   // Minimize redraws
-    if (Math.abs(fieldWidth - this.columnDragLastSetWidth) > threshold) {
-      this.columnDragLastSetWidth = fieldWidth
-      this.props.actions.setTableFieldWidth({[this.columnDragFieldName]: fieldWidth})
-    }
+
+    this.columnDragLastSetWidth = fieldWidth
+    this.props.actions.setTableFieldWidth({[this.columnDragFieldName]: fieldWidth})
+
+    // wait one frame to finish the event, otherwise events queue up syncronously
+    requestAnimationFrame(_ => { this.allowColumnDrag = true })
     return false
   }
 
   columnDragStop = (event) => {
+    this.allowColumnDrag = true
     this.columnDragFieldName = null
     this.setState({ columnDragging: false })
   }
