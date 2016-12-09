@@ -70,6 +70,14 @@ export default class Asset {
   // invokes _field to navigate through the JSON and then uses
   // _valueToString to get a displayable form of the value.
   value (field) {
+    return Asset._valueToString(Asset._field(this.document, field))
+  }
+
+  // Return the value for a metadata field specified using dot-notation
+  // as a path through the JSON-structured asset document. Recursively
+  // invokes _field to navigate through the JSON and then uses
+  // _valueToString to get a displayable form of the value.
+  rawValue (field) {
     return Asset._field(this.document, field)
   }
 
@@ -86,20 +94,20 @@ export default class Asset {
       return Asset._field(value, nextkey)
     }
 
-    // E.g. proxies, an array of objects
-    // FIXME: Unify array management with _valueToString
-    if (Array.isArray(obj) || obj instanceof Array) {
-      let array = '['
-      obj.map((f, i) => {
-        array += Asset._field(f, key)
-        array += ', '
-      })
-      array = array.slice(0, array.length - 2)
-      array += ']'
-      return array
-    }
+    // // E.g. proxies, an array of objects
+    // // FIXME: Unify array management with _valueToString
+    // if (Array.isArray(obj) || obj instanceof Array) {
+    //   let array = '['
+    //   obj.map((f, i) => {
+    //     array += Asset._field(f, key)
+    //     array += ', '
+    //   })
+    //   array = array.slice(0, array.length - 2)
+    //   array += ']'
+    //   return array
+    // }
 
-    return Asset._valueToString(obj[key])
+    return obj[key]
   }
 
   static _valueToString (value) {

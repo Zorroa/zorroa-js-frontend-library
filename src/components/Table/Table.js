@@ -131,20 +131,42 @@ class Table extends Component {
     this.props.actions.setTableFieldWidth({[field]: maxWidth})
   }
 
-  render () {
-    const { assets, fields, fieldWidth, height, tableIsDragging } = this.props
-    if (!assets || !assets.length) {
-      return
+  renderColorArrayFieldValue = () => {
+  }
+
+  renderStringArrayFieldValue = (vals) => {
+    return (
+      <div className='Table-cell-array'>
+        { vals.map(val => (<div className='Table-cell-array-string'>{val}</div>)) }
+      </div>
+    )
+  }
+
+  renderFieldValue = (val) => {
+    return (Asset._valueToString(val))
+  }
+
+  renderField = (field, asset) => {
+    const { fieldWidth } = this.props
+    const val = asset.rawValue(field)
+    let renderValFn = this.renderFieldValue
+
+    if (Array.isArray(val)) {
+      renderValFn = this.renderStringArrayFieldValue
     }
 
-    var fieldClass = fields.map(field => `Table-field-${field.replace('.', '_')}`)
+    return (
+      <div className={`Table-cell`}
+           style={{width: `${fieldWidth[field]}px`}}
+           key={field}>
+        { renderValFn(val) }
+      </div>
+    )
+  }
 
-    var mkWidthStyle = width => ({
-      width: `${width}px`
-      // These might be needed...
-      // maxWidth: `${width}px`,
-      // minWidth: `${width}px`
-    })
+  render () {
+    const { assets, fields, fieldWidth, height, tableIsDragging } = this.props
+    if (!assets || !assets.length) return
 
     const tableHeaderHeight = 26
     const rowHeight = 30
@@ -168,9 +190,9 @@ class Table extends Component {
           { fields.map((field, i) => (
             <div key={i}
                  className='Table-header-cell flexRowCenter'
-                 style={mkWidthStyle(fieldWidth[field])}>
-              <div className={`Table-cell ${fieldClass[i]}`}>
-                { unCamelCase(Asset.lastNamespace(field)) }
+                 style={{width: `${fieldWidth[field]}px`}}>
+              <div className={`Table-cell`}>
+                { field }
               </div>
               <i className='Table-header-sort icon-chevrons-expand-vertical'/>
               <div className='flexOn'/>
@@ -198,17 +220,12 @@ class Table extends Component {
                 const rowBottom = rowTop + rowHeight
                 if (rowBottom < tableScrollTop) return null
                 if (rowTop > tableScrollBottom) return null
-                return (<div key={asset.id}
-                             className={classnames('Table-row', { even: !!(index % 2) })}
-                             style={{top: `${rowTop}px`}}>
-                  { fields.map((field, i) =>
-                      (<div className={`Table-cell ${fieldClass[i]}`}
-                         style={mkWidthStyle(fieldWidth[field])}
-                         key={field}>
-                      {asset.value(field)}
-                      </div>)
-                  )}
-                </div>)
+                return (
+                  <div key={asset.id}
+                       className={classnames('Table-row', { even: !!(index % 2) })}
+                       style={{top: `${rowTop}px`}}>
+                    { fields.map((field, i) => this.renderField(field, asset)) }
+                  </div>)
               })}
               <div id='Table-cell-test' className='Table-cell'/>
             </div>
@@ -216,10 +233,7 @@ class Table extends Component {
         </div>
 
         <div className="Table-settings"
-             style={{
-               width: `${tableHeaderHeight}px`,
-               height: `${tableHeaderHeight}px`
-             }}>
+             style={{width: `${tableHeaderHeight}px`, height: `${tableHeaderHeight}px`}}>
           <div onClick={this.showDisplayOptions} className="icon-cog"/>
         </div>
       </div>
