@@ -94,68 +94,116 @@
     @include flexAlignItemsCenter;
     box-shadow: 0 0 3px 3px rgba(0,0,0,0.25);
     border-radius: 3px;
-    height: 40px;
+    height: 60px;
     background: none;
 
     .Video-time {
       margin-left: 10px;
       width: 200px;
+      font-size: 20px;
+      color: $zorroa-lightgray;
       .Video-duration {
         padding: 8px;
+        font-family: Montserrat, sans-serif;
+        font-size: 16.9px;
+        font-weight: 100;
+        font-style: normal;
+        font-stretch: normal;
       }
     }
 
-    .Video-controls {
-      @include flexRow;
-      @include flexJustifyCenter;
+  &.ProgressBar {
+    @include fullWidth;
+  }
+}
 
-      div {
-        text-align: center;
-        width: 40px;
-        font-size: 18px;
+  .Video-controls {
+    @include flexRow;
+    @include flexJustifyCenter;
+    @include flexAlignItemsCenter;
+    margin-bottom: 5px;
+    color: $zorroa-slategray;
 
-        &:hover {
-          color: $zorroa-sickly-green;
-        }
+    div {
+      text-align: center;
+      font-size: 30px;
+      margin-left: 14px;
+      margin-right: 14px;
+
+      &:hover {
+        color: $zorroa-sickly-green;
       }
     }
 
-    .Video-misc {
-      @include flexRow;
-      @include flexAlignItemsCenter;
-      width: 200px;
+    .Video-play {
+      color: white;
+      border-radius: 3px;
+      background: $zorroa-sickly-green;
+      margin-left: 8px;
+      margin-right: 8px;
+      margin-bottom: 5px;
+      padding-left: 22px;
+      padding-right: 28px;
+      padding-top: 10px;
+      padding-bottom: 10px;
 
-      .icon-mute {
-        font-size: 18px;
+      &:hover {
+        color: $zorroa-slategray;
       }
 
-      .icon-loud {
-        margin-right: 5px;
+      div:hover {
+        color: $zorroa-slategray;
       }
 
-      .icon-cross2 {
-        color: white;
-        background: none;
-        border: none;
-        margin-right: 10px;
-        margin-left: 5px;
-      }
-
-      input[type=range]::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        border: none;
-        background: none;
-      }
-
-      input {
-        background: none;
-        position: relative;
+      [class*="icon-"] {
+        margin: 0;
+        padding: 0;
+        width: 18px;
+        height: auto;
       }
     }
   }
 
-  &.ProgressBar {
-    @include fullWidth;
+  .Video-misc {
+    @include flexRow;
+    @include flexAlignItemsCenter;
+
+    [class*="icon-"] {
+      color: $zorroa-slategray;
+      background: none;
+      border: none;
+      font-size: 30px;
+    }
+
+    .icon-volume-high {
+      margin-right: 20px;
+      margin-left: 10px;
+    }
+
+    .icon-cross2 {
+      margin-right: 200px;
+      margin-left: 40px;
+    }
+
+    .icon-expand {
+      font-size: 20px;
+      margin-left: 20px;
+      margin-right: 20px;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      border: none;
+      background: none;
+    }
+
+    input {
+      background: none;
+      position: relative;
+      height: 20px;
+      padding-left: 0;
+      margin-left: 0;
+    }
   }
 }
 

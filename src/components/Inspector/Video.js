@@ -77,7 +77,7 @@ export default class Video extends Component {
       played, loaded, duration
     } = this.state
     const volumeX = 130 * volume
-    const volumeY = 30 - (7.5 + 15 * volume)
+    const volumeY = 30 - (5 + 20 * volume)
     return (
       <div className='Video'>
         <ReactPlayer
@@ -116,7 +116,9 @@ export default class Video extends Component {
           <div className="Video-controls">
             <div onClick={this.rewind} className="icon-prev-clip"/>
             <div onClick={this.frameBack} className="icon-frame-back"/>
-            <div onClick={this.playPause} className={playing ? 'icon-pause' : 'icon-play3'}></div>
+            <div onClick={this.playPause} className="Video-play">
+              <div className={playing ? 'icon-pause' : 'icon-play3'} />
+            </div>
             <div onClick={this.frameForward} className="icon-frame-forward"/>
             <div onClick={this.fastForward} className="icon-next-clip"/>
           </div>
@@ -125,14 +127,14 @@ export default class Video extends Component {
             <div className="Video-volume">
               <div className="Video-volume-background">
                 <svg width="100%" height="100%">
-                  <path d="M0 22.5 L130 22.5 L130 7.5 Z" fill="#fff" />
-                  <path d={`M0 22.5 L${volumeX} 22.5 L${volumeX} ${volumeY} Z`} fill="#73b61c"/>
+                  <path d="M0 25 L130 25 L130 5 Z" fill="#787a77" />
+                  <path d={`M0 25 L${volumeX} 25 L${volumeX} ${volumeY} Z`} fill="#73b61c"/>
                 </svg>
               </div>
               <input type='range' min={0} max={1} step='any' value={volume} onChange={this.setVolume} />
             </div>
-            <div className="icon-loud"/>
-            <button className="icon-cross2" onClick={this.zoom} />
+            <div className="icon-volume-high"/>
+            <button className="icon-expand" onClick={this.zoom} />
           </div>
         </div>
       </div>
