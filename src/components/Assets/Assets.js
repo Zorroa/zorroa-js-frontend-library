@@ -60,6 +60,7 @@ class Assets extends Component {
     this.allowTableDrag = true
     this.assetsScrollHeight = 0
     this.assetsScrollWidth = 0
+    this.updateAssetsScrollSizeInterval = null
   }
 
   // Adjust the selection set for the specified asset using
@@ -207,6 +208,18 @@ class Assets extends Component {
     }
   }
 
+  componentWillMount () {
+    if (this.updateAssetsScrollSizeInterval) {
+      clearInterval(this.updateAssetsScrollSizeInterval)
+    }
+    this.updateAssetsScrollSizeInterval = setInterval(this.updateAssetsScrollSize, 150)
+  }
+
+  componentWillUnmount () {
+    clearInterval(this.updateAssetsScrollSizeInterval)
+    this.updateAssetsScrollSizeInterval = null
+  }
+
   onAssetsScrollScroll = (event) => {
     this.setState({ assetsScrollTop: this.refs.assetsScroll.scrollTop })
     this.updateAssetsScrollSize()
@@ -214,7 +227,9 @@ class Assets extends Component {
 
   getAssetsKey = () => {
     const { assets, query } = this.props
-    return `${assets.length}:${JSON.stringify(query)}`
+    const { layout, thumbSize } = this.state
+    if (!assets) return ''
+    return `${assets.length}:${layout}:${thumbSize}:${JSON.stringify(query)}`
   }
 
   runAssetsLayout = () => {
@@ -275,10 +290,6 @@ class Assets extends Component {
               this.queueAssetsLayout()
               return (<div style={{'width': '100%'}}></div>)
             }
-            // Trigger layout if assets change.
-            if (this.getAssetsKey() !== this.state.assetsKey) this.queueAssetsLayout()
-
-            requestAnimationFrame(this.updateAssetsScrollSize)
 
             const lastPos = positions[positions.length - 1]
             const layoutHeight = Math.ceil(lastPos.y + lastPos.height)
@@ -318,6 +329,10 @@ class Assets extends Component {
   render () {
     const { assets, totalCount } = this.props
     const { showTable, layout, thumbSize, tableHeight, tableIsDragging } = this.state
+
+    // Trigger layout if assets change.
+    if (this.getAssetsKey() !== this.state.assetsKey) this.queueAssetsLayout()
+
     return (
       <div className="Assets">
         <Editbar/>
