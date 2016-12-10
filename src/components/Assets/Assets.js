@@ -173,12 +173,12 @@ class Assets extends Component {
 
     const dy = (event.pageY - this.tableStartY)
     this.newTableHeight = this.clampTableHeight(this.tableStartHeight - dy)
-     // wait one frame to handle the event, otherwise events queue up syncronously
+    // wait one frame to handle the event, otherwise events queue up syncronously
     requestAnimationFrame(_ => {
       this.setState({tableHeight: this.newTableHeight})
       this.updateAssetsScrollSize()
-      this.allowTableDrag = true
-    })
+        this.allowTableDrag = true
+      })
 
     return false
   }
@@ -351,7 +351,7 @@ class Assets extends Component {
 
   render () {
     const { assets, totalCount } = this.props
-    const { showTable, layout, thumbSize, tableHeight, tableIsDragging } = this.state
+    const { showTable, layout, thumbSize, tableHeight, tableIsDragging, assetsKey } = this.state
 
     // Trigger layout if assets change.
     if (this.getAssetsKey() !== this.state.assetsKey) this.queueAssetsLayout()
@@ -367,8 +367,11 @@ class Assets extends Component {
                onDrag={this.tableDragUpdate}
                onDragEnd={this.tableDragStop}/>
         )}
-        { showTable && (<Table height={this.clampTableHeight(tableHeight)}
-                               tableIsDragging={tableIsDragging}/>) }
+        { showTable && (
+          <Table height={this.clampTableHeight(tableHeight)}
+                 assetsKey={assetsKey}
+                 tableIsDragging={tableIsDragging}/>
+        )}
         { totalCount > 0 &&
         <Footer
           total={totalCount}

@@ -14,10 +14,14 @@ import {
 } from '../../actions/appActions'
 import TableField from './TableField'
 
+const rowHeightPx = 30;
+const tableHeaderHeight = 26
+
 class Table extends Component {
   static propTypes = {
     // app state
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+    assetsKey: PropTypes.string.isRequired,
     fields: PropTypes.arrayOf(PropTypes.string).isRequired,
     fieldWidth: PropTypes.objectOf(PropTypes.number).isRequired,
     height: PropTypes.number.isRequired,
@@ -34,7 +38,7 @@ class Table extends Component {
       tableScrollTop: 0,
       tableScrollHeight: 0,
       columnDragging: false,
-      assetFieldOpen: {}
+      assetFieldOpen: {},
     }
 
     this.columnDragFieldName = null
@@ -42,6 +46,8 @@ class Table extends Component {
     this.columnDragStartWidth = 0
     this.columnDragLastSetWidth = 0
     this.allowColumnDrag = true
+    this.assetsKey = ''
+    this.rowBottomPx = []
   }
 
   showDisplayOptions = (event) => {
@@ -115,7 +121,7 @@ class Table extends Component {
 
     // measure the largest cell in this column
     assets.forEach(asset => {
-      test.innerHTML = ReactDOMServer.renderToString(<TableField {...{ asset, field }}/>)
+      test.innerHTML = ReactDOMServer.renderToString(<TableField {...{ asset, field, isOpen: true }}/>)
       maxWidth = Math.max(maxWidth, test.clientWidth)
     })
     // include the header!
@@ -134,31 +140,64 @@ class Table extends Component {
     this.props.actions.setTableFieldWidth({[field]: maxWidth})
   }
 
-  assetFieldKey = (asset, field) => {
-    return `${field}:${asset.id}`
+  toggleArrayField = (asset, field) => {
+    let assetFieldOpen = {...this.state.assetFieldOpen} // copy assetFieldOpen
+    const doOpen = !(assetFieldOpen[asset.id] && assetFieldOpen[asset.id][field])
+    if (doOpen) {
+      if (!assetFieldOpen[asset.id]) {
+        assetFieldOpen[asset.id] = {}
+      }
+      assetFieldOpen[asset.id][field] = true
+    } else {
+      delete assetFieldOpen[asset.id][field]
+      if (assetFieldOpen[asset.id] && Object.keys(assetFieldOpen[asset.id]).length === 0) {
+        delete assetFieldOpen[asset.id]
+      }
+    }
+    this.assetsKey = '' // trigger row height recompute
+    this.setState({assetFieldOpen})
   }
 
-  toggleArrayField = (asset, field, optIsOpen) => {
-    // copy assetFieldOpen
-    let assetFieldOpen = {...this.state.assetFieldOpen}
-    const key = this.assetFieldKey(asset, field)
-    const doOpen = (optIsOpen !== undefined) ? optIsOpen : !assetFieldOpen[key]
-    if (doOpen) {
-      assetFieldOpen[key] = true
-    } else {
-      delete assetFieldOpen[key]
+  isAssetFieldOpen = (asset, field) => {
+    return this.state.assetFieldOpen[asset.id] && this.state.assetFieldOpen[asset.id][field]
+  }
+
+  isAssetOpen = (asset) => {
+    return !!this.state.assetFieldOpen[asset.id]
+  }
+
+  recomputeRowHeights () {
+    let { assets, fields } = this.props
+    const { assetFieldOpen } = this.state
+    let rowHeightInLines = []
+    for (let i = 0; i < assets.length; i++) {
+      if (this.isAssetOpen(assets[i])) {
+        rowHeightInLines[i] = Math.max.apply(Math, fields.map(field => {
+          if (!this.isAssetFieldOpen(assets[i], field)) return 1
+          return assets[i].rawValue(field).length + 1 // one extra for the toggle button
+        }))
+      } else {
+        rowHeightInLines[i] = 1
+      }
     }
-    this.setState({assetFieldOpen})
+
+    this.rowBottomPx = [0]
+    for (let i = 1; i < assets.length; i++) {
+      this.rowBottomPx[i] = this.rowBottomPx[i-1] + rowHeightInLines[i] * rowHeightPx
+    }
   }
 
   render () {
     const { assets, fields, fieldWidth, height, tableIsDragging } = this.props
     if (!assets || !assets.length) return
 
-    const tableHeaderHeight = 26
-    const rowHeight = 30
-    const { tableScrollTop, tableScrollHeight } = this.state
+    const { tableScrollTop, tableScrollHeight, assetsKey } = this.state
     const tableScrollBottom = tableScrollTop + tableScrollHeight
+
+    if (assetsKey !== this.assetsKey) {
+      this.recomputeRowHeights()
+      this.assetsKey = assetsKey
+    }
 
     requestAnimationFrame(() => {
       var tableScroll = document.querySelector('.Table-scroll')
@@ -201,19 +240,19 @@ class Table extends Component {
                maxHeight: `${height - tableHeaderHeight}px`
              }}>
           <div className='Table-scroll' onScroll={this.tableScroll}>
-            <div className='Table-body' style={{height: `${assets.length * rowHeight}px`}}>
+            <div className='Table-body' style={{height: `${this.rowBottomPx[this.rowBottomPx.length-1]}px`}}>
               { assets.map((asset, index) => {
-                const rowTop = index * rowHeight
-                const rowBottom = rowTop + rowHeight
-                if (rowBottom < tableScrollTop) return null
-                if (rowTop > tableScrollBottom) return null
+                const rowTopPx = (index) ? this.rowBottomPx[index-1] : 0
+                const rowBottomPx = this.rowBottomPx[index]
+                if (rowBottomPx < tableScrollTop) return null
+                if (rowTopPx > tableScrollBottom) return null
                 return (
                   <div key={asset.id}
                        className={classnames('Table-row', { even: !!(index % 2) })}
-                       style={{top: `${rowTop}px`}}>
+                       style={{top: `${rowTopPx}px`, height: `${rowBottomPx-rowTopPx}px`}}>
                     { fields.map((field, i) => (
                       <TableField {...{ asset, field, key: field, width: fieldWidth[field] }}
-                        isOpen={!!this.state.assetFieldOpen[this.assetFieldKey(asset,field)]}
+                        isOpen={this.isAssetFieldOpen(asset,field)}
                         onOpen={event => this.toggleArrayField(asset,field)}
                       />
                     ))}
