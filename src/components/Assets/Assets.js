@@ -177,8 +177,8 @@ class Assets extends Component {
     requestAnimationFrame(_ => {
       this.setState({tableHeight: this.newTableHeight})
       this.updateAssetsScrollSize()
-        this.allowTableDrag = true
-      })
+      this.allowTableDrag = true
+    })
 
     return false
   }
