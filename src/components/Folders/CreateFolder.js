@@ -44,7 +44,8 @@ class CreateFolder extends Component {
   }
 
   updatePermissions (props) {
-    const { user, permissions, acl, name } = props
+    const { user, permissions, acl } = props
+    const { name } = this.state
     let selectedPermissionIds = new Map()
     acl.forEach(aclEntry => {
       const permission = permissions.find(permission => (aclEntry.permissionId === permission.id))
@@ -128,13 +129,14 @@ class CreateFolder extends Component {
     if (access & AclEntry.ExportAccess) return 3
     if (access & AclEntry.WriteAccess) return 2
     if (access & AclEntry.ReadAccess) return 1
+    return -1   // Avoid undefined since this is used for input:value
   }
 
   permissionsForValue (value) {
     switch (value) {
-      case '1': return AclEntry.ReadAccess
-      case '2': return AclEntry.ReadAccess | AclEntry.WriteAccess
-      case '3': return AclEntry.ReadAccess | AclEntry.WriteAccess | AclEntry.ExportAccess
+      case 1: return AclEntry.ReadAccess
+      case 2: return AclEntry.ReadAccess | AclEntry.WriteAccess
+      case 3: return AclEntry.ReadAccess | AclEntry.WriteAccess | AclEntry.ExportAccess
     }
   }
 
@@ -146,7 +148,8 @@ class CreateFolder extends Component {
 
   changePermission (permissionId, event) {
     let selectedPermissionIds = new Map(this.state.selectedPermissionIds)
-    selectedPermissionIds.set(permissionId, this.permissionsForValue(event.target.value))
+    const value = parseInt(event.target.value, 10)
+    selectedPermissionIds.set(permissionId, this.permissionsForValue(value))
     this.setState({ selectedPermissionIds })
   }
 

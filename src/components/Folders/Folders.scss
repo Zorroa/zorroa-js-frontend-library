@@ -32,11 +32,11 @@
     font-size: 14px;
     margin: 4px;
 
-    &:disabled {
+    &.disabled {
       background-color: $zorroa-lightgray;
     }
 
-    &:not(disabled) {
+    &:not(.disabled) {
       &:hover {
         border: 1px solid $zorroa-gray;
         background-color: darken($zorroa-sickly-green, 15%);
