@@ -18,6 +18,7 @@ import * as ComputeLayout from './ComputeLayout.js'
 import AssetSearch from '../../models/AssetSearch'
 
 const assetsScrollPadding = 8
+const defaultTableHeight = 300
 
 class Assets extends Component {
   static propTypes = {
@@ -47,7 +48,7 @@ class Assets extends Component {
       showTable: false,
       thumbSize: 128,
       lastSelectedId: null,
-      tableHeight: 300,
+      tableHeight: defaultTableHeight,
       assetsScrollTop: 0,
       assetsScrollHeight: 0,
       assetsScrollWidth: 0,
@@ -151,10 +152,10 @@ class Assets extends Component {
   }
 
   tableDragStart = (event) => {
-    const { tableHeight } = this.state
+    const tableHeight = this.clampTableHeight(this.state.tableHeight)
     this.tableStartY = event.pageY
     this.newTableHeight = tableHeight
-    this.tableStartHeight = tableHeight
+    this.tableStartHeight = this.newTableHeight
 
     var dragIcon = document.createElement('img')
     // hide the drag element using a transparent 1x1 pixel image as a proxy
@@ -166,20 +167,17 @@ class Assets extends Component {
   }
 
   tableDragUpdate = (event) => {
-    if (!event.pageY) return false
-
     // let's just completely skip events that happen while we're busy
     if (!this.allowTableDrag) return false
     this.allowTableDrag = false
 
     const dy = (event.pageY - this.tableStartY)
-    this.newTableHeight = Math.min(600, Math.max(200, this.tableStartHeight - dy))
-    // wait one frame to handle the event, otherwise events queue up syncronously
+    this.newTableHeight = this.clampTableHeight(this.tableStartHeight - dy)
+     // wait one frame to handle the event, otherwise events queue up syncronously
     requestAnimationFrame(_ => {
-      this.setState({tableHeight: this.newTableHeight}, () => {
-        this.allowTableDrag = true
-      })
+      this.setState({tableHeight: this.newTableHeight})
       this.updateAssetsScrollSize()
+      this.allowTableDrag = true
     })
 
     return false
@@ -258,6 +256,18 @@ class Assets extends Component {
     this.assetsLayoutTimer = setTimeout(this.runAssetsLayout, 150)
   }
 
+  clampTableHeight = (tableHeight) => {
+    const minTableHeight = 26
+    const hardMaxTableHeight = 2000
+    const footerAndPadding = 100 // No ref available for 'stateless' Footer
+    const maxTableHeight = (this.refs.Assets && this.refs.Assets.clientHeight - footerAndPadding) || hardMaxTableHeight // worst case: table is too big, but drag handle is on-screen
+    var clampedTableHeight = Math.min(maxTableHeight, Math.max(minTableHeight, tableHeight))
+    if (!clampedTableHeight || !isFinite(clampedTableHeight)) {
+      clampedTableHeight = defaultTableHeight
+    }
+    return clampedTableHeight
+  }
+
   renderAssets () {
     const { assets, selectedIds, totalCount } = this.props
     const { layout, positions, tableIsDragging } = this.state
@@ -334,7 +344,7 @@ class Assets extends Component {
     if (this.getAssetsKey() !== this.state.assetsKey) this.queueAssetsLayout()
 
     return (
-      <div className="Assets">
+      <div className="Assets" ref="Assets">
         <Editbar/>
         {this.renderAssets()}
         { showTable && (
@@ -344,7 +354,8 @@ class Assets extends Component {
                onDrag={this.tableDragUpdate}
                onDragEnd={this.tableDragStop}/>
         )}
-        { showTable && (<Table height={tableHeight} tableIsDragging={tableIsDragging}/>) }
+        { showTable && (<Table height={this.clampTableHeight(tableHeight)}
+                               tableIsDragging={tableIsDragging}/>) }
         { totalCount > 0 &&
         <Footer
           total={totalCount}
