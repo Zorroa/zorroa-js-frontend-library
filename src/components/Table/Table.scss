@@ -1,22 +1,14 @@
 @import '../../styles/core-mixins.scss';
 
-$tableHeight: 300;
-$tableHeaderHeight: 26;
-
 .Table {
   @include flexOff;
   @include flexCol;
 
   position: relative; // for Table-settings
 
-  min-height: $tableHeight + px;
-  height: $tableHeight + px;
-  max-height: $tableHeight + px;
+  // height is defined in JSX
 
   overflow: hidden;
-
-  border-top: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
 }
 
 .Table-settings {
@@ -27,8 +19,7 @@ $tableHeaderHeight: 26;
   top: 0;
   right: 0;
 
-  width: $tableHeaderHeight + px;
-  height: $tableHeaderHeight + px;
+  // width,height are defined in JSX
 
   color: $zorroa-lightgray;
   background-color: #fff;
@@ -40,13 +31,18 @@ $tableHeaderHeight: 26;
   }
 }
 
+// this is to allow resizing of the rightmost column
+$tableResizeRightPadding: 20px;
+
 .Table-header {
   @include flexOff;
 
   position: absolute; // Allow width to respect children not parent (enable horiz scrolling)
-  height: $tableHeaderHeight + px;
+  // height is defined in JSX
   min-width: 100%;
   background-color: #fff;
+
+  padding-right: $tableResizeRightPadding;
 
   .Table-cell {
     text-align: left;
@@ -56,16 +52,33 @@ $tableHeaderHeight: 26;
   }
 }
 
+.Table-header-cell {
+  height: 100%;
+}
+
+.Table-header-sort {
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.Table-header-resizer {
+  @include flexRowCenter;
+  height: 100%;
+  width: 10px;
+  cursor: col-resize;
+}
+
+.Table-header-resizer-handle {
+  width: 0;
+  height: 60%;
+  border-right: 1px solid $zorroa-nearwhite;
+}
+
 .Table-scroll-clip {
   @include flexOn;
   position: relative;
 
-  top: 26px; // height of Table-header
-
-  // Height of Table minus height of Table-header
-  // NB this SUCKS. But I tried so many ways, its the best I've found so far.
-  height: ($tableHeight - $tableHeaderHeight) + px;
-  max-height: ($tableHeight - $tableHeaderHeight) + px;
+  // top & height are defined in JSX
 
   overflow: hidden;
 }
@@ -91,32 +104,42 @@ $tableHeaderHeight: 26;
   @include flexAlignItemsCenter;
   @include flexNoWrap;
 
+  position: absolute;
+  left: 0;
+  top: 0; // set in code
+
   height: 30px;
   min-width: 100%;
 
+  padding-right: $tableResizeRightPadding;
+
   text-align: left;
   color: $zorroa-greyish-brown;
+
+  &.even { background-color: #fff; }
 }
 
-.Table-row:nth-child(even) {
-  background-color: #fff;
-}
 
 .Table-header {
   @include flexRow;
   @include flexAlignItemsCenter;
   @include flexNoWrap;
-
-  height: $tableHeaderHeight + px;
+  // height is defined in JSX
   color: $zorroa-gray;
 }
 
 .Table-body .Table-row:hover {
   color: #fff;
-  background-color: $zorroa-sickly-green;
+  background-color: $zorroa-lightgray;
 }
 
 .Table-cell {
   @include clampText;
   padding: 8px;
+}
+
+// This is for measure text, for auto column width resizing
+#Table-cell-test {
+  position: absolute;
+  top: -50px;
 }

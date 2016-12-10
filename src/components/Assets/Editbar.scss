@@ -1,6 +1,7 @@
 @import '../../styles/core-mixins.scss';
 
 .Editbar {
+  @include flexOff;
   @include flexRow;
   @include fullWidth;
   @include flexJustifySpaceBetween;

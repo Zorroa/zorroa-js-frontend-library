@@ -128,7 +128,7 @@ class Workspace extends Component {
           <div className="Workspace-vertical-separator flexOff"/>
 
           {/*  center panel - thumbnails */}
-            <Assets/>
+          <Assets/>
 
           <div className="Workspace-vertical-separator flexOff"/>
 

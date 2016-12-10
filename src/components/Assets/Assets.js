@@ -15,10 +15,15 @@ import Footer from './Footer'
 import Table from '../Table'
 import Editbar from './Editbar'
 import * as ComputeLayout from './ComputeLayout.js'
+import AssetSearch from '../../models/AssetSearch'
+
+const assetsScrollPadding = 8
+const defaultTableHeight = 300
 
 class Assets extends Component {
   static propTypes = {
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+    query: PropTypes.instanceOf(AssetSearch),
     selectedIds: PropTypes.object,
     totalCount: PropTypes.number,
     actions: PropTypes.object
@@ -38,11 +43,25 @@ class Assets extends Component {
     // than passing in global app state, which would also force the
     // otherwise simple sub-components to be Redux containers.
     this.state = {
+      assetsKey: '',
       layout: 'masonry',
       showTable: false,
       thumbSize: 128,
-      lastSelectedId: null
+      lastSelectedId: null,
+      tableHeight: defaultTableHeight,
+      assetsScrollTop: 0,
+      assetsScrollHeight: 0,
+      assetsScrollWidth: 0,
+      tableIsDragging: false,
+      positions: []
     }
+
+    this.tableStartY = 0
+    this.tableStartHeight = 0
+    this.allowTableDrag = true
+    this.assetsScrollHeight = 0
+    this.assetsScrollWidth = 0
+    this.updateAssetsScrollSizeInterval = null
   }
 
   // Adjust the selection set for the specified asset using
@@ -132,9 +151,126 @@ class Assets extends Component {
     this.props.actions.selectFolderIds()
   }
 
+  tableDragStart = (event) => {
+    const tableHeight = this.clampTableHeight(this.state.tableHeight)
+    this.tableStartY = event.pageY
+    this.newTableHeight = tableHeight
+    this.tableStartHeight = this.newTableHeight
+
+    var dragIcon = document.createElement('img')
+    // hide the drag element using a transparent 1x1 pixel image as a proxy
+    dragIcon.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
+    dragIcon.width = 1
+    event.dataTransfer.setDragImage(dragIcon, 0, 0)
+
+    this.setState({tableIsDragging: true})
+  }
+
+  tableDragUpdate = (event) => {
+    // let's just completely skip events that happen while we're busy
+    if (!this.allowTableDrag) return false
+    this.allowTableDrag = false
+
+    const dy = (event.pageY - this.tableStartY)
+    this.newTableHeight = this.clampTableHeight(this.tableStartHeight - dy)
+    // wait one frame to handle the event, otherwise events queue up syncronously
+    requestAnimationFrame(_ => {
+      this.setState({tableHeight: this.newTableHeight})
+      this.updateAssetsScrollSize()
+      this.allowTableDrag = true
+    })
+
+    return false
+  }
+
+  tableDragStop = (event) => {
+    this.allowTableDrag = true
+    this.setState({
+      tableHeight: this.newTableHeight,
+      tableIsDragging: false
+    })
+    this.queueAssetsLayout()
+    return false
+  }
+
+  updateAssetsScrollSize = () => {
+    const assetsScroll = this.refs.assetsScroll
+    if (!assetsScroll) return
+    if (assetsScroll.clientHeight !== this.state.assetsScrollHeight ||
+      assetsScroll.clientWidth !== this.state.assetsScrollWidth) {
+      this.setState({
+        assetsScrollHeight: assetsScroll.clientHeight,
+        assetsScrollWidth: assetsScroll.clientWidth
+      })
+      if (!this.state.tableIsDragging) this.queueAssetsLayout()
+    }
+  }
+
+  componentWillMount () {
+    if (this.updateAssetsScrollSizeInterval) {
+      clearInterval(this.updateAssetsScrollSizeInterval)
+    }
+    this.updateAssetsScrollSizeInterval = setInterval(this.updateAssetsScrollSize, 150)
+  }
+
+  componentWillUnmount () {
+    clearInterval(this.updateAssetsScrollSizeInterval)
+    this.updateAssetsScrollSizeInterval = null
+  }
+
+  onAssetsScrollScroll = (event) => {
+    this.setState({ assetsScrollTop: this.refs.assetsScroll.scrollTop })
+    this.updateAssetsScrollSize()
+  }
+
+  getAssetsKey = () => {
+    const { assets, query } = this.props
+    const { layout, thumbSize } = this.state
+    if (!assets) return ''
+    return `${assets.length}:${layout}:${thumbSize}:${JSON.stringify(query)}`
+  }
+
+  runAssetsLayout = () => {
+    const width = this.state.assetsScrollWidth - 2 * assetsScrollPadding
+    if (!width) return
+
+    const { assets } = this.props
+    const { layout, thumbSize } = this.state
+
+    var positions = (_ => {
+      switch (layout) {
+        case 'grid': return ComputeLayout.grid(assets, width, thumbSize)
+        case 'masonry': return ComputeLayout.masonry(assets, width, thumbSize)
+      }
+    })()
+
+    var assetsKey = this.getAssetsKey()
+    this.setState({positions, assetsKey})
+
+    if (this.assetsLayoutTimer) clearTimeout(this.assetsLayoutTimer)
+    this.assetsLayoutTimer = null
+  }
+
+  queueAssetsLayout = () => {
+    if (this.assetsLayoutTimer) clearTimeout(this.assetsLayoutTimer)
+    this.assetsLayoutTimer = setTimeout(this.runAssetsLayout, 150)
+  }
+
+  clampTableHeight = (tableHeight) => {
+    const minTableHeight = 26
+    const hardMaxTableHeight = 2000
+    const footerAndPadding = 100 // No ref available for 'stateless' Footer
+    const maxTableHeight = (this.refs.Assets && this.refs.Assets.clientHeight - footerAndPadding) || hardMaxTableHeight // worst case: table is too big, but drag handle is on-screen
+    var clampedTableHeight = Math.min(maxTableHeight, Math.max(minTableHeight, tableHeight))
+    if (!clampedTableHeight || !isFinite(clampedTableHeight)) {
+      clampedTableHeight = defaultTableHeight
+    }
+    return clampedTableHeight
+  }
+
   renderAssets () {
     const { assets, selectedIds, totalCount } = this.props
-    const { layout, thumbSize } = this.state
+    const { layout, positions, tableIsDragging } = this.state
 
     if (!assets || !assets.length) {
       return (
@@ -145,34 +281,66 @@ class Assets extends Component {
         </div>)
     }
 
+    let assetsScrollParams = {
+      className: 'assets-scroll fullWidth flexOn',
+      onScroll: this.onAssetsScrollScroll,
+      ref: 'assetsScroll',
+      style: { padding: `${assetsScrollPadding}px` }
+    }
+    if (tableIsDragging) {
+      // this is to prevent the assets panel from scrolling while table resizing (dragging)
+      assetsScrollParams.style.pointerEvents = 'none'
+    }
+
     return (
-      <div className="assets-scroll fullWidth flexOn">
+      <div {...assetsScrollParams}>
         <Measure>
-          {({width}) => {
-            if (!width) return (<div style={{'width': '100%'}}></div>)
-            const positions = (layout => {
-              switch (layout) {
-                case 'grid': return ComputeLayout.grid(assets, width, thumbSize)
-                case 'masonry': return ComputeLayout.masonry(assets, width, thumbSize)
-              }
-            })(layout)
+          {({width, height}) => {
+            if (!width || !positions.length) {
+              this.queueAssetsLayout()
+              return (<div style={{'width': '100%'}}></div>)
+            }
+
             const lastPos = positions[positions.length - 1]
-            const height = Math.ceil(lastPos.y + lastPos.height)
+            const layoutHeight = Math.ceil(lastPos.y + lastPos.height)
+
+            // Assets-scroll size is fit on-screen, and has overflow:scroll
+            // Assets-layout's size is determined by its content
+            // The size of the scroll bars and scroll extent is
+            // controlled (like any scrollable element) by the ratio
+            // of the inner element (Assets-layout) to the scrollable element (Assets-scroll).
+            // We don't know the exact dimensions of Assets-layout,
+            // because we don't know Pager's height (and we don't want to hard code it
+            // in case Pager changes). So we're placing the top & bottom elements, Assets-layout-top
+            // and Pager, to force Assets-layout to be the exact size we need to hold all
+            // the Thumbs, given the positions we've computed for all the Thumbs.
+            // Note the explicit 'top' properties on Assets-layout-top and Pager.
+
             return (
-              <div className={`assets-layout ${layout}`} style={{'width': '100%'}}>
-                { assets.map((asset, index) => (
-                  <Thumb isSelected={selectedIds && selectedIds.has(asset.id)}
-                    dim={positions[index]}
-                    index={index}
-                    key={asset.id}
-                    asset={asset}
-                    onClick={this.select.bind(this, asset)}
-                    onDoubleClick={this.isolateToLightbox.bind(this, asset)}
-                  />
-                ))}
+              <div className={`Assets-layout ${layout}`}>
+                <div className='Assets-layout-top' style={{top: 0, width: 0, height: 0}}>&nbsp;</div>
+                { assets.map((asset, index) => {
+                  const pos = positions[index]
+                  // Render only the visible thumbnails
+                  if ((!pos) ||
+                      (assetsScrollPadding + pos.y > this.state.assetsScrollTop + this.state.assetsScrollHeight) ||
+                      (assetsScrollPadding + pos.y + pos.height < this.state.assetsScrollTop)) {
+                    return null
+                  }
+                  return (
+                    <Thumb isSelected={selectedIds && selectedIds.has(asset.id)}
+                      dim={positions[index]}
+                      key={asset.id}
+                      asset={asset}
+                      onClick={this.select.bind(this, asset)}
+                      onDoubleClick={this.isolateToLightbox.bind(this, asset)}
+                    />
+                  )
+                })}
                 <Pager total={totalCount}
                        loaded={assets.length}
-                       top={height + 12 /* 12 px padding */ }/>
+                       top={layoutHeight + 12 /* 12 px padding */ }
+                       />
               </div>
             )
           }}
@@ -183,12 +351,27 @@ class Assets extends Component {
 
   render () {
     const { assets, totalCount } = this.props
-    const { showTable, layout, thumbSize } = this.state
+    const { showTable, layout, thumbSize, tableHeight, tableIsDragging, assetsKey } = this.state
+
+    // Trigger layout if assets change.
+    if (this.getAssetsKey() !== this.state.assetsKey) this.queueAssetsLayout()
+
     return (
-      <div className="Assets">
+      <div className="Assets" ref="Assets">
         <Editbar/>
         {this.renderAssets()}
-        { showTable && <Table/> }
+        { showTable && (
+          <div className='Assets-tableDrag'
+               draggable={true}
+               onDragStart={this.tableDragStart}
+               onDrag={this.tableDragUpdate}
+               onDragEnd={this.tableDragStop}/>
+        )}
+        { showTable && (
+          <Table height={this.clampTableHeight(tableHeight)}
+                 assetsKey={assetsKey}
+                 tableIsDragging={tableIsDragging}/>
+        )}
         { totalCount > 0 &&
         <Footer
           total={totalCount}
@@ -207,6 +390,7 @@ class Assets extends Component {
 
 export default connect(state => ({
   assets: state.assets.all,
+  query: state.assets.query,
   selectedIds: state.assets.selectedIds,
   totalCount: state.assets.totalCount
 }), dispatch => ({

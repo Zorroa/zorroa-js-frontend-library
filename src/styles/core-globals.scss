@@ -272,7 +272,7 @@ Make our color defs available as classes
 .flexJustifyCenter       { @include flexJustifyCenter      ; }
 .flexJustifySpaceBetween { @include flexJustifySpaceBetween; }
 
-.flexAlignItemsStart  { -webkit-align-items: flex-start ; -moz-align-items: flex-start ; -ms-align-items: flex-start ; align-items: flex-start ; }
+.flexAlignItemsStart  { @include flexAlignItemsStart; }
 .flexAlignItemsCenter { @include flexAlignItemsCenter; }
 .flexAlignItemsEnd    { -webkit-align-items: flex-end   ; -moz-align-items: flex-end   ; -ms-align-items: flex-end   ; align-items: flex-end   ; }
 

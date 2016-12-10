@@ -1,0 +1,57 @@
+@import '../../styles/core-mixins.scss';
+
+.TableField {
+
+}
+
+.TableField-array {
+  @include nowrap;
+  overflow: hidden;
+  &.isOpen {
+    @include flexCol;
+    @include flexAlignItemsStart;
+    @include flexJustifyStart;
+  }
+  &:not(.isOpen) {
+    @include flexRow;
+    @include flexAlignItemsCenter;
+  }
+}
+
+.TableField-toggle {
+  @include flexRowCenter;
+  @include flexOff;
+  width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  color: $zorroa-sickly-green;
+  background-color: rgba(0,0,0,0.1);
+  cursor: pointer;
+  margin: 4px;
+
+  &:hover {
+    color: $zorroa-light-green;
+    background-color: $zorroa-darkgray;
+  }
+}
+
+.TableField-tag {
+  @include flexRowCenter;
+  padding: 3px 5px;
+  margin: 4px;
+  border-radius: 3px;
+  color: $zorroa-greyish-brown;
+  background-color: rgba(0,0,0,0.1);
+  cursor: pointer;
+  &:hover {
+    color: #fff;
+    background-color: $zorroa-sickly-green;
+  }
+}
+
+.TableField-color {
+  @include flexOff;
+  width: 16px;
+  height: 16px;
+  margin-right: 1px;
+}

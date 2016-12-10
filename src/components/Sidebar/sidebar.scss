@@ -59,15 +59,14 @@
     @include fullHeight;
   }
 
-  .resize-thumb {
+  .Sidebar-resize-thumb {
     position: absolute;
     top: 0;
     right: 0;
-    width: 4px;
+    width: 10px;
     height: 100%;
-    cursor: ew-resize;
+    cursor: col-resize;
     background: none;
-    border: none;
 
     &.isRightEdge {
       left: 0;
