@@ -12,12 +12,6 @@ export default class TableField extends Component {
     width: PropTypes.number
   }
 
-  constructor (props) {
-    super(props)
-    this.state = {
-    }
-  }
-
   renderColorArray = (vals) => {
     return (
       <div className='TableField-array'>
