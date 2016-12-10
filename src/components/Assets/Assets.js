@@ -304,11 +304,24 @@ class Assets extends Component {
             const lastPos = positions[positions.length - 1]
             const layoutHeight = Math.ceil(lastPos.y + lastPos.height)
 
+            // Assets-scroll size is fit on-screen, and has overflow:scroll
+            // Assets-layout's size is determined by its content
+            // The size of the scroll bars and scroll extent is
+            // controlled (like any scrollable element) by the ratio
+            // of the inner element (Assets-layout) to the scrollable element (Assets-scroll).
+            // We don't know the exact dimensions of Assets-layout,
+            // because we don't know Pager's height (and we don't want to hard code it
+            // in case Pager changes). So we're placing the top & bottom elements, Assets-layout-top
+            // and Pager, to force Assets-layout to be the exact size we need to hold all
+            // the Thumbs, given the positions we've computed for all the Thumbs.
+            // Note the explicit 'top' properties on Assets-layout-top and Pager.
+
             return (
               <div className={`Assets-layout ${layout}`}>
                 <div className='Assets-layout-top' style={{top: 0, width: 0, height: 0}}>&nbsp;</div>
                 { assets.map((asset, index) => {
                   const pos = positions[index]
+                  // Render only the visible thumbnails
                   if ((!pos) ||
                       (assetsScrollPadding + pos.y > this.state.assetsScrollTop + this.state.assetsScrollHeight) ||
                       (assetsScrollPadding + pos.y + pos.height < this.state.assetsScrollTop)) {
