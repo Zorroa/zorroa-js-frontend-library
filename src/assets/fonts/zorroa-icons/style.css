@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'zorroa-icons';
-  src:  url('fonts/zorroa-icons.eot?qdnens');
-  src:  url('fonts/zorroa-icons.eot?qdnens#iefix') format('embedded-opentype'),
-    url('fonts/zorroa-icons.woff2?qdnens') format('woff2'),
-    url('fonts/zorroa-icons.ttf?qdnens') format('truetype'),
-    url('fonts/zorroa-icons.woff?qdnens') format('woff'),
-    url('fonts/zorroa-icons.svg?qdnens#zorroa-icons') format('svg');
+  src:  url('fonts/zorroa-icons.eot?xcvbo1');
+  src:  url('fonts/zorroa-icons.eot?xcvbo1#iefix') format('embedded-opentype'),
+    url('fonts/zorroa-icons.woff2?xcvbo1') format('woff2'),
+    url('fonts/zorroa-icons.ttf?xcvbo1') format('truetype'),
+    url('fonts/zorroa-icons.woff?xcvbo1') format('woff'),
+    url('fonts/zorroa-icons.svg?xcvbo1#zorroa-icons') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -156,6 +156,9 @@
 }
 .icon-cog:before {
   content: "\e907";
+}
+.icon-spam:before {
+  content: "\e94f";
 }
 .icon-eye:before {
   content: "\e934";
@@ -373,6 +376,9 @@
 .icon-arrow-divert:before {
   content: "\e948";
 }
+.icon-expand3:before {
+  content: "\e951";
+}
 .icon-layers:before {
   content: "\e977";
 }
@@ -396,6 +402,9 @@
 }
 .icon-sort-time-desc:before {
   content: "\e9bc";
+}
+.icon-hand:before {
+  content: "\e9bf";
 }
 .icon-layout:before {
   content: "\e900";
