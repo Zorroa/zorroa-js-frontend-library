@@ -241,10 +241,10 @@ class Table extends Component {
           <div className='Table-scroll' onScroll={this.tableScroll}>
             <div className='Table-body' style={{height: `${this.rowBottomPx[this.rowBottomPx.length - 1]}px`}}>
               { assets.map((asset, index) => {
+                // Render only the visible Table rows
                 const rowTopPx = (index) ? this.rowBottomPx[index - 1] : 0
                 const rowBottomPx = this.rowBottomPx[index]
-                if (rowBottomPx < tableScrollTop) return null
-                if (rowTopPx > tableScrollBottom) return null
+                if (rowBottomPx < tableScrollTop || rowTopPx > tableScrollBottom) return null
                 return (
                   <div key={asset.id}
                        className={classnames('Table-row', { even: !!(index % 2) })}
