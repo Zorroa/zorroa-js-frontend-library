@@ -90,9 +90,11 @@ class Searcher extends Component {
       // FIXME: Update only modified folders, rather than all folders!
       actions.countAssetsInFolderIds([...folders.keys()])
     }
-    if (!query || !assetSearch.equals(query) || foldersModified) {
-      assetSearch.size = pageSize
+    const searchModified = this.inflightQuery ? !this.inflightQuery.equals(assetSearch) : (!query || !assetSearch.equals(query))
+    if (searchModified || foldersModified) {
+      assetSearch.size = pageSize || AssetSearch.defaultPageSize
       actions.searchAssets(assetSearch)
+      this.inflightQuery = assetSearch
       if (folders && folders.size > 1) {
         // New query, get all the filtered folder counts
         actions.countAssetsInFolderIds([...folders.keys()], assetSearch)

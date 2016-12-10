@@ -1,6 +1,10 @@
 import AssetFilter from './AssetFilter'
 
 export default class AssetSearch {
+
+  static defaultPageSize = 100
+  static maxPageSize = 25000
+
   constructor (json) {
     if (json) {
       // Make an extra copy to handle deep clones
@@ -64,7 +68,7 @@ export default class AssetSearch {
   }
 
   equals (assetSearch) {
-    return JSON.stringify(this, equalsReplacer) === JSON.stringify(assetSearch, equalsReplacer)
+    return JSON.stringify(new AssetSearch(this), equalsReplacer) === JSON.stringify(new AssetSearch(assetSearch), equalsReplacer)
   }
 
   empty () {

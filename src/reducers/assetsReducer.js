@@ -1,7 +1,9 @@
 import { ASSET_SEARCH, ASSET_SEARCH_ERROR, ASSET_FIELDS, PAGE_SIZE, ISOLATE_ASSET, SELECT_ASSETS, SUGGEST_COMPLETIONS, UNAUTH_USER } from '../constants/actionTypes'
 
+import AssetSearch from '../models/AssetSearch'
+
 const initialState = {
-  pageSize: 100
+  pageSize: AssetSearch.defaultPageSize
 }
 
 function inject (src, idx, arr) {

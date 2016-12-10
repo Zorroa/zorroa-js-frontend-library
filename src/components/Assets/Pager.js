@@ -22,24 +22,26 @@ class Pager extends Component {
   }
 
   handleLoadPage () {
-    const { query, loaded, pageSize } = this.props
+    const { query, loaded, total, pageSize } = this.props
     var nextPageQuery = new AssetSearch(query)
     nextPageQuery.from = loaded
-    nextPageQuery.size = pageSize
+    nextPageQuery.size = Math.min(AssetSearch.maxPageSize, pageSize === 0 ? total - loaded : pageSize)
     console.log('Loading ' + nextPageQuery.size + ' from ' + nextPageQuery.from)
     this.props.actions.searchAssets(nextPageQuery)
   }
 
   render () {
     const { loaded, total, pageSize } = this.props
-    const pageSizes = [ 100, 1000, 10000 ]
-    if (total <= 25000) {
-      pageSizes.push(0)
+    if (loaded >= total) return <div className="Pager-hidden" style={{top: this.props.top + 'px'}}/>
+    const stdPageSizes = [ 100, 1000, 10000 ]
+    if (total - loaded <= AssetSearch.maxPageSize) {
+      stdPageSizes.push(0)
     }
+    const pageSizes = stdPageSizes.filter(dim => (loaded + dim < total))
     return (
-      <div className="pager flexRowCenter" style={{top: this.props.top + 'px'}}>
-        <div className="pager-showing-page">
-          <span className='pager-showing'></span><AssetCounter loaded={loaded} total={total} />
+      <div className="Pager flexRowCenter" style={{top: this.props.top + 'px'}}>
+        <div className="Pager-showing-page">
+          <span className='Pager-showing'></span><AssetCounter loaded={loaded} total={total} />
         </div>
 
         <div className="flexOn"/>
@@ -50,10 +52,10 @@ class Pager extends Component {
 
         <div className="flexOn"/>
 
-        <div className="pager-page-size flexRowCenter">
+        <div className="Pager-page-size flexRowCenter">
           <div>LOAD SETS OF</div>
           { pageSizes.map(dim => (
-            <button key={dim} onClick={this.handlePageSize.bind(this, dim)} className={classnames('pager-page-size', { 'pager-page-size-selected': dim === pageSize })}>
+            <button key={dim} onClick={this.handlePageSize.bind(this, dim)} className={classnames('Pager-page-size', { 'Pager-page-size-selected': dim === pageSize })}>
               { dim <= 0 ? 'LOAD ALL' : dim.toLocaleString() }
             </button>
           ))}

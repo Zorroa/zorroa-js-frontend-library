@@ -1,6 +1,6 @@
 @import '../../styles/core-mixins.scss';
 
-.pager {
+.Pager {
   position: relative;
   font-size: 14px;
   color: $zorroa-greyish-brown;
@@ -32,27 +32,27 @@
     background-color: #71b623;
   }
 
-  .pager-showing-page {
+  .Pager-showing-page {
     display: flex;
     margin-left: 12px;
     color: #777;
   }
 
-  .pager-showing-text {
+  .Pager-showing-text {
     &:after {
       content: 'SHOWING ';
       @media screen and (max-width: 1300px) { content: ''; }
     }
   }
 
-  .pager-sets-text {
+  .Pager-sets-text {
     &:after {
       content: 'LOAD SETS OF';
       @media screen and (max-width: 1300px) { content: 'LOAD'; }
     }
   }
 
-  .pager-page-size {
+  .Pager-page-size {
     margin-left: 4px;
     margin-right: 4px;
     color: #777;
@@ -75,4 +75,10 @@
       font-weight: normal;
     }
   }
+}
+
+.Pager-hidden {
+  background: none;
+  position: relative;
+  height: 1px;      // Otherwise scrolling fails?
 }
