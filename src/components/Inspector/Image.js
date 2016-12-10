@@ -66,26 +66,30 @@ export default class Image extends Component {
     this.startMoving()
   }
 
+  static maxZoom = 4
+  static minZoom = 1 / Image.maxZoom
+
   zoom = (event) => {
     const { scale } = this.state
-    const scalePct = 0.05
-    const zoomFactor = scale * (event.deltaY < 0 ? (1 + scalePct) : (1 - scalePct))
+    const scalePct = 1 + Math.abs(event.deltaY) * 0.005
+    const scaleMult = (event.deltaY > 0 ? scalePct : 1 / scalePct)
+    const zoomFactor = Math.min(Image.maxZoom, Math.max(Image.minZoom, scale * scaleMult))
     this.panner.zoom(zoomFactor, {x: event.pageX, y: event.pageY})
     this.setStateToPanner()
     this.startMoving()
   }
 
   zoomIn = (event) => {
-    this.zoom({ ...event, deltaY: -10, pageX: this.panner.screenWidth / 2, pageY: this.panner.screenHeight / 2 })
+    this.zoom({ ...event, deltaY: 50, pageX: this.panner.screenWidth / 2, pageY: this.panner.screenHeight / 2 })
     this.stopMoving()
   }
 
   zoomOut = (event) => {
-    this.zoom({ ...event, deltaY: 10, pageX: this.panner.screenWidth / 2, pageY: this.panner.screenHeight / 2 })
+    this.zoom({ ...event, deltaY: -50, pageX: this.panner.screenWidth / 2, pageY: this.panner.screenHeight / 2 })
     this.stopMoving()
   }
 
-  home = (event) => {
+  zoomToFit = (event) => {
     this.panner = new Panner(this.panner.screenWidth, this.panner.screenHeight)
     this.setStateToPanner()
     this.stopMoving()
@@ -101,8 +105,10 @@ export default class Image extends Component {
   render () {
     const { url } = this.props
     const { moving } = this.state
-    const zoomOutDisabled = this.panner.scale < 0.25
-    const zoomInDisabled = this.panner.scale > 32
+    const epsilon = 0.01
+    const zoomOutDisabled = this.panner.scale <= Image.minZoom + epsilon
+    const zoomInDisabled = this.panner.scale >= Image.maxZoom - epsilon
+    const zoomToFitDisabled = this.panner.scale > (1 - epsilon) && this.panner.scale < (1 + epsilon)
     const style = { 'backgroundSize': 'fit' }
     if (url) style['backgroundImage'] = `url(${url})`
     style['transform'] = `translate(${this.state.translate.x}px, ${this.state.translate.y}px) scale(${this.state.scale})`
@@ -121,11 +127,9 @@ export default class Image extends Component {
           }}
         </Measure>
         <div className="Image-controls">
-          <div className="Image-controls-zoom">
-            <button disabled={zoomOutDisabled} className="icon-zoom-out" onClick={this.zoomOut} />
-            <button disabled={zoomInDisabled} className="icon-zoom-in" onClick={this.zoomIn} />
-          </div>
-          <button className="Image-controls-home" onClick={this.home}>Home</button>
+          <button disabled={zoomOutDisabled} className="icon-zoom-out" onClick={this.zoomOut} />
+          <button disabled={zoomToFitDisabled} className="icon-expand3" onClick={this.zoomToFit} />
+          <button disabled={zoomInDisabled} className="icon-zoom-in" onClick={this.zoomIn} />
         </div>
       </div>
     )

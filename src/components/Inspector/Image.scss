@@ -41,31 +41,20 @@
   @include flexAlignItemsCenter;
   @include flexJustifySpaceBetween;
 
-}
-
-.Image-controls-zoom {
-  margin-right: 20px;
-
-  @include flexRow;
-  @include flexAlignItemsCenter;
-  @include flexJustifySpaceBetween;
+  button:disabled {
+    color: $zorroa-darkgray;
+    &:hover {
+      color: $zorroa-darkgray;
+    }
+  }
 
   [class*='icon-'] {
     background: none;
     border: none;
     color: white;
-    font-size: 18px;
+    font-size: 20px;
     &:hover {
       color: $zorroa-sickly-green
     }
-  }
-}
-
-.Image-controls-home {
-  background: none;
-  border: none;
-  color: white;
-  &:hover {
-    color: $zorroa-sickly-green
   }
 }
