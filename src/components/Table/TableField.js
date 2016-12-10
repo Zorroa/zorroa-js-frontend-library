@@ -21,10 +21,10 @@ export default class TableField extends Component {
   renderColorArray = (vals) => {
     return (
       <div className='TableField-array'>
-        { vals.map((val,i) => (
+        { vals.map((val, i) => (
           <div className='TableField-color'
                key={i}
-               style={{backgroundColor:val}}/>
+               style={{backgroundColor: val}}/>
         ))}
       </div>
     )
@@ -36,7 +36,7 @@ export default class TableField extends Component {
       <div className={classnames('TableField-array', {isOpen})}>
         <div className='TableField-toggle'
              onClick={onOpen}>{ isOpen ? '\u22ee' : '\u22ef' }</div>
-        { vals.map((val,i) => (
+        { vals.map((val, i) => (
           <div className='TableField-tag' key={i}>{val}</div>
         ))}
       </div>
@@ -55,11 +55,10 @@ export default class TableField extends Component {
     if (Array.isArray(val) && val.length) {
       // If this is an array of colors, render colors
       if (val[0] && val[0][0] === '#' &&
-        val.every(v => v[0]==='#' && v.length===7 || v.length === 4)) {
+        val.every(v => v[0] === '#' && v.length === 7 || v.length === 4)) {
         renderValFn = this.renderColorArray
-      }
-      // otherwise, render an array of strings
-      else {
+      } else {
+        // otherwise, render an array of strings
         renderValFn = this.renderStringArray
       }
     }

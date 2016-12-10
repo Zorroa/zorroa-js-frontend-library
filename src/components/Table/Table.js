@@ -14,7 +14,7 @@ import {
 } from '../../actions/appActions'
 import TableField from './TableField'
 
-const rowHeightPx = 30;
+const rowHeightPx = 30
 const tableHeaderHeight = 26
 
 class Table extends Component {
@@ -38,7 +38,7 @@ class Table extends Component {
       tableScrollTop: 0,
       tableScrollHeight: 0,
       columnDragging: false,
-      assetFieldOpen: {},
+      assetFieldOpen: {}
     }
 
     this.columnDragFieldName = null
@@ -115,7 +115,7 @@ class Table extends Component {
   }
 
   columnAutoResize = (event, field) => {
-    const { assets, fieldWidth } = this.props
+    const { assets } = this.props
     var test = document.getElementById('Table-cell-test')
     var maxWidth = 0
 
@@ -168,7 +168,6 @@ class Table extends Component {
 
   recomputeRowHeights () {
     let { assets, fields } = this.props
-    const { assetFieldOpen } = this.state
     let rowHeightInLines = []
     for (let i = 0; i < assets.length; i++) {
       if (this.isAssetOpen(assets[i])) {
@@ -183,7 +182,7 @@ class Table extends Component {
 
     this.rowBottomPx = [0]
     for (let i = 1; i < assets.length; i++) {
-      this.rowBottomPx[i] = this.rowBottomPx[i-1] + rowHeightInLines[i] * rowHeightPx
+      this.rowBottomPx[i] = this.rowBottomPx[i - 1] + rowHeightInLines[i] * rowHeightPx
     }
   }
 
@@ -240,20 +239,20 @@ class Table extends Component {
                maxHeight: `${height - tableHeaderHeight}px`
              }}>
           <div className='Table-scroll' onScroll={this.tableScroll}>
-            <div className='Table-body' style={{height: `${this.rowBottomPx[this.rowBottomPx.length-1]}px`}}>
+            <div className='Table-body' style={{height: `${this.rowBottomPx[this.rowBottomPx.length - 1]}px`}}>
               { assets.map((asset, index) => {
-                const rowTopPx = (index) ? this.rowBottomPx[index-1] : 0
+                const rowTopPx = (index) ? this.rowBottomPx[index - 1] : 0
                 const rowBottomPx = this.rowBottomPx[index]
                 if (rowBottomPx < tableScrollTop) return null
                 if (rowTopPx > tableScrollBottom) return null
                 return (
                   <div key={asset.id}
                        className={classnames('Table-row', { even: !!(index % 2) })}
-                       style={{top: `${rowTopPx}px`, height: `${rowBottomPx-rowTopPx}px`}}>
+                       style={{top: `${rowTopPx}px`, height: `${rowBottomPx - rowTopPx}px`}}>
                     { fields.map((field, i) => (
                       <TableField {...{ asset, field, key: field, width: fieldWidth[field] }}
-                        isOpen={this.isAssetFieldOpen(asset,field)}
-                        onOpen={event => this.toggleArrayField(asset,field)}
+                        isOpen={this.isAssetFieldOpen(asset, field)}
+                        onOpen={event => this.toggleArrayField(asset, field)}
                       />
                     ))}
                   </div>)
