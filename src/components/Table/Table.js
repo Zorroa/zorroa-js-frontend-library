@@ -166,7 +166,7 @@ class Table extends Component {
     return !!this.state.assetFieldOpen[asset.id]
   }
 
-  recomputeRowHeights () {
+  recomputeRowHeights = () => {
     let { assets, fields } = this.props
     let rowHeightInLines = []
     for (let i = 0; i < assets.length; i++) {
@@ -242,9 +242,11 @@ class Table extends Component {
             <div className='Table-body' style={{height: `${this.rowBottomPx[this.rowBottomPx.length - 1]}px`}}>
               { assets.map((asset, index) => {
                 // Render only the visible Table rows
+                if (index >= this.rowBottomPx.length) return null
                 const rowTopPx = (index) ? this.rowBottomPx[index - 1] : 0
                 const rowBottomPx = this.rowBottomPx[index]
-                if (rowBottomPx < tableScrollTop || rowTopPx > tableScrollBottom) return null
+                if (rowBottomPx < tableScrollTop) return null
+                if (rowTopPx > tableScrollBottom) return null
                 return (
                   <div key={asset.id}
                        className={classnames('Table-row', { even: !!(index % 2) })}
