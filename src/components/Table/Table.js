@@ -33,7 +33,8 @@ class Table extends Component {
     this.state = {
       tableScrollTop: 0,
       tableScrollHeight: 0,
-      columnDragging: false
+      columnDragging: false,
+      assetFieldOpen: {}
     }
 
     this.columnDragFieldName = null
@@ -133,6 +134,23 @@ class Table extends Component {
     this.props.actions.setTableFieldWidth({[field]: maxWidth})
   }
 
+  assetFieldKey = (asset, field) => {
+    return `${field}:${asset.id}`
+  }
+
+  toggleArrayField = (asset, field, optIsOpen) => {
+    // copy assetFieldOpen
+    let assetFieldOpen = {...this.state.assetFieldOpen}
+    const key = this.assetFieldKey(asset, field)
+    const doOpen = (optIsOpen !== undefined) ? optIsOpen : !assetFieldOpen[key]
+    if (doOpen) {
+      assetFieldOpen[key] = true
+    } else {
+      delete assetFieldOpen[key]
+    }
+    this.setState({assetFieldOpen})
+  }
+
   render () {
     const { assets, fields, fieldWidth, height, tableIsDragging } = this.props
     if (!assets || !assets.length) return
@@ -193,7 +211,12 @@ class Table extends Component {
                   <div key={asset.id}
                        className={classnames('Table-row', { even: !!(index % 2) })}
                        style={{top: `${rowTop}px`}}>
-                    { fields.map((field, i) => <TableField {...{ asset, field, key: field, width: fieldWidth[field] }}/>)}
+                    { fields.map((field, i) => (
+                      <TableField {...{ asset, field, key: field, width: fieldWidth[field] }}
+                        isOpen={!!this.state.assetFieldOpen[this.assetFieldKey(asset,field)]}
+                        onOpen={event => this.toggleArrayField(asset,field)}
+                      />
+                    ))}
                   </div>)
               })}
               <div id='Table-cell-test' className='Table-cell'/>

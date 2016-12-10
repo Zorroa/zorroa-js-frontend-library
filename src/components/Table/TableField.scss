@@ -9,15 +9,35 @@
   @include flexAlignItemsCenter;
   @include nowrap;
   overflow: hidden;
+  &.isOpen {
+    @include flexCol;
+    @include flexAlignItemsStart;
+  }
+}
+
+.TableField-toggle {
+  @include flexRowCenter;
+  @include flexOff;
+  width: 16px;
+  height: 16px;
+  color: $zorroa-sickly-green;
+  background-color: rgba(0,0,0,0.1);
+  cursor: pointer;
+  margin-right: 3px;
+
+  &:hover {
+    color: $zorroa-light-green;
+    background-color: $zorroa-darkgray;
+  }
 }
 
 .TableField-tag {
   @include flexRowCenter;
-  padding: 5px 3px;
+  padding: 3px 5px;
   margin-right: 3px;
   border-radius: 3px;
   color: $zorroa-greyish-brown;
-  background-color: $zorroa-nearwhite;
+  background-color: rgba(0,0,0,0.1);
   cursor: pointer;
   &:hover {
     color: #fff;

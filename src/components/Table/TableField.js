@@ -7,6 +7,8 @@ export default class TableField extends Component {
     // props
     asset: PropTypes.instanceOf(Asset).isRequired,
     field: PropTypes.string.isRequired,
+    isOpen: PropTypes.bool,
+    onOpen: PropTypes.func,
     width: PropTypes.number
   }
 
@@ -19,8 +21,9 @@ export default class TableField extends Component {
   renderColorArray = (vals) => {
     return (
       <div className='TableField-array'>
-        { vals.map(val => (
+        { vals.map((val,i) => (
           <div className='TableField-color'
+               key={i}
                style={{backgroundColor:val}}/>
         ))}
       </div>
@@ -28,9 +31,14 @@ export default class TableField extends Component {
   }
 
   renderStringArray = (vals) => {
+    const { isOpen, onOpen } = this.props
     return (
-      <div className='TableField-array'>
-        { vals.map(val => (<div className='TableField-tag'>{val}</div>)) }
+      <div className={classnames('TableField-array', {isOpen})}>
+        <div className='TableField-toggle'
+             onClick={onOpen}>{ isOpen ? '\u22ee' : '\u22ef' }</div>
+        { vals.map((val,i) => (
+          <div className='TableField-tag' key={i}>{val}</div>
+        ))}
       </div>
     )
   }
@@ -63,6 +71,6 @@ export default class TableField extends Component {
       style.width = `${width}px`
     }
 
-    return (<div className='Table-cell' style={style}>{renderValFn(val)}</div>)
+    return (<div className='Table-cell' key={field} style={style}>{renderValFn(val)}</div>)
   }
 }
