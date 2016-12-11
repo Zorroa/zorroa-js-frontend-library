@@ -3,7 +3,8 @@ import {
   SHOW_DISPLAY_OPTIONS_MODAL, HIDE_DISPLAY_OPTIONS_MODAL,
   SHOW_CREATE_FOLDER_MODAL, HIDE_CREATE_FOLDER_MODAL,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
-  METADATA_FIELDS, TABLE_FIELDS, SET_DRAGGING, SET_TABLE_FIELD_WIDTH, UNAUTH_USER
+  METADATA_FIELDS, TABLE_FIELDS, SYNC_FIELDS,
+  SET_DRAGGING, SET_TABLE_FIELD_WIDTH, UNAUTH_USER
 } from '../constants/actionTypes'
 
 export const defaultTableFieldWidth = 100
@@ -62,6 +63,8 @@ export default function app (state = initialState, action) {
         ...state.tableFieldWidth
       }
       return { ...state, tableFields: action.payload, tableFieldWidth }
+    case SYNC_FIELDS:
+      return { ...state, syncMetadataAndTable: action.payload }
     case SET_DRAGGING:
       return { ...state, isDragging: action.payload }
     case SET_TABLE_FIELD_WIDTH:

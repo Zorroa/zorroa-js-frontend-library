@@ -57,6 +57,11 @@
       text-transform: none;
       margin-right: 50px;
       margin-left: 6px;
+      @include noSelect;
+
+      &:hover {
+        color: $zorroa-sickly-green;
+      }
     }
 
     .DisplayOptions-close {

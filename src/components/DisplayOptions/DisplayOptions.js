@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 import { getAssetFields } from '../../actions/assetsAction'
-import { dismissDisplayOptionsModal } from '../../actions/appActions'
+import { dismissDisplayOptionsModal, syncMetadataAndTableFields } from '../../actions/appActions'
 import { unCamelCase } from '../../services/jsUtil'
 
 class DisplayOptions extends Component {
@@ -17,6 +17,7 @@ class DisplayOptions extends Component {
     syncLabel: PropTypes.string,                      // Opposite of title, e.g. 'Table'
     fieldTypes: PropTypes.arrayOf(PropTypes.string),  // Optional list of types, e.g. ['point']
     fields: PropTypes.object,                         // state.assets.fields
+    syncMetadataAndTable: PropTypes.bool,             // state.app.syncMetadataAndTable
     actions: PropTypes.object
   }
 
@@ -25,7 +26,7 @@ class DisplayOptions extends Component {
     this.state = {
       openedNamespace: '',                            // E.g. Foo.bar
       checkedNamespaces: this.props.selectedFields,   // Array of field names
-      syncedViews: false,                             // Checkbox state
+      syncedViews: this.props.syncMetadataAndTable,   // Checkbox state
       fieldFilter: ''                                 // Filter input state
     }
   }
@@ -34,9 +35,18 @@ class DisplayOptions extends Component {
     this.props.actions.getAssetFields()
   }
 
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.syncMetadataAndTable) {
+      this.setState({ syncedViews: nextProps.syncMetadataAndTable })
+    }
+  }
+
   // Update clicked, invoked callbacks to apply state and dismiss
   update (event) {
     this.props.onUpdate(event, this.state)
+    if (this.state.syncedViews !== this.props.syncMetadataAndTable) {
+      this.props.actions.syncMetadataAndTableFields(this.state.syncedViews)
+    }
     this.cancel(event)
   }
 
@@ -94,8 +104,12 @@ class DisplayOptions extends Component {
   }
 
   // Update the state of the syncView toggle
-  syncViews (event) {
+  syncViews = (event) => {
     this.setState({ syncedViews: event.target.checked })
+  }
+
+  toggleSync = (event) => {
+    this.setState({ syncedViews: !this.state.syncedViews })
   }
 
   // Return the field names for the specified namespace
@@ -231,10 +245,10 @@ class DisplayOptions extends Component {
             { syncLabel && (
               <div className="flexRow flexAlignItemsCenter">
                 <label className="switch">
-                  <input type="checkbox" checked={this.state.syncedViews} onChange={this.syncViews.bind(this)} />
+                  <input type="checkbox" checked={this.state.syncedViews} onChange={this.syncViews} />
                   <div className="slider round"/>
                 </label>
-                <div className="DisplayOptions-sync">Sync with {syncLabel} View</div>
+                <div className="DisplayOptions-sync" onClick={this.toggleSync}>Sync with {syncLabel} View</div>
                 <div className='DisplayOptions-close' onClick={this.cancel.bind(this)}>
                   <i className="icon-cross2"/>
                 </div>
@@ -284,7 +298,11 @@ class DisplayOptions extends Component {
 }
 
 export default connect(state => ({
-  fields: state.assets.fields
+  fields: state.assets.fields,
+  syncMetadataAndTable: state.app.syncMetadataAndTable
 }), dispatch => ({
-  actions: bindActionCreators({ getAssetFields, dismissDisplayOptionsModal }, dispatch)
+  actions: bindActionCreators({
+    getAssetFields,
+    dismissDisplayOptionsModal,
+    syncMetadataAndTableFields }, dispatch)
 }))(DisplayOptions)

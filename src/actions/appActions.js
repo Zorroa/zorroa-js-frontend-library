@@ -3,7 +3,8 @@ import {
   SHOW_DISPLAY_OPTIONS_MODAL, HIDE_DISPLAY_OPTIONS_MODAL,
   SHOW_CREATE_FOLDER_MODAL, HIDE_CREATE_FOLDER_MODAL,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
-  METADATA_FIELDS, TABLE_FIELDS, SET_DRAGGING, SET_TABLE_FIELD_WIDTH
+  METADATA_FIELDS, TABLE_FIELDS, SYNC_FIELDS,
+  SET_DRAGGING, SET_TABLE_FIELD_WIDTH
 } from '../constants/actionTypes'
 
 export function showModal (props) {
@@ -98,6 +99,13 @@ export function updateTableFields (fields) {
   return ({
     type: TABLE_FIELDS,
     payload: fields
+  })
+}
+
+export function syncMetadataAndTableFields(sync) {
+  return ({
+    type: SYNC_FIELDS,
+    payload: sync
   })
 }
 
