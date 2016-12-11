@@ -143,10 +143,11 @@
   // So we use the input for control, but progress + div-based ticks for display.
   input::-webkit-slider-thumb {
     border: none;
-    width: 12px;
-    height: 12px;
-    margin-top:-5px;
+    width: 6px;
+    height: 6px;
+    margin-top:-2px;
     margin-bottom:0;
+    color: transparent;
   }
 
   input::-webkit-slider-runnable-track {
@@ -187,7 +188,10 @@
   color: $zorroa-greyish-brown;
   background-color: rgba(192, 192, 192, 0.3);
   border-radius: 3px;
-  padding: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 6px;
+  padding-bottom: 6px;
   margin: 2px 4px;
 
   @include flexRow;
@@ -195,14 +199,22 @@
   @include flexJustifySpaceBetween;
 
   [class*='icon-'] {
-    font-size: 12px;
+    font-size: 15px;
     margin-right: 4px;
     margin-left: 4px;
     color: $zorroa-gray
   }
 
+  .icon-cross2 {
+    font-size: 8px;
+  }
+
   .icon-cross2:hover {
     color: $zorroa-sickly-green;
+  }
+
+  .CreateFolder-selected-permission-name {
+    margin-left: 6px;
   }
 }
 
@@ -229,11 +241,15 @@
   @include flexAlignItemsCenter;
   @include flexJustifySpaceBetween;
 
-  width: 60px;
-  margin-right: 32px;
+  width: 64px;
+  margin-right: 28px;
 
   [class*='icon-'] {
-    font-size: 11px;
+    font-size: 12px;
+
+    &:hover {
+      color: $zorroa-sickly-green;
+    }
   }
 }
 
@@ -260,14 +276,26 @@
 }
 
 .CreateFolder-perms-tick {
-  width: 12px;
-  height: 12px;
-  border-radius: 6px;
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
   background-color: $zorroa-gray;
 
   &.ticked {
     background-color: $zorroa-sickly-green;
     border: none;
+  }
+
+  &.medium {
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+  }
+
+  &.large {
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
   }
 }
 
@@ -315,6 +343,14 @@
     color: $zorroa-gray;
     font-size: 12px;
     min-height: 20px;
+  }
+
+  .CreateFolder-permission-name {
+    margin-left: 4px;
+  }
+
+  .CreateFolder-permission-icon {
+    font-size: 15px;
   }
 
   div[class*='icon-'] {

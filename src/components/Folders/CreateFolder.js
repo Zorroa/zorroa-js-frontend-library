@@ -111,6 +111,14 @@ class CreateFolder extends Component {
     this.setState({ selectedPermissionIds })
   }
 
+  setAccess (access, event) {
+    let selectedPermissionIds = new Map()
+    this.state.selectedPermissionIds.forEach((value, key) => {
+      selectedPermissionIds.set(key, access)
+    })
+    this.setState({ selectedPermissionIds })
+  }
+
   permissionName (permissionId) {
     for (let permission of this.props.permissions) {
       if (permission.id === permissionId) return permission.name
@@ -120,7 +128,7 @@ class CreateFolder extends Component {
   permissionIcon (permissionId) {
     for (let permission of this.props.permissions) {
       if (permission.id === permissionId) {
-        return permission.type === 'group' ? 'icon-public' : 'icon-private'
+        return permission.type === 'group' ? 'icon-group' : undefined
       }
     }
   }
@@ -163,8 +171,8 @@ class CreateFolder extends Component {
         <div className="CreateFolder-perm-slider">
           <div className="CreateFolder-perms-tick-row">
             <div className={classnames('CreateFolder-perms-tick', {ticked: access & AclEntry.ReadAccess})} style={{left: '0%'}}/>
-            <div className={classnames('CreateFolder-perms-tick', {ticked: access & AclEntry.WriteAccess})} style={{left: '50%'}}/>
-            <div className={classnames('CreateFolder-perms-tick', {ticked: access & AclEntry.ExportAccess})} style={{left: '100%'}}/>
+            <div className={classnames('CreateFolder-perms-tick', 'medium', {ticked: access & AclEntry.WriteAccess})} style={{left: '50%'}}/>
+            <div className={classnames('CreateFolder-perms-tick', 'large', {ticked: access & AclEntry.ExportAccess})} style={{left: '100%'}}/>
           </div>
           <progress className="CreateFolder-perm-progress" min={0} max={2} value={this.permissionValue(access) - 1} />
           <input className="CreateFolder-perms-input" type="range" min="1" max="3" step="1" value={this.permissionValue(access)} onChange={this.changePermission.bind(this, permissionId)} />
@@ -180,14 +188,14 @@ class CreateFolder extends Component {
     return (
       <div className="CreateFolder-permissions flexCol">
         <div className="flexRow flexAlignItemsCenter">
-          <div className={icon}/>
           <div className="CreateFolder-permission-title">{name}</div>
         </div>
         <div className="CreateFolder-permission-items">
           { permissions.map(permission => (
             <div key={permission.id} className="CreateFolder-permission flexRow flexAlignItemsCenter">
               <input type="checkbox" id={permission.id} checked={selectedPermissionIds && selectedPermissionIds.has(permission.id)} onChange={this.togglePermission.bind(this, permission)}/>
-              <label htmlFor={permission.id}>{ permission.name }</label>
+              <label htmlFor={permission.id} className={classnames('CreateFolder-permission-icon', icon)}/>
+              <label htmlFor={permission.id} className="CreateFolder-permission-name">{permission.name}</label>
             </div>
           ))}
         </div>
@@ -234,9 +242,9 @@ class CreateFolder extends Component {
                     <div className="CreateFolder-shared-with-title">
                       <div>Shared With</div>
                       <div className="CreateFolder-shared-with-perm-icons">
-                        <div className="icon-eye"/>
-                        <div className="icon-pen"/>
-                        <div className="icon-export"/>
+                        <div className="icon-eye" onClick={this.setAccess.bind(this, this.permissionsForValue(1))} />
+                        <div className="icon-pen" onClick={this.setAccess.bind(this, this.permissionsForValue(2))} />
+                        <div className="icon-export" onClick={this.setAccess.bind(this, this.permissionsForValue(3))} />
                       </div>
                     </div>) : <div/>}
                   <div className="CreateFolder-shared-with-permissions">
@@ -255,10 +263,10 @@ class CreateFolder extends Component {
                   <div className="icon-search"/>
                   <input type="text"
                          value={filterText} onChange={this.changeFilterText}
-                         className="CreateFolder-filter-permission-input" placeholder="Filter permissions"/>
+                         className="CreateFolder-filter-permission-input" placeholder="Search groups and @individuals"/>
                 </div>
-                { this.renderPermissions('Groups', 'icon-public', groupPermissions) }
-                { this.renderPermissions('Individuals', 'icon-private', userPermissions) }
+                { this.renderPermissions('Groups', 'icon-group', groupPermissions) }
+                { this.renderPermissions('Individuals', undefined, userPermissions) }
               </div>
             )}
           </div>
