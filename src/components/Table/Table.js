@@ -187,10 +187,10 @@ class Table extends Component {
   }
 
   render () {
-    const { assets, fields, fieldWidth, height, tableIsDragging } = this.props
+    const { assets, fields, fieldWidth, height, tableIsDragging, assetsKey } = this.props
     if (!assets || !assets.length) return
 
-    const { tableScrollTop, tableScrollHeight, assetsKey } = this.state
+    const { tableScrollTop, tableScrollHeight } = this.state
     const tableScrollBottom = tableScrollTop + tableScrollHeight
 
     if (assetsKey !== this.assetsKey) {
