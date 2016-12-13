@@ -180,7 +180,8 @@ class Table extends Component {
       }
     }
 
-    this.rowBottomPx = [0]
+    this.rowBottomPx.length = assets.length
+    if (assets.length) this.rowBottomPx[0] = rowHeightInLines[0] * rowHeightPx
     for (let i = 1; i < assets.length; i++) {
       this.rowBottomPx[i] = this.rowBottomPx[i - 1] + rowHeightInLines[i] * rowHeightPx
     }
