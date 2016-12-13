@@ -90,9 +90,11 @@ class Editbar extends Component {
         <div className="title">{title}</div>
         <div className="right-side">
             {selectedAssetIds && selectedAssetIds.size ? (
-              <div className={classnames('selected', {disabled})}>
+              <div className={classnames('Editbar-selected', {disabled})}>
                 {`${selectedAssetIds.size} assets selected`}
-                <span onClick={this.deselectAll} className={classnames('icon-cancel-circle', {disabled})} />
+                <div onClick={this.deselectAll} className={classnames('Editbar-cancel', {disabled})}>
+                  <div className='icon-cancel-circle'/>
+                </div>
               </div>
               ) : <div/> }
           <div onClick={this.exportAssets} className="export">

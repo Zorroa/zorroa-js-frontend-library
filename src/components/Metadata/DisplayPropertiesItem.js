@@ -129,7 +129,7 @@ class DisplayPropertiesItem extends Component {
 
     return (
       <div className="DisplayPropertiesItem">
-        <div className="label">
+        <div className="DisplayPropertiesItem-label">
           {unCamelCase(displayProperties.name)}
         </div>
         <div onClick={this.searchTerms}

@@ -31,7 +31,7 @@
     input {
       @include flexOn;
       height: 20px;
-      margin: 8px 12px 8px 4px;
+      margin: 8px 4px 8px 4px;
       border-radius: 3px;
       background: none;
       border: 1px solid $zorroa-lightgray;
@@ -39,10 +39,14 @@
       padding-right: 4px;
     }
 
-    .icon-cog {
+    .Metadata-settings {
+      @include flexRowCenter;
+      width: 36px;
+      height: 36px;
       color: $zorroa-gray;
 
       &:hover {
+        background-color: rgba(0, 0, 0, 0.1);
         color: $zorroa-sickly-green;
       }
     }

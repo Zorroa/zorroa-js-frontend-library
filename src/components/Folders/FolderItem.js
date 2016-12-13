@@ -248,7 +248,7 @@ class FolderItem extends Component {
       <div className={classnames('FolderItem', { isOpen, hasChildren, isSelected, isDropTarget, dragHover })}
            style={{ paddingLeft: `${(depth - 1) * 10}px` }}>
         { this.renderContextMenu() }
-        <div className='FolderItem-toggle'
+        <div className={classnames('FolderItem-toggle', {hasChildren})}
              onClick={event => { onToggle(folder); return false }}>
           {(hasChildren) ? <i className='FolderItem-toggleArrow icon-triangle-down'/> : null}
         </div>

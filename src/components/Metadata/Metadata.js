@@ -81,7 +81,9 @@ class Metadata extends Component {
       <div className="Metadata">
         <div className="header">
           <input type="text" onChange={this.filterFields} value={this.state.filterString} placeholder="Filter Metadata" />
-          <div className="icon-cog" onClick={this.showDisplayOptions} />
+          <div className="Metadata-settings" onClick={this.showDisplayOptions}>
+            <i className="icon-cog"/>
+          </div>
         </div>
         <div className="body">
           { displayProperties.map(field =>

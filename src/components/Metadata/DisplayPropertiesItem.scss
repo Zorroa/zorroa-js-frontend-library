@@ -7,7 +7,8 @@
 
   @include flexRow;
 
-  .label {
+  .DisplayPropertiesItem-label {
+    @include flexOff;
     margin-left: 4px;
     width: 120px;
     min-width: 120px;
@@ -52,6 +53,7 @@
   }
 
   .DisplayPropertiesItem-search {
+    @include flexOff;
     @include flexRowCenter;
     width: 20px;
     height: 20px;

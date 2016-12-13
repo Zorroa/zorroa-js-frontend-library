@@ -30,7 +30,7 @@
     margin-bottom: 12px;
   }
 
-  .selected {
+  .Editbar-selected {
     margin-left: 12px;
     margin-right: 12px;
     font-size: 12px;
@@ -40,10 +40,18 @@
     &.disabled {
       color: $zorroa-lightgray;
     }
-    .icon-cancel-circle {
+
+    .Editbar-cancel {
+      @include flexRowCenter;
+      width: 24px;
+      height: 24px;
       font-size: 10px;
+      margin-left: 4px;
+      border-radius: 2px;
+      cursor: pointer;
 
       &:not(.disabled):hover {
+        background-color: rgba(0, 0, 0, 0.1);
         color: $zorroa-sickly-green;
       }
 
