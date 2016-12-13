@@ -367,7 +367,7 @@ class Assets extends Component {
                onDrag={this.tableDragUpdate}
                onDragEnd={this.tableDragStop}/>
         )}
-        { showTable && (
+        { totalCount > 0 && showTable && (
           <Table height={this.clampTableHeight(tableHeight)}
                  assetsKey={assetsKey}
                  tableIsDragging={tableIsDragging}/>

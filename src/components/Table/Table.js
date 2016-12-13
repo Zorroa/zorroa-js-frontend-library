@@ -188,7 +188,7 @@ class Table extends Component {
 
   render () {
     const { assets, fields, fieldWidth, height, tableIsDragging, assetsKey } = this.props
-    if (!assets || !assets.length) return
+    if (!assets) return
 
     const { tableScrollTop, tableScrollHeight } = this.state
     const tableScrollBottom = tableScrollTop + tableScrollHeight
