@@ -34,8 +34,9 @@
 
 .header-menu {
   margin-left: 20px;
+  position: relative;
 
-  .export {
+  .job {
     @include flexRow;
     @include flexAlignItemsCenter;
     white-space: nowrap;
@@ -51,8 +52,17 @@
     }
   }
 
-  .DropdownMenu-item:hover {
-    background-color: transparent;
+  &.header-menu-user {
+    @include flexRow;
+    @include flexAlignItemsCenter;
+
+    .DropdownMenu-button {
+      text-transform: none;
+    }
+
+    &[class*='icon-zorroa-person-'] {
+      font-size: 30px;
+    }
   }
 }
 

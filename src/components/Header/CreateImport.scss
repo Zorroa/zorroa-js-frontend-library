@@ -1,0 +1,222 @@
+@import '../../styles/core-mixins.scss';
+
+.CreateImport {
+  &.modal {
+    overflow: visible;
+  }
+}
+
+.CreateImport-header {
+  text-transform: uppercase;
+  color: white;
+  background-color: black;
+  height: auto;
+
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include flexJustifySpaceBetween;
+
+  div[class*='icon-'] {
+    margin-top: 12px;
+    margin-bottom: 12px;
+    margin-left: 12px;
+    margin-right: 12px;
+  }
+
+  .icon-folder-upload {
+    font-size: 20px;
+  }
+
+  .icon-cross2:hover {
+    color: $zorroa-sickly-green;
+  }
+}
+
+.CreateImport-title {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+}
+
+.CreateImport-body {
+  padding: 20px;
+
+  input[type=text] {
+    @include fullWidth;
+    border-radius: 3px;
+    padding-left: 8px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-right: 24px;  // Space for cancel
+    border: 1px solid $zorroa-lightgray;
+  }
+}
+
+.CreateImport-footer {
+  border: none;
+  border-top: 1px solid $zorroa-lightgray;
+  min-height: 72px;
+  max-height: 72px;
+  padding: 0;
+
+  @include flexRow;
+  @include flexJustifyCenter;
+
+  button {
+    margin: 12px;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 3px;
+    background: none;
+    text-transform: uppercase;
+    font-size: 14px;
+    color: $zorroa-lightgray;
+    @include nowrap;
+
+    &:hover {
+      color: white;
+      background-color: $zorroa-lightgray;
+    }
+
+    &.default {
+      color: $zorroa-nearwhite;
+      background-color: $zorroa-sickly-green;
+
+      &.isDisabled {
+        background-color: $zorroa-lightgray;
+
+        &:hover {
+          color: $zorroa-nearwhite;
+        }
+      }
+
+      &:hover {
+        color: white;
+      }
+    }
+
+    &.disabled {
+      background-color: $zorroa-lightgray;
+
+      &:hover {
+        color: $zorroa-nearwhite;
+      }
+    }
+  }
+}
+
+.CreateImport-package-name {
+  position: relative;
+  margin-top: 8px;
+  height: 30px;
+  font-size: 12px;
+}
+
+.CreateImport-package-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: $zorroa-lightgray;
+}
+
+.CreateImport-package-name-cancel {
+  color: $zorroa-lightgray;
+  position: absolute;
+  right: 8px;
+  font-size: 12px;
+  height: 12px;
+  margin-top: auto;
+  margin-bottom: auto;
+  top: 0;
+  bottom: 0;
+
+  &:hover {
+    color: $zorroa-sickly-green;
+  }
+}
+
+.CreateImport-input-label {
+  @include flexCol;
+}
+
+.CreateImport-dropzone {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include flexJustifyCenter;
+
+  font-size: 24px;
+  background-color: rgba(200,200,200,1);
+  color: transparent;
+  text-shadow: 0px 2px 3px rgba(255,255,255,0.5);
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+  background-clip: text;
+
+  height: 80px;
+  border-radius: 12px;
+  border: 2px dashed $zorroa-lightgray;
+  margin-top: 20px;
+
+  &.isDroppable {
+    color: $zorroa-sickly-green;
+    background-color: $zorroa-lightgray;
+    border: 2px solid $zorroa-sickly-green;
+  }
+}
+
+.CreateImport-select-file {
+  @include flexRow;
+  @include flexJustifyCenter;
+}
+
+.CreateImport-select-file-input {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+
+.CreateImport-select-file-label {
+  color: white;
+  background-color: $zorroa-lightgray;
+  border-radius: 3px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  margin-top: 10px;
+  text-transform: uppercase;
+
+  &:hover {
+    background-color: $zorroa-sickly-green;
+  }
+}
+
+.CreateImport-pipelines {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include flexJustifySpaceBetween;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.CreateImport-pipelines-title {
+  font-size: 12px;
+  color: $zorroa-lightgray;
+  text-transform: uppercase;
+}
+
+.CreateImport-pipeline {
+  @include flexCol;
+  text-transform: none;
+}
+
+.CreateImport-pipeline-name {
+  color: $zorroa-gray;
+  font-size: 14px;
+}
+
+.CreateImport-pipeline-description {
+  color: $zorroa-lightgray;
+  font-size: 11px;
+}

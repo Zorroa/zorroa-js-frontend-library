@@ -29,7 +29,7 @@ class Editbar extends Component {
   }
 
   exportAssets = () => {
-    const width = '340px'
+    const width = '460px'
     const body = <CreateExport onCreate={this.createExport} />
     this.props.actions.showModal({body, width})
   }

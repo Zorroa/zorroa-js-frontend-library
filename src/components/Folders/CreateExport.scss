@@ -17,18 +17,26 @@
       margin-left: 12px;
       margin-right: 12px;
     }
+
+    .icon-export {
+      font-size: 20px;
+    }
+
+    .icon-cross2:hover {
+      color: $zorroa-sickly-green;
+    }
   }
 
   .body {
     padding: 20px;
 
     input[type=text] {
+      @include fullWidth;
       border-radius: 3px;
-      margin-top: 8px;
-      margin-bottom: 20px;
-      height: 30px;
-      font-size: 12px;
-      padding: 8px;
+      padding-left: 8px;
+      padding-top: 8px;
+      padding-bottom: 8px;
+      padding-right: 24px;  // Space for cancel
       border: 1px solid $zorroa-lightgray;
     }
 
@@ -41,8 +49,8 @@
 
     .option-row {
       @include flexRow;
-      @include flexAlignItemsCenter;
-      margin-bottom: 12px;
+      @include flexAlignItemsStart;
+      margin-top: 20px;
       color: $zorroa-lightgray;
     }
   }
@@ -60,22 +68,30 @@
     button {
       margin: 12px;
       padding: 12px 30px;
-      font-size: 14px;
       border: none;
       border-radius: 3px;
       background: none;
       text-transform: uppercase;
-      font-size: 16px;
+      font-size: 14px;
       color: $zorroa-lightgray;
+      @include nowrap;
 
       &:hover {
-        color: $zorroa-darkgray;
+        color: white;
         background-color: $zorroa-lightgray;
       }
 
       &.default {
         color: $zorroa-nearwhite;
         background-color: $zorroa-sickly-green;
+
+        &.isDisabled {
+          background-color: $zorroa-lightgray;
+
+          &:hover {
+            color: $zorroa-nearwhite;
+          }
+        }
 
         &:hover {
           color: white;
@@ -91,4 +107,47 @@
       }
     }
   }
+}
+
+.CreateExport-package-name {
+  position: relative;
+  margin-top: 8px;
+  height: 30px;
+  font-size: 12px;
+}
+
+.CreateExport-package-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: $zorroa-lightgray;
+}
+
+.CreateExport-package-name-cancel {
+  color: $zorroa-lightgray;
+  position: absolute;
+  right: 8px;
+  font-size: 12px;
+  height: 12px;
+  margin-top: auto;
+  margin-bottom: auto;
+  top: 0;
+  bottom: 0;
+
+  &:hover {
+    color: $zorroa-sickly-green;
+  }
+}
+
+.CreateExport-input-label {
+  @include flexCol;
+}
+
+.CreateExport-input-text {
+  color: $zorroa-gray;
+  margin-bottom: 8px;
+}
+
+.CreateExport-subtext {
+  color: $zorroa-lightgray;
+  font-size: 12px;
 }

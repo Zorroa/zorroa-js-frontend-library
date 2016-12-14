@@ -6,7 +6,6 @@ export default class DropdownMenu extends Component {
     children: PropTypes.node,
     label: PropTypes.node,
     style: PropTypes.object,
-    rightAlign: PropTypes.bool,
     onChange: PropTypes.func
   }
 
@@ -39,8 +38,8 @@ export default class DropdownMenu extends Component {
   render () {
     let menuList = []
     Children.forEach(this.props.children, (child, i) => {
-      if (i) { menuList.push((<div className="DropdownMenu-separator" key={`${i}s`}/>)) }
-      menuList.push((<li className="DropdownMenu-item" key={`${i}i`}>{child}</li>))
+      if (child && menuList.length) { menuList.push((<div className="DropdownMenu-separator" key={`${i}s`}/>)) }
+      if (child) menuList.push((<li className="DropdownMenu-item" key={`${i}i`}>{child}</li>))
     })
 
     return (
@@ -50,7 +49,7 @@ export default class DropdownMenu extends Component {
           <i className={classnames('DropdownMenu-caret', 'icon-arrow-down', { 'rot180': this.state.isVisible })} />
         </div>
         { this.state.isVisible &&
-          (<ul className="DropdownMenu-list" style={this.props.rightAlign ? {right: 0} : {}}>
+          (<ul className="DropdownMenu-list">
             {menuList}
           </ul>)
         }
