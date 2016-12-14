@@ -3,7 +3,11 @@ import { ASSET_SEARCH, ASSET_SEARCH_ERROR, ASSET_FIELDS, PAGE_SIZE, ISOLATE_ASSE
 import AssetSearch from '../models/AssetSearch'
 
 const initialState = {
-  pageSize: AssetSearch.defaultPageSize
+  pageSize: AssetSearch.defaultPageSize,
+
+  // selectionCounter increments whenever the selection changes. The value itself has no meaning.
+  // This is used to trigger any changes that need to respond to the selection. (See Assets, Table)
+  selectionCounter: 0
 }
 
 function inject (src, idx, arr) {
@@ -40,20 +44,22 @@ function inject (src, idx, arr) {
 
 export default function (state = initialState, action) {
   switch (action.type) {
-    case ASSET_SEARCH:
+    case ASSET_SEARCH: {
       const { query, assets, page, aggs } = action.payload
       const all = state.all && page && page.from ? inject(state.all, page.from, assets) : assets
       const totalCount = page && page.totalCount ? page.totalCount : 0
-      const selectedIds = page && page.from ? state.selectedIds : null
-      return { ...state, all, aggs, query, totalCount, selectedIds, isolatedId: null, suggestions: null }
+      return { ...state, all, aggs, query, totalCount, isolatedId: null, suggestions: null }
+    }
     case ASSET_SEARCH_ERROR:
       return { ...state, error: action.payload }
     case ASSET_FIELDS:
       return { ...state, fields: action.payload }
     case ISOLATE_ASSET:
       return { ...state, isolatedId: action.payload }
-    case SELECT_ASSETS:
-      return { ...state, selectedIds: action.payload }
+    case SELECT_ASSETS: {
+      const selectionCounter = state.selectionCounter + 1
+      return { ...state, selectedIds: action.payload, selectionCounter }
+    }
     case PAGE_SIZE:
       return { ...state, pageSize: action.payload }
     case SUGGEST_COMPLETIONS:

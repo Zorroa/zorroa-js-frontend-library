@@ -21,11 +21,16 @@ class Table extends Component {
   static propTypes = {
     // app state
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
-    assetsKey: PropTypes.string.isRequired,
+    selectedAssetIds: PropTypes.instanceOf(Set),
+    selectionCounter: PropTypes.number.isRequired,
     fields: PropTypes.arrayOf(PropTypes.string).isRequired,
     fieldWidth: PropTypes.objectOf(PropTypes.number).isRequired,
+
+    // input props
+    assetsKey: PropTypes.string.isRequired,
     height: PropTypes.number.isRequired,
     tableIsDragging: PropTypes.bool.isRequired,
+    selectFn: PropTypes.func.isRequired,
 
     // connect actions
     actions: PropTypes.object
@@ -48,6 +53,9 @@ class Table extends Component {
     this.allowColumnDrag = true
     this.assetsKey = ''
     this.rowBottomPx = []
+    this.assetRow = null
+    this.selectionCounter = 0
+    this.skipNextSelectionScroll = false
   }
 
   showDisplayOptions = (event) => {
@@ -185,10 +193,63 @@ class Table extends Component {
     for (let i = 1; i < assets.length; i++) {
       this.rowBottomPx[i] = this.rowBottomPx[i - 1] + rowHeightInLines[i] * rowHeightPx
     }
+
+    // map asset ids to row number, so later we can easily track which rows
+    // selected asset ids are sitting in.
+    // intentionally not rolled into the above loop for logical separation & clarity
+    this.assetRow = {}
+    for (let i = 0; i < assets.length; i++) {
+      this.assetRow[assets[i].id] = i
+    }
+  }
+
+  // light wrapper around Assets.select(); just make sure we don't scroll
+  // the Table when we select from the table
+  select = (asset, event) => {
+    this.skipNextSelectionScroll = true
+    this.props.selectFn(asset, event)
+  }
+
+  scrollToSelection = () => {
+    const { assets, selectedAssetIds } = this.props
+    if (!assets.length) return
+    if (!selectedAssetIds || selectedAssetIds.size === 0) return
+
+    let selectedRows = []
+    for (let assetId of selectedAssetIds) {
+      const row = this.assetRow[assetId]
+      if (row !== undefined) selectedRows.push(row)
+    }
+    selectedRows = selectedRows.sort()
+
+    const firstRow = selectedRows[0]
+    const lastRow = selectedRows[selectedRows.length - 1]
+
+    const topPx = (firstRow > 0) ? this.rowBottomPx[firstRow - 1] : 0
+    const bottomPx = this.rowBottomPx[lastRow]
+
+    const selectionHeight = bottomPx - topPx
+
+    // center the selection vertically
+    let scrollPx = topPx + selectionHeight / 2 - this.state.tableScrollHeight / 2
+
+    // if the selection doesn't fit, scroll so the first selected row is
+    // at the top of the visible table area
+    if (selectionHeight > this.state.tableScrollHeight) {
+      scrollPx = topPx
+    }
+
+    scrollPx = Math.max(0, Math.min(this.rowBottomPx[this.rowBottomPx.length - 1], scrollPx))
+
+    requestAnimationFrame(() => {
+      if (this.refs.tableScroll) {
+        this.refs.tableScroll.scrollTop = scrollPx
+      }
+    })
   }
 
   render () {
-    const { assets, fields, fieldWidth, height, tableIsDragging, assetsKey } = this.props
+    const { assets, fields, fieldWidth, height, tableIsDragging, assetsKey, selectedAssetIds } = this.props
     if (!assets) return
 
     const { tableScrollTop, tableScrollHeight } = this.state
@@ -200,12 +261,21 @@ class Table extends Component {
     }
 
     requestAnimationFrame(() => {
-      var tableScroll = document.querySelector('.Table-scroll')
+      var tableScroll = this.refs.tableScroll
       var tableScrollHeight = tableScroll ? tableScroll.clientHeight : 0
       if (tableScrollHeight && tableScrollHeight !== this.state.tableScrollHeight) {
         this.setState({tableScrollHeight})
       }
     })
+
+    // If the selection change triggered this update, scroll to the new selection
+    if (this.props.selectionCounter !== this.selectionCounter) {
+      this.selectionCounter = this.props.selectionCounter
+      if (!this.skipNextSelectionScroll) {
+        this.scrollToSelection()
+      }
+      this.skipNextSelectionScroll = false
+    }
 
     let tableStyle = { height, minHeight: height, maxHeight: height }
     if (tableIsDragging) tableStyle.pointerEvents = 'none'
@@ -239,7 +309,7 @@ class Table extends Component {
                height: `${height - tableHeaderHeight}px`,
                maxHeight: `${height - tableHeaderHeight}px`
              }}>
-          <div className='Table-scroll' onScroll={this.tableScroll}>
+          <div ref='tableScroll' className='Table-scroll' onScroll={this.tableScroll}>
             <div className='Table-body' style={{height: `${this.rowBottomPx[this.rowBottomPx.length - 1]}px`}}>
               { assets.map((asset, index) => {
                 // Render only the visible Table rows
@@ -248,14 +318,19 @@ class Table extends Component {
                 const rowBottomPx = this.rowBottomPx[index]
                 if (rowBottomPx < tableScrollTop) return null
                 if (rowTopPx > tableScrollBottom) return null
+                const isSelected = selectedAssetIds && selectedAssetIds.has(asset.id)
                 return (
                   <div key={asset.id}
-                       className={classnames('Table-row', { even: !!(index % 2) })}
-                       style={{top: `${rowTopPx}px`, height: `${rowBottomPx - rowTopPx}px`}}>
+                       className={classnames('Table-row', { even: !!(index % 2), isSelected })}
+                       style={{top: `${rowTopPx}px`, height: `${rowBottomPx - rowTopPx}px`}}
+                       onClick={event => this.select(asset, event)}>
                     { fields.map((field, i) => (
                       <TableField {...{ asset, field, key: field, width: fieldWidth[field] }}
                         isOpen={this.isAssetFieldOpen(asset, field)}
-                        onOpen={event => this.toggleArrayField(asset, field)}
+                        onOpen={event => {
+                          event.stopPropagation() // prevent row select when openening a field
+                          this.toggleArrayField(asset, field)
+                        }}
                       />
                     ))}
                   </div>)
@@ -276,6 +351,8 @@ class Table extends Component {
 
 export default connect(state => ({
   assets: state.assets.all,
+  selectedAssetIds: state.assets.selectedIds,
+  selectionCounter: state.assets.selectionCounter,
   fields: state.app.tableFields,
   fieldWidth: state.app.tableFieldWidth
 }), dispatch => ({

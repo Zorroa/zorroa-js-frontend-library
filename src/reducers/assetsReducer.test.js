@@ -18,7 +18,6 @@ describe('assetsReducer', () => {
       query,
       all: assets,
       totalCount: 1,
-      selectedIds: null,
       isolatedId: null,
       suggestions: null
     }
@@ -42,7 +41,6 @@ describe('assetsReducer', () => {
       query,
       all: concatAssets,
       totalCount: 2,
-      selectedIds: null,
       isolatedId: null,
       suggestions: null
     }
@@ -72,8 +70,8 @@ describe('assetsReducer', () => {
     const id0 = '1234-abcd'
     const id1 = '5678-zwxy'
     const ids = new Set([id0, id1])
-    expect(assetsReducer([], {type: SELECT_ASSETS, payload: ids}))
-      .toEqual({ selectedIds: ids })
+    expect(assetsReducer({ selectionCounter: 0 }, {type: SELECT_ASSETS, payload: ids}))
+      .toEqual({ selectedIds: ids, selectionCounter: 1 })
   })
 
   it('PAGE_SIZE sets page size', () => {

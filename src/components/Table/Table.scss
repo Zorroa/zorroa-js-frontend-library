@@ -115,8 +115,10 @@ $tableResizeRightPadding: 20px;
 
   text-align: left;
   color: $zorroa-greyish-brown;
+  border: 2px solid transparent;
 
   &.even { background-color: #fff; }
+  &.isSelected { border: 2px solid $zorroa-sickly-green; }
 }
 
 
@@ -134,6 +136,7 @@ $tableResizeRightPadding: 20px;
 }
 
 .Table-cell {
+  @include noSelect;
   @include clampText;
   padding: 8px;
 }

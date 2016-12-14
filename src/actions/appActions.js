@@ -102,7 +102,7 @@ export function updateTableFields (fields) {
   })
 }
 
-export function syncMetadataAndTableFields(sync) {
+export function syncMetadataAndTableFields (sync) {
   return ({
     type: SYNC_FIELDS,
     payload: sync

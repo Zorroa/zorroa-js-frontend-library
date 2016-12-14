@@ -25,6 +25,7 @@ class Assets extends Component {
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     query: PropTypes.instanceOf(AssetSearch),
     selectedIds: PropTypes.object,
+    selectionCounter: PropTypes.number.isRequired,
     totalCount: PropTypes.number,
     actions: PropTypes.object
   }
@@ -62,13 +63,17 @@ class Assets extends Component {
     this.assetsScrollHeight = 0
     this.assetsScrollWidth = 0
     this.updateAssetsScrollSizeInterval = null
+    this.selectionCounter = 0
+    this.skipNextSelectionScroll = false
+    this.scrollToSelectionAfterLayout = false
+    this.assetsLayoutTimer = null
   }
 
   // Adjust the selection set for the specified asset using
   // the modifier keys for shift to extend and command to
   // toggle entries. We keep the anchor point for shift-select
   // in local state and must update it when the search changes.
-  select (asset, event) {
+  select = (asset, event) => {
     const { assets, selectedIds, actions } = this.props
     const { lastSelectedId } = this.state
     let ids
@@ -216,6 +221,10 @@ class Assets extends Component {
   componentWillUnmount () {
     clearInterval(this.updateAssetsScrollSizeInterval)
     this.updateAssetsScrollSizeInterval = null
+
+    // clear any pending layout
+    if (this.assetsLayoutTimer) clearTimeout(this.assetsLayoutTimer)
+    this.assetsLayoutTimer = null
   }
 
   onAssetsScrollScroll = (event) => {
@@ -249,11 +258,66 @@ class Assets extends Component {
 
     if (this.assetsLayoutTimer) clearTimeout(this.assetsLayoutTimer)
     this.assetsLayoutTimer = null
+
+    // map asset ids to thumb index, so later we can easily track which thumbs
+    // belong to selected asset ids.
+    this.positionIndexByAssetId = {}
+    for (let i = 0; i < assets.length; i++) {
+      this.positionIndexByAssetId[assets[i].id] = i
+    }
+
+    if (this.scrollToSelectionAfterLayout) {
+      this.scrollToSelection()
+    }
+    this.scrollToSelectionAfterLayout = false
   }
 
   queueAssetsLayout = () => {
     if (this.assetsLayoutTimer) clearTimeout(this.assetsLayoutTimer)
     this.assetsLayoutTimer = setTimeout(this.runAssetsLayout, 150)
+  }
+
+  scrollToSelection = () => {
+    const { assets, selectedIds } = this.props
+    if (!assets.length) return
+    if (!selectedIds || selectedIds.size === 0) return
+
+    // layout pending? wait to scroll until layout is done
+    if (this.assetsLayoutTimer) {
+      this.scrollToSelectionAfterLayout = true
+      return
+    }
+
+    let selectedPositionIndex = []
+    for (let assetId of selectedIds) {
+      const positionIndex = this.positionIndexByAssetId[assetId]
+      if (positionIndex !== undefined) selectedPositionIndex.push(positionIndex)
+    }
+    selectedPositionIndex = selectedPositionIndex.sort()
+
+    const firstIndex = selectedPositionIndex[0]
+    const lastIndex = selectedPositionIndex[selectedPositionIndex.length - 1]
+
+    const topPx = this.state.positions[firstIndex].y
+    const lastPos = this.state.positions[lastIndex]
+    const bottomPx = lastPos.y + lastPos.height
+
+    const selectionHeight = bottomPx - topPx
+
+    // center the selection vertically
+    let scrollPx = topPx + selectionHeight / 2 - this.state.assetsScrollHeight / 2
+
+    // if the selection doesn't fit, scroll so the first selected row is
+    // at the top of the visible table area
+    if (selectionHeight > this.state.assetsScrollHeight) {
+      scrollPx = topPx
+    }
+
+    requestAnimationFrame(() => {
+      if (this.refs.assetsScroll) {
+        this.refs.assetsScroll.scrollTop = scrollPx
+      }
+    })
   }
 
   clampTableHeight = (tableHeight) => {
@@ -304,10 +368,11 @@ class Assets extends Component {
             const lastPos = positions[positions.length - 1]
             const layoutHeight = Math.ceil(lastPos.y + lastPos.height)
 
-            // Assets-scroll size is fit on-screen, and has overflow:scroll
-            // Assets-layout's size is determined by its content
+            // Assets-scroll size is determined by its parent (fit on-screen),
+            // and has overflow:scroll
+            // Assets-layout's size is determined by its children (content)
             // The size of the scroll bars and scroll extent is
-            // controlled (like any scrollable element) by the ratio
+            // controlled (like any scrollable element) by the size ratio
             // of the inner element (Assets-layout) to the scrollable element (Assets-scroll).
             // We don't know the exact dimensions of Assets-layout,
             // because we don't know Pager's height (and we don't want to hard code it
@@ -332,7 +397,11 @@ class Assets extends Component {
                       dim={positions[index]}
                       key={asset.id}
                       asset={asset}
-                      onClick={this.select.bind(this, asset)}
+                      onClick={event => {
+                        // don't scroll assets when we select thumbs. (table selection will scroll)
+                        this.skipNextSelectionScroll = true
+                        this.select(asset, event)
+                      }}
                       onDoubleClick={this.isolateToLightbox.bind(this, asset)}
                     />
                   )
@@ -356,6 +425,15 @@ class Assets extends Component {
     // Trigger layout if assets change.
     if (this.getAssetsKey() !== this.state.assetsKey) this.queueAssetsLayout()
 
+    // If the selection change triggered this update, scroll to the new selection
+    if (this.props.selectionCounter !== this.selectionCounter) {
+      this.selectionCounter = this.props.selectionCounter
+      if (!this.skipNextSelectionScroll) {
+        this.scrollToSelection()
+      }
+      this.skipNextSelectionScroll = false
+    }
+
     return (
       <div className="Assets" ref="Assets">
         <Editbar/>
@@ -370,7 +448,8 @@ class Assets extends Component {
         { totalCount > 0 && showTable && (
           <Table height={this.clampTableHeight(tableHeight)}
                  assetsKey={assetsKey}
-                 tableIsDragging={tableIsDragging}/>
+                 tableIsDragging={tableIsDragging}
+                 selectFn={this.select}/>
         )}
         { totalCount > 0 &&
         <Footer
@@ -392,6 +471,7 @@ export default connect(state => ({
   assets: state.assets.all,
   query: state.assets.query,
   selectedIds: state.assets.selectedIds,
+  selectionCounter: state.assets.selectionCounter,
   totalCount: state.assets.totalCount
 }), dispatch => ({
   actions: bindActionCreators({
