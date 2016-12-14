@@ -47,6 +47,33 @@ export function selectFolderIds (ids) {
   }
 }
 
+// Works when folders is an array of either Folder or TrashedFolder so that
+// we can share this logic without duplicating the TrashedFolder array into
+// a Folder array each time we do selection, which would require dup+find.
+// TrashedFolder.folderId is used instead of Folder.id rather than instanceof.
+export function selectFolderId (id, shiftKey, metaKey, folders, selectedIds) {
+  console.log('selectFolder')
+  let selectedFolderIds = null
+  if (shiftKey) {
+    const firstSelectedIndex = folders.findIndex(folder => (selectedIds.has(folder.id) || selectedIds.has(folder.folderId)))
+    if (firstSelectedIndex >= 0) {
+      const selectedIndex = folders.findIndex(f => (id === f.id || id === f.folderId))
+      const minIndex = Math.min(selectedIndex, firstSelectedIndex)
+      const maxIndex = Math.max(selectedIndex, firstSelectedIndex)
+      const contigIds = folders.slice(minIndex, maxIndex + 1).map(folder => (folder.folderId || folder.id))
+      selectedFolderIds = new Set(contigIds)
+    } else {
+      selectedFolderIds = new Set([id])
+    }
+  } else if (metaKey) {
+    selectedFolderIds = new Set(selectedIds)
+    selectedFolderIds[selectedFolderIds.has(id) ? 'delete' : 'add'](id)
+  } else {
+    selectedFolderIds = new Set([id])
+  }
+  return selectFolderIds(selectedFolderIds)
+}
+
 export function createFolder (folder) {
   return dispatch => {
     console.log('Create folder: ' + JSON.stringify(folder))

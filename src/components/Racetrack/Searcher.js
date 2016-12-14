@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import Widget from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
+import TrashedFolder from '../../models/TrashedFolder'
 import { searchAssets } from '../../actions/assetsAction'
 import { clearFoldersModified, countAssetsInFolderIds } from '../../actions/folderAction'
 
@@ -20,6 +21,7 @@ class Searcher extends Component {
     foldersModified: PropTypes.bool,
     folderCounts: PropTypes.instanceOf(Map),
     filteredFolderCounts: PropTypes.instanceOf(Map),
+    trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
     actions: PropTypes.object.isRequired
   }
 
@@ -60,7 +62,7 @@ class Searcher extends Component {
   // they show the results that do not include their own filter.
   // Note that post-filter is less efficient than a standard filter.
   render () {
-    const { widgets, actions, folders, selectedFolderIds, query, pageSize, foldersModified } = this.props
+    const { widgets, actions, folders, selectedFolderIds, query, pageSize, foldersModified, trashedFolders } = this.props
     let assetSearch = new AssetSearch()
     let postFilter = new AssetFilter()
     for (let widget of widgets) {
@@ -79,13 +81,28 @@ class Searcher extends Component {
 
     assetSearch.postFilter = postFilter
 
+    // Add a filter for selected folders
     if (selectedFolderIds && selectedFolderIds.size) {
-      const filter = new AssetFilter({links: {folder: [...selectedFolderIds]}})
-      assetSearch.merge(new AssetSearch({filter}))
+      // Server does not support searching of trashed folders
+      let nonTrashedFolderIds
+      if (trashedFolders && trashedFolders.length) {
+        nonTrashedFolderIds = []
+        selectedFolderIds.forEach(id => {
+          const index = trashedFolders.findIndex(trashedFolder => (trashedFolder.folderId === id))
+          if (index < 0) nonTrashedFolderIds.push(id)
+        })
+      } else {
+        nonTrashedFolderIds = [...selectedFolderIds]
+      }
+      if (nonTrashedFolderIds && nonTrashedFolderIds.length) {
+        const filter = new AssetFilter({links: {folder: nonTrashedFolderIds}})
+        assetSearch.merge(new AssetSearch({filter}))
+      }
     }
 
     // Do not send the query unless it is different than the last returned query
     // FIXME: If assetSearch.empty() filtered counts == total, but tricky to flush cache
+    // FIXME: Count trashed folders once the server adds support
     if (foldersModified) {
       // FIXME: Update only modified folders, rather than all folders!
       actions.countAssetsInFolderIds([...folders.keys()])
@@ -135,7 +152,8 @@ const mapStateToProps = state => ({
   folderCounts: state.folders.counts,
   filteredFolderCounts: state.folders.filteredCounts,
   selectedFolderIds: state.folders.selectedFolderIds,
-  foldersModified: state.folders.modified
+  foldersModified: state.folders.modified,
+  trashedFolders: state.folders.trashedFolders
 })
 
 export default connect(

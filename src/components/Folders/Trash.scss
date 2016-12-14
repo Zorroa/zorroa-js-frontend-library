@@ -1,0 +1,106 @@
+@import './FolderItem.scss';
+
+$TrashHeight : 25px;
+
+.Trash {
+  @include flexCol;
+  color: $zorroa-lightgray;
+  &:not(.isOpen) .Trash-toggleArrow {
+    transform: rotate(-90deg);
+  }
+}
+
+.Trash-header {
+  @extend .FolderItem;
+}
+
+.Trash-header-left {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+}
+
+.Trash-header-icon {
+}
+
+.Trash-header-count {
+  @extend .FolderItem-count;
+}
+
+.Trash-toggle {
+  @extend .FolderItem-toggle;
+}
+
+.Trash-select {
+  @extend .FolderItem-select;
+}
+
+.Trash-label {
+  @extend .FolderItem-text;
+}
+
+.Trash-subheader {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include flexJustifySpaceBetween;
+  padding-left: 5px + $TrashHeight;
+  padding-right: 10px;
+  background-color: white;
+  font-size: 12px;
+}
+
+.Trash-count {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  div {
+    margin-left: 4px;
+  }
+}
+
+.Trash-empty {
+  color: white;
+  background-color: $zorroa-faded-red;
+  text-transform: uppercase;
+  border-radius: 3px;
+  border: none;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  margin-top: 7px;
+  margin-bottom: 7px;
+  cursor: pointer;
+}
+
+.Trash-items {
+  @include flexCol;
+  color: $zorroa-greyish-brown;
+
+  &:nth-child(odd) {
+    background-color: white;
+  }
+}
+
+.Trash-item {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+
+  position: relative;
+  padding-left: 5px + $TrashHeight;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-right: 10px;
+
+  &.isSelected { color: white; background-color: $zorroa-gray }
+}
+
+.Trash-context-menu {
+  @extend .FolderItem-context-menu;
+}
+
+.Trash-context-menu-background {
+  @extend .FolderItem-context-menu-background;
+}
+
+.Trash-context-item {
+  @extend .FolderItem-context-item;
+}

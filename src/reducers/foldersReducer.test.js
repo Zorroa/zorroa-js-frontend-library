@@ -1,9 +1,11 @@
 import foldersReducer, { createInitialState, initialState } from './foldersReducer'
 import {
   GET_FOLDER_CHILDREN, CREATE_FOLDER, UPDATE_FOLDER, DELETE_FOLDER,
-  TOGGLE_FOLDER, SELECT_FOLDERS
+  TOGGLE_FOLDER, SELECT_FOLDERS, TRASHED_FOLDERS, EMPTY_FOLDER_TRASH,
+  RESTORE_TRASHED_FOLDERS, DELETE_TRASHED_FOLDERS
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
+import TrashedFolder from '../models/TrashedFolder'
 
 describe('foldersReducer', () => {
   it('TOGGLE_FOLDER adds to open folder', () => {
@@ -83,5 +85,42 @@ describe('foldersReducer', () => {
 
     expect(foldersReducer(beforeState, { type: DELETE_FOLDER, payload: foo.id }))
       .toEqual(afterState)
+  })
+})
+
+describe('folder trash reducer', () => {
+  it('TRASHED_FOLDERS returns list of TrashedFolders', () => {
+    const trashedFolders = [ new TrashedFolder({ id: 1, folderId: 2, name: 'foo' }) ]
+    expect(foldersReducer({}, { type: TRASHED_FOLDERS, payload: trashedFolders }))
+      .toEqual({ trashedFolders })
+  })
+
+  it('EMPTY_FOLDER_TRASH to clear out the trash', () => {
+    const trashedFolders = [ new TrashedFolder({ id: 1, folderId: 2, name: 'foo' }) ]
+    expect(foldersReducer({trashedFolders}, { type: EMPTY_FOLDER_TRASH, payload: null }))
+      .toEqual({ trashedFolders: null })
+  })
+
+  it('RESTORE_TRASHED_FOLDERS clears parent list and trashedFolders', () => {
+    const parent = new Folder({id: 5, name: 'parent'})
+    const folder = new Folder({id: 3, name: 'foo', parentId: parent.id})
+    parent.childIds = new Set([folder.id])
+    const all = new Map()
+    all.set(parent.id, parent)
+    all.set(folder.id, folder)
+    const trashedFolder = new TrashedFolder({ id: 7, folderId: folder.id, parentId: parent.id })
+    const trashedFolders = [ trashedFolder ]
+    const afterParent = new Folder(parent)
+    const afterAll = new Map()
+    afterAll.set(afterParent.id, afterParent)
+    afterAll.set(folder.id, folder)
+    expect(foldersReducer({all, trashedFolders}, { type: RESTORE_TRASHED_FOLDERS, payload: [trashedFolder.id] }))
+      .toEqual({ all: afterAll, trashedFolders: null })
+  })
+
+  it('DELETE_TRASHED_FOLDERS nulls out trashedFolders', () => {
+    const trashedFolders = [ new TrashedFolder({ id: 1, folderId: 2, name: 'foo' }) ]
+    expect(foldersReducer({trashedFolders}, { type: DELETE_TRASHED_FOLDERS, payload: null }))
+      .toEqual({ trashedFolders: null })
   })
 })

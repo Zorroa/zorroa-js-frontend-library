@@ -138,7 +138,8 @@ $FolderItemHeight : 25px;
     padding-left: 0;
     padding-right: 0;
     padding-top: 4px;
-    padding-bottom: 8px;
+    padding-bottom: 4px;
+    cursor: pointer;
 
     &:hover {
       background-color: $zorroa-lightgray;

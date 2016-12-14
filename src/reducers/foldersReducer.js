@@ -1,7 +1,9 @@
 import {
   GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, UPDATE_FOLDER,
   DELETE_FOLDER, ADD_ASSETS_TO_FOLDER, REMOVE_ASSETS_FROM_FOLDER,
-  CLEAR_FOLDERS_MODIFIED, TOGGLE_FOLDER, UNAUTH_USER, FOLDER_COUNTS
+  CLEAR_FOLDERS_MODIFIED, TOGGLE_FOLDER, UNAUTH_USER, FOLDER_COUNTS,
+  TRASHED_FOLDERS, EMPTY_FOLDER_TRASH, COUNT_TRASHED_FOLDERS,
+  RESTORE_TRASHED_FOLDERS, DELETE_TRASHED_FOLDERS
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import * as assert from 'assert'
@@ -21,7 +23,10 @@ export var createInitialState = () => ({
   openFolderIds: new Set([Folder.ROOT_ID]),
 
   // a set of folder ids, indicating which folders are user-selected
-  selectedFolderIds: new Set()
+  selectedFolderIds: new Set(),
+
+  // TrashedFolder array, or null if we need to re-fetch
+  trashedFolders: null
 })
 export const initialState = createInitialState()
 
@@ -126,7 +131,7 @@ export default function (state = initialState, action) {
           openFolderIds.delete(id)
           selectedFolderIds.delete(id)
         }
-        return { ...state, all, openFolderIds, selectedFolderIds }
+        return { ...state, all, openFolderIds, selectedFolderIds, trashedFolders: null }
       }
       break
 
@@ -151,6 +156,32 @@ export default function (state = initialState, action) {
 
     case CLEAR_FOLDERS_MODIFIED:
       return { ...state, modified: false }
+
+    case TRASHED_FOLDERS:
+      return { ...state, trashedFolders: action.payload }
+
+    case EMPTY_FOLDER_TRASH:
+      return { ...state, trashedFolders: null }
+
+    case RESTORE_TRASHED_FOLDERS: {
+      let all = new Map(state.all) // copy folder map
+      const trashedFolderIds = action.payload
+      trashedFolderIds.forEach(trashedFolderId => {
+        const trashedFolder = state.trashedFolders.find(trashedFolder => (trashedFolder.id === trashedFolderId))
+        if (trashedFolder) {
+          const parent = state.all.get(trashedFolder.parentId)
+          const newParent = new Folder(parent)  // new folder with undefined children to force re-load
+          all.set(newParent.id, newParent)
+        }
+      })
+      return { ...state, all, trashedFolders: null }
+    }
+
+    case DELETE_TRASHED_FOLDERS:
+      return { ...state, trashedFolders: null }
+
+    case COUNT_TRASHED_FOLDERS:
+      return { ...state }
 
     case UNAUTH_USER:
       return initialState

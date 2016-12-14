@@ -6,6 +6,7 @@ import classnames from 'classnames'
 import Asset from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
+import TrashedFolder from '../../models/TrashedFolder'
 import CreateExport from '../Folders/CreateExport'
 import { selectAssetIds } from '../../actions/assetsAction'
 import { removeAssetIdsFromFolderId } from '../../actions/folderAction'
@@ -16,6 +17,7 @@ class Editbar extends Component {
   static propTypes = {
     selectedAssetIds: PropTypes.instanceOf(Set),
     selectedFolderIds: PropTypes.instanceOf(Set),
+    trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
     folders: PropTypes.instanceOf(Map),
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     query: PropTypes.instanceOf(AssetSearch),
@@ -68,7 +70,16 @@ class Editbar extends Component {
   }
 
   render () {
-    const { selectedAssetIds, selectedFolderIds } = this.props
+    const { selectedAssetIds, trashedFolders } = this.props
+    let selectedFolderIds = this.props.selectedFolderIds
+    if (trashedFolders && trashedFolders.length) {
+      // Server does not support editing of trashed folders
+      selectedFolderIds = new Set()
+      this.props.selectedFolderIds.forEach(id => {
+        const index = trashedFolders.findIndex(trashedFolder => (trashedFolder.folderId === id))
+        if (index < 0) selectedFolderIds.add(id)
+      })
+    }
     if ((!selectedFolderIds || !selectedFolderIds.size) &&
       (!selectedAssetIds || !selectedAssetIds.size)) {
       return (<div className="Editbar"/>)
@@ -113,6 +124,7 @@ class Editbar extends Component {
 
 export default connect(state => ({
   selectedAssetIds: state.assets.selectedIds,
+  trashedFolders: state.folders.trashedFolders,
   selectedFolderIds: state.folders.selectedFolderIds,
   folders: state.folders.all,
   assets: state.assets.all,

@@ -5,8 +5,9 @@ import * as assert from 'assert'
 import classnames from 'classnames'
 
 import Folder from '../../models/Folder'
-import { getFolderChildren, createFolder, selectFolderIds, toggleFolder } from '../../actions/folderAction'
+import { getFolderChildren, createFolder, selectFolderId, toggleFolder } from '../../actions/folderAction'
 import { showCreateFolderModal } from '../../actions/appActions'
+import Trash from './Trash'
 import FolderItem from './FolderItem'
 import AssetSearch from '../../models/AssetSearch'
 
@@ -99,31 +100,12 @@ class Folders extends Component {
     if (doOpen) this.loadChildren(folder.id)
   }
 
-  // WTF? The order of these arguments must be the reverse of FolderItem invocation
   selectFolder (folder, event) {
-    console.log('selectFolder')
-    let selectedFolderIds = null
-    if (event.shiftKey) {
-      const { folders } = this.props
-      const rootFolder = folders.all.get(Folder.ROOT_ID)
-      const folderList = this.folderList(rootFolder)
-      const firstSelectedIndex = folderList.findIndex(folder => (folders.selectedFolderIds.has(folder.id)))
-      if (firstSelectedIndex >= 0) {
-        const selectedIndex = folderList.findIndex(f => (folder.id === f.id))
-        const minIndex = Math.min(selectedIndex, firstSelectedIndex)
-        const maxIndex = Math.max(selectedIndex, firstSelectedIndex)
-        const contigIds = folderList.slice(minIndex, maxIndex + 1).map(folder => (folder.id))
-        selectedFolderIds = new Set(contigIds)
-      } else {
-        selectedFolderIds = new Set([folder.id])
-      }
-    } else if (event.metaKey) {
-      selectedFolderIds = new Set(this.props.folders.selectedFolderIds)
-      selectedFolderIds[selectedFolderIds.has(folder.id) ? 'delete' : 'add'](folder.id)
-    } else {
-      selectedFolderIds = new Set([folder.id])
-    }
-    this.props.actions.selectFolderIds(selectedFolderIds)
+    const { folders } = this.props
+    const rootFolder = folders.all.get(Folder.ROOT_ID)
+    const folderList = this.folderList(rootFolder)
+    this.props.actions.selectFolderId(folder.id, event.shiftKey, event.metaKey,
+      folderList, this.props.folders.selectedFolderIds)
   }
 
   filterFolders = (event) => {
@@ -189,11 +171,18 @@ class Folders extends Component {
 
   isAddFolderEnabled () {
     const { folders, query } = this.props
-    const selectedFolderIds = folders.selectedFolderIds
     switch (this.props.filterName) {
       case 'browsing': return true
       case 'smart': return query && !query.empty()
-      case 'simple': return selectedFolderIds && selectedFolderIds.size === 1
+      case 'simple': {
+        // True if one folder is selected and it isn't in the trash
+        const selectedFolderIds = folders.selectedFolderIds
+        if (!selectedFolderIds || selectedFolderIds.size !== 1) return false
+        if (!folders.trashedFolders) return true
+        const id = selectedFolderIds.values().next().value
+        const index = folders.trashedFolders.findIndex(trashedFolder => (trashedFolder.folderId === id))
+        return index < 0
+      }
     }
   }
 
@@ -217,6 +206,8 @@ class Folders extends Component {
       children.forEach(child => {
         grandkids = grandkids.concat(this.folderList(child))
       })
+    } else if (!childIds && isOpen) {
+      this.loadChildren(folder.id)
     }
 
     // Filter the list, showing parent if any descendents match
@@ -251,7 +242,7 @@ class Folders extends Component {
   )
 
   render () {
-    const { folders } = this.props
+    const { folders, filterName } = this.props
     const rootLoaded = folders.all.has(Folder.ROOT_ID)
     if (!rootLoaded) return null
     const folderList = this.renderFolderList(folders.all.get(Folder.ROOT_ID))
@@ -265,6 +256,7 @@ class Folders extends Component {
         </div>
         <div>
           {folderList}
+          {folderList.length ? <Trash filterName={filterName}/> : null }
         </div>
       </div>
     )
@@ -278,7 +270,7 @@ export default connect(state => ({
   actions: bindActionCreators({
     getFolderChildren,
     createFolder,
-    selectFolderIds,
+    selectFolderId,
     toggleFolder,
     showCreateFolderModal
   }, dispatch)
