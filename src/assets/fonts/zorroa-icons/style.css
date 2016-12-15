@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'zorroa-icons';
-  src:  url('fonts/zorroa-icons.eot?qzwo7a');
-  src:  url('fonts/zorroa-icons.eot?qzwo7a#iefix') format('embedded-opentype'),
-    url('fonts/zorroa-icons.woff2?qzwo7a') format('woff2'),
-    url('fonts/zorroa-icons.ttf?qzwo7a') format('truetype'),
-    url('fonts/zorroa-icons.woff?qzwo7a') format('woff'),
-    url('fonts/zorroa-icons.svg?qzwo7a#zorroa-icons') format('svg');
+  src:  url('fonts/zorroa-icons.eot?rrbrxh');
+  src:  url('fonts/zorroa-icons.eot?rrbrxh#iefix') format('embedded-opentype'),
+    url('fonts/zorroa-icons.woff2?rrbrxh') format('woff2'),
+    url('fonts/zorroa-icons.ttf?rrbrxh') format('truetype'),
+    url('fonts/zorroa-icons.woff?rrbrxh') format('woff'),
+    url('fonts/zorroa-icons.svg?rrbrxh#zorroa-icons') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -30,6 +30,30 @@
 }
 .icon-plus2:before {
   content: "\e928";
+}
+.icon-zorroa-person-02:before {
+  content: "\e953";
+}
+.icon-zorroa-person-03:before {
+  content: "\e954";
+}
+.icon-zorroa-person-04:before {
+  content: "\e955";
+}
+.icon-zorroa-person-05:before {
+  content: "\e956";
+}
+.icon-zorroa-person-06:before {
+  content: "\e957";
+}
+.icon-zorroa-person-07:before {
+  content: "\e958";
+}
+.icon-zorroa-person-08:before {
+  content: "\e959";
+}
+.icon-zorroa-person-09:before {
+  content: "\e95a";
 }
 .icon-emptybox:before {
   content: "\e952";
