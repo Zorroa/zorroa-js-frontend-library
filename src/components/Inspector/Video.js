@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react'
+import keydown from 'react-keydown'
 
 // Reference: https://github.com/CookPete/react-player
 import ReactPlayer from 'react-player'
@@ -19,7 +20,8 @@ export default class Video extends Component {
     duration: 0
   }
 
-  playPause = () => {
+  @keydown('space')
+  playPause () {
     this.setState({ playing: !this.state.playing })
   }
 
@@ -52,17 +54,16 @@ export default class Video extends Component {
   }
 
   fastForward = () => {
-    const { duration } = this.state
-    this.scrub(duration)
+    this.scrub(1)
   }
 
   frameBack = () => {
-    const t = this.state.played - 1 / (30.0 * this.state.duration)
+    const t = Math.max(0, this.state.played - 1 / (30.0 * this.state.duration))
     this.scrub(t)
   }
 
   frameForward = () => {
-    const t = this.state.played + 1 / (30.0 * this.state.duration)
+    const t = Math.min(1, this.state.played + 1 / (30.0 * this.state.duration))
     this.scrub(t)
   }
 
@@ -96,7 +97,7 @@ export default class Video extends Component {
               onPlay={() => this.setState({ playing: true })}
               onPause={() => this.setState({ playing: false })}
               onBuffer={() => console.log('onBuffer')}
-              onEnded={() => this.setState({ playing: false })}
+              onEnded={() => this.setState({ playing: false, played: 1 })}
               onError={e => console.log('onError', e)}
               onProgress={this.onProgress}
               onDuration={duration => this.setState({ duration })}
@@ -121,7 +122,7 @@ export default class Video extends Component {
           <div className="Video-controls">
             <div onClick={this.rewind} className="icon-prev-clip"/>
             <div onClick={this.frameBack} className="icon-frame-back"/>
-            <div onClick={this.playPause} className="Video-play">
+            <div onClick={this.playPause.bind(this)} className="Video-play">
               <div className={playing ? 'icon-pause' : 'icon-play3'} />
             </div>
             <div onClick={this.frameForward} className="icon-frame-forward"/>

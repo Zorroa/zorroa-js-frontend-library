@@ -25,7 +25,7 @@ class Lightbox extends Component {
     }
   }
 
-  @keydown(['esc', 'space'])
+  @keydown('esc')
   closeLightbox (event) {
     this.context.router.push('/')
   }
