@@ -68,8 +68,7 @@
     .Facet-value-table-row {
 
       &.selected {
-        color: white;
-        background-color: $zorroa-water-blue;
+        background-color: $zorroa-selected;
       }
     }
 
@@ -179,8 +178,7 @@
   }
 
   tbody tr:hover {
-    color: white;
-    background-color: $zorroa-sickly-green;
+    background-color: $zorroa-hover;
   }
 
   .Facet-controls {
@@ -203,12 +201,11 @@
       counter-reset: $zorroa-greyish-brown;
       background: transparent;
       &:hover {
-        background: $zorroa-lightgray;
+        background: $zorroa-hover;
       }
 
       &.selected {
-        color: white;
-        background-color: #a11d77;
+        background-color: $zorroa-selected;
       }
     }
   }

@@ -68,7 +68,7 @@
   position: absolute;
 
   &:hover {
-    outline: 3px solid $zorroa-lightgray;
+    outline: 3px solid $zorroa-hover;
   }
   &.isSelected {
     outline: 3px solid $zorroa-sickly-green;

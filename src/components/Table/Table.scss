@@ -26,8 +26,7 @@
   border-radius: 2px;
 
   &:hover {
-    color: $zorroa-sickly-green;
-    background-color: $zorroa-nearwhite;
+    color: $zorroa-hover;
   }
 }
 
@@ -144,7 +143,9 @@ $tableResizeRightPadding: 20px;
   border: 2px solid transparent;
 
   &.even { background-color: #fff; }
-  &.isSelected { border: 2px solid $zorroa-sickly-green; }
+  &.isSelected {
+    background-color: $zorroa-selected;
+  }
 }
 
 
@@ -157,8 +158,7 @@ $tableResizeRightPadding: 20px;
 }
 
 .Table-body .Table-row:hover {
-  color: #fff;
-  background-color: $zorroa-lightgray;
+  background-color: $zorroa-hover;
 }
 
 .Table-cell {
