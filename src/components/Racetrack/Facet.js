@@ -83,19 +83,34 @@ class Facet extends Component {
     }
   }
 
-  selectTerm (term) {
-    let terms = [ ...this.state.terms ]
-    const index = terms.indexOf(term)
-    if (index >= 0) {
-      terms.splice(index, 1)
+  selectTerm (term, event) {
+    let terms = []
+    if (event.shiftKey) {
+      const buckets = this.aggBuckets()
+      const firstSelectedIndex = buckets.findIndex(b => (this.state.terms.findIndex(t => (t === b.key)) >= 0))
+      if (firstSelectedIndex >= 0) {
+        const selectedIndex = buckets.findIndex(b => (b.key === term))
+        const minIndex = Math.min(selectedIndex, firstSelectedIndex)
+        const maxIndex = Math.max(selectedIndex, firstSelectedIndex)
+        terms = buckets.slice(minIndex, maxIndex + 1).map(bucket => bucket.key)
+      }
+    } else if (event.metaKey) {
+      const index = this.state.terms.findIndex(t => (t === term))
+      if (index >= 0) {
+        terms = [...this.state.terms]
+        terms.splice(index, 1)
+      } else {
+        terms = [...this.state.terms]
+        terms.push(term)
+      }
     } else {
-      terms.push(term)
+      terms = [term]
     }
     this.modifySliver(this.state.field, terms)
   }
 
-  selectPieSection = ({ name }) => {
-    this.selectTerm(name)
+  selectPieSection = ({ name }, i, event) => {
+    this.selectTerm(name, event)
   }
 
   selectField = (event) => {
