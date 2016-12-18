@@ -14,7 +14,8 @@ class Searchbar extends Component {
     actions: PropTypes.object.isRequired,
     query: PropTypes.instanceOf(AssetSearch),
     totalCount: PropTypes.number,
-    suggestions: PropTypes.arrayOf(PropTypes.object)
+    suggestions: PropTypes.arrayOf(PropTypes.object),
+    widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget))
   }
 
   constructor (props) {
@@ -52,6 +53,7 @@ class Searchbar extends Component {
 
   clearQueryString = (event) => {
     const queryString = ''
+    this.resetSearch(queryString)
     this.setState({ queryString })
     this.props.actions.suggestQueryStrings(null)
   }
@@ -129,11 +131,20 @@ class Searchbar extends Component {
     return queryString + suffix
   }
 
-  // Submit a new search, resetting the racetrack
+  // Submit a new query string, replacing the first SimpleSearch widget
+  // if one already exists, or adding a new one if none in racetrack.
   resetSearch (query) {
     const sliver = new AssetSearch({ query })
     const widget = new Widget({ type: SimpleSearchWidgetInfo.type, sliver })
-    this.props.actions.resetRacetrackWidgets([widget])
+    const index = this.props.widgets && this.props.widgets.findIndex(widget => (
+      widget.type === SimpleSearchWidgetInfo.type))
+    let widgets = [...this.props.widgets]
+    if (index < 0) {
+      widgets.unshift(widget)
+    } else {
+      widgets[index] = widget
+    }
+    this.props.actions.resetRacetrackWidgets(widgets)
   }
 
   render () {
@@ -141,32 +152,32 @@ class Searchbar extends Component {
     const { suggestions } = this.props
     return (
       <div className="Searchbar">
-        <div className="body flexCenter">
-          <div className="overlapping-inputs">
+        <div className="Searchbar-body flexCenter">
+          <div className="Searchbar-overlapping-inputs">
             <input disabled={true} value={this.selectedSuggestionString()} type="text" className="typeahead"/>
             <input value={queryString}
                    onKeyDown={this.onKeyDown}
                    onChange={this.updateQueryString}
                    placeholder="Search..." type="text" />
             <button onClick={this.clearQueryString} disabled={!queryString || !queryString.length} className="clear-button icon-cancel-circle" />
+            { suggestions && suggestions.length ? (
+              <div className="Searchbar-suggestions fullWidth">
+                <ul>
+                  { suggestions.map((suggestion, index) => (
+                    <li key={suggestion.text}>
+                      <div onClick={this.chooseSuggestion.bind(this, suggestion)}
+                           className={classnames('Searchbar-suggestion', {selected: index === selectedSuggestionIndex})}>
+                        <div>{suggestion.text}</div>
+                        <div>{suggestion.score}</div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : <div/>}
           </div>
           <button onClick={this.selectCurrentQueryString} className="search-button icon-search" />
         </div>
-        { suggestions && suggestions.length ? (
-          <div className="suggestions fullWidth">
-            <ul>
-              { suggestions.map((suggestion, index) => (
-                <li key={suggestion.text}>
-                  <div onClick={this.chooseSuggestion.bind(this, suggestion)}
-                       className={classnames('suggestion', {selected: index === selectedSuggestionIndex})}>
-                    <div>{suggestion.text}</div>
-                    <div>{suggestion.score}</div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : <div/>}
       </div>
     )
   }
@@ -179,7 +190,8 @@ const mapDispatchToProps = dispatch => ({
 const mapStateToProps = state => ({
   query: state.assets && state.assets.query,
   totalCount: state.assets && state.assets.totalCount,
-  suggestions: state.assets && state.assets.suggestions
+  suggestions: state.assets && state.assets.suggestions,
+  widgets: state.racetrack && state.racetrack.widgets
 })
 
 export default connect(

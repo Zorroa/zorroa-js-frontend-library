@@ -1,112 +1,112 @@
 @import '../../styles/core-mixins.scss';
 
 .Searchbar {
-  // Form layout
-  .body {
-    font-size: 20px;
-
-    .overlapping-inputs {
-      @include fullWidth;
-      height: 25px;
-      position: relative;
-
-      // Underline-only bar
-      input {
-        background: transparent;
-        border: none;
-        position: absolute;
-        top: 0;
-        left: 0;
-
-        width: 100%;
-
-        border-bottom: 2px solid $zorroa-sickly-green;
-        font-size: 16px; // TODO: see if we can delete this when bootstrap is gone
-
-        &.typeahead {
-          z-index: -1;
-          color: $zorroa-lightgray;
-        }
-      }
-    }
-
-    // Magnifying glass
-    .search-button {
-      padding-left: 12px;
-      border: none;
-      background: none;
-      color: $zorroa-sickly-green;
-      font-size: 20px; // TODO: see if we can delete this when bootstrap is gone
-    }
-
-    // Clear text button
-    .clear-button {
-      position: absolute;
-      top: 4px;
-      right: -5px;
-      border: none;
-      background: none;
-      color: $zorroa-gray;
-
-      &:hover {
-        color: $zorroa-sickly-green;
-      }
-
-      &:disabled {
-        color: transparent;
-      }
-    }
-  }
-
   // Remove box highling when focused
   .searchbar:focus {
     outline: none;
   }
+}
 
-  .suggestions {
+// Form layout
+.Searchbar-body {
+  font-size: 20px;
+
+  // Magnifying glass
+  .search-button {
+    padding-left: 12px;
+    border: none;
+    background: none;
+    color: $zorroa-sickly-green;
+    font-size: 20px; // TODO: see if we can delete this when bootstrap is gone
+  }
+
+  // Clear text button
+  .clear-button {
+    position: absolute;
+    top: 4px;
+    right: -5px;
+    border: none;
+    background: none;
+    color: $zorroa-gray;
+
+    &:hover {
+      color: $zorroa-sickly-green;
+    }
+
+    &:disabled {
+      color: transparent;
+    }
+  }
+}
+
+.Searchbar-overlapping-inputs {
+  @include fullWidth;
+  height: 25px;
+  position: relative;
+
+  // Underline-only bar
+  input {
+    background: transparent;
+    border: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+
+    border-bottom: 2px solid $zorroa-sickly-green;
+    font-size: 16px;
+
+    &.typeahead {
+      z-index: -1;
+      color: $zorroa-lightgray;
+    }
+  }
+}
+
+.Searchbar-suggestions {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  top: 100%;
+  z-index: 1000;
+
+  ul {
+    background-clip: padding-box;
+    background-color: rgba(255, 255, 255, 0.85);
+    border-radius: 3px;
+    border: 1px solid $zorroa-lightgray;
     box-sizing: border-box;
-    position: relative;
-    padding: 0;
-    margin: 0;
+    list-style-type: none;
+    margin: 2px 0 0;
+    text-align: left;
+    box-shadow: 0 4px 10px 0 $zorroa-darkgray;
+    padding: 8px 0;
+    width: 100%;
+  }
 
-    ul {
-      background-clip: padding-box;
-      background-color: rgba(255, 255, 255, 0.85);
-      border-radius: 3px;
-      border: 1px solid $zorroa-lightgray;
-      box-sizing: border-box;
-      list-style-type: none;
-      margin: 2px 0 0;
-      position: absolute;
-      text-align: left;
-      top: 100%;
-      z-index: 1000;
-      box-shadow: 0 4px 10px 0 $zorroa-darkgray;
-      padding: 8px 0;
-      // Could not figure out how to make this match the <input>
-      width: 89%;
+  li {
+    width: 100%;
+    color: $zorroa-darkgray;
+    line-height: 1.8;
+
+    &:hover {
+      color: $zorroa-sickly-green;
     }
+  }
 
-    li {
-      width: 100%;
-      color: $zorroa-darkgray;
-      line-height: 1.8;
+}
 
-      &:hover {
-        color: $zorroa-sickly-green;
-      }
-    }
+.Searchbar-suggestion {
+  @include flexRow;
+  @include flexJustifySpaceBetween;
+  @include fullWidth;
+  padding-left: 8px;
+  padding-right: 8px;
+  font-size: 14px;
 
-    .suggestion {
-      @include flexRow;
-      @include flexJustifySpaceBetween;
-      @include fullWidth;
-      padding-left: 8px;
-      padding-right: 8px;
-
-      &.selected {
-        background-color: rgba(192, 192, 192, 0.5);
-      }
-    }
+  &.selected {
+    background-color: rgba(192, 192, 192, 0.5);
   }
 }
