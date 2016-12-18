@@ -4,6 +4,7 @@ import React, { Component, PropTypes } from 'react'
 import ReactPlayer from 'react-player'
 
 import { formatDuration } from '../../services/jsUtil'
+import PanZoom from './PanZoom'
 
 export default class Video extends Component {
   static propTypes = {
@@ -80,24 +81,28 @@ export default class Video extends Component {
     const volumeY = 30 - (5 + 20 * volume)
     return (
       <div className='Video'>
-        <ReactPlayer
-          ref={player => { this.player = player }}
-          className='Video-player'
-          url={url}
-          width="100%"
-          height="100%"
-          playing={playing}
-          volume={volume}
-          onReady={() => console.log('onReady')}
-          onStart={() => console.log('onStart')}
-          onPlay={() => this.setState({ playing: true })}
-          onPause={() => this.setState({ playing: false })}
-          onBuffer={() => console.log('onBuffer')}
-          onEnded={() => this.setState({ playing: false })}
-          onError={e => console.log('onError', e)}
-          onProgress={this.onProgress}
-          onDuration={duration => this.setState({ duration })}
-        />
+        <div className="Video-pan-zoom">
+          <PanZoom>
+            <ReactPlayer
+              ref={player => { this.player = player }}
+              className='Video-player'
+              url={url}
+              width="100%"
+              height="100%"
+              playing={playing}
+              volume={volume}
+              onReady={() => console.log('onReady')}
+              onStart={() => console.log('onStart')}
+              onPlay={() => this.setState({ playing: true })}
+              onPause={() => this.setState({ playing: false })}
+              onBuffer={() => console.log('onBuffer')}
+              onEnded={() => this.setState({ playing: false })}
+              onError={e => console.log('onError', e)}
+              onProgress={this.onProgress}
+              onDuration={duration => this.setState({ duration })}
+            />
+          </PanZoom>
+        </div>
         <div className="Video-progress-bar">
           <input className="Video-scrub"
                  type='range' min={0} max={1} step='any'

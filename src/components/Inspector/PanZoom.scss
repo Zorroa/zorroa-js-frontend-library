@@ -1,0 +1,52 @@
+@import '../../styles/core-mixins.scss';
+
+.PanZoom-frame {
+  @include flexCol;
+  @include flexOn;
+}
+
+.PanZoom {
+  @include flexCol;
+  @include flexOn;
+  position: relative;
+  cursor: move; /* fallback if grab cursor is unsupported */
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
+
+.PanZoom-controls {
+  position: absolute;
+  bottom: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  left: 0;
+  right: 0;
+  width: 140px;
+  border-radius: 3px;
+  box-shadow: 0 2px 4px 4px rgba(0,0,0,0.25);
+  color: white;
+  background-color: black;
+  padding: 10px;
+
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include flexJustifySpaceBetween;
+
+  button:disabled {
+    color: $zorroa-darkgray;
+    &:hover {
+      color: $zorroa-darkgray;
+    }
+  }
+
+  [class*='icon-'] {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    &:hover {
+      color: $zorroa-sickly-green
+    }
+  }
+}

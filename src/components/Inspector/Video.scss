@@ -11,7 +11,25 @@
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
 
+  .PanZoom-controls {
+    position: fixed;    // avoid overflow:hidden on Video-pan-zoom
+    left: 200px;        // Next to the time display
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .Video-pan-zoom {
+    @include flexCol;
+    @include flexOn;
+    @include fullWidth;
+    overflow: hidden;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+  }
+
   .Video-player {
+    @include flexCol;
     @include flexOn;
     @include fullWidth;
     overflow: hidden;
@@ -95,11 +113,13 @@
     box-shadow: 0 0 3px 3px rgba(0,0,0,0.25);
     border-radius: 3px;
     height: 60px;
+    min-height: 60px;
+    max-height: 60px;
     background: none;
 
     .Video-time {
-      margin-left: 10px;
-      width: 200px;
+      padding-left: 10px;
+      width: 291px;         // match volume width to center controls
       font-size: 20px;
       color: $zorroa-lightgray;
       .Video-duration {
