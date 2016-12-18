@@ -1,4 +1,7 @@
-import { ASSET_SEARCH, ASSET_SEARCH_ERROR, ASSET_FIELDS, PAGE_SIZE, ISOLATE_ASSET, SELECT_ASSETS, SUGGEST_COMPLETIONS, UNAUTH_USER } from '../constants/actionTypes'
+import {
+  ASSET_SEARCH, ASSET_SEARCH_ERROR, ASSET_SORT, ASSET_FIELDS,
+  PAGE_SIZE, ISOLATE_ASSET, SELECT_ASSETS, SUGGEST_COMPLETIONS, UNAUTH_USER
+} from '../constants/actionTypes'
 
 import AssetSearch from '../models/AssetSearch'
 
@@ -50,20 +53,41 @@ export default function (state = initialState, action) {
       const totalCount = page && page.totalCount ? page.totalCount : 0
       return { ...state, all, aggs, query, totalCount, isolatedId: null, suggestions: null }
     }
+
     case ASSET_SEARCH_ERROR:
       return { ...state, error: action.payload }
+
+    case ASSET_SORT: {
+      const { field, ascending } = action.payload
+      let order = state.order ? [ ...state.order ] : []
+      const index = state.order && state.order.findIndex(order => (order.field === field))
+      if (index >= 0) order.splice(index, 1)  // remove if order===undefined, re-order otherwise
+      if (ascending !== undefined) {
+        // add as primary sort and crop list to max count
+        order.unshift(action.payload)
+        const maxOrder = 3
+        order = order.slice(0, maxOrder)
+      }
+      return { ...state, order }
+    }
+
     case ASSET_FIELDS:
       return { ...state, fields: action.payload }
+
     case ISOLATE_ASSET:
       return { ...state, isolatedId: action.payload }
+
     case SELECT_ASSETS: {
       const selectionCounter = state.selectionCounter + 1
       return { ...state, selectedIds: action.payload, selectionCounter }
     }
+
     case PAGE_SIZE:
       return { ...state, pageSize: action.payload }
+
     case SUGGEST_COMPLETIONS:
       return { ...state, suggestions: action.payload }
+
     case UNAUTH_USER:
       return initialState
   }

@@ -12,6 +12,7 @@ import {
   showDisplayOptionsModal,
   setTableFieldWidth
 } from '../../actions/appActions'
+import { sortAssets } from '../../actions/assetsAction'
 import TableField from './TableField'
 
 const rowHeightPx = 30
@@ -25,6 +26,7 @@ class Table extends Component {
     selectionCounter: PropTypes.number.isRequired,
     fields: PropTypes.arrayOf(PropTypes.string).isRequired,
     fieldWidth: PropTypes.objectOf(PropTypes.number).isRequired,
+    order: PropTypes.arrayOf(PropTypes.object),
 
     // input props
     assetsKey: PropTypes.string.isRequired,
@@ -248,6 +250,33 @@ class Table extends Component {
     })
   }
 
+  sortByField (field, event) {
+    console.log('Sort by ' + field)
+    const { order } = this.props
+    const index = order && order.findIndex(order => (order.field === field))
+    const ascending = event.metaKey && index >= 0 ? undefined
+      : (!order || index < 0 ? true : !order[index].ascending)
+    this.props.actions.sortAssets(field, ascending)
+  }
+
+  titleForField (field) {
+    const names = field.split('.')
+    if (!names || names.length < 2) return field
+    let title = ''
+    for (let i = names.length - 1; i >= 0; --i) {
+      title = title.concat(names[i])
+      if (i > 0) title = title.concat(` \u2039 `)
+    }
+    return title
+  }
+
+  sortOrderClassnames (field) {
+    const { order } = this.props
+    const index = order && order.findIndex(order => (order.field === field))
+    const icon = !order || index < 0 ? 'icon-sort' : (order[index].ascending ? 'icon-sort-asc' : 'icon-sort-desc')
+    return `Table-header-sort ${icon} Table-header-sort-order-${index}`
+  }
+
   render () {
     const { assets, fields, fieldWidth, height, tableIsDragging, assetsKey, selectedAssetIds } = this.props
     if (!assets) return
@@ -288,9 +317,9 @@ class Table extends Component {
                  className='Table-header-cell flexRowCenter'
                  style={{width: `${fieldWidth[field]}px`}}>
               <div className={`Table-cell`}>
-                { field.replace(/\./g, ` \u203a `) }
+                { this.titleForField(field) }
               </div>
-              <i className='Table-header-sort icon-chevrons-expand-vertical'/>
+              <i onClick={this.sortByField.bind(this, field)} className={this.sortOrderClassnames(field)}/>
               <div className='flexOn'/>
               <div className='Table-header-resizer'
                    draggable={true}
@@ -353,8 +382,14 @@ export default connect(state => ({
   assets: state.assets.all,
   selectedAssetIds: state.assets.selectedIds,
   selectionCounter: state.assets.selectionCounter,
+  order: state.assets.order,
   fields: state.app.tableFields,
   fieldWidth: state.app.tableFieldWidth
 }), dispatch => ({
-  actions: bindActionCreators({ updateMetadataFields, updateTableFields, showDisplayOptionsModal, setTableFieldWidth }, dispatch)
+  actions: bindActionCreators({
+    sortAssets,
+    updateMetadataFields,
+    updateTableFields,
+    showDisplayOptionsModal,
+    setTableFieldWidth }, dispatch)
 }))(Table)

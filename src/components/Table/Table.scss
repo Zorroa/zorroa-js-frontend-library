@@ -57,8 +57,34 @@ $tableResizeRightPadding: 20px;
 }
 
 .Table-header-sort {
-  font-size: 12px;
+  font-size: 14px;
   cursor: pointer;
+  padding: 4px;
+  border-radius: 3px;
+
+  &.icon-sort {
+    color: $zorroa-lightgray;
+    font-size: 12px;
+    padding-right: 8px;
+  }
+
+  &:hover {
+    background-color: $zorroa-sickly-green;
+    color: white;
+  }
+
+}
+
+.Table-header-sort-order-0 {
+  color: $zorroa-darkgray;
+}
+
+.Table-header-sort-order-1 {
+  color: $zorroa-gray;
+}
+
+.Table-header-sort-order-2 {
+  color: $zorroa-lightgray;
 }
 
 .Table-header-resizer {

@@ -22,6 +22,7 @@ class Searcher extends Component {
     folderCounts: PropTypes.instanceOf(Map),
     filteredFolderCounts: PropTypes.instanceOf(Map),
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
+    order: PropTypes.arrayOf(PropTypes.object),
     actions: PropTypes.object.isRequired
   }
 
@@ -62,8 +63,10 @@ class Searcher extends Component {
   // they show the results that do not include their own filter.
   // Note that post-filter is less efficient than a standard filter.
   render () {
-    const { widgets, actions, folders, selectedFolderIds, query, pageSize, foldersModified, trashedFolders } = this.props
-    let assetSearch = new AssetSearch()
+    const {
+      widgets, actions, folders, selectedFolderIds, query, pageSize,
+      foldersModified, trashedFolders, order } = this.props
+    let assetSearch = new AssetSearch({order})
     let postFilter = new AssetFilter()
     for (let widget of widgets) {
       if (!widget || !widget.sliver) {
@@ -147,6 +150,7 @@ const mapDispatchToProps = dispatch => ({
 const mapStateToProps = state => ({
   query: state.assets.query,
   pageSize: state.assets.pageSize,
+  order: state.assets.order,
   widgets: state.racetrack.widgets,
   folders: state.folders.all,
   folderCounts: state.folders.counts,
