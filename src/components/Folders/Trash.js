@@ -25,6 +25,10 @@ class Trash extends Component {
 
   showContextMenu (trashedFolder, event) {
     event.preventDefault()
+    // Isolate-select if the clicked folder is not selected
+    if (!this.props.selectedFolderIds.has(trashedFolder.folderId)) {
+      this.selectFolder(trashedFolder, {shiftKey: false, metaKey: false})
+    }
     this.setState({ contextMenuTrashedFolderId: trashedFolder.id })
   }
 

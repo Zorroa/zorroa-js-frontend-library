@@ -64,6 +64,11 @@ class FolderItem extends Component {
 
   showContextMenu = (event) => {
     event.preventDefault()
+    // Isolate-select if the clicked folder is not selected
+    const { folder, selectedFolderIds, onSelect } = this.props
+    if (!selectedFolderIds.has(folder.id)) {
+      onSelect({shiftKey: false, metaKey: false}, folder)
+    }
     this.setState({ isContextMenuVisible: true })
   }
 
