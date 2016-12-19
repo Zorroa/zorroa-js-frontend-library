@@ -16,23 +16,28 @@ class Inspector extends Component {
   render () {
     const { asset, protocol, host } = this.props
     const mediaType = asset.mediaType().toLowerCase()
-    let isImage = false
-    let isVideo = false
-    let isPdf = false
     const url = asset.url(protocol, host)
-    if (mediaType.startsWith('image')) {
-      isImage = true
+    const imageFormats = [ 'jpeg', 'jpg', 'png', 'gif' ]
+    let warning = null    // FIXME: move to Lightbar?
+    let inspector = null
+    if (mediaType.startsWith('image') &&
+      imageFormats.findIndex(format => (mediaType.endsWith(format))) >= 0) {
+      inspector = <Image url={url}/>
     } else if (mediaType.startsWith('video')) {
-      isVideo = true
+      inspector = <Video url={url}/>
     } else if (mediaType === 'application/pdf') {
-      isPdf = true
+      inspector = <Pdf documentInitParameters={{url, withCredentials: true}} />
+    } else {
+      const proxy = asset.biggestProxy()
+      inspector = <Image url={proxy.url(protocol, host)}/>
+      warning = <div>{proxy.width} x {proxy.height} proxy</div>
     }
+
     return (
-      <div className="inspector fullWidth fullHeight flexCenter">
-        <div className='inspector-content flexOn'>
-          { isImage && <Image url={url} /> }
-          { isVideo && <Video url={url} /> }
-          { isPdf && <Pdf documentInitParameters={{url, withCredentials: true}} />}
+      <div className="Inspector fullWidth fullHeight flexCenter">
+        <div className='Inspector-content flexOn'>
+          { inspector }
+          { warning ? <div className="Inspector-warning">{warning}</div> : null }
         </div>
       </div>
     )
