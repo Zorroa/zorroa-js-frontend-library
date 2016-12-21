@@ -16,6 +16,7 @@ import Table from '../Table'
 import Editbar from './Editbar'
 import * as ComputeLayout from './ComputeLayout.js'
 import AssetSearch from '../../models/AssetSearch'
+import Resizer from '../../services/Resizer'
 
 const assetsScrollPadding = 8
 const defaultTableHeight = 300
@@ -53,13 +54,13 @@ class Assets extends Component {
       assetsScrollTop: 0,
       assetsScrollHeight: 0,
       assetsScrollWidth: 0,
-      tableIsDragging: false,
+      tableIsResizing: false,
       positions: []
     }
 
     this.tableStartY = 0
     this.tableStartHeight = 0
-    this.allowTableDrag = true
+    this.allowTableResize = true
     this.assetsScrollHeight = 0
     this.assetsScrollWidth = 0
     this.updateAssetsScrollSizeInterval = null
@@ -67,6 +68,7 @@ class Assets extends Component {
     this.skipNextSelectionScroll = false
     this.scrollToSelectionAfterLayout = false
     this.assetsLayoutTimer = null
+    this.resizer = null
   }
 
   // Adjust the selection set for the specified asset using
@@ -156,46 +158,37 @@ class Assets extends Component {
     this.props.actions.selectFolderIds()
   }
 
-  tableDragStart = (event) => {
+  tableResizeStart = (event) => {
+    // capture = (onMove, onRelease, event, scaleX, scaleY)
+    this.resizer.capture(event, this.tableResizeUpdate, this.tableResizeStop, 0, this.state.tableHeight, 0, -1)
     const tableHeight = this.clampTableHeight(this.state.tableHeight)
-    this.tableStartY = event.pageY
     this.newTableHeight = tableHeight
     this.tableStartHeight = this.newTableHeight
-
-    var dragIcon = document.createElement('img')
-    // hide the drag element using a transparent 1x1 pixel image as a proxy
-    dragIcon.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
-    dragIcon.width = 1
-    event.dataTransfer.setDragImage(dragIcon, 0, 0)
-
-    this.setState({tableIsDragging: true})
+    this.setState({tableIsResizing: true})
   }
 
-  tableDragUpdate = (event) => {
-    // let's just completely skip events that happen while we're busy
-    if (!this.allowTableDrag) return false
-    this.allowTableDrag = false
+  tableResizeUpdate = (resizeX, resizeY) => {
+    if (!this.state.tableIsResizing) return
 
-    const dy = (event.pageY - this.tableStartY)
-    this.newTableHeight = this.clampTableHeight(this.tableStartHeight - dy)
+    // let's just completely skip events that happen while we're busy
+    if (!this.allowTableResize) return false
+    this.allowTableResize = false
+
+    this.newTableHeight = this.clampTableHeight(resizeY)
     // wait one frame to handle the event, otherwise events queue up syncronously
     requestAnimationFrame(_ => {
       this.setState({tableHeight: this.newTableHeight})
       this.updateAssetsScrollSize()
-      this.allowTableDrag = true
+      this.allowTableResize = true
     })
-
-    return false
   }
 
-  tableDragStop = (event) => {
-    this.allowTableDrag = true
-    this.setState({
-      tableHeight: this.newTableHeight,
-      tableIsDragging: false
-    })
+  tableResizeStop = (event) => {
+    if (!this.state.tableIsResizing) return
+
+    this.allowTableResize = true
+    this.setState({ tableIsResizing: false })
     this.queueAssetsLayout()
-    return false
   }
 
   updateAssetsScrollSize = () => {
@@ -207,24 +200,26 @@ class Assets extends Component {
         assetsScrollHeight: assetsScroll.clientHeight,
         assetsScrollWidth: assetsScroll.clientWidth
       })
-      if (!this.state.tableIsDragging) this.queueAssetsLayout()
+      if (!this.state.tableIsResizing) this.queueAssetsLayout()
     }
   }
 
-  componentWillMount () {
+  componentWillMount = () => {
     if (this.updateAssetsScrollSizeInterval) {
       clearInterval(this.updateAssetsScrollSizeInterval)
     }
     this.updateAssetsScrollSizeInterval = setInterval(this.updateAssetsScrollSize, 150)
+    this.resizer = new Resizer()
   }
 
-  componentWillUnmount () {
+  componentWillUnmount = () => {
     clearInterval(this.updateAssetsScrollSizeInterval)
     this.updateAssetsScrollSizeInterval = null
 
     // clear any pending layout
     if (this.assetsLayoutTimer) clearTimeout(this.assetsLayoutTimer)
     this.assetsLayoutTimer = null
+    this.resizer.release()
   }
 
   onAssetsScrollScroll = (event) => {
@@ -336,7 +331,7 @@ class Assets extends Component {
 
   renderAssets () {
     const { assets, selectedIds, totalCount } = this.props
-    const { layout, positions, tableIsDragging } = this.state
+    const { layout, positions, tableIsResizing } = this.state
 
     if (!assets || !assets.length) {
       return (
@@ -353,8 +348,8 @@ class Assets extends Component {
       ref: 'assetsScroll',
       style: { padding: `${assetsScrollPadding}px` }
     }
-    if (tableIsDragging) {
-      // this is to prevent the assets panel from scrolling while table resizing (dragging)
+    if (tableIsResizing) {
+      // this is to prevent the assets panel from scrolling while table resizing
       assetsScrollParams.style.pointerEvents = 'none'
     }
 
@@ -422,7 +417,7 @@ class Assets extends Component {
 
   render () {
     const { assets, totalCount } = this.props
-    const { showTable, layout, thumbSize, tableHeight, tableIsDragging, assetsKey } = this.state
+    const { showTable, layout, thumbSize, tableHeight, tableIsResizing, assetsKey } = this.state
 
     // Trigger layout if assets change.
     if (this.getAssetsKey() !== this.state.assetsKey) this.queueAssetsLayout()
@@ -441,16 +436,13 @@ class Assets extends Component {
         <Editbar/>
         {this.renderAssets()}
         { showTable && (
-          <div className='Assets-tableDrag'
-               draggable={true}
-               onDragStart={this.tableDragStart}
-               onDrag={this.tableDragUpdate}
-               onDragEnd={this.tableDragStop}/>
+          <div className='Assets-tableResize'
+               onMouseDown={this.tableResizeStart}/>
         )}
         { totalCount > 0 && showTable && (
           <Table height={this.clampTableHeight(tableHeight)}
                  assetsKey={assetsKey}
-                 tableIsDragging={tableIsDragging}
+                 tableIsResizing={tableIsResizing}
                  selectFn={this.select}/>
         )}
         { totalCount > 0 &&

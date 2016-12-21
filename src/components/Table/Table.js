@@ -32,7 +32,7 @@ class Table extends Component {
     // input props
     assetsKey: PropTypes.string.isRequired,
     height: PropTypes.number.isRequired,
-    tableIsDragging: PropTypes.bool.isRequired,
+    tableIsResizing: PropTypes.bool.isRequired,
     selectFn: PropTypes.func.isRequired,
 
     // connect actions
@@ -283,7 +283,7 @@ class Table extends Component {
   }
 
   render () {
-    const { assets, fields, fieldWidth, height, tableIsDragging, assetsKey, selectedAssetIds } = this.props
+    const { assets, fields, fieldWidth, height, tableIsResizing, assetsKey, selectedAssetIds } = this.props
     if (!assets) return
 
     const { tableScrollTop, tableScrollHeight } = this.state
@@ -312,7 +312,7 @@ class Table extends Component {
     }
 
     let tableStyle = { height, minHeight: height, maxHeight: height }
-    if (tableIsDragging) tableStyle.pointerEvents = 'none'
+    if (tableIsResizing) tableStyle.pointerEvents = 'none'
 
     return (
       <div className="Table" style={tableStyle}>
