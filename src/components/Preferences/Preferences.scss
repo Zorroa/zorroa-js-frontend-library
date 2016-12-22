@@ -1,22 +1,23 @@
 @import '../../styles/core-mixins.scss';
 
 .Preferences {
-  .header {
+  .Preferences-header {
     text-transform: uppercase;
     color: white;
     background-color: black;
-    height: auto;
+    height: 40px;
 
     @include flexRow;
     @include flexAlignItemsCenter;
     @include flexJustifySpaceBetween;
+  }
 
-    div[class*='icon-'] {
-      margin-top: 12px;
-      margin-bottom: 12px;
-      margin-left: 12px;
-      margin-right: 12px;
-    }
+  .Preferences-icon {
+    @include zorroa-square-icon(40px);
+  }
+
+  .Preferences-close {
+    @include zorroa-square-btn-lighten(40px);
   }
 
   .body {

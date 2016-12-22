@@ -10,20 +10,15 @@
   color: white;
   background-color: black;
   margin-bottom: 20px;
+  height: 40px;
 
-  div[class*='icon-'] {
-    margin-top: 12px;
-    margin-bottom: 12px;
-    margin-left: 12px;
-    margin-right: 12px;
-  }
-
-  .icon-list {
+  .JobTable-header-icon {
+    @include zorroa-square-icon(40px);
     font-size: 20px;
   }
 
-  .icon-cross2:hover {
-    color: $zorroa-sickly-green;
+  .JobTable-header-close {
+    @include zorroa-square-btn-lighten(40px);
   }
 }
 
@@ -104,6 +99,7 @@
   color: $zorroa-lightgray;
   text-transform: uppercase;
   font-size: 14px;
+  cursor: pointer;
 
   &:hover {
     color: white;

@@ -5,25 +5,19 @@
     text-transform: uppercase;
     color: white;
     background-color: black;
-    height: auto;
+    height: 40px;
 
     @include flexRow;
     @include flexAlignItemsCenter;
     @include flexJustifySpaceBetween;
 
-    div[class*='icon-'] {
-      margin-top: 12px;
-      margin-bottom: 12px;
-      margin-left: 12px;
-      margin-right: 12px;
-    }
-
-    .icon-export {
+    .CreateExport-icon {
+      @include zorroa-square-icon(40px);
       font-size: 20px;
     }
 
-    .icon-cross2:hover {
-      color: $zorroa-sickly-green;
+    .CreateExport-close {
+      @include zorroa-square-btn-lighten(40px);
     }
   }
 

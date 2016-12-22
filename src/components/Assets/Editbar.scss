@@ -42,17 +42,14 @@
     }
 
     .Editbar-cancel {
-      @include flexRowCenter;
-      width: 24px;
-      height: 24px;
+      @include zorroa-square-btn-darken(24px);
       font-size: 10px;
       margin-left: 4px;
       border-radius: 2px;
       cursor: pointer;
 
       &:not(.disabled):hover {
-        background-color: rgba(0, 0, 0, 0.1);
-        color: $zorroa-sickly-green;
+        color: black;
       }
 
       &.disabled {

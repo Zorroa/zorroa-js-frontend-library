@@ -103,9 +103,7 @@ class Editbar extends Component {
             {selectedAssetIds && selectedAssetIds.size ? (
               <div className={classnames('Editbar-selected', {disabled})}>
                 {`${selectedAssetIds.size} assets selected`}
-                <div onClick={this.deselectAll} className={classnames('Editbar-cancel', {disabled})}>
-                  <div className='icon-cancel-circle'/>
-                </div>
+                <div onClick={this.deselectAll} className={classnames('Editbar-cancel', 'icon-cancel-circle', {disabled})}/>
               </div>
               ) : <div/> }
           <div onClick={this.exportAssets} className="export">

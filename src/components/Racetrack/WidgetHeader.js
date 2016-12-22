@@ -13,11 +13,7 @@ const WidgetHeader = ({ isIconified, header, icon, backgroundColor, onToggle, on
           <div className='flexOn'/>
         </div>
         {
-          !isIconified && (
-            <div className='WidgetHeader-close flexOff flexCenter fullHeight' onClick={onClose}>
-              <div className='icon-cross2'/>
-            </div>
-          )
+          !isIconified && (<div className='WidgetHeader-close icon-cross2' onClick={onClose}/>)
         }
       </div>
     </div>

@@ -11,23 +11,11 @@
   }
 
   .Map-search {
-    @include flexRowCenter;
-    width: 40px;
-    height: 40px;
-    &:hover {
-      background-color: rgba(0,0,0,0.2);
-      color: $zorroa-sickly-green;
-    }
+    @include zorroa-square-btn-darken(40px);
   }
 
   .Map-settings {
-    @include flexRowCenter;
-    width: 40px;
-    height: 40px;
-    &:hover {
-      background-color: rgba(0,0,0,0.2);
-      color: $zorroa-sickly-green;
-    }
+    @include zorroa-square-btn-darken(40px);
   }
 
   .Widget-icon {
@@ -44,11 +32,6 @@
     @include flexAlignItemsCenter;
     @include fullWidth;
     @include noSelect;
-
-    div[class*="icon-"] {
-      margin-left: 4px;
-      margin-right: 4px;
-    }
   }
 
   .selected-term {

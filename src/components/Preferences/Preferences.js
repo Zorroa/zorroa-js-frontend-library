@@ -23,12 +23,12 @@ class Preferences extends Component {
     const { user } = this.props
     return (
       <div className="Preferences">
-        <div className="header">
+        <div className="Preferences-header">
           <div className="flexRow flexAlignItemsCenter">
-            <div className="icon-plus-square"/>
-            <div>Create Export</div>
+            <div className="Preferences-icon icon-cog"/>
+            <div>Preferences</div>
           </div>
-          <div onClick={this.dismiss} className="icon-cross2"/>
+          <div onClick={this.dismiss} className="Preferences-close icon-cross2"/>
         </div>
         <div className="body">
           {user.firstName} {user.lastName}&rsquo;s personal preferences.

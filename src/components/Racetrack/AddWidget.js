@@ -55,12 +55,10 @@ class AddWidget extends Component {
       <div className="AddWidget">
         <div className="header">
           <div className="flexRow flexAlignItemsCenter">
-            <div className="icon-search"/>
+            <div className="AddWidget-icon icon-search"/>
             <div>Add Search Widget</div>
           </div>
-          <div className='AddWidget-close' onClick={this.dismiss}>
-            <i className="icon-cross2"/>
-          </div>
+          <div className='AddWidget-close icon-cross2' onClick={this.dismiss}/>
         </div>
         <div className="controls">
           <div className="filter">
@@ -88,14 +86,14 @@ class AddWidget extends Component {
               <div className="widget" key={widgetInfo.type}>
                 <div className="title-bar" style={{backgroundColor: widgetInfo.color}}
                      onClick={showDescriptions ? null : this.addWidget.bind(this, widgetInfo)}>
-                  <div className="flexRow">
-                    <div className={widgetInfo.icon}/>
+                  <div className="flexRowCenter">
+                    <div className={`widget-icon ${widgetInfo.icon}`}/>
                     <div>{widgetInfo.title}</div>
                   </div>
-                  <div className="icon-question"/>
+                  <div className="widget-help icon-question"/>
                 </div>
                 { showDescriptions ? (
-                  <div className="description">
+                  <div className="widget-description">
                     <div className="info-text">{widgetInfo.description}</div>
                     <button onClick={this.addWidget.bind(this, widgetInfo)} style={{backgroundColor: widgetInfo.color}} className="add-button">Add Widget</button>
                   </div>

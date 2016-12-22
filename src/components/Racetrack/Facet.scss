@@ -26,13 +26,7 @@
   }
 
   .Facet-settings {
-    @include flexRowCenter;
-    width: 40px;
-    height: 40px;
-    &:hover {
-      color: $zorroa-sickly-green;
-      background-color: rgba(0,0,0,0.2);
-    }
+    @include zorroa-square-btn-darken(40px);
   }
 
   .Facet-body {

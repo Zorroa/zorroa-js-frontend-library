@@ -30,10 +30,10 @@ class JobTable extends Component {
       <div className="JobTable">
         <div className="JobTable-header">
           <div className="JobTable-header-left">
-            <div className="icon-list"/>
+            <div className="JobTable-header-icon icon-list"/>
             <div className="JobTable-header-title">All Jobs</div>
           </div>
-          <div onClick={this.dismiss} className="icon-cross2"/>
+          <div onClick={this.dismiss} className="JobTable-header-close icon-cross2"/>
         </div>
         <div className="JobTable-table-container">
           <table className="JobTable-table">

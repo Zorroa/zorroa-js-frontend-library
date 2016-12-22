@@ -25,12 +25,13 @@
       text-transform: uppercase;
       margin-bottom: 20px;
 
-      .icon-cube {
-        padding: 8px;
+      .CreateFolder-header-icon {
+        @include zorroa-square-icon(40px);
+        font-size: 20px;
       }
 
-      .icon-cross2 {
-        padding: 8px;
+      .CreateFolder-header-close {
+        @include zorroa-square-btn-lighten(40px);
       }
     }
 

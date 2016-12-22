@@ -26,7 +26,7 @@
     @include flexRow;
     @include flexJustifySpaceBetween;
     @include flexAlignItemsCenter;
-    height: auto;
+    height: 36px;
 
     input {
       @include flexOn;
@@ -40,14 +40,10 @@
     }
 
     .Metadata-settings {
-      @include flexRowCenter;
-      width: 36px;
-      height: 36px;
+      @include zorroa-square-btn-darken(36px);
       color: $zorroa-gray;
-
       &:hover {
-        background-color: rgba(0, 0, 0, 0.1);
-        color: $zorroa-sickly-green;
+        color: #000;
       }
     }
   }

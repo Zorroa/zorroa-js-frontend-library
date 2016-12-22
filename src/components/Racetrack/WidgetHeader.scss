@@ -28,17 +28,11 @@
 }
 
 .WidgetHeader-toggle {
-  padding-left: 10px;
 }
 
 .WidgetHeader-icon {
-  margin-right: 14px;
-  padding-bottom: 3px;
+  @include zorroa-square-icon(40px);
   font-size: 20px;
-
-  &.isIconified {
-    margin-right: 0;
-  }
 }
 
 .WidgetHeader-label {
@@ -46,9 +40,7 @@
 }
 
 .WidgetHeader-close {
-  width: 40px;
-  height: 40px;
-  &:hover { background-color: rgba(0,0,0,0.2); }
+  @include zorroa-square-btn-darken(40px);
 }
 
 .WidgetHeader-caret {

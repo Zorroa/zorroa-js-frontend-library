@@ -65,10 +65,10 @@ class CreateExport extends Component {
       <div className="CreateExport">
         <div className="header">
           <div className="flexRow flexAlignItemsCenter">
-            <div className="icon-export"/>
+            <div className="CreateExport-icon icon-export"/>
             <div>Create Export Package</div>
           </div>
-          <div onClick={this.dismiss} className="icon-cross2"/>
+          <div onClick={this.dismiss} className="CreateExport-close icon-cross2"/>
         </div>
         <div className="body flexCol">
           <div className="CreateExport-package-label">Export package name</div>

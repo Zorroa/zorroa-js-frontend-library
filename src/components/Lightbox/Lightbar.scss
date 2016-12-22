@@ -1,6 +1,8 @@
 @import '../../styles/core-mixins.scss';
 
 .Lightbar {
+  @include flexOff;
+
   color: white;
   background-color: black;
   justify-content: space-between;
@@ -27,10 +29,8 @@
   }
 
   .Lightbar-settings {
-    width: 40px;
-    height: 40px;
-    background-color: $zorroa-sickly-green;
-    &:hover { background-color: darken($zorroa-sickly-green, 15%); }
+    @include zorroa-square-icon(60px);
+    font-size: 20px;
   }
 
   .Lightbar-btn-icon {
@@ -49,10 +49,8 @@
   }
 
   .Lightbar-close {
-    margin-right: 12px;
-    margin-left: 32px;
+    @include zorroa-square-btn-lighten(60px);
     font-size: 20px;
-    &:hover { color: $zorroa-sickly-green; }
   }
 
   button {

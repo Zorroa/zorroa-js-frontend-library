@@ -15,22 +15,13 @@
     @include flexAlignItemsCenter;
     @include flexJustifySpaceBetween;
 
-    div[class*="icon-"] {
-      margin-left: 12px;
-      margin-right: 8px;
-      margin-top: 8px;
-      margin-bottom: 8px;
-    }
-
-    .icon-search {
+    .AddWidget-icon {
+      @include zorroa-square-icon(40px);
       font-size: 24px;
     }
 
     .AddWidget-close {
-      @include flexRowCenter;
-      height: 40px;
-      width: 40px;
-      &:hover { background-color: $zorroa-darkgray; }
+      @include zorroa-square-btn-lighten(40px);
     }
   }
 
@@ -142,24 +133,23 @@
           height: 40px;
           text-transform: uppercase;
           color: white;
-          padding-left: 8px;
-          padding-right: 8px;
           line-height: 2em;
           border-top-left-radius: 3px;
           border-top-right-radius: 3px;
           cursor: pointer;
 
-          div[class*="icon-"] {
+          .widget-icon {
+            @include zorroa-square-icon(40px);
             font-size: 24px;
-            margin-right: 8px;
           }
 
-          div.icon-question {
-            font-size: 12px;
+          .widget-help {
+            @include zorroa-square-btn-darken(40px);
+            font-size: 18px;
           }
         }
 
-        .description {
+        .widget-description {
           background-color: white;
           padding: 10px;
           border-left: solid 1px $zorroa-lightgray;

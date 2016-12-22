@@ -19,11 +19,16 @@
   }
 
   .DisplayOptions-header {
+    @include flexRow;
+    @include flexAlignItemsCenter;
+    @include fullWidth;
+
+    overflow: hidden;
+
     color: white;
     background-color: black;
     font-size: 14px;
     font-weight: 500;
-    text-transform: uppercase;
     min-height: 40px;
     max-height: 40px;
 
@@ -40,24 +45,23 @@
     }
 
     .DisplayOptions-settings {
-      @include flexRowCenter;
-      width: 40px;
-      height: 40px;
-      &:hover {
-        background-color: $zorroa-darkgray;
-      }
+      @include zorroa-square-icon(40px);
     }
 
     .DisplayOptions-title {
-      margin-left: 5px;
+      @include flexShrinkOnly;
+      @include clampText;
+      text-transform: uppercase;
+      text-overflow: ellipsis;
     }
 
     .DisplayOptions-sync {
-      color: white;
-      text-transform: none;
-      margin-right: 50px;
-      margin-left: 6px;
+      @include flexShrinkOnly;
       @include noSelect;
+      @include clampText;
+
+      color: white;
+      margin-left: 6px;
 
       &:hover {
         color: $zorroa-sickly-green;
@@ -65,12 +69,7 @@
     }
 
     .DisplayOptions-close {
-      @include flexRowCenter;
-      width: 40px;
-      height: 40px;
-      &:hover {
-        background-color: $zorroa-darkgray;
-      }
+      @include zorroa-square-btn-lighten(40px);
     }
 
     /* The switch - the box around the slider */

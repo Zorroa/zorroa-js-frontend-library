@@ -234,26 +234,20 @@ class DisplayOptions extends Component {
       <div>
         <div className="DisplayOptions-background" />
         <div className="DisplayOptions flexCol">
-          <div className="DisplayOptions-header flexRow flexAlignItemsCenter fullWidth">
-            <div className="flexRow flexAlignItemsCenter">
-              <div className='DisplayOptions-settings'>
-                <i className="icon-cog"/>
-              </div>
-              <div className="DisplayOptions-title">{title}</div>
-            </div>
-            <div className='flexOn'/>
+          <div className="DisplayOptions-header">
+            <div className="DisplayOptions-settings icon-cog"/>
+            <div className="DisplayOptions-title">{title}</div>
+            <div className="flexOn"/>
             { syncLabel && (
-              <div className="flexRow flexAlignItemsCenter">
-                <label className="switch">
-                  <input type="checkbox" checked={this.state.syncedViews} onChange={this.syncViews} />
-                  <div className="slider round"/>
-                </label>
-                <div className="DisplayOptions-sync" onClick={this.toggleSync}>Sync with {syncLabel} View</div>
-                <div className='DisplayOptions-close' onClick={this.cancel.bind(this)}>
-                  <i className="icon-cross2"/>
-                </div>
-              </div>
+              <label className="flexOff switch">
+                <input type="checkbox" checked={this.state.syncedViews} onChange={this.syncViews} />
+                <div className="slider round"/>
+              </label>
             )}
+            { syncLabel && (
+              <div className="DisplayOptions-sync" onClick={this.toggleSync}>Sync with {syncLabel} View</div>
+            )}
+            <div className="DisplayOptions-close icon-cross2" onClick={this.cancel.bind(this)}/>
           </div>
           <div className="DisplayOptions-subheader flexRow flexAlignItemsEnd">
             <input type="text" onChange={this.filter} value={fieldFilter} placeholder="Filter Fields" />

@@ -118,10 +118,10 @@ class CreateImport extends Component {
       <div className="CreateImport">
         <div className="CreateImport-header">
           <div className="CreateImport-title">
-            <div className="icon-folder-upload"/>
+            <div className="CreateImport-header-icon icon-folder-upload"/>
             <div>Import Assets</div>
           </div>
-          <div onClick={this.dismiss} className="icon-cross2"/>
+          <div className="CreateImport-header-close icon-cross2" onClick={this.dismiss}/>
         </div>
         <div className="CreateImport-body">
           <div className="CreateImport-package-label">Export package name</div>
