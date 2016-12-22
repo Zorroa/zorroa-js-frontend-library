@@ -53,7 +53,10 @@ class Searchbar extends Component {
 
   clearQueryString = (event) => {
     const queryString = ''
-    this.resetSearch(queryString)
+    const { query } = this.props
+    if (query && query.query && query.query.length) {
+      this.resetSearch(queryString)
+    }
     this.setState({ queryString })
     this.props.actions.suggestQueryStrings(null)
   }
