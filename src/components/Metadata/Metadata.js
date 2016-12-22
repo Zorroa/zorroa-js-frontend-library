@@ -23,6 +23,10 @@ class Metadata extends Component {
     filterString: ''
   }
 
+  changeFilterString = (event) => {
+    this.setState({ filterString: event.target.value })
+  }
+
   showDisplayOptions = () => {
     const singleSelection = false
     const fieldTypes = null
@@ -70,7 +74,9 @@ class Metadata extends Component {
   render () {
     const { assets, selectedIds, isIconified, fields } = this.props
     const { filterString } = this.state
-    const displayProperties = this.displayPropertiesForFields(fields).filter(field => (field.name.includes(filterString)))
+    const lcFilterString = filterString.toLowerCase()
+    const filteredFields = fields.filter(field => (field.toLowerCase().includes(lcFilterString)))
+    const displayProperties = this.displayPropertiesForFields(filteredFields)
     var selectedAssets = new Set()
     if (selectedIds) {
       for (const id of selectedIds) {
@@ -80,7 +86,7 @@ class Metadata extends Component {
     return (
       <div className="Metadata">
         <div className="header">
-          <input type="text" onChange={this.filterFields} value={this.state.filterString} placeholder="Filter Metadata" />
+          <input type="text" onChange={this.changeFilterString} value={this.state.filterString} placeholder="Filter Metadata" />
           <div className="Metadata-settings" onClick={this.showDisplayOptions}>
             <i className="icon-cog"/>
           </div>
