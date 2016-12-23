@@ -246,6 +246,8 @@ class Assets extends Component {
     const { assets } = this.props
     const { layout, thumbSize } = this.state
 
+    if (!assets) return
+
     var positions = (_ => {
       switch (layout) {
         case 'grid': return ComputeLayout.grid(assets, width, thumbSize)

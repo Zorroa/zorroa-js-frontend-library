@@ -7,6 +7,7 @@
     "start": "./node_modules/.bin/serve ./bin -p 8080",
     "dev": "./node_modules/.bin/webpack-dev-server --config ./build/webpack.dev.js --progress --inline --hot --colors --no-info --history-api-fallback",
     "build-only": "./node_modules/.bin/webpack --config ./build/webpack.prod.js --progress --colors",
+    "build-prodlocal": "./node_modules/.bin/webpack --config ./build/webpack.prodlocal.js --progress --colors",
     "build": "npm test && npm run build-only",
     "deploy": "sh ./build/build-prod.sh",
     "pretest": "npm run test:lint",

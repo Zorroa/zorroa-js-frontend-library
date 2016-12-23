@@ -50,21 +50,29 @@ There are two different modes this project can be run in: __dev mode__ and __sta
 
 ### Dev mode
 
+Dev mode is for the typical daily workflow and has live reloading enabled. It does not actually build into a directory, it runs the project though a dev server that uses the files in your working tree.
+
 ```
 npm run dev # will run with hot reloading on a special server
 ```
 
-Dev mode is for the typical daily workflow and has live reloading enabled. It does not actually build into a directory, it runs the project though a dev server that uses the files in your working tree.
-
 ### Static mode
 
+Static mode is for testing the static build before submitting pull requests or deploying. Static mode bundles code & assets using our production settings into the bin directory, then serves that directory using a node server.  The bin/ directory is the final product and can be deployed to a server.
+
+Since a static build is what gets deployed, it is highly recommended that you test a static build before submitting a pull request.
+
 ```
-npm start # will run a build then serve the static content
+npm run build # create static build in bin/
+npm start     # serve the static content in bin/
 ```
 
-Static mode is for testing the static build before submitting pull requests or deploying. Static mode bundles code & assets using our production settings into the bin directory, then serves that directory using a node server.  The bin directory is the final product and can be deployed to a server.
+The static PROD build config assumes that an archivist server is running on the same host as the web server. This is how production machines will operate, with the web server and the archivist on the same host. If you need to test a static web server using a remote archivist, you can use the PRODLOCAL build config by running:
 
-It is highly recommended that you run `npm run build` and test on the static server before submitting a pull requests.
+```
+npm run build-prodlocal # build in bin/, allow remote archivist
+npm start               # start web server, serve bin/
+```
 
 ### Troubleshooting & possible errors
 

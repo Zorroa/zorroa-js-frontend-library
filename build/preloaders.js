@@ -3,7 +3,7 @@ const paths = require('./paths.js')
 module.exports = function getPreloaders (env) {
   const preloaders = []
 
-  if (env !== 'PROD') {
+  if (env === 'DEV') {
     preloaders.push(
       {
         test: /\.(js|jsx)$/,

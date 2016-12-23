@@ -28,7 +28,8 @@
     "afterEach": true,
     "React": true,
     "DEBUG": true,
-    "PROD": true
+    "PROD": true,
+    "PRODLOCAL": true
   },
   "rules": {}
 }

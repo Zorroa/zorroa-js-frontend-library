@@ -26,11 +26,12 @@ module.exports = function getPlugins (env) {
         'ROOT_URL': JSON.stringify('http://localhost:3090')
       },
       'DEBUG': (env === 'DEV'),
-      'PROD': (env === 'PROD')
+      'PROD': (env === 'PROD'),
+      'PRODLOCAL': (env === 'PRODLOCAL')
     })
   ]
 
-  if (env === 'PROD') {
+  if (env === 'PROD' || env === 'PRODLOCAL') {
     const prodPlugins = [
       new webpack.optimize.DedupePlugin(),
       new webpack.optimize.AggressiveMergingPlugin({}),

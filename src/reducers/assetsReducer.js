@@ -14,7 +14,7 @@ const initialState = {
 }
 
 function inject (src, idx, arr) {
-  if (PROD) {
+  if (PROD || PRODLOCAL) {
     return src.slice(0, idx).concat(arr).concat(src.slice(idx))
   }
 
