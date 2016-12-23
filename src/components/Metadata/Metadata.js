@@ -99,6 +99,7 @@ class Metadata extends Component {
               field={field.name}
               selectedAssets={selectedAssets}
               displayProperties={field}
+              indentLevel={0}
             />))
           }
         </div>

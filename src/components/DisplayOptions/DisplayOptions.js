@@ -197,7 +197,7 @@ class DisplayOptions extends Component {
   renderName (name, namespace, childCounts) {
     const { singleSelection } = this.props
     const { openedNamespace } = this.state
-    const key = namespace && namespace.length && namespace !== name ? namespace + '.' + name : name
+    const key = namespace && namespace.length ? namespace + '.' + name : name
     const hasChildren = this.namesForNamespace(key).length > 0
     const selected = openedNamespace.startsWith(key)
     const disable = hasChildren && this.state.openedNamespace && namespace !== openedNamespace
@@ -259,7 +259,7 @@ class DisplayOptions extends Component {
             {/* Always show the first level namespaces */}
             <div className="DisplayOptions-body-col flexCol">
               { (names && names.length) || !fieldTypes ? (
-                names.map(name => (this.renderName(name, name, childCounts)))
+                names.map(name => (this.renderName(name, null, childCounts)))
               ) : (
                 <div className="DisplayOptions-body-empty flexCol flexAlignItemsCenter">
                   <div className="icon-thumbs-up" />

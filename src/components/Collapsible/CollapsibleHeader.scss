@@ -45,6 +45,8 @@
 .CollapsibleHeader-label {
   @include clampText;
   @include noSelect;
+  @include flexRow;
+  @include flexAlignItemsCenter;
   cursor: default;
 }
 

@@ -17,6 +17,8 @@ class DisplayPropertiesItem extends Component {
     displayProperties: PropTypes.instanceOf(DisplayProperties).isRequired,
     selectedAssets: PropTypes.object,
     isIconified: PropTypes.bool.isRequired,
+    arrayIndex: PropTypes.number,
+    indentLevel: PropTypes.number.isRequired,
 
     // connect props
     actions: PropTypes.object.isRequired,
@@ -25,11 +27,18 @@ class DisplayPropertiesItem extends Component {
     app: PropTypes.object.isRequired
   }
 
+  arrayValue(val, key, className) {
+    if (val[0] && val[0][0] === '#' && (val.length === 7 || val.length === 4)) {
+      return <div className="DisplayPropertiesItem-color" key={key} style={{backgroundColor: val}}/>
+    }
+    return <div key={key} className={className}>{val}</div>
+  }
+
   value () {
     const { field, selectedAssets } = this.props
     let allTerms = []
     let someTerms = []
-    let value = selectedAssets && selectedAssets.size ? null : '(none)'
+    let value = null
     for (let asset of selectedAssets) {
       if (!asset) continue
 
@@ -63,11 +72,13 @@ class DisplayPropertiesItem extends Component {
 
       // Check for identical values in multiple selection
       const v = asset.value(field)
-      if (!value) {
-        value = v
-      } else if (value !== v) {
-        value = '- Multiple Values -'
-        break
+      if (v !== undefined) {
+        if (value === null) {
+          value = v
+        } else if (value !== v) {
+          value = '- Multiple Values -'
+          break
+        }
       }
     }
 
@@ -75,10 +86,26 @@ class DisplayPropertiesItem extends Component {
     if (allTerms.length || someTerms.length) {
       return (
         <div className="terms flexRow flexWrap">
-          { allTerms.map(t => (<div key={t} className="all">{t}</div>)) }
-          { someTerms.map(t => (<div key={t} className="some">{t}</div>))}
+          { allTerms.map((t, i) => this.arrayValue(t, i, 'DisplayPropertiesItem-all-values')) }
+          { someTerms.map((t, i) => this.arrayValue(t, i, 'DisplayPropertiesItem-some-values')) }
         </div>
       )
+    }
+    return value
+  }
+
+  rawValue () {
+    const { field, selectedAssets } = this.props
+    let value = selectedAssets && selectedAssets.size ? null : '(none)'
+    for (let asset of selectedAssets) {
+      if (!asset) continue
+      // Check for identical values in multiple selection
+      const v = asset.rawValue(field)
+      if (!value) {
+        value = v
+      } else if (JSON.stringify(value) !== JSON.stringify(v)) {
+        return '- Multiple Values -'
+      }
     }
     return value
   }
@@ -103,33 +130,56 @@ class DisplayPropertiesItem extends Component {
     return true
   }
 
+  renderItemContainer (isArray, rawValue, indentLevel) {
+    const { field, selectedAssets, isIconified, displayProperties } = this.props
+    return (
+      (isArray ? rawValue : displayProperties.children).map((child, i) => (
+        <DisplayPropertiesItemContainer
+          field={`${field}.${isArray ? i : child.name}`}
+          selectedAssets={selectedAssets}
+          isIconified={isIconified}
+          key={i}
+          arrayIndex={isArray ? i : undefined}
+          displayProperties={isArray ? displayProperties : child}
+          indentLevel={indentLevel}
+        />
+      ))
+    )
+  }
+
   render () {
-    const { app, field, selectedAssets, displayProperties, isIconified } = this.props
+    const { app, field, displayProperties, isIconified, arrayIndex, indentLevel } = this.props
+    const rawValue = this.rawValue()
+    const isArray = Array.isArray(rawValue)
+    const indent = { marginLeft: `${indentLevel * 14}px` }
     if (displayProperties.children && displayProperties.children.length) {
+      if (isArray) return (
+        <div className="DisplayPropertiesItem-array">
+          { this.renderItemContainer(isArray, rawValue, indentLevel)}
+        </div>
+      )
       return (
         <Collapsible className='DisplayPropertiesItem'
                      style={{marginLeft: '16px'}}
                      isOpen={app.collapsibleOpen[field] || false}
                      isIconified={isIconified}
-                     header={(<span>{displayProperties.name}</span>)}
+                     header={(
+                       <div style={indent} className="DisplayPropertiesItem-header">
+                         <div key={-1} className="DisplayPropertiesItem-header-label">
+                           {displayProperties.name + (arrayIndex !== undefined ? `[${arrayIndex}]` : '')}
+                         </div>
+                       </div>
+                     )}
                      onOpen={this.toggleCollapsible.bind(this, field)}
                      >
-          { displayProperties.children.map(child => (
-            <DisplayPropertiesItemContainer
-              field={`${field}.${child.name}`}
-              selectedAssets={selectedAssets}
-              isIconified={isIconified}
-              key={child.name}
-              displayProperties={child}
-            />
-          ))}
+          { this.renderItemContainer(isArray, rawValue, indentLevel + 1) }
         </Collapsible>
       )
     }
 
     return (
       <div className="DisplayPropertiesItem">
-        <div className="DisplayPropertiesItem-label">
+        <div style={indent} className="DisplayPropertiesItem-label">
           {unCamelCase(displayProperties.name)}
         </div>
         <div onClick={this.searchTerms}
@@ -137,7 +187,7 @@ class DisplayPropertiesItem extends Component {
                {disabled: !this.isBinocularsEnabled()})}>
           <i className='icon-binoculars'/>
         </div>
-        <div className="value">
+        <div className="DisplayPropertiesItem-value">
           {this.value()}
         </div>
       </div>
