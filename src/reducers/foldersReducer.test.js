@@ -70,6 +70,7 @@ describe('foldersReducer', () => {
     let finalState = createInitialState()
     finalState.all.set(foo.id, bar)
     finalState.all.get(0).childIds = new Set([1])
+    finalState.modified = true
     expect(foldersReducer(nextState, { type: UPDATE_FOLDER, payload: bar }))
       .toEqual(finalState)
   })

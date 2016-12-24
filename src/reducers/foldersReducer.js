@@ -26,7 +26,12 @@ export var createInitialState = () => ({
   selectedFolderIds: new Set(),
 
   // TrashedFolder array, or null if we need to re-fetch
-  trashedFolders: null
+  trashedFolders: null,
+
+  // Invalidate folder counts for *ALL* folders whenever assets
+  // are added, folder search is modified in any descendant.
+  // FIXME: Optimize with ancestral invalidation and counter.
+  modified: false
 })
 export const initialState = createInitialState()
 
@@ -98,15 +103,36 @@ export default function (state = initialState, action) {
     case UPDATE_FOLDER: {
       const folder = action.payload
       const oldFolder = state.all.get(folder.id)
+      const parent = state.all.get(folder.parentId) // get folder's parent to open it
       if (folder.id) {
-        folder.childIds = oldFolder && oldFolder.childIds ? new Set(oldFolder.childIds) : new Set()
         let all = new Map(state.all) // copy folder map
+        if (oldFolder && oldFolder.childIds) {
+          if (oldFolder.parentId !== folder.parentId) {
+            // Remove from old parent child list
+            const oldParent = state.all.get(oldFolder.parentId)
+            const newOldParent = new Folder(oldParent)
+            const newOldParentChildIds = new Set(oldParent.childIds)
+            newOldParentChildIds.delete(folder.id)
+            newOldParent.childIds = newOldParentChildIds
+            all.set(oldParent.id, newOldParent)
+            // Add to new parent child list
+            const newParent = new Folder(parent)
+            const newParentChildIds = parent.childIds ? new Set(parent.childIds) : new Set()
+            newParentChildIds.add(folder.id)
+            newParent.childIds = newParentChildIds
+            all.set(parent.id, newParent)
+          } else {
+            assert.ok(parent.childIds.has(folder.id))
+          }
+          folder.childIds = new Set(oldFolder.childIds)
+        } else {
+          folder.childIds = new Set()
+          assert.ok(parent.childIds.has(folder.id))
+        }
         let openFolderIds = new Set(state.openFolderIds)
         all.set(folder.id, folder)
-        const parent = state.all.get(folder.parentId) // get folder's parent to open it
-        assert.ok(parent.childIds.has(folder.id))
         openFolderIds.add(parent.id) // make sure we can see the updated folder immediately
-        return {...state, all, openFolderIds}
+        return {...state, all, openFolderIds, modified: true}
       }
       break
     }

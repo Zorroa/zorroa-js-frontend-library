@@ -32,6 +32,14 @@ export default class Folder {
     return this.dyhiId || this.dyhiRoot
   }
 
+  isSmartCollection () {
+    return this.search && !this.search.empty() && !this.isDyhi()
+  }
+
+  isSimpleCollection () {
+    return !this.isDyhi() && !this.isSmartCollection()
+  }
+
   isPrivate (user, userPermissions) {
     return !this.isPublic(user, userPermissions)
   }
@@ -49,8 +57,34 @@ export default class Folder {
     return false
   }
 
-  isDropTarget (user) {
-    if (this.search && !this.search.empty()) return false
-    return this.hasAccess(user, AclEntry.WriteAccess)
+  isDroppableType (dragFolder) {
+    if (!dragFolder) return false
+    if (dragFolder.isDyhi() || this.isDyhi()) return false
+    if (dragFolder.isSmartCollection() !== this.isSmartCollection()) return false
+    return true
   }
+}
+
+// is the parent ancestor of child? Requires on state.folders.all
+export function isAncestor (parentId, childId, folders) {
+  if (!parentId || !childId) return false
+  if (parentId === Folder.ROOT_ID || childId === Folder.ROOT_ID) return false
+  if (parentId === childId) return true
+  return isAncestor(parentId, folders.get(childId).parentId, folders)
+}
+
+// Can any of the selectedFolderIds be dropped on this item?
+export function isDroppable ({folder, selectedFolderIds, user, folders}) {
+  if (folders && selectedFolderIds) {
+    for (let id of selectedFolderIds) {
+      const dropFolder = folders.get(id)
+      if (folder.id !== dropFolder.parentId &&          // Current parent?
+        folder.isDroppableType(dropFolder, user) &&     // Same species?
+        folder.hasAccess(user, AclEntry.WriteAccess) && // User permissions
+        !isAncestor(id, folder.id, folders)) {          // Avoid recursion & self
+        return true
+      }
+    }
+  }
+  return false
 }

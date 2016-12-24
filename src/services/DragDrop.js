@@ -46,20 +46,22 @@ export function DragSource (type, params) {
     class DragSourceHOC extends Component {
       static propTypes = {
         // connect props
-        actions: PropTypes.object.isRequired
+        hocActions: PropTypes.object.isRequired
       }
 
       render () {
         const {props} = this
-        const {actions} = props
+        const {hocActions} = props
         const dragParams = {
           onDragStart: (event) => {
             dragStart(props, type, event)
-            actions.setIsDragging(true)
+            // Magic! Delay state update one frame to workaround Chrome
+            // drag-and-drop issues when changing the DOM in onDragStart.
+            requestAnimationFrame(() => hocActions.setIsDragging(true))
           },
           onDragEnd: (event) => {
             dragEnd(props, type, event)
-            actions.setIsDragging(false)
+            hocActions.setIsDragging(false)
           },
           draggable: true
         }
@@ -71,7 +73,7 @@ export function DragSource (type, params) {
     return connect(state => ({
       app: state.app
     }), dispatch => ({
-      actions: bindActionCreators({ setIsDragging }, dispatch)
+      hocActions: bindActionCreators({ setIsDragging }, dispatch)
     }))(DragSourceHOC)
   }
 }

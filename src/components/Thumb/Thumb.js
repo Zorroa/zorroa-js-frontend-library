@@ -49,7 +49,7 @@ ImageThumb.propTypes = {
   children: React.PropTypes.element
 }
 
-@DragSource('FOLDER', source)
+@DragSource('ASSET', source)
 class Thumb extends Component {
   static propTypes = {
     asset: PropTypes.instanceOf(Asset).isRequired,

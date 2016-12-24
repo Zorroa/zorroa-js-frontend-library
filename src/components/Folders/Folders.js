@@ -100,11 +100,13 @@ class Folders extends Component {
     if (doOpen) this.loadChildren(folder.id)
   }
 
+  // Apply standard desktop shift+meta multi-select on click and update state.
   selectFolder (folder, event) {
     const { folders } = this.props
     const rootFolder = folders.all.get(Folder.ROOT_ID)
     const folderList = this.folderList(rootFolder)
-    this.props.actions.selectFolderId(folder.id, event.shiftKey, event.metaKey,
+    // Return new selection set for drag ops that require the it immediately.
+    return this.props.actions.selectFolderId(folder.id, event.shiftKey, event.metaKey,
       folderList, this.props.folders.selectedFolderIds)
   }
 
