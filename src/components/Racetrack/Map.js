@@ -4,13 +4,14 @@ import { connect } from 'react-redux'
 import ReactMapboxGl, { Layer, Feature } from 'react-mapbox-gl'
 
 import Widget from './Widget'
+import DisplayOptions from '../DisplayOptions'
 import WidgetModel from '../../models/Widget'
 import Asset from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import { MapWidgetInfo } from './WidgetInfo'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
-import { showDisplayOptionsModal } from '../../actions/appActions'
+import { showModal } from '../../actions/appActions'
 import { unCamelCase } from '../../services/jsUtil'
 
 const accessToken = 'pk.eyJ1IjoiZGFud2V4bGVyIiwiYSI6IldaWnNGM28ifQ.e18uSb539LjXseysIC7KSw'
@@ -70,22 +71,26 @@ class Map extends Component {
   }
 
   selectLocation = (event) => {
-    const syncLabel = null
-    const selectedFields = [this.state.locationField]
-    const fieldTypes = ['point']
-    const singleSelection = true
-    this.props.actions.showDisplayOptionsModal('Map Location Field', syncLabel,
-      selectedFields, singleSelection, fieldTypes, this.updateLocationField)
+    const width = '75%'
+    const body = <DisplayOptions title='Map Location Field'
+                                 syncLabel={null}
+                                 singleSelection={true}
+                                 fieldTypes={['point']}
+                                 selectedFields={[this.state.locationField]}
+                                 onUpdate={this.updateLocationField}/>
+    this.props.actions.showModal({body, width})
     event && event.stopPropagation()
   }
 
   selectSearch = (event) => {
-    const syncLabel = null
-    const selectedFields = [this.state.searchField]
-    const fieldTypes = null
-    const singleSelection = true
-    this.props.actions.showDisplayOptionsModal('Map Search Field', syncLabel,
-      selectedFields, singleSelection, fieldTypes, this.updateSearchField)
+    const width = '75%'
+    const body = <DisplayOptions title='Map Search Field'
+                                 syncLabel={null}
+                                 singleSelection={true}
+                                 fieldTypes={null}
+                                 selectedFields={[this.state.searchField]}
+                                 onUpdate={this.updateSearchField}/>
+    this.props.actions.showModal({body, width})
     event.stopPropagation()
   }
 
@@ -178,6 +183,6 @@ export default connect(
   state => ({
     assets: state.assets.all
   }), dispatch => ({
-    actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds, showDisplayOptionsModal }, dispatch)
+    actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds, showModal }, dispatch)
   })
 )(Map)

@@ -1,6 +1,5 @@
 import {
   SHOW_MODAL, HIDE_MODAL,
-  SHOW_DISPLAY_OPTIONS_MODAL, HIDE_DISPLAY_OPTIONS_MODAL,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
   METADATA_FIELDS, TABLE_FIELDS, SYNC_FIELDS,
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH, UNAUTH_USER
@@ -35,10 +34,6 @@ export default function app (state = initialState, action) {
       return { ...state, modal: action.payload }
     case HIDE_MODAL:
       return { ...state, modal: null }
-    case SHOW_DISPLAY_OPTIONS_MODAL:
-      return { ...state, displayOptions: action.payload }
-    case HIDE_DISPLAY_OPTIONS_MODAL:
-      return { ...state, displayOptions: null }
     case ICONIFY_LEFT_SIDEBAR:
       return { ...state, leftSidebarIsIconified: action.payload }
     case ICONIFY_RIGHT_SIDEBAR:

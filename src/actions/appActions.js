@@ -1,6 +1,5 @@
 import {
   SHOW_MODAL, HIDE_MODAL,
-  SHOW_DISPLAY_OPTIONS_MODAL, HIDE_DISPLAY_OPTIONS_MODAL,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
   METADATA_FIELDS, TABLE_FIELDS, SYNC_FIELDS,
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH
@@ -16,30 +15,6 @@ export function showModal (props) {
 export function hideModal () {
   return {
     type: HIDE_MODAL,
-    payload: null
-  }
-}
-
-export function showDisplayOptionsModal (title, syncLabel, selectedFields,
-                                         singleSelection, fieldTypes,
-                                         onUpdate, onDismiss) {
-  return {
-    type: SHOW_DISPLAY_OPTIONS_MODAL,
-    payload: {
-      title,
-      syncLabel,
-      selectedFields,
-      singleSelection,
-      fieldTypes,
-      onUpdate,
-      onDismiss
-    }
-  }
-}
-
-export function dismissDisplayOptionsModal () {
-  return {
-    type: HIDE_DISPLAY_OPTIONS_MODAL,
     payload: null
   }
 }

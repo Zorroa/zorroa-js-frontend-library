@@ -10,9 +10,10 @@ import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import { FacetWidgetInfo } from './WidgetInfo'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
-import { showDisplayOptionsModal } from '../../actions/appActions'
+import { showModal } from '../../actions/appActions'
 import Widget from './Widget'
 import { unCamelCase } from '../../services/jsUtil'
+import DisplayOptions from '../DisplayOptions'
 
 const BAR_CHART = 'icon-list'
 const PIE_CHART = 'icon-pie-chart'
@@ -114,12 +115,14 @@ class Facet extends Component {
   }
 
   selectField = (event) => {
-    const syncLabel = null
-    const singleSelection = true
-    const selectedFields = []
-    const fieldTypes = null
-    this.props.actions.showDisplayOptionsModal('Facet Fields', syncLabel,
-      selectedFields, singleSelection, fieldTypes, this.updateDisplayOptions)
+    const width = '75%'
+    const body = <DisplayOptions title='Facet Fields'
+                                 syncLabel={null}
+                                 singleSelection={true}
+                                 fieldTypes={null}
+                                 selectedFields={[]}
+                                 onUpdate={this.updateDisplayOptions}/>
+    this.props.actions.showModal({body, width})
     event && event.stopPropagation()
   }
 
@@ -356,6 +359,6 @@ export default connect(
     aggs: state.assets && state.assets.aggs,
     widgets: state.racetrack && state.racetrack.widgets
   }), dispatch => ({
-    actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds, showDisplayOptionsModal }, dispatch)
+    actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds, showModal }, dispatch)
   })
 )(Facet)

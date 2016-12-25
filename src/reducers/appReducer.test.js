@@ -1,25 +1,10 @@
 import {
-  SHOW_DISPLAY_OPTIONS_MODAL, HIDE_DISPLAY_OPTIONS_MODAL,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
   METADATA_FIELDS, TABLE_FIELDS, SET_TABLE_FIELD_WIDTH, SET_DRAGGING
 } from '../constants/actionTypes'
 import appReducer, { defaultTableFields, defaultTableFieldWidth } from './appReducer'
 
 describe('appReducer', () => {
-  describe('Modals', () => {
-    it('SHOW_DISPLAY_OPTIONS_MODAL should set displayOptions', () => {
-      const payload = { bar: 'bam' }
-      expect(appReducer({}, { type: SHOW_DISPLAY_OPTIONS_MODAL, payload }))
-        .toEqual({ displayOptions: payload })
-    })
-
-    it('HIDE_DISPLAY_OPTIONS_MODAL should clear displayOptions', () => {
-      const displayOptions = { bar: 'bam' }
-      expect(appReducer({displayOptions}, { type: HIDE_DISPLAY_OPTIONS_MODAL, payload: null }))
-        .toEqual({ displayOptions: null })
-    })
-  })
-
   describe('SIDEBAR', () => {
     it('left sidebar iconified', () => {
       const action = { type: ICONIFY_LEFT_SIDEBAR, payload: true }
