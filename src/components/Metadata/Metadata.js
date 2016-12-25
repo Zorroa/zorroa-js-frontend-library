@@ -5,7 +5,8 @@ import { connect } from 'react-redux'
 import Asset from '../../models/Asset'
 import DisplayProperties from '../../models/DisplayProperties'
 import DisplayPropertiesItem from './DisplayPropertiesItem'
-import { updateMetadataFields, updateTableFields, showDisplayOptionsModal } from '../../actions/appActions'
+import DisplayOptions from '../DisplayOptions'
+import { updateMetadataFields, updateTableFields, showModal } from '../../actions/appActions'
 
 class Metadata extends Component {
   static propTypes = {
@@ -28,10 +29,14 @@ class Metadata extends Component {
   }
 
   showDisplayOptions = () => {
-    const singleSelection = false
-    const fieldTypes = null
-    this.props.actions.showDisplayOptionsModal('Metadata Display Options', 'Table',
-      this.props.fields, singleSelection, fieldTypes, this.updateDisplayOptions)
+    const width = '75%'
+    const body = <DisplayOptions title='Metadata Display Options'
+                                 syncLabel='Table'
+                                 singleSelection={false}
+                                 fieldTypes={null}
+                                 selectedFields={this.props.fields}
+                                 onUpdate={this.updateDisplayOptions}/>
+    this.props.actions.showModal({body, width})
   }
 
   updateDisplayOptions = (event, state) => {
@@ -113,5 +118,5 @@ export default connect(state => ({
   selectedIds: state.assets.selectedIds,
   fields: state.app.metadataFields
 }), dispatch => ({
-  actions: bindActionCreators({ updateMetadataFields, updateTableFields, showDisplayOptionsModal }, dispatch)
+  actions: bindActionCreators({ updateMetadataFields, updateTableFields, showModal }, dispatch)
 }))(Metadata)

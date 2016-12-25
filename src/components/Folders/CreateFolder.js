@@ -5,7 +5,7 @@ import classnames from 'classnames'
 
 import { createFolder } from '../../actions/folderAction'
 import { getAllPermissions } from '../../actions/permissionsAction'
-import { dismissCreateFolderModal } from '../../actions/appActions'
+import { hideModal } from '../../actions/appActions'
 import User from '../../models/User'
 import AclEntry, { isPublic } from '../../models/Acl'
 import Permission from '../../models/Permission'
@@ -68,7 +68,7 @@ class CreateFolder extends Component {
   }
 
   dismiss = (event) => {
-    this.props.actions.dismissCreateFolderModal()
+    this.props.actions.hideModal()
     if (this.props.onDismiss) {
       this.props.onDismiss(event)
     }
@@ -94,7 +94,7 @@ class CreateFolder extends Component {
       acl = [ new AclEntry({ permissionId, access: this.permissionsForValue(3) }) ]
     }
     this.props.onCreate(name, acl)
-    this.props.actions.dismissCreateFolderModal()
+    this.props.actions.hideModal()
   }
 
   togglePublic = (event) => {
@@ -299,5 +299,5 @@ export default connect(state => ({
   user: state.auth && state.auth.user,
   permissions: state.permissions && state.permissions.all
 }), dispatch => ({
-  actions: bindActionCreators({ createFolder, getAllPermissions, dismissCreateFolderModal }, dispatch)
+  actions: bindActionCreators({ createFolder, getAllPermissions, hideModal }, dispatch)
 }))(CreateFolder)

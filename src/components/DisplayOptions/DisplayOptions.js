@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 import { getAssetFields } from '../../actions/assetsAction'
-import { dismissDisplayOptionsModal, syncMetadataAndTableFields } from '../../actions/appActions'
+import { hideModal, syncMetadataAndTableFields } from '../../actions/appActions'
 import { unCamelCase } from '../../services/jsUtil'
 
 class DisplayOptions extends Component {
@@ -52,7 +52,7 @@ class DisplayOptions extends Component {
 
   // Cancel or close clicked, dismiss without update
   cancel (event) {
-    this.props.actions.dismissDisplayOptionsModal()
+    this.props.actions.hideModal()
     if (this.props.onDismiss) {
       this.props.onDismiss(event)
     }
@@ -297,6 +297,6 @@ export default connect(state => ({
 }), dispatch => ({
   actions: bindActionCreators({
     getAssetFields,
-    dismissDisplayOptionsModal,
+    hideModal,
     syncMetadataAndTableFields }, dispatch)
 }))(DisplayOptions)

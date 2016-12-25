@@ -9,11 +9,12 @@ import { unCamelCase } from '../../services/jsUtil'
 import {
   updateMetadataFields,
   updateTableFields,
-  showDisplayOptionsModal,
+  showModal,
   setTableFieldWidth
 } from '../../actions/appActions'
 import { sortAssets } from '../../actions/assetsAction'
 import TableField from './TableField'
+import DisplayOptions from '../DisplayOptions'
 
 const rowHeightPx = 30
 const tableHeaderHeight = 26
@@ -61,10 +62,14 @@ class Table extends Component {
   }
 
   showDisplayOptions = (event) => {
-    const singleSelection = false
-    const fieldTypes = null
-    this.props.actions.showDisplayOptionsModal('Table Display Options', 'Metadata',
-      this.props.fields, singleSelection, fieldTypes, this.updateDisplayOptions)
+    const width = '75%'
+    const body = <DisplayOptions title='Table Display Options'
+                                 syncLabel='Metadata'
+                                 singleSelection={false}
+                                 fieldTypes={null}
+                                 selectedFields={this.props.fields}
+                                 onUpdate={this.updateDisplayOptions}/>
+    this.props.actions.showModal({body, width})
     event.stopPropagation()
   }
 
@@ -390,6 +395,6 @@ export default connect(state => ({
     sortAssets,
     updateMetadataFields,
     updateTableFields,
-    showDisplayOptionsModal,
+    showModal,
     setTableFieldWidth }, dispatch)
 }))(Table)
