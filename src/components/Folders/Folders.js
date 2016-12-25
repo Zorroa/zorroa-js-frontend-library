@@ -6,10 +6,11 @@ import classnames from 'classnames'
 
 import Folder from '../../models/Folder'
 import { getFolderChildren, createFolder, selectFolderId, toggleFolder } from '../../actions/folderAction'
-import { showCreateFolderModal } from '../../actions/appActions'
+import { showModal } from '../../actions/appActions'
 import Trash from './Trash'
 import FolderItem from './FolderItem'
 import AssetSearch from '../../models/AssetSearch'
+import CreateFolder from './CreateFolder'
 
 // Display all folders, starting with the root.
 // Later this will be broken into Collections and Smart Folders.
@@ -116,9 +117,10 @@ class Folders extends Component {
   }
 
   addFolder = () => {
-    const acl = []
-    this.props.actions.showCreateFolderModal(this.addFolderTitle(),
-      acl, this.addFolderCallback())
+    const width = '75%'
+    const body = <CreateFolder title={this.addFolderTitle()} acl={[]}
+                               onCreate={this.addFolderCallback()}/>
+    this.props.actions.showModal({body, width})
   }
 
   addFolderTitle () {
@@ -274,6 +276,6 @@ export default connect(state => ({
     createFolder,
     selectFolderId,
     toggleFolder,
-    showCreateFolderModal
+    showModal
   }, dispatch)
 }))(Folders)

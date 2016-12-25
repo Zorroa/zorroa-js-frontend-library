@@ -5,13 +5,14 @@ import { connect } from 'react-redux'
 import Searcher from './Searcher'
 import AddWidget from './AddWidget'
 import QuickAddWidget from './QuickAddWidget'
+import CreateFolder from '../Folders/CreateFolder'
 import Widget from '../../models/Widget'
 import * as WidgetInfo from './WidgetInfo'
 import Folder from '../../models/Folder'
 import AssetSearch from '../../models/AssetSearch'
 import { resetRacetrackWidgets } from '../../actions/racetrackAction'
 import { createFolder } from '../../actions/folderAction'
-import { showModal, showCreateFolderModal } from '../../actions/appActions'
+import { showModal } from '../../actions/appActions'
 
 class Racetrack extends Component {
   static propTypes = {
@@ -26,8 +27,10 @@ class Racetrack extends Component {
   }
 
   saveRacetrack = () => {
-    const acl = []
-    this.props.actions.showCreateFolderModal('Create Smart Collection', acl, this.saveSearch)
+    const width = '75%'
+    const body = <CreateFolder title='Create Smart Collection' acl={[]}
+                               onCreate={this.saveSearch}/>
+    this.props.actions.showModal({body, width})
   }
 
   saveSearch = (name, acl) => {
@@ -140,8 +143,7 @@ const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators({
     resetRacetrackWidgets,
     createFolder,
-    showModal,
-    showCreateFolderModal
+    showModal
   }, dispatch)
 })
 

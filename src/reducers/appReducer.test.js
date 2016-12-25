@@ -1,6 +1,5 @@
 import {
   SHOW_DISPLAY_OPTIONS_MODAL, HIDE_DISPLAY_OPTIONS_MODAL,
-  SHOW_CREATE_FOLDER_MODAL, HIDE_CREATE_FOLDER_MODAL,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
   METADATA_FIELDS, TABLE_FIELDS, SET_TABLE_FIELD_WIDTH, SET_DRAGGING
 } from '../constants/actionTypes'
@@ -18,18 +17,6 @@ describe('appReducer', () => {
       const displayOptions = { bar: 'bam' }
       expect(appReducer({displayOptions}, { type: HIDE_DISPLAY_OPTIONS_MODAL, payload: null }))
         .toEqual({ displayOptions: null })
-    })
-
-    it('SHOW_CREATE_FOLDER_MODAL should set createFolder', () => {
-      const payload = { bar: 'bam' }
-      expect(appReducer({}, { type: SHOW_CREATE_FOLDER_MODAL, payload }))
-        .toEqual({ createFolder: payload })
-    })
-
-    it('HIDE_CREATE_FOLDER_MODAL should clear createFolder', () => {
-      const createFolder = { bar: 'bam' }
-      expect(appReducer({createFolder}, { type: HIDE_CREATE_FOLDER_MODAL, payload: null }))
-        .toEqual({ createFolder: null })
     })
   })
 

@@ -1,7 +1,6 @@
 import {
   SHOW_MODAL, HIDE_MODAL,
   SHOW_DISPLAY_OPTIONS_MODAL, HIDE_DISPLAY_OPTIONS_MODAL,
-  SHOW_CREATE_FOLDER_MODAL, HIDE_CREATE_FOLDER_MODAL,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
   METADATA_FIELDS, TABLE_FIELDS, SYNC_FIELDS,
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH, UNAUTH_USER
@@ -40,10 +39,6 @@ export default function app (state = initialState, action) {
       return { ...state, displayOptions: action.payload }
     case HIDE_DISPLAY_OPTIONS_MODAL:
       return { ...state, displayOptions: null }
-    case SHOW_CREATE_FOLDER_MODAL:
-      return { ...state, createFolder: action.payload }
-    case HIDE_CREATE_FOLDER_MODAL:
-      return { ...state, createFolder: null }
     case ICONIFY_LEFT_SIDEBAR:
       return { ...state, leftSidebarIsIconified: action.payload }
     case ICONIFY_RIGHT_SIDEBAR:

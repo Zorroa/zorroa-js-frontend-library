@@ -13,7 +13,6 @@ import Racetrack from '../Racetrack'
 import Metadata from '../Metadata'
 import Collapsible from '../Collapsible'
 import DisplayOptions from '../DisplayOptions'
-import CreateFolder from '../Folders/CreateFolder'
 
 import { iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible } from '../../actions/appActions'
 import { getUserPermissions } from '../../actions/authAction'
@@ -102,7 +101,6 @@ class Workspace extends Component {
       <div className={classnames('App', 'flexCol', 'fullHeight', {isDragging: app.isDragging})}>
         { app.modal && <Modal {...app.modal} /> }
         { app.displayOptions && <DisplayOptions {...app.displayOptions} /> }
-        { app.createFolder && <CreateFolder {...app.createFolder} /> }
         <Header/>
         <div className="Workspace flexOn flexRow fullWidth fullHeight">
 

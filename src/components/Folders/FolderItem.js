@@ -10,8 +10,9 @@ import Permission from '../../models/Permission'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import CreateExport from './CreateExport'
+import CreateFolder from './CreateFolder'
 import { addAssetIdsToFolderId, deleteFolderIds, updateFolder } from '../../actions/folderAction'
-import { showModal, showCreateFolderModal } from '../../actions/appActions'
+import { showModal } from '../../actions/appActions'
 import { exportAssets } from '../../actions/jobActions'
 import { restoreSearch } from '../../actions/racetrackAction'
 
@@ -152,8 +153,11 @@ class FolderItem extends Component {
 
   edit = (event) => {
     this.dismissContextMenu(event)
-    this.props.actions.showCreateFolderModal('Edit Collection', this.props.folder.acl,
-      this.editFolder, this.props.folder.name, this.deleteFolder, this.getLink)
+    const width = '75%'
+    const body = <CreateFolder title='Edit Collection' acl={this.props.folder.acl}
+                               onCreate={this.editFolder} name={this.props.folder.name}
+                               onDelete={this.deleteFolder} onLink={this.getLink}/>
+    this.props.actions.showModal({body, width})
   }
 
   exportFolder = (event) => {
@@ -330,7 +334,6 @@ export default connect(state => ({
     addAssetIdsToFolderId,
     exportAssets,
     showModal,
-    showCreateFolderModal,
     deleteFolderIds,
     updateFolder,
     restoreSearch
