@@ -1,13 +1,14 @@
 import {
   SHOW_MODAL, HIDE_MODAL,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
-  METADATA_FIELDS, TABLE_FIELDS, SYNC_FIELDS, SHOW_IMPORT_SCRIPT_INFO,
+  METADATA_FIELDS, TABLE_FIELDS, LIGHTBAR_FIELDS,
+  SYNC_FIELDS, SHOW_IMPORT_SCRIPT_INFO,
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH, UNAUTH_USER
 } from '../constants/actionTypes'
 
 export const defaultTableFieldWidth = 100
 export const defaultTableFields = [ 'source.filename', 'source.date', 'source.fileSize' ]
-
+export const defaultLightbarFields = [ 'source.filename', 'source.date' ]
 const initialState = {
   modal: null,
   leftSidebarIsIconified: false,
@@ -24,6 +25,7 @@ const initialState = {
   },
   metadataFields: [ ...defaultTableFields ],
   tableFields: [ ...defaultTableFields ],
+  lightbarFields: [ ...defaultLightbarFields ],
   tableFieldWidth: Object.assign({},
     ...defaultTableFields.map(field => ({ [field]: defaultTableFieldWidth }))),
   showImportScriptInfo: true
@@ -54,6 +56,8 @@ export default function app (state = initialState, action) {
         ...state.tableFieldWidth
       }
       return { ...state, tableFields: action.payload, tableFieldWidth }
+    case LIGHTBAR_FIELDS:
+      return { ...state, lightbarFields: action.payload }
     case SYNC_FIELDS:
       return { ...state, syncMetadataAndTable: action.payload }
     case SHOW_IMPORT_SCRIPT_INFO:
