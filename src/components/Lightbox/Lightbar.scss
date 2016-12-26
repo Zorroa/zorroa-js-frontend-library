@@ -5,6 +5,7 @@
   @include flexRow;
   @include flexJustifySpaceBetween;
 
+  position: relative;
   color: white;
   background-color: black;
   justify-content: space-between;
@@ -25,8 +26,10 @@
   margin-top: 15px;
   @include flexCol;
   @include flexWrap;
+  align-content: flex-start;
   max-height: 100%;
   overflow-y: auto;
+  position: relative;
 
   &::-webkit-scrollbar {
     height: 5px;
@@ -49,6 +52,7 @@
   height: 32px;
   border-right: 1px solid $zorroa-darkgray;
   margin-left: 4px;
+  cursor: ew-resize;
 }
 
 .Lightbar-attr-value {
@@ -67,6 +71,7 @@
   @include flexJustifyEnd;
   @include flexAlignItemsStart;
   margin-top: 10px;
+  position: relative;
 }
 
 .Lightbar-action {
@@ -92,4 +97,48 @@
   outline: none;
   color: white;
   background-color: black;
+}
+
+.Lightbar-resizer {
+  position: absolute;
+  cursor: ns-resize;
+  height: 5px;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+}
+
+// Column resizers inside their own div so they
+// do not affect the scrolling size of the parent
+.Lightbar-column-resizers {
+  position: absolute;
+  overflow: hidden;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  top: 0;
+}
+
+.Lightbar-column-resizer {
+  cursor: ew-resize;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  &:hover {
+    background-color: $zorroa-darkgray;
+  }
+  float: left;
+}
+
+.Lightbar-action-resizer {
+  cursor: ew-resize;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 5px;
+  &:hover {
+    background-color: $zorroa-darkgray;
+  }
 }
