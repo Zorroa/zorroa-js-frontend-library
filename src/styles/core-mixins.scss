@@ -82,7 +82,7 @@ $zorroa-Sidebar-width : 340px;
 @mixin zorroa-square-btn-lighten($size) {
   @include zorroa-square-btn($size);
   &:hover {
-    font-weight: 600;
+    font-weight: 700;
     background-color: rgba(255,255,255,0.2);
   }
 }
@@ -90,7 +90,7 @@ $zorroa-Sidebar-width : 340px;
 @mixin zorroa-square-btn-darken($size) {
   @include zorroa-square-btn($size);
   &:hover {
-    font-weight: 600;
+    font-weight: 700;
     background-color: rgba(0,0,0,0.2);
   }
 }

@@ -117,7 +117,7 @@ export default class Video extends Component {
         </div>
         <div className="Video-control-bar">
           <div className="Video-time">
-            <Duration seconds={duration * played} />/<Duration seconds={duration}/>
+            <Duration className='Video-remaining' seconds={duration * played} />/<Duration seconds={duration}/>
           </div>
           <div className="Video-controls">
             <div onClick={this.rewind} className="icon-prev-clip"/>
@@ -150,7 +150,7 @@ export default class Video extends Component {
 
 const Duration = ({ className, seconds }) => {
   return (
-    <time dateTime={`P${Math.round(seconds)}S`} className={'Video-duration' || className}>
+    <time dateTime={`P${Math.round(seconds)}S`} className={className || 'Video-duration'}>
       {formatDuration(seconds)}
     </time>
   )

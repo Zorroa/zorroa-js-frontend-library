@@ -120,15 +120,20 @@
     .Video-time {
       padding-left: 10px;
       width: 291px;         // match volume width to center controls
-      font-size: 20px;
-      color: $zorroa-lightgray;
+      font-size: 18px;
+      color: $zorroa-gray;
+
       .Video-duration {
+        font-size: 16px;
         padding: 8px;
-        font-family: Montserrat, sans-serif;
-        font-size: 16.9px;
         font-weight: 100;
         font-style: normal;
         font-stretch: normal;
+      }
+
+      .Video-remaining {
+        @extend .Video-duration;
+        color: $zorroa-lightgray;
       }
     }
 

@@ -8,9 +8,10 @@ Zorroa core (shared) css classes
 @import 'core-mixins';
 
 // https://fonts.google.com/?query=roboto&category=Sans+Serif,Display,Handwriting,Monospace&selection.family=Roboto
-@import url('https://fonts.googleapis.com/css?family=Roboto');
-@import url('https://fonts.googleapis.com/css?family=Montserrat');
-
+//@import url('https://fonts.googleapis.com/css?family=Roboto');
+//@import url('https://fonts.googleapis.com/css?family=Montserrat');
+@import "../assets/fonts/Roboto/Roboto.css";
+@import "../assets/fonts/Roboto_Condensed/Roboto_Condensed.css";
 
 /*
 tread carefully!!!
