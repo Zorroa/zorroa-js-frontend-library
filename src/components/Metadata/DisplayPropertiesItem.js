@@ -27,7 +27,7 @@ class DisplayPropertiesItem extends Component {
     app: PropTypes.object.isRequired
   }
 
-  arrayValue(val, key, className) {
+  arrayValue (val, key, className) {
     if (val[0] && val[0][0] === '#' && (val.length === 7 || val.length === 4)) {
       return <div className="DisplayPropertiesItem-color" key={key} style={{backgroundColor: val}}/>
     }
@@ -153,11 +153,13 @@ class DisplayPropertiesItem extends Component {
     const isArray = Array.isArray(rawValue)
     const indent = { marginLeft: `${indentLevel * 14}px` }
     if (displayProperties.children && displayProperties.children.length) {
-      if (isArray) return (
-        <div className="DisplayPropertiesItem-array">
-          { this.renderItemContainer(isArray, rawValue, indentLevel)}
-        </div>
-      )
+      if (isArray) {
+        return (
+          <div className="DisplayPropertiesItem-array">
+            { this.renderItemContainer(isArray, rawValue, indentLevel)}
+          </div>
+        )
+      }
       return (
         <Collapsible className='DisplayPropertiesItem'
                      style={{marginLeft: '16px'}}

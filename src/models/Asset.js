@@ -30,9 +30,9 @@ export default class Asset {
   biggestProxy () {
     var biggestProxy = this.proxies[0]
     var mostPixels = 0
-    for (var i in this.proxies) {
+    for (var i = 0; i < this.proxies.length; ++i) {
       const proxy = this.proxies[i]
-      const pixels = proxy.width * proxy.height;
+      const pixels = proxy.width * proxy.height
       if (pixels > mostPixels) {
         mostPixels = pixels
         biggestProxy = proxy
@@ -44,7 +44,7 @@ export default class Asset {
   closestProxy (width, height) {
     var bestProxy = this.proxies[0]
     var bestDim = Number.MAX_SAFE_INTEGER
-    for (var i in this.proxies) {
+    for (var i = 0; i < this.proxies.length; ++i) {
       const proxy = this.proxies[i]
       const x = Math.abs(proxy.width - width)
       const y = Math.abs(proxy.height - height)
