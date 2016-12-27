@@ -13,7 +13,7 @@ import TableField from '../Table/TableField'
 import Resizer from '../../services/Resizer'
 import { exportAssets } from '../../actions/jobActions'
 import { updateLightbarFields, showModal } from '../../actions/appActions'
-import { unCamelCase } from '../../services/jsUtil'
+import { flatDisplayPropertiesForFields } from '../../models/DisplayProperties'
 
 class Lightbar extends Component {
   static displayName = 'Lightbar'
@@ -32,7 +32,7 @@ class Lightbar extends Component {
 
   state = {
     columnWidth: 300,       // Fixed widths, to be draggable
-    actionWidth: 100,
+    actionWidth: 140,
     lightbarHeight: 60
   }
 
@@ -92,37 +92,54 @@ class Lightbar extends Component {
     this.props.actions.exportAssets(name, search)
   }
 
-  lastField (field) {
-    return field.split('.').pop()
+  renderField ({title, field, displayProperties, asset}) {
+    const { columnWidth } = this.state
+
+    // Section title, contains object starting with title field
+    if (displayProperties.children && displayProperties.children.length) {
+      if (!field.includes('.')) return null   // Skip top-level section titles
+      return (
+        <div key={`${title}-${field}`} className="Lightbar-attr" style={{width: columnWidth}}>
+          <div className="Lightbar-attr-title">
+            { title }
+          </div>
+          <div className="Lightbar-attr-bar"/>
+        </div>
+      )
+    }
+
+    // Field value
+    const titleWidth = columnWidth / 3
+    const fieldWidth = 2 * titleWidth
+    return (
+      <div key={field} className="Lightbar-attr" style={{width: columnWidth}}>
+        <div className="Lightbar-attr-field" style={{width: titleWidth}}>
+          {title}
+        </div>
+        <div className="Lightbar-attr-separator"/>
+        <TableField asset={asset} field={field} width={fieldWidth}/>
+      </div>
+    )
   }
 
   render () {
-    const { assets, isolatedId, lightbarFields, modal } = this.props
+    const { lightbarFields, assets, isolatedId, modal } = this.props
     const { columnWidth, actionWidth, lightbarHeight } = this.state
-    if (!assets || !isolatedId) return null
-    const asset = assets.find(asset => (asset.id === isolatedId))
-    const titleWidth = columnWidth / 3
-    const fieldWidth = 2 * titleWidth
     const isDraggingColumn = this.resizer.onMove === this.resizeColumn
     const isDraggingAction = this.resizer.onMove === this.resizeAction
+    const asset = assets.find(asset => (asset.id === isolatedId))
+    const titleFields = flatDisplayPropertiesForFields(lightbarFields, asset)
     return (
       <div className="Lightbar" style={{height: lightbarHeight}}>
         { modal && <Modal {...modal} /> }
         <button onClick={this.showDisplayOptions} className="Lightbar-settings icon-cog" />
         <div className="Lightbar-metadata">
-          { lightbarFields && lightbarFields.map(field => (
-            <div key={field} className="Lightbar-attr" style={{width: columnWidth}}>
-              <div className="Lightbar-attr-field" style={{width: titleWidth}}>
-                {unCamelCase(this.lastField(field))}
-              </div>
-              <div className="Lightbar-attr-separator"/>
-              <TableField asset={asset} field={field} width={fieldWidth}/>
-            </div>
-          ))}
+          { titleFields.map(tf => this.renderField({...tf, asset})) }
           <div className="Lightbar-column-resizers">
-            { /* TRICKY: N columns, with accumulated scaling */ [1, 2, 3, 4].map(k => (
+            { /* TRICKY: N columns, with accumulated scaling */
+              [1, 2, 3, 4, 5, 6, 7].map(k => (
               <div key={k} className={classnames('Lightbar-column-resizer', {isDragging: isDraggingColumn})}
-                   style={{left: k * columnWidth}}
+                   style={{left: k * columnWidth - 2.5}}
                    onMouseDown={event => this.resizer.capture(this.resizeColumn, this.release, columnWidth, 0, 1.0 / k)} />
             ))}
           </div>

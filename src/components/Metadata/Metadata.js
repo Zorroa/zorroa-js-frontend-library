@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import Asset from '../../models/Asset'
-import DisplayProperties from '../../models/DisplayProperties'
+import { displayPropertiesForFields } from '../../models/DisplayProperties'
 import DisplayPropertiesItem from './DisplayPropertiesItem'
 import DisplayOptions from '../DisplayOptions'
 import { updateMetadataFields, updateTableFields, showModal } from '../../actions/appActions'
@@ -47,41 +47,12 @@ class Metadata extends Component {
     }
   }
 
-  // Return existing or create a new propertry in th passed-in array
-  getDisplayProperties (name, displayProperties) {
-    const index = displayProperties.findIndex(d => (d.name === name))
-    let dp = null
-    if (index >= 0) {
-      dp = displayProperties[index]
-    } else {
-      dp = new DisplayProperties({name})
-      displayProperties.push(dp)
-    }
-    return dp
-  }
-
-  // Create hierarchical DisplayProperties for field rendering
-  displayPropertiesForFields (fields) {
-    let displayProperties = []
-    for (let field of fields) {
-      const namespaces = field.split('.')
-      let dp = null
-      for (let name of namespaces) {
-        if (dp && !dp.children) {
-          dp.children = []
-        }
-        dp = this.getDisplayProperties(name, dp ? dp.children : displayProperties)
-      }
-    }
-    return displayProperties
-  }
-
   render () {
     const { assets, selectedIds, isIconified, fields } = this.props
     const { filterString } = this.state
     const lcFilterString = filterString.toLowerCase()
     const filteredFields = fields.filter(field => (field.toLowerCase().includes(lcFilterString)))
-    const displayProperties = this.displayPropertiesForFields(filteredFields)
+    const displayProperties = displayPropertiesForFields(filteredFields)
     var selectedAssets = new Set()
     if (selectedIds) {
       for (const id of selectedIds) {

@@ -39,6 +39,26 @@
 .Lightbar-attr {
   @include flexRow;
   @include flexAlignItemsCenter;
+
+  .TableField-tag {
+    color: white;
+    background-color: $zorroa-darkgray;
+    margin: 2px;
+    font-size: 12px;
+  }
+
+  .TableField-array {
+    @include nowrap;
+    @include flexRow;
+    @include flexWrap;
+    @include flexAlignItemsCenter;
+    @include flexJustifyStart;
+    &.isOpen {
+    }
+    &:not(.isOpen) {
+    }
+  }
+
 }
 
 .Lightbar-attr-field {
@@ -55,9 +75,16 @@
   cursor: ew-resize;
 }
 
-.Lightbar-attr-value {
-  font-size: 14px;
-  color: $zorroa-nearwhite;
+.Lightbar-attr-bar {
+  @include flexOn;
+  margin-left: 8px;
+  margin-right: 20px;
+  height: 1px;
+  border-bottom: 1px solid $zorroa-darkgray;
+}
+
+.Lightbar-attr-title {
+  font-size: 11px;
 }
 
 .Lightbar-btn-icon {
@@ -102,7 +129,7 @@
 
 .Lightbar-resizer {
   position: absolute;
-  cursor: ns-resize;
+  cursor: row-resize;
   height: 5px;
   left: 0;
   right: 0;
@@ -121,23 +148,25 @@
 }
 
 .Lightbar-column-resizer {
-  cursor: ew-resize;
+  cursor: col-resize;
   position: absolute;
   top: 0;
   bottom: 0;
   width: 5px;
+  border-radius: 2px;
 
   &:hover { background-color: $zorroa-darkgray; }
   &.isDragging { background-color: $zorroa-darkgray; }
 }
 
 .Lightbar-action-resizer {
-  cursor: ew-resize;
+  cursor: col-resize;
   position: absolute;
   top: 2px;
   bottom: 2px;
   left: 0;
   width: 5px;
+  border-radius: 2px;
 
   &:hover { background-color: $zorroa-darkgray; }
   &.isDragging { background-color: $zorroa-darkgray; }
