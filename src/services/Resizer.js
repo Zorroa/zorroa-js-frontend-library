@@ -26,8 +26,15 @@
 //       render () { <div style={{width: this.state.resizeWidth}} />
 
 export default class Resizer {
-  capture = (onMove, x, y, scaleX, scaleY) => {
+  constructor () {
+    // Not sure why the new auto-bind-member syntax didn't work here...
+    this.move = this.move.bind(this)
+    this.release = this.release.bind(this)
+  }
+
+  capture = (onMove, onRelease, x, y, scaleX, scaleY) => {
     this.onMove = onMove
+    this.onRelease = onRelease
     this.startX = x
     this.startY = y
     this.scaleX = scaleX === undefined ? 1 : scaleX
@@ -36,7 +43,8 @@ export default class Resizer {
     window.addEventListener('mouseup', this.release)
   }
 
-  move = (event) => {
+  move (event) {
+    if (!this.onMove) return
     if (!this.startPageX) {
       this.startPageX = event.pageX
       this.startPageY = event.pageY
@@ -46,7 +54,7 @@ export default class Resizer {
     this.onMove(x, y)
   }
 
-  release = () => {
+  release (event) {
     this.onMove = null
     this.startX = null
     this.startY = null
@@ -56,6 +64,7 @@ export default class Resizer {
     this.startPageY = null
     window.removeEventListener('mousemove', this.move)
     window.removeEventListener('mouseup', this.release)
-    // Consider adding onMouseUp or onRelease?
+    this.onRelease && this.onRelease(event)
+    this.onRelease = null
   }
 }
