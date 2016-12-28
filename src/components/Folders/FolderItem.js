@@ -63,13 +63,13 @@ class FolderItem extends Component {
     isSelected: PropTypes.bool.isRequired,
     onToggle: PropTypes.func,
     onSelect: PropTypes.func,
-    dragHover: PropTypes.bool.isRequired,
+    dragHover: PropTypes.bool,
     dragparams: PropTypes.object,
     dragInfo: PropTypes.object,
 
     // state props
     selectedFolderIds: PropTypes.object,
-    folders: PropTypes.arrayOf(PropTypes.instanceOf(Folder)),
+    folders: PropTypes.instanceOf(Map),
     counts: PropTypes.instanceOf(Map),
     filteredCounts: PropTypes.instanceOf(Map),
     user: PropTypes.instanceOf(User),
@@ -290,7 +290,7 @@ class FolderItem extends Component {
         { this.renderContextMenu() }
         <div className={classnames('FolderItem-toggle', {hasChildren})}
              onClick={event => { onToggle(folder); return false }}>
-          {(hasChildren) ? <i className='FolderItem-toggleArrow icon-triangle-down'/> : null}
+          {hasChildren ? <i className='FolderItem-toggleArrow icon-triangle-down'/> : null}
         </div>
         <div className={classnames('FolderItem-select')} {...dragparams}
              onClick={event => { onSelect(event, folder); return false }}

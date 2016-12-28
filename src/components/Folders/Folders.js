@@ -234,7 +234,7 @@ class Folders extends Component {
       const depth = this.depth(folder)
       const isOpen = folders.openFolderIds.has(folder.id)
       const isSelected = folders.selectedFolderIds.has(folder.id)
-      const hasChildren = folder.childIds && folder.childIds.size > 0
+      const hasChildren = (folder.childIds && folder.childIds.size > 0) || false
       return (
         <FolderItem {...{key, depth, folder, isOpen, isSelected, hasChildren}}
                     onToggle={this.toggleFolder.bind(this, folder)}
