@@ -1,13 +1,12 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
-import { setIsDragging } from '../actions/appActions'
 import { bindActionCreators } from 'redux'
 
-export function DropTarget (type, params) {
-  const {dragOver, drop} = params
+import { startDragging, stopDragging } from '../actions/appActions'
 
+export function DropTarget ({dragOver, drop}) {
   return function DropTargetFactory (DropComponent) {
-    return class DropTargetHOC extends Component {
+    class DropTargetHOC extends Component {
 
       state = {dragHover: false}
 
@@ -23,12 +22,12 @@ export function DropTarget (type, params) {
             return false
           },
           onDragOver: (event) => {
-            dragOver(props, type, event)
+            dragOver && dragOver(props, event)
             event.preventDefault()
           },
           onDrop: (event) => {
             this.setState({dragHover: false})
-            drop(props, type, event)
+            drop && drop(props, event)
             event.preventDefault()
           }
         }
@@ -36,13 +35,15 @@ export function DropTarget (type, params) {
         return <DropComponent {...props} dragHover={this.state.dragHover} dropparams={dropParams} />
       }
     }
+
+    return connect(state => ({
+      dragInfo: state.app.dragInfo    // Passed to callbacks in props
+    }), null)(DropTargetHOC)
   }
 }
 
-export function DragSource (type, params) {
+export function DragSource (type, {dragStart, dragEnd}) {
   return function DragSourceFactory (DragComponent) {
-    const {dragStart, dragEnd} = params
-
     class DragSourceHOC extends Component {
       static propTypes = {
         // connect props
@@ -54,14 +55,16 @@ export function DragSource (type, params) {
         const {hocActions} = props
         const dragParams = {
           onDragStart: (event) => {
-            dragStart(props, type, event)
+            // Get the dragging object to add to app.state.dragInfo
+            const data = dragStart(props, type, event)
             // Magic! Delay state update one frame to workaround Chrome
             // drag-and-drop issues when changing the DOM in onDragStart.
-            requestAnimationFrame(() => hocActions.setIsDragging(true))
+            requestAnimationFrame(() => hocActions.startDragging(type, data))
           },
           onDragEnd: (event) => {
-            dragEnd(props, type, event)
-            hocActions.setIsDragging(false)
+            dragEnd && dragEnd(props, type, event)
+            event.preventDefault()
+            hocActions.stopDragging()
           },
           draggable: true
         }
@@ -70,10 +73,8 @@ export function DragSource (type, params) {
       }
     }
 
-    return connect(state => ({
-      app: state.app
-    }), dispatch => ({
-      hocActions: bindActionCreators({ setIsDragging }, dispatch)
+    return connect(null, dispatch => ({
+      hocActions: bindActionCreators({ startDragging, stopDragging }, dispatch)
     }))(DragSourceHOC)
   }
 }

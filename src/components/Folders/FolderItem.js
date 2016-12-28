@@ -5,7 +5,8 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import User from '../../models/User'
-import Folder, { isDroppable } from '../../models/Folder'
+import Asset from '../../models/Asset'
+import Folder from '../../models/Folder'
 import Permission from '../../models/Permission'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
@@ -15,48 +16,30 @@ import { addAssetIdsToFolderId, deleteFolderIds, updateFolder } from '../../acti
 import { showModal } from '../../actions/appActions'
 import { exportAssets } from '../../actions/jobActions'
 import { restoreSearch } from '../../actions/racetrackAction'
+import { isolateSelectId } from '../../services/jsUtil'
 
 // Renders folder children as Collapsible elements.
 const folderSource = {
   dragStart (props, type, se) {
-    // Isolate unselected, or retain multiple selection for drag source,
-    // with special care to get the new selected set prior to state update.
-    // Using props.selectedFolderIds here misses the newly selected item,
-    // but using props.selectedFolderIds in the drop event usually works,
-    // though technically as a hard-to-hit race. Using the returned set
-    // always works and allow drops on items without props.selectedFolderIds
-    const selectedFolderIds = isolateSelect(props)
-    se.dataTransfer.setData('text/plain', JSON.stringify({type, folderIds: [...selectedFolderIds]}))
-  },
-  dragEnd (props, type, se) {
-    se.preventDefault()
+    const { folder, selectedFolderIds } = props
+    const folderIds = isolateSelectId(folder.id, selectedFolderIds)
+    return {folderIds}
   }
 }
 
 const target = {
-  dragOver (props, type, se) {
-    se.preventDefault()
-  },
-  drop (props, type, se) {
-    se.preventDefault()
-    // allows us to match drop targets to drag sources
-    const dataStr = se.dataTransfer.getData('text/plain')
-    const data = JSON.parse(dataStr)
-    if (!data) return
-    switch (data.type) {
+  drop (props, se) {
+    const { dragInfo, folder, folders, user } = props
+    if (!dragInfo) return
+    switch (dragInfo.type) {
       case 'ASSET':
-        console.log('Drop ' + props.selectedAssetIds + ' on ' + props.folder.id)
-        // Make sure the asset being dragged is added, even if it isn't selected
-        var selectedAssetIds = new Set(props.selectedAssetIds)
-        selectedAssetIds.add(data.id)
-        props.actions.addAssetIdsToFolderId(selectedAssetIds, props.folder.id)
+        console.log('Drop ' + dragInfo.assetIds + ' on ' + props.folder.id)
+        props.actions.addAssetIdsToFolderId(dragInfo.assetIds, props.folder.id)
         break
       case 'FOLDER':
-        // Drop the current selected folder set, either from the special
-        // isolateSelect return in dragStart or from props.selectedFolderIds
-        console.log('Drop ' + JSON.stringify([...data.folderIds]) + ' on ' + props.folder.id)
-        data.folderIds.forEach(folderId => {
-          if (isDroppable(props)) {
+        console.log('Drop ' + JSON.stringify(dragInfo.folderIds) + ' on ' + props.folder.id)
+        dragInfo.folderIds.forEach(folderId => {
+          if (folder.canDropFolderIds([folderId], folders, user)) {
             const folder = new Folder(props.folders.get(folderId))
             folder.parentId = props.folder.id
             props.actions.updateFolder(folder)
@@ -67,18 +50,8 @@ const target = {
   }
 }
 
-function isolateSelect (props) {
-  // Isolate-select if the clicked folder is not selected
-  const { folder, selectedFolderIds, onSelect } = props
-  if (!selectedFolderIds.has(folder.id)) {
-    const action = onSelect({shiftKey: false, metaKey: false}, folder)
-    return action.payload
-  }
-  return selectedFolderIds
-}
-
 @DragSource('FOLDER', folderSource)
-@DropTarget('ASSET', target)
+@DropTarget(target)
 class FolderItem extends Component {
   static propTypes = {
     // input props
@@ -92,6 +65,7 @@ class FolderItem extends Component {
     onSelect: PropTypes.func,
     dragHover: PropTypes.bool.isRequired,
     dragparams: PropTypes.object,
+    dragInfo: PropTypes.object,
 
     // state props
     selectedFolderIds: PropTypes.object,
@@ -100,6 +74,7 @@ class FolderItem extends Component {
     filteredCounts: PropTypes.instanceOf(Map),
     user: PropTypes.instanceOf(User),
     permissions: PropTypes.arrayOf(PropTypes.instanceOf(Permission)),
+    assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     actions: PropTypes.object
   }
 
@@ -107,7 +82,12 @@ class FolderItem extends Component {
 
   showContextMenu = (event) => {
     event.preventDefault()
-    isolateSelect(this.props)
+
+    // Isolate-select if the clicked folder is not selected
+    const { folder, selectedFolderIds, onSelect } = this.props
+    if (!selectedFolderIds.has(folder.id)) {
+      onSelect({shiftKey: false, metaKey: false}, folder)
+    }
     this.setState({ isContextMenuVisible: true })
   }
 
@@ -182,6 +162,17 @@ class FolderItem extends Component {
       count += folder.parentId === folderId ? 1 : 0
     })
     return count
+  }
+
+  isDropTarget () {
+    const { folder, dragInfo, assets, folders, user } = this.props
+    if (!dragInfo) return false
+    if (dragInfo.type === 'ASSET' && dragInfo.assetIds) {
+      return folder.canDropAssetIds(dragInfo.assetIds, assets, user)
+    } else if (dragInfo.type === 'FOLDER' && dragInfo.folderIds) {
+      return folder.canDropFolderIds(dragInfo.folderIds, folders, user)
+    }
+    return false
   }
 
   renderContextMenu () {
@@ -291,7 +282,7 @@ class FolderItem extends Component {
     const { folder, depth, isOpen, hasChildren, isSelected, onToggle, onSelect, dropparams, dragHover } = this.props
     const icon = folder.isDyhi() ? 'icon-foldercog' : (folder.search ? 'icon-collections-smart' : 'icon-collections-simple')
     const draggable = !folder.isDyhi()
-    const isDropTarget = isDroppable(this.props)
+    const isDropTarget = this.isDropTarget()
     const dragparams = { ...this.props.dragparams, draggable }  // disable drag
     return (
       <div className={classnames('FolderItem', { isOpen, hasChildren, isSelected, isDropTarget, dragHover })}
@@ -322,13 +313,15 @@ class FolderItem extends Component {
 }
 
 export default connect(state => ({
+  assets: state.assets.all,
   selectedAssetIds: state.assets.selectedIds,
   folders: state.folders.all,
   counts: state.folders.counts,
   filteredCounts: state.folders.filteredCounts,
   selectedFolderIds: state.folders.selectedFolderIds,
   user: state.auth.user,
-  permissions: state.permissions.all
+  permissions: state.permissions.all,
+  dragInfo: state.app.dragInfo
 }), dispatch => ({
   actions: bindActionCreators({
     addAssetIdsToFolderId,

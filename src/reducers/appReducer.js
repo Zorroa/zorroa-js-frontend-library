@@ -63,7 +63,7 @@ export default function app (state = initialState, action) {
     case SHOW_IMPORT_SCRIPT_INFO:
       return { ...state, showImportScriptInfo: action.payload }
     case SET_DRAGGING:
-      return { ...state, isDragging: action.payload }
+      return { ...state, dragInfo: action.payload }
     case SET_TABLE_FIELD_WIDTH:
       return { ...state, tableFieldWidth: { ...state.tableFieldWidth, ...action.payload } }
     case UNAUTH_USER:

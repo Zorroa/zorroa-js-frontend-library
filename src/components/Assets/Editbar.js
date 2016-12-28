@@ -64,7 +64,7 @@ class Editbar extends Component {
       const index = assets.findIndex(asset => (asset.id === assetId))
       if (index < 0) continue
       const asset = assets[index]
-      if (asset.memberOfFolderIds(simpleFolderIds)) return true
+      if (asset.memberOfAnyFolderIds(simpleFolderIds)) return true
     }
     return false
   }

@@ -57,7 +57,8 @@ export default class Asset {
     return bestProxy
   }
 
-  memberOfFolderIds (folderIds) {
+  // Returns true if the asset is in any of the folder ids
+  memberOfAnyFolderIds (folderIds) {
     const folders = this.document && this.document.links && this.document.links.folder
     if (!folders || !folders.length) return false
     for (const folderId of folderIds) {
@@ -65,6 +66,17 @@ export default class Asset {
       if (index >= 0) return true
     }
     return false
+  }
+
+  // Returns true if the asset is in all of the folder ids
+  memberOfAllFolderIds (folderIds) {
+    const folders = this.document && this.document.links && this.document.links.folder
+    if (!folders || !folders.length) return false
+    for (const folderId of folderIds) {
+      const index = folders.findIndex(id => (id === folderId))
+      if (index < 0) return false
+    }
+    return true
   }
 
   static lastNamespace (field) {

@@ -88,13 +88,17 @@ class CreateFolder extends Component {
       acl = selectedPermissionIds && selectedPermissionIds.size
         ? Array.from(selectedPermissionIds).map(([permissionId, access]) => (
         new AclEntry({ permissionId, access }))) : undefined
-    } else {
+    } else if (user && user.permissions) {
       // Look through this user's permissions for the one with 'user' type
       const permissionId = user.permissions.find(permission => (permission.type === 'user')).id
       acl = [ new AclEntry({ permissionId, access: this.permissionsForValue(3) }) ]
     }
-    this.props.onCreate(name, acl)
-    this.props.actions.hideModal()
+    if (acl) {
+      this.props.onCreate(name, acl)
+      this.props.actions.hideModal()
+    } else {
+      console.error('Cannot determine permissions to create folder ' + name)
+    }
   }
 
   togglePublic = (event) => {
