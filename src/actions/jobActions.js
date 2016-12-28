@@ -14,11 +14,12 @@ import Processor from '../models/Processor'
 const jobEndpoint = '/api/v1/jobs'
 const importEndpoint = '/api/v1/imports'
 
-export function exportAssets (name, search) {
+export function exportAssets (name, search, fields) {
   assert.ok(search instanceof AssetSearch)
   return dispatch => {
-    console.log('Export: ' + JSON.stringify(search))
-    getArchivist().post('/api/v1/exports', {name, search})
+    console.log('Export: ' + JSON.stringify(search) +
+    ' and fields: ' + fields ? JSON.stringify(fields) : 'none')
+    getArchivist().post('/api/v1/exports', {name, search, fields})
       .then(response => {
         dispatch({
           type: EXPORT_ASSETS,

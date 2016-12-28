@@ -15,7 +15,7 @@ class CreateExport extends Component {
   state = {
     name: '',
     exportImages: true,
-    exportTable: false,
+    exportTable: true,
     exportContactSheet: false
   }
 
@@ -48,8 +48,8 @@ class CreateExport extends Component {
   }
 
   create = (event) => {
-    const {name, exportImages, exportTables} = this.state
-    this.props.onCreate(event, name, exportImages, exportTables)
+    const {name, exportImages, exportTable} = this.state
+    this.props.onCreate(event, name, exportImages, exportTable)
     this.dismiss(event)
   }
 
@@ -84,9 +84,9 @@ class CreateExport extends Component {
             </div>
             </div>
           <div className="option-row">
-            <input disabled={true} type="checkbox" checked={this.state.exportTable} onChange={this.toggleExportTable} />
+            <input type="checkbox" checked={this.state.exportTable} onChange={this.toggleExportTable} />
             <div className="CreateExport-input-label">
-              <div className="CreateExport-input-text">Export current metadata table (TBD)</div>
+              <div className="CreateExport-input-text">Export current metadata table</div>
               <div className="CreateExport-subtext">CSV file type.</div>
             </div>
           </div>

@@ -21,6 +21,7 @@ class Editbar extends Component {
     folders: PropTypes.instanceOf(Map),
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     query: PropTypes.instanceOf(AssetSearch),
+    tableFields: PropTypes.arrayOf(PropTypes.string),
     actions: PropTypes.object
   }
 
@@ -34,13 +35,14 @@ class Editbar extends Component {
     this.props.actions.showModal({body, width})
   }
 
-  createExport = (event, name, exportImages, exportMetadata) => {
-    const { selectedAssetIds, query } = this.props
+  createExport = (event, name, exportImages, exportTable) => {
+    const { selectedAssetIds, query, tableFields } = this.props
     let search = query
     if (selectedAssetIds && selectedAssetIds.size) {
       search = new AssetSearch({ filter: new AssetFilter({ terms: {'_id': [...selectedAssetIds]} }) })
     }
-    this.props.actions.exportAssets(name, search)
+    const fields = exportTable && tableFields
+    this.props.actions.exportAssets(name, search, fields)
   }
 
   removeSelected = () => {
@@ -126,7 +128,8 @@ export default connect(state => ({
   selectedFolderIds: state.folders.selectedFolderIds,
   folders: state.folders.all,
   assets: state.assets.all,
-  query: state.assets.query
+  query: state.assets.query,
+  tableFields: state.app.tableFields
 }), dispatch => ({
   actions: bindActionCreators({
     selectAssetIds,
