@@ -15,6 +15,7 @@ export default class Modal extends Component {
     return (
       <div className="modal-container">
         <ReactCSSTransitionGroup
+          className="modal-csstg"
           transitionName="modal"
           transitionAppear={true}
           transitionEnterTimeout={500}

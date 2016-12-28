@@ -22,7 +22,7 @@ class Signout extends Component {
   }
 
   render () {
-    setTimeout(() => { this.context.router.push('/') }, 3000)
+    setTimeout(() => { this.context.router.push('/') }, 1000)
     return (
       <div className="auth flexCenter">
         <div className="auth-box flexColCenter">

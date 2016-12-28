@@ -232,7 +232,6 @@ class DisplayOptions extends Component {
     const openedNamespaces = openedNamespace && openedNamespace.length ? openedNamespace.split('.') : []
     return (
       <div>
-        <div className="DisplayOptions-background" />
         <div className="DisplayOptions flexCol">
           <div className="DisplayOptions-header">
             <div className="DisplayOptions-settings icon-cog"/>

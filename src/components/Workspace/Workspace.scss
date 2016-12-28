@@ -2,8 +2,7 @@
 
 // App class, containing header and workspace in columns
 .App {
-  display: flex;
-  flex-direction: column;
+  @include flexCol;
   overflow: hidden;
   flex: 1;
 
@@ -13,6 +12,28 @@
   left: 0;
   right: 0;
   bottom: 0;
+}
+
+.App-dropzone {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: none;
+
+  font-size: 28px;
+  color: white;
+  text-transform: uppercase;
+  display: none;
+  font-weight: 700;
+
+  &.isDroppable {
+    @include flexRow;
+    @include flexAlignItemsCenter;
+    @include flexJustifyCenter;
+    background-color: $zorroa-dropzone;
+  }
 }
 
 // Allow the workspace to fill the full height of App

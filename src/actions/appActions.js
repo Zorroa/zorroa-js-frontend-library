@@ -2,7 +2,7 @@ import {
   SHOW_MODAL, HIDE_MODAL,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
   METADATA_FIELDS, TABLE_FIELDS, SYNC_FIELDS,
-  SET_DRAGGING, SET_TABLE_FIELD_WIDTH
+  SET_DRAGGING, SET_TABLE_FIELD_WIDTH, SHOW_IMPORT_SCRIPT_INFO
 } from '../constants/actionTypes'
 
 export function showModal (props) {
@@ -73,5 +73,12 @@ export function setTableFieldWidth (newFieldWidths) {
   return ({
     type: SET_TABLE_FIELD_WIDTH,
     payload: newFieldWidths
+  })
+}
+
+export function showImportScriptInfo (show) {
+  return ({
+    type: SHOW_IMPORT_SCRIPT_INFO,
+    payload: show
   })
 }

@@ -217,7 +217,6 @@ class CreateFolder extends Component {
     ))
     return (
       <div className="CreateFolder flexRow flexAlignItemsCenter">
-        <div className="CreateFolder-background flexRowCenter">
         <div className="CreateFolder-form">
           <div className="CreateFolder-header flexRow flexJustifySpaceBetween flexAlignItemsCenter">
             <div className="flexRow flexAlignItemsCenter">
@@ -288,7 +287,6 @@ class CreateFolder extends Component {
               { onDelete && <div onClick={this.deleteFolder} className="icon-trash2"/> }
             </div>
           )}
-        </div>
         </div>
       </div>
     )

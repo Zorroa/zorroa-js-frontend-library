@@ -117,7 +117,7 @@ class Folders extends Component {
   }
 
   addFolder = () => {
-    const width = '75%'
+    const width = '300px'
     const body = <CreateFolder title={this.addFolderTitle()} acl={[]}
                                onCreate={this.addFolderCallback()}/>
     this.props.actions.showModal({body, width})

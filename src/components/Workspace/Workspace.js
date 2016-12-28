@@ -12,8 +12,8 @@ import Folders from '../Folders'
 import Racetrack from '../Racetrack'
 import Metadata from '../Metadata'
 import Collapsible from '../Collapsible'
-
-import { iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible } from '../../actions/appActions'
+import CreateImport from '../Header/CreateImport'
+import { iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible, showModal } from '../../actions/appActions'
 import { getUserPermissions } from '../../actions/authAction'
 import User from '../../models/User'
 
@@ -34,15 +34,26 @@ class Workspace extends Component {
     user: PropTypes.instanceOf(User)
   }
 
+  state = {
+    isDroppable: false
+  }
+
   componentWillMount () {
     const { actions, user } = this.props
     actions.getUserPermissions(user)
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.modal && this.state.isDroppable) {
+      this.setState({isDroppable: false})
+    }
   }
 
   toggleLeftSidebar = () => {
     const { actions, app } = this.props
     actions.iconifyLeftSidebar(!app.leftSidebarIsIconified)
   }
+
   toggleRightSidebar = () => {
     const { actions, app } = this.props
     actions.iconifyRightSidebar(!app.rightSidebarIsIconified)
@@ -55,6 +66,37 @@ class Workspace extends Component {
     if (app.leftSidebarIsIconified) return
     assert.ok(Workspace.collapsibleNames.has(name))
     actions.toggleCollapsible(name, !app.collapsibleOpen[name])
+  }
+
+  dragEnter = (event) => {
+    const isFile = event.dataTransfer.types.findIndex(type => (type === 'Files')) >= 0
+    const { app } = this.props
+    if (isFile && app && !app.modal) {
+      console.log('Drag enter app')
+      this.setState({isDroppable: true})
+    }
+  }
+
+  dragOver = (event) => {
+    if (this.state.isDroppable) {
+      console.log('Drag over app')
+    }
+    event.preventDefault()
+  }
+
+  dragLeave = (event) => {
+    if (this.state.isDroppable) {
+      console.log('Drag leave app')
+      this.setState({isDroppable: false})
+    }
+  }
+
+  dropFile = (event) => {
+    const width = '800px'
+    const body = <CreateImport initialFiles={event.dataTransfer.files}/>
+    this.props.actions.showModal({body, width})
+    this.setState({isDroppable: false})
+    event.preventDefault()
   }
 
   render () {
@@ -96,8 +138,10 @@ class Workspace extends Component {
       closeIcon: 'icon-register'
     })
 
+    const { isDroppable } = this.state
     return (
-      <div className={classnames('App', 'flexCol', 'fullHeight', {isDragging: app.isDragging})}>
+      <div className={classnames('App', 'flexCol', 'fullHeight', {isDragging: app.isDragging})}
+           onDragEnter={this.dragEnter}>
         { app.modal && <Modal {...app.modal} /> }
         <Header/>
         <div className="Workspace flexOn flexRow fullWidth fullHeight">
@@ -136,6 +180,12 @@ class Workspace extends Component {
           </Sidebar>
 
         </div>
+        <div className={classnames('App-dropzone', {isDroppable})}
+             onDragOver={this.dragOver}
+             onDragLeave={this.dragLeave}
+             onDrop={this.dropFile}>
+          Drop Assets to Import
+        </div>
       </div>
     )
   }
@@ -145,5 +195,11 @@ export default connect(state => ({
   app: state.app,
   user: state.auth.user
 }), dispatch => ({
-  actions: bindActionCreators({ iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible, getUserPermissions }, dispatch)
+  actions: bindActionCreators({
+    iconifyLeftSidebar,
+    iconifyRightSidebar,
+    toggleCollapsible,
+    getUserPermissions,
+    showModal
+  }, dispatch)
 }))(Workspace)

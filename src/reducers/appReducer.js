@@ -1,7 +1,7 @@
 import {
   SHOW_MODAL, HIDE_MODAL,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
-  METADATA_FIELDS, TABLE_FIELDS, SYNC_FIELDS,
+  METADATA_FIELDS, TABLE_FIELDS, SYNC_FIELDS, SHOW_IMPORT_SCRIPT_INFO,
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH, UNAUTH_USER
 } from '../constants/actionTypes'
 
@@ -9,7 +9,7 @@ export const defaultTableFieldWidth = 100
 export const defaultTableFields = [ 'source.filename', 'source.date', 'source.fileSize' ]
 
 const initialState = {
-  modal: {},
+  modal: null,
   leftSidebarIsIconified: false,
   rightSidebarIsIconified: true,
   collapsibleOpen: {
@@ -25,7 +25,8 @@ const initialState = {
   metadataFields: [ ...defaultTableFields ],
   tableFields: [ ...defaultTableFields ],
   tableFieldWidth: Object.assign({},
-    ...defaultTableFields.map(field => ({ [field]: defaultTableFieldWidth })))
+    ...defaultTableFields.map(field => ({ [field]: defaultTableFieldWidth }))),
+  showImportScriptInfo: true
 }
 
 export default function app (state = initialState, action) {
@@ -55,6 +56,8 @@ export default function app (state = initialState, action) {
       return { ...state, tableFields: action.payload, tableFieldWidth }
     case SYNC_FIELDS:
       return { ...state, syncMetadataAndTable: action.payload }
+    case SHOW_IMPORT_SCRIPT_INFO:
+      return { ...state, showImportScriptInfo: action.payload }
     case SET_DRAGGING:
       return { ...state, isDragging: action.payload }
     case SET_TABLE_FIELD_WIDTH:

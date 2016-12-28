@@ -11,10 +11,14 @@
   position: fixed;
   width: 100vw;
   z-index: 100000;
+  @include flexRowCenter;
+
+  .modal-csstg {
+    @include flexRowCenter;
+  }
 
   .modal {
     margin: 0 auto;
-    top: 200px;
     background-color: $BACKGROUND_COLOR;
     border-radius: $BORDER_RADIUS;
     box-shadow: 10px 10px 32px -10px rgba(0,0,0,0.75);

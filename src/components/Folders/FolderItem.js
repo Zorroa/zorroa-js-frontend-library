@@ -153,7 +153,7 @@ class FolderItem extends Component {
 
   edit = (event) => {
     this.dismissContextMenu(event)
-    const width = '75%'
+    const width = '300px'
     const body = <CreateFolder title='Edit Collection' acl={this.props.folder.acl}
                                onCreate={this.editFolder} name={this.props.folder.name}
                                onDelete={this.deleteFolder} onLink={this.getLink}/>

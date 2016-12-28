@@ -1,11 +1,11 @@
 import {
   EXPORT_ASSETS, IMPORT_ASSETS,
   GET_JOBS, GET_PIPELINES,
-  MARK_JOB_DOWNLOADED,
+  MARK_JOB_DOWNLOADED, GET_PROCESSORS,
   RESTART_JOB, CANCEL_JOB } from '../constants/actionTypes'
 import Job from '../models/Job'
 
-export const initialState = { all: {} }
+export const initialState = { all: {}, processors: [] }
 
 export default function (state = initialState, action) {
   switch (action.type) {
@@ -70,6 +70,10 @@ export default function (state = initialState, action) {
         return { ...state, all }
       }
       break
+    }
+
+    case GET_PROCESSORS: {
+      return { ...state, processors: action.payload }
     }
   }
 

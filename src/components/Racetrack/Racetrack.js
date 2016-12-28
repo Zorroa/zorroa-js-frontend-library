@@ -27,7 +27,7 @@ class Racetrack extends Component {
   }
 
   saveRacetrack = () => {
-    const width = '75%'
+    const width = '300px'
     const body = <CreateFolder title='Create Smart Collection' acl={[]}
                                onCreate={this.saveSearch}/>
     this.props.actions.showModal({body, width})

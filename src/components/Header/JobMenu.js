@@ -47,7 +47,7 @@ class JobMenu extends Component {
       return (job.type === jobType && job.state === Job.Active)
     }) >= 0
     if (containsActiveJob) {
-      this.monitorJobsInterval = setInterval(this.refreshJobs, 150)
+      this.monitorJobsInterval = setInterval(this.refreshJobs, 1500)
     }
   }
 
@@ -75,7 +75,7 @@ class JobMenu extends Component {
   }
 
   createImport = (event) => {
-    const width = '460px'
+    const width = '800px'
     const body = <CreateImport/>
     this.props.actions.showModal({body, width})
   }
@@ -207,7 +207,7 @@ class JobMenu extends Component {
         <DropdownMenu label={`${jobType}s`} onChange={this.refreshJobs}>
           { jobType === Job.Import ? (
             <div onClick={this.createImport} className="JobMenu-jobs-create-import">
-              <div className="icon-plus2"/>
+              <div className="icon-import"/>
               <div>Import assets</div>
             </div>
           ) : null }
