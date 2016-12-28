@@ -138,7 +138,7 @@ export function addAssetIdsToFolderId (assetIds, folderId) {
       .then(response => {
         dispatch({
           type: ADD_ASSETS_TO_FOLDER,
-          payload: response.data
+          payload: {assetIds, folderId, data: response.data}
         })
       })
       .catch(error => {
@@ -162,7 +162,7 @@ export function removeAssetIdsFromFolderId (assetIds, folderId) {
       .then(response => {
         dispatch({
           type: REMOVE_ASSETS_FROM_FOLDER,
-          payload: response.data
+          payload: {assetIds, folderId, data: response.data}
         })
       })
       .catch(error => {

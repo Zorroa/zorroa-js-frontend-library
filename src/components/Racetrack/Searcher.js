@@ -18,7 +18,7 @@ class Searcher extends Component {
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
     folders: PropTypes.instanceOf(Map),
     selectedFolderIds: PropTypes.object,
-    foldersModified: PropTypes.bool,
+    modifiedFolderIds: PropTypes.instanceOf(Set),
     folderCounts: PropTypes.instanceOf(Map),
     filteredFolderCounts: PropTypes.instanceOf(Map),
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
@@ -65,7 +65,7 @@ class Searcher extends Component {
   render () {
     const {
       widgets, actions, folders, selectedFolderIds, query, pageSize,
-      foldersModified, trashedFolders, order } = this.props
+      modifiedFolderIds, trashedFolders, order } = this.props
     let assetSearch = new AssetSearch({order})
     let postFilter = new AssetFilter()
     for (let widget of widgets) {
@@ -106,12 +106,8 @@ class Searcher extends Component {
     // Do not send the query unless it is different than the last returned query
     // FIXME: If assetSearch.empty() filtered counts == total, but tricky to flush cache
     // FIXME: Count trashed folders once the server adds support
-    if (foldersModified) {
-      // FIXME: Update only modified folders, rather than all folders!
-      actions.countAssetsInFolderIds([...folders.keys()])
-    }
     const searchModified = this.inflightQuery ? !this.inflightQuery.equals(assetSearch) : (!query || !assetSearch.equals(query))
-    if (searchModified || foldersModified) {
+    if (searchModified) {
       assetSearch.size = pageSize || AssetSearch.defaultPageSize
       actions.searchAssets(assetSearch)
       this.inflightQuery = assetSearch
@@ -119,21 +115,12 @@ class Searcher extends Component {
         // New query, get all the filtered folder counts
         actions.countAssetsInFolderIds([...folders.keys()], assetSearch)
       }
-    } else if (this.countedFolderIds.size !== folders.size) {
-      // Only count assets in newly added folders
-      let addedFolders = []
-      for (const id of folders.keys()) {
-        if (id && !this.countedFolderIds.has(id)) {
-          addedFolders.push(id)
-          this.countedFolderIds.add(id)
-        }
-      }
-      if (addedFolders.length) {
-        if (!foldersModified) {   // Skip if we're getting all folders above
-          actions.countAssetsInFolderIds(addedFolders)
-        }
-        actions.countAssetsInFolderIds(addedFolders, assetSearch)
-      }
+    }
+
+    if (modifiedFolderIds && modifiedFolderIds.size) {
+      const modifiedIds = [...modifiedFolderIds]
+      actions.countAssetsInFolderIds(modifiedIds)
+      actions.countAssetsInFolderIds(modifiedIds, assetSearch)
     }
 
     return null   // Just reacting to new slivers
@@ -156,7 +143,7 @@ const mapStateToProps = state => ({
   folderCounts: state.folders.counts,
   filteredFolderCounts: state.folders.filteredCounts,
   selectedFolderIds: state.folders.selectedFolderIds,
-  foldersModified: state.folders.modified,
+  modifiedFolderIds: state.folders.modifiedIds,
   trashedFolders: state.folders.trashedFolders
 })
 
