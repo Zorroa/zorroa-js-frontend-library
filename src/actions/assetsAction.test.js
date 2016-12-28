@@ -10,6 +10,7 @@ import Page from '../models/Page'
 
 const middlewares = [ thunk ]
 const mockStore = configureMockStore(middlewares)
+jest.mock('../components/Racetrack/Map')
 
 const baseURL = 'https://localhost:8066'
 const archivist = axios.create({

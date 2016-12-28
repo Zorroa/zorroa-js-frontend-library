@@ -3,7 +3,7 @@ import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { Link } from 'react-router'
 
-jest.mock('../Racetrack/WidgetInfo')
+jest.mock('../Racetrack/Map')
 
 import Header from './Header'
 import User from '../../models/User'

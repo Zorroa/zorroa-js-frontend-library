@@ -4,6 +4,8 @@ import { mount } from 'enzyme'
 import { Link } from 'react-router'
 import Signup from './Signup'
 
+jest.mock('../../Racetrack/Map')
+
 const storeFake = (state) => {
   return {
     default: () => {},
