@@ -7,6 +7,8 @@ import { USER_ITEM, HOST_ITEM, PROTOCOL_ITEM } from '../constants/localStorageIt
 
 import User from '../models/User'
 import Permission from '../models/Permission'
+import AssetSearch from '../models/AssetSearch'
+import { restoreSearch } from './racetrackAction'
 
 // Global variable to hold axios connection
 // FIXME: Should this be state?
@@ -42,9 +44,6 @@ export function getArchivist () {
 
 export function validateUser (user, protocol, host) {
   return dispatch => {
-    // Set the user state for the login form, but authenticated=false if user.id < 0
-    dispatch({type: AUTH_USER, payload: user})
-
     // Create a new archivist, if needed for a new host
     createArchivist(dispatch, protocol, host)
     if (user.id > 0) {
@@ -80,15 +79,24 @@ export function signinUser ({ username, password, protocol, host }) {
   }
 }
 
-function authorize(dispatch, json) {
+function authorize (dispatch, json) {
+  const metadata = json.settings && json.settings.metadata
+  if (metadata) {
+    // FIXME: Should move to settings.search in server?
+    if (metadata.search) {
+      const query = new AssetSearch(metadata.search)
+      dispatch(restoreSearch(query))
+    }
+    if (metadata.metadataFields) {
+      dispatch({type: METADATA_FIELDS, payload: metadata.metadataFields})
+    }
+    if (metadata.tableFields) {
+      dispatch({type: TABLE_FIELDS, payload: metadata.tableFields})
+    }
+  }
   const user = new User(json)
   dispatch({ type: AUTH_USER, payload: user })
   localStorage.setItem(USER_ITEM, JSON.stringify(user))
-  const metadata = json.settings && json.settings.metadata
-  if (metadata) {
-    dispatch({ type: METADATA_FIELDS, payload: metadata.metadataFields })
-    dispatch({ type: TABLE_FIELDS, payload: metadata.tableFields })
-  }
   browserHistory.push('/')
 }
 
@@ -135,12 +143,11 @@ export function getUserPermissions (user) {
   }
 }
 
-export function saveUserSettings (user, metadataFields, tableFields) {
+export function saveUserSettings (user, metadataFields, tableFields, search) {
   return dispatch => {
-    console.log('Get user settings')
-    const search = {}
-    const metadata = { metadataFields, tableFields }
-    const settings = { metadata, search }
+    // FIXME: Move search to settings.search in server?
+    const metadata = { metadataFields, tableFields, search }
+    const settings = { metadata }
     archivist.put('/api/v1/users/' + user.id + '/_settings', settings)
       .then(response => {
         console.log('Save user settings')

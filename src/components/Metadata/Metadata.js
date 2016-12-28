@@ -4,9 +4,10 @@ import { connect } from 'react-redux'
 
 import User from '../../models/User'
 import Asset from '../../models/Asset'
-import { displayPropertiesForFields } from '../../models/DisplayProperties'
+import AssetSearch from '../../models/AssetSearch'
 import DisplayPropertiesItem from './DisplayPropertiesItem'
 import DisplayOptions from '../DisplayOptions'
+import { displayPropertiesForFields } from '../../models/DisplayProperties'
 import { updateMetadataFields, updateTableFields, showModal } from '../../actions/appActions'
 import { saveUserSettings } from '../../actions/authAction'
 
@@ -21,6 +22,7 @@ class Metadata extends Component {
     fields: PropTypes.arrayOf(PropTypes.string).isRequired,
     tableFields: PropTypes.arrayOf(PropTypes.string).isRequired,
     user: PropTypes.instanceOf(User),
+    query: PropTypes.instanceOf(AssetSearch),
     actions: PropTypes.object
   }
 
@@ -44,14 +46,15 @@ class Metadata extends Component {
   }
 
   updateDisplayOptions = (event, state) => {
-    const { tableFields, user, actions } = this.props
+    const { tableFields, query, user, actions } = this.props
+    const { syncedViews, checkedNamespaces } = state
     console.log('Update metadata display options to:\n' + JSON.stringify(state.checkedNamespaces))
-    actions.updateMetadataFields(state.checkedNamespaces)
+    actions.updateMetadataFields(checkedNamespaces)
     if (state.syncedViews) {
-      actions.updateTableFields(state.checkedNamespaces)
+      actions.updateTableFields(checkedNamespaces)
     }
-    actions.saveUserSettings(user, state.checkedNamespaces,
-      state.syncedValues ? state.checkedNamespaces : tableFields)
+    actions.saveUserSettings(user, checkedNamespaces,
+      syncedViews ? checkedNamespaces : tableFields, query)
   }
 
   render () {
@@ -96,7 +99,8 @@ export default connect(state => ({
   selectedIds: state.assets.selectedIds,
   fields: state.app.metadataFields,
   tableFields: state.app.tableFields,
-  user: state.auth.user
+  user: state.auth.user,
+  query: state.assets.query
 }), dispatch => ({
   actions: bindActionCreators({
     updateMetadataFields,
