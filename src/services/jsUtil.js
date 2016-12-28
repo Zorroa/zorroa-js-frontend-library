@@ -36,19 +36,12 @@ export function humanFileSize (size) {
   return (size / Math.pow(1024, i)).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i]
 }
 
-// Returns an ARRAY of unique ids for dragging or context click
-// that either contains the currently selected ids or the isolated
-// id depending on whether the isolated id is in the selected set.
+// Returns a set ids that either contains the currently selected ids
+// or the isolated id depending on whether the isolated id is in the
+// selected set.
 export function isolateSelectId (id, selectedIds) {
-  let isolatedIds = []
-  if (selectedIds && selectedIds.size) {
-    if (selectedIds.has(id)) {
-      isolatedIds = [...selectedIds]  // In set, return all selected
-    } else {
-      isolatedIds = [id]              // Drag-unselected, return isolated
-    }
-  } else {
-    isolatedIds = [id]                // Nothing selected, return isolated
+  if (selectedIds && selectedIds.size && selectedIds.has(id)) {
+    return selectedIds
   }
-  return isolatedIds
+  return new Set([id])
 }

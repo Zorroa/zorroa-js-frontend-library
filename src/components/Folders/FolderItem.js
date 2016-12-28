@@ -33,11 +33,11 @@ const target = {
     if (!dragInfo) return
     switch (dragInfo.type) {
       case 'ASSET':
-        console.log('Drop ' + dragInfo.assetIds + ' on ' + props.folder.id)
+        console.log('Drop ' + JSON.stringify([...dragInfo.assetIds]) + ' on ' + props.folder.id)
         props.actions.addAssetIdsToFolderId(dragInfo.assetIds, props.folder.id)
         break
       case 'FOLDER':
-        console.log('Drop ' + JSON.stringify(dragInfo.folderIds) + ' on ' + props.folder.id)
+        console.log('Drop ' + JSON.stringify([...dragInfo.folderIds]) + ' on ' + props.folder.id)
         dragInfo.folderIds.forEach(folderId => {
           if (folder.canDropFolderIds([folderId], folders, user)) {
             const folder = new Folder(props.folders.get(folderId))

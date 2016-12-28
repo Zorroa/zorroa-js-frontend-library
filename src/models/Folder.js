@@ -65,6 +65,7 @@ export default class Folder {
   }
 
   canDropFolderIds (draggedFolderIds, folders, user) {
+    if (draggedFolderIds instanceof Set) draggedFolderIds = [...draggedFolderIds]
     if (!draggedFolderIds || !draggedFolderIds.length || !folders || !user) return false
 
     // Find at least one droppable folder
@@ -82,6 +83,7 @@ export default class Folder {
   }
 
   canDropAssetIds (draggedAssetIds, assets, user) {
+    if (draggedAssetIds instanceof Set) draggedAssetIds = [...draggedAssetIds]
     if (!draggedAssetIds || !draggedAssetIds.length || !assets || !user) return false
     if (!this.hasAccess(user, AclEntry.WriteAccess)) return false
 
