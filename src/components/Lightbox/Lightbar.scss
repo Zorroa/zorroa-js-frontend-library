@@ -2,62 +2,172 @@
 
 .Lightbar {
   @include flexOff;
+  @include flexRow;
+  @include flexJustifySpaceBetween;
 
+  position: relative;
   color: white;
   background-color: black;
   justify-content: space-between;
-  display: flex;
   width: 100%;
-  height: 60px;
+  min-height: 60px;
+}
 
-  .Lightbar-attr {
-    display: flex;
-    margin-left: 22px;
+.Lightbar-settings {
+  @include zorroa-square-btn-lighten(60px);
+  font-size: 20px;
+  color: white;
+  background-color: black;
+  border: none;
+}
 
-    .Lightbar-attr-label {
-      margin-right: 10px;
-      font-size: 12px;
-      font-weight: 100;
-      text-align: right;
-      color: $zorroa-nearwhite;
-    }
+.Lightbar-metadata {
+  @include flexOn;
+  padding-top: 15px;
+  @include flexCol;
+  @include flexWrap;
+  align-content: flex-start;
+  max-height: 100%;
+  overflow-y: auto;
+  position: relative;
 
-    .Lightbar-attr-value {
-      font-size: 14px;
-      color: white;
-    }
+  &::-webkit-scrollbar {
+    height: 5px;
   }
+}
 
-  .Lightbar-settings {
-    @include zorroa-square-icon(60px);
-    font-size: 20px;
-  }
+.Lightbar-attr {
+  @include flexRow;
+  @include flexAlignItemsCenter;
 
-  .Lightbar-btn-icon {
-    font-size: 20px;
-    margin-left: 10px;
-  }
-
-  .Lightbar-action {
-    margin: 10px;
-    &:hover  { color: $zorroa-sickly-green; }
-    &:active { color: chartreuse; }
-  }
-  .Lightbar-action-text {
-    text-transform: uppercase;
-    @media screen and (max-width: 1000px) { display: none; }
-  }
-
-  .Lightbar-close {
-    @include zorroa-square-btn-lighten(60px);
-    font-size: 20px;
-  }
-
-  button {
+  .TableField-tag {
     color: white;
-    padding: 0;
-    border: none;
-    background: none;
-    outline: none;
+    background-color: $zorroa-darkgray;
+    margin: 2px;
+    font-size: 12px;
   }
+
+  .TableField-array {
+    @include nowrap;
+    @include flexRow;
+    @include flexWrap;
+    @include flexAlignItemsCenter;
+    @include flexJustifyStart;
+    &.isOpen {
+    }
+    &:not(.isOpen) {
+    }
+  }
+
+}
+
+.Lightbar-attr-field {
+  font-size: 12px;
+  font-weight: 100;
+  color: $zorroa-lightgray;
+  text-align: right;
+}
+
+.Lightbar-attr-separator {
+  height: 32px;
+  border-right: 1px solid $zorroa-darkgray;
+  margin-left: 4px;
+  cursor: ew-resize;
+}
+
+.Lightbar-attr-bar {
+  @include flexOn;
+  margin-left: 8px;
+  margin-right: 20px;
+  height: 1px;
+  border-bottom: 1px solid $zorroa-darkgray;
+}
+
+.Lightbar-attr-title {
+  font-size: 11px;
+}
+
+.Lightbar-btn-icon {
+  font-size: 20px;
+  margin-left: 10px;
+}
+
+.Lightbar-actions {
+  @include flexRow;
+  @include flexWrap;
+  @include flexJustifyEnd;
+  @include flexAlignItemsStart;
+  margin-top: 10px;
+  position: relative;
+}
+
+.Lightbar-action {
+  @include flexRowCenter;
+  @include noSelect;
+  color: $zorroa-nearwhite;
+  margin: 10px;
+  border: none;
+  background: none;
+  outline: none;
+  &:hover  { color: $zorroa-sickly-green; }
+  &:active { color: chartreuse; }
+}
+
+.Lightbar-action-text {
+  text-transform: uppercase;
+  @media screen and (max-width: 1000px) { display: none; }
+}
+
+.Lightbar-close {
+  @include zorroa-square-btn-lighten(60px);
+  font-size: 20px;
+  border: none;
+  outline: none;
+  color: white;
+  background-color: black;
+}
+
+.Lightbar-resizer {
+  position: absolute;
+  cursor: row-resize;
+  height: 5px;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+}
+
+// Column resizers inside their own div so they
+// do not affect the scrolling size of the parent
+.Lightbar-column-resizers {
+  position: absolute;
+  overflow: hidden;
+  left: 0;
+  bottom: 2px;
+  right: 0;
+  top: 2px;
+}
+
+.Lightbar-column-resizer {
+  cursor: col-resize;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  border-radius: 2px;
+
+  &:hover { background-color: $zorroa-darkgray; }
+  &.isDragging { background-color: $zorroa-darkgray; }
+}
+
+.Lightbar-action-resizer {
+  cursor: col-resize;
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 0;
+  width: 5px;
+  border-radius: 2px;
+
+  &:hover { background-color: $zorroa-darkgray; }
+  &.isDragging { background-color: $zorroa-darkgray; }
 }

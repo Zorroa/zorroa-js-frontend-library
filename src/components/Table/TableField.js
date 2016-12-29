@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import classnames from 'classnames'
 import Asset from '../../models/Asset'
+import { humanFileSize } from '../../services/jsUtil'
 
 export default class TableField extends Component {
   static propTypes = {
@@ -28,8 +29,8 @@ export default class TableField extends Component {
     const { isOpen, onOpen } = this.props
     return (
       <div className={classnames('TableField-array', {isOpen})}>
-        <div className='TableField-toggle'
-             onClick={onOpen}>{ isOpen ? '\u22ee' : '\u22ef' }</div>
+        { onOpen ? <div className='TableField-toggle'
+             onClick={onOpen}>{ isOpen ? '\u22ee' : '\u22ef' }</div> : null }
         { vals.map((val, i) => (
           <div className='TableField-tag' key={i}>{val}</div>
         ))}
@@ -38,13 +39,24 @@ export default class TableField extends Component {
   }
 
   renderGeneral = (val) => {
-    return (Asset._valueToString(val))
+    const { field } = this.props
+    if (field.toLowerCase().endsWith('size') && typeof val === 'number') {
+      return humanFileSize(val)
+    } else if (field.toLowerCase().includes('date') && typeof val === 'string') {
+      const date = Date.parse(val)
+      if (!isNaN(date)) {
+        return (new Date(date)).toUTCString()
+      }
+    }
+    const str = Asset._valueToString(val)
+    return str
   }
 
   render = () => {
     const { asset, field, width } = this.props
     const val = asset.rawValue(field)
     let renderValFn = this.renderGeneral
+    let padding = 8
 
     if (Array.isArray(val) && val.length) {
       // If this is an array of colors, render colors
@@ -54,10 +66,11 @@ export default class TableField extends Component {
       } else {
         // otherwise, render an array of strings
         renderValFn = this.renderStringArray
+        padding = 4
       }
     }
 
-    let style = {}
+    let style = { padding }
     // Use width for visible table cells
     // Without width is for the .Table-cell-test, auto width for measuring cells
     if (width) {

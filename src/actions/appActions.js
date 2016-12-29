@@ -1,7 +1,7 @@
 import {
   SHOW_MODAL, HIDE_MODAL,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
-  METADATA_FIELDS, TABLE_FIELDS, SYNC_FIELDS,
+  METADATA_FIELDS, TABLE_FIELDS, LIGHTBAR_FIELDS, SYNC_FIELDS,
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH, SHOW_IMPORT_SCRIPT_INFO
 } from '../constants/actionTypes'
 
@@ -50,6 +50,13 @@ export function updateMetadataFields (fields) {
 export function updateTableFields (fields) {
   return ({
     type: TABLE_FIELDS,
+    payload: fields
+  })
+}
+
+export function updateLightbarFields (fields) {
+  return ({
+    type: LIGHTBAR_FIELDS,
     payload: fields
   })
 }
