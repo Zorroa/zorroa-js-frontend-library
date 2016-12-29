@@ -140,7 +140,7 @@ class Lightbar extends Component {
               [1, 2, 3, 4, 5, 6, 7].map(k => (
               <div key={k} className={classnames('Lightbar-column-resizer', {isDragging: isDraggingColumn})}
                    style={{left: k * columnWidth - 2.5}}
-                   onMouseDown={event => this.resizer.capture(event, this.resizeColumn, this.release, columnWidth, 0, 1.0 / k, 1)} />
+                   onMouseDown={event => this.resizer.capture(this.resizeColumn, this.release, columnWidth, 0, 1.0 / k)} />
             ))}
           </div>
         </div>
@@ -149,11 +149,11 @@ class Lightbar extends Component {
             <span className='Lightbar-action-text'>Download</span>
             <i className='Lightbar-btn-icon icon-download2'/>
           </div>
-          <div onMouseDown={event => this.resizer.capture(event, this.resizeAction, this.release, actionWidth, 0, -1 /* left */, 1)}
+          <div onMouseDown={event => this.resizer.capture(this.resizeAction, this.release, actionWidth, 0, -1 /* left */)}
                className={classnames('Lightbar-action-resizer', {isDragging: isDraggingAction})} />
         </div>
         <button className="Lightbar-close icon-cross2" onClick={this.closeLightbox.bind(this)} />
-        <div onMouseDown={event => this.resizer.capture(event, this.resizeLightbar, this.release, 0, lightbarHeight)}
+        <div onMouseDown={event => this.resizer.capture(this.resizeLightbar, this.release, 0, lightbarHeight)}
              className="Lightbar-resizer" />
       </div>
     )

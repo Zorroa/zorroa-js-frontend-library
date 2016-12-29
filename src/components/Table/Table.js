@@ -93,7 +93,7 @@ class Table extends Component {
 
   columnResizeStart = (event, field) => {
     this.columnResizeFieldName = field
-    this.resizer.capture(event, this.columnResizeUpdate, this.columnResizeStop,
+    this.resizer.capture(this.columnResizeUpdate, this.columnResizeStop,
       this.props.fieldWidth[field], 0)
   }
 

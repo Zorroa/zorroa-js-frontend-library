@@ -159,8 +159,7 @@ class Assets extends Component {
   }
 
   tableResizeStart = (event) => {
-    // capture = (onMove, onRelease, event, scaleX, scaleY)
-    this.resizer.capture(event, this.tableResizeUpdate, this.tableResizeStop, 0, this.state.tableHeight, 0, -1)
+    this.resizer.capture(this.tableResizeUpdate, this.tableResizeStop, 0, this.state.tableHeight, 0, -1)
     const tableHeight = this.clampTableHeight(this.state.tableHeight)
     this.newTableHeight = tableHeight
     this.tableStartHeight = this.newTableHeight
