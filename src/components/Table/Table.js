@@ -5,6 +5,8 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 import Asset from '../../models/Asset'
+import AssetSearch from '../../models/AssetSearch'
+import User from '../../models/User'
 import { unCamelCase } from '../../services/jsUtil'
 import {
   updateMetadataFields,
@@ -13,6 +15,7 @@ import {
   setTableFieldWidth
 } from '../../actions/appActions'
 import { sortAssets } from '../../actions/assetsAction'
+import { saveUserSettings } from '../../actions/authAction'
 import TableField from './TableField'
 import DisplayOptions from '../DisplayOptions'
 import Resizer from '../../services/Resizer'
@@ -29,6 +32,9 @@ class Table extends Component {
     fields: PropTypes.arrayOf(PropTypes.string).isRequired,
     fieldWidth: PropTypes.objectOf(PropTypes.number).isRequired,
     order: PropTypes.arrayOf(PropTypes.object),
+    user: PropTypes.instanceOf(User),
+    metadataFields: PropTypes.arrayOf(PropTypes.string).isRequired,
+    query: PropTypes.instanceOf(AssetSearch),
 
     // input props
     assetsKey: PropTypes.string.isRequired,
@@ -72,11 +78,15 @@ class Table extends Component {
   }
 
   updateDisplayOptions = (event, state) => {
+    const { metadataFields, query, user, actions } = this.props
+    const { syncedViews, checkedNamespaces } = state
     // console.log('Update table display options to:\n' + JSON.stringify(state.checkedNamespaces))
-    this.props.actions.updateTableFields(state.checkedNamespaces)
-    if (state.syncedViews) {
-      this.props.actions.updateMetadataFields(state.checkedNamespaces)
+    actions.updateTableFields(checkedNamespaces)
+    if (syncedViews) {
+      actions.updateMetadataFields(checkedNamespaces)
     }
+    actions.saveUserSettings(user, checkedNamespaces,
+      syncedViews ? checkedNamespaces : metadataFields, query)
   }
 
   tableScroll = (event) => {
@@ -368,14 +378,19 @@ export default connect(state => ({
   assets: state.assets.all,
   selectedAssetIds: state.assets.selectedIds,
   selectionCounter: state.assets.selectionCounter,
+  query: state.assets.query,
   order: state.assets.order,
   fields: state.app.tableFields,
-  fieldWidth: state.app.tableFieldWidth
+  fieldWidth: state.app.tableFieldWidth,
+  user: state.auth.user,
+  metadataFields: state.app.metadataFields
 }), dispatch => ({
   actions: bindActionCreators({
     sortAssets,
     updateMetadataFields,
     updateTableFields,
     showModal,
-    setTableFieldWidth }, dispatch)
+    setTableFieldWidth,
+    saveUserSettings
+  }, dispatch)
 }))(Table)

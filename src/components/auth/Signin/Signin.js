@@ -86,7 +86,6 @@ const form = reduxForm({
 
 export default connect(
   state => ({
-    initialValues: { host: state.auth.host, username: state.auth.user ? state.auth.user.username : null, ssl: true },
     errorMessage: state.auth.error
   }), actions
 )(form(Signin))

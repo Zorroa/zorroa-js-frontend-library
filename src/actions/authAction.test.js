@@ -5,6 +5,7 @@ import * as actions from './authAction'
 
 const middlewares = [ thunk ]
 const mockStore = configureMockStore(middlewares)
+jest.mock('../components/Racetrack/Map')
 
 describe('authActions', () => {
   const username = 'foo'

@@ -2,12 +2,14 @@ import { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
+import User from '../../models/User'
 import Widget from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import TrashedFolder from '../../models/TrashedFolder'
 import { searchAssets } from '../../actions/assetsAction'
 import { clearFoldersModified, countAssetsInFolderIds } from '../../actions/folderAction'
+import { saveUserSettings } from '../../actions/authAction'
 
 // Searcher is a singleton. It combines AssetSearches from the Racetrack
 // and Folders and submits a new query to the Archivist server.
@@ -23,6 +25,9 @@ class Searcher extends Component {
     filteredFolderCounts: PropTypes.instanceOf(Map),
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
     order: PropTypes.arrayOf(PropTypes.object),
+    user: PropTypes.instanceOf(User),
+    metadataFields: PropTypes.arrayOf(PropTypes.string).isRequired,
+    tableFields: PropTypes.arrayOf(PropTypes.string).isRequired,
     actions: PropTypes.object.isRequired
   }
 
@@ -65,24 +70,26 @@ class Searcher extends Component {
   render () {
     const {
       widgets, actions, folders, selectedFolderIds, query, pageSize,
-      modifiedFolderIds, trashedFolders, order } = this.props
+      modifiedFolderIds, trashedFolders, order,
+      user, metadataFields, tableFields } = this.props
     let assetSearch = new AssetSearch({order})
-    let postFilter = new AssetFilter()
-    for (let widget of widgets) {
-      if (!widget || !widget.sliver) {
-        continue
+    if (widgets && widgets.length) {
+      let postFilter = new AssetFilter()
+      for (let widget of widgets) {
+        if (!widget || !widget.sliver) {
+          continue
+        }
+        let sliver = widget.sliver
+        if (sliver.aggs) {
+          const allOthers = this.allOtherFilters(widget)
+          let aggs = {[widget.id]: {filter: allOthers, aggs: sliver.aggs}}
+          sliver = new AssetSearch({aggs})
+        }
+        postFilter.merge(widget.sliver.filter)
+        assetSearch.merge(sliver)
       }
-      let sliver = widget.sliver
-      if (sliver.aggs) {
-        const allOthers = this.allOtherFilters(widget)
-        let aggs = { [widget.id]: { filter: allOthers, aggs: sliver.aggs } }
-        sliver = new AssetSearch({ aggs })
-      }
-      postFilter.merge(widget.sliver.filter)
-      assetSearch.merge(sliver)
+      assetSearch.postFilter = postFilter
     }
-
-    assetSearch.postFilter = postFilter
 
     // Add a filter for selected folders
     if (selectedFolderIds && selectedFolderIds.size) {
@@ -111,6 +118,9 @@ class Searcher extends Component {
       assetSearch.size = pageSize || AssetSearch.defaultPageSize
       actions.searchAssets(assetSearch)
       this.inflightQuery = assetSearch
+      if (query) {
+        actions.saveUserSettings(user, metadataFields, tableFields, assetSearch)
+      }
       if (folders && folders.size > 1) {
         // New query, get all the filtered folder counts
         actions.countAssetsInFolderIds([...folders.keys()], assetSearch)
@@ -131,7 +141,9 @@ const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators({
     searchAssets,
     clearFoldersModified,
-    countAssetsInFolderIds }, dispatch)
+    countAssetsInFolderIds,
+    saveUserSettings
+  }, dispatch)
 })
 
 const mapStateToProps = state => ({
@@ -144,7 +156,10 @@ const mapStateToProps = state => ({
   filteredFolderCounts: state.folders.filteredCounts,
   selectedFolderIds: state.folders.selectedFolderIds,
   modifiedFolderIds: state.folders.modifiedIds,
-  trashedFolders: state.folders.trashedFolders
+  trashedFolders: state.folders.trashedFolders,
+  user: state.auth.user,
+  tableFields: state.app.tableFields,
+  metadataFields: state.app.metadataFields
 })
 
 export default connect(

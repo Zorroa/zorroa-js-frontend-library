@@ -2,7 +2,7 @@ import React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 
-jest.mock('../Racetrack/WidgetInfo')
+jest.mock('../Racetrack/Map')
 
 import App from './App'
 import Header from '../Header'

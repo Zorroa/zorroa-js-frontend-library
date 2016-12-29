@@ -9,6 +9,7 @@ import { createStore, applyMiddleware } from 'redux'
 import multi from 'redux-multi'
 import thunk from 'redux-thunk'
 import ReduxPromise from 'redux-promise'
+import { initialize } from 'redux-form'
 
 import routes from './routes'
 import reducers from './reducers'
@@ -49,6 +50,8 @@ const user = userItem ? new User(userItem) : null
 const host = localStorage.getItem(HOST_ITEM)
 const protocol = localStorage.getItem(PROTOCOL_ITEM)
 if (user && host) {
+  // Initialize form to avoid faking user & host in state.auth triggering Searcher
+  store.dispatch(initialize('signin', {host, username: user.username, ssl: true}))
   store.dispatch(validateUser(user, protocol, host))
 }
 

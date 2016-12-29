@@ -1,10 +1,14 @@
 import axios from 'axios'
 import { browserHistory } from 'react-router'
-import { AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR, AUTH_PERMISSIONS } from '../constants/actionTypes'
+import {
+  AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR,
+  AUTH_PERMISSIONS, METADATA_FIELDS, TABLE_FIELDS } from '../constants/actionTypes'
 import { USER_ITEM, HOST_ITEM, PROTOCOL_ITEM } from '../constants/localStorageItems'
 
 import User from '../models/User'
 import Permission from '../models/Permission'
+import AssetSearch from '../models/AssetSearch'
+import { restoreSearch } from './racetrackAction'
 
 // Global variable to hold axios connection
 // FIXME: Should this be state?
@@ -40,18 +44,12 @@ export function getArchivist () {
 
 export function validateUser (user, protocol, host) {
   return dispatch => {
-    // Set the user state for the login form, but authenticated=false if user.id < 0
-    dispatch({type: AUTH_USER, payload: user})
-
     // Create a new archivist, if needed for a new host
     createArchivist(dispatch, protocol, host)
     if (user.id > 0) {
       archivist.get('/api/v1/users/' + user.id)
         .then(response => {
-          const user = new User(response.data)
-          dispatch({type: AUTH_USER, payload: user})
-          localStorage.setItem(USER_ITEM, JSON.stringify(user))
-          browserHistory.push('/')
+          authorize(dispatch, response.data)
         })
         .catch(error => {
           if (error && error.response && error.response.status === 401) {
@@ -75,13 +73,31 @@ export function signinUser ({ username, password, protocol, host }) {
       auth: { username, password }
     })
       .then(response => {
-        const user = new User(response.data)
-        dispatch({ type: AUTH_USER, payload: user })
-        localStorage.setItem(USER_ITEM, JSON.stringify(user))
-        browserHistory.push('/')
+        authorize(dispatch, response.data)
       })
       .catch(error => dispatch(authError('Bad Login Info: ' + error)))
   }
+}
+
+function authorize (dispatch, json) {
+  const metadata = json.settings && json.settings.metadata
+  if (metadata) {
+    // FIXME: Should move to settings.search in server?
+    if (metadata.search) {
+      const query = new AssetSearch(metadata.search)
+      dispatch(restoreSearch(query))
+    }
+    if (metadata.metadataFields) {
+      dispatch({type: METADATA_FIELDS, payload: metadata.metadataFields})
+    }
+    if (metadata.tableFields) {
+      dispatch({type: TABLE_FIELDS, payload: metadata.tableFields})
+    }
+  }
+  const user = new User(json)
+  dispatch({ type: AUTH_USER, payload: user })
+  localStorage.setItem(USER_ITEM, JSON.stringify(user))
+  browserHistory.push('/')
 }
 
 export function signupUser ({ username, password }) {
@@ -123,6 +139,21 @@ export function getUserPermissions (user) {
       })
       .catch(error => {
         console.error('Cannot get user permissions ' + error)
+      })
+  }
+}
+
+export function saveUserSettings (user, metadataFields, tableFields, search) {
+  return dispatch => {
+    // FIXME: Move search to settings.search in server?
+    const metadata = { metadataFields, tableFields, search }
+    const settings = { metadata }
+    archivist.put('/api/v1/users/' + user.id + '/_settings', settings)
+      .then(response => {
+        console.log('Save user settings')
+      })
+      .catch(error => {
+        console.error('Cannot save user settings ' + error)
       })
   }
 }
