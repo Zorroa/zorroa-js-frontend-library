@@ -4,14 +4,13 @@ import { DragSource } from '../../services/DragDrop'
 import Asset from '../../models/Asset'
 import classnames from 'classnames'
 
-import { formatDuration, parseFormattedFloat } from '../../services/jsUtil'
+import { formatDuration, parseFormattedFloat, isolateSelectId } from '../../services/jsUtil'
 
 const source = {
   dragStart (props, type, se) {
-    se.dataTransfer.setData('text/plain', JSON.stringify({type, id: props.asset.id}))
-  },
-  dragEnd (props, type, se) {
-    se.preventDefault()
+    const { asset, selectedAssetIds } = props
+    const assetIds = isolateSelectId(asset.id, selectedAssetIds)
+    return {assetIds}
   }
 }
 
@@ -56,7 +55,8 @@ class Thumb extends Component {
     protocol: PropTypes.string,
     host: PropTypes.string,
     dim: PropTypes.object.isRequired,
-    isSelected: PropTypes.bool
+    isSelected: PropTypes.bool,
+    selectedAssetIds: PropTypes.instanceOf(Set)
   }
 
   renderBadges = (pages, duration, icon) => {
@@ -131,5 +131,6 @@ class Thumb extends Component {
 
 export default connect(state => ({
   protocol: state.auth.protocol,
-  host: state.auth.host
+  host: state.auth.host,
+  selectedAssetIds: state.assets.selectedIds
 }))(Thumb)

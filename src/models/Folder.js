@@ -63,6 +63,39 @@ export default class Folder {
     if (dragFolder.isSmartCollection() !== this.isSmartCollection()) return false
     return true
   }
+
+  canDropFolderIds (draggedFolderIds, folders, user) {
+    if (draggedFolderIds instanceof Set) draggedFolderIds = [...draggedFolderIds]
+    if (!draggedFolderIds || !draggedFolderIds.length || !folders || !user) return false
+
+    // Find at least one droppable folder
+    for (let i = 0; i < draggedFolderIds.length; ++i) {
+      const id = draggedFolderIds[i]
+      const dropFolder = folders.get(id)
+      if (this.id !== dropFolder.parentId &&          // Current parent?
+        this.isDroppableType(dropFolder, user) &&     // Same species?
+        this.hasAccess(user, AclEntry.WriteAccess) && // User permissions
+        !isAncestor(id, this.id, folders)) {          // Avoid recursion & self
+        return true
+      }
+    }
+    return false
+  }
+
+  canDropAssetIds (draggedAssetIds, assets, user) {
+    if (draggedAssetIds instanceof Set) draggedAssetIds = [...draggedAssetIds]
+    if (!draggedAssetIds || !draggedAssetIds.length || !assets || !user) return false
+    if (!this.hasAccess(user, AclEntry.WriteAccess)) return false
+
+    // Find at least one folder without one asset
+    const folderIds = new Set([this.id])
+    for (let i = 0; i < draggedAssetIds.length; ++i) {
+      const id = draggedAssetIds[i]
+      const dropAsset = assets.find(asset => (asset.id === id))
+      if (!dropAsset.memberOfAllFolderIds(folderIds)) return true
+    }
+    return false
+  }
 }
 
 // is the parent ancestor of child? Requires on state.folders.all
@@ -71,20 +104,4 @@ export function isAncestor (parentId, childId, folders) {
   if (parentId === Folder.ROOT_ID || childId === Folder.ROOT_ID) return false
   if (parentId === childId) return true
   return isAncestor(parentId, folders.get(childId).parentId, folders)
-}
-
-// Can any of the selectedFolderIds be dropped on this item?
-export function isDroppable ({folder, selectedFolderIds, user, folders}) {
-  if (folders && selectedFolderIds) {
-    for (let id of selectedFolderIds) {
-      const dropFolder = folders.get(id)
-      if (folder.id !== dropFolder.parentId &&          // Current parent?
-        folder.isDroppableType(dropFolder, user) &&     // Same species?
-        folder.hasAccess(user, AclEntry.WriteAccess) && // User permissions
-        !isAncestor(id, folder.id, folders)) {          // Avoid recursion & self
-        return true
-      }
-    }
-  }
-  return false
 }

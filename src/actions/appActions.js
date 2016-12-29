@@ -68,10 +68,17 @@ export function syncMetadataAndTableFields (sync) {
   })
 }
 
-export function setIsDragging (isDragging) {
+export function startDragging (type, data) {
   return ({
     type: SET_DRAGGING,
-    payload: isDragging
+    payload: {type, ...data}  // expand data e.g. dragInfo.assetIds
+  })
+}
+
+export function stopDragging () {
+  return ({
+    type: SET_DRAGGING,
+    payload: null
   })
 }
 

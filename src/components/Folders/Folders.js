@@ -31,7 +31,6 @@ class Folders extends Component {
 
   componentWillMount () {
     assert.ok(this.props.filterName in Folder.Filters) // make sure filter is valid
-
     const rootFolder = this.props.folders.all.get(Folder.ROOT_ID)
     if (!rootFolder.childIds || !rootFolder.childIds.size) {
       this.loadChildren(Folder.ROOT_ID)
@@ -106,8 +105,7 @@ class Folders extends Component {
     const { folders } = this.props
     const rootFolder = folders.all.get(Folder.ROOT_ID)
     const folderList = this.folderList(rootFolder)
-    // Return new selection set for drag ops that require the it immediately.
-    return this.props.actions.selectFolderId(folder.id, event.shiftKey, event.metaKey,
+    this.props.actions.selectFolderId(folder.id, event.shiftKey, event.metaKey,
       folderList, this.props.folders.selectedFolderIds)
   }
 
@@ -236,7 +234,7 @@ class Folders extends Component {
       const depth = this.depth(folder)
       const isOpen = folders.openFolderIds.has(folder.id)
       const isSelected = folders.selectedFolderIds.has(folder.id)
-      const hasChildren = folder.childIds && folder.childIds.size > 0
+      const hasChildren = (folder.childIds && folder.childIds.size > 0) || false
       return (
         <FolderItem {...{key, depth, folder, isOpen, isSelected, hasChildren}}
                     onToggle={this.toggleFolder.bind(this, folder)}

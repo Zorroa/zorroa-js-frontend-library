@@ -66,9 +66,9 @@ describe('appReducer', () => {
   describe('DRAGDROP', () => {
     it('set DnD dragging on', () => {
       const dragAction = { type: SET_DRAGGING, payload: true }
-      expect(appReducer({}, dragAction)).toEqual({ isDragging: true })
+      expect(appReducer({}, dragAction)).toEqual({ dragInfo: true })
       const dropAction = { type: SET_DRAGGING, payload: false }
-      expect(appReducer({}, dropAction)).toEqual({ isDragging: false })
+      expect(appReducer({}, dropAction)).toEqual({ dragInfo: false })
     })
   })
 })

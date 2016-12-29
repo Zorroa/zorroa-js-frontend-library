@@ -35,3 +35,13 @@ export function humanFileSize (size) {
   const i = Math.floor(Math.log(size) / Math.log(1024))
   return (size / Math.pow(1024, i)).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i]
 }
+
+// Returns a set ids that either contains the currently selected ids
+// or the isolated id depending on whether the isolated id is in the
+// selected set.
+export function isolateSelectId (id, selectedIds) {
+  if (selectedIds && selectedIds.size && selectedIds.has(id)) {
+    return selectedIds
+  }
+  return new Set([id])
+}

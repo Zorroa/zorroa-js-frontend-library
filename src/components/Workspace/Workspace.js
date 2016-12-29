@@ -140,8 +140,7 @@ class Workspace extends Component {
 
     const { isDroppable } = this.state
     return (
-      <div className={classnames('App', 'flexCol', 'fullHeight', {isDragging: app.isDragging})}
-           onDragEnter={this.dragEnter}>
+      <div className={classnames('App', 'flexCol', 'fullHeight', {isDragging: app.dragInfo})}>
         { app.modal && <Modal {...app.modal} /> }
         <Header/>
         <div className="Workspace flexOn flexRow fullWidth fullHeight">
