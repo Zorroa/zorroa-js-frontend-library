@@ -45,6 +45,7 @@ export default class Resizer {
   capture = (onMove, onRelease, startX, startY, optScaleX, optScaleY) => {
     this.active = true
     this.onMove = onMove
+    assert.ok(this.onMove)
     this.onRelease = onRelease
     this.startX = startX
     this.startY = startY
