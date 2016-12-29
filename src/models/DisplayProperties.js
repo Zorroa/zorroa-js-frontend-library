@@ -63,7 +63,7 @@ function _flatten (displayProperties, field, asset, list) {
       // One title per entry, skipping top-level array object title
       rawValue.forEach((child, i) => {
         const title = unCamelCase(`${displayProperties.name}[${i}]`)
-        list.push({ title , field, displayProperties })
+        list.push({ title, field, displayProperties })
         displayProperties.children.forEach(child => _flatten(child, `${field}.${i}.${child.name}`, asset, list))
       })
     } else {

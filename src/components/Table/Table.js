@@ -15,6 +15,7 @@ import {
 import { sortAssets } from '../../actions/assetsAction'
 import TableField from './TableField'
 import DisplayOptions from '../DisplayOptions'
+import Resizer from '../../services/Resizer'
 
 const rowHeightPx = 30
 const tableHeaderHeight = 26
@@ -32,7 +33,7 @@ class Table extends Component {
     // input props
     assetsKey: PropTypes.string.isRequired,
     height: PropTypes.number.isRequired,
-    tableIsDragging: PropTypes.bool.isRequired,
+    tableIsResizing: PropTypes.bool.isRequired,
     selectFn: PropTypes.func.isRequired,
 
     // connect actions
@@ -45,20 +46,17 @@ class Table extends Component {
     this.state = {
       tableScrollTop: 0,
       tableScrollHeight: 0,
-      columnDragging: false,
       assetFieldOpen: {}
     }
 
-    this.columnDragFieldName = null
-    this.columnDragStartX = 0
-    this.columnDragStartWidth = 0
-    this.columnDragLastSetWidth = 0
-    this.allowColumnDrag = true
+    this.columnResizeFieldName = null
+    this.allowColumnResize = true
     this.assetsKey = ''
     this.rowBottomPx = []
     this.assetRow = null
     this.selectionCounter = 0
     this.skipNextSelectionScroll = false
+    this.resizer = null
   }
 
   showDisplayOptions = (event) => {
@@ -90,43 +88,29 @@ class Table extends Component {
     this.setState({tableScrollTop: event.target.scrollTop, tableScrollHeight: event.target.clientHeight})
   }
 
-  columnDragStart = (event, field) => {
-    this.columnDragFieldName = field
-    this.columnDragStartX = event.pageX
-    this.columnDragStartWidth = this.props.fieldWidth[field]
-    this.columnDragLastSetWidth = this.props.fieldWidth[field]
+  componentWillMount = () => { this.resizer = new Resizer() }
+  componentWillUmount = () => { this.resizer.release() }
 
-    var dragIcon = document.createElement('img')
-    // hide the drag element using a transparent 1x1 pixel image as a proxy
-    dragIcon.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
-    dragIcon.width = 1
-    event.dataTransfer.setDragImage(dragIcon, 0, 0)
-
-    this.setState({ columnDragging: true })
+  columnResizeStart = (event, field) => {
+    this.columnResizeFieldName = field
+    this.resizer.capture(this.columnResizeUpdate, this.columnResizeStop,
+      this.props.fieldWidth[field], 0)
   }
 
-  columnDragUpdate = (event) => {
-    if (!event.pageX) return
-
+  columnResizeUpdate = (resizeX, resizeY) => {
     // let's just completely skip events that happen while we're busy
-    if (!this.allowColumnDrag) return false
-    this.allowColumnDrag = false
+    if (!this.allowColumnResize) return false
+    this.allowColumnResize = false
 
-    const dx = (event.pageX - this.columnDragStartX)
-    var fieldWidth = Math.min(2000, Math.max(50, this.columnDragStartWidth + dx))
-
-    this.columnDragLastSetWidth = fieldWidth
-    this.props.actions.setTableFieldWidth({[this.columnDragFieldName]: fieldWidth})
-
+    var fieldWidth = Math.min(2000, Math.max(50, resizeX))
+    this.props.actions.setTableFieldWidth({[this.columnResizeFieldName]: fieldWidth})
     // wait one frame to finish the event, otherwise events queue up syncronously
-    requestAnimationFrame(_ => { this.allowColumnDrag = true })
-    return false
+    requestAnimationFrame(_ => { this.allowColumnResize = true })
   }
 
-  columnDragStop = (event) => {
-    this.allowColumnDrag = true
-    this.columnDragFieldName = null
-    this.setState({ columnDragging: false })
+  columnResizeStop = (event) => {
+    this.allowColumnResize = true
+    this.columnResizeFieldName = null
   }
 
   columnAutoResize = (event, field) => {
@@ -283,7 +267,7 @@ class Table extends Component {
   }
 
   render () {
-    const { assets, fields, fieldWidth, height, tableIsDragging, assetsKey, selectedAssetIds } = this.props
+    const { assets, fields, fieldWidth, height, tableIsResizing, assetsKey, selectedAssetIds } = this.props
     if (!assets) return
 
     const { tableScrollTop, tableScrollHeight } = this.state
@@ -312,7 +296,7 @@ class Table extends Component {
     }
 
     let tableStyle = { height, minHeight: height, maxHeight: height }
-    if (tableIsDragging) tableStyle.pointerEvents = 'none'
+    if (tableIsResizing) tableStyle.pointerEvents = 'none'
 
     return (
       <div className="Table" style={tableStyle}>
@@ -327,11 +311,8 @@ class Table extends Component {
               <i onClick={this.sortByField.bind(this, field)} className={this.sortOrderClassnames(field)}/>
               <div className='flexOn'/>
               <div className='Table-header-resizer'
-                   draggable={true}
-                   onDoubleClick={event => this.columnAutoResize(event, field)}
-                   onDragStart={event => this.columnDragStart(event, field)}
-                   onDrag={this.columnDragUpdate}
-                   onDragEnd={this.columnDragStop}>
+                   onMouseDown={event => this.columnResizeStart(event, field)}
+                   onDoubleClick={event => this.columnAutoResize(event, field)}>
                 <div className='Table-header-resizer-handle'/>
               </div>
             </div>
