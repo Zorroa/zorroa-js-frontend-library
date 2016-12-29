@@ -125,8 +125,8 @@ class Lightbar extends Component {
   render () {
     const { lightbarFields, assets, isolatedId, modal } = this.props
     const { columnWidth, actionWidth, lightbarHeight } = this.state
-    const isDraggingColumn = this.resizer.onMove === this.resizeColumn
-    const isDraggingAction = this.resizer.onMove === this.resizeAction
+    const isDraggingColumn = this.resizer.active && this.resizer.onMove === this.resizeColumn
+    const isDraggingAction = this.resizer.active && this.resizer.onMove === this.resizeAction
     const asset = assets.find(asset => (asset.id === isolatedId))
     const titleFields = flatDisplayPropertiesForFields(lightbarFields, asset)
     return (

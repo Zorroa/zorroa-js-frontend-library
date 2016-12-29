@@ -11,60 +11,65 @@
 //
 // Typical usage to resize the width of a <div>:
 //   - Create a Resizer member var, not in component or Redux state:
-//       componentWillMount () { this.resizer = new Resizer() }
+//       componentWillMount = () => { this.resizer = new Resizer() }
 //
 //   - Release resizer in unmount to safely handle full redraws:
-//       componentWillUmount () { this.resizer.release() }
+//       componentWillUmount = () => { this.resizer.release() }
 //
-//   - Add onMouseDown to a draggable component:
-//       <div onMouseDown={e => this.resizer.capture(this.resize, w)} />
+//   - Add onMouseDown to a resizeable component:
+//       <div onMouseDown={() => this.resizer.capture(this.resizeUpdate, this.resizeEnd)} />
 //
 //   - Implement the resize callback, typically adjust a state variable:
-//       resize = (w) => { this.setState({ resizedWidth: w }) }
+//       resize = (w, h) => { this.setState({ resizedWidth: w }) }
 //
 //   - Use adjusted state variable in a style call to set width:
-//       render () { <div style={{width: this.state.resizeWidth}} />
+//       render = () => { <div style={{width: this.state.resizeWidth}} />
 
 export default class Resizer {
   constructor () {
-    // Not sure why the new auto-bind-member syntax didn't work here...
-    this.move = this.move.bind(this)
-    this.release = this.release.bind(this)
+    this.reset()
   }
 
-  capture = (onMove, onRelease, x, y, scaleX, scaleY) => {
+  reset = () => {
+    this.onMove = null
+    this.onRelease = null
+    this.startPageX = 0
+    this.startPageY = 0
+    this.startX = 0
+    this.startY = 0
+    this.scaleX = 1
+    this.scaleY = 1
+    this.active = false
+  }
+
+  capture = (onMove, onRelease, startX, startY, optScaleX, optScaleY) => {
+    this.active = true
     this.onMove = onMove
     this.onRelease = onRelease
-    this.startX = x
-    this.startY = y
-    this.scaleX = scaleX === undefined ? 1 : scaleX
-    this.scaleY = scaleY === undefined ? 1 : scaleY
+    this.startX = startX
+    this.startY = startY
+    this.scaleX = optScaleX === undefined ? 1 : optScaleX
+    this.scaleY = optScaleY === undefined ? 1 : optScaleY
     window.addEventListener('mousemove', this.move)
     window.addEventListener('mouseup', this.release)
   }
 
-  move (event) {
-    if (!this.onMove) return
-    if (!this.startPageX) {
+  move = (event) => {
+    if (!this.startPageX && !this.startPageY) {
       this.startPageX = event.pageX
       this.startPageY = event.pageY
     }
+    if (!this.onMove) return
     const x = this.startX + this.scaleX * (event.pageX - this.startPageX)
     const y = this.startY + this.scaleY * (event.pageY - this.startPageY)
     this.onMove(x, y)
   }
 
-  release (event) {
-    this.onMove = null
-    this.startX = null
-    this.startY = null
-    this.scaleX = 0
-    this.scaleY = 0
-    this.startPageX = null
-    this.startPageY = null
+  release = (event) => {
+    this.active = false
     window.removeEventListener('mousemove', this.move)
     window.removeEventListener('mouseup', this.release)
-    this.onRelease && this.onRelease(event)
-    this.onRelease = null
+    if (this.onRelease) this.onRelease()
+    this.reset()
   }
 }
