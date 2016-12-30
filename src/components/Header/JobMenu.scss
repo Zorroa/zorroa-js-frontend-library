@@ -35,6 +35,7 @@
 }
 
 .JobMenu-jobs {
+  margin: -7px;
 }
 
 .JobMenu-jobs-empty {
@@ -66,9 +67,8 @@
   @include flexRow;
   @include flexAlignItemsCenter;
   color: $zorroa-greyish-brown;
-  padding: 6px;
-  min-width: 200px;
   border-radius: 4px;
+  margin-bottom: 10px;
 
   .icon-import {
     margin-right: 8px;
@@ -103,9 +103,11 @@
   max-width: 430px;
   padding-top: 10px;
   padding-bottom: 10px;
+  padding-left: 8px;
+  padding-right: 8px;
 
   &:not(:last-child) {
-    border-bottom: 1px solid $zorroa-lightgray;
+    border-bottom: 1px solid $zorroa-nearwhite;
   }
 }
 
