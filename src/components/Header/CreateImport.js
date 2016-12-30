@@ -250,7 +250,7 @@ class CreateImport extends Component {
       return (
         <div className="CreateImport-activity-region">
           <div onClick={this.backToDropFiles} className="CreateImport-server-back">
-            &lt; back to drag & drop
+            ‹ back to drag & drop
           </div>
           <div className="CreateImport-server-paths">
             <div className="CreateImport-server-path-label">
@@ -299,7 +299,7 @@ class CreateImport extends Component {
           </div>
         </div>
         <div onClick={this.selectServerPath} className="CreateImport-dropzone-server-path">
-          File server path &gt;
+          File server path ›
         </div>
       </div>
     )
