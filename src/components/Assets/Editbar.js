@@ -42,7 +42,7 @@ class Editbar extends Component {
       search = new AssetSearch({ filter: new AssetFilter({ terms: {'_id': [...selectedAssetIds]} }) })
     }
     const fields = exportTable && tableFields
-    this.props.actions.exportAssets(name, search, fields)
+    this.props.actions.exportAssets(name, search, fields, exportImages)
   }
 
   removeSelected = () => {

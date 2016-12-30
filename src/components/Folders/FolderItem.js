@@ -75,6 +75,7 @@ class FolderItem extends Component {
     user: PropTypes.instanceOf(User),
     permissions: PropTypes.arrayOf(PropTypes.instanceOf(Permission)),
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+    tableFields: PropTypes.arrayOf(PropTypes.string),
     actions: PropTypes.object
   }
 
@@ -150,7 +151,8 @@ class FolderItem extends Component {
     const { selectedFolderIds } = this.props
     const filter = new AssetFilter({links: {folder: [...selectedFolderIds]}})
     const search = new AssetSearch({filter})
-    this.props.actions.exportAssets(name, search)
+    const fields = exportTable && tableFields
+    this.props.actions.exportAssets(name, search, fields, exportImages)
   }
 
   // Count direct folder descendents, which is known, unlike recursive,
@@ -321,7 +323,8 @@ export default connect(state => ({
   selectedFolderIds: state.folders.selectedFolderIds,
   user: state.auth.user,
   permissions: state.permissions.all,
-  dragInfo: state.app.dragInfo
+  dragInfo: state.app.dragInfo,
+  tableFields: state.app.tableFields
 }), dispatch => ({
   actions: bindActionCreators({
     addAssetIdsToFolderId,

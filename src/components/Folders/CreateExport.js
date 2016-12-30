@@ -77,7 +77,7 @@ class CreateExport extends Component {
             <div onClick={this.clearName} className="CreateExport-package-name-cancel icon-cancel-circle"/>
           </div>
           <div className="option-row">
-            <input disabled={true} type="checkbox" checked={this.state.exportImages} onChange={this.toggleExportImages} />
+            <input type="checkbox" checked={this.state.exportImages} onChange={this.toggleExportImages} />
             <div className="CreateExport-input-label">
               <div className="CreateExport-input-text">Export original assets.</div>
               <div className="CreateExport-subtext">Full size, original file type.</div>
