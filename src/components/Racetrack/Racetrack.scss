@@ -162,7 +162,7 @@
 }
 
 .Racetrack-empty-icon-mag {
+  @extend .Racetrack-empty;
   font-size: 30px;
-  color: $zorroa-gray;
   padding: 5px 8px;
 }
