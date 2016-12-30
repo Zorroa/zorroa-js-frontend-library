@@ -71,3 +71,25 @@
     flex: 0 0 300px;
   }
 }
+
+.Workspace-collections {
+  background-color: white;
+  margin-bottom: 3px;
+}
+
+.Workspace-collection {
+  margin-bottom: 10px;
+
+  .CollapsibleHeader {
+    background-color: white;
+    text-transform: capitalize;
+
+    &:hover {
+      background-color: $zorroa-lightgray;
+    }
+  }
+}
+
+.Workspace-collection:nth-child(even) {
+  border-top: 1px solid $zorroa-nearwhite;
+}

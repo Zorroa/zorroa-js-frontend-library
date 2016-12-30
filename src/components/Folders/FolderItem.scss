@@ -19,6 +19,7 @@ $FolderItemHeight : 25px;
     display: none;
   }
 
+  background-color: #f1f1f1;
   &:nth-child(even) {
     background-color: white;
     &.isSelected { background-color: $zorroa-selected; }
@@ -62,10 +63,16 @@ $FolderItemHeight : 25px;
   .FolderItem.isSelected.isDropTarget.dragHover & { color: white; background-color: darken($zorroa-sickly-green, 15%); }
 }
 
+.FolderItem-icon {
+  font-size: 18px;
+  color: $zorroa-greyish-brown;
+}
+
 .FolderItem-text {
   @include clampText;
   @include noSelect;
   margin-left: 10px;
+  color: $zorroa-greyish-brown;
 }
 
 .FolderItem-counts {
@@ -77,6 +84,7 @@ $FolderItemHeight : 25px;
 .FolderItem-count {
   margin-right: 4px;
   color: $zorroa-lightgray;
+  font-weight: 300;
 }
 
 .FolderItem-filtered-count {

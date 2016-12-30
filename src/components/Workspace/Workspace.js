@@ -151,14 +151,20 @@ class Workspace extends Component {
             <Collapsible {...BrowsingParams()}>
               <Folders filterName='browsing'/>
             </Collapsible>
-            <Collapsible {...CollectionParams()}>
-              <Collapsible {...SmartCollectionParams()}>
-                <Folders filterName='smart'/>
+            <div className="Workspace-collections">
+              <Collapsible {...CollectionParams()}>
+                <div className="Workspace-collection">
+                  <Collapsible {...SmartCollectionParams()}>
+                    <Folders filterName='smart'/>
+                  </Collapsible>
+                </div>
+                <div className="Workspace-collection">
+                  <Collapsible {...SimpleCollectionParams()}>
+                    <Folders filterName='simple'/>
+                  </Collapsible>
+                </div>
               </Collapsible>
-              <Collapsible {...SimpleCollectionParams()}>
-                <Folders filterName='simple'/>
-              </Collapsible>
-            </Collapsible>
+            </div>
             <Collapsible {...MetadataParams()}>
               <Metadata isIconified={app.leftSidebarIsIconified}/>
             </Collapsible>

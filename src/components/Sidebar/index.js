@@ -1,3 +1,3 @@
 import Sidebar from './Sidebar'
-import './sidebar.scss'
+import './Sidebar.scss'
 export default Sidebar

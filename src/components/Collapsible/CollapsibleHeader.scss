@@ -10,11 +10,11 @@
   @include nowrap;
   height: 40px;
   text-transform: uppercase;
-  font-weight: 100;
   overflow: hidden;
 
   color: $zorroa-gray;
-  background-color: #d8d8d8;
+  background-color: $zorroa-darkwhite;
+
   &.isSelected {
     color: white;
     background-color: $zorroa-water-blue;
@@ -22,7 +22,7 @@
 
   &:hover {
     color: white;
-    background-color: darken(#d8d8d8, 15%);
+    background-color: darken($zorroa-darkwhite, 15%);
   }
 }
 
@@ -40,6 +40,7 @@
 .CollapsibleHeader-icon {
   height: 40px;
   width: 40px;
+  font-size: 20px;
 }
 
 .CollapsibleHeader-label {

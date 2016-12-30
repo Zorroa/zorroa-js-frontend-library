@@ -1,6 +1,10 @@
 @import '../../styles/core-mixins.scss';
 
 .Folders {
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 9px;
 }
 
 .Folders-controls {
@@ -8,16 +12,36 @@
   @include flexJustifySpaceBetween;
   @include flexAlignItemsCenter;
   height: auto;
+  background-color: white;
+
+  .Folders-filter {
+    position: relative;
+    margin: 8px 12px 8px 4px;
+    @include flexOn;
+    @include flexRow;
+
+    .icon-search {
+      position: absolute;
+      right: 8px;
+      font-size: 16px;
+      margin-top: auto;
+      margin-bottom: auto;
+      top: 0;
+      bottom: 0;
+      height: 16px;
+      color: $zorroa-lightgray;
+    }
+  }
 
   input {
     @include flexOn;
-    height: 20px;
-    margin: 8px 12px 8px 4px;
+    height: 30px;
     border-radius: 3px;
     background: none;
     border: 1px solid $zorroa-lightgray;
-    padding-left: 4px;
-    padding-right: 4px;
+    padding: 8px;
+    padding-right: 24px;
+    font-size: 12px;
   }
 
 

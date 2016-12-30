@@ -9,7 +9,7 @@
   overflow: hidden;
 
   color: $zorroa-gray;
-  background-color: #d8d8d8;
+  background-color: $zorroa-darkwhite;
 
   border-radius: 3px;
   .Widget.isOpen & { border-radius: 3px 3px 0 0; }

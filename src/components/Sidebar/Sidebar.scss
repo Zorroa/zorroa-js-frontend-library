@@ -20,27 +20,6 @@
     max-width: 3 * $zorroa-Sidebar-width;
   }
 
-  .open-close-button {
-    height: 21px;
-    font-size: 9px;
-    color: $zorroa-lightgray;
-    padding-left: 10px;
-    padding-right: 10px;
-
-    @include flexRow;
-    @include flexAlignItemsCenter;
-    @include flexJustifyEnd;
-    @include flexOff;
-
-    &.isRightEdge {
-      @include flexJustifyStart;
-    }
-
-    &:hover {
-      color: $zorroa-gray;
-    }
-  }
-
   .scroller {
     max-height: 100%;
     width: 100%;
@@ -58,19 +37,51 @@
     @include flexOn;
     @include fullHeight;
   }
+}
 
-  .Sidebar-resize-thumb {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 10px;
-    height: 100%;
-    cursor: col-resize;
-    background: none;
+.Sidebar-open-close-button {
+  font-size: 12px;
+  width: 32px;
+  height: 24px;
+  color: $zorroa-lightgray;
+  padding-left: 10px;
+  padding-right: 10px;
 
-    &.isRightEdge {
-      left: 0;
-      right: auto;
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include flexJustifyCenter;
+  @include flexOff;
+  align-self: flex-end;
+
+  &.isIconified {
+    transform: rotate(180deg);
+  }
+
+  &.isRightEdge {
+    @include flexJustifyStart;
+    transform: rotate(180deg);
+    align-self: flex-start;
+    &.isIconified {
+      transform: none;
     }
+  }
+
+  &:hover {
+    color: $zorroa-gray;
+  }
+}
+
+.Sidebar-resize-thumb {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 100%;
+  cursor: col-resize;
+  background: none;
+
+  &.isRightEdge {
+    left: 0;
+    right: auto;
   }
 }

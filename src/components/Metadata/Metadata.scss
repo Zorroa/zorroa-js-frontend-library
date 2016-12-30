@@ -14,7 +14,7 @@
     color: $zorroa-darkgray;
     border-top: 1px solid $zorroa-nearwhite;
 
-    &:hover { background-color: darken(#d8d8d8, 15%); }
+    &:hover { background-color: darken($zorroa-darkwhite, 15%); }
     &.isSelected { background-color: darken($zorroa-water-blue, 15%); }
   }
 
@@ -22,21 +22,38 @@
     margin-left: 0;
   }
 
-  .header {
+  .Metadata-header {
     @include flexRow;
     @include flexJustifySpaceBetween;
     @include flexAlignItemsCenter;
-    height: 36px;
+
+    .Metadata-filter {
+      @include flexOn;
+      @include flexRow;
+      position: relative;
+      margin: 8px 0px 8px 4px;
+
+      .icon-search {
+        position: absolute;
+        right: 8px;
+        font-size: 16px;
+        margin-top: auto;
+        margin-bottom: auto;
+        top: 0;
+        bottom: 0;
+        height: 16px;
+        color: $zorroa-lightgray;
+      }
+    }
 
     input {
       @include flexOn;
-      height: 20px;
-      margin: 8px 4px 8px 4px;
+      height: 30px;
       border-radius: 3px;
       background: none;
       border: 1px solid $zorroa-lightgray;
-      padding-left: 4px;
-      padding-right: 4px;
+      padding-left: 8px;
+      padding-right: 24px;
     }
 
     .Metadata-settings {
@@ -44,6 +61,9 @@
       color: $zorroa-gray;
       &:hover {
         color: #000;
+      }
+      .icon-cog {
+        color: $zorroa-darkwhite;
       }
     }
   }

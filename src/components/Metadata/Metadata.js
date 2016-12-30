@@ -71,8 +71,12 @@ class Metadata extends Component {
     }
     return (
       <div className="Metadata">
-        <div className="header">
-          <input type="text" onChange={this.changeFilterString} value={this.state.filterString} placeholder="Filter Metadata" />
+        <div className="Metadata-header">
+          <div className="Metadata-filter">
+            <input type="text" onChange={this.changeFilterString}
+                   value={this.state.filterString} placeholder="Filter Metadata" />
+            <div className="icon-search"/>
+          </div>
           <div className="Metadata-settings" onClick={this.showDisplayOptions}>
             <i className="icon-cog"/>
           </div>

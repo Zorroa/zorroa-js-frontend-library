@@ -165,16 +165,24 @@ class Folders extends Component {
 
   addFolderIcon () {
     switch (this.props.filterName) {
-      case 'browsing': return 'icon-foldercog'
+      case 'browsing': return 'icon-folder-add'
       case 'smart': return 'icon-collections-add'
       case 'simple': return 'icon-collections-add'
+    }
+  }
+
+  filterPlaceholder () {
+    switch (this.props.filterName) {
+      case 'browsing': return 'Filter browsing folders'
+      case 'smart': return 'Filter smart collections'
+      case 'simple': return 'Filter simple collections'
     }
   }
 
   isAddFolderEnabled () {
     const { folders, query } = this.props
     switch (this.props.filterName) {
-      case 'browsing': return true
+      case 'browsing': return false
       case 'smart': return query && !query.empty()
       case 'simple': {
         // True if one folder is selected and it isn't in the trash
@@ -251,8 +259,15 @@ class Folders extends Component {
     return (
       <div className='Folders'>
         <div className="Folders-controls">
-          <input type="text" value={this.state.filterString} onChange={this.filterFolders} placeholder="Filter Collections" />
-          <div className={classnames('Folders-controls-add', {disabled: !this.isAddFolderEnabled()})} onClick={this.isAddFolderEnabled() ? this.addFolder : null}>
+          <div className="Folders-filter">
+            <input type="text" value={this.state.filterString}
+                   onChange={this.filterFolders}
+                   placeholder={this.filterPlaceholder()} />
+            <div className="icon-search"/>
+          </div>
+          <div className={classnames('Folders-controls-add',
+            {disabled: !this.isAddFolderEnabled()})}
+               onClick={this.isAddFolderEnabled() ? this.addFolder : null}>
             <span className={this.addFolderIcon()}/>
           </div>
         </div>

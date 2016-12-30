@@ -10,6 +10,7 @@
   .DisplayPropertiesItem-label {
     @include flexOff;
     @include flexRow;
+    @include flexJustifyEnd;
     width: 120px;
     min-width: 120px;
     text-align: right;
@@ -21,13 +22,13 @@
   }
 
   .DisplayPropertiesItem-value {
-    margin-left: 6px;
-    padding-left: 6px;
+    margin-right: 10px;
     text-align: left;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: $zorroa-gray;
+    color: $zorroa-greyish-brown;
+    font-size: 14px;
   }
 
   .DisplayPropertiesItem-search {
@@ -61,6 +62,12 @@
   height: 100%;
   min-height: 100%;
   max-height: 100%;
+}
+
+.DisplayPropertiesItem-header-label {
+  color: $zorroa-greyish-brown;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .DisplayPropertiesItem-indent {

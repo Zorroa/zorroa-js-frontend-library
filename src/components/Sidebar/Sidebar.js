@@ -49,11 +49,6 @@ export default class Sidebar extends Component {
     }
   }
 
-  buttonChar () {
-    // Select the right or left facing triangle unicode char using XOR
-    return this.props.isIconified === this.props.isRightEdge ? '\u25C0' : '\u25B6'
-  }
-
   toggleIfNotIconified = (event) => {
     if (!this.props.isIconified) return
     this.props.onToggle()
@@ -61,17 +56,13 @@ export default class Sidebar extends Component {
   }
 
   render () {
-    const arrow = this.buttonChar()
     const { isIconified, children, onToggle, isRightEdge } = this.props
     const { width } = this.state
     const isOpen = !isIconified
     return (
       <div style={{width}} className={classnames('Sidebar', { isOpen, isRightEdge, isIconified })}>
-        <div className={classnames('open-close-button', { isRightEdge })}
-             onClick={onToggle}
-        >
-          <label>{arrow}{arrow}</label>
-        </div>
+        <div className={classnames('Sidebar-open-close-button', 'icon-doublearrows',
+          { isRightEdge, isIconified })} onClick={onToggle} />
         <div className={classnames('scroller', { isRightEdge })} onClick={this.toggleIfNotIconified}>
           { children }
         </div>
