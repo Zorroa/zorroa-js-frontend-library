@@ -55,8 +55,10 @@
     height: 30px;
     font-size: 14px;
     margin: 4px;
+    cursor: pointer;
 
     &.disabled {
+      cursor: not-allowed;
       background-color: $zorroa-lightgray;
     }
 

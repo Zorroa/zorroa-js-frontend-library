@@ -194,6 +194,8 @@
       margin: 4px;
       counter-reset: $zorroa-greyish-brown;
       background: transparent;
+      cursor: pointer;
+
       &:hover {
         background: $zorroa-hover;
       }

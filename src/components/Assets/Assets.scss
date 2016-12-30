@@ -85,6 +85,8 @@
     outline: none;
     font-size: 20px;
     background-color: #fff;
+    cursor: pointer;
+
     &:hover { background-color: $zorroa-lightgray; }
   }
 
@@ -116,6 +118,7 @@
     outline: none;
     font-size: 20px;
     background-color: #fff;
+    cursor: pointer;
     &:hover { background-color: $zorroa-lightgray; }
   }
 
