@@ -8,6 +8,7 @@ import * as actions from '../../../actions/authAction'
 class Signout extends Component {
   static propTypes = {
     signoutUser: PropTypes.func.isRequired,
+    host: PropTypes.string,
     user: PropTypes.instanceOf(User)
   }
 
@@ -18,7 +19,8 @@ class Signout extends Component {
   }
 
   componentWillMount () {
-    this.props.signoutUser(this.props.user)
+    const { host, user } = this.props
+    this.props.signoutUser(user, host)
   }
 
   render () {
@@ -39,5 +41,6 @@ class Signout extends Component {
 }
 
 export default connect(state => ({
+  host: state.auth.host,
   user: state.auth.user
 }), actions)(Signout)

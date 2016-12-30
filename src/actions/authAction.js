@@ -1,10 +1,11 @@
 import axios from 'axios'
 import { browserHistory } from 'react-router'
+import { initialize } from 'redux-form'
+
 import {
   AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR,
   AUTH_PERMISSIONS, METADATA_FIELDS, TABLE_FIELDS } from '../constants/actionTypes'
 import { USER_ITEM, HOST_ITEM, PROTOCOL_ITEM } from '../constants/localStorageItems'
-
 import User from '../models/User'
 import Permission from '../models/Permission'
 import AssetSearch from '../models/AssetSearch'
@@ -113,11 +114,12 @@ export function signupUser ({ username, password }) {
   }
 }
 
-export function signoutUser (user) {
+export function signoutUser (user, host) {
   return dispatch => {
     archivist.post('/api/v1/logout')
       .then(response => {
         dispatch({ type: UNAUTH_USER, payload: response.data })
+        dispatch(initialize('signin', {host, username: user.username, ssl: true}))
         localStorage.setItem(USER_ITEM, JSON.stringify(new User({...user, id: -1})))
       })
       .catch(error => dispatch(authError(error)))
