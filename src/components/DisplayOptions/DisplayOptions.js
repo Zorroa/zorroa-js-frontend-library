@@ -261,7 +261,7 @@ class DisplayOptions extends Component {
                 names.map(name => (this.renderName(name, null, childCounts)))
               ) : (
                 <div className="DisplayOptions-body-empty flexCol flexAlignItemsCenter">
-                  <div className="icon-thumbs-up" />
+                  <div className="icon-emptybox" />
                   <div>No fields match the required types:</div>
                   <div className="flexRow">
                     { fieldTypes.map(type => (<div key={type} className="DisplayOptions-body-field-type">{type}</div>)) }
