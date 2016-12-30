@@ -43,7 +43,7 @@ class Lightbox extends Component {
   isolateIndexOffset (offset) {
     const { assets, isolatedId, actions } = this.props
     const index = assets.findIndex(asset => (asset.id === isolatedId))
-    if (index + offset >= 0 && index + offset < assets.length - 1) {
+    if (index + offset >= 0 && index + offset < assets.length) {
       actions.isolateAssetId(assets[index + offset].id)
     }
   }
