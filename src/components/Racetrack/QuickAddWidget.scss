@@ -3,6 +3,10 @@
 .QuickAddWidget {
   position: relative;   // For floating list
 
+  QuickAddWidget-input {
+
+  }
+
   .QuickAddWidget-list {
     position: absolute;
     top: 110%;
@@ -38,17 +42,36 @@
       }
     }
   }
-
-  input {
-    height: 40px;
-    padding: 0 8px;
-    border-radius: 3px;
-    border: 1px solid #a5a5a5;
-    font-size: 14px;
-    font-weight: 500;
-  }
 }
 
 .QuickAddWidget-item-icon {
   margin-right: 6px;
+}
+
+.QuickAddWidget-input-container {
+  position: relative;
+
+  .icon-search {
+    position: absolute;
+    left: 10px;
+    top: 0;
+    bottom: 0;
+    margin-top: auto;
+    margin-bottom: auto;
+    color: $zorroa-lightgray;
+    height: 15px;
+    font-size: 15px;
+  }
+}
+
+.QuickAddWidget-input {
+  height: 40px;
+  padding-left: 32px;
+  padding-right: 8px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  border-radius: 3px;
+  border: 1px solid #a5a5a5;
+  font-size: 12px;
+  font-weight: 300;
 }

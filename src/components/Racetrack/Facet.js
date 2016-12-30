@@ -263,8 +263,8 @@ class Facet extends Component {
             <table>
               <thead>
               <tr>
-                <td>Keyword</td>
-                <td>Count</td>
+                <th>Keyword</th>
+                <th>Count</th>
               </tr>
               </thead>
               <tbody>
@@ -332,7 +332,10 @@ class Facet extends Component {
       <Widget className="Facet"
               header={(
                 <div className="Facet-header">
-                  <span>Facet: {title}</span>
+                  <div className="Facet-header-label">
+                    <span className="Facet-header-title">Facet:</span>
+                    <span className="Facet-header-field">{title}</span>
+                  </div>
                   <div onClick={this.selectField} className="Facet-settings icon-cog"/>
                 </div>
               )}

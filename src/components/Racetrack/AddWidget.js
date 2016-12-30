@@ -3,6 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
+import Toggle from '../Toggle'
 import Widget from '../../models/Widget'
 import * as WidgetInfo from './WidgetInfo'
 import { modifyRacetrackWidget } from '../../actions/racetrackAction'
@@ -77,8 +78,8 @@ class AddWidget extends Component {
         </div>
         <div className="body">
           <div className="search-info">
-            <label htmlFor="showDescription">Show Search Information</label>
-            <input type="checkbox" name="showDescription" value={showDescriptions} onChange={this.toggleShowDescriptions}/>
+            <label htmlFor="showDescription" className="search-info-label">Show Search Information</label>
+            <Toggle checked={showDescriptions} onChange={this.toggleShowDescriptions} />
             <div className="text-val">{showDescriptions ? 'On' : 'Off'}</div>
           </div>
           <div className="widget-grid">

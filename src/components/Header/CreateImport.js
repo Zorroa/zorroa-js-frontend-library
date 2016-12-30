@@ -8,6 +8,7 @@ import { importAssets, getPipelines, getProcessors, uploadFiles } from '../../ac
 import { humanFileSize } from '../../services/jsUtil'
 import Pipeline from '../../models/Pipeline'
 import Processor from '../../models/Processor'
+import Toggle from '../Toggle'
 
 class CreateImport extends Component {
   static propTypes = {
@@ -326,11 +327,7 @@ class CreateImport extends Component {
             <div className="CreateImport-pipeline-script-info-label">
               Show Script Information
             </div>
-            <label className="CreateImport-pipeline-script-info-switch">
-              <input type="checkbox" checked={showScriptInfo} onChange={this.toggleScriptInfo}
-                     className="CreateImport-pipeline-script-info-checkbox"/>
-              <div className="CreateImport-pipeline-script-info-slider round"/>
-            </label>
+            <Toggle checked={showScriptInfo} onChange={this.toggleScriptInfo} />
             <div onClick={this.toggleScriptInfo}
                  className={classnames('CreateImport-pipeline-script-info-state', {showScriptInfo})}>
               {showScriptInfo ? 'ON' : 'OFF'}

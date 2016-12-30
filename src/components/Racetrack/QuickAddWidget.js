@@ -106,9 +106,13 @@ class QuickAddWidget extends Component {
     const widgetInfos = this.widgetInfos()
     return (
       <div className="QuickAddWidget">
+        <div className="QuickAddWidget-input-container">
         <input value={this.state.filterText} onChange={this.changeFilterText}
                onKeyDown={this.keyDown} onFocus={this.focus} onBlur={this.blur}
+               className="QuickAddWidget-input"
                placeholder="Quick Add - Widget"/>
+          <div className="icon-search"/>
+        </div>
         { widgetInfos.length ? (
           <div className="QuickAddWidget-list">
             { widgetInfos.map(widgetInfo => (

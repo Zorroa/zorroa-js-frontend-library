@@ -92,6 +92,7 @@
       @include fullWidth;
       @include flexRow;
       @include flexJustifyEnd;
+      @include flexAlignItemsCenter;
 
       text-align: right;
       margin-top: 8px;
@@ -105,6 +106,10 @@
         margin-left: 8px;
         text-transform: uppercase;
         color: $zorroa-lightgray;
+      }
+
+      .search-info-label {
+        margin-right: 6px;
       }
     }
 
@@ -141,6 +146,7 @@
           .widget-icon {
             @include zorroa-square-icon(40px);
             font-size: 24px;
+            opacity: 0.5;
           }
 
           .widget-help {

@@ -1,0 +1,70 @@
+@import '../../styles/core-mixins.scss';
+
+.Toggle {
+  position: relative;
+  display: inline-block;
+  width: 30px;
+  height: 4px;
+
+  input:checked + .Toggle-slider {
+    background-color: $zorroa-sickly-green;
+  }
+
+  input:focus + .Toggle-slider {
+    box-shadow: 0 0 1px $zorroa-sickly-green;
+  }
+
+  input:checked + .Toggle-slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+  }
+
+  /* Rounded sliders */
+  .Toggle-slider.round {
+    border-radius: 34px;
+  }
+
+  .Toggle-slider.round:before {
+    border-radius: 50%;
+    border-color: red;
+  }
+}
+
+
+.Toggle input {
+  display: none;
+}
+
+$animation-duration: 0.25s;
+
+.Toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 2px;
+  background-color: $zorroa-gray;
+  -webkit-transition: $animation-duration;
+  transition: $animation-duration;
+}
+
+.Toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 10px;
+  width: 10px;
+  left: 0;
+  bottom: -2.5px;
+  background-color: $zorroa-sickly-green;
+  box-shadow: 0px 0px 0px 1px white;
+  -webkit-transition: $animation-duration;
+  transition: $animation-duration;
+  border-radius: 6px;
+}
+
+.Toggle-checkbox {
+
+}

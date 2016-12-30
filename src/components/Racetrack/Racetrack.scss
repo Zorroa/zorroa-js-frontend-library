@@ -80,7 +80,7 @@
       border-radius: 3px;
       border: none;
       margin-right: 12px;
-      font-weight: 700;
+      font-weight: 500;
       text-transform: uppercase;
       @include noSelect;
       cursor: pointer;
@@ -111,15 +111,17 @@
   .Racetrack-footer {
     display: flex;
     justify-content: center;
-    border-top: 1px solid #ccc;
+    border-top: 1px solid $zorroa-lightgray;
+    margin-left: 8px;
+    margin-right: 8px;
 
     .Racetrack-footer-group {
       display: flex;
     }
 
     .Racetrack-footer-save-button {
-      background-color: #a5a5a5;
-      color: $zorroa-nearwhite;
+      background-color: $zorroa-gray;
+      color: white;
 
       &:disabled {
         cursor: not-allowed;
@@ -142,6 +144,7 @@
       background: none;
       border: none;
       cursor:pointer;
+      text-transform: uppercase;
 
       &:hover:enabled {
         background-color: #a5a5a5;

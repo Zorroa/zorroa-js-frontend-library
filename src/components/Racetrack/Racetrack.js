@@ -108,7 +108,7 @@ class Racetrack extends Component {
     if (isIconified) return null
     return (
       <div className="Racetrack-add-filter">
-        <div onClick={this.showAddWidget} className='Racetrack-add-widget'><i className='icon-plus2'/>Add Widget</div>
+        <div onClick={this.showAddWidget} className='Racetrack-add-widget'><i className='icon-plus'/>Add Widget</div>
         <QuickAddWidget/>
       </div>
     )

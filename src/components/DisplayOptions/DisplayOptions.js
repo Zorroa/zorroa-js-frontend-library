@@ -3,6 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
+import Toggle from '../Toggle'
 import { getAssetFields } from '../../actions/assetsAction'
 import { hideModal, syncMetadataAndTableFields } from '../../actions/appActions'
 import { unCamelCase } from '../../services/jsUtil'
@@ -237,12 +238,7 @@ class DisplayOptions extends Component {
             <div className="DisplayOptions-settings icon-cog"/>
             <div className="DisplayOptions-title">{title}</div>
             <div className="flexOn"/>
-            { syncLabel && (
-              <label className="flexOff switch">
-                <input type="checkbox" checked={this.state.syncedViews} onChange={this.syncViews} />
-                <div className="slider round"/>
-              </label>
-            )}
+            { syncLabel && <Toggle checked={this.state.syncedViews} onChange={this.syncViews} backgroundColor='black' /> }
             { syncLabel && (
               <div className="DisplayOptions-sync" onClick={this.toggleSync}>Sync with {syncLabel} View</div>
             )}

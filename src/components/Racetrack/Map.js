@@ -138,7 +138,10 @@ class Map extends Component {
               icon={MapWidgetInfo.icon}
               header={(
                 <div className="Map-header">
-                  <span>Map: {title}</span>
+                  <div className="Map-header-label">
+                    <div className="Map-header-title">Map:</div>
+                    <div className="Map-header-field">{title}</div>
+                  </div>
                   <div className="flexRow flexAlignItemsCenter">
                     <div onClick={this.selectSearch} className="Map-search icon-search"/>
                     <div onClick={this.selectLocation} className="Map-settings icon-cog"/>

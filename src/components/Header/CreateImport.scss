@@ -287,80 +287,12 @@ $dropcolor: rgba(115, 182, 28, 0.1);
   margin-right: 20px;
 }
 
-.CreateImport-pipeline-script-info-switch {
-  position: relative;
-  display: inline-block;
-  width: 30px;
-  height: 4px;
-
-  input:checked + .CreateImport-pipeline-script-info-slider {
-    background-color: $zorroa-sickly-green;
-  }
-
-  input:focus + .CreateImport-pipeline-script-info-slider {
-    box-shadow: 0 0 1px $zorroa-sickly-green;
-  }
-
-  input:checked + .CreateImport-pipeline-script-info-slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
-    transform: translateX(26px);
-  }
-
-  /* Rounded sliders */
-  .CreateImport-pipeline-script-info-slider.round {
-    border-radius: 34px;
-  }
-
-  .CreateImport-pipeline-script-info-slider.round:before {
-    border-radius: 50%;
-  }
-}
-
 .CreateImport-pipeline-script-info-label {
   text-transform: capitalize;
   @include nowrap;
   color: $zorroa-gray;
   margin-right: 8px;
 }
-
-.CreateImport-pipeline-script-info-switch input {
-  display: none;
-}
-
-$animation-duration: 0.25s;
-
-.CreateImport-pipeline-script-info-slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border-radius: 2px;
-  background-color: $zorroa-gray;
-  -webkit-transition: $animation-duration;
-  transition: $animation-duration;
-}
-
-.CreateImport-pipeline-script-info-slider:before {
-  position: absolute;
-  content: "";
-  height: 10px;
-  width: 10px;
-  left: 0;
-  bottom: -2.5px;
-  background-color: $zorroa-sickly-green;
-  box-shadow: 0px 0px 0px 1px white;
-  -webkit-transition: $animation-duration;
-  transition: $animation-duration;
-  border-radius: 6px;
-}
-
-.CreateImport-pipeline-script-info-checkbox {
-
-}
-
 .CreateImport-pipeline-script-info-state {
   text-transform: uppercase;
   color: $zorroa-lightgray;

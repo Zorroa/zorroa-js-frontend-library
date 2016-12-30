@@ -21,8 +21,20 @@
     @include noSelect;
 
     flex-shrink: 1;
-    span {
-    }
+  }
+
+  .Facet-header-label {
+    @include flexRow;
+    @include flexAlignItemsCenter;
+  }
+
+  .Facet-header-title {
+    font-weight: 100;
+    margin-right: 4px;
+  }
+
+  .Facet-header-field {
+    font-weight: 400;
   }
 
   .Facet-settings {
@@ -122,6 +134,7 @@
     width: 100%;
     border: 0;
     border-spacing: 0;
+    padding-right: 10px;
   }
 
   th {
@@ -158,11 +171,26 @@
     width: 60px;
   }
 
+  th {
+    text-align: left;
+    font-family: "Roboto Condensed";
+    font-weight: 300;
+    text-transform: uppercase;
+    font-size: 12px;
+    line-height: 1;
+    color: $zorroa-gray;
+    background-color: white;
+  }
+  th:last-child {
+    text-align: right;
+    width: 60px;
+  }
+
   tr:nth-child(odd) {
     background-color: $zorroa-nearwhite;
   }
 
-  thead tr td {
+  thead tr td th {
     font-size: 12px;
     text-transform: uppercase;
     font-stretch: condensed;
@@ -197,11 +225,12 @@
       cursor: pointer;
 
       &:hover {
-        background: $zorroa-hover;
+        background-color: rgba(161, 29, 119, 0.1);
       }
 
       &.selected {
-        background-color: $zorroa-selected;
+        color: white;
+        background-color: #a11d77;  // ack! Should by dynamically set
       }
     }
   }
