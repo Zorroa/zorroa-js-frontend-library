@@ -1,9 +1,9 @@
 import React from 'react'
 
 const Logo = () => {
-  const img = require('./zorroa-logo.png')
+  const img = require('./zorroa-logo.svg')
   return (
-    <img src={img} />
+    <img className="Logo" src={img} />
   )
 }
 
