@@ -3,8 +3,9 @@ import { browserHistory } from 'react-router'
 import { initialize } from 'redux-form'
 
 import {
-  AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR,
-  AUTH_PERMISSIONS, METADATA_FIELDS, TABLE_FIELDS } from '../constants/actionTypes'
+  AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR, USER_SETTINGS,
+  AUTH_PERMISSIONS, METADATA_FIELDS, TABLE_FIELDS,
+  THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT } from '../constants/actionTypes'
 import { USER_ITEM, HOST_ITEM, PROTOCOL_ITEM } from '../constants/localStorageItems'
 import User from '../models/User'
 import Permission from '../models/Permission'
@@ -95,6 +96,18 @@ function authorize (dispatch, json) {
     if (metadata.tableFields) {
       dispatch({type: TABLE_FIELDS, payload: metadata.tableFields})
     }
+    if (metadata.thumbSize) {
+      dispatch({type: THUMB_SIZE, payload: metadata.thumbSize})
+    }
+    if (metadata.thumbLayout) {
+      dispatch({type: THUMB_LAYOUT, payload: metadata.thumbLayout})
+    }
+    if (metadata.showTable) {
+      dispatch({type: SHOW_TABLE, payload: metadata.showTable})
+    }
+    if (metadata.tableHeight) {
+      dispatch({type: TABLE_HEIGHT, payload: metadata.tableHeight})
+    }
   }
   const user = new User(json)
   dispatch({ type: AUTH_USER, payload: user })
@@ -151,13 +164,13 @@ export function getUserPermissions (user) {
   }
 }
 
-export function saveUserSettings (user, metadataFields, tableFields, search) {
+export function saveUserSettings (user, metadata) {
   return dispatch => {
     // FIXME: Move search to settings.search in server?
-    const metadata = { metadataFields, tableFields, search }
     const settings = { metadata }
     archivist.put('/api/v1/users/' + user.id + '/_settings', settings)
       .then(response => {
+        dispatch({ type: USER_SETTINGS, payload: { user, metadata } })
         console.log('Save user settings')
       })
       .catch(error => {

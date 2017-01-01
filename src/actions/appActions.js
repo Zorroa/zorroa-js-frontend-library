@@ -2,7 +2,8 @@ import {
   SHOW_MODAL, HIDE_MODAL,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
   METADATA_FIELDS, TABLE_FIELDS, LIGHTBAR_FIELDS, SYNC_FIELDS,
-  SET_DRAGGING, SET_TABLE_FIELD_WIDTH, SHOW_IMPORT_SCRIPT_INFO
+  SET_DRAGGING, SET_TABLE_FIELD_WIDTH, SHOW_IMPORT_SCRIPT_INFO,
+  THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT
 } from '../constants/actionTypes'
 
 export function showModal (props) {
@@ -94,5 +95,33 @@ export function showImportScriptInfo (show) {
   return ({
     type: SHOW_IMPORT_SCRIPT_INFO,
     payload: show
+  })
+}
+
+export function setThumbSize (size) {
+  return ({
+    type: THUMB_SIZE,
+    payload: size
+  })
+}
+
+export function setThumbLayout (layout) {
+  return ({
+    type: THUMB_LAYOUT,
+    payload: layout
+  })
+}
+
+export function showTable (show) {
+  return ({
+    type: SHOW_TABLE,
+    payload: show
+  })
+}
+
+export function setTableHeight (height) {
+  return ({
+    type: TABLE_HEIGHT,
+    payload: height
   })
 }

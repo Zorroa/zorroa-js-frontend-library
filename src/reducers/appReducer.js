@@ -3,7 +3,9 @@ import {
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
   METADATA_FIELDS, TABLE_FIELDS, LIGHTBAR_FIELDS,
   SYNC_FIELDS, SHOW_IMPORT_SCRIPT_INFO,
-  SET_DRAGGING, SET_TABLE_FIELD_WIDTH, UNAUTH_USER
+  SET_DRAGGING, SET_TABLE_FIELD_WIDTH,
+  THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
+  USER_SETTINGS, UNAUTH_USER
 } from '../constants/actionTypes'
 
 export const defaultTableFieldWidth = 100
@@ -28,7 +30,19 @@ const initialState = {
   lightbarFields: [ ...defaultLightbarFields ],
   tableFieldWidth: Object.assign({},
     ...defaultTableFields.map(field => ({ [field]: defaultTableFieldWidth }))),
-  showImportScriptInfo: true
+  showImportScriptInfo: true,
+  thumbSize: 128,
+  thumbLayout: 'masonry',
+  tableHeight: 300,
+  showTable: false,
+  userSettings: {
+    tableFields: defaultTableFields,
+    metadataFields: defaultTableFields,
+    showTable: false,
+    tableHeight: 300,
+    thumbSize: 128,
+    thumbLayout: 'masonry'
+  }
 }
 
 export default function app (state = initialState, action) {
@@ -66,6 +80,16 @@ export default function app (state = initialState, action) {
       return { ...state, dragInfo: action.payload }
     case SET_TABLE_FIELD_WIDTH:
       return { ...state, tableFieldWidth: { ...state.tableFieldWidth, ...action.payload } }
+    case THUMB_SIZE:
+      return { ...state, thumbSize: action.payload }
+    case THUMB_LAYOUT:
+      return { ...state, thumbLayout: action.payload }
+    case SHOW_TABLE:
+      return { ...state, showTable: action.payload }
+    case TABLE_HEIGHT:
+      return { ...state, tableHeight: action.payload}
+    case USER_SETTINGS:
+      return { ...state, userSettings: action.payload.metadata }
     case UNAUTH_USER:
       return initialState
     default:

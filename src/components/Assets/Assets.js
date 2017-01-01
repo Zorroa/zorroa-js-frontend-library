@@ -6,10 +6,13 @@ import keydown from 'react-keydown'
 import * as assert from 'assert'
 
 import Thumb from '../Thumb'
+import User from '../../models/User'
 import Asset from '../../models/Asset'
 import { isolateAssetId, selectAssetIds } from '../../actions/assetsAction'
 import { resetRacetrackWidgets } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
+import { saveUserSettings } from '../../actions/authAction'
+import { setThumbSize, setThumbLayout, showTable, setTableHeight } from '../../actions/appActions'
 import Pager from './Pager'
 import Footer from './Footer'
 import Table from '../Table'
@@ -30,6 +33,12 @@ class Assets extends Component {
     selectedIds: PropTypes.object,
     selectionCounter: PropTypes.number.isRequired,
     totalCount: PropTypes.number,
+    thumbSize: PropTypes.number.isRequired,
+    layout: PropTypes.string.isRequired,
+    showTable: PropTypes.bool.isRequired,
+    tableHeight: PropTypes.number.isRequired,
+    user: PropTypes.instanceOf(User),
+    userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object
   }
 
@@ -42,16 +51,12 @@ class Assets extends Component {
   constructor (props) {
     super(props)
 
-    // Store layout as local state, not shared in URLs or outside Assets.
+    // Store layout as app state so it is retained on route and reload.
     // Requires passing layout info to subcomponents as needed, rather
     // than passing in global app state, which would also force the
     // otherwise simple sub-components to be Redux containers.
     this.state = {
-      layout: 'masonry',
-      showTable: false,
-      thumbSize: 128,
       lastSelectedId: null,
-      tableHeight: defaultTableHeight,
       assetsScrollTop: 0,
       assetsScrollHeight: 0,
       assetsScrollWidth: 0,
@@ -145,19 +150,25 @@ class Assets extends Component {
   }
 
   toggleShowTable () {
-    this.setState({ ...this.state, showTable: !this.state.showTable })
+    const { showTable, user, userSettings, actions } = this.props
+    actions.showTable(!showTable)
+    actions.saveUserSettings(user, { ...userSettings, showTable: !showTable })
   }
 
   changeLayout (layout) {
-    if (this.state.layout !== layout) {
-      this.setState({...this.state, layout})
+    if (this.props.layout !== layout) {
+      this.props.actions.setThumbLayout(layout)
+      this.props.actions.saveUserSettings(this.props.user,
+        { ...this.props.userSettings, thumbLayout: layout })
     }
   }
 
   changeThumbSize (thumbSize) {
     assert.ok(typeof thumbSize === 'number')
-    if (this.state.thumbSize !== thumbSize) {
-      this.setState({...this.state, thumbSize})
+    if (this.props.thumbSize !== thumbSize) {
+      this.props.actions.setThumbSize(thumbSize)
+      this.props.actions.saveUserSettings(this.props.user,
+        { ...this.props.userSettings, thumbSize })
     }
   }
 
@@ -167,7 +178,7 @@ class Assets extends Component {
   }
 
   tableResizeStart = (event) => {
-    this.resizer.capture(this.tableResizeUpdate, this.tableResizeStop, 0, this.state.tableHeight, 0, -1)
+    this.resizer.capture(this.tableResizeUpdate, this.tableResizeStop, 0, this.props.tableHeight, 0, -1)
     const tableHeight = this.clampTableHeight(this.state.tableHeight)
     this.newTableHeight = tableHeight
     this.tableStartHeight = this.newTableHeight
@@ -184,7 +195,9 @@ class Assets extends Component {
     this.newTableHeight = this.clampTableHeight(resizeY)
     // wait one frame to handle the event, otherwise events queue up syncronously
     requestAnimationFrame(_ => {
-      this.setState({tableHeight: this.newTableHeight})
+      this.props.actions.setTableHeight(this.newTableHeight)
+      this.props.actions.saveUserSettings(this.props.user,
+        { ...this.props.userSettings, tableHeight: this.newTableHeight })
       this.updateAssetsScrollSize()
       this.allowTableResize = true
     })
@@ -238,8 +251,7 @@ class Assets extends Component {
     const width = this.state.assetsScrollWidth - 2 * assetsScrollPadding
     if (!width) return
 
-    const { assets } = this.props
-    const { layout, thumbSize } = this.state
+    const { assets, layout, thumbSize } = this.props
 
     if (!assets) return
 
@@ -329,7 +341,7 @@ class Assets extends Component {
   }
 
   renderAssets () {
-    const { assets, selectedIds, totalCount } = this.props
+    const { assets, selectedIds, totalCount, layout } = this.props
     const { layout, positions, tableIsResizing } = this.state
     api.setTableIsResizing(tableIsResizing)
 
@@ -416,7 +428,7 @@ class Assets extends Component {
   }
 
   render () {
-    const { assets, totalCount } = this.props
+    const { assets, totalCount, tableHeight, showTable, layout, thumbSize } = this.props
     const { showTable, layout, thumbSize, tableHeight, tableIsResizing, assetsCounter } = this.state
 
     // Trigger layout if assets change.
@@ -466,12 +478,23 @@ export default connect(state => ({
   query: state.assets.query,
   selectedIds: state.assets.selectedIds,
   selectionCounter: state.assets.selectionCounter,
-  totalCount: state.assets.totalCount
+  totalCount: state.assets.totalCount,
+  user: state.auth.user,
+  userSettings: state.app.userSettings,
+  thumbSize: state.app.thumbSize,
+  layout: state.app.thumbLayout,
+  showTable: state.app.showTable,
+  tableHeight: state.app.tableHeight
 }), dispatch => ({
   actions: bindActionCreators({
     isolateAssetId,
     selectAssetIds,
     resetRacetrackWidgets,
-    selectFolderIds
+    selectFolderIds,
+    setThumbSize,
+    setThumbLayout,
+    showTable,
+    setTableHeight,
+    saveUserSettings
   }, dispatch)
 }))(Assets)

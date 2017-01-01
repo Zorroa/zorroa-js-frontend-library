@@ -26,8 +26,7 @@ class Searcher extends Component {
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
     order: PropTypes.arrayOf(PropTypes.object),
     user: PropTypes.instanceOf(User),
-    metadataFields: PropTypes.arrayOf(PropTypes.string).isRequired,
-    tableFields: PropTypes.arrayOf(PropTypes.string).isRequired,
+    userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired
   }
 
@@ -71,7 +70,7 @@ class Searcher extends Component {
     const {
       widgets, actions, folders, selectedFolderIds, query, pageSize,
       modifiedFolderIds, trashedFolders, order,
-      user, metadataFields, tableFields } = this.props
+      user, userSettings } = this.props
     let assetSearch = new AssetSearch({order})
     if (widgets && widgets.length) {
       let postFilter = new AssetFilter()
@@ -119,7 +118,7 @@ class Searcher extends Component {
       actions.searchAssets(assetSearch)
       this.inflightQuery = assetSearch
       if (query) {
-        actions.saveUserSettings(user, metadataFields, tableFields, assetSearch)
+        actions.saveUserSettings(user, { ...userSettings, search: assetSearch })
       }
       if (folders && folders.size > 1) {
         // New query, get all the filtered folder counts
@@ -158,8 +157,7 @@ const mapStateToProps = state => ({
   modifiedFolderIds: state.folders.modifiedIds,
   trashedFolders: state.folders.trashedFolders,
   user: state.auth.user,
-  tableFields: state.app.tableFields,
-  metadataFields: state.app.metadataFields
+  userSettings: state.app.userSettings
 })
 
 export default connect(

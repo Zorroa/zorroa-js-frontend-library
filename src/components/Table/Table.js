@@ -34,6 +34,7 @@ class Table extends Component {
     fieldWidth: PropTypes.objectOf(PropTypes.number).isRequired,
     order: PropTypes.arrayOf(PropTypes.object),
     user: PropTypes.instanceOf(User),
+    userSettings: PropTypes.object.isRequired,
     metadataFields: PropTypes.arrayOf(PropTypes.string).isRequired,
     query: PropTypes.instanceOf(AssetSearch),
 
@@ -85,8 +86,12 @@ class Table extends Component {
     if (syncedViews) {
       actions.updateMetadataFields(checkedNamespaces)
     }
-    actions.saveUserSettings(user, checkedNamespaces,
-      syncedViews ? checkedNamespaces : metadataFields, query)
+    const settings = {
+      ...this.props.userSettings,
+      tableFields: checkedNamespaces,
+      metadataFields: syncedViews ? checkedNamespaces : metadataFields,
+    }
+    actions.saveUserSettings(user, settings)
   }
 
   tableScroll = (event) => {
@@ -384,6 +389,7 @@ export default connect(state => ({
   fields: state.app.tableFields,
   fieldWidth: state.app.tableFieldWidth,
   user: state.auth.user,
+  userSettings: state.app.userSettings,
   metadataFields: state.app.metadataFields
 }), dispatch => ({
   actions: bindActionCreators({
