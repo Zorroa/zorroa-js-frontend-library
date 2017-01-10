@@ -25,8 +25,6 @@
 //   - Use adjusted state variable in a style call to set width:
 //       render = () => { <div style={{width: this.state.resizeWidth}} />
 
-import * as api from '../globals/api.js'
-
 export default class Resizer {
   constructor () {
     this.reset()
@@ -54,8 +52,6 @@ export default class Resizer {
     this.scaleY = optScaleY === undefined ? 1 : optScaleY
     window.addEventListener('mousemove', this.move)
     window.addEventListener('mouseup', this.release)
-
-    api.log(`[resizer.capture] ${startX} ${startY} ${Date.now()}`)
   }
 
   move = (event) => {
@@ -67,7 +63,6 @@ export default class Resizer {
     const x = this.startX + this.scaleX * (event.pageX - this.startPageX)
     const y = this.startY + this.scaleY * (event.pageY - this.startPageY)
     this.onMove(x, y)
-    api.log(`[resizer.move] page:(${event.pageX}, ${event.pageY}) ${Date.now()}`)
   }
 
   release = (event) => {
@@ -76,6 +71,5 @@ export default class Resizer {
     window.removeEventListener('mouseup', this.release)
     if (this.onRelease) this.onRelease()
     this.reset()
-    api.log(`[resizer.release] page:(${event.pageX}, ${event.pageY}) ${Date.now()}`)
   }
 }
