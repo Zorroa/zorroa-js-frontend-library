@@ -27,7 +27,7 @@ export default class ThumbSizeSlider extends Component {
              onClick={this.goSmaller}>
           <i className='icon-picture2' style={{fontSize: '15px'}} />
         </div>
-        <div className='ThumbSizeSlider-box'>
+        <div className='ThumbSizeSlider-box flexRowCenter'>
           <div className='ThumbSizeSlider-line-box flexRowCenter'>
             <div className='ThumbSizeSlider-line'/>
           </div>

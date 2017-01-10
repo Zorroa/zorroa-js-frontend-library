@@ -27,6 +27,7 @@ class Table extends Component {
   static propTypes = {
     // app state
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+    assetsCounter: PropTypes.number.isRequired,
     selectedAssetIds: PropTypes.instanceOf(Set),
     selectionCounter: PropTypes.number.isRequired,
     fields: PropTypes.arrayOf(PropTypes.string).isRequired,
@@ -37,7 +38,6 @@ class Table extends Component {
     query: PropTypes.instanceOf(AssetSearch),
 
     // input props
-    assetsKey: PropTypes.string.isRequired,
     height: PropTypes.number.isRequired,
     tableIsResizing: PropTypes.bool.isRequired,
     selectFn: PropTypes.func.isRequired,
@@ -57,7 +57,7 @@ class Table extends Component {
 
     this.columnResizeFieldName = null
     this.allowColumnResize = true
-    this.assetsKey = ''
+    this.assetsCounter = 0
     this.rowBottomPx = []
     this.assetRow = null
     this.selectionCounter = 0
@@ -163,7 +163,7 @@ class Table extends Component {
         delete assetFieldOpen[asset.id]
       }
     }
-    this.assetsKey = '' // trigger row height recompute
+    this.assetsCounter = 0 // trigger row height recompute
     this.setState({assetFieldOpen})
   }
 
@@ -277,15 +277,15 @@ class Table extends Component {
   }
 
   render () {
-    const { assets, fields, fieldWidth, height, tableIsResizing, assetsKey, selectedAssetIds } = this.props
+    const { assets, fields, fieldWidth, height, tableIsResizing, selectedAssetIds } = this.props
     if (!assets) return
 
     const { tableScrollTop, tableScrollHeight } = this.state
     const tableScrollBottom = tableScrollTop + tableScrollHeight
 
-    if (assetsKey !== this.assetsKey) {
+    if (this.props.assetsCounter !== this.assetsCounter) {
       this.recomputeRowHeights()
-      this.assetsKey = assetsKey
+      this.assetsCounter = this.props.assetsCounter
     }
 
     requestAnimationFrame(() => {
@@ -305,7 +305,7 @@ class Table extends Component {
       this.skipNextSelectionScroll = false
     }
 
-    let tableStyle = { height, minHeight: height, maxHeight: height }
+    let tableStyle = { height } //, minHeight: height, maxHeight: height }
     if (tableIsResizing) tableStyle.pointerEvents = 'none'
 
     return (
@@ -376,6 +376,7 @@ class Table extends Component {
 
 export default connect(state => ({
   assets: state.assets.all,
+  assetsCounter: state.assets.assetsCounter,
   selectedAssetIds: state.assets.selectedIds,
   selectionCounter: state.assets.selectionCounter,
   query: state.assets.query,

@@ -7,9 +7,34 @@
   }
 }
 
-// Form layout
+  // Form layout
 .Searchbar-body {
   font-size: 20px;
+
+  .overlapping-inputs {
+    @include fullWidth;
+    height: 25px;
+    position: relative;
+
+    // Underline-only bar
+    input {
+      background: transparent;
+      border: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+
+      width: 100%;
+
+      border-bottom: 2px solid $zorroa-sickly-green;
+      font-size: 16px;
+
+      .Searchbar-typeahead {
+        z-index: -1;
+        color: $zorroa-lightgray;
+      }
+    }
+  }
 
   // Magnifying glass
   .search-button {
@@ -22,7 +47,7 @@
   }
 
   // Clear text button
-  .clear-button {
+  .Searchbar-clear {
     position: absolute;
     top: 4px;
     right: -5px;
@@ -96,7 +121,6 @@
       color: $zorroa-sickly-green;
     }
   }
-
 }
 
 .Searchbar-suggestion {

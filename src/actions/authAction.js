@@ -10,6 +10,7 @@ import User from '../models/User'
 import Permission from '../models/Permission'
 import AssetSearch from '../models/AssetSearch'
 import { restoreSearch } from './racetrackAction'
+import * as api from '../globals/api.js'
 
 // Global variable to hold axios connection
 // FIXME: Should this be state?
@@ -84,7 +85,7 @@ function authorize (dispatch, json) {
   const metadata = json.settings && json.settings.metadata
   if (metadata) {
     // FIXME: Should move to settings.search in server?
-    if (metadata.search) {
+    if (metadata.search && !api.getSeleniumTesting()) {
       const query = new AssetSearch(metadata.search)
       dispatch(restoreSearch(query))
     }
@@ -116,13 +117,18 @@ export function signupUser ({ username, password }) {
 
 export function signoutUser (user, host) {
   return dispatch => {
-    archivist.post('/api/v1/logout')
+    if (archivist) {
+      archivist.post('/api/v1/logout')
       .then(response => {
         dispatch({ type: UNAUTH_USER, payload: response.data })
         dispatch(initialize('signin', {host, username: user.username, ssl: true}))
         localStorage.setItem(USER_ITEM, JSON.stringify(new User({...user, id: -1})))
       })
       .catch(error => dispatch(authError(error)))
+    } else {
+      dispatch({ type: UNAUTH_USER, payload: {} })
+      localStorage.setItem(USER_ITEM, JSON.stringify(new User({...user, id: -1})))
+    }
   }
 }
 

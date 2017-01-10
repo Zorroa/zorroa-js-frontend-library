@@ -17,6 +17,7 @@ import Editbar from './Editbar'
 import * as ComputeLayout from './ComputeLayout.js'
 import AssetSearch from '../../models/AssetSearch'
 import Resizer from '../../services/Resizer'
+import * as api from '../../globals/api.js'
 
 const assetsScrollPadding = 8
 const defaultTableHeight = 300
@@ -24,6 +25,7 @@ const defaultTableHeight = 300
 class Assets extends Component {
   static propTypes = {
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+    assetsCounter: PropTypes.number.isRequired,
     query: PropTypes.instanceOf(AssetSearch),
     selectedIds: PropTypes.object,
     selectionCounter: PropTypes.number.isRequired,
@@ -45,7 +47,6 @@ class Assets extends Component {
     // than passing in global app state, which would also force the
     // otherwise simple sub-components to be Redux containers.
     this.state = {
-      assetsKey: '',
       layout: 'masonry',
       showTable: false,
       thumbSize: 128,
@@ -68,6 +69,7 @@ class Assets extends Component {
     this.skipNextSelectionScroll = false
     this.scrollToSelectionAfterLayout = false
     this.assetsLayoutTimer = null
+    this.assetsCounter = 0
     this.resizer = null
   }
 
@@ -226,13 +228,6 @@ class Assets extends Component {
     this.updateAssetsScrollSize()
   }
 
-  getAssetsKey = () => {
-    const { assets, query } = this.props
-    const { layout, thumbSize } = this.state
-    if (!assets) return ''
-    return `${assets.length}:${layout}:${thumbSize}:${JSON.stringify(query)}`
-  }
-
   runAssetsLayout = () => {
     const width = this.state.assetsScrollWidth - 2 * assetsScrollPadding
     if (!width) return
@@ -249,8 +244,7 @@ class Assets extends Component {
       }
     })()
 
-    var assetsKey = this.getAssetsKey()
-    this.setState({positions, assetsKey})
+    this.setState({ positions })
 
     if (this.assetsLayoutTimer) clearTimeout(this.assetsLayoutTimer)
     this.assetsLayoutTimer = null
@@ -319,8 +313,8 @@ class Assets extends Component {
   clampTableHeight = (tableHeight) => {
     const minTableHeight = 26
     const hardMaxTableHeight = 2000
-    const footerAndPadding = 100 // No ref available for 'stateless' Footer
-    const maxTableHeight = (this.refs.Assets && this.refs.Assets.clientHeight - footerAndPadding) || hardMaxTableHeight // worst case: table is too big, but drag handle is on-screen
+    const footerEditbarAndPaddingHeight = 180 // No ref available for 'stateless' Footer
+    const maxTableHeight = (this.refs.Assets && this.refs.Assets.clientHeight - footerEditbarAndPaddingHeight) || hardMaxTableHeight // worst case: table is too big, but drag handle is on-screen
     var clampedTableHeight = Math.min(maxTableHeight, Math.max(minTableHeight, tableHeight))
     if (!clampedTableHeight || !isFinite(clampedTableHeight)) {
       clampedTableHeight = defaultTableHeight
@@ -331,6 +325,7 @@ class Assets extends Component {
   renderAssets () {
     const { assets, selectedIds, totalCount } = this.props
     const { layout, positions, tableIsResizing } = this.state
+    api.setTableIsResizing(tableIsResizing)
 
     if (!assets || !assets.length) {
       return (
@@ -416,10 +411,10 @@ class Assets extends Component {
 
   render () {
     const { assets, totalCount } = this.props
-    const { showTable, layout, thumbSize, tableHeight, tableIsResizing, assetsKey } = this.state
+    const { showTable, layout, thumbSize, tableHeight, tableIsResizing, assetsCounter } = this.state
 
     // Trigger layout if assets change.
-    if (this.getAssetsKey() !== this.state.assetsKey) this.queueAssetsLayout()
+    if (assetsCounter !== this.assetsCounter) this.queueAssetsLayout()
 
     // If the selection change triggered this update, scroll to the new selection
     if (this.props.selectionCounter !== this.selectionCounter) {
@@ -440,7 +435,6 @@ class Assets extends Component {
         )}
         { totalCount > 0 && showTable && (
           <Table height={this.clampTableHeight(tableHeight)}
-                 assetsKey={assetsKey}
                  tableIsResizing={tableIsResizing}
                  selectFn={this.select}/>
         )}
@@ -462,6 +456,7 @@ class Assets extends Component {
 
 export default connect(state => ({
   assets: state.assets.all,
+  assetsCounter: state.assets.assetsCounter,
   query: state.assets.query,
   selectedIds: state.assets.selectedIds,
   selectionCounter: state.assets.selectionCounter,

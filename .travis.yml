@@ -2,7 +2,7 @@ language: node_js
 node_js:
   - "6"
 
-bundler_args: --retry 1
+bundler_args: --retry 2
 
 notifications:
   slack: zorroa:U0489fQGuSPls5EZZfSUoGsL
@@ -12,8 +12,17 @@ addons:
 
 env:
   global:
-    - SAUCE_USERNAME: "danwexler"
-    - SAUCE_ACCESS_KEY: "64400a01-0dc8-41b8-b2ed-d58f3911efe5"
+    # # parent Sauce Labs account credentials
+    # - SAUCE_USERNAME: "danwexler"
+    # - SAUCE_ACCESS_KEY: "64400a01-0dc8-41b8-b2ed-d58f3911efe5"
+
+    - SAUCE_USERNAME: "zorroasauce"
+    - SAUCE_ACCESS_KEY: "f6c35e63-e19a-4575-be77-b49748e98bd6"
+
+    # sub-account Sauce Labs credentials
+    # Currently, the Sauce web site gives me UI warnings when using Wex's creds
+    # - SAUCE_USERNAME: "davidAtZorroa"
+    # - SAUCE_ACCESS_KEY: "b1932cf1-4c5e-408b-9617-122c06263c18"
 
 before_script:
   - npm run dev &

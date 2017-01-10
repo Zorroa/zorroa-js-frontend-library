@@ -12,6 +12,7 @@ export default (
   <Route path='/' component={App}>
     <IndexRoute component={RequireAuth(Workspace, '/signin')} />
     <Route path="signin" component={Signin} />
+    <Route path="signup" component={Signin} />
     <Route path="signout" component={Signout} />
     <Route path="lightbox" component={Lightbox} />
   </Route>

@@ -11,7 +11,7 @@
     "build": "npm test && npm run build-only",
     "deploy": "sh ./build/build-prod.sh",
     "pretest": "npm run test:lint",
-    "test": "./node_modules/.bin/jest",
+    "test": "./node_modules/.bin/jest -i",
     "test:watch": "./node_modules/.bin/jest --verbose --watch",
     "test:e2e": "./node_modules/.bin/jest ./tests/e2e/homePage.test.js",
     "test:lint": "./node_modules/.bin/eslint . --color; exit 0",
@@ -36,7 +36,7 @@
     "axios-mock-adapter": "1.6.1",
     "babel-core": "6.14.0",
     "babel-eslint": "7.0.0",
-    "babel-jest": "15.0.0",
+    "babel-jest": "16.0.0",
     "babel-loader": "6.2.5",
     "babel-plugin-transform-class-properties": "6.11.5",
     "babel-plugin-transform-decorators-legacy": "1.3.4",
@@ -56,7 +56,7 @@
     "geckodriver": "1.2.0",
     "html-loader": "0.4.3",
     "html-webpack-plugin": "2.22.0",
-    "jest-cli": "15.1.1",
+    "jest-cli": "18.1.0",
     "json-loader": "0.5.4",
     "less": "2.7.1",
     "less-loader": "2.2.3",
@@ -74,7 +74,7 @@
     "standard": "8.0.0",
     "style-loader": "0.13.1",
     "webpack": "1.13.2",
-    "webpack-dev-server": "1.15.1"
+    "webpack-dev-server": "1.16.2"
   },
   "dependencies": {
     "axios": "0.14.0",

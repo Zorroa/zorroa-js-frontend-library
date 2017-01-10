@@ -157,28 +157,29 @@ class Searchbar extends Component {
       <div className="Searchbar">
         <div className="Searchbar-body flexCenter">
           <div className="Searchbar-overlapping-inputs">
-            <input disabled={true} value={this.selectedSuggestionString()} type="text" className="typeahead"/>
-            <input value={queryString}
+            <input disabled={true} value={this.selectedSuggestionString()} type="text" className="Searchbar-typeahead"/>
+            <input className='Searchbar-search'
+                   value={queryString}
                    onKeyDown={this.onKeyDown}
                    onChange={this.updateQueryString}
                    placeholder="Search..." type="text" />
-            <button onClick={this.clearQueryString} disabled={!queryString || !queryString.length} className="clear-button icon-cancel-circle" />
-            { suggestions && suggestions.length ? (
+            <button onClick={this.clearQueryString} disabled={!queryString || !queryString.length} className="Searchbar-clear icon-cancel-circle" />
+        { suggestions && suggestions.length ? (
               <div className="Searchbar-suggestions fullWidth">
-                <ul>
-                  { suggestions.map((suggestion, index) => (
-                    <li key={suggestion.text}>
-                      <div onClick={this.chooseSuggestion.bind(this, suggestion)}
+            <ul>
+              { suggestions.map((suggestion, index) => (
+                <li key={suggestion.text}>
+                  <div onClick={this.chooseSuggestion.bind(this, suggestion)}
                            className={classnames('Searchbar-suggestion', {selected: index === selectedSuggestionIndex})}>
-                        <div>{suggestion.text}</div>
-                        <div>{suggestion.score}</div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : <div/>}
+                    <div>{suggestion.text}</div>
+                    <div>{suggestion.score}</div>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
+        ) : <div/>}
+      </div>
           <button onClick={this.selectCurrentQueryString} className="search-button icon-search" />
         </div>
       </div>

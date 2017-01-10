@@ -148,7 +148,7 @@ class FolderItem extends Component {
   }
 
   createExport = (event, name, exportImages, exportTable) => {
-    const { selectedFolderIds } = this.props
+    const { selectedFolderIds, tableFields } = this.props
     const filter = new AssetFilter({links: {folder: [...selectedFolderIds]}})
     const search = new AssetSearch({filter})
     const fields = exportTable && tableFields

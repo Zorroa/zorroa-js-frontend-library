@@ -20,16 +20,17 @@ describe('assetsReducer', () => {
       all: assets,
       totalCount: 1,
       isolatedId: null,
-      suggestions: null
+      suggestions: null,
+      assetsCounter: 1
     }
-    expect(assetsReducer([], { type: ASSET_SEARCH, payload }))
+    expect(assetsReducer({assetsCounter: 0}, { type: ASSET_SEARCH, payload }))
       .toEqual(result)
   })
 
   it('ASSET_SEARCH for second page concats assets DEBUG', () => {
     // Reduce the first page of assets
     const payload1 = { query, assets, page }
-    const state1 = assetsReducer({}, { type: ASSET_SEARCH, payload: payload1 })
+    const state1 = assetsReducer({assetsCounter: 0}, { type: ASSET_SEARCH, payload: payload1 })
 
     // Reduce the second page of assets
     const assets2 = [{id: 'b'}]
@@ -43,7 +44,8 @@ describe('assetsReducer', () => {
       all: concatAssets,
       totalCount: 2,
       isolatedId: null,
-      suggestions: null
+      suggestions: null,
+      assetsCounter: 2
     }
     expect(assetsReducer(state1, { type: ASSET_SEARCH, payload: payload2 }))
       .toEqual(result)

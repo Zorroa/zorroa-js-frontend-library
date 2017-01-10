@@ -112,6 +112,51 @@ Tips for making testing quicker & easier:
 - [End to End (e2e) Testing React Apps With Selenium WebDriver And Node.js is Easier Than You Think](http://marmelab.com/blog/2016/04/19/e2e-testing-with-node-and-es6.html)
 - [Using Sauce Labs with Travis CI](https://docs.travis-ci.com/user/sauce-connect/)
 
+### Tips for writing Selenium tests:
+
+- Never use sleep(), hardcoded amounts of time are extremely brittle
+- Use explicit waits liberally (for DOM conditions or events)
+-- For example, if you load a page and try to click something on it immeidately, it may not be created or visible or ready on the first frame. Wait until it has been located and is visible.
+-- You will probably have to write app code to help the tests understand how to wait whenever the app makes server calls.
+- Use assertions liberally, e.g., Jest's expect(). Tests should fail early.
+-- Especially after a wait, make sure a test fails as early as possible, and with as specific a message about what went wrong as possible.
+-- I usually pair every explicit wait with an assert/expect using the same condition. Remember any wait will time out and continue when the wait condition isn't met.
+- Factor common interactions into reusable pieces. (Duh?) Lots of people are calling this the ["page objects pattern"](http://docs.seleniumhq.org/docs/06_test_design_considerations.jsp#page-object-design-pattern).
+- selenium.js contains some factored test utility functions, some specific to Zorroa. api.js contains frontend app-side functions that the tests are allowed to call. Use them. Add new ones! Examples:
+-- `login()` / `logout()` -- Logs into a Zorroa app. login() logs out first, use this whenever you need to have a fresh session. (Will matter more when we have multiple user accounts.)
+-- `waitForAssetsCounterChange()` -- Wait for new search query results
+-- `waitForJsFnVal()` -- Wait until the given function returns the given value
+-- `expectCssElementIsVisible()` -- Wait until the given css selector is visible
+- When Jest tests run on Sauce labs in parallel, they break, so Jest has been set to run tests serially. TODO: figure out how to run tests in parallel.
+- You will see any console.log() calls made from the test.js file in your shell.
+- console.log() calls in the app are absorbed & hidden. Look at api.js:log(),getLog() if you need to see debug prints from the app in your Selenium tests.
+
+### Running Selenium tests manually:
+
+- `npm test` and `jest` accept a pattern argument to filter which tests to run.
+- Use `npm test e2e` to run only tests/e2e/* (Selenium) tests
+- Use `./node_modules/.bin/jest table` if you want to run just the table test, without the lint or code coverage passes. Useful for iterating more quickly.
+
+### Running Sauce Labs tests manually:
+
+- Download [Sauce Connect](https://wiki.saucelabs.com/display/DOCS/Sauce+Connect+Proxy), put it in the project tmp/ dir, if you want
+- Set env vars to connect to sauce. (copy & paste line below into your shell; our Selenium tests automatically use Sauce when these are defined, and run Selenium tests locally when they aren't)
+
+```
+export SAUCE_USERNAME=zorroasauce; export SAUCE_ACCESS_KEY=f6c35e63-e19a-4575-be77-b49748e98bd6
+```
+
+- In the same shell, launch Sauce Connect in the background
+
+```
+tmp/sc-4.4.2-osx/bin/sc -u $SAUCE_USERNAME -k $SAUCE_ACCESS_KEY &
+```
+
+- In the same shell, run any Selenium tests you want
+- Monitor test results in the [Sauce Labs tests dashboard](https://saucelabs.com/beta/dashboard/tests)
+-- Clicking on the test, then navigating to the "Watch" tab will display the test's browser screen real-time.
+
+
 ## Deploying the project
 
 ```

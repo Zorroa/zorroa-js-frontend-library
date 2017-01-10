@@ -4,12 +4,15 @@ import {
 } from '../constants/actionTypes'
 
 import AssetSearch from '../models/AssetSearch'
+import * as api from '../globals/api.js'
 
 const initialState = {
   pageSize: AssetSearch.defaultPageSize,
 
-  // selectionCounter increments whenever the selection changes. The value itself has no meaning.
-  // This is used to trigger any changes that need to respond to the selection. (See Assets, Table)
+  // These "counters" increment whenever the query or selection changes.
+  // The value itself has no meaning, these are used to respond to query
+  // or selection changes. (See Assets & Table for examples)
+  assetsCounter: 0,
   selectionCounter: 0
 }
 
@@ -51,7 +54,9 @@ export default function (state = initialState, action) {
       const { query, assets, page, aggs } = action.payload
       const all = state.all && page && page.from ? inject(state.all, page.from, assets) : assets
       const totalCount = page && page.totalCount ? page.totalCount : 0
-      return { ...state, all, aggs, query, totalCount, isolatedId: null, suggestions: null }
+      const assetsCounter = state.assetsCounter + 1
+      api.setAssetsCounter(assetsCounter)
+      return { ...state, all, aggs, query, totalCount, isolatedId: null, suggestions: null, assetsCounter }
     }
 
     case ASSET_SEARCH_ERROR:
@@ -79,6 +84,7 @@ export default function (state = initialState, action) {
 
     case SELECT_ASSETS: {
       const selectionCounter = state.selectionCounter + 1
+      api.setSelectionCounter(selectionCounter)
       return { ...state, selectedIds: action.payload, selectionCounter }
     }
 

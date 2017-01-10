@@ -1,96 +1,70 @@
 require('babel-register')({})
+// import * as assert from 'assert'
+import * as selenium from './selenium.js'
+var driver
+const { By } = selenium.webdriver
 
-var SauceLabs = require('saucelabs')
-
-var username = process.env.SAUCE_USERNAME
-var accessKey = process.env.SAUCE_ACCESS_KEY
-
-var saucelabs
-
-const USE_SAUCE = (username !== undefined)
-if (USE_SAUCE) {
-  saucelabs = new SauceLabs({
-    username: username,
-    password: accessKey
-  })
-}
-
-// http://seleniumhq.github.io/selenium/docs/api/javascript/index.html
-// https://github.com/SeleniumHQ/selenium/wiki/WebDriverJs
-// https://github.com/ndmanvar/JS-Mocha-WebdriverJS/blob/master/tests/sample-spec.js#L47-L50
-
-const URL = 'http://localhost:8080/'
-
-const browserDriverConfig = {
-  chrome: { driver: 'selenium-webdriver/chrome', pathModule: 'chromedriver' },
-  firefox: { driver: 'selenium-webdriver/firefox', pathModule: 'geckodriver' }
-}
-
-const browserName = 'chrome' // 'firefox'
-const webdriver = require('selenium-webdriver')
-const browserDriver = require(browserDriverConfig[browserName].driver)
-const path = require(browserDriverConfig[browserName].pathModule).path
-const { By } = webdriver
-
-if (browserName === 'chrome') {
-  // Note these calls are chrome-specific
-  const service = new browserDriver.ServiceBuilder(path).build()
-  browserDriver.setDefaultService(service)
-}
-if (browserName === 'firefox') {
-}
-
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000
+const DEBUG = false
 
 describe('Home Page', function () {
-  // var suite = this
-  beforeEach(function () {
-    if (USE_SAUCE) {
-      // run tests using travis+sauce
-      const caps = {
-        'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
-        build: process.env.TRAVIS_BUILD_NUMBER,
-        username: process.env.SAUCE_USERNAME,
-        accessKey: process.env.SAUCE_ACCESS_KEY,
-        browserName: browserName
-      }
+  // For all jest functions that are passed a function parameter
+  // (it, beforeEach, afterEach, beforeAll, afterAll):
+  // if the passed function takes a callback, jest will wait for the callback to be called
+  // if the passed function returns a promise, jest will wait for the promise to resolve
 
-      this.browser = new webdriver.Builder()
-      .withCapabilities(caps)
-      .usingServer(`https://${username}:${accessKey}@ondemand.saucelabs.com/wd/hub`)
-      .build()
-    } else {
-      // run tests locally if when not using travis+sauce
-      this.browser = new webdriver.Builder()
-      .withCapabilities({browserName})
-      .build()
-    }
+  const suite = this
+
+  beforeAll(function (/* doneFn */) {
+    driver = selenium.startBrowserAndDriver(suite)
+    return driver
   })
 
-  afterEach(function (done) {
-    if (USE_SAUCE) {
-      const title = 'Home Page' // TODO: get test name
-      const passed = true // TODO: get test result
-
-      this.browser.quit()
-
-      // TODO: get this reporting status back to Sauce
-      // TODO part 2: report the actual test result here
-      // (The Job ID is probably wrong)
-      saucelabs.updateJob(process.env.TRAVIS_JOB_NUMBER, {
-        name: title,
-        passed: passed
-      }, done)
-    } else {
-      this.browser.quit()
-      done()
-    }
+  afterAll(function () {
+    return selenium.stopBrowserAndDriver()
   })
 
-  it('should have a header', function () {
-    return this.browser.get(URL)
-    .then(_ => this.browser.findElement(By.css('.auth-logo')))
+  // beforeEach(function () {
+  // })
+
+  // afterEach(function () {
+  // })
+
+  // Pay attention to where there are hidden promises
+  // All driver actions turn into promises
+  // And all driver actions wait for any previous unresolved promises
+  // to complete before starting.
+
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+
+  it('signin page should have a header and login form', function () {
+    DEBUG && console.log('------ signin page should have a header and login form')
+    // return the driver (a thenable) so that jest will wait
+    return selenium.logout(driver)
+
+    .then(_ => driver.get(selenium.BASE_URL))
+
+    // Make sure header image is there
+    .then(_ => driver.findElement(By.css('.auth-logo')))
     .then(el => el.getAttribute('class'))
     .then(attr => expect(attr).toMatch(/auth-logo/))
+
+    // Make sure we have username & password fields
+    .then(_ => selenium.expectCssElementIsVisible(driver, 'input[name="username"]'))
+    .then(_ => selenium.expectCssElementIsVisible(driver, 'input[name="password"]'))
+  })
+
+  it('forgot password should redirect to /signup', function () {
+    DEBUG && console.log('------ forgot password should redirect to /signup')
+    return selenium.logout(driver)
+    .then(_ => selenium.expectCssElementIsVisible(driver, '.auth-forgot'))
+    .then(_ => driver.findElement(By.css('.auth-forgot')).click())
+    .then(_ => driver.getCurrentUrl())
+    .then(url => expect(url).toBe(`${selenium.BASE_URL}/signup`))
+  })
+
+  it('user should be able to log in', function () {
+    DEBUG && console.log('------ forgot password should redirect to /signup')
+    return selenium.login(driver)
   })
 })
