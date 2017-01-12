@@ -9,15 +9,26 @@ import PanZoom from './PanZoom'
 
 export default class Video extends Component {
   static propTypes = {
-    url: PropTypes.string.isRequired
+    url: PropTypes.string.isRequired,
+    startSec: PropTypes.number,
+    stopSec: PropTypes.number
   }
 
-  state = {
-    playing: true,
-    volume: 0.8,
-    played: 0,
-    loaded: 0,
-    duration: 0
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      playing: true,
+      volume: 0.8,
+      played: this.props.startSec,
+      loaded: 0,
+      duration: 0,
+      startFraction: 0,
+      stopFraction: 1,
+      isClip: false
+    }
+
+    this.needToInit = true
   }
 
   @keydown('space')
@@ -46,15 +57,25 @@ export default class Video extends Component {
     // We only want to update time slider if we are not currently seeking
     if (!this.state.seeking) {
       this.setState(state)
+
+      // Auto-stop when we run past the end of a clip
+      if (this.state.isClip) {
+        // console.log(`time left: ${(this.state.stopFraction - state.played) * this.state.duration} played:${state.played} start:${this.state.startFraction} stop:${this.state.stopFraction} dur:${this.state.duration}`)
+        if (state.played > this.state.stopFraction) {
+          // console.log('stop')
+          this.setState({ playing: false })
+          this.rewind()
+        }
+      }
     }
   }
 
   rewind = () => {
-    this.scrub(0)
+    this.scrub(this.state.startFraction)
   }
 
   fastForward = () => {
-    this.scrub(1)
+    this.scrub(this.state.stopFraction)
   }
 
   frameBack = () => {
@@ -72,6 +93,31 @@ export default class Video extends Component {
     this.player.seekTo(played)
   }
 
+  setDuration = (duration) => {
+    this.setState({ duration })
+  }
+
+  init = () => {
+    if (!this.needToInit) return
+    if (!this.player) return
+    if (!this.state.duration) return
+
+    this.needToInit = false
+
+    const { duration } = this.state
+    const startFraction = (this.props.startSec || 0) / duration
+    const stopFraction = (this.props.stopSec || duration) / duration
+
+    console.log(`video init start:${startFraction * duration} stop:${stopFraction * duration} clip:${(stopFraction - startFraction) * duration}`)
+
+    if (startFraction > 0) {
+      requestAnimationFrame(() => {
+        this.setState({ startFraction, stopFraction, isClip: true })
+        this.scrub(startFraction)
+      })
+    }
+  }
+
   render () {
     const { url } = this.props
     const {
@@ -80,6 +126,9 @@ export default class Video extends Component {
     } = this.state
     const volumeX = 130 * volume
     const volumeY = 30 - (5 + 20 * volume)
+
+    if (this.needToInit) this.init()
+
     return (
       <div className='Video'>
         <div className="Video-pan-zoom">
@@ -100,7 +149,8 @@ export default class Video extends Component {
               onEnded={() => this.setState({ playing: false, played: 1 })}
               onError={e => console.log('onError', e)}
               onProgress={this.onProgress}
-              onDuration={duration => this.setState({ duration })}
+              progressFrequency="100"
+              onDuration={this.setDuration}
             />
           </PanZoom>
         </div>
