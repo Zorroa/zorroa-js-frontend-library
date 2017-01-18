@@ -82,10 +82,14 @@ class Editbar extends Component {
         if (index < 0) selectedFolderIds.add(id)
       })
     }
+    /*
+    // For now, show the Editbar when no assets are selected
+    // This prevents the thumbnails from moving when you click on one
     if ((!selectedFolderIds || !selectedFolderIds.size) &&
       (!selectedAssetIds || !selectedAssetIds.size)) {
       return (<div className="Editbar"/>)
     }
+    */
     let title = 'Selected assets'
     const containsSelected = this.containsSelected()
     if (selectedFolderIds && selectedFolderIds.size) {
@@ -96,19 +100,18 @@ class Editbar extends Component {
         title = 'Browsing assets'
       }
     }
+    const nAssetsSelected = selectedAssetIds ? selectedAssetIds.size : 0
     const disabled = !selectedAssetIds || !selectedAssetIds.size
     const removable = !disabled && containsSelected
     return (
       <div className="Editbar">
         <div className="title">{title}</div>
         <div className="right-side">
-            {selectedAssetIds && selectedAssetIds.size ? (
-              <div className={classnames('Editbar-selected', {disabled})}>
-                {`${selectedAssetIds.size} assets selected`}
-                <div onClick={this.deselectAll} className={classnames('Editbar-cancel', 'icon-cancel-circle', {disabled})}/>
-              </div>
-              ) : <div/> }
-          <div onClick={this.exportAssets} className="export">
+            <div className={classnames('Editbar-selected', {disabled})}>
+              {`${nAssetsSelected || 'no'} assets selected`}
+              { nAssetsSelected ? (<div onClick={this.deselectAll} className={classnames('Editbar-cancel', 'icon-cancel-circle', {disabled})}/>) : null }
+            </div>
+          <div onClick={this.exportAssets} className={classnames('export', {disabled})}>
             Export
             <span onClick={this.exportSelected} className="icon-export" />
           </div>
