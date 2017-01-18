@@ -2,6 +2,7 @@ import React from 'react'
 import SimpleSearch from './SimpleSearch'
 import Facet from './Facet'
 import Map from './Map'
+import Color from './Color'
 
 export const SimpleSearchWidgetInfo = {
   type: 'SIMPLE_SEARCH',
@@ -28,4 +29,13 @@ export const MapWidgetInfo = {
   description: 'Map GPS locations on a map and select to search for matching fields',
   element: <Map/>,
   color: '#785549'
+}
+
+export const ColorWidgetInfo = {
+  type: 'COLOR',
+  icon: 'icon-eyedropper',
+  title: 'Color Search',
+  description: 'Search by color',
+  element: <Color/>,
+  color: '#fc6c2c'
 }

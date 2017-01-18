@@ -94,14 +94,17 @@ class Thumb extends Component {
       return <div className="Thumb-proxy" style={{ backgroundColor: asset.backgroundColor() }} />
     }
     let pages, duration, icon
-    const mediaType = asset.mediaType().toLowerCase()
-    if (mediaType.startsWith('image') && asset.value('image.subimages')) {
-      pages = asset.value('image.subimages')
-    } else if (mediaType.includes('video') || mediaType.includes('sequence')) {
-      duration = asset.value('video.duration')
-    } else if (mediaType === 'application/pdf' || asset.value('document.pages')) {
-      icon = require('./pdf-icon.png')
-      pages = asset.value('document.pages')
+    let mediaType = asset.mediaType()
+    if (mediaType) {
+      mediaType = mediaType.toLowerCase()
+      if (mediaType.startsWith('image') && asset.value('image.subimages')) {
+        pages = asset.value('image.subimages')
+      } else if (mediaType.includes('video') || mediaType.includes('sequence')) {
+        duration = asset.value('video.duration')
+      } else if (mediaType === 'application/pdf' || asset.value('document.pages')) {
+        icon = require('./pdf-icon.png')
+        pages = asset.value('document.pages')
+      }
     }
     const { width, height, x, y } = this.props.dim      // Original thumb rect
     const style = { width, height, left: x, top: y }    // Dim -> left, right

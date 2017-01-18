@@ -17,7 +17,8 @@
     "test:lint": "./node_modules/.bin/eslint . --color; exit 0",
     "test:coverage": "npm test; ./node_modules/.bin/serve ./coverage/lcov-report & open http://localhost:8080",
     "purge": "rm -rf node_modules; npm cache clean; npm install",
-    "update-fonts": "src/assets/fonts/zorroa-icons/update-fonts.bash"
+    "update-fonts": "src/assets/fonts/zorroa-icons/update-fonts.bash",
+    "preview-fonts": "open src/assets/fonts/zorroa-icons/demo.html"
   },
   "author": "Jordan Papaleo",
   "license": "",
@@ -57,6 +58,7 @@
     "html-loader": "0.4.3",
     "html-webpack-plugin": "2.22.0",
     "jest-cli": "18.1.0",
+    "json": "9.0.4",
     "json-loader": "0.5.4",
     "less": "2.7.1",
     "less-loader": "2.2.3",

@@ -1,0 +1,172 @@
+@import '../../styles/core-mixins.scss';
+
+.Color {
+  .WidgetHeader {
+    color: $zorroa-nearwhite;
+  }
+
+  .WidgetHeader-icon {
+    transform: rotate(-90deg) scaleY(-1);
+  }
+
+  .Widget-icon {
+    font-size: 20px;
+  }
+
+  .Color-header {
+    @include flexRow;
+    @include flexJustifySpaceBetween;
+    @include flexAlignItemsCenter;
+    @include fullWidth;
+    @include noSelect;
+
+    color: #fff;
+
+    flex-shrink: 1;
+  }
+
+  .Color-header-label {
+    @include flexRow;
+    @include flexAlignItemsCenter;
+  }
+
+  .Color-header-title {
+    font-weight: 100;
+    margin-right: 4px;
+  }
+
+  .Color-body {
+    padding: 10px;
+  }
+
+  // Custom scrollbar styles from Amber
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  .Color-picker {
+    @include flexCol;
+    padding: 20px;
+  }
+
+  .Color-swatches {
+    @include flexColCenter;
+  }
+
+  .Color-swatch-row {
+    @include flexRow;
+    @include flexOff;
+  }
+
+  .Color-swatch {
+    @include flexOff;
+    width: 16px;
+    height: 16px;
+
+    &.selected {
+      border: 2px solid black;
+      &.lightborder {
+        border: 2px solid white;
+      }
+    }
+  }
+
+  .Color-status {
+    @include flexRow;
+    margin-top: 20px;
+  }
+
+  .Color-preview {
+    @include flexOff;
+    @include flexRow;
+    @include flexAlignItemsEnd;
+    @include flexJustifyEnd;
+
+    width: 40px;
+    height: 40px;
+    border-radius: 3px;
+    border: 1px solid $zorroa-lightgray;
+  }
+
+  .Color-preview-icon {
+    width: 20px;
+    height: 20px;
+    color: $zorroa-nearwhite;
+  }
+
+  .Color-hex-input {
+    @include flexOn;
+
+    height: 40px;
+    width: 100%;
+    margin-left: 1em;
+    border-radius: 3px;
+    border: 1px solid $zorroa-lightgray;
+    padding: 5px;
+    font-size: 14px;
+  }
+
+  .Color-separator {
+    height: 1px;
+    width: 100%;
+    background-color: $zorroa-lightgray;
+  }
+
+  .Color-slider {
+    position: relative;
+  }
+
+  .Color-slider-text {
+    @include flexRowCenter;
+    color: $zorroa-lightgray;
+    height: 40px;
+    width: 100%;
+  }
+
+  .Color-slider-bg {
+    @include flexColCenter;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    color: #ddd;
+  }
+
+  .Color-slider-icon {
+    font-size: 50px;
+    margin: 10px;
+  }
+
+  .Color-slider-fg {
+    z-index: 1;
+    height: 180px;
+    width: 100%;
+  }
+
+  .Color-slider-color {
+  }
+  .Color-slider-pct {
+    color: white;
+    font-size: 14px;
+    padding-left: 10px;
+  }
+  .Color-slider-resizer {
+    width: 100%;
+    height: 5px;
+    background-color: white;
+    &:hover {
+      cursor: ns-resize;
+    }
+  }
+  .Color-slider-del {
+    width: 12px;
+    height: 12px;
+    margin: 5px;
+    border-radius: 5px;
+    color: white;
+    background-color: $zorroa-lightgray;
+    border: 1px solid white;
+    font-size: 9px;
+  }
+}

@@ -1,0 +1,67 @@
+#!/bin/bash
+
+HUE=${1-0}
+SAT=${2-75}
+BRI=${3-69}
+
+hueRange=24
+saturationRange=75
+brightnessRange=25
+
+minRatio=10
+maxRatio=100
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+projroot=$DIR/..
+json=$projroot/node_modules/.bin/json
+
+# this should be running from the project root
+if [[ ! -f $json ]]; then
+  echo 'Cant find "json" executable; please run this from the project root'
+  echo 'and make sure you have run npm install recently'
+  exit
+fi
+
+tmpdir=$(mktemp -d)
+cd $tmpdir
+
+echo searching color $HUE $SAT $BRI
+
+filter=$(cat << END
+{"size": 36, "filter": {"colors": {"colors": [{"hue": $HUE, "saturation": $SAT, "brightness": $BRI, "hueRange": $hueRange, "maxRatio": $maxRatio, "saturationRange": $saturationRange, "minRatio": $minRatio, "brightnessRange": $brightnessRange}]}}}
+END
+)
+
+# override with a multi-color search filter copied from the curator, if you want. example:
+# filter=$(cat << END
+# {"filter":{"colors":{"colors":[{"hue":315,"saturation":100,"brightness":49,"hueRange":24,"maxRatio":37.5,"saturationRange":75,"minRatio":8.34,"brightnessRange":25},{"hue":67,"saturation":100,"brightness":43,"hueRange":24,"maxRatio":37.5,"saturationRange":75,"minRatio":8.34,"brightnessRange":25},{"hue":67,"saturation":100,"brightness":36,"hueRange":24,"maxRatio":37.5,"saturationRange":75,"minRatio":8.34,"brightnessRange":25},{"hue":67,"saturation":100,"brightness":29,"hueRange":24,"maxRatio":37.5,"saturationRange":75,"minRatio":8.34,"brightnessRange":25}]}},"postFilter":{},"size":100}
+# END
+# )
+
+command=$(cat << END
+curl -H "Content-Type: application/json" -X POST http://54.89.104.244:8066/api/v3/assets/_search -u admin:admin -d '$filter' > colorSearchResults
+END
+)
+
+echo command=$command
+eval $command
+
+# echo color search results:
+# cat colorSearchResults
+
+# On the flickr server, snag the original flickr URL
+$json -f colorSearchResults list | json -a document.flickr.URL > images
+
+# For the general case, we'll want to use proxies instead of flickr
+# proxies will download faster & montage faster!
+# but we have to use the zorroa rest api, this command in incomplete
+# $json -f /var/folders/ph/hqqdt51x26l3ghhdgdf98k7r0000gn/T/tmp.ce6E4hHkCJ/colorSearchResults list | $json -a document.proxies.proxies | grep -A 3 '"width": 128,' | grep '"id":'
+
+# cat url.list | parallel -j 8 wget -O {#}.html {}
+< images parallel -k -j 8 wget --quiet {}
+
+montage -geometry 128x128+0+0 *.jpg montage.jpg
+
+open -a preview montage.jpg
+
+echo results in $tmpdir
