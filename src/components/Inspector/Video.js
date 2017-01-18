@@ -1,17 +1,24 @@
 import React, { Component, PropTypes } from 'react'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
 import keydown from 'react-keydown'
 
 // Reference: https://github.com/CookPete/react-player
 import ReactPlayer from 'react-player'
 
+import { saveUserSettings } from '../../actions/authAction'
 import { formatDuration } from '../../services/jsUtil'
 import PanZoom from './PanZoom'
+import User from '../../models/User'
 
-export default class Video extends Component {
+class Video extends Component {
   static propTypes = {
     url: PropTypes.string.isRequired,
     startSec: PropTypes.number,
-    stopSec: PropTypes.number
+    stopSec: PropTypes.number,
+    user: PropTypes.instanceOf(User),
+    userSettings: PropTypes.object.isRequired,
+    actions: PropTypes.object
   }
 
   constructor (props) {
@@ -19,7 +26,7 @@ export default class Video extends Component {
 
     this.state = {
       playing: true,
-      volume: 0.8,
+      volume: this.props.userSettings.videoVolume || 0.8,
       played: this.props.startSec,
       loaded: 0,
       duration: 0,
@@ -37,7 +44,10 @@ export default class Video extends Component {
   }
 
   setVolume = e => {
-    this.setState({ volume: parseFloat(e.target.value) })
+    const volume = parseFloat(e.target.value)
+    this.setState({ volume })
+    const settings = { ...this.props.userSettings, videoVolume: volume }
+    this.props.actions.saveUserSettings(this.props.user, settings)
   }
 
   onSeekMouseDown = e => {
@@ -197,6 +207,14 @@ export default class Video extends Component {
     )
   }
 }
+
+export default connect(state => ({
+  userSettings: state.app.userSettings
+}), dispatch => ({
+  actions: bindActionCreators({
+    saveUserSettings
+  }, dispatch)
+}))(Video)
 
 const Duration = ({ className, seconds }) => {
   return (

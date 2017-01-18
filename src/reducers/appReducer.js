@@ -4,7 +4,7 @@ import {
   METADATA_FIELDS, TABLE_FIELDS, LIGHTBAR_FIELDS,
   SYNC_FIELDS, SHOW_IMPORT_SCRIPT_INFO,
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH,
-  THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
+  THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT, VIDEO_VOLUME,
   USER_SETTINGS, UNAUTH_USER
 } from '../constants/actionTypes'
 
@@ -87,7 +87,9 @@ export default function app (state = initialState, action) {
     case SHOW_TABLE:
       return { ...state, showTable: action.payload }
     case TABLE_HEIGHT:
-      return { ...state, tableHeight: action.payload}
+      return { ...state, tableHeight: action.payload }
+    case VIDEO_VOLUME:
+      return { ...state, videoVolume: action.payload }
     case USER_SETTINGS:
       return { ...state, userSettings: action.payload.metadata }
     case UNAUTH_USER:

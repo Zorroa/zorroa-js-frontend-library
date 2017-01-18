@@ -5,7 +5,8 @@ import { initialize } from 'redux-form'
 import {
   AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR, USER_SETTINGS,
   AUTH_PERMISSIONS, METADATA_FIELDS, TABLE_FIELDS,
-  THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT } from '../constants/actionTypes'
+  THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT, VIDEO_VOLUME
+} from '../constants/actionTypes'
 import { USER_ITEM, HOST_ITEM, PROTOCOL_ITEM } from '../constants/localStorageItems'
 import User from '../models/User'
 import Permission from '../models/Permission'
@@ -83,7 +84,7 @@ export function signinUser ({ username, password, protocol, host }) {
 }
 
 function authorize (dispatch, json) {
-  const metadata = json.settings && json.settings.metadata
+  const metadata = null /* FIXME -- Disabled: json.settings && json.settings.metadata */
   if (metadata) {
     // FIXME: Should move to settings.search in server?
     if (metadata.search && !api.getSeleniumTesting()) {
@@ -107,6 +108,9 @@ function authorize (dispatch, json) {
     }
     if (metadata.tableHeight) {
       dispatch({type: TABLE_HEIGHT, payload: metadata.tableHeight})
+    }
+    if (metadata.videoVolume) {
+      dispatch({type: VIDEO_VOLUME, payload: metadata.videoVolume})
     }
   }
   const user = new User(json)
@@ -167,6 +171,9 @@ export function getUserPermissions (user) {
 export function saveUserSettings (user, metadata) {
   return dispatch => {
     // FIXME: Move search to settings.search in server?
+    // FIXME: Use localStore rather than server?
+    dispatch({ type: USER_SETTINGS, payload: { user, metadata } })
+    /* FIXME: Disabled server-side because restoring causes confusion.
     const settings = { metadata }
     archivist.put('/api/v1/users/' + user.id + '/_settings', settings)
       .then(response => {
@@ -176,5 +183,6 @@ export function saveUserSettings (user, metadata) {
       .catch(error => {
         console.error('Cannot save user settings ' + error)
       })
+    */
   }
 }

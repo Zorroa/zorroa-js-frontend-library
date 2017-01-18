@@ -342,7 +342,7 @@ class Assets extends Component {
 
   renderAssets () {
     const { assets, selectedIds, totalCount, layout } = this.props
-    const { layout, positions, tableIsResizing } = this.state
+    const { positions, tableIsResizing } = this.state
     api.setTableIsResizing(tableIsResizing)
 
     if (!assets || !assets.length) {
@@ -429,7 +429,7 @@ class Assets extends Component {
 
   render () {
     const { assets, totalCount, tableHeight, showTable, layout, thumbSize } = this.props
-    const { showTable, layout, thumbSize, tableHeight, tableIsResizing, assetsCounter } = this.state
+    const { tableIsResizing, assetsCounter } = this.state
 
     // Trigger layout if assets change.
     if (assetsCounter !== this.assetsCounter) this.queueAssetsLayout()
