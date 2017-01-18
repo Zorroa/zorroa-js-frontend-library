@@ -25,16 +25,24 @@
     width: 100%;
     max-width: 100%;
 
-    overflow-x: hidden;
-    overflow-y: auto;
-
     padding-bottom: 10px;
     &:not(.isRightEdge) {
       padding-left: 10px;
       padding-right: 10px;
     }
 
-    @include flexOn;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    .scroller-inner {
+      max-height: 100%;
+      width: 100%;
+      max-width: 100%;
+
+      overflow: hidden;
+
+      @include flexOn;
+    }
   }
 }
 
@@ -72,15 +80,16 @@
 
 .Sidebar-resize-thumb {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 24px;
+  right: -10px; // place left sidebar resizer in the Assets' left side padding (this is awkward, will be fixed)
   width: 10px;
   height: 100%;
   cursor: col-resize;
   background: none;
 
   &.isRightEdge {
-    left: 0;
+    // place right sidebar resizer in the sidebar's left side padding
+    left: 0px;
     right: auto;
   }
 }
