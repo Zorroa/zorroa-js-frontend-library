@@ -47,7 +47,7 @@ $tableResizeRightPadding: 20px;
     text-align: left;
     text-transform: uppercase;
     font-size: 12px;
-    font-weight: 100;
+    font-family: Roboto Condensed;
   }
 }
 
@@ -56,22 +56,24 @@ $tableResizeRightPadding: 20px;
 }
 
 .Table-header-sort {
-  font-size: 14px;
+  @include flexRowCenter;
+  @include flexOff;
+  height: 24px;
+  width: 16px;
+  padding-right: 2px; // This compensates for the slight offset of icon-sort*
+  font-size: 11px;
   cursor: pointer;
-  padding: 4px;
   border-radius: 3px;
+  color: $zorroa-lightgray;
 
   &.icon-sort {
-    color: $zorroa-lightgray;
-    font-size: 12px;
-    padding-right: 8px;
+    color: $zorroa-nearwhite;
   }
 
   &:hover {
     background-color: $zorroa-sickly-green;
     color: white;
   }
-
 }
 
 .Table-header-sort-order-0 {
@@ -95,7 +97,8 @@ $tableResizeRightPadding: 20px;
 
 .Table-header-resizer-handle {
   width: 0;
-  height: 60%;
+  height: 100%;
+  color: #f1f1f1;
   border-right: 1px solid $zorroa-nearwhite;
 }
 
@@ -164,7 +167,7 @@ $tableResizeRightPadding: 20px;
 .Table-cell {
   @include noSelect;
   @include clampText;
-  padding: 8px;
+  padding: 8px 5px;
 }
 
 // This is for measure text, for auto column width resizing
