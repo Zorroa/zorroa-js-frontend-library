@@ -35,13 +35,15 @@ const initialState = {
   thumbLayout: 'masonry',
   tableHeight: 300,
   showTable: false,
+  videoVolume: 0.8,
   userSettings: {
-    tableFields: defaultTableFields,
-    metadataFields: defaultTableFields,
+    tableFields: [ ...defaultTableFields ],
+    metadataFields: [ ...defaultTableFields ],
     showTable: false,
     tableHeight: 300,
     thumbSize: 128,
-    thumbLayout: 'masonry'
+    thumbLayout: 'masonry',
+    videoVolume: 0.8
   }
 }
 

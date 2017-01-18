@@ -79,7 +79,7 @@ class Table extends Component {
   }
 
   updateDisplayOptions = (event, state) => {
-    const { metadataFields, query, user, actions } = this.props
+    const { metadataFields, user, actions } = this.props
     const { syncedViews, checkedNamespaces } = state
     // console.log('Update table display options to:\n' + JSON.stringify(state.checkedNamespaces))
     actions.updateTableFields(checkedNamespaces)
@@ -89,7 +89,7 @@ class Table extends Component {
     const settings = {
       ...this.props.userSettings,
       tableFields: checkedNamespaces,
-      metadataFields: syncedViews ? checkedNamespaces : metadataFields,
+      metadataFields: syncedViews ? checkedNamespaces : metadataFields
     }
     actions.saveUserSettings(user, settings)
   }

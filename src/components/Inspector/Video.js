@@ -6,6 +6,7 @@ import keydown from 'react-keydown'
 // Reference: https://github.com/CookPete/react-player
 import ReactPlayer from 'react-player'
 
+import { setVideoVolume } from '../../actions/appActions'
 import { saveUserSettings } from '../../actions/authAction'
 import { formatDuration } from '../../services/jsUtil'
 import PanZoom from './PanZoom'
@@ -16,6 +17,7 @@ class Video extends Component {
     url: PropTypes.string.isRequired,
     startSec: PropTypes.number,
     stopSec: PropTypes.number,
+    videoVolume: PropTypes.number,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object
@@ -26,7 +28,7 @@ class Video extends Component {
 
     this.state = {
       playing: true,
-      volume: this.props.userSettings.videoVolume || 0.8,
+      volume: this.props.videoVolume,
       played: this.props.startSec,
       loaded: 0,
       duration: 0,
@@ -46,6 +48,7 @@ class Video extends Component {
   setVolume = e => {
     const volume = parseFloat(e.target.value)
     this.setState({ volume })
+    this.props.actions.setVideoVolume(volume)
     const settings = { ...this.props.userSettings, videoVolume: volume }
     this.props.actions.saveUserSettings(this.props.user, settings)
   }
@@ -209,9 +212,11 @@ class Video extends Component {
 }
 
 export default connect(state => ({
+  videoVolume: state.app.videoVolume,
   userSettings: state.app.userSettings
 }), dispatch => ({
   actions: bindActionCreators({
+    setVideoVolume,
     saveUserSettings
   }, dispatch)
 }))(Video)
