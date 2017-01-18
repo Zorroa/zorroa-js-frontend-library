@@ -25,6 +25,18 @@ export default class TableField extends Component {
     )
   }
 
+  renderColors = (vals) => {
+    return (
+      <div className='TableField-array'>
+        { vals.map((val, i) => (
+          <div className='TableField-color'
+               key={i}
+               style={{backgroundColor: val['hex']}}/>
+        ))}
+      </div>
+    )
+  }
+
   renderStringArray = (vals) => {
     const { isOpen, onOpen } = this.props
     return (
@@ -60,9 +72,11 @@ export default class TableField extends Component {
 
     if (Array.isArray(val) && val.length) {
       // If this is an array of colors, render colors
-      if (val[0] && val[0][0] === '#' &&
+      if (val[0] && typeof val[0] === 'string' && val[0][0] === '#' &&
         val.every(v => v[0] === '#' && v.length === 7 || v.length === 4)) {
         renderValFn = this.renderColorArray
+      } else if (field === 'colors') {
+        renderValFn = this.renderColors
       } else {
         // otherwise, render an array of strings
         renderValFn = this.renderStringArray
