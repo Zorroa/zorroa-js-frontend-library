@@ -69,7 +69,12 @@ export function selectFolderId (id, shiftKey, metaKey, folders, selectedIds) {
     selectedFolderIds = new Set(selectedIds)
     selectedFolderIds[selectedFolderIds.has(id) ? 'delete' : 'add'](id)
   } else {
-    selectedFolderIds = new Set([id])
+    // single click of a single selected folder should deselect
+    if (selectedIds && selectedIds.size === 1 && selectedIds.has(id)) {
+      selectedFolderIds = new Set()
+    } else {
+      selectedFolderIds = new Set([id])
+    }
   }
   return selectFolderIds(selectedFolderIds)
 }

@@ -114,9 +114,15 @@ class Assets extends Component {
       const lastSelectedId = ids.length ? asset.id : null
       this.setState({...this.state, lastSelectedId})
     } else {
-      // Select the single asset and use it as the anchor point
-      ids = new Set([asset.id])
-      this.setState({...this.state, lastSelectedId: asset.id})
+      if (selectedIds && selectedIds.size === 1 && selectedIds.has(asset.id)) {
+        // single click of a single selected asset should deselect
+        ids = new Set()
+        this.setState({...this.state, lastSelectedId: null})
+      } else {
+        // Select the single asset and use it as the anchor point
+        ids = new Set([asset.id])
+        this.setState({...this.state, lastSelectedId: asset.id})
+      }
     }
     actions.selectAssetIds(ids)
   }

@@ -105,7 +105,10 @@ class Facet extends Component {
         terms.push(term)
       }
     } else {
-      terms = [term]
+      // single click on a single selected term will deselect, otherwise select the clicked term
+      if (!(this.state.terms && this.state.terms.length === 1 && this.state.terms[0] === term)) {
+        terms = [term]
+      }
     }
     this.modifySliver(this.state.field, terms)
   }
