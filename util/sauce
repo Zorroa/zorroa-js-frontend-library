@@ -1,0 +1,58 @@
+#!/bin/bash
+
+# This will let you run Selenium tests on the Sauce Labs servers instead of locally
+# Run this script, it will launch sauce connect and then let you run tests until you're done
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+ZORROA=$DIR/..
+
+# make sure user is running a local server first
+if ! nc -z localhost 8080; then
+  echo "I see no curator running on localhost:8080; make sure to start your server"
+  exit
+fi
+
+export SAUCE_USERNAME=zorroasauce
+export SAUCE_ACCESS_KEY=f6c35e63-e19a-4575-be77-b49748e98bd6
+
+TMP=$(mktemp -d)
+readyfile=$TMP/readyfile
+
+# If user doesn't have sauce connect, get it
+# If this breaks, update the version & links from using
+# https://wiki.saucelabs.com/display/DOCS/Sauce+Connect+Proxy
+SC_VERSION=4.4.2
+SC_PLATFORM=osx
+case "$OSTYPE" in
+  linux*)
+    case $(uname -m) in
+      i686) SC_PLATFORM=linux32 ;;
+      *)    SC_PLATFORM=linux ;;
+    esac ;;
+  msys*) SC_PLATFORM=win32 ;;
+esac
+
+SC_BASE=sc-${SC_VERSION}-${SC_PLATFORM}
+SC_BIN=$ZORROA/tmp/${SC_BASE}/bin/sc
+
+if [ ! -e $SC_BIN ]; then
+  cd $ZORROA/tmp
+  wget "https://saucelabs.com/downloads/${SC_BASE}.zip"
+  unzip -o ${SC_BASE}.zip
+fi
+
+# Launch sauce connect
+"$SC_BIN" -f $readyfile -u $SAUCE_USERNAME -k $SAUCE_ACCESS_KEY &
+
+# kill sauce connect whenever we're done
+PID=$!
+trap 'kill $PID' 0
+
+# wait for sauce connect to be ready
+while [ ! -f $readyfile ]; do sleep 1; done
+
+# test REPL; execute each test (pattern)
+while read -p 'Enter test to run (blank to exit):' test && [ ! -z "$test" ]; do
+  echo "running tests that match '$test'"
+  $ZORROA/node_modules/.bin/jest -i "$test"
+done

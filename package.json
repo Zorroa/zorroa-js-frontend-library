@@ -13,7 +13,7 @@
     "pretest": "npm run test:lint",
     "test": "./node_modules/.bin/jest -i",
     "test:watch": "./node_modules/.bin/jest --verbose --watch",
-    "test:e2e": "./node_modules/.bin/jest ./tests/e2e/homePage.test.js",
+    "test:e2e": "./node_modules/.bin/jest e2e",
     "test:lint": "./node_modules/.bin/eslint . --color; exit 0",
     "test:coverage": "npm test; ./node_modules/.bin/serve ./coverage/lcov-report & open http://localhost:8080",
     "purge": "rm -rf node_modules; npm cache clean; npm install",

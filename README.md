@@ -140,19 +140,19 @@ Tips for making testing quicker & easier:
 ### Running Sauce Labs tests manually:
 
 - Download [Sauce Connect](https://wiki.saucelabs.com/display/DOCS/Sauce+Connect+Proxy), put it in the project tmp/ dir, if you want
-- Set env vars to connect to sauce. (copy & paste line below into your shell; our Selenium tests automatically use Sauce when these are defined, and run Selenium tests locally when they aren't)
+- Launch util/sauce to run any Selenium tests you want, for example:
 
 ```
-export SAUCE_USERNAME=zorroasauce; export SAUCE_ACCESS_KEY=f6c35e63-e19a-4575-be77-b49748e98bd6
+> util/sauce
+
+...
+18 Jan 17:52:21 - Sauce Connect is up, you may start your tests.
+Enter test to run (blank to exit):work
+running tests that match 'work'
+
+RUNS  tests/e2e/workspace.test.js
 ```
 
-- In the same shell, launch Sauce Connect in the background
-
-```
-tmp/sc-4.4.2-osx/bin/sc -u $SAUCE_USERNAME -k $SAUCE_ACCESS_KEY &
-```
-
-- In the same shell, run any Selenium tests you want
 - Monitor test results in the [Sauce Labs tests dashboard](https://saucelabs.com/beta/dashboard/tests)
 -- Clicking on the test, then navigating to the "Watch" tab will display the test's browser screen real-time.
 
