@@ -60,12 +60,12 @@ describe('Table', function () {
 
     var TableToggle
     var assetsScrollHeight
-    var expectedMinAssetsScrollHeight = '110px' // see Assets.js:footerEditbarAndPaddingHeight
+    var expectedMinAssetsScrollHeight = '62px' // see Assets.js:footerEditbarAndPaddingHeight
     var expectedMinTableHeight = '26px' // see Assets.js:minTableHeight
     var elements
 
     const dragVertFn = (fromEleName, toEleName, yoffset) => {
-      var n = Math.abs(yoffset / 100)
+      var n = Math.abs(yoffset / 50)
       var dy = yoffset / n
 
       DEBUG && console.log({n, dy, yoffset})
@@ -123,7 +123,7 @@ describe('Table', function () {
     .then(height => { assetsScrollHeight = height })
 
     // Expand the Table as far as it will go
-    .then(_ => dragVertFn('.Assets-tableResize', '.header', -450))
+    .then(_ => dragVertFn('.Assets-tableResize', '.header', -500))
 
     // Check that the table size changed, and that the assets scroll is at the expected minimum
     .then(_ => elements['.assets-scroll'].getCssValue('height'))
@@ -133,7 +133,7 @@ describe('Table', function () {
     })
 
     // Shrink the Table as far as it will go
-    .then(_ => dragVertFn('.Assets-tableResize', '.assets-footer', 450))
+    .then(_ => dragVertFn('.Assets-tableResize', '.assets-footer', 500))
 
     // Check that the Table height is at the expected minimum
     .then(_ => elements['.Table'].getCssValue('height'))
