@@ -80,7 +80,7 @@ class Trash extends Component {
   constrainContextMenu = (ctxMenu) => {
     const { contextMenuPos } = this.state
     if (contextMenuPos.y + ctxMenu.clientHeight > window.innerHeight) {
-      this.setState({ contextMenuPos: {...contextMenuPos, y: window.innerHeight - ctxMenu.clientHeight } })
+      this.setState({ contextMenuPos: { ...contextMenuPos, y: window.innerHeight - ctxMenu.clientHeight } })
     }
   }
 
