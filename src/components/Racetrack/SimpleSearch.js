@@ -27,14 +27,18 @@ class SimpleSearch extends Component {
 
   state = {
     queryString: queryString(this.props),
-    fuzzy: true,
-    field: ''
+    fuzzy: isFuzzy(this.props),
+    field: queryField(this.props)
   }
 
   // If the query is changed elsewhere, e.g. from the Searchbar,
   // capture the new props and update our local state to match.
   componentWillReceiveProps (nextProps) {
-    this.setState({ queryString: queryString(nextProps) })
+    this.setState({
+      queryString: queryString(nextProps),
+      fuzzy: isFuzzy(nextProps),
+      field: queryField(nextProps)
+    })
   }
 
   // Remove our sliver if the close button in our header is clicked
@@ -134,6 +138,14 @@ class SimpleSearch extends Component {
 
 const queryString = props => (
   props && props.query && props.query.query ? props.query.query : ''
+)
+
+const isFuzzy = props => (
+  props && props.query && props.query.fuzzy
+)
+
+const queryField = props => (
+  props && props.query.queryFields ? Object.keys(props.query.queryFields)[0] : ''
 )
 
 const mapDispatchToProps = dispatch => ({
