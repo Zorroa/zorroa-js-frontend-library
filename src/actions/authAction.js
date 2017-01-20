@@ -81,8 +81,12 @@ export function signinUser ({ username, password, protocol, host }) {
 }
 
 function authorize (dispatch, json) {
+  const user = new User(json)
+  dispatch({ type: AUTH_USER, payload: user })
+  localStorage.setItem(USER_ITEM, JSON.stringify(user))
   const metadata = json.settings && json.settings.metadata
   if (metadata) {
+    dispatch({type: USER_SETTINGS, payload: {user, metadata}})
     // FIXME: Should move to settings.search in server?
     /* FIXME: Disable restoring the search due to user conflicts.
     if (metadata.search && !api.getSeleniumTesting()) {
@@ -112,9 +116,6 @@ function authorize (dispatch, json) {
       dispatch({type: VIDEO_VOLUME, payload: metadata.videoVolume})
     }
   }
-  const user = new User(json)
-  dispatch({ type: AUTH_USER, payload: user })
-  localStorage.setItem(USER_ITEM, JSON.stringify(user))
   browserHistory.push('/')
 }
 
