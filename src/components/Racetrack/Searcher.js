@@ -118,7 +118,8 @@ class Searcher extends Component {
       actions.searchAssets(assetSearch)
       this.inflightQuery = assetSearch
       if (query) {
-        actions.saveUserSettings(user, { ...userSettings, search: assetSearch })
+        // FIXME: Disable saving search to user settings to avoid conflicts
+        // actions.saveUserSettings(user, { ...userSettings, search: assetSearch })
       }
       if (folders && folders.size > 1) {
         // New query, get all the filtered folder counts

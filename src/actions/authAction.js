@@ -84,13 +84,15 @@ export function signinUser ({ username, password, protocol, host }) {
 }
 
 function authorize (dispatch, json) {
-  const metadata = null /* FIXME -- Disabled: json.settings && json.settings.metadata */
+  const metadata = json.settings && json.settings.metadata
   if (metadata) {
     // FIXME: Should move to settings.search in server?
+    /* FIXME: Disable restoring the search due to user conflicts.
     if (metadata.search && !api.getSeleniumTesting()) {
       const query = new AssetSearch(metadata.search)
       dispatch(restoreSearch(query))
     }
+    */
     if (metadata.metadataFields) {
       dispatch({type: METADATA_FIELDS, payload: metadata.metadataFields})
     }
@@ -172,8 +174,6 @@ export function saveUserSettings (user, metadata) {
   return dispatch => {
     // FIXME: Move search to settings.search in server?
     // FIXME: Use localStore rather than server?
-    dispatch({ type: USER_SETTINGS, payload: { user, metadata } })
-    /* FIXME: Disabled server-side because restoring causes confusion.
     const settings = { metadata }
     archivist.put('/api/v1/users/' + user.id + '/_settings', settings)
       .then(response => {
@@ -183,6 +183,5 @@ export function saveUserSettings (user, metadata) {
       .catch(error => {
         console.error('Cannot save user settings ' + error)
       })
-    */
   }
 }
