@@ -34,15 +34,7 @@
     overflow-x: hidden;
     overflow-y: auto;
 
-    .scroller-inner {
-      max-height: 100%;
-      width: 100%;
-      max-width: 100%;
-
-      overflow: hidden;
-
-      @include flexOn;
-    }
+    @include flexOn;
   }
 }
 
