@@ -5,6 +5,40 @@
     color: $zorroa-nearwhite;
   }
 
+  .Widget-icon {
+    font-size: 20px;
+  }
+
+  .SimpleSearch-header {
+    @include flexRow;
+    @include flexJustifySpaceBetween;
+    @include flexAlignItemsCenter;
+    @include fullWidth;
+    @include noSelect;
+
+    flex-shrink: 1;
+  }
+
+  .SimpleSearch-header-label {
+    @include flexRow;
+    @include flexAlignItemsCenter;
+  }
+
+  .SimpleSearch-header-title {
+    font-weight: 100;
+    margin-right: 4px;
+  }
+
+  .SimpleSearch-header-field {
+    font-weight: 400;
+  }
+
+  .SimpleSearch-settings {
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
   .SimpleSearch-body {
     background-color: white;
     color: $zorroa-gray;
@@ -23,6 +57,34 @@
       margin: 12px;
       padding-left: 8px;
       padding-right: 8px;
+    }
+  }
+
+  .SimpleSearch-toggles {
+    @include flexRow;
+    @include flexAlignItemsCenter;
+    @include flexJustifySpaceBetween;
+  }
+
+  .SimpleSearch-fuzzy {
+    @include flexRow;
+    @include flexAlignItemsCenter;
+    padding-left: 12px;
+    padding-right: 12px;
+    margin-bottom: 10px;
+  }
+
+  .SimpleSearch-fuzzy-label {
+    margin-left: 12px;
+  }
+
+  .SimpleSearch-clear-search {
+    margin-left: 4px;
+    margin-right: 4px;
+    font-size: 10px;
+
+    &:hover {
+      cursor: pointer;
     }
   }
 }

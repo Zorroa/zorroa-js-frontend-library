@@ -48,16 +48,18 @@ export default class AssetSearch {
         this.postFilter = new AssetFilter(assetSearch.postFilter)
       }
     }
-    if (assetSearch.fuzzy) {
-      this.fuzzy = this.fuzzy || assetSearch.fuzzy
-    }
+    this.fuzzy = this.fuzzy || assetSearch.fuzzy
     if (assetSearch.queryFields) {
-      for (let key in assetSearch.queryFields) {
-        if (assetSearch.queryFields.hasOwnProperty(key)) {
-          if (this.queryFields.hasOwnProperty(key)) {
-            this.queryFields[key] = union([this.queryFields[key], assetSearch.queryFields[key]])
-          } else {
-            this.queryFields[key] = { ...assetSearch.queryFields[key] }
+      if (!this.queryFields) {
+        this.queryFields = { ...assetSearch.queryFields }
+      } else {
+        for (let key in assetSearch.queryFields) {
+          if (assetSearch.queryFields.hasOwnProperty(key)) {
+            if (this.queryFields && this.queryFields.hasOwnProperty(key)) {
+              this.queryFields[key] = union([this.queryFields[key], assetSearch.queryFields[key]])
+            } else {
+              this.queryFields[key] = assetSearch.queryFields[key]
+            }
           }
         }
       }
