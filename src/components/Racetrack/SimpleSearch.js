@@ -50,7 +50,7 @@ class SimpleSearch extends Component {
   // ...and onKeyPress to monitor for the Enter key to submit the new query
   queryStringKeyPressed = (event) => {
     if (event.key === 'Enter') {
-      this.modifySliver({...this.state})
+      this.modifySliver(this.state.queryString, this.state.fuzzy, this.state.field)
     }
   }
 
