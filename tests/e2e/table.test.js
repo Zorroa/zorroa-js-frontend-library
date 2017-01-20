@@ -55,7 +55,7 @@ describe('Table', function () {
   // Tests below ASSUME we are logged in!
   // ------------------------------------
 
-  it('test the Table', function () {
+  xit('test the Table', function () {
     DEBUG && console.log('test the Table')
 
     var TableToggle
