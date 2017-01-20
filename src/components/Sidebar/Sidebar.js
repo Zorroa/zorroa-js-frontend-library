@@ -64,9 +64,7 @@ export default class Sidebar extends Component {
         <div className={classnames('Sidebar-open-close-button', 'icon-doublearrows',
           { isRightEdge, isIconified })} onClick={onToggle} />
         <div className={classnames('scroller', { isRightEdge })} onClick={this.toggleIfNotIconified}>
-          <div className='scroller-inner'>
-            { children }
-          </div>
+          { children }
         </div>
         { isOpen && <div draggable={true} onDragStart={this.startDrag} onDrag={this.drag}
                          className={classnames('Sidebar-resize-thumb', { isRightEdge })} /> }
