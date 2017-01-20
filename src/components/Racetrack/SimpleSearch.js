@@ -58,7 +58,7 @@ class SimpleSearch extends Component {
     const type = SimpleSearchWidgetInfo.type
     const sliver = new AssetSearch({query: queryString, fuzzy})
     if (field.length) {
-      sliver.queryFields = { field: 1 }
+      sliver.queryFields = { [field]: 1 }
     }
     const widget = new WidgetModel({id: this.props.id, type, sliver})
     this.props.actions.modifyRacetrackWidget(widget)
