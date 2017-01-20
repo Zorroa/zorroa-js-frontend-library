@@ -122,7 +122,7 @@ $FolderItemHeight : 25px;
   @include flexCol;
   background-color: white;
   border-radius: 3px;
-  position: absolute;
+  position: fixed;
   top: 24px;
   left: 28px;
   width: 180px;

@@ -20,7 +20,8 @@ class Trash extends Component {
 
   state = {
     isOpen: false,
-    contextMenuTrashedFolderId: null
+    contextMenuTrashedFolderId: null,
+    contextMenuPos: { x: 0, y: 0 }
   }
 
   showContextMenu (trashedFolder, event) {
@@ -29,7 +30,10 @@ class Trash extends Component {
     if (!this.props.selectedFolderIds.has(trashedFolder.folderId)) {
       this.selectFolder(trashedFolder, {shiftKey: false, metaKey: false})
     }
-    this.setState({ contextMenuTrashedFolderId: trashedFolder.id })
+    this.setState({
+      contextMenuTrashedFolderId: trashedFolder.id,
+      contextMenuPos: { x: event.pageX, y: event.pageY }
+    })
   }
 
   dismissContextMenu = (event) => {
@@ -72,11 +76,23 @@ class Trash extends Component {
       this.props.trashedFolders, this.props.selectedFolderIds)
   }
 
+  // Keep the context menu from running off the bottom of the screen
+  constrainContextMenu = (ctxMenu) => {
+    const { contextMenuPos } = this.state
+    if (contextMenuPos.y + ctxMenu.clientHeight > window.innerHeight) {
+      this.setState({ contextMenuPos: {...contextMenuPos, y: window.innerHeight - ctxMenu.clientHeight } })
+    }
+  }
+
   renderContextMenu (trashedFolder) {
+    const { contextMenuPos } = this.state
     return (
       <div>
         <div onClick={this.dismissContextMenu} className="FolderItem-context-menu-background" onContextMenu={this.dismissContextMenu} />
-        <div className="FolderItem-context-menu" onContextMenu={this.dismissContextMenu}>
+        <div className="FolderItem-context-menu"
+             onContextMenu={this.dismissContextMenu}
+             style={{ top: contextMenuPos.y, left: contextMenuPos.x }}
+             ref={ this.constrainContextMenu }>
           <div onClick={this.restoreSelected.bind(this, trashedFolder)}
                className="Trash-context-item"
                onContextMenu={this.dismissContextMenu}>

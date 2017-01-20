@@ -79,7 +79,10 @@ class FolderItem extends Component {
     actions: PropTypes.object
   }
 
-  state = { isContextMenuVisible: false }
+  state = {
+    isContextMenuVisible: false,
+    contextMenuPos: { x: 0, y: 0 }
+  }
 
   showContextMenu = (event) => {
     event.preventDefault()
@@ -89,7 +92,10 @@ class FolderItem extends Component {
     if (!selectedFolderIds.has(folder.id)) {
       onSelect({shiftKey: false, metaKey: false}, folder)
     }
-    this.setState({ isContextMenuVisible: true })
+    this.setState({
+      isContextMenuVisible: true,
+      contextMenuPos: { x: event.pageX, y: event.pageY }
+    })
   }
 
   dismissContextMenu = (event) => {
@@ -177,6 +183,15 @@ class FolderItem extends Component {
     return false
   }
 
+  // Keep the context menu from running off the bottom of the screen
+  constrainContextMenu = (ctxMenu) => {
+    if (!ctxMenu) return
+    const { contextMenuPos } = this.state
+    if (contextMenuPos.y + ctxMenu.clientHeight > window.innerHeight) {
+      this.setState({ contextMenuPos: {...contextMenuPos, y: window.innerHeight - ctxMenu.clientHeight } })
+    }
+  }
+
   renderContextMenu () {
     const { folder, selectedFolderIds, user } = this.props
     if (!this.state.isContextMenuVisible) {
@@ -187,11 +202,15 @@ class FolderItem extends Component {
     const singleFolderSelected = count <= 1
     const subfolderCount = this.subfolderCount(folder.id)
     const subfolderLabel = subfolderCount === 0 ? 'No subfolders' : (subfolderCount === 1 ? '1 subfolder' : `${subfolderCount} subfolders`)
+    const { contextMenuPos } = this.state
     // FIXME: Get Link, Move to, and Favorite are disabled until implemented
     return (
       <div>
         <div onClick={this.dismissContextMenu} className="FolderItem-context-menu-background" onContextMenu={this.dismissContextMenu} />
-        <div className="FolderItem-context-menu" onContextMenu={this.dismissContextMenu}>
+        <div className="FolderItem-context-menu"
+             onContextMenu={this.dismissContextMenu}
+             style={{ top: contextMenuPos.y, left: contextMenuPos.x }}
+             ref={ this.constrainContextMenu }>
           { singleFolderSelected &&
           <div className="FolderItem-context-item disabled"
                onContextMenu={this.dismissContextMenu}>
