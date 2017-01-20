@@ -69,8 +69,7 @@ class Searcher extends Component {
   render () {
     const {
       widgets, actions, folders, selectedFolderIds, query, pageSize,
-      modifiedFolderIds, trashedFolders, order,
-      user, userSettings } = this.props
+      modifiedFolderIds, trashedFolders, order } = this.props
     let assetSearch = new AssetSearch({order})
     if (widgets && widgets.length) {
       let postFilter = new AssetFilter()

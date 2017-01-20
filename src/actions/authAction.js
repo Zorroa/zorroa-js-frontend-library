@@ -10,9 +10,6 @@ import {
 import { USER_ITEM, HOST_ITEM, PROTOCOL_ITEM } from '../constants/localStorageItems'
 import User from '../models/User'
 import Permission from '../models/Permission'
-import AssetSearch from '../models/AssetSearch'
-import { restoreSearch } from './racetrackAction'
-import * as api from '../globals/api.js'
 
 // Global variable to hold axios connection
 // FIXME: Should this be state?
