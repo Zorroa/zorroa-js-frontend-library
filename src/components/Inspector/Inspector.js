@@ -27,7 +27,7 @@ class Inspector extends Component {
     // TODO: remove this asap and put in proper video clip detection code
     // Main reason for this is SPE video clips at the time of writing
     // do not have video metadata, they identify as jpg images
-    if (asset.document.spe) {
+    if (asset.document.spe && asset.document.spe.clip) {
       let startTime = asset.document.spe.clip.timecodeStart
       let stopTime = asset.document.spe.clip.timecodeStop
       let startSec = parseTimecodeMS(startTime) / 1000
