@@ -67,6 +67,18 @@ export default class AssetFilter {
       } else {
         this.terms = { ...filter.terms }
       }
+
+      // convert to elasticSearch schema:
+      // multiple terms in the aggs fields need to be boolean queries
+      if (this.terms && Object.keys(this.terms).length > 1) {
+        let terms = this.terms
+        delete this.terms
+        let boolMust = []
+        for (let termKey in terms) {
+          boolMust.push({ terms: { [termKey]: terms[termKey] }})
+        }
+        this.bool = { must: boolMust }
+      }
     }
   }
 }
