@@ -27,15 +27,17 @@ export default class Asset {
   url (protocol, host) {
     let id = this.id
 
-    // [dhart 2017-01-11] REMOVE ASAP
-    // temporarily, for SPE, video clips can be represented by a sub-clip of another asset
-    // The asset id is hardcoded for a demo, this needs to be removed asap
-    // The sub-clip start and end time codes are inside the metadata spe.clip
-    // spe is going to be renamed to something that is not client specific
-    try { // this will bail out if anything goes wrong accessing spe
-      id = Clips[this.document.spe.Film.Title[0].toLowerCase()]
-    } catch (e) { /* absorb & ignore these errors */ }
-
+    if (this.document.spe && this.document.spe.clip) {
+      // [dhart 2017-01-11] REMOVE ASAP
+      // temporarily, for SPE, video clips can be represented by a sub-clip of another asset
+      // The asset id is hardcoded for a demo, this needs to be removed asap
+      // The sub-clip start and end time codes are inside the metadata spe.clip
+      // spe is going to be renamed to something that is not client specific
+      try { // this will bail out if anything goes wrong accessing spe
+        id = Clips[this.document.spe.Film.Title[0].toLowerCase()]
+      } catch (e) { /* absorb & ignore these errors */
+      }
+    }
     return `${protocol}//${host}:8066/api/v1/assets/${id}/_stream`
   }
   mediaType () { return this.document.source.mediaType }
