@@ -2,7 +2,7 @@ import { MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_W
 import Widget from '../models/Widget'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
-import { SimpleSearchWidgetInfo, FacetWidgetInfo } from '../components/Racetrack/WidgetInfo'
+import { SimpleSearchWidgetInfo, FacetWidgetInfo, ColorWidgetInfo } from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
 
 export function modifyRacetrackWidget (widget) {
@@ -53,6 +53,15 @@ export function restoreSearch (search) {
       const facet = new Widget({type, sliver})
       widgets.push(facet)
     })
+  }
+
+  // Create a color widget if there's a color query
+  if (search.filter && search.filter.colors) {
+    const type = ColorWidgetInfo.type
+    let sliver = new AssetSearch()
+    sliver.filter = new AssetFilter({colors: search.filter.colors})
+    const color = new Widget({type, sliver})
+    widgets.push(color)
   }
 
   // Reset the racetrack to the new widget

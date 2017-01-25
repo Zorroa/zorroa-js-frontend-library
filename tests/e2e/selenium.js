@@ -267,7 +267,7 @@ export function login (driver) {
   .then(_ => driver.get(`${BASE_URL}/signin`))
   .then(_ => driver.executeScript('window.zorroa.setSeleniumTesting(true)'))
   .then(_ => driver.findElement(By.css('input[name="username"]')).sendKeys('admin'))
-  .then(_ => driver.findElement(By.css('input[name="password"]')).sendKeys('admin'))
+  .then(_ => driver.findElement(By.css('input[name="password"]')).sendKeys('z0rr0@12'))
   .then(_ => driver.findElement(By.css('input[name="host"]')).sendKeys('dev.zorroa.com'))
   .then(_ => driver.findElement(By.css('input[name="ssl"]')).isSelected())
   .then(isSelected => !isSelected && driver.findElement(By.css('input[name="ssl"]')).click())
