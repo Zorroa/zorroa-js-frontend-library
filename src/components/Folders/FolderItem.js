@@ -107,6 +107,7 @@ class FolderItem extends Component {
     event.preventDefault()
     const { folder, actions } = this.props
     actions.restoreSearch(folder.search)
+    this.dismissContextMenu(event)
   }
 
   moveTo = (event) => {

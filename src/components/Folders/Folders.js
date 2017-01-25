@@ -273,7 +273,7 @@ class Folders extends Component {
         </div>
         <div>
           {folderList}
-          {folderList.length ? <Trash filterName={filterName}/> : null }
+          {folderList ? <Trash filterName={filterName}/> : null }
         </div>
       </div>
     )

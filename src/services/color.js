@@ -214,7 +214,10 @@ export function hexToRgb (hex) {
 }
 
 export function rgbToHex ([r, g, b]) {
-  return '#' + ((1 << 24) + (Math.floor(r * 255) << 16) + (Math.floor(g * 255) << 8) + Math.floor(b * 255)).toString(16).slice(1)
+  return '#' + ((1 << 24) +
+    (Math.min(255, Math.floor(r * 256)) << 16) +
+    (Math.min(255, Math.floor(g * 256)) << 8) +
+    (Math.min(255, Math.floor(b * 256)))).toString(16).slice(1)
 }
 
 // convert between normalized hsl/hsv and percent based hsl/hsv

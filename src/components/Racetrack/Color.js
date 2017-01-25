@@ -15,6 +15,11 @@ import Resizer from '../../services/Resizer'
 import { hexToRgb, rgbToHex, HSL2HSV, RGB2HSL, HSL2RGB } from '../../services/color'
 
 const COLOR_SLIDER_HEIGHT = 180
+const COLOR_RESIZER_HEIGHT = 5
+
+const RATIO_MAX_FACTOR = 1.5  // maxRatio in query is this factor times user ratio
+const RATIO_MIN_FACTOR = 0.25 // minRatio in query is this factor times user ratio
+const LUMA_OVERLAY_THRESHOLD = 0.5
 
 class Color extends Component {
   static propTypes = {
@@ -29,9 +34,38 @@ class Color extends Component {
     isServerHSL: true // see toggleServerHSL
   }
 
+  syncLocalColorWithAppState (nextProps) {
+    // sync local state with existing app state
+    const { id, widgets } = nextProps
+    const index = widgets && widgets.findIndex(widget => (id === widget.id))
+    const widget = widgets && widgets[index]
+    if (!widget || !widget.sliver) return
+
+    let colors
+    try {
+      colors = widget.sliver.filter.colors.colors
+    } catch (e) {
+      return
+    }
+
+    this.setState({colors: colors.map(color => {
+      return {
+        hsl: [color.hue, color.saturation, color.brightness],
+        key: color.key || this.getKeyForHSL([color.hue, color.saturation, color.brightness]),
+        ratio: color.ratio || color.maxRatio / (RATIO_MAX_FACTOR * 100),
+        maxRatio: color.maxRatio,
+        minRatio: color.minRatio
+      }
+    })})
+  }
+
+  componentWillReceiveProps (nextProps) {
+    this.syncLocalColorWithAppState(nextProps)
+  }
+
   componentWillMount () {
-    this.componentWillReceiveProps(this.props)
     this.resizer = new Resizer()
+    this.syncLocalColorWithAppState(this.props)
   }
 
   componentWillUnmount () {
@@ -50,11 +84,16 @@ class Color extends Component {
           hue: Math.floor(hsv[0]),
           saturation: Math.floor(hsv[1]),
           brightness: Math.floor(hsv[2]),
-          hueRange: 24, // 20%
-          maxRatio: color.ratio * COLOR_SLIDER_HEIGHT,
+
+          hueRange: 24,
           saturationRange: 75, // we have no saturation control, so allow a wide variety
-          minRatio: color.ratio * 100 / 4,
-          brightnessRange: 25
+          brightnessRange: 25,
+
+          ratio: color.ratio, // [0..1] range
+          minRatio: color.ratio * RATIO_MIN_FACTOR * 100, // [0..100] range
+          maxRatio: color.ratio * RATIO_MAX_FACTOR * 100,  // [0..100] range
+
+          key: color.key
         }
       })}})
     }
@@ -94,7 +133,7 @@ class Color extends Component {
 
     const oldN = colors.length
     if (oldN === 1) {
-      this.setState({ colors: [] })
+      this.setState({ colors: [] }, () => this.modifySliver([]))
       return
     }
 
@@ -118,15 +157,20 @@ class Color extends Component {
     // only consider 6-char hex strings for now
     if (hexStr.length !== 7) return
 
-    var rgb = hexToRgb(hexStr).map(x => x / 256)
+    let rgb = hexToRgb(hexStr).map(x => x / 256)
     if (!rgb) return
-    var hsl = RGB2HSL(rgb)
+    let hsl = RGB2HSL(rgb)
     this.setColorHSL(hsl, hexStr)
   }
 
-  getOverlayHSL = ([H, S, L]) => {
-    // near white? use black, otherwise use white
-    return (L > 50) ? [0, 0, 0] : [0, 0, 100]
+  HSLLuma = (hsl) => {
+    const [r, g, b] = HSL2RGB(hsl)
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+  }
+
+  getKeyForHSL = (hsl) => {
+    const rgb = HSL2RGB(hsl)
+    return rgbToHex(rgb)
   }
 
   keyExists = (key) => (this.state.colors.findIndex(color => key === color.key) > -1)
@@ -139,22 +183,23 @@ class Color extends Component {
     const nL = nTiles - 1
     const maxL = 100
     const dL = maxL / nL
+    const sL = maxL - dL / 2
 
     const nH = nTiles
     const maxH = 360
     const dH = maxH / nH
+    const sH = dH * 0.75 // This phase offset gives us a better canonical yellow
 
     // Color rows
-    for (let L = maxL - dL / 2; L > 0; L -= dL) {
+    for (let L = sL; L > 0; L -= dL) {
       let rowSwatches = []
-      for (let H = 0; H < maxH; H += dH) {
-        const hsl = [ H, 100, L ]
-        const rgb = HSL2RGB(hsl)
-        const hex = rgbToHex(rgb)
-        const key = hex
+      for (let H = sH; H < maxH; H += dH) {
+        // saved searches are rounded; so we need to round in order to restore picked colors
+        const hsl = [ Math.round(H), 100, Math.round(L) ]
+        const key = this.getKeyForHSL(hsl)
         const selected = this.keyExists(key)
         const swatch = (
-          <div className={classnames('Color-swatch', {selected, lightborder: L < 50})}
+          <div className={classnames('Color-swatch', {selected, lightOverlay: this.HSLLuma(hsl) < LUMA_OVERLAY_THRESHOLD})}
                key={key}
                style={{backgroundColor: `hsl(${hsl[0]}, ${hsl[1]}%, ${hsl[2]}%)`}}
                onClick={event => this.setColorHSL(hsl, key)}/>)
@@ -165,14 +210,12 @@ class Color extends Component {
 
     // 1 grayscale row
     let rowSwatches = []
-    for (let L = maxL, i = 0; i < 16; L -= dL, i++) {
-      const hsl = [ 0, 0, L ]
-      const rgb = HSL2RGB(hsl)
-      const hex = rgbToHex(rgb)
-      const key = hex
+    for (let L = sL, i = 0; i < nTiles; L -= dL, i++) {
+      const hsl = [ 0, 0, Math.round(L) ]
+      const key = this.getKeyForHSL(hsl)
       const selected = this.keyExists(key)
       const swatch = (
-        <div className={classnames('Color-swatch', {selected, lightborder: L < 50})}
+        <div className={classnames('Color-swatch', {selected, lightOverlay: this.HSLLuma(hsl) < LUMA_OVERLAY_THRESHOLD})}
              key={key}
              style={{backgroundColor: `hsl(${hsl[0]}, ${hsl[1]}%, ${hsl[2]}%)`}}
              onClick={event => this.setColorHSL(hsl, key)}/>)
@@ -181,12 +224,6 @@ class Color extends Component {
     swatchRows.push(<div className="Color-swatch-row" key={'0'}>{rowSwatches}</div>)
 
     return swatchRows
-  }
-
-  componentWillReceiveProps (nextProps) {
-    // const { id, widgets } = nextProps
-    // const index = widgets && widgets.findIndex(widget => (id === widget.id))
-    // const widget = widgets && widgets[index]
   }
 
   removeFilter = () => {
@@ -244,11 +281,16 @@ class Color extends Component {
     const { isIconified } = this.props
     const { colors } = this.state
 
-    var hsl = [0, 0, 100]
+    let hsl = [0, 0, 100]
     if (colors.length) {
       hsl = colors[colors.length - 1].hsl
     }
-    const overlayHSL = this.getOverlayHSL(hsl)
+    const lightOverlay = this.HSLLuma(hsl) < LUMA_OVERLAY_THRESHOLD
+
+    const colorHeightAdjust = (colors.length)
+      ? (colors.length - 1) * COLOR_RESIZER_HEIGHT / colors.length
+      : 0
+
     return (
       <Widget className="Color"
               header={(
@@ -268,10 +310,9 @@ class Color extends Component {
               { this.renderSwatches() }
             </div>
             <div className="Color-status">
-              <div className="Color-preview"
+              <div className={classnames('Color-preview', {lightOverlay})}
                    style={{ backgroundColor: `hsl(${hsl[0]}, ${hsl[1]}%, ${hsl[2]}%)` }}>
-                <div className="Color-preview-icon icon-eyedropper"
-                     style={{ color: `hsl(${overlayHSL[0]}, ${overlayHSL[1]}%, ${overlayHSL[2]}%)` }}/>
+                <div className="Color-preview-icon icon-eyedropper"/>
               </div>
               <input className="Color-hex-input"
                      placeholder="Enter HEX value"
@@ -299,16 +340,15 @@ class Color extends Component {
             <div className="Color-slider-fg">
               { colors.map((color, i, a) => {
                 const { hsl, key } = color
-                const overlayHSL = this.getOverlayHSL(hsl)
+                const lightOverlay = this.HSLLuma(hsl) < LUMA_OVERLAY_THRESHOLD
                 return (
-                  <div className='Color-slider-entry fullWidth'>
+                  <div className={classnames('Color-slider-entry', 'fullWidth', { lightOverlay })}>
                     <div className='Color-slider-color flexRowCenter'
                          key={key}
                          style={{width: '100%',
-                                 height: `${Math.round(color.ratio * COLOR_SLIDER_HEIGHT)}px`,
+                                 height: `${Math.round(color.ratio * COLOR_SLIDER_HEIGHT - colorHeightAdjust)}px`,
                                  backgroundColor: `hsl(${hsl[0]}, ${hsl[1]}%, ${hsl[2]}%)`}}>
-                      <div className='Color-slider-pct flexOff'
-                           style={{color: `hsl(${overlayHSL[0]}, ${overlayHSL[1]}%, ${overlayHSL[2]}%)`}}>
+                      <div className='Color-slider-pct flexOff'>
                         {`${Math.round(color.ratio * 100)}%`}
                       </div>
                       <div className='flexOn'/>
@@ -321,7 +361,8 @@ class Color extends Component {
                       // put a resizer in between every pair of colors (but not after the last color)
                       (i < a.length - 1) && (
                         <div className='Color-slider-resizer'
-                             onMouseDown={event => this.resizeColorStart(key)}/>)
+                             onMouseDown={event => this.resizeColorStart(key)}
+                             style={{ height: `${COLOR_RESIZER_HEIGHT}px` }}/>)
                     }
                   </div>
                 )
