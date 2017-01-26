@@ -34,6 +34,9 @@
   }
 
   .SimpleSearch-settings {
+    @include zorroa-square-btn-darken(40px);
+    margin: 5px 0px;
+
     &:hover {
       cursor: pointer;
     }
@@ -79,8 +82,9 @@
   }
 
   .SimpleSearch-clear-search {
-    margin-left: 4px;
-    margin-right: 4px;
+    @include zorroa-square-btn-darken(20px);
+    margin: 5px;
+    border-radius: 2px;
     font-size: 10px;
 
     &:hover {
