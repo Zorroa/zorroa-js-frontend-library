@@ -1,0 +1,101 @@
+@import '../../styles/core-mixins.scss';
+
+.Exists {
+  min-width: 0;
+
+  .WidgetHeader {
+    color: $zorroa-nearwhite;
+  }
+
+  .Exists-header {
+    @include flexRow;
+    @include flexJustifySpaceBetween;
+    @include flexAlignItemsCenter;
+    @include fullWidth;
+    @include noSelect;
+
+    flex-shrink: 1;
+    min-width: 0;
+  }
+
+  .Exists-header-label {
+    @include flexRow;
+    @include flexAlignItemsCenter;
+    min-width: 0;
+  }
+
+  .Exists-header-title {
+    @include flexOff;
+    font-weight: 100;
+    margin-right: 4px;
+  }
+
+  .Exists-header-field {
+    @include flexShrinkOnly;
+    @include clampText;
+    min-width: 0;
+    text-transform: uppercase;
+    text-overflow: ellipsis;
+    font-weight: 400;
+  }
+
+  .Exists-settings {
+    @include zorroa-square-btn-darken(40px);
+    margin: 5px 0px;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  .Exists-clear-search {
+    @include zorroa-square-btn-darken(20px);
+    margin: 5px;
+    font-size: 10px;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  .Exists-body {
+    background-color: white;
+    color: $zorroa-gray;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+
+    input {
+      flex: 1;
+      outline: none;
+      background: none;
+      border: 1px solid $zorroa-gray;
+      border-radius: 3px;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 2em;
+      margin: 12px;
+      padding-left: 8px;
+      padding-right: 8px;
+    }
+  }
+
+  .Exists-exists {
+    @include flexRowCenter;
+
+    .Toggle {
+      margin: 5px 10px;
+    }
+  }
+
+  .Exists-exists-label {
+    margin-left: 12px;
+    cursor: default;
+  }
+
+  .Exists-missing-label {
+    margin-right: 12px;
+    cursor: default;
+  }
+
+}
