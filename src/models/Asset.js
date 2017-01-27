@@ -40,7 +40,7 @@ export default class Asset {
     }
     return `${protocol}//${host}:8066/api/v1/assets/${id}/_stream`
   }
-  mediaType () { return this.document.source.mediaType }
+  mediaType () { return this.document.source.mediaType || 'unknown' }
   tinyProxy () { return this.document.proxies ? this.document.proxies.tinyProxy : null }
 
   width () { return this.document.image && this.document.image.width ? this.document.image.width : 0 }
