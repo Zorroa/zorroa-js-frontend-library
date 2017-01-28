@@ -254,12 +254,16 @@ class Table extends Component {
     })
   }
 
-  sortByField (field, event) {
+  sortByField (field) {
     console.log('Sort by ' + field)
     const { order } = this.props
-    const index = order && order.findIndex(order => (order.field === field))
-    const ascending = event.metaKey && index >= 0 ? undefined
-      : (!order || index < 0 ? true : !order[index].ascending)
+    let ascending = true
+    if (order) {
+      const index = order && order.findIndex(order => (order.field === field))
+      if (index >= 0) {
+        ascending = order[index].ascending ? false : undefined
+      }
+    }
     this.props.actions.sortAssets(field, ascending)
   }
 
@@ -279,6 +283,12 @@ class Table extends Component {
     const index = order && order.findIndex(order => (order.field === field))
     const icon = !order || index < 0 ? 'icon-sort' : (order[index].ascending ? 'icon-sort-asc' : 'icon-sort-desc')
     return `Table-header-sort ${icon} Table-header-sort-order-${index}`
+  }
+
+  headerClassnames (field) {
+    const { order } = this.props
+    const index = order && order.findIndex(order => (order.field === field))
+    return `Table-header-cell ${!order || index < 0 ? 'unordred' : 'ordered'}`
   }
 
   render () {
@@ -318,7 +328,7 @@ class Table extends Component {
         <div className='Table-header' style={{height: `${tableHeaderHeight}px`}}>
           { fields.map((field, i) => (
             <div key={i}
-                 className='Table-header-cell flexRowCenter'
+                 className={this.headerClassnames(field)}
                  style={{width: `${fieldWidth[field]}px`}}>
               <div className={`Table-cell`}>
                 { this.titleForField(field) }
