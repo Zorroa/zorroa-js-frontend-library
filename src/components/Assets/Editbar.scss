@@ -17,15 +17,20 @@
     margin-right: 6px;
   }
 
-  .title {
+  .Editbar-title {
     margin-left: 8px;
     text-transform: uppercase;
     @include noSelect;
   }
 
-  .right-side {
+  .Editbar-right-side {
     @include flexRow;
     margin-right: 12px;
+  }
+
+  .Editbar-left-side {
+    @include flexRow;
+    @include flexAlignItemsCenter;
   }
 
   .Editbar-selected {
@@ -56,7 +61,33 @@
     }
   }
 
-  .export {
+  .Editbar-sorted {
+    font-size: 12px;
+    @include flexRow;
+    @include flexAlignItemsCenter;
+    margin-left: 24px;
+    margin-right: 8px;
+
+    &.disabled { color: $zorroa-lightgray; }
+  }
+
+  .Editbar-sorted-icon {
+    @include zorroa-square-btn-darken(24px);
+    font-size: 10px;
+    margin-left: 4px;
+    border-radius: 2px;
+    cursor: pointer;
+
+    &:not(.disabled):hover {
+      color: black;
+    }
+
+    &.disabled {
+      color: $zorroa-lightgray;
+    }
+  }
+
+  .Editbar-export {
     margin-left: 12px;
     margin-right: 12px;
     text-transform: uppercase;
@@ -73,7 +104,7 @@
     }
   }
 
-  .remove {
+  .Editbar-remove {
     margin-left: 12px;
     text-transform: uppercase;
     @include flexRow;

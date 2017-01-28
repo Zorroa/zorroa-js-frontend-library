@@ -1,7 +1,8 @@
 import * as assert from 'assert'
 
 import {
-  UNAUTH_USER, ASSET_SEARCH, ASSET_SEARCH_ERROR, ASSET_SORT, ASSET_FIELDS,
+  UNAUTH_USER, ASSET_SEARCH, ASSET_SEARCH_ERROR,
+  ASSET_SORT, ASSET_ORDER, ASSET_FIELDS,
   ISOLATE_ASSET, SELECT_ASSETS, PAGE_SIZE, SUGGEST_COMPLETIONS
 } from '../constants/actionTypes'
 import Asset from '../models/Asset'
@@ -64,6 +65,14 @@ export function suggestQueryStrings (text) {
 
 export function sortAssets (field, ascending) {
   return ({ type: ASSET_SORT, payload: {field, ascending} })
+}
+
+export function orderAssets (order) {
+  return ({ type: ASSET_ORDER, payload: order })
+}
+
+export function unorderAssets () {
+  return orderAssets([])
 }
 
 export function isolateAssetId (id) {
