@@ -5,12 +5,15 @@ import * as assert from 'assert'
 import classnames from 'classnames'
 
 import Folder from '../../models/Folder'
-import { getFolderChildren, createFolder, selectFolderId, toggleFolder } from '../../actions/folderAction'
+import { getFolderChildren, createFolder, selectFolderIds, selectFolderId, toggleFolder } from '../../actions/folderAction'
 import { showModal } from '../../actions/appActions'
 import Trash from './Trash'
 import FolderItem from './FolderItem'
 import AssetSearch from '../../models/AssetSearch'
 import CreateFolder from './CreateFolder'
+
+const SORT_ALPHABETICAL = 'alpha'
+const SORT_TIME = 'time'
 
 // Display all folders, starting with the root.
 // Later this will be broken into Collections and Smart Folders.
@@ -27,7 +30,7 @@ class Folders extends Component {
     query: PropTypes.instanceOf(AssetSearch)
   }
 
-  state = { filterString: '' }
+  state = { filterString: '', sort: 'alpha-asc' }
 
   componentWillMount () {
     assert.ok(this.props.filterName in Folder.Filters) // make sure filter is valid
@@ -114,6 +117,37 @@ class Folders extends Component {
     this.setState({ filterString })
   }
 
+  deselectAll = (event) => {
+    if (!this.props.folders || !this.props.folders.all || !this.props.folders.selectedFolderIds) return
+    const selectedIds = this.props.folders.selectedFolderIds
+    const folderList = this.folderList(this.props.folders.all.get(Folder.ROOT_ID))
+    let ids = new Set()
+    selectedIds.forEach(id => { if (folderList.findIndex(f => (f.id === id)) < 0) ids.add(id) })
+    this.props.actions.selectFolderIds(ids)
+  }
+
+  sortFolders (field) {
+    const { sort } = this.state
+    let newSort = sort
+    switch (field) {
+      case SORT_ALPHABETICAL:
+        if (sort === 'alpha-asc') {
+          newSort = 'alpha-desc'
+        } else {
+          newSort = 'alpha-asc'
+        }
+        break
+      case SORT_TIME:
+        if (sort === 'time-asc') {
+          newSort = 'time-desc'
+        } else {
+          newSort = 'time-asc'
+        }
+        break
+    }
+    this.setState({ sort: newSort })
+  }
+
   addFolder = () => {
     const width = '300px'
     const body = <CreateFolder title={this.addFolderTitle()} acl={[]}
@@ -198,7 +232,7 @@ class Folders extends Component {
 
   folderList (folder) {
     const { folders, filterName } = this.props
-    const { filterString } = this.state
+    const { filterString, sort } = this.state
     const isOpen = folders.openFolderIds.has(folder.id)
     const childIds = folder.childIds
 
@@ -212,6 +246,20 @@ class Folders extends Component {
       // Filter the tree at the root by the filter type passed in from Workspace
       if (folder.id === Folder.ROOT_ID) {
         children = children.filter(Folder.Filters[filterName])
+      }
+      switch (sort) {
+        case 'alpha-asc':
+          children = children.sort((a, b) => a.name.localeCompare(b.name))
+          break
+        case 'alpha-desc':
+          children = children.sort((a, b) => b.name.localeCompare(a.name))
+          break
+        case 'time-asc':
+          children = children.sort((a, b) => a.timeModified < b.timeModified ? -1 : (a.timeModified > b.timeModified ? 1 : 0))
+          break
+        case 'time-desc':
+          children = children.sort((a, b) => b.timeModified < a.timeModified ? -1 : (b.timeModified > a.timeModified ? 1 : 0))
+          break
       }
       children.forEach(child => {
         grandkids = grandkids.concat(this.folderList(child))
@@ -235,8 +283,8 @@ class Folders extends Component {
     return this.depth(parent) + 1
   }
 
-  renderFolderList = (rootFolder) => (
-    this.folderList(rootFolder).map(folder => {
+  renderFolderList = (folderList) => (
+    folderList.map(folder => {
       const key = folder.id
       const { folders } = this.props
       const depth = this.depth(folder)
@@ -251,29 +299,60 @@ class Folders extends Component {
     })
   )
 
+  renderSortButton (field) {
+    const { sort } = this.state
+    const enabled = sort.match(field) != null
+    const icon = enabled ? `icon-sort-${sort}` : `icon-sort-${field}-asc`
+    return (
+      <div onClick={this.sortFolders.bind(this, field)} className={classnames('Folders-sort-button', icon, {enabled})}/>
+    )
+  }
+
+  renderFolderDeselector (folderList) {
+    const selectedFolderIds = this.props.folders && this.props.folders.selectedFolderIds || new Set()
+    const selectedFolders = folderList.filter(folder => (selectedFolderIds.has(folder.id)))
+    if (!selectedFolders || selectedFolders.length === 0) return null
+    return (
+      <div className="Folders-selected">
+        { `${selectedFolders.length} folders selected` }
+        <div onClick={this.deselectAll} className="Folders-deselect-all icon-cancel-circle"/>
+      </div>
+    )
+  }
+
   render () {
     const { folders, filterName } = this.props
     const rootLoaded = folders.all.has(Folder.ROOT_ID)
     if (!rootLoaded) return null
-    const folderList = this.renderFolderList(folders.all.get(Folder.ROOT_ID))
+    const folderList = this.folderList(folders.all.get(Folder.ROOT_ID))
+    const folderComponentList = this.renderFolderList(folderList)
     return (
       <div className='Folders'>
         <div className="Folders-controls">
-          <div className="Folders-filter">
-            <input type="text" value={this.state.filterString}
-                   onChange={this.filterFolders}
-                   placeholder={this.filterPlaceholder()} />
-            <div className="icon-search"/>
+          <div className="Folders-filter-add">
+            <div className="Folders-filter">
+              <input className="Folders-filter-input" type="text" value={this.state.filterString}
+                     onChange={this.filterFolders}
+                     placeholder={this.filterPlaceholder()} />
+              <div className="icon-search"/>
+            </div>
+            <div className={classnames('Folders-controls-add',
+              {disabled: !this.isAddFolderEnabled()})}
+                 onClick={this.isAddFolderEnabled() ? this.addFolder : null}>
+              <span className={this.addFolderIcon()}/>
+            </div>
           </div>
-          <div className={classnames('Folders-controls-add',
-            {disabled: !this.isAddFolderEnabled()})}
-               onClick={this.isAddFolderEnabled() ? this.addFolder : null}>
-            <span className={this.addFolderIcon()}/>
+          <div className="Folders-sort-selected">
+            <div className="Folders-sort">
+              { this.renderSortButton(SORT_ALPHABETICAL) }
+              { this.renderSortButton(SORT_TIME) }
+            </div>
+            { this.renderFolderDeselector(folderList) }
           </div>
         </div>
         <div>
-          {folderList}
-          {folderList ? <Trash filterName={filterName}/> : null }
+          {folderComponentList}
+          {folderComponentList ? <Trash filterName={filterName}/> : null }
         </div>
       </div>
     )
@@ -287,6 +366,7 @@ export default connect(state => ({
   actions: bindActionCreators({
     getFolderChildren,
     createFolder,
+    selectFolderIds,
     selectFolderId,
     toggleFolder,
     showModal

@@ -8,69 +8,115 @@
 }
 
 .Folders-controls {
+  @include flexCol;
+  height: auto;
+  background-color: white;
+}
+
+.Folders-filter-add {
   @include flexRow;
   @include flexJustifySpaceBetween;
   @include flexAlignItemsCenter;
-  height: auto;
-  background-color: white;
+}
 
-  .Folders-filter {
-    position: relative;
-    margin: 8px 12px 8px 4px;
-    @include flexOn;
-    @include flexRow;
+.Folders-sort-selected {
+  @include flexRow;
+  @include flexJustifySpaceBetween;
+  @include flexAlignItemsCenter;
+}
 
-    .icon-search {
-      position: absolute;
-      right: 8px;
-      font-size: 16px;
-      margin-top: auto;
-      margin-bottom: auto;
-      top: 0;
-      bottom: 0;
-      height: 16px;
-      color: $zorroa-lightgray;
+.Folders-filter {
+  position: relative;
+  margin: 8px 12px 8px 4px;
+  @include flexOn;
+  @include flexRow;
+
+  .icon-search {
+    position: absolute;
+    right: 8px;
+    font-size: 16px;
+    margin-top: auto;
+    margin-bottom: auto;
+    top: 0;
+    bottom: 0;
+    height: 16px;
+    color: $zorroa-lightgray;
+  }
+}
+
+.Folders-filter-input {
+  @include flexOn;
+  height: 30px;
+  border-radius: 3px;
+  background: none;
+  border: 1px solid $zorroa-lightgray;
+  padding: 8px;
+  padding-right: 24px;
+  font-size: 12px;
+}
+
+.Folders-controls-add {
+  @include flexRowCenter;
+  color: white;
+  background-color: $zorroa-sickly-green;
+  border: none;
+  border-radius: 15px;
+  width: 30px;
+  height: 30px;
+  font-size: 14px;
+  margin: 4px;
+  cursor: pointer;
+
+  &.disabled {
+    cursor: not-allowed;
+    background-color: $zorroa-lightgray;
+  }
+
+  &:not(.disabled) {
+    &:hover {
+      border: 1px solid $zorroa-gray;
+      background-color: darken($zorroa-sickly-green, 15%);
+    }
+    &:active {
+      color: $zorroa-nearwhite;
+      background-color: darken($zorroa-sickly-green, 15%);
     }
   }
+}
 
-  input {
-    @include flexOn;
-    height: 30px;
-    border-radius: 3px;
-    background: none;
-    border: 1px solid $zorroa-lightgray;
-    padding: 8px;
-    padding-right: 24px;
-    font-size: 12px;
-  }
+.Folders-sort {
+  @include flexRow;
+  @include flexJustifySpaceBetween;
+  @include flexAlignItemsCenter;
+}
 
+.Folders-sort-button {
+  @include zorroa-square-btn-darken(20px);
+  font-size: 12px;
+  border-radius: 3px;
+  margin-bottom: 8px;
+  margin-left: 4px;
+  color: $zorroa-lightgray;
 
-  .Folders-controls-add {
-    @include flexRowCenter;
+  &:hover {
     color: white;
-    background-color: $zorroa-sickly-green;
-    border: none;
-    border-radius: 15px;
-    width: 30px;
-    height: 30px;
-    font-size: 14px;
-    margin: 4px;
-    cursor: pointer;
-
-    &.disabled {
-      cursor: not-allowed;
-      background-color: $zorroa-lightgray;
-    }
-
-    &:not(.disabled) {
-      &:hover {
-        border: 1px solid $zorroa-gray;
-        background-color: darken($zorroa-sickly-green, 15%);
-      }
-      &:active {
-        color: $zorroa-nearwhite;
-        background-color: darken($zorroa-sickly-green, 15%);
-      }
-    }
   }
+
+  &.enabled {
+    color: $zorroa-gray;
+    background-color: $zorroa-nearwhite;
+  }
+}
+
+.Folders-selected {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  color: $zorroa-lightgray;
+  font-size: 12px;
+  margin-right: 8px;
+}
+
+.Folders-deselect-all {
+  font-size: 10px;
+  margin-left: 4px;
 }
