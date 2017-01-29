@@ -14,7 +14,7 @@ import {
   showModal,
   setTableFieldWidth
 } from '../../actions/appActions'
-import { sortAssets } from '../../actions/assetsAction'
+import { sortAssets, unorderAssets } from '../../actions/assetsAction'
 import { saveUserSettings } from '../../actions/authAction'
 import TableField from './TableField'
 import DisplayOptions from '../DisplayOptions'
@@ -254,13 +254,22 @@ class Table extends Component {
     })
   }
 
-  sortByField (field, event) {
+  // Rotate through on -> off -> unordered
+  sortByField (field) {
     console.log('Sort by ' + field)
     const { order } = this.props
-    const index = order && order.findIndex(order => (order.field === field))
-    const ascending = event.metaKey && index >= 0 ? undefined
-      : (!order || index < 0 ? true : !order[index].ascending)
-    this.props.actions.sortAssets(field, ascending)
+    let ascending = true
+    if (order) {
+      const index = order && order.findIndex(order => (order.field === field))
+      if (index >= 0) {
+        ascending = order[index].ascending ? false : undefined
+      }
+    }
+    if (ascending === undefined) {
+      this.props.actions.unorderAssets()
+    } else {
+      this.props.actions.sortAssets(field, ascending)
+    }
   }
 
   titleForField (field) {
@@ -277,8 +286,14 @@ class Table extends Component {
   sortOrderClassnames (field) {
     const { order } = this.props
     const index = order && order.findIndex(order => (order.field === field))
-    const icon = !order || index < 0 ? 'icon-sort' : (order[index].ascending ? 'icon-sort-asc' : 'icon-sort-desc')
+    const icon = !order || index !== 0 ? 'icon-sort' : (order[index].ascending ? 'icon-sort-asc' : 'icon-sort-desc')
     return `Table-header-sort ${icon} Table-header-sort-order-${index}`
+  }
+
+  headerClassnames (field) {
+    const { order } = this.props
+    const index = order && order.findIndex(order => (order.field === field))
+    return `Table-header-cell ${!order || index !== 0 ? 'unordred' : 'ordered'}`
   }
 
   render () {
@@ -318,7 +333,7 @@ class Table extends Component {
         <div className='Table-header' style={{height: `${tableHeaderHeight}px`}}>
           { fields.map((field, i) => (
             <div key={i}
-                 className='Table-header-cell flexRowCenter'
+                 className={this.headerClassnames(field)}
                  style={{width: `${fieldWidth[field]}px`}}>
               <div className={`Table-cell`}>
                 { this.titleForField(field) }
@@ -394,6 +409,7 @@ export default connect(state => ({
 }), dispatch => ({
   actions: bindActionCreators({
     sortAssets,
+    unorderAssets,
     updateMetadataFields,
     updateTableFields,
     showModal,

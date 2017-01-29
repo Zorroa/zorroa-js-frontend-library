@@ -1,5 +1,6 @@
 import {
-  ASSET_SEARCH, ASSET_SEARCH_ERROR, ASSET_SORT, ASSET_FIELDS,
+  ASSET_SEARCH, ASSET_SEARCH_ERROR,
+  ASSET_SORT, ASSET_ORDER, ASSET_FIELDS,
   PAGE_SIZE, ISOLATE_ASSET, SELECT_ASSETS, SUGGEST_COMPLETIONS, UNAUTH_USER
 } from '../constants/actionTypes'
 
@@ -74,6 +75,10 @@ export default function (state = initialState, action) {
         order = order.slice(0, maxOrder)
       }
       return { ...state, order }
+    }
+
+    case ASSET_ORDER: {
+      return { ...state, order: action.payload }
     }
 
     case ASSET_FIELDS:

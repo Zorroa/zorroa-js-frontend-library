@@ -53,6 +53,11 @@ $tableResizeRightPadding: 20px;
 
 .Table-header-cell {
   height: 100%;
+  @include flexRowCenter;
+
+  &.ordered {
+    background-color: $zorroa-selected;
+  }
 }
 
 .Table-header-sort {
