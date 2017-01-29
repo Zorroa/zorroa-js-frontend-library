@@ -68,6 +68,17 @@ export default class AssetFilter {
         this.terms = { ...filter.terms }
       }
     }
+    if (filter.range) {
+      if (this.range) {
+        for (let key in filter.range) {
+          // No duplicate fields allowed in multiple range queries, let
+          // the incoming filter replace anything that's there.
+          this.range[key] = filter.range[key]
+        }
+      } else {
+        this.range = { ...filter.range }
+      }
+    }
   }
 }
 

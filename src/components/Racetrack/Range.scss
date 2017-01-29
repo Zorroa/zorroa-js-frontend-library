@@ -1,0 +1,94 @@
+@import '../../styles/core-mixins.scss';
+
+.Range {
+  min-width: 0;
+
+  .WidgetHeader {
+    color: $zorroa-nearwhite;
+  }
+
+  .Range-header {
+    @include flexRow;
+    @include flexJustifySpaceBetween;
+    @include flexAlignItemsCenter;
+    @include fullWidth;
+    @include noSelect;
+
+    flex-shrink: 1;
+    min-width: 0;
+  }
+
+  .Range-header-label {
+    @include flexRow;
+    @include flexAlignItemsCenter;
+    min-width: 0;
+  }
+
+  .Range-header-title {
+    @include flexOff;
+    font-weight: 100;
+    margin-right: 4px;
+  }
+
+  .Range-header-field {
+    @include flexShrinkOnly;
+    @include clampText;
+    min-width: 0;
+    text-transform: uppercase;
+    text-overflow: ellipsis;
+    font-weight: 400;
+  }
+
+  .Range-settings {
+    @include zorroa-square-btn-darken(40px);
+    margin: 5px 0px;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  .Range-clear-search {
+    @include zorroa-square-btn-darken(20px);
+    margin: 5px;
+    font-size: 10px;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  .Range-body {
+    background-color: white;
+    color: $zorroa-gray;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+
+    input {
+      flex: 1;
+      outline: none;
+      background: none;
+      border: 1px solid $zorroa-gray;
+      border-radius: 3px;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 2em;
+      margin: 6px;
+      padding-left: 8px;
+      padding-right: 8px;
+    }
+  }
+
+  .Range-label {
+    margin: 6px;
+    font-size: 20px;
+    cursor: default;
+  }
+
+  .Range-missing-label {
+    margin-right: 12px;
+    cursor: default;
+  }
+
+}

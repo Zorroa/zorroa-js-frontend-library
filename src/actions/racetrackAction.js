@@ -2,7 +2,13 @@ import { MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_W
 import Widget from '../models/Widget'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
-import { SimpleSearchWidgetInfo, FacetWidgetInfo, ColorWidgetInfo, ExistsWidgetInfo } from '../components/Racetrack/WidgetInfo'
+import {
+  SimpleSearchWidgetInfo,
+  FacetWidgetInfo,
+  ColorWidgetInfo,
+  ExistsWidgetInfo,
+  RangeWidgetInfo
+} from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
 
 export function modifyRacetrackWidget (widget) {
@@ -69,6 +75,17 @@ export function restoreSearch (search) {
     }
     if (search.filter.missing) {
       search.filter.missing.forEach(field => mkExistsWidget(field, true))
+    }
+  }
+
+  // Create a range widget for each "range" field in the query
+  if (search.filter && search.filter.range) {
+    const type = RangeWidgetInfo.type
+    for (var field in search.filter.range) {
+      let sliver = new AssetSearch()
+      sliver.filter = new AssetFilter({ range: { [field]: search.filter.range[field] } })
+      const rangeWidget = new Widget({type, sliver})
+      widgets.push(rangeWidget)
     }
   }
 
