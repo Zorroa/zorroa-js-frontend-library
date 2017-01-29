@@ -308,3 +308,8 @@ Make our color defs available as classes
   font-weight: 700;
   content: "\2203";
 }
+.custom-icon-range:before {
+  font-weight: 700;
+  // content: "\2265";
+  content: "[\22ef]"
+}

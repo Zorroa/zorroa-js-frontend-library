@@ -1,0 +1,13 @@
+{
+  "filter": {
+    "range": {
+      "flickr.title": {
+        "gt": "high",
+        "lt": "low"
+      }
+    }
+  },
+  "postFilter": {},
+  "order": [],
+  "size": 5
+}
