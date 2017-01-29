@@ -17,8 +17,7 @@ import DisplayOptions from '../DisplayOptions'
 
 const BAR_CHART = 'icon-list'
 const PIE_CHART = 'icon-pie-chart'
-const COL_CHART = 'icon-chart-growth'
-const chartTypes = [ BAR_CHART, PIE_CHART, COL_CHART ]
+const chartTypes = [ BAR_CHART, PIE_CHART ]
 
 // Manage a single term facet
 class Facet extends Component {
@@ -32,6 +31,7 @@ class Facet extends Component {
 
   state = {
     field: '',
+    order: { '_count': 'desc' },
     terms: [],
     chartType: BAR_CHART
   }
@@ -57,14 +57,16 @@ class Facet extends Component {
       } else {
         this.setState({terms: []})
       }
+      const order = widget.sliver.aggs.facet.terms.order
+      this.setState({order})
     } else {
       this.selectField()
     }
   }
 
-  modifySliver = (field, terms) => {
+  modifySliver = (field, terms, order) => {
     const type = FacetWidgetInfo.type
-    const aggs = { facet: { terms: { field, size: 100 } } }
+    const aggs = { facet: { terms: { field, order, size: 100 } } }
     let sliver = new AssetSearch({aggs})
     if (terms && terms.length) {
       sliver.filter = new AssetFilter({terms: {[field]: terms}})
@@ -110,7 +112,7 @@ class Facet extends Component {
         terms = [term]
       }
     }
-    this.modifySliver(this.state.field, terms)
+    this.modifySliver(this.state.field, terms, this.state.order)
   }
 
   selectPieSection = ({ name }, i, event) => {
@@ -126,7 +128,21 @@ class Facet extends Component {
                                  selectedFields={[]}
                                  onUpdate={this.updateDisplayOptions}/>
     this.props.actions.showModal({body, width})
-    event && event.stopPropagation()
+  }
+
+  rotateOrder (order, field, dir) {
+    if (order[field] === 'asc') return { [field]: 'desc' }
+    if (order[field] === 'desc') return { [field]: 'asc' }
+    return { [field]: dir }
+  }
+
+  sortBuckets (column) {
+    const { field, terms, order } = this.state
+    const sortField = { 'keyword': '_term', 'count': '_count' }
+    const dir = { 'keyword': 'asc', 'count': 'desc' }
+    let newOrder = this.rotateOrder(order, sortField[column], dir[column])
+    this.setState({ order: newOrder })
+    this.modifySliver(field, terms, newOrder)
   }
 
   updateDisplayOptions = (event, state) => {
@@ -134,7 +150,7 @@ class Facet extends Component {
     if (base && base.length) {
       const field = base + '.raw'
       const terms = []
-      this.modifySliver(field, terms)
+      this.modifySliver(field, terms, this.state.order)
     }
   }
 
@@ -243,6 +259,19 @@ class Facet extends Component {
     )
   }
 
+  renderHeaderCell (column) {
+    const { order } = this.state
+    const sortField = { 'keyword': '_term', 'count': '_count' }
+    const dir = order[sortField[column]]
+    const icon = 'Facet-table-header-count icon-sort' + (dir ? `-${dir}` : '')
+    return (
+      <td onClick={this.sortBuckets.bind(this, column)} className="Facet-table-header-cell">
+        <div className="Facet-table-header-title">{column}</div>
+        <div className={icon}/>
+      </td>
+    )
+  }
+
   renderChart () {
     const { field, terms, chartType } = this.state
     let maxCount = 0
@@ -262,30 +291,30 @@ class Facet extends Component {
     switch (chartType) {
       case BAR_CHART:
         return (
-          <div className="Facet-value-table">
-            <table>
-              <thead>
-              <tr>
-                <th>Keyword</th>
-                <th>Count</th>
-              </tr>
-              </thead>
-              <tbody>
-              { buckets && buckets.map(bucket => (
-                <tr className={classnames('Facet-value-table-row',
-                  { selected: terms.indexOf(bucket.key) >= 0 })}
-                    key={bucket.key} onClick={this.selectTerm.bind(this, bucket.key)}>
-                  <td>
-                    <div className="Facet-value-table-key">
-                      <div className="Facet-value-pct-bar" style={{width: `${100 * bucket.doc_count / maxCount}%`}} />
-                      <div className="Facet-value-key">{bucket.key}</div>
-                    </div>
-                  </td>
-                  <td>{bucket.doc_count}</td>
-                </tr>
-              )) }
-              </tbody>
-            </table>
+          <div className="Facet-table">
+            <div className="Facet-table-header">
+              { this.renderHeaderCell('keyword') }
+              { this.renderHeaderCell('count') }
+            </div>
+            <div className="Facet-value-table">
+              <table>
+                <tbody>
+                { buckets && buckets.map(bucket => (
+                  <tr className={classnames('Facet-value-table-row',
+                    { selected: terms.indexOf(bucket.key) >= 0 })}
+                      key={bucket.key} onClick={this.selectTerm.bind(this, bucket.key)}>
+                    <td className="Facet-value-cell">
+                      <div className="Facet-value-table-key">
+                        <div className="Facet-value-pct-bar" style={{width: `${100 * bucket.doc_count / maxCount}%`}} />
+                        <div className="Facet-value-key">{bucket.key}</div>
+                      </div>
+                    </td>
+                    <td className="Facet-value-count">{bucket.doc_count}</td>
+                  </tr>
+                )) }
+                </tbody>
+              </table>
+            </div>
           </div>
         )
 
@@ -309,11 +338,6 @@ class Facet extends Component {
               </PieChart>
             </ResponsiveContainer>
           </div>
-        )
-
-      case COL_CHART:
-        return (
-          <div>Col</div>
         )
     }
   }
