@@ -6,7 +6,7 @@ import classnames from 'classnames'
 
 import Folder from '../../models/Folder'
 import { getFolderChildren, createFolder, selectFolderIds, selectFolderId, toggleFolder } from '../../actions/folderAction'
-import { showModal } from '../../actions/appActions'
+import { showModal, sortFolders } from '../../actions/appActions'
 import Trash from './Trash'
 import FolderItem from './FolderItem'
 import AssetSearch from '../../models/AssetSearch'
@@ -27,10 +27,11 @@ class Folders extends Component {
 
     // state props
     folders: PropTypes.object.isRequired,
-    query: PropTypes.instanceOf(AssetSearch)
+    query: PropTypes.instanceOf(AssetSearch),
+    sortFolders: PropTypes.object
   }
 
-  state = { filterString: '', sort: 'alpha-asc' }
+  state = { filterString: '' }
 
   componentWillMount () {
     assert.ok(this.props.filterName in Folder.Filters) // make sure filter is valid
@@ -38,6 +39,11 @@ class Folders extends Component {
     if (!rootFolder.childIds || !rootFolder.childIds.size) {
       this.loadChildren(Folder.ROOT_ID)
     }
+  }
+
+  sortOrder () {
+    const { filterName, sortFolders } = this.props
+    return sortFolders[filterName] || 'alpha-asc'
   }
 
   loadChildren (id) {
@@ -127,7 +133,7 @@ class Folders extends Component {
   }
 
   sortFolders (field) {
-    const { sort } = this.state
+    const sort = this.sortOrder()
     let newSort = sort
     switch (field) {
       case SORT_ALPHABETICAL:
@@ -145,7 +151,8 @@ class Folders extends Component {
         }
         break
     }
-    this.setState({ sort: newSort })
+    const { filterName, actions } = this.props
+    actions.sortFolders(filterName, newSort)
   }
 
   addFolder = () => {
@@ -232,7 +239,7 @@ class Folders extends Component {
 
   folderList (folder) {
     const { folders, filterName } = this.props
-    const { filterString, sort } = this.state
+    const { filterString } = this.state
     const isOpen = folders.openFolderIds.has(folder.id)
     const childIds = folder.childIds
 
@@ -247,7 +254,7 @@ class Folders extends Component {
       if (folder.id === Folder.ROOT_ID) {
         children = children.filter(Folder.Filters[filterName])
       }
-      switch (sort) {
+      switch (this.sortOrder()) {
         case 'alpha-asc':
           children = children.sort((a, b) => a.name.localeCompare(b.name))
           break
@@ -300,7 +307,7 @@ class Folders extends Component {
   )
 
   renderSortButton (field) {
-    const { sort } = this.state
+    const sort = this.sortOrder()
     const enabled = sort.match(field) != null
     const icon = enabled ? `icon-sort-${sort}` : `icon-sort-${field}-asc`
     return (
@@ -361,7 +368,8 @@ class Folders extends Component {
 
 export default connect(state => ({
   folders: state.folders,
-  query: state.assets.query
+  query: state.assets.query,
+  sortFolders: state.app.sortFolders
 }), dispatch => ({
   actions: bindActionCreators({
     getFolderChildren,
@@ -369,6 +377,7 @@ export default connect(state => ({
     selectFolderIds,
     selectFolderId,
     toggleFolder,
-    showModal
+    showModal,
+    sortFolders
   }, dispatch)
 }))(Folders)
