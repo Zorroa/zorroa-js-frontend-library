@@ -49,11 +49,23 @@
     table {}
   }
 
-  .Facet-min-value {
+  .Facet-clear-selection {
+    @include flexRowCenter;
     font-size: 13px;
     color: $zorroa-lightgray;
-    margin-top: 22px;
+    height: 14px;
+    margin-top: 14px;
     margin-bottom: 14px;
+  }
+
+  .Facet-clear-selection-cancel {
+    @include flexRowCenter;
+    &:hover { background-color: $zorroa-lightgray; color: white; }
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
+    margin-left: 2px;
+    font-size: 10px;
   }
 
   .Facet-value-range {

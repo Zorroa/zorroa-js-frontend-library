@@ -86,6 +86,10 @@ class Facet extends Component {
     }
   }
 
+  deselectAllTerms = (event) => {
+    this.modifySliver(this.state.field, [], this.state.order)
+  }
+
   selectTerm (term, event) {
     let terms = []
     if (event.shiftKey) {
@@ -351,9 +355,20 @@ class Facet extends Component {
     )
   }
 
+  renderClearSelection () {
+    const { terms } = this.state
+    if (!terms || terms.length === 0) return <div className="Facet-clear-selection"/>
+    return (
+      <div className="Facet-clear-selection">
+        { `${terms.length} facets selected` }
+        <div onClick={this.deselectAllTerms} className="Facet-clear-selection-cancel icon-cancel-circle"/>
+      </div>
+    )
+  }
+
   render () {
     const { isIconified } = this.props
-    const { field, minCount } = this.state
+    const { field } = this.state
     const title = Asset.lastNamespace(unCamelCase(field))
     return (
       <Widget className="Facet"
@@ -372,9 +387,7 @@ class Facet extends Component {
               onClose={this.removeFilter.bind(this)}>
         <div className="Facet-body flexCol">
           { this.renderChart() }
-          <div className="Facet-min-value flexRow flexJustifyCenter">
-            {minCount && `Search is limited to >${minCount} results per keyword` }
-          </div>
+          { this.renderClearSelection() }
           <div className="Facet-footer flexRow flexJustifyCenter">
             { chartTypes.map(type => this.renderChartIcon(type)) }
           </div>
