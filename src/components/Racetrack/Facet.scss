@@ -88,7 +88,7 @@
     }
 
     .Facet-value-table-row {
-      user-select: none;
+      @include noSelect;
       color: $zorroa-greyish-brown;
       &:hover { background-color: $zorroa-hover; }
       &.selected { background-color: $zorroa-selected; }

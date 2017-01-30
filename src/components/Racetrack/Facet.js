@@ -124,6 +124,8 @@ class Facet extends Component {
         const minIndex = Math.min(selectedIndex, firstSelectedIndex)
         const maxIndex = Math.max(selectedIndex, firstSelectedIndex)
         terms = buckets.slice(minIndex, maxIndex + 1).map(bucket => bucket.key)
+        // prevent shift-click term selection from natively selecting text
+        window.getSelection().removeAllRanges()
       }
     } else if (event.metaKey) {
       const index = this.state.terms.findIndex(t => (t === term))
