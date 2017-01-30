@@ -18,6 +18,7 @@ import DisplayOptions from '../DisplayOptions'
 const BAR_CHART = 'icon-list'
 const PIE_CHART = 'icon-pie-chart'
 const chartTypes = [ BAR_CHART, PIE_CHART ]
+const OTHER_BUCKET = 'Other'
 
 // Manage a single term facet
 class Facet extends Component {
@@ -86,13 +87,36 @@ class Facet extends Component {
     }
   }
 
-  deselectAllTerms = (event) => {
-    this.modifySliver(this.state.field, [], this.state.order)
-  }
-
   selectTerm (term, event) {
     let terms = []
-    if (event.shiftKey) {
+    if (term === OTHER_BUCKET) {
+      const buckets = this.aggBuckets()
+      const merged = this.mergeOtherBuckets(buckets, 9)
+      let otherTerms = []
+      buckets.forEach(bucket => {
+        if (merged.findIndex(b => (b.key === bucket.key)) < 0) {
+          otherTerms.push(bucket.key)
+        }
+      })
+      terms = event.metaKey || event.shiftKey ? [...this.state.terms] : []
+      let isOtherEnabled = false
+      for (let i = 0; i < this.state.terms.length; ++i) {
+        const term = this.state.terms[i]
+        const index = merged.findIndex(bucket => (bucket.key === term))
+        if (index < 0) {
+          isOtherEnabled = true
+          break
+        }
+      }
+      otherTerms.forEach(term => {
+        const index = terms.findIndex(t => (t === term))
+        if (isOtherEnabled) {
+          if (index >= 0) terms.splice(index, 1)
+        } else {
+          if (index < 0) terms.push(term)
+        }
+      })
+    } else if (event.shiftKey) {
       const buckets = this.aggBuckets()
       const firstSelectedIndex = buckets.findIndex(b => (this.state.terms.findIndex(t => (t === b.key)) >= 0))
       if (firstSelectedIndex >= 0) {
@@ -132,6 +156,10 @@ class Facet extends Component {
                                  selectedFields={[]}
                                  onUpdate={this.updateDisplayOptions}/>
     this.props.actions.showModal({body, width})
+  }
+
+  deselectAllTerms = (event) => {
+    this.modifySliver(this.state.field, [], this.state.order)
   }
 
   rotateOrder (order, field, dir) {
@@ -276,12 +304,39 @@ class Facet extends Component {
     )
   }
 
+  renderClearSelection () {
+    const { terms } = this.state
+    if (!terms || terms.length === 0) return <div className="Facet-clear-selection"/>
+    return (
+      <div className="Facet-clear-selection">
+        { `${terms.length} facets selected` }
+        <div onClick={this.deselectAllTerms} className="Facet-clear-selection-cancel icon-cancel-circle"/>
+      </div>
+    )
+  }
+
+  mergeOtherBuckets (buckets, maxCount) {
+    if (buckets.length <= maxCount || this.state.chartType === BAR_CHART) return buckets
+    // Keep the order, but group the smallest ones into "Other"
+    const sorted = buckets.sort((a, b) => (a.doc_count < b.doc_count ? 1 : (a.doc_count > b.doc_count ? -1 : 0)))
+    let otherCount = 0
+    for (let i = maxCount; i < buckets.length; ++i) otherCount += sorted[i].doc_count
+    let merged = []
+    buckets.forEach(bucket => {
+      if (sorted.findIndex(b => (bucket.key === b.key)) < maxCount) {
+        merged.push(bucket)
+      }
+    })
+    merged.push({ key: OTHER_BUCKET, doc_count: otherCount })
+    return merged
+  }
+
   renderChart () {
     const { field, terms, chartType } = this.state
     let maxCount = 0
     let minCount = Number.MAX_SAFE_INTEGER
     // Extract the buckets for this widget from the global query using id
-    const buckets = this.aggBuckets()
+    const buckets = this.mergeOtherBuckets(this.aggBuckets(), chartType === BAR_CHART ? 100 : 9)
     buckets.forEach(bucket => {
       maxCount = Math.max(maxCount, bucket.doc_count)
       minCount = Math.min(minCount, bucket.doc_count)
@@ -289,6 +344,8 @@ class Facet extends Component {
     // Only animate when the buckets change, cached in class variable, not state
     const animate = JSON.stringify(buckets) !== JSON.stringify(this.buckets)
     this.buckets = buckets
+    const mergedTerms = terms.filter(t => (buckets.findIndex(b => (b.key === t)) >= 0))
+    if (mergedTerms.length < terms.length) mergedTerms.push(OTHER_BUCKET)
     const data = buckets.map(bucket => ({name: bucket.key, value: bucket.doc_count}))
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042',
       '#ce2d3f', '#fc6c2c', ' #a11e77', '#b7df4d', '#1875d1' ]
@@ -305,7 +362,7 @@ class Facet extends Component {
                 <tbody>
                 { buckets && buckets.map(bucket => (
                   <tr className={classnames('Facet-value-table-row',
-                    { selected: terms.indexOf(bucket.key) >= 0 })}
+                    { selected: mergedTerms.indexOf(bucket.key) >= 0 })}
                       key={bucket.key} onClick={this.selectTerm.bind(this, bucket.key)}>
                     <td className="Facet-value-cell">
                       <div className="Facet-value-table-key">
@@ -323,7 +380,7 @@ class Facet extends Component {
         )
 
       case PIE_CHART:
-        const activeIndex = terms.map((term, index) => (buckets.findIndex(bucket => (bucket.key === term))))
+        const activeIndex = mergedTerms.map((term, index) => (buckets.findIndex(bucket => (bucket.key === term))))
         return (
           <div className="Facet-pie-chart">
             <ResponsiveContainer>
@@ -352,17 +409,6 @@ class Facet extends Component {
     return (
       <button className={classnames('Facet-icon', type, {selected})}
               key={type} onClick={this.selectGraph.bind(this, type)} />
-    )
-  }
-
-  renderClearSelection () {
-    const { terms } = this.state
-    if (!terms || terms.length === 0) return <div className="Facet-clear-selection"/>
-    return (
-      <div className="Facet-clear-selection">
-        { `${terms.length} facets selected` }
-        <div onClick={this.deselectAllTerms} className="Facet-clear-selection-cancel icon-cancel-circle"/>
-      </div>
     )
   }
 
