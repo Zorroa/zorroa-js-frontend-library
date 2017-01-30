@@ -14,7 +14,7 @@ import {
   showModal,
   setTableFieldWidth
 } from '../../actions/appActions'
-import { sortAssets, unorderAssets } from '../../actions/assetsAction'
+import { sortAssets, unorderAssets, isolateAssetId } from '../../actions/assetsAction'
 import { saveUserSettings } from '../../actions/authAction'
 import TableField from './TableField'
 import DisplayOptions from '../DisplayOptions'
@@ -45,6 +45,12 @@ class Table extends Component {
 
     // connect actions
     actions: PropTypes.object
+  }
+
+  static get contextTypes () {
+    return {
+      router: PropTypes.object
+    }
   }
 
   constructor (props) {
@@ -209,6 +215,11 @@ class Table extends Component {
     }
   }
 
+  isolateToLightbox (asset) {
+    this.props.actions.isolateAssetId(asset.id)
+    this.context.router.push('/lightbox')
+  }
+
   // light wrapper around Assets.select(); just make sure we don't scroll
   // the Table when we select from the table
   select = (asset, event) => {
@@ -368,7 +379,8 @@ class Table extends Component {
                   <div key={asset.id}
                        className={classnames('Table-row', { even: !!(index % 2), isSelected })}
                        style={{top: `${rowTopPx}px`, height: `${rowBottomPx - rowTopPx}px`}}
-                       onClick={event => this.select(asset, event)}>
+                       onClick={event => this.select(asset, event)}
+                       onDoubleClick={event => this.isolateToLightbox(asset)}>
                     { fields.map((field, i) => (
                       <TableField {...{ asset, field, key: field, width: fieldWidth[field] }}
                         isOpen={this.isAssetFieldOpen(asset, field)}
@@ -410,6 +422,7 @@ export default connect(state => ({
   actions: bindActionCreators({
     sortAssets,
     unorderAssets,
+    isolateAssetId,
     updateMetadataFields,
     updateTableFields,
     showModal,
