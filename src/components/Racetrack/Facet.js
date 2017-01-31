@@ -240,7 +240,7 @@ class Facet extends Component {
               <text x={ex} y={ey}
                     textAnchor={textAnchor}
                     className="Facet-pie-label" dominantBaseline="central">
-                { name }
+                { name || '(none)' }
               </text>
               <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none"/>
             </svg>
@@ -369,7 +369,7 @@ class Facet extends Component {
                     <td className="Facet-value-cell">
                       <div className="Facet-value-table-key">
                         <div className="Facet-value-pct-bar" style={{width: `${100 * bucket.doc_count / maxCount}%`}} />
-                        <div className="Facet-value-key">{bucket.key}</div>
+                        <div className="Facet-value-key">{bucket.key || '(none)'}</div>
                       </div>
                     </td>
                     <td className="Facet-value-count">{bucket.doc_count}</td>
