@@ -3,11 +3,13 @@
 .PanZoom-frame {
   @include flexCol;
   @include flexOn;
+  overflow: hidden;
 }
 
 .PanZoom {
   @include flexCol;
   @include flexOn;
+  overflow: hidden;
   position: relative;
   cursor: move; /* fallback if grab cursor is unsupported */
   cursor: grab;

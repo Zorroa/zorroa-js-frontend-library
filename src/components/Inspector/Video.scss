@@ -11,6 +11,12 @@
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
 
+  // This is the native video element that React-player creates
+  video {
+    object-fit: contain; // needed for Firefox when window is narrower aspect than video
+    object-position: center center; // needed for Chrome when window is narrower aspect than video
+  }
+
   .PanZoom-controls {
     position: fixed;    // avoid overflow:hidden on Video-pan-zoom
     left: 200px;        // Next to the time display
@@ -29,7 +35,7 @@
   }
 
   .Video-player {
-    @include flexCol;
+    @include flexColCenter;
     @include flexOn;
     @include fullWidth;
     overflow: hidden;
@@ -39,10 +45,13 @@
 
   .Video-progress-bar {
     @include fullWidth;
+    @include flexOff;
+    @include flexRowCenter
+
     position: relative;
     top: 0;
     left: 0;
-    height: auto;
+    height: 16px;
 
     .Video-scrub {
       @include fullWidth;
@@ -56,14 +65,26 @@
       background-color: rgba(64,64,64,0.05);
     }
 
-    input.Video-scrub[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      border: none;
-      height: 8px;
-      width: 8px;
-      border-radius: 25%;
-      background: $zorroa-nearwhite;
-      margin-top: -4px;
+    input.Video-scrub[type=range] {
+      &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        border: none;
+        height: 8px;
+        width: 8px;
+        border-radius: 25%;
+        background: $zorroa-nearwhite;
+        margin-top: 4px;
+      }
+
+      &::-moz-range-thumb {
+        -webkit-appearance: none;
+        border: none;
+        height: 8px;
+        width: 8px;
+        border-radius: 25%;
+        background: $zorroa-nearwhite;
+        // margin-top: -4px;
+      }
     }
 
     progress[value] {
@@ -77,31 +98,13 @@
       background-color: transparent;
     }
 
-    progress.loaded[value]::-webkit-progress-value {
-      color: transparent;
-      background-color: $zorroa-gray;
-    }
-
-    progress.played[value]::-webkit-progress-value {
-      color: transparent;
-      background-color: $zorroa-sickly-green;
-      opacity: 0.75;
-    }
-
-    .loaded {
+    .Video-progress-progress {
       @include fullWidth;
+      height: 4px;
+
       position: absolute;
       left:0;
-      top: 2px;
-      z-index: 1;
-    }
-
-    .played {
-      @include fullWidth;
-      position: absolute;
-      top: 2px;
-      z-index: 2;
-      left:0;
+      top: 6px; // .Video-progress-bar.height - 0.5 * .Video-progress-progress.height
     }
   }
 
@@ -211,10 +214,17 @@
       margin-right: 20px;
     }
 
-    input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      border: none;
-      background: none;
+    input[type=range] {
+      &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        border: none;
+        background: none;
+      }
+      &::-moz-range-thumb {
+        -webkit-appearance: none;
+        border: none;
+        background: none;
+      }
     }
 
     input {

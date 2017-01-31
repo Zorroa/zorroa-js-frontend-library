@@ -162,7 +162,7 @@ class Video extends Component {
               onEnded={() => this.setState({ playing: false, played: 1 })}
               onError={e => console.log('onError', e)}
               onProgress={this.onProgress}
-              progressFrequency="100"
+              progressFrequency={100}
               onDuration={this.setDuration}
             />
           </PanZoom>
@@ -175,8 +175,10 @@ class Video extends Component {
                  onInput={this.onSeekChange}
                  onMouseUp={this.onSeekMouseUp}
           />
-          <progress className="loaded" max={1} value={loaded} />
-          <progress className="played" max={1} value={played} />
+          <svg className="Video-progress-progress" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <rect width={`${(loaded||0)*100}`} height="100" style={{fill: '#808080', stroke: 'none'}}></rect>
+            <rect width={`${(played||0)*100}`} height="100" style={{fill: '#73b61c', stroke: 'none'}}></rect>
+          </svg>
         </div>
         <div className="Video-control-bar">
           <div className="Video-time">
