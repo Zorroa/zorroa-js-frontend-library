@@ -1,15 +1,13 @@
 @import '../../styles/core-mixins.scss';
 
-.SimpleSearch {
+.Exists {
+  min-width: 0;
+
   .WidgetHeader {
     color: $zorroa-nearwhite;
   }
 
-  .Widget-icon {
-    font-size: 20px;
-  }
-
-  .SimpleSearch-header {
+  .Exists-header {
     @include flexRow;
     @include flexJustifySpaceBetween;
     @include flexAlignItemsCenter;
@@ -17,23 +15,31 @@
     @include noSelect;
 
     flex-shrink: 1;
+    min-width: 0;
   }
 
-  .SimpleSearch-header-label {
+  .Exists-header-label {
     @include flexRow;
     @include flexAlignItemsCenter;
+    min-width: 0;
   }
 
-  .SimpleSearch-header-title {
+  .Exists-header-title {
+    @include flexOff;
     font-weight: 100;
     margin-right: 4px;
   }
 
-  .SimpleSearch-header-field {
+  .Exists-header-field {
+    @include flexShrinkOnly;
+    @include clampText;
+    min-width: 0;
+    text-transform: uppercase;
+    text-overflow: ellipsis;
     font-weight: 400;
   }
 
-  .SimpleSearch-settings {
+  .Exists-settings {
     @include zorroa-square-btn-darken(40px);
     margin: 5px 0px;
 
@@ -42,11 +48,22 @@
     }
   }
 
-  .SimpleSearch-body {
+  .Exists-clear-search {
+    @include zorroa-square-btn-darken(20px);
+    margin: 5px;
+    font-size: 10px;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  .Exists-body {
     background-color: white;
     color: $zorroa-gray;
     display: flex;
     flex-direction: column;
+    padding: 10px;
 
     input {
       flex: 1;
@@ -63,32 +80,22 @@
     }
   }
 
-  .SimpleSearch-toggles {
-    @include flexRow;
-    @include flexAlignItemsCenter;
-    @include flexJustifySpaceBetween;
-  }
+  .Exists-exists {
+    @include flexRowCenter;
 
-  .SimpleSearch-fuzzy {
-    @include flexRow;
-    @include flexAlignItemsCenter;
-    padding-left: 12px;
-    padding-right: 12px;
-    margin-bottom: 10px;
-  }
-
-  .SimpleSearch-fuzzy-label {
-    margin-left: 12px;
-  }
-
-  .SimpleSearch-clear-search {
-    @include zorroa-square-btn-darken(20px);
-    margin: 5px;
-    border-radius: 2px;
-    font-size: 10px;
-
-    &:hover {
-      cursor: pointer;
+    .Toggle {
+      margin: 5px 10px;
     }
   }
+
+  .Exists-exists-label {
+    margin-left: 12px;
+    cursor: default;
+  }
+
+  .Exists-missing-label {
+    margin-right: 12px;
+    cursor: default;
+  }
+
 }

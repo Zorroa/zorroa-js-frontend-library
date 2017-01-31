@@ -1,5 +1,5 @@
 import {
-  SHOW_MODAL, HIDE_MODAL,
+  SHOW_MODAL, HIDE_MODAL, SORT_FOLDERS,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
   METADATA_FIELDS, TABLE_FIELDS, LIGHTBAR_FIELDS,
   SYNC_FIELDS, SHOW_IMPORT_SCRIPT_INFO,
@@ -36,6 +36,7 @@ const initialState = {
   tableHeight: 300,
   showTable: false,
   videoVolume: 0.8,
+  sortFolders: {},
   userSettings: {
     tableFields: [ ...defaultTableFields ],
     metadataFields: [ ...defaultTableFields ],
@@ -92,6 +93,18 @@ export default function app (state = initialState, action) {
       return { ...state, tableHeight: action.payload }
     case VIDEO_VOLUME:
       return { ...state, videoVolume: action.payload }
+    case SORT_FOLDERS: {
+      const { filter, order } = action.payload
+      if (order === undefined) {
+        if (state.sort[filter]) {
+          const sort = {...state.sort}
+          delete sort[filter]
+          return sort
+        }
+      } else {
+        return {...state, sortFolders: { ...state.sort, [filter]: order }}
+      }
+    }
     case USER_SETTINGS:
       return { ...state, userSettings: action.payload.metadata }
     case UNAUTH_USER:

@@ -1,5 +1,5 @@
 import {
-  SHOW_MODAL, HIDE_MODAL,
+  SHOW_MODAL, HIDE_MODAL, SORT_FOLDERS,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
   METADATA_FIELDS, TABLE_FIELDS, LIGHTBAR_FIELDS, SYNC_FIELDS,
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH, SHOW_IMPORT_SCRIPT_INFO,
@@ -130,5 +130,12 @@ export function setVideoVolume (volume) {
   return ({
     type: VIDEO_VOLUME,
     payload: volume
+  })
+}
+
+export function sortFolders (filter, order) {
+  return ({
+    type: SORT_FOLDERS,
+    payload: { filter, order }
   })
 }

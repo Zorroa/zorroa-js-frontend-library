@@ -94,18 +94,25 @@ class Thumb extends Component {
       return <div className="Thumb-proxy" style={{ backgroundColor: asset.backgroundColor() }} />
     }
     let pages, duration, icon
-    let mediaType = asset.mediaType()
-    if (mediaType) {
-      mediaType = mediaType.toLowerCase()
-      if (mediaType.startsWith('image') && asset.value('image.subimages')) {
-        pages = asset.value('image.subimages')
-      } else if (mediaType.includes('video') || mediaType.includes('sequence')) {
-        duration = asset.value('video.duration')
-      } else if (mediaType === 'application/pdf' || asset.value('document.pages')) {
-        icon = require('./pdf-icon.png')
-        pages = asset.value('document.pages')
-      }
+    const mediaType = asset.mediaType().toLowerCase()
+
+    // [dhart 2017-01-11] REMOVE ASAP
+    // [wex 2017-1-24] Adjusted badge identification
+    // temporarily, for SPE, video clips can be represented by a sub-clip of another asset
+    // The asset id is hardcoded for a demo, this needs to be removed asap
+    // The sub-clip start and end time codes are inside the metadata spe.clip
+    // spe is going to be renamed to something that is not client specific
+    if (asset.document.spe && asset.document.spe.clip && asset.document.spe.clip.frameLength) {
+      duration = asset.document.spe.clip.frameLength * 1000 / 24
+    } else if (mediaType.startsWith('image') && asset.value('image.subimages')) {
+      pages = asset.value('image.subimages')
+    } else if (mediaType.includes('video') || mediaType.includes('sequence')) {
+      duration = asset.value('video.duration')
+    } else if (mediaType === 'application/pdf' || asset.value('document.pages')) {
+      icon = require('./pdf-icon.png')
+      pages = asset.value('document.pages')
     }
+
     const { width, height, x, y } = this.props.dim      // Original thumb rect
     const style = { width, height, left: x, top: y }    // Dim -> left, right
     const ninetyDim = { width: '90%', height: '90%' }   // When multipaged

@@ -121,7 +121,7 @@ class QuickAddWidget extends Component {
                    className={classnames('QuickAddWidget-item',
                      {selected: widgetInfo.type === selectedWidgetType})}
                    key={widgetInfo.type}>
-                <i className={`QuickAddWidget-item-icon ${widgetInfo.icon}`}></i>
+                <span className={`QuickAddWidget-item-icon ${widgetInfo.icon}`}></span>
                 <span>{widgetInfo.title}</span>
               </div>
             ))}

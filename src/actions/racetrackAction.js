@@ -2,7 +2,13 @@ import { MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_W
 import Widget from '../models/Widget'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
-import { SimpleSearchWidgetInfo, FacetWidgetInfo, ColorWidgetInfo } from '../components/Racetrack/WidgetInfo'
+import {
+  SimpleSearchWidgetInfo,
+  FacetWidgetInfo,
+  ColorWidgetInfo,
+  ExistsWidgetInfo,
+  RangeWidgetInfo
+} from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
 
 export function modifyRacetrackWidget (widget) {
@@ -53,6 +59,34 @@ export function restoreSearch (search) {
       const facet = new Widget({type, sliver})
       widgets.push(facet)
     })
+  }
+
+  // Create an exists widget for each "exists" & "missing" field
+  if (search.filter && (search.filter.exists || search.filter.missing)) {
+    const type = ExistsWidgetInfo.type
+    var mkExistsWidget = (field, isMissing) => {
+      let sliver = new AssetSearch()
+      sliver.filter = new AssetFilter({[isMissing ? 'missing' : 'exists']: [field]})
+      const existsWidget = new Widget({type, sliver})
+      widgets.push(existsWidget)
+    }
+    if (search.filter.exists) {
+      search.filter.exists.forEach(field => mkExistsWidget(field, false))
+    }
+    if (search.filter.missing) {
+      search.filter.missing.forEach(field => mkExistsWidget(field, true))
+    }
+  }
+
+  // Create a range widget for each "range" field in the query
+  if (search.filter && search.filter.range) {
+    const type = RangeWidgetInfo.type
+    for (var field in search.filter.range) {
+      let sliver = new AssetSearch()
+      sliver.filter = new AssetFilter({ range: { [field]: search.filter.range[field] } })
+      const rangeWidget = new Widget({type, sliver})
+      widgets.push(rangeWidget)
+    }
   }
 
   // Create a color widget if there's a color query

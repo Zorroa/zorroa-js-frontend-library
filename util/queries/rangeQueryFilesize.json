@@ -1,0 +1,17 @@
+{
+  "filter": {
+    "range": {
+      "source.fileSize": {
+        "gt": "40000",
+        "lt": "60000"
+      },
+      "image.FNumber": {
+        "gt": "4",
+        "lt": "6"
+      }
+    }
+  },
+  "postFilter": {},
+  "order": [],
+  "size": 5
+}

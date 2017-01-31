@@ -46,6 +46,9 @@
 
 .QuickAddWidget-item-icon {
   margin-right: 6px;
+  width: 16px;
+  height: 16px;
+  @include flexRowCenter;
 }
 
 .QuickAddWidget-input-container {
