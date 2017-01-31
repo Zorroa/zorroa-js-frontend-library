@@ -78,12 +78,12 @@ class Searcher extends Component {
           continue
         }
         let sliver = widget.sliver
+        postFilter.merge(widget.sliver.filter)
         if (sliver.aggs) {
-          const allOthers = this.allOtherFilters(widget)
+          const allOthers = this.allOtherFilters(widget).convertToBool()
           let aggs = {[widget.id]: {filter: allOthers, aggs: sliver.aggs}}
           sliver = new AssetSearch({aggs})
         }
-        postFilter.merge(widget.sliver.filter)
         assetSearch.merge(sliver)
       }
       assetSearch.postFilter = postFilter
