@@ -59,6 +59,15 @@ class Thumb extends Component {
     selectedAssetIds: PropTypes.instanceOf(Set)
   }
 
+  renderSelectedOverlay (isSelected) {
+    return (
+      <div className={classnames('Thumb-selection', {isSelected})}>
+        <div className={classnames('Thumb-selection-overlay', {isSelected})}/>
+        <div className={classnames('Thumb-selection-check', 'icon-checkbox-checked', {isSelected})}/>
+      </div>
+    )
+  }
+
   renderBadges = (pages, duration, icon) => {
     const { width, height } = this.props.dim
     const hideText = (!pages && !duration) || width < 50 || height < 50
@@ -131,6 +140,7 @@ class Thumb extends Component {
         <div style={hideMultipageStyle} className="stack-middle"/>
         <div className="stack-front" style={frontDim}>
           <ImageThumb {...props} thumbURL={thumbURL}>
+            { this.renderSelectedOverlay(isSelected) }
             { this.renderBadges(pages, duration, icon) }
           </ImageThumb>
         </div>
