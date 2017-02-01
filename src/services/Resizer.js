@@ -63,6 +63,8 @@ export default class Resizer {
     const x = this.startX + this.scaleX * (event.pageX - this.startPageX)
     const y = this.startY + this.scaleY * (event.pageY - this.startPageY)
     this.onMove(x, y)
+    // prevent resizer from natively selecting anything
+    window.getSelection().removeAllRanges()
   }
 
   release = (event) => {
@@ -71,5 +73,7 @@ export default class Resizer {
     window.removeEventListener('mouseup', this.release)
     if (this.onRelease) this.onRelease()
     this.reset()
+    // prevent resizer from natively selecting anything
+    window.getSelection().removeAllRanges()
   }
 }
