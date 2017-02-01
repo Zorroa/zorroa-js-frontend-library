@@ -45,6 +45,7 @@
   color: $zorroa-lightgray;
   padding-left: 10px;
   padding-right: 10px;
+  cursor: pointer;
 
   @include flexRow;
   @include flexAlignItemsCenter;

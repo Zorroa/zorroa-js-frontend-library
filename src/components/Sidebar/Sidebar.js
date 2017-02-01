@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import classnames from 'classnames'
+import Resizer from '../../services/Resizer'
 
 export default class Sidebar extends Component {
   static displayName () {
@@ -20,33 +21,56 @@ export default class Sidebar extends Component {
     isRightEdge: false
   }
 
+  resizer = null
+  allowResize = true
+
   state = {
-    startx: 0,
-    startw: 0,
+    isResizing: false,
     width: 340    // Tricky ref stuff needed in componentDidMount to get width
   }
 
-  startDrag = (event) => {
-    const { width } = this.state
-    this.setState({ startx: event.pageX, startw: width })
-
-    var dragIcon = document.createElement('img')
-    // hide the drag element using a transparent 1x1 pixel image as a proxy
-    dragIcon.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
-    dragIcon.width = 1
-    event.dataTransfer.setDragImage(dragIcon, 0, 0)
+  componentWillMount = () => {
+    this.resizer = new Resizer()
   }
 
-  drag = (event) => {
-    const { isRightEdge } = this.props
-    const { startx, startw } = this.state
-    if (!event.pageX) return
-    const dx = (event.pageX - startx) * (isRightEdge ? -1 : 1)
-    const width = Math.min(1020, Math.max(340, startw + dx))
-    const threshold = 4   // Minimize redraws
-    if (Math.abs(width - this.state.width) > threshold) {
-      this.setState({width})
-    }
+  componentWillUnmount = () => {
+    this.resizer.release()
+  }
+
+  clampWidth = (width) => {
+    return Math.min(1020, Math.max(340, width))
+  }
+
+  resizeStart = (event) => {
+    // capture (onMove, onRelease, startX, startY, optScaleX, optScaleY)
+    this.resizer.capture(this.resizeUpdate, this.resizeStop,
+       this.state.width,                 /* startX    */
+       0,                                /* startY    */
+       this.props.isRightEdge ? -1 : 1,  /* optScaleX */
+       0)                                /* optScaleY */
+    const width = this.clampWidth(this.state.width)
+    this.setState({ isResizing: true, width })
+  }
+
+  resizeUpdate = (resizeX, resizeY) => {
+    if (!this.state.isResizing) return
+
+    // let's just completely skip events that happen while we're busy
+    if (!this.allowResize) return false
+    this.allowResize = false
+
+    // wait one frame to handle the event, otherwise events queue up syncronously
+    requestAnimationFrame(_ => {
+      const width = this.clampWidth(resizeX)
+      this.setState({ width })
+      this.allowResize = true
+    })
+  }
+
+  resizeStop = (event) => {
+    if (!this.state.isResizing) return
+    this.allowResize = true
+    this.setState({ isResizing: false })
   }
 
   toggleIfNotIconified = (event) => {
@@ -66,7 +90,7 @@ export default class Sidebar extends Component {
         <div className={classnames('scroller', { isRightEdge })} onClick={this.toggleIfNotIconified}>
           { children }
         </div>
-        { isOpen && <div draggable={true} onDragStart={this.startDrag} onDrag={this.drag}
+        { isOpen && <div onMouseDown={this.resizeStart}
                          className={classnames('Sidebar-resize-thumb', { isRightEdge })} /> }
       </div>
     )
