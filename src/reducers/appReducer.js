@@ -104,6 +104,7 @@ export default function app (state = initialState, action) {
       } else {
         return {...state, sortFolders: { ...state.sort, [filter]: order }}
       }
+      break
     }
     case USER_SETTINGS:
       return { ...state, userSettings: action.payload.metadata }

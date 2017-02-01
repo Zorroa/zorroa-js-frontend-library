@@ -89,7 +89,7 @@ export default class AssetFilter {
       delete this.terms
       let boolMust = []
       for (let termKey in terms) {
-        boolMust.push({ terms: { [termKey]: terms[termKey] }})
+        boolMust.push({ terms: { [termKey]: terms[termKey] } })
       }
       this.bool = { must: boolMust }
     }

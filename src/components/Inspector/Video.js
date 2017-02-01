@@ -176,8 +176,8 @@ class Video extends Component {
                  onMouseUp={this.onSeekMouseUp}
           />
           <svg className="Video-progress-progress" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <rect width={`${(loaded||0)*100}`} height="100" style={{fill: '#808080', stroke: 'none'}}></rect>
-            <rect width={`${(played||0)*100}`} height="100" style={{fill: '#73b61c', stroke: 'none'}}></rect>
+            <rect width={`${(loaded || 0) * 100}`} height="100" style={{fill: '#808080', stroke: 'none'}}></rect>
+            <rect width={`${(played || 0) * 100}`} height="100" style={{fill: '#73b61c', stroke: 'none'}}></rect>
           </svg>
         </div>
         <div className="Video-control-bar">
