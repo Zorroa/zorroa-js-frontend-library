@@ -65,7 +65,7 @@ class Assets extends Component {
     }
 
     this.tableStartY = 0
-    this.tableStartHeight = 0
+    this.newTableHeight = 0
     this.allowTableResize = true
     this.assetsScrollHeight = 0
     this.assetsScrollWidth = 0
@@ -181,7 +181,6 @@ class Assets extends Component {
     this.resizer.capture(this.tableResizeUpdate, this.tableResizeStop, 0, this.props.tableHeight, 0, -1)
     const tableHeight = this.clampTableHeight(this.state.tableHeight)
     this.newTableHeight = tableHeight
-    this.tableStartHeight = this.newTableHeight
     this.setState({tableIsResizing: true})
   }
 
