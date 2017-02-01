@@ -62,30 +62,56 @@
       }
     }
   }
+
+  .Thumb-selection {
+    @include fullWidth;
+    @include fullHeight;
+
+    opacity: 0;
+
+    &.isSelected {
+      opacity: 1;
+    }
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  .Thumb-selection-overlay {
+    @include fullWidth;
+    @include fullHeight;
+
+    &.isSelected {
+      background-color: black;
+    }
+
+    opacity: 0.5;
+  }
+
+  .Thumb-selection-check {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 16px;
+    border-radius: 3px;
+    background-color: white;
+    color: $zorroa-gray;
+    &.isSelected {
+      color: $zorroa-sickly-green;
+    }
+  }
 }
 
 .Thumb {
   position: absolute;
 
-  &:hover {
-    outline: 3px solid $zorroa-hover;
-  }
   &.isSelected {
     outline: 3px solid $zorroa-sickly-green;
   }
 
-  .Thumb:hover {
-    border: none;
-  }
-
-  &.Thumb.isSelected {
-    border: none;
-  }
-
   .stack-front {
     position: absolute;
-    //width: 90%;
-    //height: 90%;
     top: 0;
     left: 0;
     border: solid 1px $zorroa-lightgray;
