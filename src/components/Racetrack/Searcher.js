@@ -52,7 +52,7 @@ class Searcher extends Component {
     const { widgets } = this.props
     let allOther = new AssetFilter()
     for (let w of widgets) {
-      if (w !== widget && w.sliver && w.sliver.filter) {
+      if (w !== widget && w.sliver && w.sliver.filter && w.sliver.aggs) {
         allOther.merge(w.sliver.filter)
       }
     }
@@ -78,8 +78,8 @@ class Searcher extends Component {
           continue
         }
         let sliver = widget.sliver
-        postFilter.merge(widget.sliver.filter)
         if (sliver.aggs) {
+          postFilter.merge(widget.sliver.filter)
           const allOthers = this.allOtherFilters(widget).convertToBool()
           let aggs = {[widget.id]: {filter: allOthers, aggs: sliver.aggs}}
           sliver = new AssetSearch({aggs})
