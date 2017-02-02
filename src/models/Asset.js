@@ -2,16 +2,6 @@ import * as assert from 'assert'
 
 import Proxy from './Proxy'
 
-// [dhart 01/11/17] REMOVE ASAP
-// This is a demo day hack
-export const Clips = {
-  'other guys, the': '4fee274f-15b3-5751-b0cb-ad9b63304c41',
-  'the other guys': '4fee274f-15b3-5751-b0cb-ad9b63304c41',
-  '22 jump street': '8305906a-1a68-5f07-a22d-3250ca314b0c',
-  'talladega nights': '9de7d881-963f-5156-987e-8dd4c4eadb8f',
-  'talladega nights: the ballad of ricky bobby (ur)': '9de7d881-963f-5156-987e-8dd4c4eadb8f'
-}
-
 export default class Asset {
   constructor ({ id, document }) {
     this.id = id
@@ -25,20 +15,7 @@ export default class Asset {
 
   source () { return this.document.source.filename }
   url (protocol, host) {
-    let id = this.id
-
-    if (this.document.spe && this.document.spe.clip) {
-      // [dhart 2017-01-11] REMOVE ASAP
-      // temporarily, for SPE, video clips can be represented by a sub-clip of another asset
-      // The asset id is hardcoded for a demo, this needs to be removed asap
-      // The sub-clip start and end time codes are inside the metadata spe.clip
-      // spe is going to be renamed to something that is not client specific
-      try { // this will bail out if anything goes wrong accessing spe
-        id = Clips[this.document.spe.Film.Title[0].toLowerCase()]
-      } catch (e) { /* absorb & ignore these errors */
-      }
-    }
-    return `${protocol}//${host}:8066/api/v1/assets/${id}/_stream`
+    return `${protocol}//${host}:8066/api/v1/assets/${this.id}/_stream`
   }
   mediaType () { return this.document.source.mediaType || 'unknown' }
   tinyProxy () { return this.document.proxies ? this.document.proxies.tinyProxy : null }
@@ -55,6 +32,25 @@ export default class Asset {
   aspect () { return this.width() / Math.max(1, this.height()) }
 
   backgroundColor () { return this.tinyProxy() ? this.tinyProxy()[5] : getRandomColor() }
+
+  frameRate () {
+    if (this.document.video) return this.document.video.frameRate
+  }
+  frames () {
+    if (this.document.video) return this.document.video.frames
+  }
+  startFrame () {
+    if (this.document.video) {
+      if (this.document.source.clip && this.document.source.clip.frame) return this.document.source.clip.frame.start
+      return 0
+    }
+  }
+  stopFrame () {
+    if (this.document.video) {
+      if (this.document.source.clip && this.document.source.clip.frame) return this.document.source.clip.frame.stop
+      return this.document.video.frames
+    }
+  }
 
   biggestProxy () {
     if (!this.proxies) return null

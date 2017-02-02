@@ -8,15 +8,17 @@ import ReactPlayer from 'react-player'
 
 import { setVideoVolume } from '../../actions/appActions'
 import { saveUserSettings } from '../../actions/authAction'
-import { formatDuration } from '../../services/jsUtil'
+import { formatDuration, clamp } from '../../services/jsUtil'
 import PanZoom from './PanZoom'
 import User from '../../models/User'
 
 class Video extends Component {
   static propTypes = {
     url: PropTypes.string.isRequired,
-    startSec: PropTypes.number,
-    stopSec: PropTypes.number,
+    frames: PropTypes.number,
+    frameRate: PropTypes.number,
+    startFrame: PropTypes.number,
+    stopFrame: PropTypes.number,
     videoVolume: PropTypes.number,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
@@ -29,15 +31,9 @@ class Video extends Component {
     this.state = {
       playing: true,
       volume: this.props.videoVolume,
-      played: this.props.startSec,
-      loaded: 0,
-      duration: 0,
-      startFraction: 0,
-      stopFraction: 1,
-      isClip: false
+      played: 0,
+      loaded: 0
     }
-
-    this.needToInit = true
   }
 
   @keydown('space')
@@ -58,7 +54,9 @@ class Video extends Component {
   }
 
   onSeekChange = e => {
-    const t = parseFloat(e.target.value)
+    const { frames, startFrame, stopFrame } = this.props
+    const v = parseFloat(e.target.value)
+    const t = (startFrame + v * (stopFrame - startFrame)) / frames
     this.scrub(t)
   }
 
@@ -70,34 +68,31 @@ class Video extends Component {
     // We only want to update time slider if we are not currently seeking
     if (!this.state.seeking) {
       this.setState(state)
-
-      // Auto-stop when we run past the end of a clip
-      if (this.state.isClip) {
-        // console.log(`time left: ${(this.state.stopFraction - state.played) * this.state.duration} played:${state.played} start:${this.state.startFraction} stop:${this.state.stopFraction} dur:${this.state.duration}`)
-        if (state.played > this.state.stopFraction) {
-          // console.log('stop')
-          this.setState({ playing: false })
-          this.rewind()
-        }
+      const { stopFrame, frames } = this.props
+      if (state.played >= stopFrame / frames) {
+        this.setState({ playing: false })
+        this.rewind()
       }
     }
   }
 
   rewind = () => {
-    this.scrub(this.state.startFraction)
+    const { startFrame, frames } = this.props
+    this.scrub(startFrame / frames)
   }
 
   fastForward = () => {
-    this.scrub(this.state.stopFraction)
+    const { stopFrame, frames } = this.props
+    this.scrub(stopFrame / frames)
   }
 
   frameBack = () => {
-    const t = Math.max(0, this.state.played - 1 / (30.0 * this.state.duration))
+    const t = Math.max(0, this.state.played - 1 / this.props.frames)
     this.scrub(t)
   }
 
   frameForward = () => {
-    const t = Math.min(1, this.state.played + 1 / (30.0 * this.state.duration))
+    const t = Math.min(1, this.state.played + 1 / this.props.frames)
     this.scrub(t)
   }
 
@@ -106,42 +101,24 @@ class Video extends Component {
     this.player.seekTo(played)
   }
 
-  setDuration = (duration) => {
-    this.setState({ duration })
+  clipTime (t) {
+    const { frames, startFrame, stopFrame } = this.props
+    return clamp((t * frames - startFrame) / (stopFrame - startFrame), 0, 1)
   }
 
-  init = () => {
-    if (!this.needToInit) return
-    if (!this.player) return
-    if (!this.state.duration) return
-
-    this.needToInit = false
-
-    const { duration } = this.state
-    const startFraction = (this.props.startSec || 0) / duration
-    const stopFraction = (this.props.stopSec || duration) / duration
-
-    console.log(`video init start:${startFraction * duration} stop:${stopFraction * duration} clip:${(stopFraction - startFraction) * duration}`)
-
-    if (startFraction > 0) {
-      requestAnimationFrame(() => {
-        this.setState({ startFraction, stopFraction, isClip: true })
-        this.scrub(startFraction)
-      })
-    }
+  init () {
+    if (this.initialized) return
+    const { frames, startFrame } = this.props
+    this.scrub(startFrame / frames)
+    this.initialized = true
   }
 
   render () {
-    const { url } = this.props
-    const {
-      playing, volume,
-      played, loaded, duration
-    } = this.state
+    const { url, frameRate, frames, startFrame } = this.props
+    const { playing, volume, played, loaded } = this.state
     const volumeX = 130 * volume
     const volumeY = 30 - (5 + 20 * volume)
-
-    if (this.needToInit) this.init()
-
+    const duration = frames / frameRate
     return (
       <div className='Video'>
         <div className="Video-pan-zoom">
@@ -154,7 +131,7 @@ class Video extends Component {
               height="100%"
               playing={playing}
               volume={volume}
-              onReady={() => console.log('onReady')}
+              onReady={() => this.init()}
               onStart={() => console.log('onStart')}
               onPlay={() => this.setState({ playing: true })}
               onPause={() => this.setState({ playing: false })}
@@ -163,21 +140,20 @@ class Video extends Component {
               onError={e => console.log('onError', e)}
               onProgress={this.onProgress}
               progressFrequency={100}
-              onDuration={this.setDuration}
             />
           </PanZoom>
         </div>
         <div className="Video-progress-bar">
           <input className="Video-scrub"
                  type='range' min={0} max={1} step='any'
-                 value={played}
+                 value={this.clipTime(played)}
                  onMouseDown={this.onSeekMouseDown}
                  onInput={this.onSeekChange}
                  onMouseUp={this.onSeekMouseUp}
           />
           <svg className="Video-progress-progress" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <rect width={`${(loaded || 0) * 100}`} height="100" style={{fill: '#808080', stroke: 'none'}}></rect>
-            <rect width={`${(played || 0) * 100}`} height="100" style={{fill: '#73b61c', stroke: 'none'}}></rect>
+            <rect width={`${(this.clipTime(loaded) || 0) * 100}`} height="100" style={{fill: '#808080', stroke: 'none'}}></rect>
+            <rect width={`${(this.clipTime(played) || 0) * 100}`} height="100" style={{fill: '#73b61c', stroke: 'none'}}></rect>
           </svg>
         </div>
         <div className="Video-control-bar">

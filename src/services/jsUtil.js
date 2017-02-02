@@ -38,6 +38,10 @@ export function remap (x, min1, max1, min2, max2) {
   return min2 + (max2 - min2) * ((x - min1) / (max1 - min1))
 }
 
+export function clamp (v, min, max) {
+  return Math.max(min, Math.min(max, v))
+}
+
 function pad (string) {
   return ('0' + string).slice(-2)
 }
