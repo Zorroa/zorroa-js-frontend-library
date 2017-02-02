@@ -54,10 +54,10 @@ class Video extends Component {
   }
 
   onSeekChange = e => {
-    const { frames, startFrame, stopFrame } = this.props
+    const { startFrame, stopFrame } = this.props
     const v = parseFloat(e.target.value)
-    const t = (startFrame + v * (stopFrame - startFrame)) / frames
-    this.scrub(t)
+    const frame = startFrame + v * (stopFrame - startFrame)
+    this.scrub(frame)
   }
 
   onSeekMouseUp = e => {
@@ -77,26 +77,25 @@ class Video extends Component {
   }
 
   rewind = () => {
-    const { startFrame, frames } = this.props
-    this.scrub(startFrame / frames)
+    this.scrub(this.props.startFrame)
   }
 
   fastForward = () => {
-    const { stopFrame, frames } = this.props
-    this.scrub(stopFrame / frames)
+    this.scrub(this.props.stopFrame)
   }
 
   frameBack = () => {
-    const t = Math.max(0, this.state.played - 1 / this.props.frames)
-    this.scrub(t)
+    const frame = Math.max(0, this.state.played * this.props.frames - 1)
+    this.scrub(frame)
   }
 
   frameForward = () => {
-    const t = Math.min(1, this.state.played + 1 / this.props.frames)
-    this.scrub(t)
+    const frame = Math.min(this.state.played * this.props.frames + 1, this.state.stopFrame)
+    this.scrub(frame)
   }
 
-  scrub (played) {
+  scrub (frame) {
+    const played = frame / this.props.frames
     this.setState({ played })
     this.player.seekTo(played)
   }
@@ -108,8 +107,7 @@ class Video extends Component {
 
   init () {
     if (this.initialized) return
-    const { frames, startFrame } = this.props
-    this.scrub(startFrame / frames)
+    this.scrub(this.props.startFrame)
     this.initialized = true
   }
 
