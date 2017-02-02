@@ -17,8 +17,9 @@ const source = {
 const ImageThumb = (props) => {
   const { asset, dim, onClick, onDoubleClick, dragparams, thumbURL, children } = props
   const tproxy = asset.tinyProxy()
+  const bgColor = tproxy ? tproxy[4] : '#888'
   const style = {
-    'backgroundColor': tproxy[4],
+    'backgroundColor': bgColor,
     'backgroundSize': 'cover',
     'width': dim.width,
     'height': dim.height,
@@ -45,7 +46,7 @@ ImageThumb.propTypes = {
   onDoubleClick: PropTypes.func.isRequired,
   dragparams: PropTypes.object,
   thumbURL: PropTypes.string.isRequired,
-  children: React.PropTypes.element
+  children: PropTypes.arrayOf(React.PropTypes.element)
 }
 
 @DragSource('ASSET', source)
@@ -99,11 +100,8 @@ class Thumb extends Component {
 
   render () {
     const { asset, isSelected } = this.props
-    if (!asset.proxies) {
-      return <div className="Thumb-proxy" style={{ backgroundColor: asset.backgroundColor() }} />
-    }
-    let pages, duration, icon
     const mediaType = asset.mediaType().toLowerCase()
+    let pages, duration, icon
 
     // [dhart 2017-01-11] REMOVE ASAP
     // [wex 2017-1-24] Adjusted badge identification
@@ -132,7 +130,7 @@ class Thumb extends Component {
 
     const { protocol, host, dim } = this.props
     var proxy = asset.closestProxy(dim.width, dim.height)
-    const thumbURL = proxy.url(protocol, host)
+    const thumbURL = proxy ? proxy.url(protocol, host) : ''
 
     return (
       <div className={classnames('Thumb', {isSelected})} style={style} >

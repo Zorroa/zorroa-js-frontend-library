@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import Pdf from './Pdf'
 import Video from './Video'
 import Image from './Image'
-import { Asset } from '../../models/Asset'
+import Asset from '../../models/Asset'
 import { parseTimecodeMS } from '../../services/jsUtil'
 
 class Inspector extends Component {

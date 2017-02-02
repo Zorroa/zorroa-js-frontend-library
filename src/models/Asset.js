@@ -43,14 +43,21 @@ export default class Asset {
   mediaType () { return this.document.source.mediaType || 'unknown' }
   tinyProxy () { return this.document.proxies ? this.document.proxies.tinyProxy : null }
 
-  width () { return this.document.image && this.document.image.width ? this.document.image.width : 0 }
-  height () { return this.document.image && this.document.image.height ? this.document.image.height : 0 }
+  width () {
+    if (this.document.image) return this.document.image.width
+    if (this.document.video) return this.document.video.width
+  }
+  height () {
+    if (this.document.image) return this.document.image.height
+    if (this.document.video) return this.document.video.height
+  }
 
   aspect () { return this.width() / Math.max(1, this.height()) }
 
   backgroundColor () { return this.tinyProxy() ? this.tinyProxy()[5] : getRandomColor() }
 
   biggestProxy () {
+    if (!this.proxies) return null
     var biggestProxy = this.proxies[0]
     var mostPixels = 0
     for (var i = 0; i < this.proxies.length; ++i) {
@@ -65,6 +72,7 @@ export default class Asset {
   }
 
   closestProxy (width, height) {
+    if (!this.proxies) return null
     var bestProxy = this.proxies[0]
     var bestDim = Number.MAX_SAFE_INTEGER
     for (var i = 0; i < this.proxies.length; ++i) {
