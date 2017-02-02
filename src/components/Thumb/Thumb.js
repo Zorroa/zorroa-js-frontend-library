@@ -91,7 +91,7 @@ class Thumb extends Component {
             <div className={classnames('arrow-right', {small})} />
           </div>
           <div style={textStyle} className={classnames('duration', {small})}>
-            { formatDuration(parseFormattedFloat(duration) / 1000.0) }
+            { formatDuration(parseFormattedFloat(duration)) }
           </div>
         </div>
       )
@@ -106,7 +106,7 @@ class Thumb extends Component {
     if (mediaType.startsWith('image') && asset.value('image.subimages')) {
       pages = asset.value('image.subimages')
     } else if (mediaType.includes('video') || mediaType.includes('sequence')) {
-      duration = asset.value('video.duration')
+      duration = asset.duration()
     } else if (mediaType === 'application/pdf' || asset.value('document.pages')) {
       icon = require('./pdf-icon.png')
       pages = asset.value('document.pages')

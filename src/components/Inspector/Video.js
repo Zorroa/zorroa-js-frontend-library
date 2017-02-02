@@ -114,11 +114,12 @@ class Video extends Component {
   }
 
   render () {
-    const { url, frameRate, frames, startFrame } = this.props
+    const { url, frameRate, frames, startFrame, stopFrame } = this.props
     const { playing, volume, played, loaded } = this.state
     const volumeX = 130 * volume
     const volumeY = 30 - (5 + 20 * volume)
-    const duration = frames / frameRate
+    const seconds = played ? (played * frames - startFrame) / frameRate : 0
+    const duration = (stopFrame - startFrame) / frameRate
     return (
       <div className='Video'>
         <div className="Video-pan-zoom">
@@ -158,7 +159,7 @@ class Video extends Component {
         </div>
         <div className="Video-control-bar">
           <div className="Video-time">
-            <Duration className='Video-remaining' seconds={duration * played} />/<Duration seconds={duration}/>
+            <Duration className='Video-remaining' seconds={seconds} frameRate={frameRate} />/<Duration seconds={duration} frameRate={frameRate}/>
           </div>
           <div className="Video-controls">
             <div onClick={this.rewind} className="icon-prev-clip"/>
@@ -199,16 +200,17 @@ export default connect(state => ({
   }, dispatch)
 }))(Video)
 
-const Duration = ({ className, seconds }) => {
+const Duration = ({ className, seconds, frameRate }) => {
   return (
     <time dateTime={`P${Math.round(seconds)}S`} className={className || 'Video-duration'}>
-      {formatDuration(seconds)}
+      {formatDuration(seconds, frameRate)}
     </time>
   )
 }
 
 Duration.propTypes = {
   seconds: PropTypes.number.isRequired,
+  frameRate: PropTypes.number.isRequired,
   className: PropTypes.string
 }
 

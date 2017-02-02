@@ -33,19 +33,25 @@ export default class Asset {
 
   backgroundColor () { return this.tinyProxy() ? this.tinyProxy()[5] : getRandomColor() }
 
-  frameRate () {
+  frameRate () {    // frames per second
     if (this.document.video) return this.document.video.frameRate
   }
-  frames () {
+  frames () {       // total # frames in the source video -- the entire film, not the clip
     if (this.document.video) return this.document.video.frames
   }
-  startFrame () {
+  frameRange () {   // number of frames in this clip -- a subset of frames()
+    if (this.document.video) return this.stopFrame() - this.startFrame()
+  }
+  duration () {     // seconds in this clip -- a subset of the entire film
+    if (this.document.video) return this.frameRange() / this.frameRate()
+  }
+  startFrame () {   // start frame for this clip -- >= 0
     if (this.document.video) {
       if (this.document.source.clip && this.document.source.clip.frame) return this.document.source.clip.frame.start
       return 0
     }
   }
-  stopFrame () {
+  stopFrame () {    // stop frame for this clip -- <= frames()
     if (this.document.video) {
       if (this.document.source.clip && this.document.source.clip.frame) return this.document.source.clip.frame.stop
       return this.document.video.frames
