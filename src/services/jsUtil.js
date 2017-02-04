@@ -8,13 +8,16 @@ export function unCamelCase (str) {
     .replace(/^./, function (str) { return str.toUpperCase() })
 }
 
-export function formatDuration (seconds) {
+export function formatDuration (seconds, fps) {
   const date = new Date(seconds * 1000)
   const hh = date.getUTCHours()
   const mm = date.getUTCMinutes()
   const ss = pad(date.getUTCSeconds())
   if (hh) {
     return `${hh}:${pad(mm)}:${ss}`
+  } else if (fps) {
+    const ff = pad(Math.round(fps * date.getUTCMilliseconds() / 1000))
+    return `${mm}:${ss}:${ff}`
   }
   return `${mm}:${ss}`
 }
@@ -38,8 +41,12 @@ export function remap (x, min1, max1, min2, max2) {
   return min2 + (max2 - min2) * ((x - min1) / (max1 - min1))
 }
 
-function pad (string) {
-  return ('0' + string).slice(-2)
+export function clamp (v, min, max) {
+  return Math.max(min, Math.min(max, v))
+}
+
+function pad (string, digits) {
+  return ('0' + string).slice(-(digits || 2))
 }
 
 export function parseFormattedFloat (obj) {
