@@ -7,7 +7,8 @@ import {
   FacetWidgetInfo,
   ColorWidgetInfo,
   ExistsWidgetInfo,
-  RangeWidgetInfo
+  RangeWidgetInfo,
+  FiletypeWidgetInfo
 } from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
 
@@ -48,10 +49,11 @@ export function restoreSearch (search) {
   // Create a facet for each term.
   // FIXME: Maps create a term facet too!
   if (search.postFilter && search.postFilter.terms) {
-    const type = FacetWidgetInfo.type
     Object.keys(search.postFilter.terms).forEach(field => {
+      const type = field === 'source.extension' ? FiletypeWidgetInfo.type : FacetWidgetInfo.type
       const terms = search.postFilter.terms[field]
-      const aggs = { facet: { terms: {field, size: 100} } }
+      const agg = type === FiletypeWidgetInfo.type ? 'filetype' : 'facet'
+      const aggs = { [agg]: { terms: {field, size: 100} } }
       let sliver = new AssetSearch({aggs})
       if (terms && terms.length) {
         sliver.filter = new AssetFilter({terms: {[field]: terms}})

@@ -5,6 +5,7 @@ import Map from './Map'
 import Color from './Color'
 import Exists from './Exists'
 import Range from './Range'
+import Filetype from './Filetype'
 
 export const SimpleSearchWidgetInfo = {
   type: 'SIMPLE_SEARCH',
@@ -58,4 +59,13 @@ export const RangeWidgetInfo = {
   description: 'Match a range of a specific (numeric) field',
   element: <Range/>,
   color: '#4287b1'
+}
+
+export const FiletypeWidgetInfo = {
+  type: 'FILETYPE',
+  icon: 'icon-file-empty',
+  title: 'File Type',
+  description: 'Select by file format',
+  element: <Filetype/>,
+  color: '#ef4487'
 }

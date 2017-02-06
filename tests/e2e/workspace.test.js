@@ -110,14 +110,14 @@ describe('Workspace', function () {
 
   it('test the Searchbar', function () {
     DEBUG && console.log('------ test the Searchbar')
-    const suggestionsSelector = '.Searchbar-suggestions'
+    const suggestionsSelector = '.Suggestions-suggestions'
     var searchbarSearch
     var suggestions
 
     return driver
 
     // Search for something we know exists
-    .then(_ => driver.findElement(By.css('.Searchbar-search')))
+    .then(_ => driver.findElement(By.css('.Suggestions-search')))
     .then(element => { searchbarSearch = element })
     .then(_ => searchbarSearch.sendKeys('dumbo'))
 
@@ -127,7 +127,7 @@ describe('Workspace', function () {
     .then(element => { suggestions = element })
 
     .then(_ => selenium.expectElementIsVisible(driver, suggestions, suggestionsSelector))
-    .then(_ => suggestions.findElements(By.css('.Searchbar-suggestion')))
+    .then(_ => suggestions.findElements(By.css('.Suggestions-suggestion')))
     .then(elementArray => expect(elementArray.length).toBeGreaterThan(0))
 
     // Make sure a search works and returns assets

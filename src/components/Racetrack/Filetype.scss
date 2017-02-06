@@ -1,0 +1,231 @@
+@import '../../styles/core-mixins.scss';
+
+.Filetype {
+  .WidgetHeader {
+    color: $zorroa-nearwhite;
+  }
+
+  .WidgetHeader-icon {
+  }
+
+  .Widget-icon {
+    font-size: 20px;
+  }
+
+  .Filetype-header {
+    @include flexRow;
+    @include flexJustifySpaceBetween;
+    @include flexAlignItemsCenter;
+    @include fullWidth;
+    @include noSelect;
+
+    flex-shrink: 1;
+  }
+
+  .Filetype-header-label {
+    @include flexRow;
+    @include flexAlignItemsCenter;
+  }
+
+  .Filetype-header-title {
+    font-weight: 100;
+    margin-right: 4px;
+  }
+
+  .Filetype-header-field {
+    font-weight: 400;
+  }
+
+  .Filetype-body {
+  }
+
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  .Suggestions-search {
+    border: none;
+    color: $zorroa-gray;
+    font-size: 12px;
+  }
+
+  .Suggestions-typeahead {
+    font-size: 12px;
+  }
+
+  .Suggestions-suggestion {
+    font-size: 12px;
+    color: $zorroa-gray;
+  }
+}
+
+.Filetype-fixed {
+  @include flexRow;
+  @include flexWrap;
+}
+
+.Filetype-selected {
+  @include flexRow;
+  @include flexWrap;
+  border-bottom: 1px solid $zorroa-lightgray;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 10px;
+}
+
+.Filetype-selected-ext {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  border-radius: 3px;
+  padding: 5px;
+  margin: 2px;
+  text-transform: uppercase;
+  background-color: $zorroa-lightgray;
+  color: $zorroa-greyish-brown;
+}
+
+.Filetype-remove-ext {
+  font-size: 10px;
+  color: $zorroa-gray;
+  margin-left: 6px;
+  cursor: pointer;
+  &:hover {
+    color: white;
+  }
+}
+
+.Filetype-type-sections {
+  @include flexCol;
+
+  max-height: 350px;
+  overflow: auto;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.Filetype-groups {
+  @include flexCol;
+  margin-bottom: 4px;
+}
+
+.Filetype-title {
+  font-family: "Roboto Condensed";
+  text-transform: uppercase;
+  color: $zorroa-gray;
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
+.Filetype-groups-list {
+  @include flexCol;
+  margin-left: 10px;
+}
+
+.Filetype-group {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  height: 14px;
+  min-height: 14px;
+  margin-bottom: 5px;
+}
+
+.Filetype-group-icon {
+  margin-right: 4px;
+  color: $zorroa-gray;
+
+}
+
+.Filetype-group-label {
+  font-family: "Roboto Condensed";
+  height: 12px;
+  min-height: 12px;
+  font-size: 12px;
+  color: $zorroa-gray;
+
+  .Filetype-group.disabled & {
+    color: $zorroa-lightgray;
+  }
+}
+
+.Filetype-group-count {
+  @include flexOn;
+  font-family: "Roboto Condensed";
+  font-size: 12px;
+  color: $zorroa-lightgray;
+  text-align: right;
+}
+
+.Filetype-types {
+  @include flexCol;
+  margin-bottom: 10px;
+}
+
+.Filetype-types-list {
+  @include flexCol;
+  margin-left: 10px;
+}
+
+.Filetype-type {
+  @include flexRow;
+  height: 14px;
+  min-height: 14px;
+  margin-bottom: 5px;
+}
+
+.Filetype-type-ext {
+  font-family: "Roboto Condensed";
+  text-transform: uppercase;
+  font-size: 12px;
+  color: $zorroa-gray;
+  min-height: 12px;
+
+  .Filetype-type.disabled & {
+    color: $zorroa-lightgray;
+  }
+}
+
+.Filetype-type-label {
+  font-family: "Roboto Condensed";
+  height: 12px;
+  min-height: 12px;
+  font-size: 12px;
+  color: $zorroa-gray;
+
+  .Filetype-type.disabled & {
+    color: $zorroa-lightgray;
+  }
+}
+
+.Filetype-type-count {
+  @include flexOn;
+  font-family: "Roboto Condensed";
+  font-size: 12px;
+  color: $zorroa-lightgray;
+  text-align: right;
+}
+
+
+.Filetype-suggestions {
+  min-width: 50px;
+  margin-left: 4px;
+  @include flexRow;
+  @include flexAlignItemsCenter;
+}
+
+.Filetype-suggestions-input {
+  @include flexOn;
+  padding-left: 18px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  color: $zorroa-gray;
+  border: none;
+}
+
+.Filetype-suggestions-search-icon {
+  color: $zorroa-gray;
+  width: 14px;
+  height: 14px;
+  margin-right: 4px;
+}
