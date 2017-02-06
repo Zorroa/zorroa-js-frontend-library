@@ -21,7 +21,7 @@ class Range extends Component {
     actions: PropTypes.object.isRequired,
     id: PropTypes.number.isRequired,
     isIconified: PropTypes.bool.isRequired,
-    widgets: PropTypes.arrayOf(PropTypes.instanceOf(WidgetModel))
+    widgets: PropTypes.arrayOf(PropTypes.object)
   }
 
   state = {

@@ -23,7 +23,7 @@ class Map extends Component {
     id: PropTypes.number.isRequired,
     isIconified: PropTypes.bool.isRequired,
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
-    widgets: PropTypes.arrayOf(PropTypes.instanceOf(WidgetModel))
+    widgets: PropTypes.arrayOf(PropTypes.object)
   }
 
   state = {
@@ -139,7 +139,7 @@ class Map extends Component {
               header={(
                 <div className="Map-header">
                   <div className="Map-header-label">
-                    <div className="Map-header-title">Map:</div>
+                    <div className="Map-header-title">{MapWidgetInfo.title}:</div>
                     <div className="Map-header-field">{title}</div>
                   </div>
                   <div className="flexRow flexAlignItemsCenter">

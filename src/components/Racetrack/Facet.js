@@ -27,7 +27,7 @@ class Facet extends Component {
     id: PropTypes.number.isRequired,
     isIconified: PropTypes.bool.isRequired,
     aggs: PropTypes.object,
-    widgets: PropTypes.arrayOf(PropTypes.instanceOf(WidgetModel))
+    widgets: PropTypes.arrayOf(PropTypes.object)
   }
 
   state = {
@@ -423,7 +423,9 @@ class Facet extends Component {
               header={(
                 <div className="Facet-header">
                   <div className="Facet-header-label">
-                    <span className="Facet-header-title">Facet:</span>
+                    <span className="Facet-header-title">
+                      {FacetWidgetInfo.title}:
+                    </span>
                     <span className="Facet-header-field">{title}</span>
                   </div>
                   <div onClick={this.selectField} className="Facet-settings icon-cog"/>
