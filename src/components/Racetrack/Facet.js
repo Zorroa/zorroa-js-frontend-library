@@ -59,7 +59,7 @@ class Facet extends Component {
         this.setState({terms: []})
       }
       const order = widget.sliver.aggs.facet.terms.order
-      this.setState({order})
+      if (order) this.setState({order})
     } else {
       this.selectField()
     }
@@ -299,10 +299,10 @@ class Facet extends Component {
     const dir = order[sortField[column]]
     const icon = 'Facet-table-header-count icon-sort' + (dir ? `-${dir}` : '')
     return (
-      <td onClick={this.sortBuckets.bind(this, column)} className="Facet-table-header-cell">
+      <div onClick={this.sortBuckets.bind(this, column)} className="Facet-table-header-cell">
         <div className="Facet-table-header-title">{column}</div>
         <div className={icon}/>
-      </td>
+      </div>
     )
   }
 
