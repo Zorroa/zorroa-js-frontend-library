@@ -63,7 +63,6 @@ class Table extends Component {
     }
 
     this.columnResizeFieldName = null
-    this.allowColumnResize = true
     this.assetsCounter = 0
     this.rowBottomPx = []
     this.assetRow = null
@@ -119,18 +118,11 @@ class Table extends Component {
   }
 
   columnResizeUpdate = (resizeX, resizeY) => {
-    // let's just completely skip events that happen while we're busy
-    if (!this.allowColumnResize) return false
-    this.allowColumnResize = false
-
     var fieldWidth = Math.min(2000, Math.max(50, resizeX))
     this.props.actions.setTableFieldWidth({[this.columnResizeFieldName]: fieldWidth})
-    // wait one frame to finish the event, otherwise events queue up syncronously
-    requestAnimationFrame(_ => { this.allowColumnResize = true })
   }
 
   columnResizeStop = (event) => {
-    this.allowColumnResize = true
     this.columnResizeFieldName = null
   }
 

@@ -68,13 +68,12 @@ export default class Resizer {
     const x = this.startX + this.scaleX * (event.pageX - this.startPageX)
     const y = this.startY + this.scaleY * (event.pageY - this.startPageY)
 
-    // wait one frame to handle the event, otherwise events queue up syncronously
-    requestAnimationFrame(_ => {
-      this.onMove && this.onMove(x, y)
-      this.allowUpdate = true
-      // prevent resizer from natively selecting anything
-      window.getSelection().removeAllRanges()
-    })
+    this.onMove && this.onMove(x, y)
+    // prevent resizer from natively selecting anything
+    window.getSelection().removeAllRanges()
+
+    // wait a frame to allow more events, otherwise events queue up syncronously
+    requestAnimationFrame(_ => { this.allowUpdate = true })
   }
 
   release = (event) => {
