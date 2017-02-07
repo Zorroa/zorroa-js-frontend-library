@@ -64,9 +64,9 @@
     display: flex;
     flex-direction: column;
     padding: 10px;
+    overflow: hidden;
 
     input {
-      flex: 1;
       outline: none;
       background: none;
       border: 1px solid $zorroa-gray;
@@ -74,15 +74,13 @@
       font-size: 14px;
       font-weight: 500;
       line-height: 2em;
-      margin: 6px;
       padding-left: 8px;
-      padding-right: 8px;
+      width: 100%;
     }
   }
 
   .Range-label {
-    margin: 6px;
-    font-size: 20px;
+    margin: 4px;
     cursor: default;
   }
 
@@ -91,4 +89,109 @@
     cursor: default;
   }
 
+  .Range-slider-clip {
+    width: 100%;
+    position: relative;
+    // overflow: hidden;
+    padding:2px;
+  }
+  .Range-slider-box {
+    margin-top: 6px;
+    height: 40px;
+    width: 100%;
+    position: relative;
+    @include flexRowCenter;
+  }
+  .Range-slider-center {
+    position: relative;
+    height: 0;
+    width: 100%;
+  }
+  .Range-slider-bg {
+    position: absolute;
+    height: 8px;
+    top: -4px;
+    width: 100%;
+  }
+  .Range-slider-loc {
+    position: absolute;
+    width: 0;
+    height: 0;
+    top: 0;
+  }
+  .Range-slider-handle {
+    position: absolute;
+    @include flexRowCenter;
+    border-radius: 3px;
+    width: 8px;
+    height: 30px;
+    top: -15px; // my height / 2
+    font-size: 20px;
+    background-color: $zorroa-nearwhite;
+    border: 1px solid $zorroa-lightgray;
+    cursor: pointer;
+    &:hover {
+      font-size: 24px;
+      background-color: $zorroa-lightgray;
+    }
+  }
+  .Range-slider-handle-min {
+    right: 0;
+  }
+  .Range-slider-handle-max {
+    left: 0;
+  }
+  .Range-auto-box {
+    @include flexRowCenter;
+    @include fullWidth;
+    @include flexJustifySpaceBetween;
+    @include flexAlignItemsStart;
+    font-size: 10px;
+    height: 18px;
+  }
+
+  .Range-auto-label-box {
+    @include flexOn;
+    @include flexRow;
+    width: 100%;
+    overflow: hidden;
+  }
+  .Range-auto-label-box-max {
+    justify-content: flex-end;
+  }
+  .Range-auto-label {
+    @include clampText;
+    max-width: 100%;
+    padding: 3px;
+    border-radius: 3px;
+
+    &.changed {
+      background-color: $zorroa-sickly-green;
+      transition: background-color 0s;
+    }
+
+    background-color: rgba($zorroa-sickly-green, 0);
+    transition: background-color 2s ease-out 0.5s;
+  }
+  .Range-auto-max {
+    text-align: right;
+  }
+  .Range-auto-reset {
+    @include flexOn;
+    @include flexRowCenter;
+    @include zorroa-darken;
+    cursor: pointer;
+    width: 100%;
+    padding: 3px;
+    margin: 0 3px;
+    color: $zorroa-lightgray;
+    &:hover {
+      background-color: $zorroa-lightgray;
+      color: white;
+    }
+    border-radius: 3px;
+  }
+  .Range-auto-reset-button {
+    margin-left: 5px;
+  }
 }
