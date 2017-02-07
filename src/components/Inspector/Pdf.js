@@ -33,7 +33,6 @@ export default class Pdf extends Component {
   state = {
     page: null,
     pdf: null,
-    rendering: false,
     error: null,
     scale: 1,
     disableZoomOut: false
@@ -41,7 +40,7 @@ export default class Pdf extends Component {
 
   componentDidMount () {
     this.loadPDFDocument(this.props)
-    this.renderPdf()
+    this.queueRenderPage(1)
   }
 
   componentWillReceiveProps (newProps) {
@@ -57,7 +56,7 @@ export default class Pdf extends Component {
 
     if (pdf && (newProps.page && newProps.page !== this.props.page)) {
       this.setState({ page: null, error: null })
-      pdf.getPage(newProps.page).then(this.onPageComplete)
+      this.queueRenderPage(newProps.page)
     }
   }
 
@@ -73,17 +72,13 @@ export default class Pdf extends Component {
 
   onDocumentComplete = (pdf) => {
     this.setState({ pdf, error: null })
-    pdf.getPage(this.props.page).then(this.onPageComplete)
-  }
-
-  onPageComplete = (page) => {
-    this.setState({ page, error: null })
-    this.renderPdf()
+    this.queueRenderPage(this.props.page)
   }
 
   loadProgress = (progress) => {
+    const { page } = this.state
     if (progress && progress.loaded >= progress.total) {
-      this.renderPdf()
+      this.queueRenderPage((page && page.pageNumber) || 1)
       this.setState({ progress: null, error: null })
     } else {
       this.setState({ progress })
@@ -95,8 +90,7 @@ export default class Pdf extends Component {
       this.documentPromise.cancel()
     }
     this.documentPromise = makeCancelable(window.PDFJS.getDocument(val, null, null, this.loadProgress).promise)
-    this.documentPromise
-      .promise
+    this.documentPromise.promise
       .then(this.onDocumentComplete)
       .catch(this.onDocumentError)
     return this.documentPromise
@@ -111,70 +105,88 @@ export default class Pdf extends Component {
   }
 
   previousPage = () => {
-    const { page, pdf, rendering } = this.state
-    if (rendering) return
-    if (page && page.pageIndex) {
-      pdf.getPage(page.pageIndex).then(this.onPageComplete)
-    }
+    this.queueRenderPage(this.state.page.pageNumber - 1)
   }
 
   nextPage = () => {
-    const { page, pdf, rendering } = this.state
-    if (rendering) return
-    if (pdf && page && page.pageIndex < pdf.numPages - 1) {
-      pdf.getPage(page.pageIndex + 2).then(this.onPageComplete)
-    }
+    this.queueRenderPage(this.state.page.pageNumber + 1)
   }
 
   static scaleFactor = 1.5
   zoomIn = (event) => {
-    const { page, pdf, rendering } = this.state
-    if (rendering) return
     const scale = this.state.scale * Pdf.scaleFactor
     this.setState({scale})
-    if (page && page.pageIndex >= 0) {
-      pdf.getPage(page.pageIndex + 1).then(this.onPageComplete)
-    }
+    this.queueRenderPage(this.state.page.pageNumber)
   }
 
   zoomOut = (event) => {
-    const { page, pdf, rendering } = this.state
-    if (rendering) return
     const scale = this.state.scale / Pdf.scaleFactor
     this.setState({scale})
-    if (page && page.pageIndex >= 0) {
-      pdf.getPage(page.pageIndex + 1).then(this.onPageComplete)
+    this.queueRenderPage(this.state.page.pageNumber)
+  }
+
+  // https://mozilla.github.io/pdf.js/examples/
+  pageNumPending = null
+  pageRendering = false
+
+  queueRenderPage = (pageNum) => {
+    const { pdf } = this.state
+    if (!pdf) return
+    if (pageNum < 1 || pageNum > pdf.numPages) return
+
+    if (this.pageRendering) {
+      this.pageNumPending = pageNum
+    } else {
+      this._renderPage(pageNum)
     }
   }
 
-  renderPdf () {
-    const { page } = this.state
-    if (page) {
-      const { canvas } = this
-      if (!canvas) return
-      const canvasContext = canvas.getContext('2d')
-      const { scale } = this.state
-      let viewport = page.getViewport(scale)
+  // dont call this directly; use queueRenderPage
+  _renderPage = (pageNum) => {
+    const { pdf } = this.state
+    if (!pdf) return
+    if (pageNum < 1 || pageNum > pdf.numPages) return
 
-      // Adjust the scale so the view exactly fits the parent body element
-      const body = canvas.parentElement
-      let { width, height } = viewport
-      const aspect = width / height
-      let disableZoomOut = false
-      if (height < body.clientHeight) {
-        disableZoomOut = true
-        height = body.clientHeight
-        width = height * aspect
-        viewport = page.getViewport(scale * width / viewport.width)
-      }
-      canvas.height = viewport.height
-      canvas.width = viewport.width
+    this.pageRendering = true
+    pdf.getPage(pageNum)
+    .then(page => {
+      new Promise(resolve => this.setState({ page, error: null }, resolve))
+      .then(() => this._UnsafeRenderPdf(page))
+      .then(() => {
+        this.pageRendering = false
+        if (this.pageNumPending !== null) {
+          this._renderPage(this.pageNumPending)
+          this.pageNumPending = null
+        }
+      })
+    })
+  }
 
-      // https://github.com/mozilla/pdf.js/issues/2923#issuecomment-14715851
-      this.setState({rendering: true, error: null, disableZoomOut})
-      page.render({ canvasContext, viewport })
-      .then(() => { this.setState({rendering: false}) })
+  // dont call this directly; use queueRenderPage
+  _UnsafeRenderPdf = (page) => {
+    const { canvas } = this
+    if (!canvas) return
+    const canvasContext = canvas.getContext('2d')
+    const { scale } = this.state
+    let viewport = page.getViewport(scale)
+
+    // Adjust the scale so the view exactly fits the parent body element
+    const body = canvas.parentElement
+    let { width, height } = viewport
+    const aspect = width / height
+    let disableZoomOut = false
+    if (height < body.clientHeight) {
+      disableZoomOut = true
+      height = body.clientHeight
+      width = height * aspect
+      viewport = page.getViewport(scale * width / viewport.width)
     }
+    canvas.height = viewport.height
+    canvas.width = viewport.width
+
+    // https://github.com/mozilla/pdf.js/issues/2923#issuecomment-14715851
+    this.setState({error: null, disableZoomOut})
+    return page.render({ canvasContext, viewport })
   }
 
   render () {
@@ -190,8 +202,8 @@ export default class Pdf extends Component {
       const percentage = Math.round(100 * progress.loaded / progress.total)
       return (<div className="Pdf"><Progress percentage={percentage} /></div>)
     }
-    const isPreviousDisabled = page.pageIndex < 1
-    const isNextDisabled = page.pageIndex >= pdf.numPages - 1
+    const isPreviousDisabled = page.pageNumber <= 1
+    const isNextDisabled = page.pageNumber >= pdf.numPages
     const isZoomInDisabled = scale > 32
     const isZoomOutDisabled = scale < 0.1 || disableZoomOut
     return (
@@ -201,7 +213,7 @@ export default class Pdf extends Component {
         </div>
         { pdf && pdf.numPages && (
           <div className="Pdf-controls">
-            <div className="Pdf-controls-group border-right">Page {page.pageIndex + 1} / {pdf.numPages}</div>
+            <div className="Pdf-controls-group border-right">Page {page.pageNumber} / {pdf.numPages}</div>
             <div className="Pdf-controls-group">
               <button className="icon-frame-back" disabled={isPreviousDisabled}
                       onClick={this.previousPage}/>
