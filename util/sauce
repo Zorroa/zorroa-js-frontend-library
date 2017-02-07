@@ -21,7 +21,7 @@ readyfile=$TMP/readyfile
 # If user doesn't have sauce connect, get it
 # If this breaks, update the version & links from using
 # https://wiki.saucelabs.com/display/DOCS/Sauce+Connect+Proxy
-SC_VERSION=4.4.2
+SC_VERSION=4.4.3
 SC_PLATFORM=osx
 case "$OSTYPE" in
   linux*)
@@ -36,6 +36,7 @@ SC_BASE=sc-${SC_VERSION}-${SC_PLATFORM}
 SC_BIN=$ZORROA/tmp/${SC_BASE}/bin/sc
 
 if [ ! -e $SC_BIN ]; then
+  mkdir -p $ZORROA/tmp
   cd $ZORROA/tmp
   wget "https://saucelabs.com/downloads/${SC_BASE}.zip"
   unzip -o ${SC_BASE}.zip
