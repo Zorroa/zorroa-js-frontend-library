@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { browserHistory } from 'react-router'
 import { initialize } from 'redux-form'
+import * as api from '../globals/api.js'
 
 import {
   AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR, USER_SETTINGS,
@@ -85,11 +86,12 @@ function authorize (dispatch, json) {
   dispatch({ type: AUTH_USER, payload: user })
   localStorage.setItem(USER_ITEM, JSON.stringify(user))
   const metadata = json.settings && json.settings.metadata
-  if (metadata) {
+  // ignore all UI settings when selenium testing
+  if (metadata && !api.getSeleniumTesting()) {
     dispatch({type: USER_SETTINGS, payload: {user, metadata}})
     // FIXME: Should move to settings.search in server?
     /* FIXME: Disable restoring the search due to user conflicts.
-    if (metadata.search && !api.getSeleniumTesting()) {
+    if (metadata.search) {
       const query = new AssetSearch(metadata.search)
       dispatch(restoreSearch(query))
     }

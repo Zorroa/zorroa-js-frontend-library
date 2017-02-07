@@ -1,0 +1,18 @@
+{
+  "filter": {},
+  "aggs": {
+    "source.fileSize": {
+      "stats": {
+        "field": "source.fileSize"
+      }
+    },
+    "image.FNumber": {
+      "stats": {
+        "field": "image.FNumber"
+      }
+    }
+  },
+  "postFilter": {},
+  "order": [],
+  "size": 1
+}

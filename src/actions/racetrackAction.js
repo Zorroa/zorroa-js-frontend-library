@@ -81,11 +81,11 @@ export function restoreSearch (search) {
   }
 
   // Create a range widget for each "range" field in the query
-  if (search.filter && search.filter.range) {
+  if (search.postFilter && search.postFilter.range) {
     const type = RangeWidgetInfo.type
-    for (var field in search.filter.range) {
+    for (var field in search.postFilter.range) {
       let sliver = new AssetSearch()
-      sliver.filter = new AssetFilter({ range: { [field]: search.filter.range[field] } })
+      sliver.filter = new AssetFilter({ range: { [field]: search.postFilter.range[field] } })
       const rangeWidget = new Widget({type, sliver})
       widgets.push(rangeWidget)
     }
