@@ -45,7 +45,7 @@ export const ColorWidgetInfo = {
 
 export const ExistsWidgetInfo = {
   type: 'EXISTS',
-  icon: 'icon-map', // special one-off defined in core-globals
+  icon: 'icon-map',
   title: 'Exists',
   description: 'Match assets with specific fields that exist or are missing',
   element: <Exists/>,
@@ -54,7 +54,7 @@ export const ExistsWidgetInfo = {
 
 export const RangeWidgetInfo = {
   type: 'RANGE',
-  icon: 'icon-equalizer2', // special one-off defined in core-globals
+  icon: 'icon-equalizer2',
   title: 'Range',
   description: 'Match a range of a specific (numeric) field',
   element: <Range/>,
