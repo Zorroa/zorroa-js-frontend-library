@@ -46,7 +46,7 @@
   .Video-progress-bar {
     @include fullWidth;
     @include flexOff;
-    @include flexRowCenter
+    @include flexRowCenter;
 
     position: relative;
     top: 0;
