@@ -35,7 +35,6 @@
 // Clear text button
 .Suggestions-clear {
   position: absolute;
-  top: 4px;
   right: -5px;
   border: none;
   background: none;
@@ -68,7 +67,7 @@
   text-align: left;
   box-shadow: 0 4px 10px 0 $zorroa-darkgray;
   padding: 8px 0;
-  width: 100%;
+  min-width: 100%;
 }
 
 .Suggestions-suggestion {
@@ -78,8 +77,8 @@
   padding-left: 8px;
   padding-right: 8px;
   font-size: 14px;
-
-  width: 100%;
+  white-space: nowrap;
+  min-width: 100%;
   color: $zorroa-darkgray;
   line-height: 1.8;
 
