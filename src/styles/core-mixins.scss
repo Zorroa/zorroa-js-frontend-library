@@ -81,20 +81,28 @@ $zorroa-Sidebar-width : 340px;
   cursor: pointer;
 }
 
-@mixin zorroa-square-btn-lighten($size) {
-  @include zorroa-square-btn($size);
+@mixin zorroa-lighten {
   &:hover {
     font-weight: 700;
     background-color: rgba(255,255,255,0.2);
   }
 }
 
-@mixin zorroa-square-btn-darken($size) {
+@mixin zorroa-square-btn-lighten($size) {
   @include zorroa-square-btn($size);
+  @include zorroa-lighten;
+}
+
+@mixin zorroa-darken {
   &:hover {
     font-weight: 700;
     background-color: rgba(0,0,0,0.2);
   }
+}
+
+@mixin zorroa-square-btn-darken($size) {
+  @include zorroa-square-btn($size);
+  @include zorroa-darken;
 }
 
 /* Text classes */

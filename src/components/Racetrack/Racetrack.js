@@ -124,7 +124,7 @@ class Racetrack extends Component {
           { widgets && widgets.length > 0 && (
           <div className="Racetrack-filters">
             {widgets.map((widget, i) => (
-              <div key={i} className="Racetrack-widget">
+              <div key={widget.id} className="Racetrack-widget">
                 { this.renderWidget(widget, isIconified) }
               </div>
             ))}

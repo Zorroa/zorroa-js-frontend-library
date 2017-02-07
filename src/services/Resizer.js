@@ -32,6 +32,7 @@ export default class Resizer {
 
   reset = () => {
     this.onMove = null
+    this.allowUpdate = true
     this.onRelease = null
     this.startPageX = 0
     this.startPageY = 0
@@ -59,16 +60,25 @@ export default class Resizer {
       this.startPageX = event.pageX
       this.startPageY = event.pageY
     }
-    if (!this.onMove) return
+
+    // let's just completely skip events that happen while we're busy
+    if (!this.allowUpdate) return false
+    this.allowUpdate = false
+
     const x = this.startX + this.scaleX * (event.pageX - this.startPageX)
     const y = this.startY + this.scaleY * (event.pageY - this.startPageY)
-    this.onMove(x, y)
+
+    this.onMove && this.onMove(x, y)
     // prevent resizer from natively selecting anything
     window.getSelection().removeAllRanges()
+
+    // wait a frame to allow more events, otherwise events queue up syncronously
+    requestAnimationFrame(_ => { this.allowUpdate = true })
   }
 
   release = (event) => {
     this.active = false
+    this.allowUpdate = true
     window.removeEventListener('mousemove', this.move)
     window.removeEventListener('mouseup', this.release)
     if (this.onRelease) this.onRelease()

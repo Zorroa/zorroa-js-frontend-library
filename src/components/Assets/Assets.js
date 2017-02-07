@@ -64,11 +64,7 @@ class Assets extends Component {
       positions: []
     }
 
-    this.tableStartY = 0
     this.newTableHeight = 0
-    this.allowTableResize = true
-    this.assetsScrollHeight = 0
-    this.assetsScrollWidth = 0
     this.updateAssetsScrollSizeInterval = null
     this.selectionCounter = 0
     this.skipNextSelectionScroll = false
@@ -185,27 +181,15 @@ class Assets extends Component {
   }
 
   tableResizeUpdate = (resizeX, resizeY) => {
-    if (!this.state.tableIsResizing) return
-
-    // let's just completely skip events that happen while we're busy
-    if (!this.allowTableResize) return false
-    this.allowTableResize = false
-
     this.newTableHeight = this.clampTableHeight(resizeY)
     // wait one frame to handle the event, otherwise events queue up syncronously
-    requestAnimationFrame(_ => {
-      this.props.actions.setTableHeight(this.newTableHeight)
-      this.props.actions.saveUserSettings(this.props.user,
-        { ...this.props.userSettings, tableHeight: this.newTableHeight })
-      this.updateAssetsScrollSize()
-      this.allowTableResize = true
-    })
+    this.props.actions.setTableHeight(this.newTableHeight)
+    this.updateAssetsScrollSize()
   }
 
   tableResizeStop = (event) => {
-    if (!this.state.tableIsResizing) return
-
-    this.allowTableResize = true
+    this.props.actions.saveUserSettings(this.props.user,
+      { ...this.props.userSettings, tableHeight: this.newTableHeight })
     this.setState({ tableIsResizing: false })
     this.queueAssetsLayout()
   }
@@ -427,11 +411,12 @@ class Assets extends Component {
   }
 
   render () {
-    const { assets, totalCount, tableHeight, showTable, layout, thumbSize } = this.props
-    const { tableIsResizing, assetsCounter } = this.state
+    const { assets, totalCount, tableHeight, showTable, layout, thumbSize, assetsCounter } = this.props
+    const { tableIsResizing } = this.state
 
     // Trigger layout if assets change.
     if (assetsCounter !== this.assetsCounter) this.queueAssetsLayout()
+    this.assetsCounter = assetsCounter
 
     // If the selection change triggered this update, scroll to the new selection
     if (this.props.selectionCounter !== this.selectionCounter) {

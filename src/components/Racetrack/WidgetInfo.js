@@ -13,7 +13,7 @@ export const SimpleSearchWidgetInfo = {
   title: 'Simple Search',
   description: 'Fuzzy text search on keywords or specific fields',
   element: <SimpleSearch/>,
-  color: '#74b618'
+  color: '#73b61c' // $zorroa-sickly-green
 }
 
 export const FacetWidgetInfo = {
@@ -22,7 +22,7 @@ export const FacetWidgetInfo = {
   title: 'Facet: Keyword',
   description: 'Match keywords and specific values for specific fields',
   element: <Facet/>,
-  color: '#a11d77'
+  color: '#a11d77' // zorroa-darkish-purple
 }
 
 export const MapWidgetInfo = {
@@ -40,25 +40,25 @@ export const ColorWidgetInfo = {
   title: 'Color Search',
   description: 'Search by color',
   element: <Color/>,
-  color: '#fc6c2c'
+  color: '#fc6c2c' // $zorroa-orangish
 }
 
 export const ExistsWidgetInfo = {
   type: 'EXISTS',
-  icon: 'custom-icon-exists', // special one-off defined in core-globals
+  icon: 'icon-map',
   title: 'Exists',
   description: 'Match assets with specific fields that exist or are missing',
   element: <Exists/>,
-  color: '#9062ff'
+  color: '#a11e77' // $zorroa-darkish-purple
 }
 
 export const RangeWidgetInfo = {
   type: 'RANGE',
-  icon: 'custom-icon-range', // special one-off defined in core-globals
+  icon: 'icon-equalizer2',
   title: 'Range',
   description: 'Match a range of a specific (numeric) field',
   element: <Range/>,
-  color: '#4287b1'
+  color: '#1875d1' // $zorroa-water-blue
 }
 
 export const FiletypeWidgetInfo = {
