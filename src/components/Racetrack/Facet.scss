@@ -226,24 +226,26 @@
     padding-bottom: 4px;
 
     .Facet-icon {
+      @include flexRowCenter;
       width: 30px;
       height: 30px;
       border: none;
       outline: none;
-      font-size: 16px;
+      font-size: 22px;
       border-radius: 3px;
       margin: 4px;
       counter-reset: $zorroa-greyish-brown;
       background: transparent;
       cursor: pointer;
+      color: $zorroa-lightgray;
 
       &:hover {
-        background-color: rgba(161, 29, 119, 0.1);
+        background-color: $zorroa-nearwhite;
       }
 
       &.selected {
         color: white;
-        background-color: #a11d77;  // ack! Should by dynamically set
+        background-color: $zorroa-darkish-purple;
       }
     }
   }
