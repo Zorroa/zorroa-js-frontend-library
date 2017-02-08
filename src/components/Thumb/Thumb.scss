@@ -94,11 +94,12 @@
     top: 0;
     left: 0;
     font-size: 16px;
-    border-radius: 3px;
-    background-color: white;
     color: $zorroa-gray;
+    margin: -1px;         // Avoid white outline
+    padding: 3px;
     &.isSelected {
-      color: $zorroa-sickly-green;
+      color: white;
+      background-color: $zorroa-sickly-green;
     }
   }
 }

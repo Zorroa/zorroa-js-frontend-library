@@ -14,11 +14,17 @@ export function searchAssets (query) {
   assert.ok(query instanceof AssetSearch)
   assert.ok(query.size)
   return dispatch => {
-    console.log('Search: ' + JSON.stringify(query))
     assert.ok(typeof query.from === 'undefined' || query.from >= 0)
-    getArchivist().post('/api/v3/assets/_search', query)
+    // Escape special characters
+    // https://www.elastic.co/guide/en/elasticsearch/reference/2.1/query-dsl-query-string-query.html#_reserved_characters
+    let safeQuery = { ...query }
+    if (safeQuery.query) {
+      safeQuery.query = safeQuery.query.replace(/(\+|\-|\=|\&\&|\|\||\>|\<|\!|\(|\)|\{|\}|\[|\]|\^|\"|\~|\*|\?|\:|\\|\/)/g, '\\$&')
+    }
+    console.log('Search: ' + JSON.stringify(safeQuery))
+    getArchivist().post('/api/v3/assets/_search', safeQuery)
       .then(response => {
-        console.log('Query ' + JSON.stringify(query))
+        console.log('Query ' + JSON.stringify(safeQuery))
         console.log(response)
         const page = new Page(response.data.page)
         const assets = response.data.list.map(asset => (new Asset(asset)))
