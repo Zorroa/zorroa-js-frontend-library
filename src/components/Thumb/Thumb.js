@@ -64,7 +64,7 @@ class Thumb extends Component {
     return (
       <div className={classnames('Thumb-selection', {isSelected})}>
         <div className={classnames('Thumb-selection-overlay', {isSelected})}/>
-        <div className={classnames('Thumb-selection-check', 'icon-checkbox-checked', {isSelected})}/>
+        <div className={classnames('Thumb-selection-check', 'icon-check', {isSelected})}/>
       </div>
     )
   }

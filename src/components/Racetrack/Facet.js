@@ -158,6 +158,7 @@ class Facet extends Component {
                                  selectedFields={[]}
                                  onUpdate={this.updateDisplayOptions}/>
     this.props.actions.showModal({body, width})
+    event && event.stopPropagation()
   }
 
   deselectAllTerms = (event) => {
