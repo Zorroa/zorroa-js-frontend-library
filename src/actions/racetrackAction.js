@@ -8,6 +8,7 @@ import {
   ColorWidgetInfo,
   ExistsWidgetInfo,
   RangeWidgetInfo,
+  DateRangeWidgetInfo,
   FiletypeWidgetInfo
 } from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
@@ -81,11 +82,30 @@ export function restoreSearch (search) {
   }
 
   // Create a range widget for each "range" field in the query
+  // NOTE the date ranges are in filter instead of postFilter
+  // that is the only differentiating factor right now
+  // TODO: fix all this during the widget state refactor
+  // when we store an explicit racetrack data block on the server
   if (search.postFilter && search.postFilter.range) {
     const type = RangeWidgetInfo.type
-    for (var field in search.postFilter.range) {
+    for (let field in search.postFilter.range) {
       let sliver = new AssetSearch()
       sliver.filter = new AssetFilter({ range: { [field]: search.postFilter.range[field] } })
+      const rangeWidget = new Widget({type, sliver})
+      widgets.push(rangeWidget)
+    }
+  }
+
+  // Create a DateRange widget for each "range" field in the query
+  // NOTE the date ranges are in filter instead of postFilter
+  // that is the only differentiating factor right now
+  // TODO: fix all this during the widget state refactor
+  // when we store an explicit racetrack data block on the server
+  if (search.filter && search.filter.range) {
+    const type = DateRangeWidgetInfo.type
+    for (let field in search.filter.range) {
+      let sliver = new AssetSearch()
+      sliver.filter = new AssetFilter({ range: { [field]: search.filter.range[field] } })
       const rangeWidget = new Widget({type, sliver})
       widgets.push(rangeWidget)
     }

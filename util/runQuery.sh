@@ -1,7 +1,9 @@
 #!/bin/bash
 
-FLICKR_SERVER="54.89.104.244"
-SERVER=$FLICKR_SERVER
+DEV_SERVER="https://dev.zorroa.com"
+FLICKR_SERVER="http://54.89.104.244"
+
+SERVER=$DEV_SERVER
 USERNAME=admin
 PASSWORD=z0rr0@12
 QUIET=""
@@ -40,7 +42,7 @@ done
 filter=$(cat $QUERY_FILE | tr -d '\n' | tr -s ' ')
 
 command=$(cat << END
-curl $QUIET -H "Content-Type: application/json" -X POST http://${SERVER}:8066/api/v3/assets/_search -u $USERNAME:$PASSWORD -d '$filter'
+curl $QUIET -H "Content-Type: application/json" -X POST ${SERVER}:8066/api/v3/assets/_search -u $USERNAME:$PASSWORD -d '$filter'
 END
 )
 
