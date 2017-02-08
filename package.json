@@ -18,7 +18,7 @@
     "test:coverage": "npm test; ./node_modules/.bin/serve ./coverage/lcov-report & open http://localhost:8080",
     "purge": "rm -rf node_modules; npm cache clean; npm install",
     "update-fonts": "src/assets/fonts/zorroa-icons/update-fonts.bash",
-    "preview-fonts": "open src/assets/fonts/zorroa-icons/demo.html"
+    "preview-fonts": "src/assets/fonts/zorroa-icons/preview-fonts.bash"
   },
   "author": "Jordan Papaleo",
   "license": "",
