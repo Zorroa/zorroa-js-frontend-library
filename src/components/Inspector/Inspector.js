@@ -28,7 +28,8 @@ class Inspector extends Component {
       inspector = <Video url={url} frames={asset.frames()} frameRate={asset.frameRate()}
                          startFrame={asset.startFrame()} stopFrame={asset.stopFrame()}/>
     } else if (mediaType === 'application/pdf') {
-      inspector = <Pdf documentInitParameters={{url, withCredentials: true}} />
+      inspector = <Pdf page={asset.startPage()}
+                       documentInitParameters={{url, withCredentials: true}} />
     } else {
       const proxy = asset.biggestProxy()
       inspector = <Image url={proxy.url(protocol, host)}/>
