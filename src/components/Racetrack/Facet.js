@@ -27,7 +27,7 @@ class Facet extends Component {
     id: PropTypes.number.isRequired,
     isIconified: PropTypes.bool.isRequired,
     aggs: PropTypes.object,
-    widgets: PropTypes.arrayOf(PropTypes.instanceOf(WidgetModel))
+    widgets: PropTypes.arrayOf(PropTypes.object)
   }
 
   state = {
@@ -59,7 +59,7 @@ class Facet extends Component {
         this.setState({terms: []})
       }
       const order = widget.sliver.aggs.facet.terms.order
-      this.setState({order})
+      if (order) this.setState({order})
     } else {
       this.selectField()
     }
@@ -158,6 +158,7 @@ class Facet extends Component {
                                  selectedFields={[]}
                                  onUpdate={this.updateDisplayOptions}/>
     this.props.actions.showModal({body, width})
+    event && event.stopPropagation()
   }
 
   deselectAllTerms = (event) => {
@@ -299,10 +300,10 @@ class Facet extends Component {
     const dir = order[sortField[column]]
     const icon = 'Facet-table-header-count icon-sort' + (dir ? `-${dir}` : '')
     return (
-      <td onClick={this.sortBuckets.bind(this, column)} className="Facet-table-header-cell">
+      <div onClick={this.sortBuckets.bind(this, column)} className="Facet-table-header-cell">
         <div className="Facet-table-header-title">{column}</div>
         <div className={icon}/>
-      </td>
+      </div>
     )
   }
 
@@ -423,7 +424,9 @@ class Facet extends Component {
               header={(
                 <div className="Facet-header">
                   <div className="Facet-header-label">
-                    <span className="Facet-header-title">Facet:</span>
+                    <span className="Facet-header-title">
+                      {FacetWidgetInfo.title}:
+                    </span>
                     <span className="Facet-header-field">{title}</span>
                   </div>
                   <div onClick={this.selectField} className="Facet-settings icon-cog"/>

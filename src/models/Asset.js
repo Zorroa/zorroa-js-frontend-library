@@ -33,6 +33,10 @@ export default class Asset {
 
   backgroundColor () { return this.tinyProxy() ? this.tinyProxy()[5] : getRandomColor() }
 
+  startPage () {
+    if (this.document.source.clip && this.document.source.clip.page) return this.document.source.clip.page.start
+  }
+
   frameRate () {    // frames per second
     if (this.document.video) return this.document.video.frameRate
   }

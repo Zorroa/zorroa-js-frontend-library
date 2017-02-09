@@ -5,7 +5,6 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 import WidgetModel from '../../models/Widget'
-// import Asset from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import { ColorWidgetInfo } from './WidgetInfo'
@@ -26,7 +25,7 @@ class Color extends Component {
     actions: PropTypes.object.isRequired,
     id: PropTypes.number.isRequired,
     isIconified: PropTypes.bool.isRequired,
-    widgets: PropTypes.arrayOf(PropTypes.instanceOf(WidgetModel))
+    widgets: PropTypes.arrayOf(PropTypes.object)
   }
 
   state = {
@@ -296,7 +295,9 @@ class Color extends Component {
               header={(
                 <div className="Color-header">
                   <div className="Color-header-label">
-                    <span className="Color-header-title">Color</span>
+                    <span className="Color-header-title">
+                      {ColorWidgetInfo.title}
+                    </span>
                   </div>
                 </div>
               )}

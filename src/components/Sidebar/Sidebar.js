@@ -22,10 +22,8 @@ export default class Sidebar extends Component {
   }
 
   resizer = null
-  allowResize = true
 
   state = {
-    isResizing: false,
     width: 340    // Tricky ref stuff needed in componentDidMount to get width
   }
 
@@ -42,35 +40,18 @@ export default class Sidebar extends Component {
   }
 
   resizeStart = (event) => {
-    // capture (onMove, onRelease, startX, startY, optScaleX, optScaleY)
-    this.resizer.capture(this.resizeUpdate, this.resizeStop,
-       this.state.width,                 /* startX    */
-       0,                                /* startY    */
-       this.props.isRightEdge ? -1 : 1,  /* optScaleX */
-       0)                                /* optScaleY */
-    const width = this.clampWidth(this.state.width)
-    this.setState({ isResizing: true, width })
+    this.resizer.capture(
+      this.resizeUpdate,                /* onMove    */
+      null,                             /* onRelease */
+      this.state.width,                 /* startX    */
+      0,                                /* startY    */
+      this.props.isRightEdge ? -1 : 1,  /* optScaleX */
+      0)                                /* optScaleY */
   }
 
   resizeUpdate = (resizeX, resizeY) => {
-    if (!this.state.isResizing) return
-
-    // let's just completely skip events that happen while we're busy
-    if (!this.allowResize) return false
-    this.allowResize = false
-
-    // wait one frame to handle the event, otherwise events queue up syncronously
-    requestAnimationFrame(_ => {
-      const width = this.clampWidth(resizeX)
-      this.setState({ width })
-      this.allowResize = true
-    })
-  }
-
-  resizeStop = (event) => {
-    if (!this.state.isResizing) return
-    this.allowResize = true
-    this.setState({ isResizing: false })
+    const width = this.clampWidth(resizeX)
+    this.setState({ width })
   }
 
   toggleIfNotIconified = (event) => {

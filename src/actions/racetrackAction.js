@@ -7,7 +7,9 @@ import {
   FacetWidgetInfo,
   ColorWidgetInfo,
   ExistsWidgetInfo,
-  RangeWidgetInfo
+  RangeWidgetInfo,
+  DateRangeWidgetInfo,
+  FiletypeWidgetInfo
 } from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
 
@@ -48,10 +50,11 @@ export function restoreSearch (search) {
   // Create a facet for each term.
   // FIXME: Maps create a term facet too!
   if (search.postFilter && search.postFilter.terms) {
-    const type = FacetWidgetInfo.type
     Object.keys(search.postFilter.terms).forEach(field => {
+      const type = field === 'source.extension' ? FiletypeWidgetInfo.type : FacetWidgetInfo.type
       const terms = search.postFilter.terms[field]
-      const aggs = { facet: { terms: {field, size: 100} } }
+      const agg = type === FiletypeWidgetInfo.type ? 'filetype' : 'facet'
+      const aggs = { [agg]: { terms: {field, size: 100} } }
       let sliver = new AssetSearch({aggs})
       if (terms && terms.length) {
         sliver.filter = new AssetFilter({terms: {[field]: terms}})
@@ -79,9 +82,28 @@ export function restoreSearch (search) {
   }
 
   // Create a range widget for each "range" field in the query
-  if (search.filter && search.filter.range) {
+  // NOTE the date ranges are in filter instead of postFilter
+  // that is the only differentiating factor right now
+  // TODO: fix all this during the widget state refactor
+  // when we store an explicit racetrack data block on the server
+  if (search.postFilter && search.postFilter.range) {
     const type = RangeWidgetInfo.type
-    for (var field in search.filter.range) {
+    for (let field in search.postFilter.range) {
+      let sliver = new AssetSearch()
+      sliver.filter = new AssetFilter({ range: { [field]: search.postFilter.range[field] } })
+      const rangeWidget = new Widget({type, sliver})
+      widgets.push(rangeWidget)
+    }
+  }
+
+  // Create a DateRange widget for each "range" field in the query
+  // NOTE the date ranges are in filter instead of postFilter
+  // that is the only differentiating factor right now
+  // TODO: fix all this during the widget state refactor
+  // when we store an explicit racetrack data block on the server
+  if (search.filter && search.filter.range) {
+    const type = DateRangeWidgetInfo.type
+    for (let field in search.filter.range) {
       let sliver = new AssetSearch()
       sliver.filter = new AssetFilter({ range: { [field]: search.filter.range[field] } })
       const rangeWidget = new Widget({type, sliver})
