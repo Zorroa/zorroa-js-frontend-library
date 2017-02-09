@@ -100,9 +100,24 @@ $zorroa-Sidebar-width : 340px;
   }
 }
 
+// squre button overlay -- background is transparent
 @mixin zorroa-square-btn-darken($size) {
   @include zorroa-square-btn($size);
   @include zorroa-darken;
+}
+
+// more general non-square button, opaque background, explicit hover color
+@mixin zorroa-btn($width, $height, $bgColor, $bgHover) {
+  @include flexOff;
+  @include flexRowCenter;
+  width: $width;
+  height: $height;
+  cursor: pointer;
+  border-radius: 3px;
+  background-color: $bgColor;
+  &:hover {
+    background-color: $bgHover;
+  }
 }
 
 /* Text classes */
