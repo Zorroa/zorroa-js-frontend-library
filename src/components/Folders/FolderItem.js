@@ -12,7 +12,11 @@ import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import CreateExport from './CreateExport'
 import CreateFolder from './CreateFolder'
-import { addAssetIdsToFolderId, deleteFolderIds, updateFolder } from '../../actions/folderAction'
+import {
+  selectFolderIds,
+  addAssetIdsToFolderId,
+  deleteFolderIds,
+  updateFolder } from '../../actions/folderAction'
 import { showModal } from '../../actions/appActions'
 import { exportAssets } from '../../actions/jobActions'
 import { restoreSearch } from '../../actions/racetrackAction'
@@ -107,6 +111,12 @@ class FolderItem extends Component {
     event.preventDefault()
     const { folder, actions } = this.props
     actions.restoreSearch(folder.search)
+    let folders = []
+    if (folder.search && folder.search.filter &&
+      folder.search.filter.links && folder.search.filter.links.folder) {
+      folders = folder.search.filter.links.folder
+    }
+    actions.selectFolderIds(folders)
     this.dismissContextMenu(event)
   }
 
@@ -347,6 +357,7 @@ export default connect(state => ({
   tableFields: state.app.tableFields
 }), dispatch => ({
   actions: bindActionCreators({
+    selectFolderIds,
     addAssetIdsToFolderId,
     exportAssets,
     showModal,
