@@ -19,7 +19,7 @@ export function searchAssets (query) {
     // https://www.elastic.co/guide/en/elasticsearch/reference/2.1/query-dsl-query-string-query.html#_reserved_characters
     let safeQuery = { ...query }
     if (safeQuery.query) {
-      safeQuery.query = safeQuery.query.replace(/(\+|\-|\=|\&\&|\|\||\>|\<|\!|\(|\)|\{|\}|\[|\]|\^|\"|\~|\*|\?|\:|\\|\/)/g, '\\$&')
+      safeQuery.query = safeQuery.query.replace(/(\+|\-|=|&&|\|\||>|<|!|\(|\)|\{|\}|\[|\]|\^|"|~|\*|\?|:|\\|\/)/g, '\\$&')
     }
     console.log('Search: ' + JSON.stringify(safeQuery))
     getArchivist().post('/api/v3/assets/_search', safeQuery)
