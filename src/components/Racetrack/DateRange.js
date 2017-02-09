@@ -33,8 +33,6 @@ class DateRange extends Component {
   }
 
   resizer = null
-  minLeft = null
-  minRight = null
 
   state = {
     field: '',
