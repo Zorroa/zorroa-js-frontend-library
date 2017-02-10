@@ -27,6 +27,7 @@ class Facet extends Component {
     id: PropTypes.number.isRequired,
     isIconified: PropTypes.bool.isRequired,
     aggs: PropTypes.object,
+    fields: PropTypes.object,                         // state.assets.fields
     widgets: PropTypes.arrayOf(PropTypes.object)
   }
 
@@ -36,6 +37,9 @@ class Facet extends Component {
     terms: [],
     chartType: BAR_CHART
   }
+
+  fieldTypes = null
+  numericFieldTypes = new Set(['double', 'integer', 'long'])
 
   componentWillMount () {
     this.componentWillReceiveProps(this.props)
@@ -62,6 +66,18 @@ class Facet extends Component {
       if (order) this.setState({order})
     } else {
       this.selectField()
+    }
+
+    // initialize fieldTypes first time through
+    if (!this.fieldTypes) {
+      const { fields } = nextProps
+      if (fields) {
+        // invert the app state field types, so we can look up by name
+        this.fieldTypes = {}
+        for (let fieldType in fields) {
+          fields[fieldType].forEach(field => { this.fieldTypes[field] = fieldType })
+        }
+      }
     }
   }
 
@@ -183,7 +199,9 @@ class Facet extends Component {
   updateDisplayOptions = (event, state) => {
     const base = state.checkedNamespaces && state.checkedNamespaces.length && state.checkedNamespaces[0]
     if (base && base.length) {
-      const field = base + '.raw'
+      const fieldType = this.fieldTypes[base]
+      const isNumeric = this.numericFieldTypes.has(fieldType)
+      const field = (isNumeric) ? base : base + '.raw'
       const terms = []
       this.modifySliver(field, terms, this.state.order)
     }
@@ -451,6 +469,7 @@ class Facet extends Component {
 export default connect(
   state => ({
     aggs: state.assets && state.assets.aggs,
+    fields: state.assets && state.assets.fields,
     widgets: state.racetrack && state.racetrack.widgets
   }), dispatch => ({
     actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds, showModal }, dispatch)
