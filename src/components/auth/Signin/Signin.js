@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import { Link } from 'react-router'
 import { connect } from 'react-redux'
 import { reduxForm, Field } from 'redux-form'
+import classnames from 'classnames'
 
 import Logo from '../../../components/Logo'
 import * as actions from '../../../actions/authAction'
@@ -15,18 +16,32 @@ class Signin extends Component {
     errorMessage: PropTypes.string
   }
 
+  state = {
+    errTime: 0,
+    submitTime: 0
+  }
+
   handleFormSubmit ({ username, password, ssl, host }) {
     const protocol = ssl ? 'https:' : 'http:'
-    this.props.signinUser({ username, password, protocol, host })
+    // strip the protocol & port if this is copy/pasted
+    const bareHost = host.replace(/http.?:\/\//, '').replace(/:8066.*/, '')
+    this.props.signinUser({ username, password, protocol, host: bareHost })
+    // this is only to force a re-render
+    this.setState({submitTime: Date.now()})
   }
 
   renderAlert () {
+    let changed = false
     let msg = ''
     if (this.props.errorMessage) {
+      if (Date.now() - this.state.errTime > 300) {
+        changed = true
+        setTimeout(() => { this.setState({ errTime: Date.now() }) }, 0)
+      }
       console.log(this.props.errorMessage)
       msg = (<div className="auth-error-msg">The username and/or password don&rsquo;t match. Please try again or use the <Link className="" to="/signup">forgot password</Link> link.</div>)
     }
-    return (<span className="auth-error">{msg}</span>)
+    return (<div className={classnames('auth-error', {changed})}>{msg}</div>)
   }
 
   renderField ({ input, label, type, meta: { touched, error } }) {

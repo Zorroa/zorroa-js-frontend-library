@@ -52,10 +52,12 @@
   margin-top: 24px;
   padding: 7pt 24px 7pt 24px;
   color: #fff;
-  background-color: $zorroa-sickly-green;
   border-radius: 3px;
   border: 1px solid transparent;
   cursor: pointer;
+  background-color: $zorroa-sickly-green;
+  &:hover { background-color: darken($zorroa-sickly-green, 15%); }
+  &:active { background-color: darken($zorroa-water-blue, 15%); }
 }
 
 .auth-form {
@@ -83,6 +85,16 @@
   color: $zorroa-faded-red;
   height: 3.5em;
   margin: 1em 0;
+  padding: 3px 0;
+  border-radius: 3px;
+
+  &.changed {
+    background-color: #fdae75;
+    transition: background-color 0s;
+  }
+
+  background-color: rgba(#ffffff, 0);
+  transition: background-color 0.5s ease-out;
 }
 
 .auth-error-msg {
