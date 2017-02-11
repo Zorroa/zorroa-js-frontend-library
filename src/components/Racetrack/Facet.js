@@ -27,28 +27,46 @@ class Facet extends Component {
     id: PropTypes.number.isRequired,
     isIconified: PropTypes.bool.isRequired,
     aggs: PropTypes.object,
+    fields: PropTypes.object,                         // state.assets.fields
     widgets: PropTypes.arrayOf(PropTypes.object)
   }
 
   state = {
     field: '',
+    fieldIsDate: false,
     order: { '_count': 'desc' },
     terms: [],
     chartType: BAR_CHART
   }
+
+  fieldTypes = null
+  numericFieldTypes = new Set(['double', 'integer', 'long', 'date'])
 
   componentWillMount () {
     this.componentWillReceiveProps(this.props)
   }
 
   componentWillReceiveProps (nextProps) {
+    // initialize fieldTypes first time through
+    if (!this.fieldTypes) {
+      const { fields } = nextProps
+      if (fields) {
+        // invert the app state field types, so we can look up by name
+        this.fieldTypes = {}
+        for (let fieldType in fields) {
+          fields[fieldType].forEach(field => { this.fieldTypes[field] = fieldType })
+        }
+      }
+    }
+
     const { id, widgets } = nextProps
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
     if (widget && widget.sliver) {
       const field = widget.sliver.aggs.facet.terms.field
       if (field !== this.state.field) {
-        this.setState({field})
+        const fieldIsDate = field && this.fieldTypes && this.fieldTypes[field] === 'date'
+        this.setState({field, fieldIsDate})
       }
       if (widget.sliver.filter) {
         const terms = widget.sliver.filter.terms[field]
@@ -183,7 +201,9 @@ class Facet extends Component {
   updateDisplayOptions = (event, state) => {
     const base = state.checkedNamespaces && state.checkedNamespaces.length && state.checkedNamespaces[0]
     if (base && base.length) {
-      const field = base + '.raw'
+      const fieldType = this.fieldTypes[base]
+      const isNumeric = this.numericFieldTypes.has(fieldType)
+      const field = (isNumeric) ? base : base + '.raw'
       const terms = []
       this.modifySliver(field, terms, this.state.order)
     }
@@ -241,7 +261,7 @@ class Facet extends Component {
               <text x={ex} y={ey}
                     textAnchor={textAnchor}
                     className="Facet-pie-label" dominantBaseline="central">
-                { name || '(none)' }
+                { this.renderBucketKey(name) }
               </text>
               <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none"/>
             </svg>
@@ -289,7 +309,13 @@ class Facet extends Component {
         />
         <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none"/>
         <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none"/>
-        <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} className="Facet-pie-label active" dominantBaseline="central">{name}</text>
+        <text x={ex + (cos >= 0 ? 1 : -1) * 12}
+              y={ey}
+              textAnchor={textAnchor}
+              className="Facet-pie-label active"
+              dominantBaseline="central">
+          {this.renderBucketKey(name)}
+        </text>
       </g>
     )
   }
@@ -334,6 +360,13 @@ class Facet extends Component {
     return merged
   }
 
+  renderBucketKey = (key) => {
+    if (!key) return '(none)'
+    if (key === OTHER_BUCKET) return key
+    if (this.state.fieldIsDate) return new Date(key).toLocaleString()
+    return key
+  }
+
   renderChart () {
     const { field, terms, chartType } = this.state
     let maxCount = 0
@@ -349,7 +382,6 @@ class Facet extends Component {
     this.buckets = buckets
     const mergedTerms = terms.filter(t => (buckets.findIndex(b => (b.key === t)) >= 0))
     if (mergedTerms.length < terms.length) mergedTerms.push(OTHER_BUCKET)
-    const data = buckets.map(bucket => ({name: bucket.key, value: bucket.doc_count}))
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042',
       '#ce2d3f', '#fc6c2c', ' #a11e77', '#b7df4d', '#1875d1' ]
     switch (chartType) {
@@ -370,7 +402,7 @@ class Facet extends Component {
                     <td className="Facet-value-cell">
                       <div className="Facet-value-table-key">
                         <div className="Facet-value-pct-bar" style={{width: `${100 * bucket.doc_count / maxCount}%`}} />
-                        <div className="Facet-value-key">{bucket.key || '(none)'}</div>
+                        <div className="Facet-value-key">{this.renderBucketKey(bucket.key)}</div>
                       </div>
                     </td>
                     <td className="Facet-value-count">{bucket.doc_count}</td>
@@ -383,6 +415,7 @@ class Facet extends Component {
         )
 
       case PIE_CHART:
+        const data = buckets.map(bucket => ({name: bucket.key, value: bucket.doc_count}))
         const activeIndex = mergedTerms.map((term, index) => (buckets.findIndex(bucket => (bucket.key === term))))
         return (
           <div className="Facet-pie-chart">
@@ -451,6 +484,7 @@ class Facet extends Component {
 export default connect(
   state => ({
     aggs: state.assets && state.assets.aggs,
+    fields: state.assets && state.assets.fields,
     widgets: state.racetrack && state.racetrack.widgets
   }), dispatch => ({
     actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds, showModal }, dispatch)

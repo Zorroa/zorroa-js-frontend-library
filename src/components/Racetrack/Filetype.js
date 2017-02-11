@@ -14,17 +14,24 @@ import Check from '../Check'
 import Suggestions from '../Suggestions'
 
 const allExts = {
-  pdf: 'Adobe Acrobat',
+  // image files
   psd: 'Adobe Photoshop',
-  gif: 'Graphics Interchange Foramt',
+  gif: 'Graphics Interchange Format',
   png: 'Portable Network Graphics',
   jpg: 'Joint Photographic Experts Group',
+  jpeg: 'Joint Photographic Experts Group',
   tiff: 'Tagged Image File Format',
+  tif: 'Tagged Image File Format',
+  // vector files
+  pdf: 'Adobe Acrobat',
+  svg: 'Scalable Vector Graphic',
+  // video files
   mov: 'Quicktime Movie',
   mp4: 'Video File',
   ogg: 'Ogg Vorbis',
   mpg: 'Motion Picture Group',
-  svg: 'Scalable Vector Graphic'
+  mpeg: 'Motion Picture Group'
+
   // aac: 'Advanced Audio Coding',
   // mp3: 'Music File',
   // ai: 'Adobe Illustrator',
@@ -45,9 +52,9 @@ const allExts = {
 }
 
 const groupExts = {
-  'Image Files': ['gif', 'png', 'jpg', 'tif', 'geotiff', 'psd'],
-  'Video Files': ['mp4', 'mov', 'ogg'],
-  'Vector Files': ['pdf', 'svg', 'ai', 'shp', 'cdr']
+  'Image Files': ['gif', 'png', 'jpg', 'jpeg', 'tif', 'tiff', 'psd'], /*, 'geotiff' */
+  'Vector Files': ['pdf', 'svg', 'ai', 'shp', 'cdr'],
+  'Video Files': ['mp4', 'mov', 'ogg', 'mpg', 'mpeg']
   // 'Audio Files': ['aac', 'mp3'],
   // 'Design Source Files - sketch, Adobe': ['ai', 'indd', 'psd'],
   // 'Map Files': ['shp', 'kml', 'gdb', 'osm', 'geotiff'],
