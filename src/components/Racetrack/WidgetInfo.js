@@ -6,6 +6,7 @@ import Color from './Color'
 import Exists from './Exists'
 import Range from './Range'
 import Filetype from './Filetype'
+import DateRange from './DateRange'
 
 export const SimpleSearchWidgetInfo = {
   type: 'SIMPLE_SEARCH',
@@ -68,4 +69,13 @@ export const FiletypeWidgetInfo = {
   description: 'Select by file format',
   element: <Filetype/>,
   color: '#ef4487'
+}
+
+export const DateRangeWidgetInfo = {
+  type: 'DATERANGE',
+  icon: 'icon-calendar',
+  title: 'Date Range',
+  description: 'Match a range of a date field',
+  element: <DateRange/>,
+  color: '#1875d1' // $zorroa-water-blue
 }
