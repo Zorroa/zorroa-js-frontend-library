@@ -90,7 +90,7 @@ class Video extends Component {
   }
 
   frameForward = () => {
-    const frame = Math.min(this.state.played * this.props.frames + 1, this.state.stopFrame)
+    const frame = Math.min(this.state.played * this.props.frames + 1, this.props.stopFrame)
     this.scrub(frame)
   }
 
