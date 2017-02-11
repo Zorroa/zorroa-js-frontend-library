@@ -156,6 +156,7 @@ class Assets extends Component {
       this.props.actions.setThumbLayout(layout)
       this.props.actions.saveUserSettings(this.props.user,
         { ...this.props.userSettings, thumbLayout: layout })
+      this.queueAssetsLayout()
     }
   }
 
@@ -165,6 +166,7 @@ class Assets extends Component {
       this.props.actions.setThumbSize(thumbSize)
       this.props.actions.saveUserSettings(this.props.user,
         { ...this.props.userSettings, thumbSize })
+      this.queueAssetsLayout()
     }
   }
 
