@@ -16,7 +16,7 @@
   }
 }
 
-.Pdf-body {
+.Pdf-singlepage-body {
   @include flexOn;
   @include fullWidth;
   @include flexRow;
@@ -32,6 +32,25 @@
     // center horizontally
     margin-left: auto;
     margin-right: auto;
+    left: 0;
+    right: 0;
+  }
+}
+
+.Pdf-multipage-scroll {
+  @include flexOn;
+  @include fullWidth;
+  @include flexRow;
+  @include flexJustifyCenter;
+  overflow-y: auto;
+}
+
+.Pdf-multipage-body {
+  position: relative;
+
+  canvas {
+    position: absolute;
+    top:0;
     left: 0;
     right: 0;
   }

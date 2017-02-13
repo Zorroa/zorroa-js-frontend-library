@@ -71,3 +71,53 @@ export function isolateSelectId (id, selectedIds) {
   }
   return new Set([id])
 }
+
+/* ----------------------------------------------------------------------
+Execute a sequence of promises, with a max limit
+on the number of promises in flight at once.
+
+'data' is an array containing the data needed to make each promise
+  each element of 'data' is passed to 'mkPromiseFn'
+'mkPromiseFn' is a callback function that generates a promise
+  called once per item in 'data', passed the single datum, takes only that 1 param
+'optQueueSize' is an OPTIONAL number specifying the max queue length
+  negative optQueueSize == #data/n (percentage), e.g. -1 for no limit, -2 for n/2, etc...
+  default optQueueSize == sqrt(data.length)
+'optProgressFn' is an OPTIONAL callback that is called once for every completed promise
+and passed the number of completed items
+
+Returns a promise that resolves when all promises in the queue resolve,
+or rejects when the first promise in the queue rejects,
+just like Promise.all()
+
+Resolves with an array of the results, in the same order as 'data'
+Rejects with the first error that occurs
+*/
+export function makePromiseQueue (data, mkPromiseFn, optQueueSize, optProgressFn) {
+  return new Promise((resolve, reject) => {
+    const n = data.length
+    optQueueSize = optQueueSize || Math.round(Math.sqrt(n))
+    if (optQueueSize < 0) optQueueSize = n / Math.abs(optQueueSize)
+    optQueueSize = Math.max(1, Math.min(n, optQueueSize))
+
+    let dataResults = []
+    let nextDataToProcess = 0
+    let totalFinished = 0
+
+    let start = (idx) => {
+      nextDataToProcess++
+      mkPromiseFn(data[idx])
+      .then((results) => {
+        totalFinished++
+        dataResults[idx] = results
+        if (totalFinished >= n) resolve(dataResults)
+        else optProgressFn && optProgressFn(totalFinished, n)
+        if (nextDataToProcess < n) start(nextDataToProcess)
+      })
+      .catch(err => reject(err))
+    }
+
+    for (var i = 0; i < optQueueSize; i++) start(i)
+  })
+}
+

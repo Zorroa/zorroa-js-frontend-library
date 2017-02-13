@@ -1,6 +1,8 @@
 import React, { Component, PropTypes } from 'react'
 
 import Progress from '../Progress'
+import { makePromiseQueue } from '../../services/jsUtil'
+import * as ComputeLayout from '../Assets/ComputeLayout.js'
 
 // Orignal Code: https://github.com/mikecousins/react-pdf-js
 // Core library is Pdf.js, which we now call directly.
@@ -16,31 +18,37 @@ export default class Pdf extends Component {
     documentInitParameters: PropTypes.shape({
       url: PropTypes.string
     }),
-    page: PropTypes.number
+    page: PropTypes.number,
+    thumbSize: PropTypes.number
   }
 
   static defaultProps = { page: 1 }
 
-  onDocumentError = (err) => {
-    if (err.isCanceled && err.pdf) {
-      err.pdf.destroy()
-      this.setState({ error: 'PDF loading canceled' })
-    } else {
-      this.setState({ error: 'Error loading PDF: ' + err })
-    }
-  }
+  constructor (props) {
+    super(props)
 
-  state = {
-    page: null,
-    pdf: null,
-    error: null,
-    scale: 1,
-    disableZoomOut: false
+    this.state = {
+      pageNumber: 1,
+      pdf: null,
+      error: null,
+      scale: 1,
+      disableZoomOut: false,
+      multipage: false,
+      width: 0,
+      positions: [],
+      multipageScrollHeight: 0,
+      multipageScrollWidth: 0
+    }
+
+    this.multipageScroll = null
+    this.multipageUpdateInterval = null
+    this.multipageLayoutTimer = null
+    this.canvases = {}
   }
 
   componentDidMount () {
     this.loadPDFDocument(this.props)
-    this.queueRenderPage(1)
+    this.queueRenderPage(this.state.pageNumber)
   }
 
   componentWillReceiveProps (newProps) {
@@ -55,7 +63,7 @@ export default class Pdf extends Component {
     }
 
     if (pdf && (newProps.page && newProps.page !== this.props.page)) {
-      this.setState({ page: null, error: null })
+      this.setState({ pageNumber: newProps.page, error: null })
       this.queueRenderPage(newProps.page)
     }
   }
@@ -70,16 +78,25 @@ export default class Pdf extends Component {
     }
   }
 
-  onDocumentComplete = (pdf) => {
-    this.setState({ pdf, error: null })
+  onDocumentLoaded = (pdf) => {
+    this.setState({ pdf, pageNumber: this.props.page, error: null })
     this.queueRenderPage(this.props.page)
   }
 
+  onDocumentError = (err) => {
+    if (err.isCanceled && err.pdf) {
+      err.pdf.destroy()
+      this.setState({ error: 'PDF loading canceled' })
+    } else {
+      this.setState({ error: 'Error loading PDF: ' + err })
+    }
+  }
+
   loadProgress = (progress) => {
-    const { page } = this.state
+    const pageNumber = this.state.pageNumber || 1
     if (progress && progress.loaded >= progress.total) {
-      this.queueRenderPage((page && page.pageNumber) || 1)
-      this.setState({ progress: null, error: null })
+      this.queueRenderPage(pageNumber)
+      this.setState({ pageNumber, progress: null, error: null })
     } else {
       this.setState({ progress })
     }
@@ -91,7 +108,7 @@ export default class Pdf extends Component {
     }
     this.documentPromise = makeCancelable(window.PDFJS.getDocument(val, null, null, this.loadProgress).promise)
     this.documentPromise.promise
-      .then(this.onDocumentComplete)
+      .then(this.onDocumentLoaded)
       .catch(this.onDocumentError)
     return this.documentPromise
   }
@@ -105,24 +122,34 @@ export default class Pdf extends Component {
   }
 
   previousPage = () => {
-    this.queueRenderPage(this.state.page.pageNumber - 1)
+    const pageNumber = Math.max(this.state.pageNumber - 1, 1)
+    this.setState({ pageNumber })
+    this.queueRenderPage(pageNumber)
   }
 
   nextPage = () => {
-    this.queueRenderPage(this.state.page.pageNumber + 1)
+    const { pdf } = this.state
+    const pageNumber = Math.min(this.state.pageNumber + 1, pdf.numPages)
+    this.setState({ pageNumber })
+    this.queueRenderPage(this.state.pageNumber + 1)
   }
 
-  static scaleFactor = 1.5
   zoomIn = (event) => {
     const scale = this.state.scale * Pdf.scaleFactor
     this.setState({scale})
-    this.queueRenderPage(this.state.page.pageNumber)
+    this.queueRenderPage(this.state.pageNumber)
   }
 
   zoomOut = (event) => {
     const scale = this.state.scale / Pdf.scaleFactor
     this.setState({scale})
-    this.queueRenderPage(this.state.page.pageNumber)
+    this.queueRenderPage(this.state.pageNumber)
+  }
+
+  setMultipage = (multipage) => {
+    this.setState({multipage}, () => {
+      this.queueRenderPage(this.state.pageNumber)
+    })
   }
 
   // https://mozilla.github.io/pdf.js/examples/
@@ -148,26 +175,27 @@ export default class Pdf extends Component {
     if (pageNum < 1 || pageNum > pdf.numPages) return
 
     this.pageRendering = true
-    pdf.getPage(pageNum)
-    .then(page => {
-      new Promise(resolve => this.setState({ page, error: null }, resolve))
-      .then(() => this._UnsafeRenderPdf(page))
-      .then(() => {
-        this.pageRendering = false
-        if (this.pageNumPending !== null) {
-          this._renderPage(this.pageNumPending)
-          this.pageNumPending = null
-        }
-      })
+    return pdf.getPage(pageNum)
+    .then(page => this._UnsafeRenderPdf(page))
+    .then(() => {
+      this.pageRendering = false
+      if (this.pageNumPending !== null) {
+        this._renderPage(this.pageNumPending)
+        this.pageNumPending = null
+      }
     })
   }
 
   // dont call this directly; use queueRenderPage
   _UnsafeRenderPdf = (page) => {
-    const { canvas } = this
+    const { multipage } = this.state
+    const canvasIndex = multipage ? page.pageNumber : 1
+    const canvas = this.canvases[canvasIndex]
     if (!canvas) return
     const canvasContext = canvas.getContext('2d')
-    const { scale } = this.state
+    const desiredWidth = (this.state.multipage) ? this.props.thumbSize : (this.multipageScrollWidth || 1200)
+    let unscaledViewport = page.getViewport(1)
+    const scale = this.state.scale * desiredWidth / unscaledViewport.width
     let viewport = page.getViewport(scale)
 
     // Adjust the scale so the view exactly fits the parent body element
@@ -175,7 +203,7 @@ export default class Pdf extends Component {
     let { width, height } = viewport
     const aspect = width / height
     let disableZoomOut = false
-    if (height < body.clientHeight) {
+    if (!multipage && height < body.clientHeight) {
       disableZoomOut = true
       height = body.clientHeight
       width = height * aspect
@@ -189,31 +217,135 @@ export default class Pdf extends Component {
     return page.render({ canvasContext, viewport })
   }
 
+  updateMultipageElement = (element) => {
+    this.multipageScroll = element
+    if (element) {
+      if (this.multipageUpdateInterval) clearInterval(this.multipageUpdateInterval)
+      this.multipageUpdateInterval = setInterval(this.multipageUpdate, 150)
+    } else {
+      clearInterval(this.multipageUpdateInterval)
+      this.multipageUpdateInterval = null
+      this.clearMultipageLayoutTimer()
+    }
+  }
+
+  multipageUpdate = () => {
+    const scroll = this.multipageScroll
+    if (!scroll) return
+
+    if (scroll.clientHeight !== this.state.multipageScrollHeight ||
+      scroll.clientWidth !== this.state.multipageScrollWidth) {
+      this.setState({
+        multipageScrollHeight: scroll.clientHeight,
+        multipageScrollWidth: scroll.clientWidth
+      })
+      this.queueMultipageLayout()
+    }
+  }
+
+  runMultipageLayout = () => {
+    const width = this.state.multipageScrollWidth // - 2 * multipageScrollPadding
+    const { pdf } = this.state
+    const { thumbSize } = this.props
+    if (!width || !thumbSize || !pdf) return
+
+    const pageNums = []
+    for (let i = 1; i <= pdf.numPages; i++) {
+      pageNums.push(i)
+    }
+    Promise.all(pageNums.map(pageNum => pdf.getPage(pageNum)))
+    .then(pages => {
+      const viewports = pages.map(page => page.getViewport(1))
+      var positions = ComputeLayout.masonry(viewports, width, thumbSize)
+      this.setState({ positions })
+      this.clearMultipageLayoutTimer()
+    })
+
+    // // map asset ids to thumb index, so later we can easily track which thumbs
+    // // belong to selected asset ids.
+    // this.positionIndexByAssetId = {}
+    // for (let i = 0; i < viewports.length; i++) {
+    //   this.positionIndexByAssetId[viewports[i].id] = i
+    // }
+  }
+
+  queueMultipageLayout = () => {
+    this.clearMultipageLayoutTimer()
+    this.multipageLayoutTimer = setTimeout(this.runMultipageLayout, 150)
+  }
+
+  clearMultipageLayoutTimer = () => {
+    if (this.multipageLayoutTimer) clearTimeout(this.multipageLayoutTimer)
+    this.multipageLayoutTimer = null
+  }
+
+  renderingMultipage = false
+  renderPdfElement = () => {
+    const { pdf, multipage } = this.state
+    if (!multipage) {
+      return (
+        <div className="Pdf-singlepage-body">
+          <canvas ref={(c) => { this.canvases[1] = c }} />
+        </div>)
+    }
+
+    const { positions } = this.state
+    let maxy = 0
+    if (!positions.length) {
+      this.queueMultipageLayout()
+    } else {
+      var pageElements = []
+      var pageNumbers = []
+      const lastPos = this.state.positions[this.state.positions.length - 1]
+      maxy = lastPos.y + lastPos.height
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const { x, y, width, height } = positions[i - 1]
+        pageElements.push(<canvas key={`${i}`} ref={ (c) => { this.canvases[i] = c } }
+          style={{top: `${y}px`, left: `${x}px`, width: `${width}px`, height: `${height}px`}}/>)
+        pageNumbers.push(i)
+      }
+
+      if (!this.renderingMultipage) {
+        this.renderingMultipage = true
+        makePromiseQueue(pageNumbers, i => this._renderPage(i), 4)
+        .then(() => {
+          this.renderingMultipage = false
+        })
+      }
+    }
+
+    return (
+      <div className="Pdf-multipage-scroll" ref={this.updateMultipageElement}>
+        <div className="Pdf-multipage-body" style={{width: `100%`, height: `${maxy}px`}}>
+          {pageElements}
+        </div>
+      </div>)
+  }
+
   render () {
-    const { page, pdf, progress, error, scale, disableZoomOut } = this.state
+    const { pageNumber, pdf, progress, error, disableZoomOut, multipage } = this.state
     const svg = require('./loading-ring.svg')
     if (error) {
       return (<div className="Pdf"><div className="error">{error}</div></div>)
     }
-    if (!page && !progress) {
+    if (!pdf && !progress) {
       return (<div className="Pdf"><img className="loading" src={svg} /></div>)
     }
     if (progress && progress.loaded < progress.total) {
       const percentage = Math.round(100 * progress.loaded / progress.total)
       return (<div className="Pdf"><Progress percentage={percentage} /></div>)
     }
-    const isPreviousDisabled = page.pageNumber <= 1
-    const isNextDisabled = page.pageNumber >= pdf.numPages
-    const isZoomInDisabled = scale > 32
-    const isZoomOutDisabled = scale < 0.1 || disableZoomOut
+    let scale = (multipage) ? 1 : this.state.scale
+    const isPreviousDisabled = multipage || (pageNumber <= 1)
+    const isNextDisabled = multipage || (pageNumber >= pdf.numPages)
+    const isZoomInDisabled = multipage || (scale > 32)
+    const isZoomOutDisabled = multipage || (scale < 0.1) || disableZoomOut
     return (
       <div className="Pdf">
-        <div className="Pdf-body">
-          <canvas ref={(c) => { this.canvas = c }} />
-        </div>
+        { this.renderPdfElement() }
         { pdf && pdf.numPages && (
           <div className="Pdf-controls">
-            <div className="Pdf-controls-group border-right">Page {page.pageNumber} / {pdf.numPages}</div>
+            <div className="Pdf-controls-group border-right">Page {pageNumber} / {pdf.numPages}</div>
             <div className="Pdf-controls-group">
               <button className="icon-frame-back" disabled={isPreviousDisabled}
                       onClick={this.previousPage}/>
@@ -225,6 +357,12 @@ export default class Pdf extends Component {
                       onClick={this.zoomIn}/>
               <button className="icon-zoom-out" disabled={isZoomOutDisabled}
                       onClick={this.zoomOut}/>
+            </div>
+            <div className="Pdf-controls-group">
+              <button className="icon-checkbox-empty" disabled={!multipage}
+                      onClick={this.setMultipage.bind(this, false)}/>
+              <button className="icon-icons2" disabled={multipage}
+                      onClick={this.setMultipage.bind(this, true)}/>
             </div>
           </div>
         )}
