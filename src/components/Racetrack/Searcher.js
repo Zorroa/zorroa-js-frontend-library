@@ -10,6 +10,7 @@ import TrashedFolder from '../../models/TrashedFolder'
 import { searchAssets } from '../../actions/assetsAction'
 import { clearFoldersModified, countAssetsInFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
+import { MapWidgetInfo } from './WidgetInfo'
 
 // Searcher is a singleton. It combines AssetSearches from the Racetrack
 // and Folders and submits a new query to the Archivist server.
@@ -80,7 +81,7 @@ class Searcher extends Component {
         let sliver = widget.sliver
         if (sliver.aggs) {
           postFilter.merge(widget.sliver.filter)
-          const allOthers = this.allOtherFilters(widget).convertToBool()
+          const allOthers = widget.type === MapWidgetInfo.type ? new AssetFilter() : this.allOtherFilters(widget).convertToBool()
           let aggs = {[widget.id]: {filter: allOthers, aggs: sliver.aggs}}
           sliver = new AssetSearch({aggs})
         }

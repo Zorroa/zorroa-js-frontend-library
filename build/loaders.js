@@ -54,7 +54,7 @@ module.exports = function getLoaders (env) {
       }
     },
     {
-      test: /\.json$/,
+      test: /\.(geojson|json)$/,
       loader: 'json-loader'
     }
   ]
