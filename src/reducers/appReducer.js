@@ -4,7 +4,8 @@ import {
   METADATA_FIELDS, TABLE_FIELDS, LIGHTBAR_FIELDS,
   SYNC_FIELDS, SHOW_IMPORT_SCRIPT_INFO,
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH,
-  THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT, VIDEO_VOLUME,
+  THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
+  SHOW_MULTIPAGE, VIDEO_VOLUME,
   USER_SETTINGS, UNAUTH_USER
 } from '../constants/actionTypes'
 
@@ -36,6 +37,7 @@ const initialState = {
   tableHeight: 300,
   showTable: false,
   videoVolume: 0.8,
+  showMultipage: false,
   sortFolders: {},
   userSettings: {
     tableFields: [ ...defaultTableFields ],
@@ -93,6 +95,8 @@ export default function app (state = initialState, action) {
       return { ...state, tableHeight: action.payload }
     case VIDEO_VOLUME:
       return { ...state, videoVolume: action.payload }
+    case SHOW_MULTIPAGE:
+      return { ...state, showMultipage: action.payload }
     case SORT_FOLDERS: {
       const { filter, order } = action.payload
       if (order === undefined) {

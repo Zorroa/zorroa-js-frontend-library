@@ -12,7 +12,7 @@ import { isolateAssetId, selectAssetIds } from '../../actions/assetsAction'
 import { resetRacetrackWidgets } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
-import { setThumbSize, setThumbLayout, showTable, setTableHeight } from '../../actions/appActions'
+import { setThumbSize, setThumbLayout, showTable, setTableHeight, showMultipage } from '../../actions/appActions'
 import Pager from './Pager'
 import Footer from './Footer'
 import Table from '../Table'
@@ -37,6 +37,7 @@ class Assets extends Component {
     layout: PropTypes.string.isRequired,
     showTable: PropTypes.bool.isRequired,
     tableHeight: PropTypes.number.isRequired,
+    showMultipage: PropTypes.bool.isRequired,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object
@@ -145,10 +146,16 @@ class Assets extends Component {
     this.context.router.push('/lightbox')
   }
 
-  toggleShowTable () {
+  toggleShowTable = () => {
     const { showTable, user, userSettings, actions } = this.props
     actions.showTable(!showTable)
     actions.saveUserSettings(user, { ...userSettings, showTable: !showTable })
+  }
+
+  toggleShowMultipage = () => {
+    const { showMultipage, user, userSettings, actions } = this.props
+    actions.showMultipage(!showMultipage)
+    actions.saveUserSettings(user, { ...userSettings, showMultipage: !showMultipage })
   }
 
   changeLayout (layout) {
@@ -421,7 +428,7 @@ class Assets extends Component {
   }
 
   render () {
-    const { assets, totalCount, tableHeight, showTable, layout, thumbSize, assetsCounter } = this.props
+    const { assets, totalCount, tableHeight, showTable, showMultipage, layout, thumbSize, assetsCounter } = this.props
     const { tableIsResizing } = this.state
 
     // Trigger layout if assets change.
@@ -454,8 +461,10 @@ class Assets extends Component {
         <Footer
           total={totalCount}
           loaded={assets.length}
+          showMultipage={showMultipage}
+          toggleShowMultipage={this.toggleShowMultipage}
           showTable={showTable}
-          toggleShowTable={this.toggleShowTable.bind(this)}
+          toggleShowTable={this.toggleShowTable}
           layout={layout}
           handleLayout={this.changeLayout.bind(this)}
           thumbSize={thumbSize}
@@ -478,7 +487,8 @@ export default connect(state => ({
   thumbSize: state.app.thumbSize,
   layout: state.app.thumbLayout,
   showTable: state.app.showTable,
-  tableHeight: state.app.tableHeight
+  tableHeight: state.app.tableHeight,
+  showMultipage: state.app.showMultipage
 }), dispatch => ({
   actions: bindActionCreators({
     isolateAssetId,
@@ -489,6 +499,7 @@ export default connect(state => ({
     setThumbLayout,
     showTable,
     setTableHeight,
+    showMultipage,
     saveUserSettings
   }, dispatch)
 }))(Assets)

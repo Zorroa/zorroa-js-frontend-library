@@ -3,7 +3,8 @@ import {
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
   METADATA_FIELDS, TABLE_FIELDS, LIGHTBAR_FIELDS, SYNC_FIELDS,
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH, SHOW_IMPORT_SCRIPT_INFO,
-  THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT, VIDEO_VOLUME
+  THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
+  SHOW_MULTIPAGE, VIDEO_VOLUME
 } from '../constants/actionTypes'
 
 export function showModal (props) {
@@ -130,6 +131,13 @@ export function setVideoVolume (volume) {
   return ({
     type: VIDEO_VOLUME,
     payload: volume
+  })
+}
+
+export function showMultipage (show) {
+  return ({
+    type: SHOW_MULTIPAGE,
+    payload: show
   })
 }
 

@@ -6,7 +6,8 @@ import * as api from '../globals/api.js'
 import {
   AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR, USER_SETTINGS,
   AUTH_PERMISSIONS, METADATA_FIELDS, TABLE_FIELDS,
-  THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT, VIDEO_VOLUME
+  THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
+  SHOW_MULTIPAGE, VIDEO_VOLUME
 } from '../constants/actionTypes'
 import { USER_ITEM, HOST_ITEM, PROTOCOL_ITEM } from '../constants/localStorageItems'
 import User from '../models/User'
@@ -113,6 +114,9 @@ function authorize (dispatch, json) {
     }
     if (metadata.tableHeight) {
       dispatch({type: TABLE_HEIGHT, payload: metadata.tableHeight})
+    }
+    if (metadata.showMultipage) {
+      dispatch({type: SHOW_MULTIPAGE, payload: metadata.showMultipage})
     }
     if (metadata.videoVolume) {
       dispatch({type: VIDEO_VOLUME, payload: metadata.videoVolume})
