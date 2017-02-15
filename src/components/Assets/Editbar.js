@@ -8,7 +8,8 @@ import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import TrashedFolder from '../../models/TrashedFolder'
 import CreateExport from '../Folders/CreateExport'
-import { selectAssetIds, unorderAssets } from '../../actions/assetsAction'
+import SortingSelector from './SortingSelector'
+import { selectAssetIds, sortAssets } from '../../actions/assetsAction'
 import { removeAssetIdsFromFolderId } from '../../actions/folderAction'
 import { exportAssets } from '../../actions/jobActions'
 import { showModal } from '../../actions/appActions'
@@ -30,8 +31,8 @@ class Editbar extends Component {
     this.props.actions.selectAssetIds(null)
   }
 
-  unorderAssets = () => {
-    this.props.actions.unorderAssets()
+  sortAssets = (field, ascending) => {
+    this.props.actions.sortAssets(field, ascending)
   }
 
   exportAssets = () => {
@@ -87,37 +88,12 @@ class Editbar extends Component {
         if (index < 0) selectedFolderIds.add(id)
       })
     }
-    /*
-    // For now, show the Editbar when no assets are selected
-    // This prevents the thumbnails from moving when you click on one
-    if ((!selectedFolderIds || !selectedFolderIds.size) &&
-      (!selectedAssetIds || !selectedAssetIds.size)) {
-      return (<div className="Editbar"/>)
-    }
-    */
-    let title = 'Selected assets'
-    const containsSelected = this.containsSelected()
-    if (selectedFolderIds && selectedFolderIds.size) {
-      if (containsSelected) {
-        const plural = selectedFolderIds.size > 1
-        title = 'Assets included in collection' + (plural ? 's' : '')
-      } else {
-        title = 'Browsing assets'
-      }
-    }
     const nAssetsSelected = selectedAssetIds ? selectedAssetIds.size : 0
     const disabledSelected = !selectedAssetIds || !selectedAssetIds.size
-    const disabledSorted = !order || order.length === 0
-    const removable = !disabledSelected && containsSelected
+    const removable = !disabledSelected && this.containsSelected()
     return (
       <div className="Editbar">
-        <div className="Editbar-left-side">
-          <div className="Editbar-title">{title}</div>
-          <div className={classnames('Editbar-sorted', {disabled: disabledSorted})}>
-            <div>{ disabledSorted ? 'unsorted' : 'sorted' }</div>
-            { disabledSorted ? null : <div onClick={this.unorderAssets} className={classnames('Editbar-sorted-icon', 'icon-cancel-circle', {disabled: disabledSorted})}/> }
-          </div>
-        </div>
+        <SortingSelector sortAssets={this.props.actions.sortAssets} order={order}/>
         <div className="Editbar-right-side">
           <div className={classnames('Editbar-selected', {disabled: disabledSelected})}>
             {`${nAssetsSelected || 'no'} assets selected`}
@@ -150,7 +126,7 @@ export default connect(state => ({
   actions: bindActionCreators({
     selectAssetIds,
     removeAssetIdsFromFolderId,
-    unorderAssets,
+    sortAssets,
     showModal,
     exportAssets
   }, dispatch)

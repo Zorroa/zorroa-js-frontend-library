@@ -28,11 +28,6 @@
     margin-right: 12px;
   }
 
-  .Editbar-left-side {
-    @include flexRow;
-    @include flexAlignItemsCenter;
-  }
-
   .Editbar-selected {
     margin-left: 12px;
     margin-right: 12px;
@@ -58,32 +53,6 @@
       &.disabled {
         color: $zorroa-lightgray;
       }
-    }
-  }
-
-  .Editbar-sorted {
-    font-size: 12px;
-    @include flexRow;
-    @include flexAlignItemsCenter;
-    margin-left: 24px;
-    margin-right: 8px;
-
-    &.disabled { color: $zorroa-lightgray; }
-  }
-
-  .Editbar-sorted-icon {
-    @include zorroa-square-btn-darken(24px);
-    font-size: 10px;
-    margin-left: 4px;
-    border-radius: 2px;
-    cursor: pointer;
-
-    &:not(.disabled):hover {
-      color: black;
-    }
-
-    &.disabled {
-      color: $zorroa-lightgray;
     }
   }
 
@@ -116,6 +85,35 @@
     }
 
     &.disabled {
+      color: $zorroa-lightgray;
+    }
+  }
+}
+
+.SortingSelector {
+  @include flexRow;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-family: "Roboto Condensed";
+  margin-left: 10px;
+  color: $zorroa-lightgray;
+
+  .SortingSelector-sort {
+
+    margin-left: 10px;
+    color: $zorroa-gray;
+
+    &:hover {
+      color: $zorroa-sickly-green;
+    }
+
+    &.SortingSelector-enabled {
+      cursor: pointer;
+      color: $zorroa-sickly-green;
+      text-decoration: underline;
+    }
+
+    &.SortingSelector-disabled {
       color: $zorroa-lightgray;
     }
   }

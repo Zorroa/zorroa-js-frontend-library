@@ -70,6 +70,7 @@ export function suggestQueryStrings (text) {
 }
 
 export function sortAssets (field, ascending) {
+  if (!field || !field.length) return unorderAssets()
   return ({ type: ASSET_SORT, payload: {field, ascending} })
 }
 
