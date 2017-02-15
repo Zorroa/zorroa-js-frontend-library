@@ -79,7 +79,7 @@ export function orderAssets (order) {
 }
 
 export function unorderAssets () {
-  return orderAssets([])
+  return orderAssets()
 }
 
 export function isolateAssetId (id) {
