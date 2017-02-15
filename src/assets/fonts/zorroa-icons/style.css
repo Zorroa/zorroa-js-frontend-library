@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'zorroa-icons';
-  src:  url('fonts/zorroa-icons.eot?ungl2s');
-  src:  url('fonts/zorroa-icons.eot?ungl2s#iefix') format('embedded-opentype'),
-    url('fonts/zorroa-icons.woff2?ungl2s') format('woff2'),
-    url('fonts/zorroa-icons.ttf?ungl2s') format('truetype'),
-    url('fonts/zorroa-icons.woff?ungl2s') format('woff'),
-    url('fonts/zorroa-icons.svg?ungl2s#zorroa-icons') format('svg');
+  src:  url('fonts/zorroa-icons.eot?ryuz29');
+  src:  url('fonts/zorroa-icons.eot?ryuz29#iefix') format('embedded-opentype'),
+    url('fonts/zorroa-icons.woff2?ryuz29') format('woff2'),
+    url('fonts/zorroa-icons.ttf?ryuz29') format('truetype'),
+    url('fonts/zorroa-icons.woff?ryuz29') format('woff'),
+    url('fonts/zorroa-icons.svg?ryuz29#zorroa-icons') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -25,11 +25,35 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-search3:before {
+  content: "\e965";
+}
+.icon-layout:before {
+  content: "\e900";
+}
+.icon-layout2:before {
+  content: "\e901";
+}
+.icon-layout3:before {
+  content: "\e902";
+}
+.icon-layout4:before {
+  content: "\e903";
+}
 .icon-settings_backup_restore:before {
   content: "\e92f";
 }
+.icon-search2:before {
+  content: "\e962";
+}
 .icon-plus2:before {
   content: "\e928";
+}
+.icon-singleasset:before {
+  content: "\e966";
+}
+.icon-table:before {
+  content: "\e967";
 }
 .icon-check:before {
   content: "\e961";
@@ -343,6 +367,12 @@
 .icon-envelope:before {
   content: "\e696";
 }
+.icon-eye2:before {
+  content: "\e6a5";
+}
+.icon-eye-crossed:before {
+  content: "\e6a6";
+}
 .icon-file-empty2:before {
   content: "\e6b3";
 }
@@ -403,6 +433,9 @@
 .icon-cube:before {
   content: "\e874";
 }
+.icon-icons2:before {
+  content: "\e880";
+}
 .icon-site-map:before {
   content: "\e883";
 }
@@ -411,6 +444,9 @@
 }
 .icon-download2:before {
   content: "\e8f5";
+}
+.icon-enter-right2:before {
+  content: "\e964";
 }
 .icon-link2:before {
   content: "\e917";
@@ -435,6 +471,9 @@
 }
 .icon-chevron-down:before {
   content: "\e93a";
+}
+.icon-chevron-right:before {
+  content: "\e963";
 }
 .icon-chevrons-expand-vertical:before {
   content: "\e93d";
@@ -474,17 +513,5 @@
 }
 .icon-hand:before {
   content: "\e9bf";
-}
-.icon-layout:before {
-  content: "\e900";
-}
-.icon-layout2:before {
-  content: "\e901";
-}
-.icon-layout3:before {
-  content: "\e902";
-}
-.icon-layout4:before {
-  content: "\e903";
 }
 
