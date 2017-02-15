@@ -62,7 +62,8 @@ class Assets extends Component {
       assetsScrollHeight: 0,
       assetsScrollWidth: 0,
       tableIsResizing: false,
-      positions: []
+      positions: [],
+      multipage: {}
     }
 
     this.newTableHeight = 0
@@ -156,6 +157,7 @@ class Assets extends Component {
     const { showMultipage, user, userSettings, actions } = this.props
     actions.showMultipage(!showMultipage)
     actions.saveUserSettings(user, { ...userSettings, showMultipage: !showMultipage })
+    this.queueAssetsLayout()
   }
 
   changeLayout (layout) {
@@ -242,23 +244,23 @@ class Assets extends Component {
     const width = this.state.assetsScrollWidth - 2 * assetsScrollPadding
     if (!width) return
 
-    const { assets, layout, thumbSize } = this.props
+    const { assets, layout, thumbSize, showMultipage } = this.props
     if (!assets) return
 
     const assetSizes = assets.map(asset => {
       return asset.proxies
         ? asset.proxies[0]
-        : { width: asset.width() || 1, height: asset.height() || 1 }
+        : { width: asset.width() || 1, height: asset.height() || 1, parentId: asset.parentId() }
     })
 
-    var positions = (_ => {
+    var { positions, multipage } = (_ => {
       switch (layout) {
-        case 'grid': return ComputeLayout.grid(assetSizes, width, thumbSize)
-        case 'masonry': return ComputeLayout.masonry(assetSizes, width, thumbSize)
+        case 'grid': return ComputeLayout.grid(assetSizes, width, thumbSize, showMultipage)
+        case 'masonry': return ComputeLayout.masonry(assetSizes, width, thumbSize, showMultipage)
       }
     })()
 
-    this.setState({ positions })
+    this.setState({ positions, multipage })
 
     this.clearAssetsLayoutTimer()
 
@@ -342,7 +344,7 @@ class Assets extends Component {
 
   renderAssets () {
     const { assets, selectedIds, totalCount, layout } = this.props
-    const { positions, tableIsResizing } = this.state
+    const { positions, multipage, tableIsResizing } = this.state
     api.setTableIsResizing(tableIsResizing)
 
     if (!assets || !assets.length) {
@@ -401,11 +403,13 @@ class Assets extends Component {
                       (assetsScrollPadding + pos.y + pos.height < this.state.assetsScrollTop)) {
                     return null
                   }
+                  const parentId = asset.parentId()
+                  const assets = parentId && multipage[parentId] || [asset]
                   return (
                     <Thumb isSelected={selectedIds && selectedIds.has(asset.id)}
                       dim={positions[index]}
                       key={asset.id}
-                      assets={[asset]}
+                      assets={assets}
                       onClick={event => {
                         // don't scroll assets when we select thumbs. (table selection will scroll)
                         this.skipNextSelectionScroll = true

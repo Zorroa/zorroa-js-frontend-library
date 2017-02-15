@@ -95,6 +95,7 @@ class Thumb extends Component {
   render () {
     const {assets, protocol, host, isSelected, onClick, onDoubleClick, dragparams} = this.props
     const {width, height, x, y} = this.props.dim      // Original thumb rect
+    if (!width || !height) return null
     const style = {width, height, left: x, top: y}    // Dim -> left, right
     const parentURL = assets[0].parentProxyURL(protocol, host)
     if (!parentURL) {
@@ -120,7 +121,7 @@ class Thumb extends Component {
     return (
       <div className={classnames('Thumb', {isSelected})} style={style}
            onClick={onClick} onDoubleClick={onDoubleClick} {...dragparams}>
-        { assets.reverse().map((asset, rindex) => {
+        { assets.slice(0).reverse().map((asset, rindex) => {
           var proxy = asset.closestProxy(width, height)
           const url = proxy ? proxy.url(protocol, host) : ''
           const tproxy = asset.tinyProxy()
