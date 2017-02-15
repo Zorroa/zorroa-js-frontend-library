@@ -72,6 +72,7 @@
     .protip {
       text-align: right;
       color: $zorroa-lightgray;
+      visibility: hidden;       // Disable until we add Alt-s to open AddWidget
 
       @include flexRow;
       @include flexJustifyEnd;
