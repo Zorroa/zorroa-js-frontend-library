@@ -405,7 +405,7 @@ class Assets extends Component {
                     <Thumb isSelected={selectedIds && selectedIds.has(asset.id)}
                       dim={positions[index]}
                       key={asset.id}
-                      asset={asset}
+                      assets={[asset]}
                       onClick={event => {
                         // don't scroll assets when we select thumbs. (table selection will scroll)
                         this.skipNextSelectionScroll = true

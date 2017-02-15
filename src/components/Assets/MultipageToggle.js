@@ -3,7 +3,7 @@ import classnames from 'classnames'
 
 const MultipageToggle = (props) => (
   <div onClick={props.onClick}
-       className={classnames('MultipageToggle', 'icon-files',
+       className={classnames('MultipageToggle', 'icon-stack-empty',
          { 'MultipageToggle-enabled': props.enabled })} />
 )
 

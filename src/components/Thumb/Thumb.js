@@ -15,91 +15,44 @@ const source = {
 }
 
 const ImageThumb = (props) => {
-  const { asset, dim, onClick, onDoubleClick, dragparams, thumbURL, children } = props
-  const tproxy = asset.tinyProxy()
-  const bgColor = tproxy ? tproxy[4] : '#888'
+  const { url, backgroundColor, children } = props
   const style = {
-    'backgroundColor': bgColor,
+    backgroundColor,
     'backgroundSize': 'cover',
-    'width': dim.width,
-    'height': dim.height,
-    'left': dim.x,
-    'top': dim.y,
-    'backgroundImage': `url(${thumbURL})`
+    'backgroundImage': `url(${url})`
   }
   return (
-    <div
-      className={classnames('ImageThumb')}
-      style={style}
-      onDoubleClick={onDoubleClick}
-      onClick={onClick}
-      {...dragparams} >
+    <div className={classnames('ImageThumb')} style={style}>
       { children }
     </div>
   )
 }
 
 ImageThumb.propTypes = {
-  asset: PropTypes.instanceOf(Asset).isRequired,
-  dim: PropTypes.object.isRequired,
-  onClick: PropTypes.func.isRequired,
-  onDoubleClick: PropTypes.func.isRequired,
-  dragparams: PropTypes.object,
-  thumbURL: PropTypes.string.isRequired,
+  url: PropTypes.string.isRequired,
+  backgroundColor: PropTypes.string,
   children: PropTypes.arrayOf(React.PropTypes.element)
 }
 
 @DragSource('ASSET', source)
 class Thumb extends Component {
   static propTypes = {
-    asset: PropTypes.instanceOf(Asset).isRequired,
+    assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)).isRequired,
     protocol: PropTypes.string,
     host: PropTypes.string,
     dim: PropTypes.object.isRequired,
     isSelected: PropTypes.bool,
-    selectedAssetIds: PropTypes.instanceOf(Set)
+    selectedAssetIds: PropTypes.instanceOf(Set),
+    onClick: PropTypes.func.isRequired,
+    onDoubleClick: PropTypes.func.isRequired,
+    dragparams: PropTypes.object
   }
 
-  renderSelectedOverlay (isSelected) {
-    return (
-      <div className={classnames('Thumb-selection', {isSelected})}>
-        <div className={classnames('Thumb-selection-overlay', {isSelected})}/>
-        <div className={classnames('Thumb-selection-check', 'icon-check', {isSelected})}/>
-      </div>
-    )
-  }
-
-  renderBadges = (pages, duration, icon) => {
+  renderBadges = () => {
+    const { assets } = this.props
     const { width, height } = this.props.dim
-    const hideText = (!pages && !duration) || width < 50 || height < 50
-    const textStyle = hideText ? { display: 'none' } : {}
-    const small = width < 80 || height < 80
+    const asset = assets[0]
 
-    if (pages || icon) {
-      return (
-        <div className="multipage-badge">
-          <div className={classnames('icon', {small})}><img src={icon}/></div>
-          <div style={textStyle} className={classnames('pages', {small})}>
-            {pages}
-          </div>
-        </div>
-      )
-    } else if (duration) {
-      return (
-        <div className="time-badge">
-          <div className={classnames('play-badge', {small})}>
-            <div className={classnames('arrow-right', {small})} />
-          </div>
-          <div style={textStyle} className={classnames('duration', {small})}>
-            { formatDuration(parseFormattedFloat(duration)) }
-          </div>
-        </div>
-      )
-    }
-  }
-
-  render () {
-    const { asset, isSelected } = this.props
     const mediaType = asset.mediaType().toLowerCase()
     let pages, duration, icon
 
@@ -112,28 +65,81 @@ class Thumb extends Component {
       pages = asset.value('document.pages')
     }
 
-    const { width, height, x, y } = this.props.dim      // Original thumb rect
-    const style = { width, height, left: x, top: y }    // Dim -> left, right
-    const ninetyDim = { width: '90%', height: '90%' }   // When multipaged
-    const fullDim = { width: '100%', height: '100%' }   // Single thumb
-    const frontDim = pages ? ninetyDim : fullDim        // stack-front dim
-    const props = { ...this.props, dim: {width: '100%', height: '100%', x: 0, y: 0} }
-    const hideMultipageStyle = pages ? { display: 'none' } : {}
+    const hideText = (!pages && !duration) || width < 50 || height < 50
+    const textStyle = hideText ? { display: 'none' } : {}
+    const small = width < 80 || height < 80
 
-    const { protocol, host, dim } = this.props
-    var proxy = asset.closestProxy(dim.width, dim.height)
-    const thumbURL = proxy ? proxy.url(protocol, host) : ''
+    if (pages || icon) {
+      return (
+        <div className="Thumb-multipage-badge">
+          <div className={classnames('icon', {small})}><img src={icon}/></div>
+          <div style={textStyle} className={classnames('Thumb-pages', {small})}>
+            {pages}
+          </div>
+        </div>
+      )
+    } else if (duration) {
+      return (
+        <div className="Thumb-time-badge">
+          <div className={classnames('Thumb-play-badge', {small})}>
+            <div className={classnames('Thumb-arrow-right', {small})} />
+          </div>
+          <div style={textStyle} className={classnames('Thumb-duration', {small})}>
+            { formatDuration(parseFormattedFloat(duration)) }
+          </div>
+        </div>
+      )
+    }
+  }
 
-    return (
-      <div className={classnames('Thumb', {isSelected})} style={style} >
-        <div style={hideMultipageStyle} className="stack-back"/>
-        <div style={hideMultipageStyle} className="stack-middle"/>
-        <div className="stack-front" style={frontDim}>
-          <ImageThumb {...props} thumbURL={thumbURL}>
-            { this.renderSelectedOverlay(isSelected) }
-            { this.renderBadges(pages, duration, icon) }
+  render () {
+    const {assets, protocol, host, isSelected, onClick, onDoubleClick, dragparams} = this.props
+    const {width, height, x, y} = this.props.dim      // Original thumb rect
+    const style = {width, height, left: x, top: y}    // Dim -> left, right
+    const parentURL = assets[0].parentProxyURL(protocol, host)
+    if (!parentURL) {
+      const asset = assets[0]
+      var proxy = asset.closestProxy(width, height)
+      const url = proxy ? proxy.url(protocol, host) : ''
+      const tproxy = asset.tinyProxy()
+      const backgroundColor = tproxy ? tproxy[4] : '#888'
+      return (
+        <div className={classnames('Thumb', {isSelected})} style={style}
+             onClick={onClick} onDoubleClick={onDoubleClick} {...dragparams}>
+          <ImageThumb url={url} backgroundColor={backgroundColor}>
+            <div className='Thumb-selection'>
+              <div className='Thumb-selection-overlay'/>
+              <div className='Thumb-selection-check icon-check'/>
+            </div>
+            { this.renderBadges() }
           </ImageThumb>
         </div>
+      )
+    }
+
+    return (
+      <div className={classnames('Thumb', {isSelected})} style={style}
+           onClick={onClick} onDoubleClick={onDoubleClick} {...dragparams}>
+        { assets.reverse().map((asset, rindex) => {
+          var proxy = asset.closestProxy(width, height)
+          const url = proxy ? proxy.url(protocol, host) : ''
+          const tproxy = asset.tinyProxy()
+          const backgroundColor = tproxy ? tproxy[4] : '#888'
+          const index = assets.length - rindex - 1
+          return (
+            <div key={`${asset.id}-${index}`} className={classnames('Thumb-stack', `Thumb-stack-${index}`)}>
+              <ImageThumb url={url} backgroundColor={backgroundColor}/>
+            </div>
+          )
+        })}
+        <div className="Thumb-inset">
+          <ImageThumb url={parentURL}/>
+        </div>
+        <div className='Thumb-selection'>
+          <div className='Thumb-selection-overlay'/>
+          <div className='Thumb-selection-check icon-check'/>
+        </div>
+        { this.renderBadges() }
       </div>
     )
   }

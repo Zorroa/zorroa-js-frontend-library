@@ -143,6 +143,9 @@
   outline: none;
   font-size: 20px;
   cursor: pointer;
+
+  transform: scaleX(-1);
+
   &:hover { background-color: $zorroa-lightgray; }
 
   &.MultipageToggle-enabled {

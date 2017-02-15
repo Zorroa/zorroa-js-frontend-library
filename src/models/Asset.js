@@ -62,6 +62,21 @@ export default class Asset {
     }
   }
 
+  smallestProxy () {
+    if (!this.proxies) return null
+    var smallestProxy = this.proxies[0]
+    var leastPixels = Number.MAX_SAFE_INTEGER
+    for (var i = 0; i < this.proxies.length; ++i) {
+      const proxy = this.proxies[i]
+      const pixels = proxy.width * proxy.height
+      if (pixels < leastPixels) {
+        leastPixels = pixels
+        smallestProxy = proxy
+      }
+    }
+    return smallestProxy
+  }
+
   biggestProxy () {
     if (!this.proxies) return null
     var biggestProxy = this.proxies[0]
@@ -92,6 +107,21 @@ export default class Asset {
       }
     }
     return bestProxy
+  }
+
+  parentId () {
+    if (!this.document.source || !this.document.source.clip) return null
+    return this.document.source.clip.parent
+  }
+
+  parentProxyURL (protocol, host) {
+    const parentId = this.parentId()
+    if (!parentId) return null
+    const smallestProxy = this.smallestProxy()
+    if (!smallestProxy) return null
+    const { width, height, format } = smallestProxy
+    const id = `proxy/${this.parentId()}_${width}x${height}.${format}`
+    return `${protocol}//${host}:8066/api/v1/ofs/${id}`
   }
 
   // Returns true if the asset is in any of the folder ids
