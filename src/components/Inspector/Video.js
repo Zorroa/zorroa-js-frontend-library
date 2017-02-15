@@ -106,9 +106,11 @@ class Video extends Component {
   }
 
   init () {
-    if (this.initialized) return
+    const { url, startFrame } = this.props
+    const initialized = `${url}@${startFrame}`
+    if (this.initialized === initialized) return
     this.scrub(this.props.startFrame)
-    this.initialized = true
+    this.initialized = initialized
   }
 
   render () {
