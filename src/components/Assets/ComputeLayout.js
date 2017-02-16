@@ -27,6 +27,8 @@ export function masonry (assets, panelWidth, thumbSize, showMultipage) {
 
     let collapse = false
     if (showMultipage) {
+      // Collapse siblings by setting the aspect to zero.
+      // The height and y position are retained to set the Pager top.
       if (parentId) {
         const pages = multipage[parentId]
         if (!pages) {

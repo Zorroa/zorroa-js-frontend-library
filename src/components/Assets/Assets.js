@@ -20,6 +20,7 @@ import Editbar from './Editbar'
 import * as ComputeLayout from './ComputeLayout.js'
 import AssetSearch from '../../models/AssetSearch'
 import Resizer from '../../services/Resizer'
+import { addSiblings, equalSets } from '../../services/jsUtil'
 import * as api from '../../globals/api.js'
 
 const assetsScrollPadding = 8
@@ -82,7 +83,7 @@ class Assets extends Component {
   // toggle entries. We keep the anchor point for shift-select
   // in local state and must update it when the search changes.
   select = (asset, event) => {
-    const { assets, selectedIds, actions } = this.props
+    const { assets, selectedIds, showMultipage, actions } = this.props
     const { lastSelectedId } = this.state
     let ids
     if (event.shiftKey) {
@@ -99,32 +100,41 @@ class Assets extends Component {
             for (var i = min; i <= max; ++i) {
               ids.add(assets[i].id)
             }
+            if (showMultipage) {
+              addSiblings(ids, assets)
+            }
           }
         }
       }
       if (!ids) {
         // Nothing in the extended selection set, treat as new selection
         ids = new Set([asset.id])
+        if (showMultipage) addSiblings(ids, assets)
         this.setState({...this.state, lastSelectedId: asset.id})
       }
     } else if (event.metaKey) {
       // Toggle the current asset on or off
       ids = new Set([...selectedIds])
-      if (ids.has(asset.id)) {
-        ids.delete(asset.id)
-      } else {
-        ids.add(asset.id)
-      }
+      const siblings = new Set([asset.id])
+      if (showMultipage) addSiblings(siblings, assets)
+      siblings.forEach(id => {
+        if (ids.has(id)) {
+          ids.delete(id)
+        } else {
+          ids.add(id)
+        }
+      })
       const lastSelectedId = ids.length ? asset.id : null
       this.setState({...this.state, lastSelectedId})
     } else {
-      if (selectedIds && selectedIds.size === 1 && selectedIds.has(asset.id)) {
+      ids = new Set([asset.id])
+      if (showMultipage) addSiblings(ids, assets)
+      if (selectedIds && equalSets(ids, selectedIds)) {
         // single click of a single selected asset should deselect
         ids = new Set()
         this.setState({...this.state, lastSelectedId: null})
       } else {
         // Select the single asset and use it as the anchor point
-        ids = new Set([asset.id])
         this.setState({...this.state, lastSelectedId: asset.id})
       }
     }
