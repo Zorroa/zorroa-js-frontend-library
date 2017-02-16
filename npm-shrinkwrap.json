@@ -3593,22 +3593,24 @@
     "mapbox-gl": {
       "version": "0.25.1",
       "from": "mapbox-gl@>=0.25.1 <0.26.0",
-      "resolved": "https://registry.npmjs.org/mapbox-gl/-/mapbox-gl-0.25.1.tgz"
+      "resolved": "https://registry.npmjs.org/mapbox-gl/-/mapbox-gl-0.25.1.tgz",
+      "dependencies": {
+        "mapbox-gl-shaders": {
+          "version": "1.0.0",
+          "from": "git://github.com/mapbox/mapbox-gl-shaders.git#df162476980d9ee2ab6f8d0cf5a06e27aac60472",
+          "resolved": "git://github.com/mapbox/mapbox-gl-shaders.git#df162476980d9ee2ab6f8d0cf5a06e27aac60472"
+        },
+        "mapbox-gl-style-spec": {
+          "version": "8.8.1",
+          "from": "git://github.com/mapbox/mapbox-gl-style-spec.git#a6c95d33ff5ced2c0d7df995fd89eb557c0a353c",
+          "resolved": "git://github.com/mapbox/mapbox-gl-style-spec.git#a6c95d33ff5ced2c0d7df995fd89eb557c0a353c"
+        }
+      }
     },
     "mapbox-gl-function": {
       "version": "1.3.0",
       "from": "mapbox-gl-function@>=1.2.1 <2.0.0",
       "resolved": "https://registry.npmjs.org/mapbox-gl-function/-/mapbox-gl-function-1.3.0.tgz"
-    },
-    "mapbox-gl-shaders": {
-      "version": "1.0.0",
-      "from": "git://github.com/mapbox/mapbox-gl-shaders.git#df162476980d9ee2ab6f8d0cf5a06e27aac60472",
-      "resolved": "git://github.com/mapbox/mapbox-gl-shaders.git#df162476980d9ee2ab6f8d0cf5a06e27aac60472"
-    },
-    "mapbox-gl-style-spec": {
-      "version": "8.8.1",
-      "from": "git://github.com/mapbox/mapbox-gl-style-spec.git#a6c95d33ff5ced2c0d7df995fd89eb557c0a353c",
-      "resolved": "git://github.com/mapbox/mapbox-gl-style-spec.git#a6c95d33ff5ced2c0d7df995fd89eb557c0a353c"
     },
     "mapbox-gl-supported": {
       "version": "1.2.0",
@@ -4210,9 +4212,9 @@
       "resolved": "https://registry.npmjs.org/pbkdf2-compat/-/pbkdf2-compat-2.0.1.tgz"
     },
     "pdfjs-dist": {
-      "version": "1.6.313",
-      "from": "pdfjs-dist@1.6.313",
-      "resolved": "https://registry.npmjs.org/pdfjs-dist/-/pdfjs-dist-1.6.313.tgz"
+      "version": "1.7.235",
+      "from": "pdfjs-dist@1.7.235",
+      "resolved": "https://registry.npmjs.org/pdfjs-dist/-/pdfjs-dist-1.7.235.tgz"
     },
     "performance-now": {
       "version": "0.2.0",
@@ -4631,9 +4633,9 @@
       "resolved": "https://registry.npmjs.org/react-measure/-/react-measure-1.2.0.tgz"
     },
     "react-pdf-js": {
-      "version": "1.0.31",
-      "from": "react-pdf-js@1.0.31",
-      "resolved": "https://registry.npmjs.org/react-pdf-js/-/react-pdf-js-1.0.31.tgz"
+      "version": "1.0.33",
+      "from": "react-pdf-js@1.0.33",
+      "resolved": "https://registry.npmjs.org/react-pdf-js/-/react-pdf-js-1.0.33.tgz"
     },
     "react-player": {
       "version": "0.12.0",

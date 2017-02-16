@@ -20,8 +20,8 @@ export function masonry (assets, panelWidth, thumbSize) {
   // Shove thumbs into rows as long as they'll fit.
   for (var i = 0; i < assets.length; i++) {
     const asset = assets[i]
-    const proxy = asset.proxies ? asset.proxies[0] : { width: asset.width() || 1, height: asset.height() || 1 }
-    let aspect = Math.min(3, proxy.width / proxy.height)
+    const { width, height } = asset
+    let aspect = Math.min(3, width / height)
     aspects[i] = aspect
 
     const rowIndex = rowLengths.length - 1

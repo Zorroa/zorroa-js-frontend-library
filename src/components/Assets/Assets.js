@@ -222,8 +222,7 @@ class Assets extends Component {
     this.updateAssetsScrollSizeInterval = null
 
     // clear any pending layout
-    if (this.assetsLayoutTimer) clearTimeout(this.assetsLayoutTimer)
-    this.assetsLayoutTimer = null
+    this.clearAssetsLayoutTimer()
     this.resizer.release()
   }
 
@@ -237,20 +236,24 @@ class Assets extends Component {
     if (!width) return
 
     const { assets, layout, thumbSize } = this.props
-
     if (!assets) return
+
+    const assetSizes = assets.map(asset => {
+      return asset.proxies
+        ? asset.proxies[0]
+        : { width: asset.width() || 1, height: asset.height() || 1 }
+    })
 
     var positions = (_ => {
       switch (layout) {
-        case 'grid': return ComputeLayout.grid(assets, width, thumbSize)
-        case 'masonry': return ComputeLayout.masonry(assets, width, thumbSize)
+        case 'grid': return ComputeLayout.grid(assetSizes, width, thumbSize)
+        case 'masonry': return ComputeLayout.masonry(assetSizes, width, thumbSize)
       }
     })()
 
     this.setState({ positions })
 
-    if (this.assetsLayoutTimer) clearTimeout(this.assetsLayoutTimer)
-    this.assetsLayoutTimer = null
+    this.clearAssetsLayoutTimer()
 
     // map asset ids to thumb index, so later we can easily track which thumbs
     // belong to selected asset ids.
@@ -266,8 +269,13 @@ class Assets extends Component {
   }
 
   queueAssetsLayout = () => {
-    if (this.assetsLayoutTimer) clearTimeout(this.assetsLayoutTimer)
+    this.clearAssetsLayoutTimer()
     this.assetsLayoutTimer = setTimeout(this.runAssetsLayout, 150)
+  }
+
+  clearAssetsLayoutTimer = () => {
+    if (this.assetsLayoutTimer) clearTimeout(this.assetsLayoutTimer)
+    this.assetsLayoutTimer = null
   }
 
   scrollToSelection = () => {
