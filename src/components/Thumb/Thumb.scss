@@ -6,101 +6,106 @@
 
   position: absolute;
 
-  .time-badge {
-    position: absolute;
-    right: 4px;
-    bottom: 4px;
-    color: $zorroa-greyish-brown;
-    background: none;
+  @include fullWidth;
+  @include fullHeight;
+}
 
-    @include flexRow;
-    @include flexAlignItemsCenter;
+.Thumb-time-badge {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  color: $zorroa-greyish-brown;
+  background: none;
 
-    .duration {
-      padding: 2px;
-      line-height: 2em;
-      height: 28px;
-      background-color: rgba(256,256,256, 0.75);
+  @include flexRow;
+  @include flexAlignItemsCenter;
 
-      &.small {
-        height: 14px;
-        font-size: 10px;
-        line-height: 1.25em;
-      }
-    }
+}
 
-    .play-badge {
-      padding: 4px;
-      margin: 1px;
-      background-color: rgba(256,256,256, 0.75);
-      width: 28px;
-      height: 28px;
+.Thumb-duration {
+  padding: 2px;
+  line-height: 2em;
+  height: 28px;
+  background-color: rgba(256,256,256, 0.75);
 
-      &.small {
-        width: 14PX;
-        height: 14px;
-      }
+  &.small {
+    height: 14px;
+    font-size: 10px;
+    line-height: 1.25em;
+  }
+}
 
-      @include flexRow;
-      @include flexAlignItemsCenter;
-      @include flexJustifyCenter;
+.Thumb-play-badge {
+  padding: 4px;
+  margin: 1px;
+  background-color: rgba(256,256,256, 0.75);
+  width: 28px;
+  height: 28px;
 
-      @media (max-width: 56px) { visibility: hidden }
-
-      .arrow-right {
-        width: 0;
-        height: 0;
-        border-top: 8px solid transparent;
-        border-bottom: 8px solid transparent;
-        border-left: 12px solid $zorroa-greyish-brown;
-
-        &.small {
-          border-top: 4px solid transparent;
-          border-bottom: 4px solid transparent;
-          border-left: 6px solid $zorroa-greyish-brown;
-        }
-      }
-    }
+  &.small {
+    width: 14PX;
+    height: 14px;
   }
 
-  .Thumb-selection {
-    @include fullWidth;
-    @include fullHeight;
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include flexJustifyCenter;
 
-    opacity: 0;
+  @media (max-width: 56px) { visibility: hidden }
+}
 
-    &.isSelected {
-      opacity: 1;
-    }
+.Thumb-arrow-right {
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 12px solid $zorroa-greyish-brown;
 
-    &:hover {
-      opacity: 1;
-    }
+  &.small {
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-left: 6px solid $zorroa-greyish-brown;
+  }
+}
+
+.Thumb-selection {
+  @include fullWidth;
+  @include fullHeight;
+
+  opacity: 0;
+
+  .Thumb.isSelected & {
+    opacity: 1;
   }
 
-  .Thumb-selection-overlay {
-    @include fullWidth;
-    @include fullHeight;
+  &:hover {
+    opacity: 1;
+  }
+}
 
-    &.isSelected {
-      background-color: black;
-    }
+.Thumb-selection-overlay {
+  @include fullWidth;
+  @include fullHeight;
 
-    opacity: 0.5;
+  .Thumb.isSelected & {
+    background-color: black;
   }
 
-  .Thumb-selection-check {
-    position: absolute;
-    top: 0;
-    left: 0;
-    font-size: 16px;
-    color: $zorroa-gray;
-    margin: -1px;         // Avoid white outline
-    padding: 3px;
-    &.isSelected {
-      color: white;
-      background-color: $zorroa-sickly-green;
-    }
+  opacity: 0.5;
+}
+
+.Thumb-selection-check {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 16px;
+  color: $zorroa-gray;
+  margin: -1px;         // Avoid white outline
+  padding: 3px;
+
+  .Thumb.isSelected & {
+    color: white;
+    background-color: $zorroa-sickly-green;
   }
 }
 
@@ -110,70 +115,76 @@
   &.isSelected {
     outline: 3px solid $zorroa-sickly-green;
   }
+}
 
-  .stack-front {
-    position: absolute;
-    top: 0;
-    left: 0;
-    border: solid 1px $zorroa-lightgray;
+.Thumb-multipage-badge {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
 
-    .multipage-badge {
-      position: absolute;
-      right: 4px;
-      bottom: 4px;
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @media screen and (max-width: 56px) { hidden: true; }
 
-      @include flexRow;
-      @include flexAlignItemsCenter;
-      @media screen and (max-width: 56px) { hidden: true; }
+  .icon {
+    width: 30px;
+    height: 30px;
 
-      .icon {
-        width: 30px;
-        height: 30px;
+    &.small {
+      width: 15px;
+      height: 15px;
+    }
 
-        &.small {
-          width: 15px;
-          height: 15px;
-        }
-
-        img {
-          width: 100%;
-          height: 100%;
-        }
-      }
-
-      .pages {
-        color: $zorroa-greyish-brown;
-        background-color: rgba(256, 256, 256, 0.75);
-        padding: 2px;
-        line-height: 2em;
-        height: 28px;
-
-        &.small {
-          font-size: 10px;
-          height: 16px;
-          line-height: 1.5em;
-        }
-      }
+    img {
+      width: 100%;
+      height: 100%;
     }
   }
+}
 
-  .stack-middle {
-    width: 90%;
-    height: 90%;
-    position: absolute;
-    right: 5%;
-    bottom: 5%;
-    background-color: white;
-    border: solid 1px $zorroa-lightgray;
-  }
+.Thumb-pages {
+  color: $zorroa-greyish-brown;
+  background-color: rgba(256, 256, 256, 0.75);
+  padding: 2px;
+  line-height: 2em;
+  height: 28px;
 
-  .stack-back {
-    width: 90%;
-    height: 90%;
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    background-color: white;
-    border: solid 1px $zorroa-lightgray;
+  &.small {
+    font-size: 10px;
+    height: 16px;
+    line-height: 1.5em;
   }
+}
+
+.Thumb-stack {
+  position: absolute;
+  width: 82%;
+  height: 82%;
+  box-shadow: 1px 0 3px 0 $zorroa-gray;
+}
+
+.Thumb-stack-0 {
+  left: 5%;
+  bottom: 5%;
+}
+
+.Thumb-stack-1 {
+  left: 7%;
+  bottom: 7%;
+  transform: rotate(4deg);
+}
+
+.Thumb-stack-2 {
+  left: 9%;
+  bottom: 9%;
+  transform: rotate(8deg);
+}
+
+.Thumb-inset {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 25%;
+  height: 25%;
+  border: 2px solid $zorroa-lightgray;
 }

@@ -72,6 +72,27 @@ export function isolateSelectId (id, selectedIds) {
   return new Set([id])
 }
 
+// Add all sibling assets in allAssets to assetIds.
+// WARNING: requires multiple passes over allAssets.
+export function addSiblings (assetIds, allAssets) {
+  const parentIds = new Set()
+  assetIds.forEach(id => {
+    const index = allAssets.findIndex(asset => (asset.id === id))
+    const parentId = allAssets[index].parentId()
+    if (parentId) parentIds.add(parentId)
+  })
+  allAssets.forEach(asset => {
+    const parentId = asset.parentId()
+    if (parentId && parentIds.has(parentId)) assetIds.add(asset.id)
+  })
+}
+
+export function equalSets (as, bs) {
+  if (as.size !== bs.size) return false
+  for (var a of as) if (!bs.has(a)) return false
+  return true
+}
+
 /* ----------------------------------------------------------------------
 Execute a sequence of promises, with a max limit
 on the number of promises in flight at once.
@@ -120,4 +141,3 @@ export function makePromiseQueue (data, mkPromiseFn, optQueueSize, optProgressFn
     for (var i = 0; i < optQueueSize; i++) start(i)
   })
 }
-

@@ -12,7 +12,7 @@ import { isolateAssetId, selectAssetIds } from '../../actions/assetsAction'
 import { resetRacetrackWidgets } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
-import { setThumbSize, setThumbLayout, showTable, setTableHeight } from '../../actions/appActions'
+import { setThumbSize, setThumbLayout, showTable, setTableHeight, showMultipage } from '../../actions/appActions'
 import Pager from './Pager'
 import Footer from './Footer'
 import Table from '../Table'
@@ -20,6 +20,7 @@ import Editbar from './Editbar'
 import * as ComputeLayout from './ComputeLayout.js'
 import AssetSearch from '../../models/AssetSearch'
 import Resizer from '../../services/Resizer'
+import { addSiblings, equalSets } from '../../services/jsUtil'
 import * as api from '../../globals/api.js'
 
 const assetsScrollPadding = 8
@@ -37,6 +38,7 @@ class Assets extends Component {
     layout: PropTypes.string.isRequired,
     showTable: PropTypes.bool.isRequired,
     tableHeight: PropTypes.number.isRequired,
+    showMultipage: PropTypes.bool.isRequired,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object
@@ -61,7 +63,9 @@ class Assets extends Component {
       assetsScrollHeight: 0,
       assetsScrollWidth: 0,
       tableIsResizing: false,
-      positions: []
+      positions: [],
+      multipage: {},
+      collapsed: 0
     }
 
     this.newTableHeight = 0
@@ -79,7 +83,7 @@ class Assets extends Component {
   // toggle entries. We keep the anchor point for shift-select
   // in local state and must update it when the search changes.
   select = (asset, event) => {
-    const { assets, selectedIds, actions } = this.props
+    const { assets, selectedIds, showMultipage, actions } = this.props
     const { lastSelectedId } = this.state
     let ids
     if (event.shiftKey) {
@@ -96,32 +100,41 @@ class Assets extends Component {
             for (var i = min; i <= max; ++i) {
               ids.add(assets[i].id)
             }
+            if (showMultipage) {
+              addSiblings(ids, assets)
+            }
           }
         }
       }
       if (!ids) {
         // Nothing in the extended selection set, treat as new selection
         ids = new Set([asset.id])
+        if (showMultipage) addSiblings(ids, assets)
         this.setState({...this.state, lastSelectedId: asset.id})
       }
     } else if (event.metaKey) {
       // Toggle the current asset on or off
       ids = new Set([...selectedIds])
-      if (ids.has(asset.id)) {
-        ids.delete(asset.id)
-      } else {
-        ids.add(asset.id)
-      }
+      const siblings = new Set([asset.id])
+      if (showMultipage) addSiblings(siblings, assets)
+      siblings.forEach(id => {
+        if (ids.has(id)) {
+          ids.delete(id)
+        } else {
+          ids.add(id)
+        }
+      })
       const lastSelectedId = ids.length ? asset.id : null
       this.setState({...this.state, lastSelectedId})
     } else {
-      if (selectedIds && selectedIds.size === 1 && selectedIds.has(asset.id)) {
+      ids = new Set([asset.id])
+      if (showMultipage) addSiblings(ids, assets)
+      if (selectedIds && equalSets(ids, selectedIds)) {
         // single click of a single selected asset should deselect
         ids = new Set()
         this.setState({...this.state, lastSelectedId: null})
       } else {
         // Select the single asset and use it as the anchor point
-        ids = new Set([asset.id])
         this.setState({...this.state, lastSelectedId: asset.id})
       }
     }
@@ -145,10 +158,24 @@ class Assets extends Component {
     this.context.router.push('/lightbox')
   }
 
-  toggleShowTable () {
+  toggleShowTable = () => {
     const { showTable, user, userSettings, actions } = this.props
     actions.showTable(!showTable)
     actions.saveUserSettings(user, { ...userSettings, showTable: !showTable })
+  }
+
+  toggleShowMultipage = () => {
+    const { showMultipage, user, userSettings, actions } = this.props
+    actions.showMultipage(!showMultipage)
+    actions.saveUserSettings(user, { ...userSettings, showMultipage: !showMultipage })
+    this.queueAssetsLayout()
+  }
+
+  uncollapse = () => {
+    const { user, userSettings, actions } = this.props
+    actions.showMultipage(false)
+    actions.saveUserSettings(user, { ...userSettings, showMultipage: false })
+    this.queueAssetsLayout()
   }
 
   changeLayout (layout) {
@@ -235,23 +262,23 @@ class Assets extends Component {
     const width = this.state.assetsScrollWidth - 2 * assetsScrollPadding
     if (!width) return
 
-    const { assets, layout, thumbSize } = this.props
+    const { assets, layout, thumbSize, showMultipage } = this.props
     if (!assets) return
 
     const assetSizes = assets.map(asset => {
-      return asset.proxies
-        ? asset.proxies[0]
-        : { width: asset.width() || 1, height: asset.height() || 1 }
+      const width = asset.width() || (asset.proxies && asset.proxies[0].width) || 1
+      const height = asset.height() || (asset.proxies && asset.proxies[0].height) || 1
+      return { width, height, parentId: asset.parentId() }
     })
 
-    var positions = (_ => {
+    var { positions, multipage, collapsed } = (_ => {
       switch (layout) {
-        case 'grid': return ComputeLayout.grid(assetSizes, width, thumbSize)
-        case 'masonry': return ComputeLayout.masonry(assetSizes, width, thumbSize)
+        case 'grid': return ComputeLayout.grid(assetSizes, width, thumbSize, showMultipage)
+        case 'masonry': return ComputeLayout.masonry(assetSizes, width, thumbSize, showMultipage)
       }
     })()
 
-    this.setState({ positions })
+    this.setState({ positions, multipage, collapsed })
 
     this.clearAssetsLayoutTimer()
 
@@ -335,7 +362,7 @@ class Assets extends Component {
 
   renderAssets () {
     const { assets, selectedIds, totalCount, layout } = this.props
-    const { positions, tableIsResizing } = this.state
+    const { positions, multipage, collapsed, tableIsResizing } = this.state
     api.setTableIsResizing(tableIsResizing)
 
     if (!assets || !assets.length) {
@@ -394,11 +421,14 @@ class Assets extends Component {
                       (assetsScrollPadding + pos.y + pos.height < this.state.assetsScrollTop)) {
                     return null
                   }
+                  const parentId = asset.parentId()
+                  const indexes = parentId && multipage[parentId]
+                  const pages = indexes && indexes.map(index => (assets[index])) || [asset]
                   return (
                     <Thumb isSelected={selectedIds && selectedIds.has(asset.id)}
                       dim={positions[index]}
                       key={asset.id}
-                      asset={asset}
+                      assets={pages}
                       onClick={event => {
                         // don't scroll assets when we select thumbs. (table selection will scroll)
                         this.skipNextSelectionScroll = true
@@ -410,6 +440,8 @@ class Assets extends Component {
                 })}
                 <Pager total={totalCount}
                        loaded={assets.length}
+                       collapsed={collapsed}
+                       onUncollapse={this.uncollapse}
                        top={layoutHeight + 12 /* 12 px padding */ }
                        />
               </div>
@@ -421,8 +453,8 @@ class Assets extends Component {
   }
 
   render () {
-    const { assets, totalCount, tableHeight, showTable, layout, thumbSize, assetsCounter } = this.props
-    const { tableIsResizing } = this.state
+    const { assets, totalCount, tableHeight, showTable, showMultipage, layout, thumbSize, assetsCounter } = this.props
+    const { collapsed, tableIsResizing } = this.state
 
     // Trigger layout if assets change.
     if (assetsCounter !== this.assetsCounter) this.queueAssetsLayout()
@@ -453,9 +485,13 @@ class Assets extends Component {
         { totalCount > 0 &&
         <Footer
           total={totalCount}
+          collapsed={collapsed}
           loaded={assets.length}
+          onUncollapse={this.uncollapse}
+          showMultipage={showMultipage}
+          toggleShowMultipage={this.toggleShowMultipage}
           showTable={showTable}
-          toggleShowTable={this.toggleShowTable.bind(this)}
+          toggleShowTable={this.toggleShowTable}
           layout={layout}
           handleLayout={this.changeLayout.bind(this)}
           thumbSize={thumbSize}
@@ -478,7 +514,8 @@ export default connect(state => ({
   thumbSize: state.app.thumbSize,
   layout: state.app.thumbLayout,
   showTable: state.app.showTable,
-  tableHeight: state.app.tableHeight
+  tableHeight: state.app.tableHeight,
+  showMultipage: state.app.showMultipage
 }), dispatch => ({
   actions: bindActionCreators({
     isolateAssetId,
@@ -489,6 +526,7 @@ export default connect(state => ({
     setThumbLayout,
     showTable,
     setTableHeight,
+    showMultipage,
     saveUserSettings
   }, dispatch)
 }))(Assets)
