@@ -5,7 +5,6 @@ import { Link } from 'react-router'
 
 import Job from '../../models/Job'
 import User from '../../models/User'
-import AssetSearch from '../../models/AssetSearch'
 import JobMenu from './JobMenu'
 import Logo from '../../components/Logo'
 import Searchbar from '../../components/Searchbar'
@@ -16,7 +15,6 @@ import { showModal } from '../../actions/appActions'
 class Header extends Component {
   static propTypes = {
     user: PropTypes.instanceOf(User).isRequired,
-    query: PropTypes.instanceOf(AssetSearch),
     actions: PropTypes.object.isRequired
   }
 
@@ -64,10 +62,7 @@ class Header extends Component {
 }
 
 export default connect(state => ({
-  user: state.auth.user,
-  selectedAssetIds: state.assets && state.assets.selectedIds,
-  totalCount: state.assets && state.assets.totalCount,
-  query: state.assets && state.assets.query
+  user: state.auth.user
 }), dispatch => ({
   actions: bindActionCreators({ showModal }, dispatch)
 }))(Header)

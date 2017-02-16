@@ -7,7 +7,6 @@ import { connect } from 'react-redux'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
 import Folder from '../../models/Folder'
-import Permission from '../../models/Permission'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import CreateExport from './CreateExport'
@@ -77,7 +76,6 @@ class FolderItem extends Component {
     counts: PropTypes.instanceOf(Map),
     filteredCounts: PropTypes.instanceOf(Map),
     user: PropTypes.instanceOf(User),
-    permissions: PropTypes.arrayOf(PropTypes.instanceOf(Permission)),
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     tableFields: PropTypes.arrayOf(PropTypes.string),
     actions: PropTypes.object
@@ -346,13 +344,11 @@ class FolderItem extends Component {
 
 export default connect(state => ({
   assets: state.assets.all,
-  selectedAssetIds: state.assets.selectedIds,
   folders: state.folders.all,
   counts: state.folders.counts,
   filteredCounts: state.folders.filteredCounts,
   selectedFolderIds: state.folders.selectedFolderIds,
   user: state.auth.user,
-  permissions: state.permissions.all,
   dragInfo: state.app.dragInfo,
   tableFields: state.app.tableFields
 }), dispatch => ({
