@@ -10,7 +10,9 @@ import { searchAssets, setPageSize } from '../../actions/assetsAction'
 class Pager extends Component {
   static propTypes = {
     loaded: PropTypes.number.isRequired,
+    collapsed: PropTypes.number.isRequired,
     total: PropTypes.number.isRequired,
+    onUncollapse: PropTypes.func.isRequired,
     pageSize: PropTypes.number.isRequired,
     actions: PropTypes.object.isRequired,
     top: PropTypes.number.isRequired,
@@ -31,7 +33,7 @@ class Pager extends Component {
   }
 
   render () {
-    const { loaded, total, pageSize } = this.props
+    const { loaded, collapsed, total, pageSize, onUncollapse } = this.props
     if (loaded >= total) return <div className="Pager-hidden" style={{top: this.props.top + 'px'}}/>
     const stdPageSizes = [ 100, 1000, 10000 ]
     if (total - loaded <= AssetSearch.maxPageSize) {
@@ -41,7 +43,9 @@ class Pager extends Component {
     return (
       <div className="Pager flexRowCenter" style={{top: this.props.top + 'px'}}>
         <div className="Pager-showing-page">
-          <span className='Pager-showing'></span><AssetCounter loaded={loaded} total={total} />
+          <span className='Pager-showing'></span>
+          <AssetCounter loaded={loaded} collapsed={collapsed} total={total}
+                        onUncollapse={onUncollapse} />
         </div>
 
         <div className="flexOn"/>

@@ -160,26 +160,24 @@
   position: absolute;
   width: 82%;
   height: 82%;
+  box-shadow: 1px 0 3px 0 $zorroa-gray;
 }
 
 .Thumb-stack-0 {
   left: 5%;
   bottom: 5%;
-  border: 2px solid rgba(128,128,128,0.75);
 }
 
 .Thumb-stack-1 {
   left: 7%;
   bottom: 7%;
   transform: rotate(4deg);
-  border: 2px solid rgba(128,128,128,0.75);
 }
 
 .Thumb-stack-2 {
   left: 9%;
   bottom: 9%;
   transform: rotate(8deg);
-  border: 2px solid rgba(128,128,128,0.75);
 }
 
 .Thumb-inset {
@@ -188,5 +186,5 @@
   bottom: 0;
   width: 25%;
   height: 25%;
-  border: 2px solid rgba(128,128,128,0.75);
+  border: 2px solid $zorroa-lightgray;
 }

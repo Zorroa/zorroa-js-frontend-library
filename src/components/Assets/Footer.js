@@ -9,7 +9,8 @@ import MultipageToggle from './MultipageToggle'
 const Footer = (props) => (
   <div className="assets-footer flexOff flexRow flexJustifySpaceBetween flexAlignItemsCenter">
     <div className="flexRow">
-      <AssetCounter loaded={props.loaded} total={props.total}/>
+      <AssetCounter loaded={props.loaded} collapsed={props.collapsed}
+                    total={props.total} onUncollapse={props.onUncollapse}/>
     </div>
     <div className="flexRow flexJustifyEnd flexAlignItemsCenter">
       <ThumbSizeSlider value={props.thumbSize} onChange={props.handleThumbSize} />
@@ -22,7 +23,9 @@ const Footer = (props) => (
 
 Footer.propTypes = {
   loaded: PropTypes.number.isRequired,
+  collapsed: PropTypes.number.isRequired,
   total: PropTypes.number.isRequired,
+  onUncollapse: PropTypes.func.isRequired,
   showTable: PropTypes.bool.isRequired,
   toggleShowTable: PropTypes.func.isRequired,
   layout: PropTypes.string.isRequired,

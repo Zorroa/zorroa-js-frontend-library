@@ -63,7 +63,8 @@ class Assets extends Component {
       assetsScrollWidth: 0,
       tableIsResizing: false,
       positions: [],
-      multipage: {}
+      multipage: {},
+      collapsed: 0
     }
 
     this.newTableHeight = 0
@@ -160,6 +161,13 @@ class Assets extends Component {
     this.queueAssetsLayout()
   }
 
+  uncollapse = () => {
+    const { user, userSettings, actions } = this.props
+    actions.showMultipage(false)
+    actions.saveUserSettings(user, { ...userSettings, showMultipage: false })
+    this.queueAssetsLayout()
+  }
+
   changeLayout (layout) {
     if (this.props.layout !== layout) {
       this.props.actions.setThumbLayout(layout)
@@ -253,14 +261,14 @@ class Assets extends Component {
         : { width: asset.width() || 1, height: asset.height() || 1, parentId: asset.parentId() }
     })
 
-    var { positions, multipage } = (_ => {
+    var { positions, multipage, collapsed } = (_ => {
       switch (layout) {
         case 'grid': return ComputeLayout.grid(assetSizes, width, thumbSize, showMultipage)
         case 'masonry': return ComputeLayout.masonry(assetSizes, width, thumbSize, showMultipage)
       }
     })()
 
-    this.setState({ positions, multipage })
+    this.setState({ positions, multipage, collapsed })
 
     this.clearAssetsLayoutTimer()
 
@@ -344,7 +352,7 @@ class Assets extends Component {
 
   renderAssets () {
     const { assets, selectedIds, totalCount, layout } = this.props
-    const { positions, multipage, tableIsResizing } = this.state
+    const { positions, multipage, collapsed, tableIsResizing } = this.state
     api.setTableIsResizing(tableIsResizing)
 
     if (!assets || !assets.length) {
@@ -421,6 +429,8 @@ class Assets extends Component {
                 })}
                 <Pager total={totalCount}
                        loaded={assets.length}
+                       collapsed={collapsed}
+                       onUncollapse={this.uncollapse}
                        top={layoutHeight + 12 /* 12 px padding */ }
                        />
               </div>
@@ -433,7 +443,7 @@ class Assets extends Component {
 
   render () {
     const { assets, totalCount, tableHeight, showTable, showMultipage, layout, thumbSize, assetsCounter } = this.props
-    const { tableIsResizing } = this.state
+    const { collapsed, tableIsResizing } = this.state
 
     // Trigger layout if assets change.
     if (assetsCounter !== this.assetsCounter) this.queueAssetsLayout()
@@ -464,7 +474,9 @@ class Assets extends Component {
         { totalCount > 0 &&
         <Footer
           total={totalCount}
+          collapsed={collapsed}
           loaded={assets.length}
+          onUncollapse={this.uncollapse}
           showMultipage={showMultipage}
           toggleShowMultipage={this.toggleShowMultipage}
           showTable={showTable}

@@ -17,6 +17,7 @@ export function masonry (assets, panelWidth, thumbSize, showMultipage) {
   let rowEmptys = [0]
   let aspects = []
   let multipage = {}
+  let collapsed = 0
 
   // Make a list of rows
   // Shove thumbs into rows as long as they'll fit.
@@ -32,6 +33,7 @@ export function masonry (assets, panelWidth, thumbSize, showMultipage) {
           multipage[parentId] = [asset]
         } else {
           collapse = true
+          ++collapsed
           if (pages && pages.length < 3) {
             multipage[parentId] = [...pages, asset]
           }
@@ -85,7 +87,7 @@ export function masonry (assets, panelWidth, thumbSize, showMultipage) {
     curY += rowHeight + margin
   }
 
-  return { positions, multipage }
+  return { positions, multipage, collapsed }
 }
 
 /* ----------------------------------------------------------------------
@@ -105,6 +107,8 @@ export function grid (assets, panelWidth, thumbSize, showMultipage) {
   var j = 0
   let positions = []
   let multipage = {}
+  let collapsed = 0
+
   for (var i = 0; i < assets.length; i++) {
     const asset = assets[i]
     if (showMultipage) {
@@ -114,6 +118,7 @@ export function grid (assets, panelWidth, thumbSize, showMultipage) {
         if (!pages) {
           multipage[parentId] = [asset]
         } else {
+          ++collapsed
           if (pages && pages.length < 3) {
             multipage[parentId] = [...pages, asset]
           }
@@ -137,5 +142,5 @@ export function grid (assets, panelWidth, thumbSize, showMultipage) {
     })
   }
 
-  return { positions, multipage }
+  return { positions, multipage, collapsed }
 }
