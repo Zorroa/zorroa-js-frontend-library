@@ -1,12 +1,23 @@
 
 /* ----------------------------------------------------------------------
-Given the asset list, asset panel width, and suggested thumbnail size,
-Compute the positions & size of each thumbnail for a masonry layout
+ Given the asset list, asset panel width, and suggested thumbnail size,
+ Compute the positions & size of each thumbnail for a a given layout.
 
-The return value is an array that matches the input array <assets> 1:1
-Each entry in the output array is an object with the following keys: x, y, width, height
-The values are in css pixel units
+ Inputs:
+ assets        - Array of { width, height, parentId } matching external asset array
+ panelWidth    - Width in CSS pixels of desired display width
+ thumbSize     - Target size of thumbnail
+ showMultipage - True if results should be collapsed into multipage docs
+
+ The return value is an object that contains { position, multipage, collapsed }:
+ position      - Array that matches the input array <assets> 1:1 where each
+                 entry in the output array is an object with the following
+                 values in css pixel units: { x, y, width, height }
+ multipage     - Object indexed by parentId containing the indices in <assets>
+                 for the first 3 sibling assets.
+ collapsed     - Total number of assets collapsed into multipage docs
 */
+
 export function masonry (assets, panelWidth, thumbSize, showMultipage) {
   let idealAspectSum = panelWidth / thumbSize
   const proposedRowHeight = panelWidth / idealAspectSum
@@ -32,12 +43,12 @@ export function masonry (assets, panelWidth, thumbSize, showMultipage) {
       if (parentId) {
         const pages = multipage[parentId]
         if (!pages) {
-          multipage[parentId] = [asset]
+          multipage[parentId] = [i]
         } else {
           collapse = true
           ++collapsed
           if (pages && pages.length < 3) {
-            multipage[parentId] = [...pages, asset]
+            multipage[parentId] = [...pages, i]
           }
         }
       }
@@ -92,14 +103,6 @@ export function masonry (assets, panelWidth, thumbSize, showMultipage) {
   return { positions, multipage, collapsed }
 }
 
-/* ----------------------------------------------------------------------
-Given the asset list, asset panel width, and suggested thumbnail size,
-Compute the positions & size of each thumbnail for a grid layout
-
-The return value is an array that matches the input array <assets> 1:1
-Each entry in the output array is an object with the following keys: x, y, width, height
-The values are in css pixel units
-*/
 export function grid (assets, panelWidth, thumbSize, showMultipage) {
   const numColumns = Math.floor(panelWidth / thumbSize)
   const numMargins = numColumns - 1
@@ -113,16 +116,16 @@ export function grid (assets, panelWidth, thumbSize, showMultipage) {
 
   for (var i = 0; i < assets.length; i++) {
     const asset = assets[i]
+    const { parentId } = asset
     if (showMultipage) {
-      const parentId = asset.parentId()
       if (parentId) {
         const pages = multipage[parentId]
         if (!pages) {
-          multipage[parentId] = [asset]
+          multipage[parentId] = [i]
         } else {
           ++collapsed
           if (pages && pages.length < 3) {
-            multipage[parentId] = [...pages, asset]
+            multipage[parentId] = [...pages, i]
           }
           // Zero width, but valid y & height for Pager
           const y = positions[positions.length - 1].y

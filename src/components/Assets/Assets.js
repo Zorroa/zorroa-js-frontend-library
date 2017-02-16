@@ -266,9 +266,9 @@ class Assets extends Component {
     if (!assets) return
 
     const assetSizes = assets.map(asset => {
-      return asset.proxies
-        ? asset.proxies[0]
-        : { width: asset.width() || 1, height: asset.height() || 1, parentId: asset.parentId() }
+      const width = asset.width() || (asset.proxies && asset.proxies[0].width) || 1
+      const height = asset.height() || (asset.proxies && asset.proxies[0].height) || 1
+      return { width, height, parentId: asset.parentId() }
     })
 
     var { positions, multipage, collapsed } = (_ => {
@@ -422,12 +422,13 @@ class Assets extends Component {
                     return null
                   }
                   const parentId = asset.parentId()
-                  const assets = parentId && multipage[parentId] || [asset]
+                  const indexes = parentId && multipage[parentId]
+                  const pages = indexes && indexes.map(index => (assets[index])) || [asset]
                   return (
                     <Thumb isSelected={selectedIds && selectedIds.has(asset.id)}
                       dim={positions[index]}
                       key={asset.id}
-                      assets={assets}
+                      assets={pages}
                       onClick={event => {
                         // don't scroll assets when we select thumbs. (table selection will scroll)
                         this.skipNextSelectionScroll = true
