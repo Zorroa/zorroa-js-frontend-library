@@ -24,7 +24,8 @@ class Signin extends Component {
   handleFormSubmit ({ username, password, ssl, host }) {
     const protocol = ssl ? 'https:' : 'http:'
     // strip the protocol & port if this is copy/pasted
-    const bareHost = host.replace(/http.?:\/\//, '').replace(/:8066.*/, '')
+    let bareHost
+    if (host) bareHost = host.replace(/http.?:\/\//, '').replace(/:8066.*/, '')
     this.props.signinUser({ username, password, protocol, host: bareHost })
     // this is only to force a re-render
     this.setState({submitTime: Date.now()})
