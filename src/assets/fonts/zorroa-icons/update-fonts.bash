@@ -23,7 +23,7 @@ git checkout zorroa-icons
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
 
-# Download zorroa-icons.zip
+# Download zorroa-icons.zip. This URL is also in preview-fonts.bash
 curl -L 'https://docs.google.com/uc?export=download&id=0B2crMLkmt3O9TU9BWm4xeUlLQVU' > zorroa-icons.zip
 
 # unpack the downloaded file in place, with overwrite
