@@ -34,7 +34,6 @@ export default class Pdf extends Component {
       scale: 1,
       disableZoomOut: false,
       multipage: false,
-      width: 0,
       positions: [],
       multipageScrollHeight: 0,
       multipageScrollWidth: 0
@@ -256,7 +255,7 @@ export default class Pdf extends Component {
     Promise.all(pageNums.map(pageNum => pdf.getPage(pageNum)))
     .then(pages => {
       const viewports = pages.map(page => page.getViewport(1))
-      var positions = ComputeLayout.masonry(viewports, width, thumbSize)
+      var { positions } = ComputeLayout.masonry(viewports, width, thumbSize)
       this.setState({ positions })
       this.clearMultipageLayoutTimer()
     })
