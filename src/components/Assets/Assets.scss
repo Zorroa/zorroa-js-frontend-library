@@ -144,7 +144,7 @@
   font-size: 20px;
   cursor: pointer;
 
-  transform: scaleX(-1);
+  transform: scaleX(-1) rotate(90deg);
 
   &:hover { background-color: $zorroa-lightgray; }
 
