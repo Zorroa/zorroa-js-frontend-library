@@ -1,16 +1,47 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { DragSource } from '../../services/DragDrop'
-import { addSiblings } from '../../services/jsUtil'
 import Asset from '../../models/Asset'
 import classnames from 'classnames'
 
-import { formatDuration, parseFormattedFloat, isolateSelectId } from '../../services/jsUtil'
+import {
+  addSiblings,
+  formatDuration,
+  parseFormattedFloat,
+  isolateSelectId } from '../../services/jsUtil'
 
+// Extract thumb page info from an asset
+export function page (asset, width, height, protocol, host) {
+  const proxy = asset.closestProxy(width, height)
+  const url = proxy ? proxy.url(protocol, host) : ''
+  const tproxy = asset.tinyProxy()
+  const backgroundColor = tproxy ? tproxy[4] : '#888'
+  return { url, backgroundColor }
+}
+
+// Extract badging info from an asset.
+export function badges (asset, protocol, host) {
+  const mediaType = asset.mediaType().toLowerCase()
+  let pageBadge, duration, iconBadge
+
+  if (mediaType.startsWith('image') && asset.value('image.subimages')) {
+    pageBadge = asset.value('image.subimages')
+  } else if (mediaType.includes('video') || mediaType.includes('sequence')) {
+    duration = asset.duration()
+  } else if (mediaType === 'application/pdf' || asset.value('document.pages')) {
+    iconBadge = require('./pdf-icon.png')
+    pageBadge = asset.value('document.pages')
+  }
+
+  const parentURL = asset.parentProxyURL(protocol, host)
+  return { pageBadge, iconBadge, duration, parentURL }
+}
+
+// Called when dragging an asset to assign assetIds to drop info
 const source = {
   dragStart (props, type, se) {
-    const { assets, selectedAssetIds, allAssets, showMultipage } = props
-    let assetIds = isolateSelectId(assets[0].id, selectedAssetIds)
+    const { assetId, selectedAssetIds, allAssets, showMultipage } = props
+    let assetIds = isolateSelectId(assetId, selectedAssetIds)
     if (showMultipage) {
       assetIds = new Set(assetIds)      // Don't change app state
       addSiblings(assetIds, allAssets)  // Modifies assetIds
@@ -19,6 +50,7 @@ const source = {
   }
 }
 
+// Internal component to render an image div with children (badges)
 const ImageThumb = (props) => {
   const { url, backgroundColor, children } = props
   const style = {
@@ -42,46 +74,48 @@ ImageThumb.propTypes = {
 @DragSource('ASSET', source)
 class Thumb extends Component {
   static propTypes = {
-    assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)).isRequired,
-    protocol: PropTypes.string,
-    host: PropTypes.string,
+    // Rendering properties
     dim: PropTypes.object.isRequired,
+    pages: PropTypes.arrayOf(PropTypes.shape({
+      url: React.PropTypes.string,
+      backgroundColor: React.PropTypes.string
+    })).isRequired,
+
+    // Rendering options
+    parentURL: PropTypes.string,
+    pageBadge: PropTypes.string,
+    iconBadge: PropTypes.element,
+    duration: PropTypes.number,
     isSelected: PropTypes.bool,
-    showMultipage: PropTypes.bool,
-    allAssets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
-    selectedAssetIds: PropTypes.instanceOf(Set),
+
+    // Actions
     onClick: PropTypes.func.isRequired,
     onDoubleClick: PropTypes.func.isRequired,
-    dragparams: PropTypes.object
+
+    // Dragging properties
+    assetId: PropTypes.string,
+    dragparams: PropTypes.object,
+
+    // Dragging properties from app state
+    allAssets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+    showMultipage: PropTypes.bool,
+    selectedAssetIds: PropTypes.instanceOf(Set)
   }
 
   renderBadges = () => {
-    const { assets } = this.props
+    const { pageBadge, duration, iconBadge } = this.props
     const { width, height } = this.props.dim
-    const asset = assets[0]
 
-    const mediaType = asset.mediaType().toLowerCase()
-    let pages, duration, icon
-
-    if (mediaType.startsWith('image') && asset.value('image.subimages')) {
-      pages = asset.value('image.subimages')
-    } else if (mediaType.includes('video') || mediaType.includes('sequence')) {
-      duration = asset.duration()
-    } else if (mediaType === 'application/pdf' || asset.value('document.pages')) {
-      icon = require('./pdf-icon.png')
-      pages = asset.value('document.pages')
-    }
-
-    const hideText = (!pages && !duration) || width < 50 || height < 50
+    const hideText = (!pageBadge && !duration) || width < 50 || height < 50
     const textStyle = hideText ? { display: 'none' } : {}
     const small = width < 80 || height < 80
 
-    if (pages || icon) {
+    if (pageBadge || iconBadge) {
       return (
         <div className="Thumb-multipage-badge">
-          <div className={classnames('icon', {small})}><img src={icon}/></div>
+          <div className={classnames('icon', {small})}><img src={iconBadge}/></div>
           <div style={textStyle} className={classnames('Thumb-pages', {small})}>
-            {pages}
+            {pageBadge}
           </div>
         </div>
       )
@@ -108,26 +142,15 @@ class Thumb extends Component {
     )
   }
 
-  thumb (asset) {
-    const { protocol, host } = this.props
-    const { width, height } = this.props.dim
-    const proxy = asset.closestProxy(width, height)
-    const url = proxy ? proxy.url(protocol, host) : ''
-    const tproxy = asset.tinyProxy()
-    const backgroundColor = tproxy ? tproxy[4] : '#888'
-    return { url, backgroundColor }
-  }
-
   render () {
-    const {assets, protocol, host, isSelected, onClick, onDoubleClick, dragparams} = this.props
+    const {pages, parentURL, isSelected, onClick, onDoubleClick, dragparams} = this.props
     const {width, height, x, y} = this.props.dim      // Original thumb rect
     if (!width || !height) return null
 
     const style = {width, height, left: x, top: y}    // Dim -> left, right
 
-    const parentURL = assets[0].parentProxyURL(protocol, host)
     if (!parentURL) {
-      const { url, backgroundColor } = this.thumb(assets[0])
+      const { url, backgroundColor } = pages[0]
       return (
         <div className={classnames('Thumb', {isSelected})} style={style}
              onClick={onClick} onDoubleClick={onDoubleClick} {...dragparams}>
@@ -142,11 +165,11 @@ class Thumb extends Component {
     return (
       <div className={classnames('Thumb', {isSelected})} style={style}
            onClick={onClick} onDoubleClick={onDoubleClick} {...dragparams}>
-        { assets.slice(0).reverse().map((asset, rindex) => {
-          const { url, backgroundColor } = this.thumb(asset)
-          const index = assets.length - rindex - 1
+        { pages.slice(0).reverse().map((page, rindex) => {
+          const { url, backgroundColor } = page
+          const index = pages.length - rindex - 1
           return (
-            <div key={`${asset.id}-${index}`}
+            <div key={`${url}-${index}`}
                  className={classnames('Thumb-stack', `Thumb-stack-${index}`)}>
               <ImageThumb url={url} backgroundColor={backgroundColor}/>
             </div>
@@ -163,8 +186,6 @@ class Thumb extends Component {
 }
 
 export default connect(state => ({
-  protocol: state.auth.protocol,
-  host: state.auth.host,
   showMultipage: state.app.showMultipage,
   allAssets: state.assets.all,
   selectedAssetIds: state.assets.selectedIds

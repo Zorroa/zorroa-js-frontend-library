@@ -23,7 +23,7 @@ const SortingSelector = (props) => (
 )
 
 SortingSelector.propTypes = {
-  order: PropTypes.arrayOf(PropTypes.object).isRequired,
+  order: PropTypes.arrayOf(PropTypes.object),
   sortAssets: PropTypes.func.isRequired
 }
 

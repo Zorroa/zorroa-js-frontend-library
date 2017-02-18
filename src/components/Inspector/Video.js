@@ -123,7 +123,7 @@ class Video extends Component {
     return (
       <div className='Video'>
         <div className="Video-pan-zoom">
-          <PanZoom>
+          <PanZoom showControls={false}>
             <ReactPlayer
               ref={player => { this.player = player }}
               className='Video-player'

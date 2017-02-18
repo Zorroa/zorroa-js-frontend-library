@@ -11,11 +11,12 @@ class Inspector extends Component {
     asset: PropTypes.instanceOf(Asset),
     protocol: PropTypes.string,
     host: PropTypes.string,
-    thumbSize: PropTypes.number
+    thumbSize: PropTypes.number,
+    assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset))
   }
 
   render () {
-    const { asset, protocol, host, thumbSize } = this.props
+    const { asset, assets, protocol, host, thumbSize } = this.props
     const mediaType = asset.mediaType().toLowerCase()
     const url = asset.url(protocol, host)
     const imageFormats = [ 'jpeg', 'jpg', 'png', 'gif' ]
@@ -24,7 +25,9 @@ class Inspector extends Component {
 
     if (mediaType.startsWith('image') &&
       imageFormats.findIndex(format => (mediaType.endsWith(format))) >= 0) {
-      inspector = <Image url={url}/>
+      const parentId = asset.parentId()
+      const pages = parentId && assets.filter(a => (a.parentId() === parentId))
+      inspector = <Image url={url} assets={pages}/>
     } else if (mediaType.startsWith('video')) {
       inspector = <Video url={url} frames={asset.frames()} frameRate={asset.frameRate()}
                          startFrame={asset.startFrame()} stopFrame={asset.stopFrame()}/>
@@ -33,7 +36,8 @@ class Inspector extends Component {
                        documentInitParameters={{url, withCredentials: true}} />
     } else {
       const proxy = asset.biggestProxy()
-      inspector = <Image url={proxy.url(protocol, host)}/>
+      const pages = assets.filter(a => (a.parentId() === asset.parentId()))
+      inspector = <Image url={proxy.url(protocol, host)} assets={pages} />
       warning = <div>{proxy.width} x {proxy.height} proxy</div>
     }
 
@@ -51,5 +55,6 @@ class Inspector extends Component {
 export default connect(state => ({
   protocol: state.auth.protocol,
   host: state.auth.host,
-  thumbSize: state.app.thumbSize
+  thumbSize: state.app.thumbSize,
+  assets: state.assets.all
 }))(Inspector)

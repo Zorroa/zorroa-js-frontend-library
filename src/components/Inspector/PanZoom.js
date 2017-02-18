@@ -1,9 +1,17 @@
 import React, { Component, PropTypes } from 'react'
 import Measure from 'react-measure'
 
-export default class Image extends Component {
+import Controlbar from './Controlbar'
+
+export default class PanZoom extends Component {
   static propTypes = {
+    showControls: PropTypes.bool,
+    onMultipage: PropTypes.func,
     children: PropTypes.node.isRequired
+  }
+
+  static defaultProps = {
+    showControls: true
   }
 
   constructor (props) {
@@ -67,13 +75,13 @@ export default class Image extends Component {
   }
 
   static maxZoom = 4
-  static minZoom = 1 / Image.maxZoom
+  static minZoom = 1 / PanZoom.maxZoom
 
   zoom = (event) => {
     const { scale } = this.state
     const scalePct = 1 + Math.abs(event.deltaY) * 0.005
     const scaleMult = (event.deltaY > 0 ? scalePct : 1 / scalePct)
-    const zoomFactor = Math.min(Image.maxZoom, Math.max(Image.minZoom, scale * scaleMult))
+    const zoomFactor = Math.min(PanZoom.maxZoom, Math.max(PanZoom.minZoom, scale * scaleMult))
     this.panner.zoom(zoomFactor, {x: event.pageX, y: event.pageY})
     this.setStateToPanner()
     this.startMoving()
@@ -103,10 +111,11 @@ export default class Image extends Component {
   }
 
   render () {
+    const { showControls } = this.props
     const { moving } = this.state
     const epsilon = 0.01
-    const zoomOutDisabled = this.panner.scale <= Image.minZoom + epsilon
-    const zoomInDisabled = this.panner.scale >= Image.maxZoom - epsilon
+    const zoomOutDisabled = this.panner.scale <= PanZoom.minZoom + epsilon
+    const zoomInDisabled = this.panner.scale >= PanZoom.maxZoom - epsilon
     const zoomToFitDisabled = this.panner.scale > (1 - epsilon) && this.panner.scale < (1 + epsilon)
     const style = {}
     style['transform'] = `translate(${this.state.translate.x}px, ${this.state.translate.y}px) scale(${this.state.scale})`
@@ -122,11 +131,12 @@ export default class Image extends Component {
                    onMouseDown={this.startDrag} onWheel={this.zoom}>
                 { this.props.children }
               </div>
-              <div className="PanZoom-controls">
-                <button disabled={zoomOutDisabled} className="icon-zoom-out" onClick={this.zoomOut} />
-                <button disabled={zoomToFitDisabled} className="icon-expand3" onClick={this.zoomToFit} />
-                <button disabled={zoomInDisabled} className="icon-zoom-in" onClick={this.zoomIn} />
-              </div>
+              { showControls ? (
+                  <Controlbar onZoomOut={!zoomOutDisabled && this.zoomOut || null}
+                              onZoomIn={!zoomInDisabled && this.zoomIn || null}
+                              onFit={!zoomToFitDisabled && this.zoomToFit || null}
+                              onMultipage={this.props.onMultipage} /> ) : null
+              }
             </div>
           )
         }}

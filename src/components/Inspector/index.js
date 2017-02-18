@@ -1,5 +1,7 @@
 import Inspector from './Inspector'
 import './Inspector.scss'
+import './Thumbs.scss'
+import './Controlbar.scss'
 import './PanZoom.scss'
 import './Image.scss'
 import './Video.scss'

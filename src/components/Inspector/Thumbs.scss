@@ -1,0 +1,14 @@
+@import '../../styles/core-mixins.scss';
+
+.Thumbs {
+  @include flexOn;
+  @include fullWidth;
+  @include flexRow;
+  @include flexJustifyCenter;
+  overflow-y: auto;
+}
+
+.Thumbs-body {
+  position: relative;
+  @include fullWidth;
+}

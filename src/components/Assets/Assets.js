@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import keydown from 'react-keydown'
 import * as assert from 'assert'
 
-import Thumb from '../Thumb'
+import Thumb, { page, badges } from '../Thumb'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
 import { isolateAssetId, selectAssetIds } from '../../actions/assetsAction'
@@ -41,6 +41,8 @@ class Assets extends Component {
     showMultipage: PropTypes.bool.isRequired,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
+    protocol: PropTypes.string,
+    host: PropTypes.string,
     actions: PropTypes.object
   }
 
@@ -110,7 +112,7 @@ class Assets extends Component {
         // Nothing in the extended selection set, treat as new selection
         ids = new Set([asset.id])
         if (showMultipage) addSiblings(ids, assets)
-        this.setState({...this.state, lastSelectedId: asset.id})
+        this.setState({lastSelectedId: asset.id})
       }
     } else if (event.metaKey) {
       // Toggle the current asset on or off
@@ -125,17 +127,17 @@ class Assets extends Component {
         }
       })
       const lastSelectedId = ids.length ? asset.id : null
-      this.setState({...this.state, lastSelectedId})
+      this.setState({lastSelectedId})
     } else {
       ids = new Set([asset.id])
       if (showMultipage) addSiblings(ids, assets)
       if (selectedIds && equalSets(ids, selectedIds)) {
         // single click of a single selected asset should deselect
         ids = new Set()
-        this.setState({...this.state, lastSelectedId: null})
+        this.setState({lastSelectedId: null})
       } else {
         // Select the single asset and use it as the anchor point
-        this.setState({...this.state, lastSelectedId: asset.id})
+        this.setState({lastSelectedId: asset.id})
       }
     }
     actions.selectAssetIds(ids)
@@ -361,7 +363,7 @@ class Assets extends Component {
   }
 
   renderAssets () {
-    const { assets, selectedIds, totalCount, layout } = this.props
+    const { assets, selectedIds, totalCount, layout, protocol, host } = this.props
     const { positions, multipage, collapsed, tableIsResizing } = this.state
     api.setTableIsResizing(tableIsResizing)
 
@@ -423,18 +425,23 @@ class Assets extends Component {
                   }
                   const parentId = asset.parentId()
                   const indexes = parentId && multipage[parentId]
-                  const pages = indexes && indexes.map(index => (assets[index])) || [asset]
+                  const dim = positions[index]
+                  const { width, height } = dim
+                  const pages = indexes && indexes.map(index => (
+                      page(assets[index], width, height, protocol, host))) || [page(asset, width, height, protocol, host
+                    )]
                   return (
                     <Thumb isSelected={selectedIds && selectedIds.has(asset.id)}
-                      dim={positions[index]}
-                      key={asset.id}
-                      assets={pages}
-                      onClick={event => {
-                        // don't scroll assets when we select thumbs. (table selection will scroll)
-                        this.skipNextSelectionScroll = true
-                        this.select(asset, event)
-                      }}
-                      onDoubleClick={this.isolateToLightbox.bind(this, asset)}
+                           dim={dim}
+                           key={asset.id}
+                           pages={pages}
+                           { ...badges(asset, protocol, host) }
+                           onClick={event => {
+                             // don't scroll assets when we select thumbs. (table selection will scroll)
+                             this.skipNextSelectionScroll = true
+                             this.select(asset, event)
+                           }}
+                           onDoubleClick={this.isolateToLightbox.bind(this, asset)}
                     />
                   )
                 })}
@@ -515,7 +522,9 @@ export default connect(state => ({
   layout: state.app.thumbLayout,
   showTable: state.app.showTable,
   tableHeight: state.app.tableHeight,
-  showMultipage: state.app.showMultipage
+  showMultipage: state.app.showMultipage,
+  protocol: state.auth.protocol,
+  host: state.auth.host
 }), dispatch => ({
   actions: bindActionCreators({
     isolateAssetId,
