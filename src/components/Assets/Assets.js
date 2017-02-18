@@ -46,12 +46,6 @@ class Assets extends Component {
     actions: PropTypes.object
   }
 
-  static get contextTypes () {
-    return {
-      router: PropTypes.object
-    }
-  }
-
   constructor (props) {
     super(props)
 
@@ -157,7 +151,6 @@ class Assets extends Component {
 
   isolateToLightbox (asset) {
     this.props.actions.isolateAssetId(asset.id)
-    this.context.router.push('/lightbox')
   }
 
   toggleShowTable = () => {

@@ -47,12 +47,6 @@ class Table extends Component {
     actions: PropTypes.object
   }
 
-  static get contextTypes () {
-    return {
-      router: PropTypes.object
-    }
-  }
-
   constructor (props) {
     super(props)
 
@@ -209,7 +203,6 @@ class Table extends Component {
 
   isolateToLightbox (asset) {
     this.props.actions.isolateAssetId(asset.id)
-    this.context.router.push('/lightbox')
   }
 
   // light wrapper around Assets.select(); just make sure we don't scroll

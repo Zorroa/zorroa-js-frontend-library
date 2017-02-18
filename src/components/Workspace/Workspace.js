@@ -16,6 +16,7 @@ import CreateImport from '../Header/CreateImport'
 import { iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible, showModal } from '../../actions/appActions'
 import { getUserPermissions } from '../../actions/authAction'
 import User from '../../models/User'
+import Lightbox from '../Lightbox'
 
 class Workspace extends Component {
   static displayName () {
@@ -31,7 +32,8 @@ class Workspace extends Component {
 
     // state props
     app: PropTypes.object.isRequired,
-    user: PropTypes.instanceOf(User)
+    user: PropTypes.instanceOf(User),
+    isolatedId: PropTypes.string
   }
 
   state = {
@@ -100,7 +102,9 @@ class Workspace extends Component {
   }
 
   render () {
-    const { app } = this.props
+    const { app, isolatedId } = this.props
+
+    if (isolatedId) return <Lightbox/>
 
     const BrowsingParams = () => ({
       header: (<span>Browsing</span>),
@@ -198,7 +202,8 @@ class Workspace extends Component {
 
 export default connect(state => ({
   app: state.app,
-  user: state.auth.user
+  user: state.auth.user,
+  isolatedId: state.assets.isolatedId
 }), dispatch => ({
   actions: bindActionCreators({
     iconifyLeftSidebar,

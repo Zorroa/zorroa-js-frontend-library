@@ -14,6 +14,7 @@ import Resizer from '../../services/Resizer'
 import { exportAssets } from '../../actions/jobActions'
 import { updateLightbarFields, showModal } from '../../actions/appActions'
 import { flatDisplayPropertiesForFields } from '../../models/DisplayProperties'
+import { isolateAssetId } from '../../actions/assetsAction'
 
 class Lightbar extends Component {
   static displayName = 'Lightbar'
@@ -24,10 +25,6 @@ class Lightbar extends Component {
     lightbarFields: PropTypes.arrayOf(PropTypes.string),
     modal: PropTypes.object,
     actions: PropTypes.object
-  }
-
-  static contextTypes = {
-    router: PropTypes.object
   }
 
   state = {
@@ -45,7 +42,7 @@ class Lightbar extends Component {
   }
 
   closeLightbox () {
-    this.context.router.push('/')
+    this.props.actions.isolateAssetId()
   }
 
   showDisplayOptions = () => {
@@ -167,6 +164,7 @@ export default connect(state => ({
   modal: state.app.modal
 }), dispatch => ({
   actions: bindActionCreators({
+    isolateAssetId,
     updateLightbarFields,
     exportAssets,
     showModal }, dispatch)

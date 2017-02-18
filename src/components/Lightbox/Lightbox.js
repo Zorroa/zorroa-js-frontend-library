@@ -19,15 +19,9 @@ class Lightbox extends Component {
     actions: PropTypes.object
   }
 
-  static get contextTypes () {
-    return {
-      router: PropTypes.object
-    }
-  }
-
   @keydown('esc')
   closeLightbox (event) {
-    this.context.router.push('/')
+    this.props.actions.isolateAssetId()
   }
 
   @keydown('right')
