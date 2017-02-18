@@ -7,7 +7,7 @@ import {
   AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR, USER_SETTINGS,
   AUTH_PERMISSIONS, METADATA_FIELDS, TABLE_FIELDS,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
-  SHOW_MULTIPAGE, VIDEO_VOLUME
+  SHOW_MULTIPAGE, VIDEO_VOLUME, PAGE_SIZE
 } from '../constants/actionTypes'
 import { USER_ITEM, HOST_ITEM, PROTOCOL_ITEM } from '../constants/localStorageItems'
 import User from '../models/User'
@@ -120,6 +120,9 @@ function authorize (dispatch, json) {
     }
     if (metadata.videoVolume) {
       dispatch({type: VIDEO_VOLUME, payload: metadata.videoVolume})
+    }
+    if (metadata.pageSize) {
+      dispatch({type: PAGE_SIZE, payload: metadata.pageSize})
     }
   }
   browserHistory.push('/')

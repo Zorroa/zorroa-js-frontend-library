@@ -5,7 +5,9 @@ import { connect } from 'react-redux'
 
 import AssetCounter from './AssetCounter'
 import AssetSearch from '../../models/AssetSearch'
+import User from '../../models/User'
 import { searchAssets, setPageSize } from '../../actions/assetsAction'
+import { saveUserSettings } from '../../actions/authAction'
 
 class Pager extends Component {
   static propTypes = {
@@ -16,11 +18,15 @@ class Pager extends Component {
     pageSize: PropTypes.number.isRequired,
     actions: PropTypes.object.isRequired,
     top: PropTypes.number.isRequired,
-    query: PropTypes.instanceOf(AssetSearch).isRequired
+    query: PropTypes.instanceOf(AssetSearch).isRequired,
+    user: PropTypes.instanceOf(User),
+    userSettings: PropTypes.object.isRequired
   }
 
   handlePageSize (dim) {
-    this.props.actions.setPageSize(dim)
+    const { user, userSettings, actions } = this.props
+    actions.setPageSize(dim)
+    actions.saveUserSettings(user, { ...userSettings, pageSize: dim || 10000 })
   }
 
   handleLoadPage () {
@@ -70,12 +76,14 @@ class Pager extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({ searchAssets, setPageSize }, dispatch)
+  actions: bindActionCreators({ searchAssets, setPageSize, saveUserSettings }, dispatch)
 })
 
 const mapStateToProps = state => ({
   query: state.assets.query,
-  pageSize: state.assets.pageSize
+  pageSize: state.assets.pageSize,
+  user: state.auth.user,
+  userSettings: state.app.userSettings
 })
 
 export default connect(
