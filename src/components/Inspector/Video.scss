@@ -234,6 +234,13 @@
       margin-left: 0;
     }
   }
+
+  .Video-multipage {
+    &:hover {
+      cursor: pointer;
+      color: $zorroa-sickly-green;
+    }
+  }
 }
 
 .Video-volume {

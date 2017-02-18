@@ -4,7 +4,7 @@ import PanZoom from './PanZoom'
 
 const Image = (props) => (
   <div className="Image-frame">
-    <PanZoom>
+    <PanZoom onMultipage={props.onMultipage}>
       <div className="Image" style={{ backgroundSize: 'fit', backgroundImage: `url(${props.url})` }} />
     </PanZoom>
   </div>

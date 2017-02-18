@@ -1,14 +1,12 @@
 import React, { Component, PropTypes } from 'react'
 import Measure from 'react-measure'
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
 
 import Controlbar from './Controlbar'
-import { showPages } from '../../actions/appActions'
 
-class PanZoom extends Component {
+export default class PanZoom extends Component {
   static propTypes = {
     showControls: PropTypes.bool,
+    onMultipage: PropTypes.func,
     actions: PropTypes.object,
     children: PropTypes.node.isRequired
   }
@@ -106,10 +104,6 @@ class PanZoom extends Component {
     this.stopMoving()
   }
 
-  setMultipage = () => {
-    this.props.actions.showPages(true)
-  }
-
   setStateToPanner () {
     this.setState({
       translate: { x: this.panner.x, y: this.panner.y },
@@ -118,7 +112,7 @@ class PanZoom extends Component {
   }
 
   render () {
-    const { showControls } = this.props
+    const { showControls, onMultipage } = this.props
     const { moving } = this.state
     const epsilon = 0.01
     const zoomOutDisabled = this.panner.scale <= PanZoom.minZoom + epsilon
@@ -212,10 +206,3 @@ class Panner {
     }
   }
 }
-
-export default connect(state => ({
-}), dispatch => ({
-  actions: bindActionCreators({
-    showPages
-  }, dispatch)
-}))(PanZoom)
