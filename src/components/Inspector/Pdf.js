@@ -19,7 +19,8 @@ export default class Pdf extends Component {
       url: PropTypes.string
     }),
     page: PropTypes.number,
-    thumbSize: PropTypes.number
+    thumbSize: PropTypes.number,
+    multipage: PropTypes.bool
   }
 
   static defaultProps = { page: 1 }
@@ -33,7 +34,7 @@ export default class Pdf extends Component {
       error: null,
       scale: 1,
       disableZoomOut: false,
-      multipage: false,
+      multipage: this.props.multipage,
       positions: [],
       multipageScrollHeight: 0,
       multipageScrollWidth: 0
@@ -133,6 +134,7 @@ export default class Pdf extends Component {
     this.queueRenderPage(this.state.pageNumber + 1)
   }
 
+  static scaleFactor = 1.5
   zoomIn = (event) => {
     const scale = this.state.scale * Pdf.scaleFactor
     this.setState({scale})
