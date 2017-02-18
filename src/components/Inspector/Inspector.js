@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import Pdf from './Pdf'
 import Video from './Video'
 import Image from './Image'
+import Multipage from './Multipage'
 import Asset from '../../models/Asset'
 
 class Inspector extends Component {
@@ -26,9 +27,7 @@ class Inspector extends Component {
 
     if (mediaType.startsWith('image') &&
       imageFormats.findIndex(format => (mediaType.endsWith(format))) >= 0) {
-      const parentId = asset.parentId()
-      const pages = parentId && assets.filter(a => (a.parentId() === parentId))
-      inspector = <Image url={url} assets={pages}/>
+      inspector = <Image url={url}/>
     } else if (mediaType.startsWith('video')) {
       inspector = <Video url={url} frames={asset.frames()} frameRate={asset.frameRate()}
                          startFrame={asset.startFrame()} stopFrame={asset.stopFrame()}/>
@@ -37,16 +36,20 @@ class Inspector extends Component {
                        documentInitParameters={{url, withCredentials: true}} />
     } else {
       const proxy = asset.biggestProxy()
-      const pages = assets.filter(a => (a.parentId() === asset.parentId()))
-      inspector = <Image url={proxy.url(protocol, host)} assets={pages} />
+      inspector = <Image url={proxy.url(protocol, host)} />
       warning = <div>{proxy.width} x {proxy.height} proxy</div>
     }
+
+    const parentId = asset.parentId()
+    const pages = parentId && assets.filter(a => (a.parentId() === parentId))
 
     return (
       <div className="Inspector fullWidth fullHeight flexCenter">
         <div className='Inspector-content flexOn'>
-          { inspector }
-          { warning ? <div className="Inspector-warning">{warning}</div> : null }
+          <Multipage assets={pages}>
+            { inspector }
+            { warning ? <div className="Inspector-warning">{warning}</div> : null }
+          </Multipage>
         </div>
       </div>
     )

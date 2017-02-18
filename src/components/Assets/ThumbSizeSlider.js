@@ -1,23 +1,22 @@
 import React, { Component, PropTypes } from 'react'
 
+import { MIN_THUMBSIZE, MAX_THUMBSIZE, DELTA_THUMBSIZE } from '../../actions/appActions'
+
 export default class ThumbSizeSlider extends Component {
   static propTypes = {
     value: PropTypes.number.isRequired,
     onChange: PropTypes.func.isRequired
   }
 
-  static MAX_VAL = 480
-  static MIN_VAL = 48
-
   handleChange = (event) => {
     this.props.onChange(Number(event.target.value))
   }
 
   goBigger = (event) => {
-    this.props.onChange(Math.min(ThumbSizeSlider.MAX_VAL, this.props.value + 48))
+    this.props.onChange(Math.min(MAX_THUMBSIZE, this.props.value + DELTA_THUMBSIZE))
   }
   goSmaller = (event) => {
-    this.props.onChange(Math.max(ThumbSizeSlider.MIN_VAL, this.props.value - 48))
+    this.props.onChange(Math.max(MIN_THUMBSIZE, this.props.value - DELTA_THUMBSIZE))
   }
 
   render () {
@@ -33,8 +32,8 @@ export default class ThumbSizeSlider extends Component {
           </div>
           <input className='ThumbSizeSlider-slider'
                  type='range'
-                 min={`${ThumbSizeSlider.MIN_VAL}`}
-                 max={`${ThumbSizeSlider.MAX_VAL}`}
+                 min={`${MIN_THUMBSIZE}`}
+                 max={`${MAX_THUMBSIZE}`}
                  step='4'
                  value={this.props.value}
                  onChange={this.handleChange}/>

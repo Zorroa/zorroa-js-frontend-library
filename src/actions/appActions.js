@@ -4,8 +4,13 @@ import {
   METADATA_FIELDS, TABLE_FIELDS, LIGHTBAR_FIELDS, SYNC_FIELDS,
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH, SHOW_IMPORT_SCRIPT_INFO,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
-  SHOW_MULTIPAGE, VIDEO_VOLUME
+  SHOW_MULTIPAGE, SHOW_PAGES, VIDEO_VOLUME
 } from '../constants/actionTypes'
+
+export const MIN_THUMBSIZE = 48
+export const MAX_THUMBSIZE = 480
+export const DELTA_THUMBSIZE = 48
+export const DEFAULT_THUMBSIZE = 128
 
 export function showModal (props) {
   return {
@@ -137,6 +142,13 @@ export function setVideoVolume (volume) {
 export function showMultipage (show) {
   return ({
     type: SHOW_MULTIPAGE,
+    payload: show
+  })
+}
+
+export function showPages (show) {
+  return ({
+    type: SHOW_PAGES,
     payload: show
   })
 }

@@ -25,15 +25,11 @@ class Video extends Component {
     actions: PropTypes.object
   }
 
-  constructor (props) {
-    super(props)
-
-    this.state = {
-      playing: true,
-      volume: this.props.videoVolume,
-      played: 0,
-      loaded: 0
-    }
+  state = {
+    playing: true,
+    volume: this.props.videoVolume,
+    played: 0,
+    loaded: 0
   }
 
   @keydown('space')
