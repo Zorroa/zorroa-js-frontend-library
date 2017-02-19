@@ -1,6 +1,5 @@
 import Metadata from './Metadata'
 import './Metadata.scss'
-import './DisplayPropertiesItem.scss'
 export default Metadata
 
 /*

@@ -1,4 +1,5 @@
-import { MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS } from '../constants/actionTypes'
+import { MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS,
+  EXISTS_FIELDS } from '../constants/actionTypes'
 import Widget from '../models/Widget'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
@@ -32,6 +33,13 @@ export function resetRacetrackWidgets (widgets) {
   return ({
     type: RESET_RACETRACK_WIDGETS,
     payload: widgets
+  })
+}
+
+export function existsFields (fields) {
+  return ({
+    type: EXISTS_FIELDS,
+    payload: fields
   })
 }
 

@@ -1,4 +1,4 @@
-import { FacetWidgetInfo } from '../components/Racetrack/WidgetInfo'
+import { FacetWidgetInfo, MapWidgetInfo } from '../components/Racetrack/WidgetInfo'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
 
@@ -34,6 +34,7 @@ export function aggField (field, fieldTypes) {
 export function createFacetWidget (field, assets, fieldTypes) {
   const type = FacetWidgetInfo.type
   const isOpen = true
+  const isEnabled = true
   let terms = []
   if (assets) {
     for (let asset of assets) {
@@ -50,7 +51,22 @@ export function createFacetWidget (field, assets, fieldTypes) {
   const aggs = { facet: { terms: { field: rawField, size: 100 } } }
   const filter = terms.length ? new AssetFilter({terms: {[rawField]: terms}}) : null
   const sliver = new AssetSearch({filter, aggs})
-  return new Widget({type, sliver, isOpen})
+  return new Widget({type, sliver, isEnabled, isOpen})
+}
+
+export function createMapWidget (field, term) {
+  const type = MapWidgetInfo.type
+  const isOpen = true
+  const isEnabled = true
+  const aggs = { map: { geohash_grid: { field, precision: 7 } } }
+  let sliver = new AssetSearch({aggs})
+  if (term && term.length) {
+    const terms = {[field + '.raw']: [term]}
+    const bounds = { [field + '.raw']: {top_left: 'hash', bottom_right: 'hash'} }
+    sliver.filter = new AssetFilter({terms, geo_bounding_box: bounds})
+    // Add this.bounds and set agg precision
+  }
+  return new Widget({type, sliver, isEnabled, isOpen})
 }
 
 // Acts like a static variable, returning increasing unique ids

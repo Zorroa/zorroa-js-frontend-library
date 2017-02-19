@@ -4,24 +4,6 @@
 
   background-color: white;
 
-  // Metadata don't select, so we toggle them when clicking the label or caret
-  // So, hover on the whole header
-  .CollapsibleHeader {
-    padding-left: 8px;
-    background: none;
-    text-transform: capitalize;
-    font-weight: 900;
-    color: $zorroa-darkgray;
-    border-top: 1px solid $zorroa-nearwhite;
-
-    &:hover { background-color: darken($zorroa-darkwhite, 15%); }
-    &.isSelected { background-color: darken($zorroa-water-blue, 15%); }
-  }
-
-  .Collapsible {
-    margin-left: 0;
-  }
-
   .Metadata-header {
     @include flexRow;
     @include flexJustifySpaceBetween;
@@ -69,17 +51,110 @@
   }
 
   .body {
+  }
+}
 
-    // use smaller chevrons for metadata subfields
-    .CollapsibleHeader {
-      .icon-chevron-down {
-        font-size: 10px;
+.Metadata-left {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+}
 
-        // magic lineup ala CollapsibleHeader.scss
-        &.isOpen {
-          transform-origin: 30% 50%;
-        }
-      }
+.Metadata-right {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+}
+
+.Metadata-item {
+  margin-left: 8px;
+  font-size: 14px;
+
+  @include flexRow;
+  @include flexJustifySpaceBetween;
+  @include flexAlignItemsCenter;
+
+  .Metadata-item-label {
+    @include flexRow;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .Metadata-item-right {
+    @include flexRow;
+  }
+
+  .Metadata-item-search {
+    @include zorroa-square-btn-darken(20px);
+    color: $zorroa-lightgray;
+    margin: 4px;
+    font-size: 10px;
+
+    &.selected {
+      color: $zorroa-sickly-green;
     }
+  }
+
+  .Metadata-item-hide {
+    @include flexRowCenter;
+  }
+
+  .Metadata-item-hide {
+    @include flexOff;
+    @include flexRowCenter;
+    width: 20px;
+    height: 20px;
+    border-radius: 2px;
+    font-size: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+    font-size: 10px;
+    color: transparent;
+    background-color: transparent;
+
+    &:not(.disabled):hover {
+      font-size: 12px;
+      background-color: $zorroa-lightgray;
+      color: $zorroa-greyish-brown;
+    }
+
+    &.disabled {
+      color: $zorroa-lightgray;
+    }
+
+    &:hover {
+      color: $zorroa-gray;
+    }
+  }
+
+  &:nth-child(even) {
+    background-color: #f1f1f1;
+  }
+
+  &.isSelected { background-color: $zorroa-selected; }
+  &:hover { background-color: $zorroa-hover; }
+}
+
+$FolderItemHeight : 25px;
+
+.Metadata-item-toggle {
+  @include flexOff;
+  @include flexRowCenter;
+
+  width: $FolderItemHeight;
+  height: $FolderItemHeight;
+
+  cursor: pointer;
+
+  &.hasChildren:hover { color: white; background-color: $zorroa-darkgray; }
+  .FolderItem.isSelected & { background-color: $zorroa-selected; }
+  .FolderItem.isSelected &.hasChildren:hover { color: white; background-color: $zorroa-darkgray; }
+  .FolderItem.isDropTarget.dragHover & { color: white; background-color: $zorroa-sickly-green; }
+  .FolderItem.isSelected.isDropTarget.dragHover & { color: white; background-color: darken($zorroa-sickly-green, 15%); }
+}
+
+.Metadata-toggleArrow {
+  transform: rotate(-90deg);
+  &.isOpen {
+    transform: none;
   }
 }

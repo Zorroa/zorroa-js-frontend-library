@@ -7,7 +7,7 @@ import Widget from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import TrashedFolder from '../../models/TrashedFolder'
-import { searchAssets } from '../../actions/assetsAction'
+import { searchAssets, getAssetFields } from '../../actions/assetsAction'
 import { countAssetsInFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
 import { MapWidgetInfo } from './WidgetInfo'
@@ -26,6 +26,7 @@ class Searcher extends Component {
     filteredFolderCounts: PropTypes.instanceOf(Map),
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
     order: PropTypes.arrayOf(PropTypes.object),
+    existsFields: PropTypes.object,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired
@@ -34,6 +35,7 @@ class Searcher extends Component {
   componentWillMount () {
     this.pendingQueryCountIds = new Set()
     this.pendingFullCountIds = new Set()
+    this.props.actions.getAssetFields()
   }
 
   isCounted (folderId) {
@@ -99,7 +101,7 @@ class Searcher extends Component {
   render () {
     const {
       widgets, actions, folders, selectedFolderIds, query, pageSize,
-      modifiedFolderIds, trashedFolders, order } = this.props
+      modifiedFolderIds, trashedFolders, order, existsFields } = this.props
     let assetSearch = new AssetSearch({order})
     if (widgets && widgets.length) {
       let postFilter = new AssetFilter()
@@ -138,6 +140,13 @@ class Searcher extends Component {
       }
     }
 
+    // Add filters for each exists field
+    if (existsFields && existsFields.size) {
+      const should = [...existsFields].map(field => new AssetFilter({exists: [field]}))
+      const filter = new AssetFilter({should})
+      assetSearch.merge(new AssetSearch({filter}))
+    }
+
     // Do not send the query unless it is different than the last returned query
     // FIXME: If assetSearch.empty() filtered counts == total, but tricky to flush cache
     // FIXME: Count trashed folders once the server adds support
@@ -168,6 +177,7 @@ class Searcher extends Component {
 const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators({
     searchAssets,
+    getAssetFields,
     countAssetsInFolderIds,
     saveUserSettings
   }, dispatch)
@@ -184,6 +194,7 @@ const mapStateToProps = state => ({
   selectedFolderIds: state.folders.selectedFolderIds,
   modifiedFolderIds: state.folders.modifiedIds,
   trashedFolders: state.folders.trashedFolders,
+  existsFields: state.racetrack.existsFields,
   user: state.auth.user,
   userSettings: state.app.userSettings
 })
