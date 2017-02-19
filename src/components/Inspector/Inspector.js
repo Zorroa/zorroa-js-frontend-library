@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import classnames from 'classnames'
 
 import Pdf from './Pdf'
 import Video from './Video'
@@ -15,7 +16,6 @@ class Inspector extends Component {
     protocol: PropTypes.string,
     host: PropTypes.string,
     thumbSize: PropTypes.number,
-    assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     actions: PropTypes.object
   }
 
@@ -24,7 +24,7 @@ class Inspector extends Component {
   }
 
   render () {
-    const { asset, assets, protocol, host, thumbSize } = this.props
+    const { asset, protocol, host, thumbSize } = this.props
     const mediaType = asset.mediaType().toLowerCase()
     const url = asset.url(protocol, host)
     const imageFormats = [ 'jpeg', 'jpg', 'png', 'gif' ]
@@ -48,13 +48,10 @@ class Inspector extends Component {
       warning = <div>{proxy.width} x {proxy.height} proxy</div>
     }
 
-    const parentId = asset.parentId()
-    const pages = parentId && assets.filter(a => (a.parentId() === parentId))
-
     return (
       <div className="Inspector fullWidth fullHeight flexCenter">
         <div className='Inspector-content flexOn'>
-          <Multipage assets={pages}>
+          <Multipage parentId={asset.parentId()}>
             { inspector }
             { warning ? <div className="Inspector-warning">{warning}</div> : null }
           </Multipage>
@@ -67,8 +64,7 @@ class Inspector extends Component {
 export default connect(state => ({
   protocol: state.auth.protocol,
   host: state.auth.host,
-  thumbSize: state.app.thumbSize,
-  assets: state.assets.all
+  thumbSize: state.app.thumbSize
 }), dispatch => ({
   actions: bindActionCreators({
     showPages

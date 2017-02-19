@@ -3,24 +3,32 @@ import * as assert from 'assert'
 import {
   UNAUTH_USER, ASSET_SEARCH, ASSET_SEARCH_ERROR,
   ASSET_SORT, ASSET_ORDER, ASSET_FIELDS,
-  ISOLATE_ASSET, SELECT_ASSETS, PAGE_SIZE, SUGGEST_COMPLETIONS
+  ISOLATE_ASSET, SELECT_ASSETS, PAGE_SIZE,
+  SUGGEST_COMPLETIONS, SEARCH_DOCUMENT
 } from '../constants/actionTypes'
 import Asset from '../models/Asset'
 import Page from '../models/Page'
 import AssetSearch from '../models/AssetSearch'
+import AssetFilter from '../models/AssetFilter'
 import { getArchivist } from './authAction'
+
+function escapeQuery (query) {
+  if (!query) return new AssetSearch()
+  // Escape special characters
+  // https://www.elastic.co/guide/en/elasticsearch/reference/2.1/query-dsl-query-string-query.html#_reserved_characters
+  let safeQuery = { ...query }
+  if (safeQuery.query) {
+    safeQuery.query = safeQuery.query.replace(/(\+|\-|=|&&|\|\||>|<|!|\(|\)|\{|\}|\[|\]|\^|"|~|\*|\?|:|\\|\/)/g, '\\$&')
+  }
+  return safeQuery
+}
 
 export function searchAssets (query) {
   assert.ok(query instanceof AssetSearch)
   assert.ok(query.size)
   return dispatch => {
     assert.ok(typeof query.from === 'undefined' || query.from >= 0)
-    // Escape special characters
-    // https://www.elastic.co/guide/en/elasticsearch/reference/2.1/query-dsl-query-string-query.html#_reserved_characters
-    let safeQuery = { ...query }
-    if (safeQuery.query) {
-      safeQuery.query = safeQuery.query.replace(/(\+|\-|=|&&|\|\||>|<|!|\(|\)|\{|\}|\[|\]|\^|"|~|\*|\?|:|\\|\/)/g, '\\$&')
-    }
+    const safeQuery = escapeQuery(query)
     console.log('Search: ' + JSON.stringify(safeQuery))
     getArchivist().post('/api/v3/assets/_search', safeQuery)
       .then(response => {
@@ -50,6 +58,31 @@ export function searchAssets (query) {
   }
 }
 
+export function searchDocument (query, parentId) {
+  assert.ok(!query || query instanceof AssetSearch)
+  return dispatch => {
+    const safeQuery = escapeQuery(query)
+    const filter = new AssetFilter({terms: {'source.clip.parent.raw': [parentId]}})
+    safeQuery.filter = safeQuery.filter ? safeQuery.filter.merge(filter) : filter
+    safeQuery.size = 10000
+    safeQuery.from = 0
+    if (!query) safeQuery.order = [{ field: 'source.clip.page.start', ascending: true }]
+    console.log('Search Document: ' + JSON.stringify(safeQuery))
+    getArchivist().post('/api/v3/assets/_search', safeQuery)
+      .then(response => {
+        console.log('Query Document' + JSON.stringify(safeQuery))
+        console.log(response)
+        const assets = response.data.list.map(asset => (new Asset(asset)))
+        dispatch({
+          type: SEARCH_DOCUMENT,
+          payload: assets
+        })
+      })
+      .catch(error => {
+        console.error('Error searching for assets: ' + error)
+      })
+  }
+}
 export function suggestQueryStrings (text) {
   if (!text) {
     return ({ type: SUGGEST_COMPLETIONS, payload: null })
