@@ -57,11 +57,12 @@
   filter: none;
   font-size: 24px;
 
-  &:hover { background-color: rgba(0,0,0,0.2); }
-
-  &.isEnabled {
+  &:hover {
+    // showing green is the intent, but the color is currently not visible due to parent's filter when disabled
     background-color: $zorroa-sickly-green;
-    &:hover { background-color: darken($zorroa-sickly-green, 15%); }
+  }
+  &.isEnabled:hover {
+    background-color: $zorroa-faded-red;
   }
 }
 

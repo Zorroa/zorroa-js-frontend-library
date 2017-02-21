@@ -3,14 +3,6 @@
 .SimpleSearch {
   .WidgetHeader {
     color: $zorroa-nearwhite;
-
-    // Customize SimpleSearch's enable button, because the button and header are same color, green
-    .WidgetHeader-enable {
-      &.isEnabled {
-        background-color: transparent;
-        &:hover { background-color: rgba(0,0,0,0.2); }
-      }
-    }
   }
 
   .Widget-icon {
