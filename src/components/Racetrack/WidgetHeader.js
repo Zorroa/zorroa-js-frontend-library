@@ -14,7 +14,7 @@ const WidgetHeader = ({ isEnabled, isIconified, header, icon, backgroundColor, e
           { !isIconified && header }
           <div className='flexOn'/>
         </div>
-        <div className={classnames('WidgetHeader-enable', {'icon-eye2': isEnabled, 'icon-eye-crossed': !isEnabled, isEnabled})} onClick={enableToggleFn}/>
+        { !isIconified && (<div className={classnames('WidgetHeader-enable', {'icon-eye2': isEnabled, 'icon-eye-crossed': !isEnabled, isEnabled})} onClick={enableToggleFn}/>) }
         { !isIconified && (<div className='WidgetHeader-close icon-cross2' onClick={onClose}/>) }
       </div>
     </div>
