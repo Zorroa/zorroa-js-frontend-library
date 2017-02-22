@@ -8,7 +8,6 @@ import User from '../../models/User'
 class Preferences extends Component {
   static propTypes = {
     user: PropTypes.instanceOf(User),
-    onCreate: PropTypes.func.isRequired,
     onDismiss: PropTypes.func,
     actions: PropTypes.object
   }
