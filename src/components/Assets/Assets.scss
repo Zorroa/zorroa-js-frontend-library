@@ -66,6 +66,15 @@
   }
 }
 
+.Assets-page-label {
+  @include nowrap;
+  @include flexRow;
+  font-family: "Roboto Condensed";
+  background-color: rgba(256, 256, 256, 0.75);
+  padding-right: 4px;
+  padding-left: 4px;
+}
+
 .assets-footer {
   padding-left: 8px;
   padding-right: 8px;

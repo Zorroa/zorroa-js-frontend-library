@@ -7,13 +7,21 @@
   text-transform: uppercase;
   font-weight: 100;
   overflow: hidden;
+  filter: grayscale(100%) opacity(50%);
 
   color: $zorroa-gray;
   background-color: $zorroa-darkwhite;
+  & .WidgetHeader-enable {
+    filter: none;
+  }
 
   border-radius: 3px;
   .Widget.isOpen & { border-radius: 3px 3px 0 0; }
   .Widget.isOpen.isIconified & { border-radius: 3px; }
+}
+
+.WidgetHeader.isEnabled {
+  filter: none;
 }
 
 .WidgetHeader-hover {
@@ -38,6 +46,23 @@
 
 .WidgetHeader-label {
   @include clampText;
+}
+
+.WidgetHeader-enable {
+  @include flexOff;
+  @include flexRowCenter;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  filter: none;
+  font-size: 24px;
+
+  &:hover { background-color: rgba(0,0,0,0.2); }
+
+  &.isEnabled {
+    background-color: $zorroa-sickly-green;
+    &:hover { background-color: darken($zorroa-sickly-green, 15%); }
+  }
 }
 
 .WidgetHeader-close {

@@ -14,7 +14,7 @@
                  entry in the output array is an object with the following
                  values in css pixel units: { x, y, width, height }
  multipage     - Object indexed by parentId containing the indices in <assets>
-                 for the first 3 sibling assets.
+                 for all of the collapsed pages
  collapsed     - Total number of assets collapsed into multipage docs
 */
 
@@ -47,9 +47,7 @@ export function masonry (assets, panelWidth, thumbSize, showMultipage) {
         } else {
           collapse = true
           ++collapsed
-          if (pages && pages.length < 3) {
-            multipage[parentId] = [...pages, i]
-          }
+          multipage[parentId] = [...pages, i]
         }
       }
     }
@@ -124,9 +122,7 @@ export function grid (assets, panelWidth, thumbSize, showMultipage) {
           multipage[parentId] = [i]
         } else {
           ++collapsed
-          if (pages && pages.length < 3) {
-            multipage[parentId] = [...pages, i]
-          }
+          multipage[parentId] = [...pages, i]
           // Zero width, but valid y & height for Pager
           const y = positions[positions.length - 1].y
           positions.push({x: 0, y, width: 0, height: thumbWidth})

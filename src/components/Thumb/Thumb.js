@@ -1,14 +1,13 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
-import { DragSource } from '../../services/DragDrop'
-import Asset from '../../models/Asset'
 import classnames from 'classnames'
 
-import {
-  addSiblings,
-  formatDuration,
-  parseFormattedFloat,
-  isolateSelectId } from '../../services/jsUtil'
+import FileIcon from '../FileIcon'
+import Duration from '../Duration'
+import { DragSource } from '../../services/DragDrop'
+import Asset from '../../models/Asset'
+
+import { addSiblings, isolateSelectId } from '../../services/jsUtil'
 
 // Extract thumb page info from an asset
 export function page (asset, width, height, protocol, host) {
@@ -20,21 +19,30 @@ export function page (asset, width, height, protocol, host) {
 }
 
 // Extract badging info from an asset.
-export function badges (asset, protocol, host) {
-  const mediaType = asset.mediaType().toLowerCase()
-  let pageBadge, duration, iconBadge
+export function badges (asset, protocol, host, stackCount, height) {
+  let pageBadge, iconBadge, parentURL
 
-  if (mediaType.startsWith('image') && asset.value('image.subimages')) {
-    pageBadge = asset.value('image.subimages')
-  } else if (mediaType.includes('video') || mediaType.includes('sequence')) {
-    duration = asset.duration()
-  } else if (mediaType === 'application/pdf' || asset.value('document.pages')) {
-    iconBadge = require('./pdf-icon.png')
-    pageBadge = asset.value('document.pages')
+  const pageCount = asset.pageCount()
+  const startPage = asset.startPage()
+  const stopPage = asset.stopPage()
+  if (asset.mediaType().includes('video')) {
+    pageBadge = <Duration duration={asset.duration()}/>
+  } else if (((stackCount === undefined || stackCount === 0 || stackCount === true) && pageCount) || (stackCount && pageCount && stackCount === pageCount)) {
+    pageBadge = <div className="Assets-page-label">{pageCount}</div>
+  } else if (stackCount >= 0 && pageCount) {
+    pageBadge = <div className="Assets-page-label">{stackCount} of {pageCount}</div>
+  } else if (startPage && (!stopPage || startPage === stopPage)) {
+    pageBadge = <div className="Assets-page-label">{startPage}</div>
+  } else if (startPage && stopPage) {
+    pageBadge = <div className="Assets-page-label">{startPage} - {stopPage}</div>
   }
 
-  const parentURL = asset.parentProxyURL(protocol, host)
-  return { pageBadge, iconBadge, duration, parentURL }
+  if (stackCount) {
+    iconBadge = <FileIcon ext={asset.value('source.extension')} height={height} />
+    parentURL = asset.parentProxyURL(protocol, host)
+  }
+
+  return { pageBadge, iconBadge, parentURL }
 }
 
 // Called when dragging an asset to assign assetIds to drop info
@@ -83,10 +91,10 @@ class Thumb extends Component {
 
     // Rendering options
     parentURL: PropTypes.string,
-    pageBadge: PropTypes.string,
+    pageBadge: PropTypes.node,
     iconBadge: PropTypes.element,
-    duration: PropTypes.number,
     isSelected: PropTypes.bool,
+    badgeHeight: PropTypes.number,
 
     // Actions
     onClick: PropTypes.func.isRequired,
@@ -103,34 +111,15 @@ class Thumb extends Component {
   }
 
   renderBadges = () => {
-    const { pageBadge, duration, iconBadge } = this.props
-    const { width, height } = this.props.dim
+    const { pageBadge, iconBadge, badgeHeight } = this.props
+    if (!pageBadge && !iconBadge) return
 
-    const hideText = (!pageBadge && !duration) || width < 50 || height < 50
-    const textStyle = hideText ? { display: 'none' } : {}
-    const small = width < 80 || height < 80
-
-    if (pageBadge || iconBadge) {
-      return (
-        <div className="Thumb-multipage-badge">
-          <div className={classnames('icon', {small})}><img src={iconBadge}/></div>
-          <div style={textStyle} className={classnames('Thumb-pages', {small})}>
-            {pageBadge}
-          </div>
-        </div>
-      )
-    } else if (duration) {
-      return (
-        <div className="Thumb-time-badge">
-          <div className={classnames('Thumb-play-badge', {small})}>
-            <div className={classnames('Thumb-arrow-right', {small})} />
-          </div>
-          <div style={textStyle} className={classnames('Thumb-duration', {small})}>
-            { formatDuration(parseFormattedFloat(duration)) }
-          </div>
-        </div>
-      )
-    }
+    return (
+      <div className={classnames('Thumb-badges', {small: badgeHeight < 25 })}>
+        {pageBadge ? <div className="Thumb-pages">{pageBadge}</div> : null}
+        {iconBadge ? <div className="Thumb-icon">{iconBadge}</div> : null}
+      </div>
+    )
   }
 
   renderOverlays = () => {
@@ -165,9 +154,9 @@ class Thumb extends Component {
     return (
       <div className={classnames('Thumb', {isSelected})} style={style}
            onClick={onClick} onDoubleClick={onDoubleClick} {...dragparams}>
-        { pages.slice(0).reverse().map((page, rindex) => {
+        { pages.slice(0, 3).reverse().map((page, rindex) => {
           const { url, backgroundColor } = page
-          const index = pages.length - rindex - 1
+          const index = Math.min(3, pages.length) - rindex - 1
           return (
             <div key={`${url}-${index}`}
                  className={classnames('Thumb-stack', `Thumb-stack-${index}`)}>

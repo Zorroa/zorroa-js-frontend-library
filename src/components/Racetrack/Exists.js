@@ -24,6 +24,7 @@ class Exists extends Component {
   }
 
   state = {
+    isEnabled: true,
     field: '',
     isMissing: false
   }
@@ -31,6 +32,7 @@ class Exists extends Component {
   // If the query is changed elsewhere, e.g. from the Searchbar,
   // capture the new props and update our local state to match.
   syncWithAppState (nextProps, selectFieldIfEmpty) {
+    if (!this.state.isEnabled) return
     const { id, widgets } = nextProps
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
@@ -60,14 +62,20 @@ class Exists extends Component {
     this.props.actions.removeRacetrackWidgetIds([this.props.id])
   }
 
+  toggleEnabled = () => {
+    this.setState({isEnabled: !this.state.isEnabled},
+      () => { this.modifySliver(this.state.field, this.state.isMissing) })
+  }
+
   modifySliver = (field, isMissing) => {
+    const { isEnabled } = this.state
     const type = ExistsWidgetInfo.type
     const sliver = new AssetSearch()
     if (field) {
       const key = (isMissing) ? 'missing' : 'exists'
       sliver.filter = new AssetFilter({ [key]: [ field ] })
     }
-    const widget = new WidgetModel({ id: this.props.id, type, sliver })
+    const widget = new WidgetModel({ id: this.props.id, type, sliver, isEnabled })
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
@@ -99,7 +107,7 @@ class Exists extends Component {
 
   render () {
     const { isIconified } = this.props
-    const { field } = this.state
+    const { field, isEnabled } = this.state
     const title = Asset.lastNamespace(unCamelCase(field))
     return (
       <Widget className='Exists'
@@ -113,6 +121,8 @@ class Exists extends Component {
                 </div>
               )}
               backgroundColor={ExistsWidgetInfo.color}
+              isEnabled={isEnabled}
+              enableToggleFn={this.toggleEnabled}
               isIconified={isIconified}
               icon={ExistsWidgetInfo.icon}
               onClose={this.removeFilter.bind(this)}>

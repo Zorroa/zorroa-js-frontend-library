@@ -33,8 +33,18 @@ export default class Asset {
 
   backgroundColor () { return this.tinyProxy() ? this.tinyProxy()[5] : getRandomColor() }
 
+  pageCount () {
+    if (this.document.document && this.document.document.pages) return this.document.document.pages
+    if (this.document.image && this.document.image.pages) return this.document.image.pages
+    if (this.document.video && this.document.video.pages) return this.document.video.pages
+  }
+
   startPage () {
     if (this.document.source.clip && this.document.source.clip.page) return this.document.source.clip.page.start
+  }
+
+  stopPage () {
+    if (this.document.source.clip && this.document.source.clip.page) return this.document.source.clip.page.stop
   }
 
   frameRate () {    // frames per second

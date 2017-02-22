@@ -1,0 +1,9 @@
+@import '../../styles/core-mixins.scss';
+
+.Widget-body {
+  filter: grayscale(100%) opacity(50%);
+}
+
+.Widget.isEnabled .Widget-body {
+  filter: none;
+}

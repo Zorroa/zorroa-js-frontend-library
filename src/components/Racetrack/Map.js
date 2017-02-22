@@ -27,6 +27,7 @@ class Map extends Component {
   }
 
   state = {
+    isEnabled: true,
     locationField: '',
     searchField: '',
     term: undefined
@@ -51,14 +52,19 @@ class Map extends Component {
     }
   }
 
+  toggleEnabled = () => {
+    this.setState({isEnabled: !this.state.isEnabled},
+      () => { this.modifySliver(this.state.term) })
+  }
+
   modifySliver (term) {
-    const { searchField } = this.state
+    const { searchField, isEnabled } = this.state
     const type = MapWidgetInfo.type
     let sliver = new AssetSearch()
     if (term && term.length) {
       sliver.filter = new AssetFilter({terms: {[searchField + '.raw']: [term]}})
     }
-    const widget = new WidgetModel({id: this.props.id, type, sliver})
+    const widget = new WidgetModel({id: this.props.id, type, sliver, isEnabled})
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
@@ -124,7 +130,7 @@ class Map extends Component {
 
   render () {
     const { isIconified, assets } = this.props
-    const { locationField, searchField, term } = this.state
+    const { locationField, searchField, term, isEnabled } = this.state
     const title = Asset.lastNamespace(unCamelCase(searchField || locationField || '<Select Fields>'))
     const locationAssets = assets.filter(asset => (asset.value(locationField)))
     const layoutProperties = {
@@ -149,6 +155,8 @@ class Map extends Component {
                 </div>
               )}
               backgroundColor={MapWidgetInfo.color}
+              isEnabled={isEnabled}
+              enableToggleFn={this.toggleEnabled}
               isIconified={isIconified}
               onClose={this.removeFilter.bind(this)}>
         <ReactMapboxGl containerStyle={{height: '300px'}}

@@ -26,6 +26,7 @@ class SimpleSearch extends Component {
   }
 
   state = {
+    isEnabled: true,
     queryString: queryString(this.props),
     fuzzy: isFuzzy(this.props),
     field: queryField(this.props)
@@ -34,6 +35,7 @@ class SimpleSearch extends Component {
   // If the query is changed elsewhere, e.g. from the Searchbar,
   // capture the new props and update our local state to match.
   componentWillReceiveProps (nextProps) {
+    if (!this.state.isEnabled) return
     this.setState({
       queryString: queryString(nextProps),
       fuzzy: isFuzzy(nextProps),
@@ -58,13 +60,19 @@ class SimpleSearch extends Component {
     }
   }
 
+  toggleEnabled = () => {
+    this.setState({isEnabled: !this.state.isEnabled},
+      () => { this.modifySliver(this.state.queryString, this.state.fuzzy, this.state.field) })
+  }
+
   modifySliver (queryString, fuzzy, field) {
+    const { isEnabled } = this.state
     const type = SimpleSearchWidgetInfo.type
     const sliver = new AssetSearch({query: queryString, fuzzy})
     if (field.length) {
       sliver.queryFields = { [field]: 1 }
     }
-    const widget = new WidgetModel({id: this.props.id, type, sliver})
+    const widget = new WidgetModel({id: this.props.id, type, sliver, isEnabled})
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
@@ -102,7 +110,7 @@ class SimpleSearch extends Component {
   }
 
   render () {
-    const { fuzzy, field } = this.state
+    const { fuzzy, field, isEnabled } = this.state
     const { isIconified } = this.props
     const title = Asset.lastNamespace(unCamelCase(field))
     return (
@@ -118,6 +126,8 @@ class SimpleSearch extends Component {
                 </div>
               )}
               backgroundColor={SimpleSearchWidgetInfo.color}
+              isEnabled={isEnabled}
+              enableToggleFn={this.toggleEnabled}
               isIconified={isIconified}
               icon={SimpleSearchWidgetInfo.icon}
               onClose={this.removeFilter.bind(this)}>

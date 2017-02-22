@@ -47,6 +47,7 @@ class Range extends Component {
   resizer = null
 
   state = {
+    isEnabled: true,
     field: '',
     min: null, // min threshold (greater than)
     max: null, // max threshold (less than)
@@ -63,6 +64,7 @@ class Range extends Component {
   // If the query is changed elsewhere, e.g. from the Searchbar,
   // capture the new props and update our local state to match.
   syncWithAppState (nextProps, selectFieldIfEmpty) {
+    if (!this.state.isEnabled) return
     const { id, widgets } = nextProps
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
@@ -128,8 +130,12 @@ class Range extends Component {
     this.props.actions.removeRacetrackWidgetIds([this.props.id])
   }
 
+  toggleEnabled = () => {
+    this.setState({isEnabled: !this.state.isEnabled}, this.modifySliver)
+  }
+
   modifySliver = () => {
-    const { field, min, max } = this.state
+    const { field, min, max, isEnabled } = this.state
     if (!field) return
     const type = RangeWidgetInfo.type
 
@@ -141,7 +147,7 @@ class Range extends Component {
       const range = { [field]: { 'gte': min, 'lte': max } }
       sliver.filter = new AssetFilter({ range })
     }
-    const widget = new WidgetModel({ id: this.props.id, type, sliver })
+    const widget = new WidgetModel({ id: this.props.id, type, sliver, isEnabled })
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
@@ -274,7 +280,7 @@ class Range extends Component {
 
   render () {
     const { isIconified, id } = this.props
-    const { field } = this.state
+    const { isEnabled, field } = this.state
     const title = Asset.lastNamespace(unCamelCase(field))
 
     const { min, max, minStr, maxStr, autoMin, autoMax, prevAutoMin, prevAutoMax } = this.state
@@ -305,6 +311,8 @@ class Range extends Component {
                 </div>
               )}
               backgroundColor={RangeWidgetInfo.color}
+              isEnabled={isEnabled}
+              enableToggleFn={this.toggleEnabled}
               isIconified={isIconified}
               icon={RangeWidgetInfo.icon}
               onClose={this.removeFilter.bind(this)}>

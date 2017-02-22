@@ -73,6 +73,7 @@ class Filetype extends Component {
   }
 
   state = {
+    isEnabled: true,
     exts: [],
     suggestions: [],
     suggestion: ''
@@ -83,6 +84,7 @@ class Filetype extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
+    if (!this.state.isEnabled) return
     const { id, widgets } = nextProps
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
@@ -100,7 +102,13 @@ class Filetype extends Component {
     }
   }
 
+  toggleEnabled = () => {
+    this.setState({isEnabled: !this.state.isEnabled},
+      () => { this.modifySliver(this.state.exts) })
+  }
+
   modifySliver = (exts) => {
+    const { isEnabled } = this.state
     const type = FiletypeWidgetInfo.type
     const order = { '_term': 'asc' }
     const aggs = { filetype: { terms: { field: extField, order, size: 100 } } }
@@ -108,7 +116,7 @@ class Filetype extends Component {
     if (exts && exts.length) {
       sliver.filter = new AssetFilter({terms: {[extField]: exts}})
     }
-    const widget = new WidgetModel({id: this.props.id, type, sliver})
+    const widget = new WidgetModel({id: this.props.id, type, sliver, isEnabled})
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
@@ -273,7 +281,7 @@ class Filetype extends Component {
 
   render () {
     const { isIconified } = this.props
-    const { suggestions, suggestion } = this.state
+    const { suggestions, suggestion, isEnabled } = this.state
     const isSelected = this.state.exts.length > 0
     const placeholder = isSelected ? '' : 'Search filetypes'
     const style = { height: '14px', width: isSelected ? '40px' : '90px' }
@@ -289,6 +297,8 @@ class Filetype extends Component {
                 </div>
               )}
               backgroundColor={FiletypeWidgetInfo.color}
+              isEnabled={isEnabled}
+              enableToggleFn={this.toggleEnabled}
               isIconified={isIconified}
               icon={FiletypeWidgetInfo.icon}
               onClose={this.removeFilter.bind(this)}>

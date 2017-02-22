@@ -356,7 +356,7 @@ class Assets extends Component {
   }
 
   renderAssets () {
-    const { assets, selectedIds, totalCount, layout, protocol, host } = this.props
+    const { assets, selectedIds, totalCount, layout, showMultipage, protocol, host, thumbSize } = this.props
     const { positions, multipage, collapsed, tableIsResizing } = this.state
     api.setTableIsResizing(tableIsResizing)
 
@@ -420,15 +420,18 @@ class Assets extends Component {
                   const indexes = parentId && multipage[parentId]
                   const dim = positions[index]
                   const { width, height } = dim
-                  const pages = indexes && indexes.map(index => (
-                      page(assets[index], width, height, protocol, host))) || [page(asset, width, height, protocol, host
-                    )]
+                  const badgeHeight = thumbSize < 100 ? 15 : 25
+                  const badge = badges(asset, protocol, host, indexes && indexes.length || showMultipage, badgeHeight)
+                  const pages = indexes && indexes.slice(0, 3).map(index => (
+                      page(assets[index], width, height, protocol, host, indexes))) ||
+                    [page(asset, width, height, protocol, host)]
                   return (
                     <Thumb isSelected={selectedIds && selectedIds.has(asset.id)}
                            dim={dim}
                            key={asset.id}
                            pages={pages}
-                           { ...badges(asset, protocol, host) }
+                           badgeHeight={badgeHeight}
+                           { ...badge }
                            onClick={event => {
                              // don't scroll assets when we select thumbs. (table selection will scroll)
                              this.skipNextSelectionScroll = true

@@ -29,12 +29,14 @@ class Color extends Component {
   }
 
   state = {
+    isEnabled: true,
     colors: [],
     isServerHSL: true // see toggleServerHSL
   }
 
+  // sync local state with existing app state
   syncLocalColorWithAppState (nextProps) {
-    // sync local state with existing app state
+    if (!this.state.isEnabled) return
     const { id, widgets } = nextProps
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
@@ -72,6 +74,7 @@ class Color extends Component {
   }
 
   modifySliver (colors) {
+    const { isEnabled } = this.state
     const type = ColorWidgetInfo.type
     const sliver = new AssetSearch()
 
@@ -97,7 +100,7 @@ class Color extends Component {
       })}})
     }
 
-    const widget = new WidgetModel({id: this.props.id, type, sliver})
+    const widget = new WidgetModel({id: this.props.id, type, sliver, isEnabled})
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
@@ -229,6 +232,11 @@ class Color extends Component {
     this.props.actions.removeRacetrackWidgetIds([this.props.id])
   }
 
+  toggleEnabled = () => {
+    this.setState({isEnabled: !this.state.isEnabled},
+      () => { this.modifySliver(this.state.colors) })
+  }
+
   resizer = null
   resizeIndex = -1
   resize1start = 0.5
@@ -278,7 +286,7 @@ class Color extends Component {
 
   render () {
     const { isIconified } = this.props
-    const { colors } = this.state
+    const { colors, isEnabled } = this.state
 
     let hsl = [0, 0, 100]
     if (colors.length) {
@@ -302,9 +310,11 @@ class Color extends Component {
                 </div>
               )}
               backgroundColor={ColorWidgetInfo.color}
+              isEnabled={isEnabled}
               isIconified={isIconified}
               icon={ColorWidgetInfo.icon}
-              onClose={this.removeFilter.bind(this)}>
+              onClose={this.removeFilter.bind(this)}
+              enableToggleFn={this.toggleEnabled}>
         <div className="Color-body">
           <div className="Color-picker">
             <div className="Color-swatches">
