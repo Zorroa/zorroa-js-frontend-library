@@ -33,7 +33,12 @@
     "React": true,
     "DEBUG": true,
     "PROD": true,
-    "PRODLOCAL": true
+    "PRODLOCAL": true,
+    "zvBranch": true,
+    "zvCommit": true,
+    "zvCount": true,
+    "zvDateStr": true,
+    "zvDateMs": true
   },
   "rules": {}
 }

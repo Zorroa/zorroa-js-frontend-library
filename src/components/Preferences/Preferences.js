@@ -32,6 +32,10 @@ class Preferences extends Component {
         </div>
         <div className="body">
           {user.firstName} {user.lastName}&rsquo;s personal preferences.
+          <div className='Preferences-build flexCol'>
+            <div>Build number: {`${zvCount} (${zvCommit} ${zvBranch})`}</div>
+            <div>Build date: {`${zvDateStr}`}</div>
+          </div>
         </div>
         <div className="footer">
           <button onClick={this.dismiss}>Done</button>
