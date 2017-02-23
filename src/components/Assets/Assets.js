@@ -8,7 +8,7 @@ import * as assert from 'assert'
 import Thumb, { page, badges } from '../Thumb'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
-import { isolateAssetId, selectAssetIds } from '../../actions/assetsAction'
+import { isolateAssetId, selectAssetIds, sortAssets } from '../../actions/assetsAction'
 import { resetRacetrackWidgets } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
@@ -17,6 +17,7 @@ import Pager from './Pager'
 import Footer from './Footer'
 import Table from '../Table'
 import Editbar from './Editbar'
+import SortingSelector from './SortingSelector'
 import * as ComputeLayout from './ComputeLayout.js'
 import AssetSearch from '../../models/AssetSearch'
 import Resizer from '../../services/Resizer'
@@ -31,6 +32,7 @@ class Assets extends Component {
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     assetsCounter: PropTypes.number.isRequired,
     query: PropTypes.instanceOf(AssetSearch),
+    order: PropTypes.arrayOf(PropTypes.object),
     selectedIds: PropTypes.object,
     selectionCounter: PropTypes.number.isRequired,
     totalCount: PropTypes.number,
@@ -356,7 +358,7 @@ class Assets extends Component {
   }
 
   renderAssets () {
-    const { assets, selectedIds, totalCount, layout, protocol, host } = this.props
+    const { assets, selectedIds, totalCount, layout, showMultipage, protocol, host, thumbSize } = this.props
     const { positions, multipage, collapsed, tableIsResizing } = this.state
     api.setTableIsResizing(tableIsResizing)
 
@@ -420,15 +422,18 @@ class Assets extends Component {
                   const indexes = parentId && multipage[parentId]
                   const dim = positions[index]
                   const { width, height } = dim
-                  const pages = indexes && indexes.map(index => (
-                      page(assets[index], width, height, protocol, host))) || [page(asset, width, height, protocol, host
-                    )]
+                  const badgeHeight = thumbSize < 100 ? 15 : 25
+                  const badge = badges(asset, protocol, host, indexes && indexes.length || showMultipage, badgeHeight)
+                  const pages = indexes && indexes.slice(0, 3).map(index => (
+                      page(assets[index], width, height, protocol, host, indexes))) ||
+                    [page(asset, width, height, protocol, host)]
                   return (
                     <Thumb isSelected={selectedIds && selectedIds.has(asset.id)}
                            dim={dim}
                            key={asset.id}
                            pages={pages}
-                           { ...badges(asset, protocol, host) }
+                           badgeHeight={badgeHeight}
+                           { ...badge }
                            onClick={event => {
                              // don't scroll assets when we select thumbs. (table selection will scroll)
                              this.skipNextSelectionScroll = true
@@ -453,7 +458,7 @@ class Assets extends Component {
   }
 
   render () {
-    const { assets, totalCount, tableHeight, showTable, showMultipage, layout, thumbSize, assetsCounter } = this.props
+    const { assets, totalCount, tableHeight, showTable, showMultipage, layout, thumbSize, assetsCounter, order } = this.props
     const { collapsed, tableIsResizing } = this.state
 
     // Trigger layout if assets change.
@@ -471,7 +476,7 @@ class Assets extends Component {
 
     return (
       <div className="Assets" ref="Assets">
-        <Editbar/>
+        <Editbar leftSide={<SortingSelector sortAssets={this.props.actions.sortAssets} order={order}/>}/>
         {this.renderAssets()}
         { showTable && (
           <div className='Assets-tableResize'
@@ -506,6 +511,7 @@ export default connect(state => ({
   assets: state.assets.all,
   assetsCounter: state.assets.assetsCounter,
   query: state.assets.query,
+  order: state.assets.order,
   selectedIds: state.assets.selectedIds,
   selectionCounter: state.assets.selectionCounter,
   totalCount: state.assets.totalCount,
@@ -522,6 +528,7 @@ export default connect(state => ({
   actions: bindActionCreators({
     isolateAssetId,
     selectAssetIds,
+    sortAssets,
     resetRacetrackWidgets,
     selectFolderIds,
     setThumbSize,

@@ -35,6 +35,7 @@ class DateRange extends Component {
   resizer = null
 
   state = {
+    isEnabled: true,
     field: '',
     min: null, // min threshold (greater than)
     max: null, // max threshold (less than)
@@ -45,6 +46,7 @@ class DateRange extends Component {
   // If the query is changed elsewhere, e.g. from the Searchbar,
   // capture the new props and update our local state to match.
   syncWithAppState (nextProps, selectFieldIfEmpty) {
+    if (!this.state.isEnabled) return
     const { id, widgets } = nextProps
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
@@ -118,8 +120,12 @@ class DateRange extends Component {
     this.setState({ max: optDate, maxStr: dateStr })
   }
 
+  toggleEnabled = () => {
+    this.setState({isEnabled: !this.state.isEnabled}, this.modifySliver)
+  }
+
   modifySliver = () => {
-    const { field, min, max, minStr, maxStr } = this.state
+    const { field, min, max, minStr, maxStr, isEnabled } = this.state
     if (!field || !min || !max || !minStr || !maxStr) return
     const type = DateRangeWidgetInfo.type
 
@@ -128,13 +134,13 @@ class DateRange extends Component {
       const range = { [field]: { 'gte': minStr, 'lte': maxStr } }
       sliver.filter = new AssetFilter({ range })
     }
-    const widget = new WidgetModel({ id: this.props.id, type, sliver })
+    const widget = new WidgetModel({ id: this.props.id, type, sliver, isEnabled })
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
   render () {
     const { isIconified, id } = this.props
-    const { field } = this.state
+    const { field, isEnabled } = this.state
     const title = Asset.lastNamespace(unCamelCase(field))
 
     return (
@@ -149,6 +155,8 @@ class DateRange extends Component {
                 </div>
               )}
               backgroundColor={DateRangeWidgetInfo.color}
+              isEnabled={isEnabled}
+              enableToggleFn={this.toggleEnabled}
               isIconified={isIconified}
               icon={DateRangeWidgetInfo.icon}
               onClose={this.removeFilter.bind(this)}>

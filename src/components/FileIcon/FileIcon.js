@@ -1,10 +1,10 @@
 import React, { PropTypes } from 'react'
 
 const FileIcon = (props) => {
-  const { ext, showText } = props
+  const { ext, showText, height } = props
   let color = '#888'
   // https://docs.google.com/spreadsheets/d/1QTVOmvf4ImUYR7JFVJCpkvWjKiJGTgpFBVcXz1aTLTA/edit#gid=0
-  switch (ext) {
+  switch (ext.toUpperCase()) {
     case 'AAC': color = '#996633'; break
     case 'AI': color = '#FF6600'; break
     case 'AVI': color = '#00980D'; break
@@ -43,7 +43,7 @@ const FileIcon = (props) => {
          y="0px"
          viewBox="0 0 15 20"
          xmlSpace="preserve"
-         style={{ height: '22px', enableBackground: 'new 0 0 15 20', color }}
+         style={{ height: `${height}px`, enableBackground: 'new 0 0 15 20', color }}
     >
       <style type="text/css">{`
           .st0{fill:currentColor;}
@@ -54,7 +54,7 @@ const FileIcon = (props) => {
       <path className="st0" d="M10,0H0v20h15V5L10,0z M10,5V0.9L14.1,5H10z"/>
       { showText ? (
           <text transform="matrix(1 0 0 1 1.7656 18.1638)" className="st1 st2 st3">
-            {ext}
+            {ext.toUpperCase()}
           </text>) : null }
     </svg>
   )
@@ -62,10 +62,12 @@ const FileIcon = (props) => {
 
 FileIcon.propTypes = {
   ext: PropTypes.string.isRequired,
+  height: PropTypes.number,
   showText: PropTypes.bool
 }
 
 FileIcon.defaultProps = {
+  height: 25,
   showText: true
 }
 

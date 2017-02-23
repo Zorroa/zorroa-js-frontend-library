@@ -3,10 +3,11 @@ import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
 
 export default class Widget {
-  constructor ({id, type, sliver, isOpen}) {
+  constructor ({id, type, sliver, isEnabled, isOpen}) {
     this.id = id || uniqueId()
     this.type = type
     this.sliver = sliver
+    this.isEnabled = (isEnabled !== undefined) ? isEnabled : true
     this.isOpen = isOpen
   }
 }

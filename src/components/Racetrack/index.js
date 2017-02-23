@@ -14,5 +14,6 @@ import './WidgetHeader.scss'
 import './AddWidget.scss'
 import './QuickAddWidget.scss'
 import './DateRange.scss'
+import './Widget.scss'
 
 export default Racetrack

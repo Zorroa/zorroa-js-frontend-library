@@ -5,9 +5,10 @@ import {
   SYNC_FIELDS, SHOW_IMPORT_SCRIPT_INFO,
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
-  SHOW_MULTIPAGE, VIDEO_VOLUME,
+  SHOW_MULTIPAGE, SHOW_PAGES, VIDEO_VOLUME,
   USER_SETTINGS, UNAUTH_USER
 } from '../constants/actionTypes'
+import { DEFAULT_THUMBSIZE } from '../actions/appActions'
 
 export const defaultTableFieldWidth = 100
 export const defaultTableFields = [ 'source.filename', 'source.date', 'source.fileSize' ]
@@ -32,19 +33,20 @@ const initialState = {
   tableFieldWidth: Object.assign({},
     ...defaultTableFields.map(field => ({ [field]: defaultTableFieldWidth }))),
   showImportScriptInfo: true,
-  thumbSize: 128,
+  thumbSize: DEFAULT_THUMBSIZE,
   thumbLayout: 'masonry',
   tableHeight: 300,
   showTable: false,
   videoVolume: 0.8,
   showMultipage: false,
+  showPages: false,
   sortFolders: {},
   userSettings: {
     tableFields: [ ...defaultTableFields ],
     metadataFields: [ ...defaultTableFields ],
     showTable: false,
     tableHeight: 300,
-    thumbSize: 128,
+    thumbSize: DEFAULT_THUMBSIZE,
     thumbLayout: 'masonry',
     videoVolume: 0.8
   }
@@ -96,7 +98,9 @@ export default function app (state = initialState, action) {
     case VIDEO_VOLUME:
       return { ...state, videoVolume: action.payload }
     case SHOW_MULTIPAGE:
-      return { ...state, showMultipage: action.payload }
+      return { ...state, showMultipage: action.payload, showPages: action.payload}
+    case SHOW_PAGES:
+      return { ...state, showPages: action.payload }
     case SORT_FOLDERS: {
       const { filter, order } = action.payload
       if (order === undefined) {

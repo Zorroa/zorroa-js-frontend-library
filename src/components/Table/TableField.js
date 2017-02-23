@@ -16,7 +16,7 @@ export default class TableField extends Component {
 
   renderFileType = (vals, asset) => (
     <FileIcon ext={asset.document.source && asset.document.source.extension
-      ? asset.document.source.extension.slice(0, 4).toUpperCase() : '???'} />
+      ? asset.document.source.extension.slice(0, 4) : '???'} />
   )
 
   renderColorArray = (vals) => {

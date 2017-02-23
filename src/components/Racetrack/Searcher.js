@@ -52,7 +52,7 @@ class Searcher extends Component {
     const { widgets } = this.props
     let allOther = new AssetFilter()
     for (let w of widgets) {
-      if (w !== widget && w.sliver && w.sliver.filter && w.sliver.aggs) {
+      if (w !== widget && w.isEnabled && w.sliver && w.sliver.filter && w.sliver.aggs) {
         allOther.merge(w.sliver.filter)
       }
     }
@@ -74,7 +74,7 @@ class Searcher extends Component {
     if (widgets && widgets.length) {
       let postFilter = new AssetFilter()
       for (let widget of widgets) {
-        if (!widget || !widget.sliver) {
+        if (!widget || !widget.sliver || !widget.isEnabled) {
           continue
         }
         let sliver = widget.sliver

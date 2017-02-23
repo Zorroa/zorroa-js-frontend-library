@@ -1,0 +1,55 @@
+@import '../../styles/core-mixins.scss';
+
+.Duration {
+  color: $zorroa-greyish-brown;
+  background: none;
+
+  @include flexRow;
+  @include flexAlignItemsCenter;
+
+}
+
+.Duration-duration {
+  padding-left: 2px;
+  padding-right: 4px;
+  height: 25px;
+  background-color: rgba(256,256,256, 0.75);
+
+  .small & {
+    height: 15px;
+    font-size: 10px;
+  }
+}
+
+.Duration-play-badge {
+  padding: 4px;
+  margin: 1px;
+  background-color: rgba(256,256,256, 0.75);
+  width: 25px;
+  height: 25px;
+
+  .small & {
+    width: 15PX;
+    height: 15px;
+  }
+
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include flexJustifyCenter;
+
+  @media (max-width: 56px) { visibility: hidden }
+}
+
+.Duration-arrow-right {
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 12px solid $zorroa-greyish-brown;
+
+  .small & {
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-left: 6px solid $zorroa-greyish-brown;
+  }
+}

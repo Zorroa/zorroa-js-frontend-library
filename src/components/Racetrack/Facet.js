@@ -32,6 +32,7 @@ class Facet extends Component {
   }
 
   state = {
+    isEnabled: true,
     field: '',
     fieldIsDate: false,
     order: { '_count': 'desc' },
@@ -47,6 +48,8 @@ class Facet extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
+    if (!this.state.isEnabled) return
+
     // initialize fieldTypes first time through
     if (!this.fieldTypes) {
       const { fields } = nextProps
@@ -83,14 +86,20 @@ class Facet extends Component {
     }
   }
 
+  toggleEnabled = () => {
+    this.setState({isEnabled: !this.state.isEnabled},
+      () => { this.modifySliver(this.state.field, this.state.terms, this.state.order) })
+  }
+
   modifySliver = (field, terms, order) => {
+    const { isEnabled } = this.state
     const type = FacetWidgetInfo.type
     const aggs = { facet: { terms: { field, order, size: 100 } } }
     let sliver = new AssetSearch({aggs})
     if (terms && terms.length) {
       sliver.filter = new AssetFilter({terms: {[field]: terms}})
     }
-    const widget = new WidgetModel({id: this.props.id, type, sliver})
+    const widget = new WidgetModel({id: this.props.id, isEnabled, type, sliver})
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
@@ -450,7 +459,7 @@ class Facet extends Component {
 
   render () {
     const { isIconified } = this.props
-    const { field } = this.state
+    const { isEnabled, field } = this.state
     const title = Asset.lastNamespace(unCamelCase(field))
     return (
       <Widget className="Facet"
@@ -466,6 +475,8 @@ class Facet extends Component {
                 </div>
               )}
               backgroundColor={FacetWidgetInfo.color}
+              isEnabled={isEnabled}
+              enableToggleFn={this.toggleEnabled}
               isIconified={isIconified}
               icon={FacetWidgetInfo.icon}
               onClose={this.removeFilter.bind(this)}>
