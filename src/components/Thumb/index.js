@@ -1,4 +1,4 @@
-import Thumb, { page, badges } from './Thumb'
+import Thumb, { page, multipageBadges, monopageBadges } from './Thumb'
 import './Thumb.scss'
 export default Thumb
-export { page, badges }
+export { page, multipageBadges, monopageBadges }

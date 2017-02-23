@@ -64,7 +64,7 @@ class Multipage extends Component {
 
   render () {
     const { showPages, pages } = this.props
-    if (showPages) {
+    if (showPages && pages) {
       const { thumbSize } = this.props
       const zoomOutDisabled = thumbSize < MIN_THUMBSIZE
       const zoomInDisabled = thumbSize > MAX_THUMBSIZE

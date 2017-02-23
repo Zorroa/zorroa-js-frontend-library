@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import keydown from 'react-keydown'
 import * as assert from 'assert'
 
-import Thumb, { page, badges } from '../Thumb'
+import Thumb, { page, monopageBadges, multipageBadges } from '../Thumb'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
 import { isolateAssetId, selectAssetIds, sortAssets } from '../../actions/assetsAction'
@@ -423,7 +423,7 @@ class Assets extends Component {
                   const dim = positions[index]
                   const { width, height } = dim
                   const badgeHeight = thumbSize < 100 ? 15 : 25
-                  const badge = badges(asset, protocol, host, indexes && indexes.length || showMultipage, badgeHeight)
+                  const badge = showMultipage ? multipageBadges(asset, protocol, host, indexes && indexes.length) : monopageBadges(asset)
                   const pages = indexes && indexes.slice(0, 3).map(index => (
                       page(assets[index], width, height, protocol, host, indexes))) ||
                     [page(asset, width, height, protocol, host)]

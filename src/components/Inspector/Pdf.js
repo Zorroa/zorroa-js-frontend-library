@@ -233,7 +233,7 @@ export default class Pdf extends Component {
             </div>
             <div className="Pdf-controls-group">
               <button className="icon-checkbox-empty" disabled={true} />
-              <button className="icon-icons2" disabled={false}
+              <button className="icon-icons2" disabled={!this.props.onMultipage}
                       onClick={this.props.onMultipage}/>
             </div>
           </div>

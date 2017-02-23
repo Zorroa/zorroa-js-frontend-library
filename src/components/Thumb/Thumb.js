@@ -19,7 +19,21 @@ export function page (asset, width, height, protocol, host) {
 }
 
 // Extract badging info from an asset.
-export function badges (asset, protocol, host, stackCount, height) {
+export function monopageBadges (asset) {
+  const startPage = asset.startPage()
+  const stopPage = asset.stopPage()
+  let pageBadge
+  if (asset.mediaType().includes('video')) {
+    pageBadge = <Duration duration={asset.duration()}/>
+  } else if (startPage && (!stopPage || startPage === stopPage)) {
+    pageBadge = <div className="Thumb-page-label">{startPage}</div>
+  } else if (startPage && stopPage) {
+    pageBadge = <div className="Thumb-page-label">{startPage} - {stopPage}</div>
+  }
+  return { pageBadge }
+}
+
+export function multipageBadges (asset, protocol, host, stackCount) {
   let pageBadge, iconBadge, parentURL
 
   const pageCount = asset.pageCount()
@@ -27,18 +41,19 @@ export function badges (asset, protocol, host, stackCount, height) {
   const stopPage = asset.stopPage()
   if (asset.mediaType().includes('video')) {
     pageBadge = <Duration duration={asset.duration()}/>
-  } else if (((stackCount === undefined || stackCount === 0 || stackCount === true) && pageCount) || (stackCount && pageCount && stackCount === pageCount)) {
-    pageBadge = <div className="Assets-page-label">{pageCount}</div>
-  } else if (stackCount >= 0 && pageCount) {
-    pageBadge = <div className="Assets-page-label">{stackCount} of {pageCount}</div>
+  } else if (stackCount && pageCount && stackCount === pageCount || pageCount > 0) {
+    pageBadge = <div className="Thumb-page-label">{pageCount}</div>
+  } else if (stackCount > 0 && pageCount) {
+    pageBadge = <div className="Thumb-page-label">{stackCount} of {pageCount}</div>
   } else if (startPage && (!stopPage || startPage === stopPage)) {
-    pageBadge = <div className="Assets-page-label">{startPage}</div>
+    pageBadge = <div className="Thumb-page-label">{startPage}</div>
   } else if (startPage && stopPage) {
-    pageBadge = <div className="Assets-page-label">{startPage} - {stopPage}</div>
+    pageBadge = <div className="Thumb-page-label">{startPage} - {stopPage}</div>
   }
 
-  if (stackCount) {
-    iconBadge = <FileIcon ext={asset.value('source.extension')} height={height} />
+  // Show the icon & inset if we have any page badging
+  if (pageBadge) {
+    iconBadge = <FileIcon ext={asset.value('source.extension')}/>
     parentURL = asset.parentProxyURL(protocol, host)
   }
 
@@ -115,7 +130,7 @@ class Thumb extends Component {
     if (!pageBadge && !iconBadge) return
 
     return (
-      <div className={classnames('Thumb-badges', {small: badgeHeight < 25 })}>
+      <div className={classnames('Thumb-badges', { small: badgeHeight < 25 })}>
         {pageBadge ? <div className="Thumb-pages">{pageBadge}</div> : null}
         {iconBadge ? <div className="Thumb-icon">{iconBadge}</div> : null}
       </div>

@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react'
 
 const FileIcon = (props) => {
-  const { ext, showText, height } = props
+  const { ext } = props
   let color = '#888'
   // https://docs.google.com/spreadsheets/d/1QTVOmvf4ImUYR7JFVJCpkvWjKiJGTgpFBVcXz1aTLTA/edit#gid=0
   switch (ext.toUpperCase()) {
@@ -35,7 +35,8 @@ const FileIcon = (props) => {
   }
 
   return (
-    <svg version="1.1"
+    <svg className="FileIcon"
+         version="1.1"
          id="Layer_1"
          xmlns="http://www.w3.org/2000/svg"
          xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -43,32 +44,18 @@ const FileIcon = (props) => {
          y="0px"
          viewBox="0 0 15 20"
          xmlSpace="preserve"
-         style={{ height: `${height}px`, enableBackground: 'new 0 0 15 20', color }}
+         style={{ color }}
     >
-      <style type="text/css">{`
-          .st0{fill:currentColor;}
-          .st1{fill:#FFFFFF;}
-          .st2{font-family:'Roboto';}
-          .st3{font-size:6px;}
-        `}</style>
-      <path className="st0" d="M10,0H0v20h15V5L10,0z M10,5V0.9L14.1,5H10z"/>
-      { showText ? (
-          <text transform="matrix(1 0 0 1 1.7656 18.1638)" className="st1 st2 st3">
-            {ext.toUpperCase()}
-          </text>) : null }
+      <path className="FileIcon-path" d="M10,0H0v20h15V5L10,0z M10,5V0.9L14.1,5H10z"/>
+      <text transform="matrix(1 0 0 1 1.7656 18.1638)" className="FileIcon-text">
+        {ext.toUpperCase()}
+      </text>
     </svg>
   )
 }
 
 FileIcon.propTypes = {
-  ext: PropTypes.string.isRequired,
-  height: PropTypes.number,
-  showText: PropTypes.bool
-}
-
-FileIcon.defaultProps = {
-  height: 25,
-  showText: true
+  ext: PropTypes.string.isRequired
 }
 
 export default FileIcon

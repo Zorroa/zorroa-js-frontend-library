@@ -70,6 +70,7 @@
 
   .Thumb-icon {
     @include flexRow;
+    margin-left: 2px;
   }
 }
 
@@ -116,4 +117,13 @@
   width: 30%;
   height: 30%;
   border: 2px solid $zorroa-lightgray;
+}
+
+.Thumb-page-label {
+  @include nowrap;
+  @include flexRow;
+  font-family: "Roboto Condensed";
+  background-color: rgba(256, 256, 256, 0.75);
+  padding-right: 4px;
+  padding-left: 4px;
 }

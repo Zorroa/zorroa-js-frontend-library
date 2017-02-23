@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 
-import Thumb, { page } from '../Thumb'
+import Thumb, { page, monopageBadges } from '../Thumb'
 import Asset from '../../models/Asset'
 import * as ComputeLayout from '../Assets/ComputeLayout.js'
 
@@ -123,7 +123,7 @@ class Thumbs extends Component {
 
   render () {
     const { positions, selected } = this.state
-    const { assets, protocol, host } = this.props
+    const { assets, protocol, host, thumbSize } = this.props
     if (!positions || !assets || positions.length !== assets.length) {
       return <div className="Thumbs" ref={this.updateElement} />
     }
@@ -131,11 +131,13 @@ class Thumbs extends Component {
       <div className="Thumbs" ref={this.updateElement}>
         <div className="Thumbs-body">
           { assets.map((asset, i) => {
+            const { pageBadge } = monopageBadges(asset, protocol, host, -1, thumbSize < 100 ? 15 : 25)
             const dim = positions[i]
             const { width, height } = dim
             return <Thumb key={asset.id}
                           pages={[page(asset, width, height, protocol, host)]}
                           dim={dim}
+                          pageBadge={pageBadge}
                           isSelected={selected.has(asset.id)}
                           onClick={e => this.select(asset, e)}
                           onDoubleClick={e => this.props.onMonopage(asset, e)}/>
