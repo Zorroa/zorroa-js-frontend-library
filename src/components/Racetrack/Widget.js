@@ -1,5 +1,3 @@
-// @flow
-
 import React, { Component, PropTypes } from 'react'
 import classnames from 'classnames'
 import WidgetHeader from './WidgetHeader'
@@ -19,10 +17,7 @@ export default class Widget extends Component {
     enableToggleFn: PropTypes.func.isRequired
   }
 
-  state: Object
-  toggleCollapse: Function
-
-  constructor (props: Object) {
+  constructor (props) {
     super(props)
     this.state = { isOpen: true }
   }
