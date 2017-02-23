@@ -1,6 +1,7 @@
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const paths = require('./paths.js')
+const childProcess = require('child_process')
 
 function BuildFinishedOutputPlugin (options) {
   this.apply = function (compiler) {
@@ -12,6 +13,13 @@ function BuildFinishedOutputPlugin (options) {
 }
 
 module.exports = function getPlugins (env) {
+  const date = new Date()
+  const zvCommit = childProcess.execSync('git rev-parse --short HEAD').toString().trim()
+  const zvBranch = childProcess.execSync('git rev-parse --abbrev-ref HEAD').toString().trim()
+  const zvCount = childProcess.execSync('git rev-list HEAD --count').toString().trim()
+  const zvDateMs = date.valueOf().toString()
+  const zvDateStr = date.toISOString()
+
   let plugins = [
     new BuildFinishedOutputPlugin({}),
     new webpack.optimize.OccurenceOrderPlugin(),
@@ -20,6 +28,11 @@ module.exports = function getPlugins (env) {
       template: paths.appHtml,
       hash: true
     }),
+
+    // These defines act like global vars, but they are string-replaced at build time
+    // So they're not actually variables, they're macros,
+    // and they may need to be trimmed/quoted to build (especially shell-outs)
+
     new webpack.DefinePlugin({
       'process.env': {
         BUILD_ENV: process.env.ENV,
@@ -27,7 +40,12 @@ module.exports = function getPlugins (env) {
       },
       'DEBUG': (env === 'DEV'),
       'PROD': (env === 'PROD'),
-      'PRODLOCAL': (env === 'PRODLOCAL')
+      'PRODLOCAL': (env === 'PRODLOCAL'),
+      'zvCommit': `"${zvCommit}"`,
+      'zvBranch': `"${zvBranch}"`,
+      'zvCount': `"${zvCount}"`,
+      'zvDateMs': `"${zvDateMs}"`,
+      'zvDateStr': `"${zvDateStr}"`
     })
   ]
 

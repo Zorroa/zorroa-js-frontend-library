@@ -8,7 +8,6 @@ import User from '../../models/User'
 class Preferences extends Component {
   static propTypes = {
     user: PropTypes.instanceOf(User),
-    onCreate: PropTypes.func.isRequired,
     onDismiss: PropTypes.func,
     actions: PropTypes.object
   }
@@ -32,6 +31,10 @@ class Preferences extends Component {
         </div>
         <div className="body">
           {user.firstName} {user.lastName}&rsquo;s personal preferences.
+          <div className='Preferences-build flexCol'>
+            <div>Build number: {`${zvCount} (${zvCommit} ${zvBranch})`}</div>
+            <div>Build date: {`${zvDateStr}`}</div>
+          </div>
         </div>
         <div className="footer">
           <button onClick={this.dismiss}>Done</button>
