@@ -136,7 +136,7 @@ export default class PanZoom extends Component {
                   <Controlbar onZoomOut={!zoomOutDisabled && this.zoomOut || null}
                               onZoomIn={!zoomInDisabled && this.zoomIn || null}
                               onFit={!zoomToFitDisabled && this.zoomToFit || null}
-                              onMultipage={this.props.onMultipage} />) : null
+                              onMultipage={onMultipage} />) : null
               }
             </div>
           )

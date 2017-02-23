@@ -1,7 +1,8 @@
 import {
   ASSET_SEARCH, ASSET_SEARCH_ERROR,
   ASSET_SORT, ASSET_ORDER, ASSET_FIELDS,
-  PAGE_SIZE, ISOLATE_ASSET, SELECT_ASSETS, SUGGEST_COMPLETIONS, UNAUTH_USER
+  PAGE_SIZE, ISOLATE_ASSET, SELECT_ASSETS,
+  SUGGEST_COMPLETIONS, SEARCH_DOCUMENT, UNAUTH_USER
 } from '../constants/actionTypes'
 
 import AssetSearch from '../models/AssetSearch'
@@ -60,6 +61,10 @@ export default function (state = initialState, action) {
       return { ...state, all, aggs, query, totalCount, isolatedId: null, suggestions: null, assetsCounter }
     }
 
+    case SEARCH_DOCUMENT: {
+      return { ...state, pages: action.payload }
+    }
+
     case ASSET_SEARCH_ERROR:
       return { ...state, error: action.payload }
 
@@ -85,7 +90,7 @@ export default function (state = initialState, action) {
       return { ...state, fields: action.payload }
 
     case ISOLATE_ASSET:
-      return { ...state, isolatedId: action.payload }
+      return { ...state, isolatedId: action.payload, pages: action.payload ? state.pages : null }
 
     case SELECT_ASSETS: {
       const selectionCounter = state.selectionCounter + 1

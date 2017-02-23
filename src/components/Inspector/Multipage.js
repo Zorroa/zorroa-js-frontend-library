@@ -1,19 +1,24 @@
 import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import classnames from 'classnames'
 
 import Controlbar from './Controlbar'
+import Editbar from '../Assets/Editbar'
 import Thumbs from './Thumbs'
 import Asset from '../../models/Asset'
+import AssetSearch from '../../models/AssetSearch'
 import { showPages, setThumbSize, MIN_THUMBSIZE, MAX_THUMBSIZE, DELTA_THUMBSIZE, DEFAULT_THUMBSIZE } from '../../actions/appActions'
-import { isolateAssetId } from '../../actions/assetsAction'
+import { isolateAssetId, searchDocument } from '../../actions/assetsAction'
 
 class Multipage extends Component {
   static propTypes = {
-    assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)).isRequired,
+    parentId: PropTypes.string,
     showMultipage: PropTypes.bool,
     showPages: PropTypes.bool,
     thumbSize: PropTypes.number,
+    query: PropTypes.instanceOf(AssetSearch),
+    pages: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     actions: PropTypes.object,
     children: PropTypes.node.isRequired
   }
@@ -22,14 +27,18 @@ class Multipage extends Component {
     thumbSize: DEFAULT_THUMBSIZE
   }
 
-  componentWillMount () {
-    const { showMultipage, assets } = this.props
-    if (showMultipage && assets && assets.length) {
-      this.props.actions.showPages(true)
-    }
+  state = {
+    showDocument: false
   }
 
-  componentWill
+  componentWillMount () {
+    const { showMultipage, parentId, query } = this.props
+    if (showMultipage && parentId && parentId.length) {
+      this.props.actions.showPages(true)
+    }
+    this.props.actions.searchDocument(query, parentId)
+  }
+
   zoomIn = (event) => {
     let {thumbSize} = this.props
     thumbSize = Math.min(MAX_THUMBSIZE, thumbSize + DELTA_THUMBSIZE)
@@ -47,19 +56,37 @@ class Multipage extends Component {
     this.props.actions.showPages(false)
   }
 
-  switchToMultipage = () => {
-    this.props.actions.showPages(true)
+  showDocument = (show) => {
+    this.setState({showDocument: show})
+    const { query, parentId } = this.props
+    this.props.actions.searchDocument(show ? null : query, parentId)
   }
 
   render () {
-    const { showPages } = this.props
+    const { showPages, pages } = this.props
     if (showPages) {
-      const { assets, thumbSize } = this.props
+      const { thumbSize } = this.props
       const zoomOutDisabled = thumbSize < MIN_THUMBSIZE
       const zoomInDisabled = thumbSize > MAX_THUMBSIZE
+      const { showDocument } = this.state
+
+      const documentSwitch = () => (
+        <div className="Multipage-document-switch">
+          <div onClick={e => this.showDocument(false)}
+               className={classnames('Multipage-document-mode left', {selected: !showDocument})}>
+            Search Results
+          </div>
+          <div onClick={e => this.showDocument(true)}
+               className={classnames('Multipage-document-mode right', {selected: showDocument})}>
+            Full Document
+          </div>
+        </div>
+      )
+
       return (
         <div className="Multipage">
-          <Thumbs assets={assets} onMonopage={this.switchToPanZoom}/>
+          <Editbar leftSide={documentSwitch()}/>
+          <Thumbs assets={pages} onMonopage={this.switchToPanZoom}/>
           <Controlbar onZoomIn={!zoomInDisabled && this.zoomIn}
                       onZoomOut={!zoomOutDisabled && this.zoomOut}
                       onMonopage={e => this.switchToPanZoom(null, e)}/>
@@ -73,11 +100,14 @@ class Multipage extends Component {
 export default connect(state => ({
   thumbSize: state.app.thumbSize,
   showMultipage: state.app.showMultipage,
-  showPages: state.app.showPages
+  showPages: state.app.showPages,
+  query: state.assets.query,
+  pages: state.assets.pages
 }), dispatch => ({
   actions: bindActionCreators({
     setThumbSize,
     showPages,
-    isolateAssetId
+    isolateAssetId,
+    searchDocument
   }, dispatch)
 }))(Multipage)
