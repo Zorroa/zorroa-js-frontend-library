@@ -20,20 +20,17 @@ class Video extends Component {
     startFrame: PropTypes.number,
     stopFrame: PropTypes.number,
     videoVolume: PropTypes.number,
+    onMultipage: PropTypes.func,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object
   }
 
-  constructor (props) {
-    super(props)
-
-    this.state = {
-      playing: true,
-      volume: this.props.videoVolume,
-      played: 0,
-      loaded: 0
-    }
+  state = {
+    playing: true,
+    volume: this.props.videoVolume,
+    played: 0,
+    loaded: 0
   }
 
   @keydown('space')
@@ -114,7 +111,7 @@ class Video extends Component {
   }
 
   render () {
-    const { url, frameRate, frames, startFrame, stopFrame } = this.props
+    const { url, frameRate, frames, startFrame, stopFrame, onMultipage } = this.props
     const { playing, volume, played, loaded } = this.state
     const volumeX = 130 * volume
     const volumeY = 30 - (5 + 20 * volume)
@@ -123,7 +120,7 @@ class Video extends Component {
     return (
       <div className='Video'>
         <div className="Video-pan-zoom">
-          <PanZoom showControls={false}>
+          <PanZoom showControls={false} onMultipage={onMultipage}>
             <ReactPlayer
               ref={player => { this.player = player }}
               className='Video-player'
@@ -182,7 +179,7 @@ class Video extends Component {
               <input type='range' min={0} max={1} step='any' value={volume} onChange={this.setVolume} />
             </div>
             <div className="icon-volume-high"/>
-            <button className="icon-expand" onClick={this.zoom} />
+            <button className="Video-multipage icon-icons2" onClick={onMultipage} />
           </div>
         </div>
       </div>

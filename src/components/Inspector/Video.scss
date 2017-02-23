@@ -7,7 +7,6 @@
   @include fullHeight;
   color: white;
   background-color: black;
-  z-index: -4;
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
 
@@ -233,6 +232,13 @@
       height: 20px;
       padding-left: 0;
       margin-left: 0;
+    }
+  }
+
+  .Video-multipage {
+    &:hover {
+      cursor: pointer;
+      color: $zorroa-sickly-green;
     }
   }
 }

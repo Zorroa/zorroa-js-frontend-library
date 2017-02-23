@@ -7,6 +7,7 @@ export default class PanZoom extends Component {
   static propTypes = {
     showControls: PropTypes.bool,
     onMultipage: PropTypes.func,
+    actions: PropTypes.object,
     children: PropTypes.node.isRequired
   }
 
@@ -111,7 +112,7 @@ export default class PanZoom extends Component {
   }
 
   render () {
-    const { showControls } = this.props
+    const { showControls, onMultipage } = this.props
     const { moving } = this.state
     const epsilon = 0.01
     const zoomOutDisabled = this.panner.scale <= PanZoom.minZoom + epsilon

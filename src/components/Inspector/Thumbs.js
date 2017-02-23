@@ -124,7 +124,7 @@ class Thumbs extends Component {
   render () {
     const { positions, selected } = this.state
     const { assets, protocol, host } = this.props
-    if (positions.length !== assets.length) {
+    if (!positions || !assets || positions.length !== assets.length) {
       return <div className="Thumbs" ref={this.updateElement} />
     }
     return (
