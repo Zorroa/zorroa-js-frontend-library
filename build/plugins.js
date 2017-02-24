@@ -14,6 +14,7 @@ function BuildFinishedOutputPlugin (options) {
 
 module.exports = function getPlugins (env) {
   const date = new Date()
+  const zvVersion = JSON.stringify(require('../package.json').version).replace(/"/g, '').trim()
   const zvCommit = childProcess.execSync('git rev-parse --short HEAD').toString().trim()
   const zvBranch = childProcess.execSync('git rev-parse --abbrev-ref HEAD').toString().trim()
   const zvCount = childProcess.execSync('git rev-list HEAD --count').toString().trim()
@@ -45,7 +46,8 @@ module.exports = function getPlugins (env) {
       'zvBranch': `"${zvBranch}"`,
       'zvCount': `"${zvCount}"`,
       'zvDateMs': `"${zvDateMs}"`,
-      'zvDateStr': `"${zvDateStr}"`
+      'zvDateStr': `"${zvDateStr}"`,
+      'zvVersion': `"${zvVersion}"`
     })
   ]
 

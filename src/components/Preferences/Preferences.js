@@ -32,7 +32,8 @@ class Preferences extends Component {
         <div className="body">
           {user.firstName} {user.lastName}&rsquo;s personal preferences.
           <div className='Preferences-build flexCol'>
-            <div>Build number: {`${zvCount} (${zvCommit} ${zvBranch})`}</div>
+            <div>Version: {`${zvVersion}`}</div>
+            <div>Build: {`${zvCount} (${zvCommit} ${zvBranch})`}</div>
             <div>Build date: {`${zvDateStr}`}</div>
           </div>
         </div>

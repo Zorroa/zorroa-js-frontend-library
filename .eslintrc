@@ -38,7 +38,8 @@
     "zvCommit": true,
     "zvCount": true,
     "zvDateStr": true,
-    "zvDateMs": true
+    "zvDateMs": true,
+    "zvVersion": true
   },
   "rules": {}
 }
