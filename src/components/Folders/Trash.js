@@ -11,7 +11,6 @@ import { getTrashedFolders, countTrashedFolders, emptyFolderTrash, deleteTrashed
 
 class Trash extends Component {
   static propTypes = {
-    filterName: PropTypes.string.isRequired,
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
     selectedFolderIds: PropTypes.instanceOf(Set),
     user: PropTypes.instanceOf(User),
@@ -119,7 +118,7 @@ class Trash extends Component {
   }
 
   render () {
-    const { filterName, trashedFolders, selectedFolderIds } = this.props
+    const { trashedFolders, selectedFolderIds } = this.props
     const { isOpen, contextMenuTrashedFolderId } = this.state
     const hasChildren = trashedFolders && trashedFolders.length > 0
     const isSelected = false
@@ -129,15 +128,7 @@ class Trash extends Component {
       return null
     }
     // Filter for trash location, only used in simple or smart for now
-    const filteredTrashedFolders = trashedFolders.filter(trashedFolder => {
-      switch (filterName) {
-        case 'simple':
-          return !trashedFolder.search
-        case 'smart':
-          return trashedFolder.search
-      }
-    })
-    if (!filteredTrashedFolders.length) return null
+    if (!trashedFolders.length) return null
     return (
       <div className={classnames('Trash', {isOpen, hasChildren, isSelected, isDropTarget})} >
         <div className="Trash-header">
@@ -150,7 +141,7 @@ class Trash extends Component {
               <div className="Trash-label">Trash</div>
             </div>
             <div className="Trash-header-count">
-              { filteredTrashedFolders.length }
+              { trashedFolders.length }
             </div>
           </div>
         </div>
@@ -158,7 +149,7 @@ class Trash extends Component {
           <div className="Trash-body">
             <div className="Trash-subheader">
               <div className="Trash-count">
-                <div>{ filteredTrashedFolders.length }</div>
+                <div>{ trashedFolders.length }</div>
                 <div>folders</div>
               </div>
               <div className="Trash-empty" onClick={this.emptyTrash}>
@@ -166,7 +157,7 @@ class Trash extends Component {
               </div>
             </div>
             <div className="Trash-items">
-              { filteredTrashedFolders.map(trashedFolder => {
+              { trashedFolders.map(trashedFolder => {
                 const isDyHi = false
                 const icon = isDyHi ? 'icon-foldercog' : (trashedFolder.search ? 'icon-collections-smart' : 'icon-collections-simple')
                 return (

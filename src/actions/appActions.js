@@ -153,9 +153,9 @@ export function showPages (show) {
   })
 }
 
-export function sortFolders (filter, order) {
+export function sortFolders (order) {
   return ({
     type: SORT_FOLDERS,
-    payload: { filter, order }
+    payload: order
   })
 }

@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import * as assert from 'assert'
 import classnames from 'classnames'
 
 import Folder from '../../models/Folder'
@@ -9,7 +8,6 @@ import { getFolderChildren, createFolder, selectFolderIds, selectFolderId, toggl
 import { showModal, sortFolders } from '../../actions/appActions'
 import Trash from './Trash'
 import FolderItem from './FolderItem'
-import AssetSearch from '../../models/AssetSearch'
 import CreateFolder from './CreateFolder'
 
 const SORT_ALPHABETICAL = 'alpha'
@@ -20,7 +18,6 @@ const SORT_TIME = 'time'
 class Folders extends Component {
   static propTypes = {
     // input props
-    filterName: PropTypes.string.isRequired,
     filter: PropTypes.func,
     onSelect: PropTypes.func,
 
@@ -29,14 +26,12 @@ class Folders extends Component {
 
     // state props
     folders: PropTypes.object.isRequired,
-    query: PropTypes.instanceOf(AssetSearch),
     sortFolders: PropTypes.object
   }
 
   state = { filterString: '' }
 
   componentWillMount () {
-    assert.ok(this.props.filterName in Folder.Filters) // make sure filter is valid
     const rootFolder = this.props.folders.all.get(Folder.ROOT_ID)
     if (!rootFolder.childIds || !rootFolder.childIds.size) {
       this.loadChildren(Folder.ROOT_ID)
@@ -44,8 +39,7 @@ class Folders extends Component {
   }
 
   sortOrder () {
-    const { filterName, sortFolders } = this.props
-    return sortFolders[filterName] || 'alpha-asc'
+    return this.props.sortFolders || 'alpha-asc'
   }
 
   loadChildren (id) {
@@ -155,48 +149,17 @@ class Folders extends Component {
         }
         break
     }
-    const { filterName, actions } = this.props
-    actions.sortFolders(filterName, newSort)
+    this.props.actions.sortFolders(newSort)
   }
 
   addFolder = () => {
     const width = '300px'
-    const body = <CreateFolder title={this.addFolderTitle()} acl={[]}
-                               onCreate={this.addFolderCallback()}/>
+    const body = <CreateFolder title='Create Collection' acl={[]}
+                               onCreate={this.createFolder}/>
     this.props.actions.showModal({body, width})
   }
 
-  addFolderTitle () {
-    switch (this.props.filterName) {
-      case 'browsing': return 'Create Browsing Folder'
-      case 'smart': return 'Create Smart Collection'
-      case 'simple': return 'Create Simple Collection'
-    }
-  }
-
-  addFolderCallback () {
-    switch (this.props.filterName) {
-      case 'browsing': return this.createBrowsingFolder
-      case 'smart': return this.createSmartFolder
-      case 'simple': return this.createSimpleFolder
-    }
-  }
-
-  createBrowsingFolder = (name, acl) => {
-    console.log('Create browsing folder')
-  }
-
-  createSmartFolder = (name, acl) => {
-    const search = new AssetSearch(this.props.query)
-    search.aggs = null
-    this.createFolder(name, acl, search)
-  }
-
-  createSimpleFolder = (name, acl) => {
-    this.createFolder(name, acl, undefined)
-  }
-
-  createFolder (name, acl, search) {
+  createFolder = (name, acl, search) => {
     const parentId = this.selectedParentId()
     const folder = new Folder({ name, parentId, acl, search })
     this.props.actions.createFolder(folder)
@@ -208,41 +171,19 @@ class Folders extends Component {
     return selectedFolderIds.values().next().value
   }
 
-  addFolderIcon () {
-    switch (this.props.filterName) {
-      case 'browsing': return 'icon-folder-add'
-      case 'smart': return 'icon-collections-add'
-      case 'simple': return 'icon-collections-add'
-    }
-  }
-
-  filterPlaceholder () {
-    switch (this.props.filterName) {
-      case 'browsing': return 'Filter browsing folders'
-      case 'smart': return 'Filter smart collections'
-      case 'simple': return 'Filter simple collections'
-    }
-  }
-
   isAddFolderEnabled () {
-    const { folders, query } = this.props
-    switch (this.props.filterName) {
-      case 'browsing': return false
-      case 'smart': return query && !query.empty()
-      case 'simple': {
-        // True if one folder is selected and it isn't in the trash
-        const selectedFolderIds = folders.selectedFolderIds
-        if (!selectedFolderIds || selectedFolderIds.size !== 1) return false
-        if (!folders.trashedFolders) return true
-        const id = selectedFolderIds.values().next().value
-        const index = folders.trashedFolders.findIndex(trashedFolder => (trashedFolder.folderId === id))
-        return index < 0
-      }
-    }
+    const { folders } = this.props
+    // True if one folder is selected and it isn't in the trash
+    const selectedFolderIds = folders.selectedFolderIds
+    if (!selectedFolderIds || selectedFolderIds.size !== 1) return false
+    if (!folders.trashedFolders) return true
+    const id = selectedFolderIds.values().next().value
+    const index = folders.trashedFolders.findIndex(trashedFolder => (trashedFolder.folderId === id))
+    return index < 0
   }
 
   folderList (folder) {
-    const { folders, filterName, filter } = this.props
+    const { folders, filter } = this.props
     const { filterString } = this.state
     const isOpen = folders.openFolderIds.has(folder.id)
     const childIds = folder.childIds
@@ -254,27 +195,34 @@ class Folders extends Component {
     if (childIds && isOpen) {
       let children = []
       childIds.forEach(childId => children.push(folders.all.get(childId)))
-      // Filter the tree at the root by the filter type passed in from Workspace
-      if (folder.id === Folder.ROOT_ID) {
-        children = children.filter(Folder.Filters[filterName])
+
+      // Sort children by selected sort, initially partitioned by type: dyhi, smart, simple
+      const typeCompare = (a, b) => {
+        if (a.isDyhi() && !b.isDyhi()) return -1
+        if (b.isDyhi() && !a.isDyhi()) return 1
+        if (a.search && !b.search) return -1
+        if (b.search && !a.search) return 1
+        return 0
       }
       if (filter) {
         children = children.filter(filter)
       }
+      let subsort = (a, b) => a.name.localeCompare(b.name)
       switch (this.sortOrder()) {
-        case 'alpha-asc':
-          children = children.sort((a, b) => a.name.localeCompare(b.name))
+        case 'alpha-asc': break
           break
         case 'alpha-desc':
-          children = children.sort((a, b) => b.name.localeCompare(a.name))
+          subsort = (a, b) => b.name.localeCompare(a.name)
           break
         case 'time-asc':
-          children = children.sort((a, b) => a.timeModified < b.timeModified ? -1 : (a.timeModified > b.timeModified ? 1 : 0))
+          subsort = (a, b) => a.timeModified < b.timeModified ? -1 : (a.timeModified > b.timeModified ? 1 : 0)
           break
         case 'time-desc':
-          children = children.sort((a, b) => b.timeModified < a.timeModified ? -1 : (b.timeModified > a.timeModified ? 1 : 0))
+          subsort = (a, b) => b.timeModified < a.timeModified ? -1 : (b.timeModified > a.timeModified ? 1 : 0)
           break
       }
+
+      children.sort((a, b) => typeCompare(a, b) || subsort(a, b))
       children.forEach(child => {
         grandkids = grandkids.concat(this.folderList(child))
       })
@@ -335,7 +283,7 @@ class Folders extends Component {
   }
 
   render () {
-    const { folders, filterName } = this.props
+    const { folders } = this.props
     const rootLoaded = folders.all.has(Folder.ROOT_ID)
     if (!rootLoaded) return null
     const folderList = this.folderList(folders.all.get(Folder.ROOT_ID))
@@ -347,13 +295,13 @@ class Folders extends Component {
             <div className="Folders-filter">
               <input className="Folders-filter-input" type="text" value={this.state.filterString}
                      onChange={this.filterFolders}
-                     placeholder={this.filterPlaceholder()} />
+                     placeholder='Filter collections' />
               <div className="icon-search"/>
             </div>
             <div className={classnames('Folders-controls-add',
               {disabled: !this.isAddFolderEnabled()})}
                  onClick={this.isAddFolderEnabled() ? this.addFolder : null}>
-              <span className={this.addFolderIcon()}/>
+              <span className='icon-collections-add'/>
             </div>
           </div>
           <div className="Folders-sort-selected">
@@ -366,7 +314,7 @@ class Folders extends Component {
         </div>
         <div>
           {folderComponentList}
-          {folderComponentList ? <Trash filterName={filterName}/> : null }
+          {folderComponentList ? <Trash/> : null }
         </div>
       </div>
     )
@@ -375,7 +323,6 @@ class Folders extends Component {
 
 export default connect(state => ({
   folders: state.folders,
-  query: state.assets.query,
   sortFolders: state.app.sortFolders
 }), dispatch => ({
   actions: bindActionCreators({
