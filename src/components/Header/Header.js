@@ -10,6 +10,7 @@ import Logo from '../../components/Logo'
 import Searchbar from '../../components/Searchbar'
 import DropdownMenu from '../../components/DropdownMenu'
 import Preferences from '../../components/Preferences'
+import Feedback from '../../components/Feedback'
 import { showModal } from '../../actions/appActions'
 
 class Header extends Component {
@@ -22,6 +23,13 @@ class Header extends Component {
     const { user, actions } = this.props
     const width = '460px'
     const body = <Preferences user={user}/>
+    actions.showModal({body, width})
+  }
+
+  showFeedback = () => {
+    const { user, actions } = this.props
+    const width = '460px'
+    const body = <Feedback user={user}/>
     actions.showModal({body, width})
   }
 
@@ -40,6 +48,9 @@ class Header extends Component {
           <div className="header-menu">
             <DropdownMenu label="Help">
               <a href="http://zorroa.com/docs/help" target="_blank" className="header-menu-item" >Help</a>
+              <div className="header-menu-item" onClick={this.showFeedback}>
+                Question/Feedback
+              </div>
               <a href="http://zorroa.com/docs/tutorials" target="_blank" className="header-menu-item" >Tutorials</a>
               <a href="http://zorroa.com/docs/release-notes" target="_blank" className="header-menu-item" >Release Notes</a>
             </DropdownMenu>
