@@ -92,6 +92,7 @@
 
 .SortingSelector {
   @include flexRow;
+
   text-transform: uppercase;
   font-size: 12px;
   font-family: "Roboto Condensed";
@@ -99,6 +100,7 @@
   color: $zorroa-lightgray;
 
   .SortingSelector-sort {
+    @include nowrap;
 
     margin-left: 10px;
     color: $zorroa-gray;
