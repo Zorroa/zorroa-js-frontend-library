@@ -41,12 +41,12 @@ class Feedback extends Component {
     // Note that gmail doesn't respect the sender address here, gmail will
     // replace sender name & email with the gmail account that is connect to emailjs.
     const emailBlob = {
-      to_name: "Zorroa Support",
+      to_name: 'Zorroa Support',
       to_email: SUPPORT_ADDRESS,
       from_name: `${user.firstName} ${user.lastName}`,
       from_email: this.props.user.email,
       reply_to: this.props.user.email,
-      subject: "help",
+      subject: 'help',
       message: this.state.text
     }
 
@@ -66,18 +66,20 @@ class Feedback extends Component {
     // The email template is setup manually inside the emailjs.com account
     // emailjs.send parameters: service_id, template_id, template_parameters
     //
-    emailjs.send("default_service","template_4EvEfQML", emailBlob)
-    .then((response) => {
-      // console.log("SUCCESS. status=%d, text=%s", response.status, response.text);
-      this.setState({ sendState: SENT })
-    }, (err) => {
-      // console.log("FAILED. error=", err);
-      this.setState({ sendState: SENDERROR })
-    });
+    emailjs.send('default_service', 'template_4EvEfQML', emailBlob)
+    .then(
+      (response) => {
+        // console.log("SUCCESS. status=%d, text=%s", response.status, response.text)
+        this.setState({ sendState: SENT })
+      },
+      (reason) => {
+        // console.log("FAILED. error=", reason)
+        this.setState({ sendState: SENDERROR })
+      }
+    )
   }
 
   render () {
-    const { user } = this.props
     const { sendState } = this.state
     return (
       <div className="Feedback">
@@ -88,24 +90,24 @@ class Feedback extends Component {
           </div>
           <div onClick={this.dismiss} className="Feedback-close icon-cross2"/>
         </div>
-        { (sendState == EDITING) && (
+        { (sendState === EDITING) && (
           <div className="Feedback-body">
             <span>Enter a question or note here, and we will get back to you asap.
             If you prefer, you can email <a href={`mailto:${SUPPORT_ADDRESS}?Subject=Zorroa%20support%20request`} target="_top">{SUPPORT_ADDRESS}</a> directly.</span>
-            <textarea className="Feedback-text" type="text" rows="5"  value={this.state.name} onChange={this.updateText}/>
+            <textarea className="Feedback-text" type="text" rows="5" value={this.state.name} onChange={this.updateText}/>
           </div>
         )}
-        { (sendState == SENDING) && (
+        { (sendState === SENDING) && (
           <div className="Feedback-body">
             <span>Sending feedback to Zorroa Support...</span>
           </div>
         )}
-        { (sendState == SENT) && (
+        { (sendState === SENT) && (
           <div className="Feedback-body">
             <span>Feedback sent. Thank you! We will get back to you as soon as we can.</span>
           </div>
         )}
-        { (sendState == SENDERROR) && (
+        { (sendState === SENDERROR) && (
           <div className="Feedback-body">
             <span>
               Sorry, something went wrong emailing support.
@@ -115,13 +117,13 @@ class Feedback extends Component {
           </div>
         )}
 
-        { (sendState == EDITING) && (
+        { (sendState === EDITING) && (
           <div className="Feedback-footer">
             <button className="Feedback-send default" onClick={this.send}>Send</button>
             <button className="Feedback-cancel" onClick={this.dismiss}>Cancel</button>
           </div>
         )}
-        { (sendState != EDITING) && (
+        { (sendState !== EDITING) && (
           <div className="Feedback-footer">
             <button className="Feedback-close" onClick={this.dismiss}>Close</button>
           </div>

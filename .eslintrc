@@ -40,6 +40,7 @@
     "zvDateStr": true,
     "zvDateMs": true,
     "zvVersion": true
+    "emailjs": true
   },
   "rules": {}
 }
