@@ -108,6 +108,15 @@ class Searcher extends Component {
       }
     }
 
+    // Filter out parent TIFF and PDF files
+    const filterParentDocs = true
+    if (filterParentDocs) {
+      const terms = {'source.mediaType': ['application/pdf', 'image/tiff']}
+      const missing = ['source.clip.parent']
+      const filter = new AssetFilter({ must_not: [new AssetFilter({terms, missing})] })
+      assetSearch.merge(new AssetSearch({filter}))
+    }
+
     // Do not send the query unless it is different than the last returned query
     // FIXME: If assetSearch.empty() filtered counts == total, but tricky to flush cache
     // FIXME: Count trashed folders once the server adds support

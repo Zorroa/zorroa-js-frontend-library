@@ -10,6 +10,9 @@ export default class AssetFilter {
       this.scripts = json.scripts   // [AssetScript]
       this.colors = json.colors     // {string, [ColorFilters]
       this.links = json.links       // {string, [object]}
+      if (json.must) this.must = json.must.map(filter => new AssetFilter(filter))
+      if (json.must_not) this.must_not = json.must_not.map(filter => new AssetFilter(filter))
+      if (json.should) this.should = json.should.map(filter => new AssetFilter(filter))
     }
   }
 
@@ -21,7 +24,10 @@ export default class AssetFilter {
       (this.range && Object.keys(this.range).length) ||
       (this.scripts && this.scripts.length) ||
       (this.colors && Object.keys(this.colors).length) ||
-      (this.links && Object.keys(this.links).length)) {
+      (this.links && Object.keys(this.links).length) ||
+      (this.must && !this.must.empty()) ||
+      (this.must_not && !this.must_not.empty()) ||
+      (this.should && !this.should.empty())) {
       return false
     }
     return true
@@ -77,6 +83,27 @@ export default class AssetFilter {
         }
       } else {
         this.range = { ...filter.range }
+      }
+    }
+    if (filter.must) {
+      if (this.must) {
+        filter.must.forEach(f => { this.must.push(new AssetFilter(f)) })
+      } else {
+        this.must = filter.must.map(f => new AssetFilter(f))
+      }
+    }
+    if (filter.must_not) {
+      if (this.must_not) {
+        filter.must_not.forEach(f => { this.must_not.push(new AssetFilter(f)) })
+      } else {
+        this.must_not = filter.must_not.map(f => new AssetFilter(f))
+      }
+    }
+    if (filter.should) {
+      if (this.should) {
+        filter.should.forEach(f => { this.should.push(new AssetFilter(f)) })
+      } else {
+        this.should = filter.should.map(f => new AssetFilter(f))
       }
     }
   }

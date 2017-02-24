@@ -16,7 +16,7 @@ function escapeQuery (query) {
   if (!query) return new AssetSearch()
   // Escape special characters
   // https://www.elastic.co/guide/en/elasticsearch/reference/2.1/query-dsl-query-string-query.html#_reserved_characters
-  let safeQuery = { ...query }
+  let safeQuery = new AssetSearch(query)
   if (safeQuery.query) {
     safeQuery.query = safeQuery.query.replace(/(\+|\-|=|&&|\|\||>|<|!|\(|\)|\{|\}|\[|\]|\^|"|~|\*|\?|:|\\|\/)/g, '\\$&')
   }
@@ -63,7 +63,11 @@ export function searchDocument (query, parentId) {
   return dispatch => {
     const safeQuery = escapeQuery(query)
     const filter = new AssetFilter({terms: {'source.clip.parent.raw': [parentId]}})
-    safeQuery.filter = safeQuery.filter ? safeQuery.filter.merge(filter) : filter
+    if (safeQuery.filter) {
+      safeQuery.filter.merge(filter)
+    } else {
+      safeQuery.filter = filter
+    }
     safeQuery.size = 10000
     safeQuery.from = 0
     if (!query) safeQuery.order = [{ field: 'source.clip.page.start', ascending: true }]
