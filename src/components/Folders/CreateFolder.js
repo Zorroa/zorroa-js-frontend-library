@@ -15,6 +15,7 @@ class CreateFolder extends Component {
     title: PropTypes.string.isRequired,   // Title bar
     acl: PropTypes.arrayOf(PropTypes.instanceOf(AclEntry)).isRequired,
     name: PropTypes.string,               // optional folder name
+    date: PropTypes.node,                 // optional creation date
     onDismiss: PropTypes.func,            // unmount
     onCreate: PropTypes.func.isRequired,  // passed Folder
     onDelete: PropTypes.func,             // optional delete button
@@ -208,7 +209,7 @@ class CreateFolder extends Component {
   }
 
   render () {
-    const { title, permissions, onLink, onDelete } = this.props
+    const { title, permissions, onLink, onDelete, user, date } = this.props
     const { isShared, selectedPermissionIds, name, filterText } = this.state
     const lcFilterText = filterText.toLowerCase()
     const groupPermissions = permissions.filter(permission => (
@@ -280,12 +281,11 @@ class CreateFolder extends Component {
           { (onLink || onDelete) && (
             <div className="CreateFolder-editing flexRow flexJustifySpaceBetween flexAlignItemsCenter">
               <div className="CreateFolder-editing-date flexRow">
-                <div className="flexRow">
-                  Created 9/2916 by
-                </div>
-                <div className="CreateFolder-editing-owner">
-                  amber
-                </div>
+                { date }
+              </div>
+              <div className="CreateFolder-editing-separator">by</div>
+              <div className="CreateFolder-editing-owner">
+                {user.username}
               </div>
               { onLink && <div onClick={onLink} className="icon-link2"/> }
               { onDelete && <div onClick={this.deleteFolder} className="icon-trash2"/> }

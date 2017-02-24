@@ -116,14 +116,30 @@
     }
 
     .CreateFolder-editing {
-      padding: 12px;
       border-top: 1px solid $zorroa-lightgray;
       height: 30px;
-      color: $zorroa-gray;
+      padding: 12px;
+
+      .CreateFolder-editing-date {
+        color: $zorroa-lightgray;
+        text-transform: uppercase;
+        @include nowrap;
+        font-family: "Roboto Condensed";
+        font-size: 12px;
+      }
 
       .CreateFolder-editing-owner {
-        padding-left: 4px;
         color: $zorroa-sickly-green;
+        @include nowrap;
+        font-family: "Roboto Condensed";
+        font-size: 12px;
+      }
+
+      .CreateFolder-editing-separator {
+        color: $zorroa-lightgray;
+        @include nowrap;
+        font-family: "Roboto Condensed";
+        font-size: 12px;
       }
 
       .icon-trash2 {

@@ -150,9 +150,15 @@ class FolderItem extends Component {
   edit = (event) => {
     this.dismissContextMenu(event)
     const width = '300px'
-    const body = <CreateFolder title='Edit Collection' acl={this.props.folder.acl}
-                               onCreate={this.editFolder} name={this.props.folder.name}
-                               onDelete={this.deleteFolder} onLink={this.getLink}/>
+    const { acl, timeCreated, timeModified, name } = this.props.folder
+    const date = timeModified > timeCreated ? `Modified ${new Date(timeModified).toLocaleString('en-US')}` : `Created ${new Date(timeCreated).toLocaleString('en-US')}`
+    const body = <CreateFolder title='Edit Collection'
+                               acl={acl}
+                               date={date}
+                               name={name}
+                               onCreate={this.editFolder}
+                               onDelete={this.deleteFolder}
+                               onLink={this.getLink}/>
     this.props.actions.showModal({body, width})
   }
 
