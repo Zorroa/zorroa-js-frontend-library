@@ -32,11 +32,14 @@ class Feedback extends Component {
   }
 
   send = (event) => {
-    // alert(this.state.text + ' by ' + this.props.user.email)
-    // this.props.actions.hideModal()
-
     const { user } = this.props
 
+    // These will be injected into the email according to the template we're using.
+    // See template ID in the emailjs.send() call.
+    // The template can be modified in the emailjs account (credentials below), where
+    // variables for injection can be added or removed as needed.
+    // Note that gmail doesn't respect the sender address here, gmail will
+    // replace sender name & email with the gmail account that is connect to emailjs.
     const emailBlob = {
       to_name: "Zorroa Support",
       to_email: SUPPORT_ADDRESS,
@@ -51,46 +54,26 @@ class Feedback extends Component {
 
     this.setState({ sendState: SENDING })
 
-    // parameters: service_id, template_id, template_parameters
+    // emailjs delivers email via REST request through the account zorroafeedback@gmail.com
+    // Having a separate email account for delivery makes it so emailjs doesn't have
+    // access to anything Zorroa confidential other than support emails.
+    //
+    // emailjs username: support@zorroa.com
+    // emailjs password: warabedowagenetelushabel
+    //
+    // zorroafeedback@gmail.com password: iongstornerfuncriacierpo
+    //
+    // The email template is setup manually inside the emailjs.com account
+    // emailjs.send parameters: service_id, template_id, template_parameters
+    //
     emailjs.send("default_service","template_4EvEfQML", emailBlob)
     .then((response) => {
       // console.log("SUCCESS. status=%d, text=%s", response.status, response.text);
       this.setState({ sendState: SENT })
     }, (err) => {
-      this.setState({ sendState: SENDERROR })
       // console.log("FAILED. error=", err);
+      this.setState({ sendState: SENDERROR })
     });
-
-    // var start = () => {
-    //   // Initializes the client with the API key and the Translate API.
-    //   gapi.client.init({
-    //     'client_id': '582965223173-p4mq3gctkf7pfh50lv4c9vful1irakmt.apps.googleusercontent.com',
-    //     'apiKey': 'AIzaSyCMRftKq-tEFZ6ZBsb3q4msScFhhAW6ZBA',
-    //     'discoveryDocs': ["https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest"],
-    //     // https://developers.google.com/gmail/api/auth/scopes
-    //     // https://www.googleapis.com/auth/gmail.send: Send messages only. No read or modify privileges on mailbox.
-    //     'scope': 'https://www.googleapis.com/auth/gmail.send'
-    //   })
-    //   .then(response => {
-    //     const email = 'To: zorroafeedback@gmail.com\r\n' + this.state.text
-    //     const emailEncoded = window.btoa(email).replace(/\+/g, '-').replace(/\//g, '_')
-
-    //     var sendRequest = gapi.client.gmail.users.messages.send({
-    //       'userId': 'me',
-    //       'resource': { 'raw': emailEncoded }
-    //     });
-    //     return new Promise(resolve => sendRequest.execute(resolve))
-    //   },
-    //     error => { console.error(error) }
-    //   )
-    //   .then(
-    //     response => { console.log(response) },
-    //     error => { console.error(error) }
-    //   )
-    // };
-
-    // // Loads the JavaScript client library and invokes `start` afterwards.
-    // gapi.load('client', start);
   }
 
   render () {
