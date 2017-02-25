@@ -431,6 +431,7 @@ class Assets extends Component {
                     <Thumb isSelected={selectedIds && selectedIds.has(asset.id)}
                            dim={dim}
                            key={asset.id}
+                           assetId={asset.id}
                            pages={pages}
                            badgeHeight={badgeHeight}
                            { ...badge }
