@@ -9,6 +9,7 @@ import DisplayOptions from '../DisplayOptions'
 import { displayPropertiesForFields } from '../../models/DisplayProperties'
 import { updateMetadataFields, updateTableFields, showModal } from '../../actions/appActions'
 import { saveUserSettings } from '../../actions/authAction'
+import { getAssetFields } from '../../actions/assetsAction'
 
 class Metadata extends Component {
   static propTypes = {
@@ -27,6 +28,10 @@ class Metadata extends Component {
 
   state = {
     filterString: ''
+  }
+
+  componentWillMount () {
+    this.props.actions.getAssetFields()
   }
 
   changeFilterString = (event) => {
@@ -113,6 +118,7 @@ export default connect(state => ({
   actions: bindActionCreators({
     updateMetadataFields,
     updateTableFields,
+    getAssetFields,
     saveUserSettings,
     showModal }, dispatch)
 }))(Metadata)

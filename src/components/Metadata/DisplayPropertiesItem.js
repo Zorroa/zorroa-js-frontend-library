@@ -5,7 +5,7 @@ import classnames from 'classnames'
 
 import DisplayProperties from '../../models/DisplayProperties'
 import Collapsible from '../Collapsible'
-import { toggleCollapsible } from '../../actions/appActions'
+import { toggleCollapsible, hoverField, clearHoverField } from '../../actions/appActions'
 import { createFacetWidget } from '../../models/Widget'
 import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import { unCamelCase } from '../../services/jsUtil'
@@ -14,6 +14,7 @@ class DisplayPropertiesItem extends Component {
   static propTypes = {
     // input props
     field: PropTypes.string.isRequired,
+    fieldTypes: PropTypes.object,
     displayProperties: PropTypes.instanceOf(DisplayProperties).isRequired,
     selectedAssets: PropTypes.object,
     isIconified: PropTypes.bool.isRequired,
@@ -117,17 +118,25 @@ class DisplayPropertiesItem extends Component {
 
   searchTerms = (event) => {
     if (!this.isBinocularsEnabled()) return
-    const { field, selectedAssets, actions } = this.props
-    const facetWidget = createFacetWidget(field, selectedAssets)
+    const { field, fieldTypes, selectedAssets, actions } = this.props
+    const facetWidget = createFacetWidget(field, selectedAssets, fieldTypes)
     actions.modifyRacetrackWidget(facetWidget)
   }
 
   isBinocularsEnabled () {
-    const { field, selectedAssets } = this.props
-    if (!field || !field.length || !selectedAssets || !selectedAssets.size) {
+    const { field, fieldTypes } = this.props
+    if (!field || !field.length || !fieldTypes || !Object.keys(fieldTypes).length) {
       return false
     }
     return true
+  }
+
+  hover = () => {
+    this.props.actions.hoverField(this.props.field)
+  }
+
+  clearHover = () => {
+    this.props.actions.clearHoverField(this.props.field)
   }
 
   renderItemContainer (isArray, rawValue, indentLevel) {
@@ -155,7 +164,7 @@ class DisplayPropertiesItem extends Component {
     if (displayProperties.children && displayProperties.children.length) {
       if (isArray) {
         return (
-          <div className="DisplayPropertiesItem-array">
+          <div className="DisplayPropertiesItem-array" onMouseOver={this.hover} onMouseOut={this.clearHover} >
             { this.renderItemContainer(isArray, rawValue, indentLevel)}
           </div>
         )
@@ -180,7 +189,7 @@ class DisplayPropertiesItem extends Component {
     }
 
     return (
-      <div className="DisplayPropertiesItem">
+      <div className="DisplayPropertiesItem" onMouseOver={this.hover} onMouseOut={this.clearHover}>
         <div style={indent} className="DisplayPropertiesItem-label">
           {unCamelCase(displayProperties.name)}
         </div>
@@ -198,9 +207,10 @@ class DisplayPropertiesItem extends Component {
 }
 
 const DisplayPropertiesItemContainer = connect(state => ({
-  app: state.app
+  app: state.app,
+  fieldTypes: state.assets.types
 }), dispatch => ({
-  actions: bindActionCreators({ toggleCollapsible, modifyRacetrackWidget }, dispatch)
+  actions: bindActionCreators({ toggleCollapsible, modifyRacetrackWidget, hoverField, clearHoverField }, dispatch)
 }))(DisplayPropertiesItem)
 
 export default DisplayPropertiesItemContainer

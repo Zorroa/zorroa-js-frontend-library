@@ -57,10 +57,12 @@ describe('assetsReducer', () => {
       .toEqual({ error: a })
   })
 
-  it('ASSET_FIELDS returns fields', () => {
-    const fields = ['some.thing.important']
+  it('ASSET_FIELDS returns fields and types', () => {
+    const fields = {'string': ['some.thing.important']}
+    const types = {}
+    Object.keys(fields).forEach(type => { fields[type].forEach(field => { types[field] = type }) })
     expect(assetsReducer([], { type: ASSET_FIELDS, payload: fields }))
-      .toEqual({ fields })
+      .toEqual({ fields, types })
   })
 
   it('ISOLATE_ASSET returns isolated asset id', () => {

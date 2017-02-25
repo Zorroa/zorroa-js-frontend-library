@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Text, Sector } from 'recharts'
 
-import WidgetModel from '../../models/Widget'
+import WidgetModel, { aggField } from '../../models/Widget'
 import Asset from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
@@ -29,7 +29,7 @@ class Facet extends Component {
     id: PropTypes.number.isRequired,
     isIconified: PropTypes.bool.isRequired,
     aggs: PropTypes.object,
-    fields: PropTypes.object,                         // state.assets.fields
+    fieldTypes: PropTypes.object,
     widgets: PropTypes.arrayOf(PropTypes.object)
   }
 
@@ -37,14 +37,10 @@ class Facet extends Component {
     isEnabled: true,
     otherIsSelected: false,
     field: '',
-    fieldIsDate: false,
     order: { '_count': 'desc' },
     terms: [],
     chartType: BAR_CHART
   }
-
-  fieldTypes = null
-  numericFieldTypes = new Set(['double', 'integer', 'long', 'date'])
 
   componentWillMount () {
     this.componentWillReceiveProps(this.props)
@@ -52,27 +48,13 @@ class Facet extends Component {
 
   componentWillReceiveProps (nextProps) {
     if (!this.state.isEnabled) return
-
-    // initialize fieldTypes first time through
-    if (!this.fieldTypes) {
-      const { fields } = nextProps
-      if (fields) {
-        // invert the app state field types, so we can look up by name
-        this.fieldTypes = {}
-        for (let fieldType in fields) {
-          fields[fieldType].forEach(field => { this.fieldTypes[field] = fieldType })
-        }
-      }
-    }
-
     const { id, widgets } = nextProps
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
     if (widget && widget.sliver) {
-      const field = widget.sliver.aggs.facet.terms.field
+      const field = aggField(widget.sliver.aggs.facet.terms.field, this.props.fieldTypes)
       if (field !== this.state.field) {
-        const fieldIsDate = field && this.fieldTypes && this.fieldTypes[field] === 'date'
-        this.setState({field, fieldIsDate})
+        this.setState({field})
       }
       if (widget.sliver.filter) {
         const terms = widget.sliver.filter.terms[field]
@@ -229,10 +211,8 @@ class Facet extends Component {
   updateDisplayOptions = (event, state) => {
     const base = state.checkedNamespaces && state.checkedNamespaces.length && state.checkedNamespaces[0]
     if (base && base.length) {
-      const fieldType = this.fieldTypes[base]
-      const isNumeric = this.numericFieldTypes.has(fieldType)
-      const field = (isNumeric) ? base : base + '.raw'
       const terms = []
+      const field = aggField(base, this.props.fieldTypes)
       this.modifySliver(field, terms, this.state.order)
     }
   }
@@ -396,7 +376,8 @@ class Facet extends Component {
   renderBucketKey = (key) => {
     if (!key) return '(none)'
     if (key === OTHER_BUCKET) return key
-    if (this.state.fieldIsDate) return new Date(key).toLocaleString()
+    const field = this.state.field && this.state.field.replace(/\.raw$/, '')
+    if (this.props.fieldTypes && this.props.fieldTypes[field] === 'date') return new Date(key).toLocaleString()
     return key
   }
 
@@ -519,7 +500,7 @@ class Facet extends Component {
 export default connect(
   state => ({
     aggs: state.assets && state.assets.aggs,
-    fields: state.assets && state.assets.fields,
+    fieldTypes: state.assets && state.assets.types,
     widgets: state.racetrack && state.racetrack.widgets
   }), dispatch => ({
     actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds, showModal }, dispatch)

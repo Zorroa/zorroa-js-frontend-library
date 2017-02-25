@@ -4,7 +4,8 @@ import {
   METADATA_FIELDS, TABLE_FIELDS, LIGHTBAR_FIELDS, SYNC_FIELDS,
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH, SHOW_IMPORT_SCRIPT_INFO,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
-  SHOW_MULTIPAGE, SHOW_PAGES, VIDEO_VOLUME
+  SHOW_MULTIPAGE, SHOW_PAGES, VIDEO_VOLUME,
+  HOVER_FIELD, CLEAR_HOVER_FIELD
 } from '../constants/actionTypes'
 
 export const MIN_THUMBSIZE = 48
@@ -157,5 +158,19 @@ export function sortFolders (order) {
   return ({
     type: SORT_FOLDERS,
     payload: order
+  })
+}
+
+export function hoverField (field) {
+  return ({
+    type: HOVER_FIELD,
+    payload: field
+  })
+}
+
+export function clearHoverField (field) {
+  return ({
+    type: CLEAR_HOVER_FIELD,
+    payload: field
   })
 }

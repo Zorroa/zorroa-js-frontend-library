@@ -1,6 +1,7 @@
 import React, { Component, PropTypes, cloneElement } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import classnames from 'classnames'
 
 import Searcher from './Searcher'
 import AddWidget from './AddWidget'
@@ -19,7 +20,8 @@ class Racetrack extends Component {
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
     query: PropTypes.instanceOf(AssetSearch),
     actions: PropTypes.object.isRequired,
-    isIconified: PropTypes.bool.isRequired
+    isIconified: PropTypes.bool.isRequired,
+    hoverFields: PropTypes.instanceOf(Set)
   }
 
   state = {
@@ -115,7 +117,7 @@ class Racetrack extends Component {
   }
 
   render () {
-    const { widgets, isIconified } = this.props
+    const { widgets, isIconified, hoverFields } = this.props
     return (
       <div className="Racetrack flexCol fullHeight">
         <Searcher/>
@@ -124,7 +126,8 @@ class Racetrack extends Component {
           { widgets && widgets.length > 0 && (
           <div className="Racetrack-filters">
             {widgets.map((widget, i) => (
-              <div key={widget.id} className="Racetrack-widget">
+              <div key={widget.id}
+                   className={classnames('Racetrack-widget', {hoverField: hoverFields.has(widget.field())})} >
                 { this.renderWidget(widget, isIconified) }
               </div>
             ))}
@@ -149,7 +152,8 @@ const mapDispatchToProps = dispatch => ({
 
 const mapStateToProps = state => ({
   widgets: state.racetrack.widgets,
-  query: state.assets.query
+  query: state.assets.query,
+  hoverFields: state.app.hoverFields
 })
 
 export default connect(

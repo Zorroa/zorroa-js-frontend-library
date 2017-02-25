@@ -6,6 +6,7 @@ import {
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
   SHOW_MULTIPAGE, SHOW_PAGES, VIDEO_VOLUME,
+  HOVER_FIELD, CLEAR_HOVER_FIELD,
   USER_SETTINGS, UNAUTH_USER
 } from '../constants/actionTypes'
 import { DEFAULT_THUMBSIZE } from '../actions/appActions'
@@ -41,6 +42,7 @@ const initialState = {
   showMultipage: true,
   showPages: false,
   sortFolders: 'alpha-asc',
+  hoverFields: new Set(),
   userSettings: {
     tableFields: [ ...defaultTableFields ],
     metadataFields: [ ...defaultTableFields ],
@@ -103,6 +105,16 @@ export default function app (state = initialState, action) {
       return { ...state, showPages: action.payload }
     case SORT_FOLDERS:
       return { ...state, sortFolders: action.payload }
+    case HOVER_FIELD: {
+      const hoverFields = new Set(state.hoverFields)
+      hoverFields.add(action.payload)
+      return { ...state, hoverFields }
+    }
+    case CLEAR_HOVER_FIELD: {
+      const hoverFields = new Set(state.hoverFields)
+      hoverFields.delete(action.payload)
+      return { ...state, hoverFields }
+    }
     case USER_SETTINGS:
       return { ...state, userSettings: action.payload.metadata }
     case UNAUTH_USER:

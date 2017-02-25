@@ -82,13 +82,15 @@ export default function (state = initialState, action) {
       return { ...state, order }
     }
 
-    case ASSET_ORDER: {
+    case ASSET_ORDER:
       return { ...state, order: action.payload }
+
+    case ASSET_FIELDS: {
+      const fields = action.payload
+      const types = {}
+      Object.keys(fields).forEach(type => { fields[type].forEach(field => { types[field] = type }) })
+      return { ...state, fields, types }
     }
-
-    case ASSET_FIELDS:
-      return { ...state, fields: action.payload }
-
     case ISOLATE_ASSET:
       return { ...state, isolatedId: action.payload, pages: action.payload ? state.pages : null }
 
