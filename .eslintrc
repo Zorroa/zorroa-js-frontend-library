@@ -39,7 +39,7 @@
     "zvCount": true,
     "zvDateStr": true,
     "zvDateMs": true,
-    "zvVersion": true
+    "zvVersion": true,
     "emailjs": true
   },
   "rules": {}
