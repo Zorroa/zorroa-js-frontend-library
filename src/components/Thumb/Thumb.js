@@ -41,10 +41,10 @@ export function multipageBadges (asset, protocol, host, stackCount) {
   const stopPage = asset.stopPage()
   if (asset.mediaType().includes('video')) {
     pageBadge = <Duration duration={asset.duration()}/>
+  } else if (stackCount > 0 && pageCount && stackCount !== pageCount) {
+    pageBadge = <div className="Thumb-page-label">{stackCount} of {pageCount}</div>
   } else if (stackCount && pageCount && stackCount === pageCount || pageCount > 0) {
     pageBadge = <div className="Thumb-page-label">{pageCount}</div>
-  } else if (stackCount > 0 && pageCount) {
-    pageBadge = <div className="Thumb-page-label">{stackCount} of {pageCount}</div>
   } else if (startPage && (!stopPage || startPage === stopPage)) {
     pageBadge = <div className="Thumb-page-label">{startPage}</div>
   } else if (startPage && stopPage) {
