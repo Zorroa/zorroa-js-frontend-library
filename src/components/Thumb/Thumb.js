@@ -36,19 +36,21 @@ export function monopageBadges (asset) {
 export function multipageBadges (asset, protocol, host, stackCount) {
   let pageBadge, iconBadge, parentURL
 
-  const pageCount = asset.pageCount()
+  const pageCount = asset.pageCount() || stackCount
   const startPage = asset.startPage()
   const stopPage = asset.stopPage()
   if (asset.mediaType().includes('video')) {
     pageBadge = <Duration duration={asset.duration()}/>
-  } else if (stackCount > 0 && pageCount && stackCount !== pageCount) {
-    pageBadge = <div className="Thumb-page-label">{stackCount} of {pageCount}</div>
-  } else if (stackCount && pageCount && stackCount === pageCount || pageCount > 0) {
-    pageBadge = <div className="Thumb-page-label">{pageCount}</div>
-  } else if (startPage && (!stopPage || startPage === stopPage)) {
-    pageBadge = <div className="Thumb-page-label">{startPage}</div>
-  } else if (startPage && stopPage) {
-    pageBadge = <div className="Thumb-page-label">{startPage} - {stopPage}</div>
+  } else if (pageCount > 1) {
+    if (stackCount > 0 && stackCount !== pageCount) {
+      pageBadge = <div className="Thumb-page-label">{stackCount} of {pageCount}</div>
+    } else if (stackCount === pageCount) {
+      pageBadge = <div className="Thumb-page-label">{pageCount}</div>
+    } else if (startPage && (!stopPage || startPage === stopPage)) {
+      pageBadge = <div className="Thumb-page-label">{startPage}</div>
+    } else if (startPage && stopPage) {
+      pageBadge = <div className="Thumb-page-label">{startPage} - {stopPage}</div>
+    }
   }
 
   // Show the icon & inset if we have any page badging
