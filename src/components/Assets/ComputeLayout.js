@@ -34,7 +34,7 @@ export function masonry (assets, panelWidth, thumbSize, showMultipage) {
   // Shove thumbs into rows as long as they'll fit.
   for (var i = 0; i < assets.length; i++) {
     const asset = assets[i]
-    const { width, height, parentId } = asset
+    const { width, height, id, parentId } = asset
 
     let collapse = false
     if (showMultipage) {
@@ -49,6 +49,9 @@ export function masonry (assets, panelWidth, thumbSize, showMultipage) {
           ++collapsed
           multipage[parentId] = [...pages, i]
         }
+      } else if (id && multipage[id]) {
+        collapse = true
+        ++collapsed
       }
     }
 
@@ -112,22 +115,29 @@ export function grid (assets, panelWidth, thumbSize, showMultipage) {
   let multipage = {}
   let collapsed = 0
 
+  const pushEmpty = () => {
+    ++collapsed
+    // Zero width, but valid y & height for Pager
+    const y = positions[positions.length - 1].y
+    positions.push({x: 0, y, width: 0, height: thumbWidth})
+  }
+
   for (var i = 0; i < assets.length; i++) {
     const asset = assets[i]
-    const { parentId } = asset
+    const { id, parentId } = asset
     if (showMultipage) {
       if (parentId) {
         const pages = multipage[parentId]
         if (!pages) {
           multipage[parentId] = [i]
         } else {
-          ++collapsed
           multipage[parentId] = [...pages, i]
-          // Zero width, but valid y & height for Pager
-          const y = positions[positions.length - 1].y
-          positions.push({x: 0, y, width: 0, height: thumbWidth})
+          pushEmpty()
           continue
         }
+      } else if (id && multipage[id]) {
+        pushEmpty()
+        continue
       }
     }
 

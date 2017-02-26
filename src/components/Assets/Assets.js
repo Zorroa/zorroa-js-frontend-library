@@ -265,7 +265,7 @@ class Assets extends Component {
     const assetSizes = assets.map(asset => {
       const width = asset.width() || (asset.proxies && asset.proxies[0].width) || 1
       const height = asset.height() || (asset.proxies && asset.proxies[0].height) || 1
-      return { width, height, parentId: asset.parentId() }
+      return { width, height, parentId: asset.parentId(), id: asset.id }
     })
 
     var { positions, multipage, collapsed } = (_ => {
