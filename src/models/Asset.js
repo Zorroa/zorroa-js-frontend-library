@@ -34,6 +34,7 @@ export default class Asset {
   backgroundColor () { return this.tinyProxy() ? this.tinyProxy()[5] : getRandomColor() }
 
   pageCount () {
+    if (this.document.source && this.document.source.clip && this.document.source.clip.pages) return this.document.source.clip.pages
     if (this.document.document && this.document.document.pages) return this.document.document.pages
     if (this.document.image && this.document.image.pages) return this.document.image.pages
     if (this.document.video && this.document.video.pages) return this.document.video.pages

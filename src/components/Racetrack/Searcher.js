@@ -109,7 +109,7 @@ class Searcher extends Component {
     }
 
     // Filter out parent TIFF and PDF files
-    const filterParentDocs = true
+    const filterParentDocs = false
     if (filterParentDocs) {
       const terms = {'source.mediaType': ['application/pdf', 'image/tiff']}
       const missing = ['source.clip.parent']
