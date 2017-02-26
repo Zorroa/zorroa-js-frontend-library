@@ -411,17 +411,16 @@ class Assets extends Component {
               <div className={`Assets-layout ${layout}`}>
                 <div className='Assets-layout-top' style={{top: 0, width: 0, height: 0}}>&nbsp;</div>
                 { assets.map((asset, index) => {
-                  const pos = positions[index]
+                  const dim = positions[index]
+                  const { width, height } = dim
                   // Render only the visible thumbnails
-                  if ((!pos) ||
-                      (assetsScrollPadding + pos.y > this.state.assetsScrollTop + this.state.assetsScrollHeight) ||
-                      (assetsScrollPadding + pos.y + pos.height < this.state.assetsScrollTop)) {
+                  if ((!dim) || width <= 0 || height <= 0 ||
+                      (assetsScrollPadding + dim.y > this.state.assetsScrollTop + this.state.assetsScrollHeight) ||
+                      (assetsScrollPadding + dim.y + height < this.state.assetsScrollTop)) {
                     return null
                   }
                   const parentId = asset.parentId()
                   const indexes = parentId && multipage[parentId]
-                  const dim = positions[index]
-                  const { width, height } = dim
                   const badgeHeight = thumbSize < 100 ? 15 : 25
                   const badge = showMultipage ? multipageBadges(asset, protocol, host, indexes && indexes.length) : monopageBadges(asset)
                   const pages = indexes && indexes.slice(0, 3).map(index => (
