@@ -25,9 +25,9 @@ export default class AssetFilter {
       (this.scripts && this.scripts.length) ||
       (this.colors && Object.keys(this.colors).length) ||
       (this.links && Object.keys(this.links).length) ||
-      (this.must && !this.must.empty()) ||
-      (this.must_not && !this.must_not.empty()) ||
-      (this.should && !this.should.empty())) {
+      (this.must && this.must.findIndex(f => !f.empty()) >= 0) ||
+      (this.must_not && this.must_not.findIndex(f => !f.empty()) >= 0) ||
+      (this.should && this.should.findIndex(f => !f.empty()) >= 0)) {
       return false
     }
     return true
