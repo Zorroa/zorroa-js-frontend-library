@@ -104,8 +104,6 @@ class Workspace extends Component {
   render () {
     const { app, isolatedId } = this.props
 
-    if (isolatedId) return <Lightbox/>
-
     const BrowsingParams = () => ({
       header: (<span>Browsing</span>),
       isIconified: app.leftSidebarIsIconified,
@@ -195,6 +193,7 @@ class Workspace extends Component {
              onDrop={this.dropFile}>
           Drop Assets to Import
         </div>
+        { isolatedId && <Lightbox/> }
       </div>
     )
   }
