@@ -19,6 +19,8 @@ const BAR_CHART = 'icon-list'
 const PIE_CHART = 'icon-pie-chart'
 const chartTypes = [ BAR_CHART, PIE_CHART ]
 const OTHER_BUCKET = 'Other'
+const MAX_BAR_BUCKETS = 100
+const MAX_PIE_BUCKETS = 9
 
 // Manage a single term facet
 class Facet extends Component {
@@ -118,7 +120,7 @@ class Facet extends Component {
     let terms = []
     if (term === OTHER_BUCKET) {
       const buckets = this.aggBuckets()
-      const merged = this.mergeOtherBuckets(buckets, 9)
+      const merged = this.mergeOtherBuckets(buckets, MAX_PIE_BUCKETS)
       let otherTerms = []
       buckets.forEach(bucket => {
         if (merged.findIndex(b => (b.key === bucket.key)) < 0) {
@@ -356,7 +358,13 @@ class Facet extends Component {
   mergeOtherBuckets (buckets, maxCount) {
     if (buckets.length <= maxCount || this.state.chartType === BAR_CHART) return buckets
     // Keep the order, but group the smallest ones into "Other"
-    const sorted = buckets.sort((a, b) => (a.doc_count < b.doc_count ? 1 : (a.doc_count > b.doc_count ? -1 : 0)))
+    const sorted = buckets.sort((a, b) => {
+      if (a.doc_count < b.doc_count) return 1
+      if (a.doc_count > b.doc_count) return -1
+      if (a.key < b.key) return 1
+      if (a.key > b.key) return -1
+      return 0
+    })
     let otherCount = 0
     for (let i = maxCount; i < buckets.length; ++i) otherCount += sorted[i].doc_count
     let merged = []
@@ -381,7 +389,7 @@ class Facet extends Component {
     let maxCount = 0
     let minCount = Number.MAX_SAFE_INTEGER
     // Extract the buckets for this widget from the global query using id
-    const buckets = this.mergeOtherBuckets(this.aggBuckets(), chartType === BAR_CHART ? 100 : 9)
+    const buckets = this.mergeOtherBuckets(this.aggBuckets(), chartType === BAR_CHART ? MAX_BAR_BUCKETS : MAX_PIE_BUCKETS)
     buckets.forEach(bucket => {
       maxCount = Math.max(maxCount, bucket.doc_count)
       minCount = Math.min(minCount, bucket.doc_count)
