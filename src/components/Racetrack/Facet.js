@@ -35,6 +35,7 @@ class Facet extends Component {
 
   state = {
     isEnabled: true,
+    otherIsSelected: false,
     field: '',
     fieldIsDate: false,
     order: { '_count': 'desc' },
@@ -118,7 +119,9 @@ class Facet extends Component {
 
   selectTerm (term, event) {
     let terms = []
+    let { otherIsSelected } = this.state
     if (term === OTHER_BUCKET) {
+      otherIsSelected = true
       const buckets = this.aggBuckets()
       const merged = this.mergeOtherBuckets(buckets, MAX_PIE_BUCKETS)
       let otherTerms = []
@@ -134,6 +137,7 @@ class Facet extends Component {
         const index = merged.findIndex(bucket => (bucket.key === term))
         if (index < 0) {
           isOtherEnabled = true
+          otherIsSelected = false
           break
         }
       }
@@ -171,7 +175,8 @@ class Facet extends Component {
         terms = [term]
       }
     }
-    this.modifySliver(this.state.field, terms, this.state.order)
+    new Promise(resolve => this.setState({ otherIsSelected }, resolve))
+    .then(() => { this.modifySliver(this.state.field, terms, this.state.order) })
   }
 
   selectPieSection = ({ name }, i, event) => {
@@ -191,7 +196,8 @@ class Facet extends Component {
   }
 
   deselectAllTerms = (event) => {
-    this.modifySliver(this.state.field, [], this.state.order)
+    new Promise(resolve => this.setState({ otherIsSelected: false }, resolve))
+    .then(() => this.modifySliver(this.state.field, [], this.state.order))
   }
 
   rotateOrder (order, field, dir) {
@@ -237,7 +243,7 @@ class Facet extends Component {
   }
 
   renderPieLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name, fill }) => {
-    const { terms } = this.state
+    const { terms, otherIsSelected } = this.state
     const RADIAN = Math.PI / 180
     const sin = Math.sin(-RADIAN * midAngle)
     const cos = Math.cos(-RADIAN * midAngle)
@@ -267,7 +273,7 @@ class Facet extends Component {
             </text>
           }
           {
-            percent > 0.025 && terms.indexOf(name) < 0 &&
+            percent > 0.025 && terms.indexOf(name) < 0 && !(name === OTHER_BUCKET && otherIsSelected) &&
             <svg>
               <text x={ex} y={ey}
                     textAnchor={textAnchor}
