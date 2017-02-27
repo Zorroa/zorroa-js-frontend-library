@@ -77,10 +77,26 @@ class Facet extends Component {
       if (widget.sliver.filter) {
         const terms = widget.sliver.filter.terms[field]
         if (terms !== this.state.terms) {
-          this.setState({terms})
+          // determine whether any of the current terms are in the "other" bucket
+          let otherIsSelected = false
+          const buckets = this.aggBuckets(this.state.terms)
+          const merged = this.mergeOtherBuckets(buckets, MAX_PIE_BUCKETS)
+          let otherTerms = new Set()
+          buckets.forEach(bucket => {
+            if (merged.findIndex(b => (b.key === bucket.key)) < 0) {
+              otherTerms.add(bucket.key)
+            }
+          })
+          for (let i = 0; i < terms.length; i++) {
+            if (otherTerms.has(terms[i])) {
+              otherIsSelected = true
+              break
+            }
+          }
+          this.setState({terms, otherIsSelected})
         }
       } else {
-        this.setState({terms: []})
+        this.setState({terms: [], otherIsSelected: false})
       }
       const order = widget.sliver.aggs.facet.terms.order
       if (order) this.setState({order})
@@ -119,10 +135,8 @@ class Facet extends Component {
 
   selectTerm (term, event) {
     let terms = []
-    let { otherIsSelected } = this.state
     if (term === OTHER_BUCKET) {
-      otherIsSelected = true
-      const buckets = this.aggBuckets()
+      const buckets = this.aggBuckets(this.state.terms)
       const merged = this.mergeOtherBuckets(buckets, MAX_PIE_BUCKETS)
       let otherTerms = []
       buckets.forEach(bucket => {
@@ -137,7 +151,6 @@ class Facet extends Component {
         const index = merged.findIndex(bucket => (bucket.key === term))
         if (index < 0) {
           isOtherEnabled = true
-          otherIsSelected = false
           break
         }
       }
@@ -150,7 +163,7 @@ class Facet extends Component {
         }
       })
     } else if (event.shiftKey) {
-      const buckets = this.aggBuckets()
+      const buckets = this.aggBuckets(this.state.terms)
       const firstSelectedIndex = buckets.findIndex(b => (this.state.terms.findIndex(t => (t === b.key)) >= 0))
       if (firstSelectedIndex >= 0) {
         const selectedIndex = buckets.findIndex(b => (b.key === term))
@@ -175,8 +188,7 @@ class Facet extends Component {
         terms = [term]
       }
     }
-    new Promise(resolve => this.setState({ otherIsSelected }, resolve))
-    .then(() => { this.modifySliver(this.state.field, terms, this.state.order) })
+    this.modifySliver(this.state.field, terms, this.state.order)
   }
 
   selectPieSection = ({ name }, i, event) => {
@@ -196,8 +208,7 @@ class Facet extends Component {
   }
 
   deselectAllTerms = (event) => {
-    new Promise(resolve => this.setState({ otherIsSelected: false }, resolve))
-    .then(() => this.modifySliver(this.state.field, [], this.state.order))
+    this.modifySliver(this.state.field, [], this.state.order)
   }
 
   rotateOrder (order, field, dir) {
@@ -226,12 +237,11 @@ class Facet extends Component {
     }
   }
 
-  aggBuckets () {
+  aggBuckets (terms) {
     const { id, aggs } = this.props
     let buckets = aggs && (id in aggs) ? aggs[id].facet.buckets : []
 
     // Add in any selected terms that are not in the search agg
-    const { terms } = this.state
     terms && terms.forEach(key => {
       const index = buckets.findIndex(bucket => (bucket.key === key))
       if (index < 0) {
@@ -395,7 +405,7 @@ class Facet extends Component {
     let maxCount = 0
     let minCount = Number.MAX_SAFE_INTEGER
     // Extract the buckets for this widget from the global query using id
-    const buckets = this.mergeOtherBuckets(this.aggBuckets(), chartType === BAR_CHART ? MAX_BAR_BUCKETS : MAX_PIE_BUCKETS)
+    const buckets = this.mergeOtherBuckets(this.aggBuckets(terms), chartType === BAR_CHART ? MAX_BAR_BUCKETS : MAX_PIE_BUCKETS)
     buckets.forEach(bucket => {
       maxCount = Math.max(maxCount, bucket.doc_count)
       minCount = Math.min(minCount, bucket.doc_count)
