@@ -9,6 +9,10 @@
   top:0;
   height: 100vh;
   width: 100vw;
+
+  // z-index was added to prevent the "imports" animated gif (z-index:1) in Assets|header
+  // from appearing above the lightbox.
+  z-index: 10;
 }
 
 .lightbox-body {

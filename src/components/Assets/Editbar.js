@@ -12,6 +12,8 @@ import { showModal } from '../../actions/appActions'
 
 class Editbar extends Component {
   static propTypes = {
+    children: PropTypes.node,
+
     selectedAssetIds: PropTypes.instanceOf(Set),
     isRemoveEnabled: PropTypes.func.isRequired,
     onRemove: PropTypes.func.isRequired,

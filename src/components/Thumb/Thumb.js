@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
-import FileIcon from '../FileIcon'
+// import FileIcon from '../FileIcon'
 import Duration from '../Duration'
 import { DragSource } from '../../services/DragDrop'
 import Asset from '../../models/Asset'
