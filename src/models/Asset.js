@@ -128,11 +128,7 @@ export default class Asset {
   parentProxyURL (protocol, host) {
     const parentId = this.parentId()
     if (!parentId) return null
-    const smallestProxy = this.smallestProxy()
-    if (!smallestProxy) return null
-    const { width, height, format } = smallestProxy
-    const id = `proxy/${this.parentId()}_${width}x${height}.${format}`
-    return `${protocol}//${host}:8066/api/v1/ofs/${id}`
+    return `${protocol}//${host}:8066/api/v1/assets/${parentId}/proxies/smallest`
   }
 
   // Returns true if the asset is in any of the folder ids
