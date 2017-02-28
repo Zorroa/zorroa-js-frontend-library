@@ -2,19 +2,19 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
+import copy from 'copy-to-clipboard'
 
 import Modal from '../Modal'
+import User from '../../models/User'
 import Asset from '../../models/Asset'
-import AssetSearch from '../../models/AssetSearch'
-import AssetFilter from '../../models/AssetFilter'
-import CreateExport from '../Folders/CreateExport'
+import Folders from '../Folders'
 import DisplayOptions from '../DisplayOptions'
 import TableField from '../Table/TableField'
 import Resizer from '../../services/Resizer'
-import { exportAssets } from '../../actions/jobActions'
 import { updateLightbarFields, showModal } from '../../actions/appActions'
 import { flatDisplayPropertiesForFields } from '../../models/DisplayProperties'
 import { isolateAssetId } from '../../actions/assetsAction'
+import { addAssetIdsToFolderId } from '../../actions/folderAction'
 
 class Lightbar extends Component {
   static displayName = 'Lightbar'
@@ -22,23 +22,48 @@ class Lightbar extends Component {
   static propTypes = {
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     isolatedId: PropTypes.string,
+    selectedPageIds: PropTypes.instanceOf(Set),
+    showPages: PropTypes.bool,
+    pages: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     lightbarFields: PropTypes.arrayOf(PropTypes.string),
     modal: PropTypes.object,
+    protocol: PropTypes.string,
+    host: PropTypes.string,
+    user: PropTypes.instanceOf(User),
     actions: PropTypes.object
   }
 
   state = {
     columnWidth: 300,       // Fixed widths, to be draggable
-    actionWidth: 140,
-    lightbarHeight: 60
+    actionWidth: 425,
+    lightbarHeight: 60,
+    copyingLink: false,
+    showFolders: false,
+    addingToCollection: false
   }
 
   componentWillMount () {
     this.resizer = new Resizer()
+    this.componentWillReceiveProps(this.props)
   }
 
   componentWillUnmount () {
     this.resizer.release()  // safe, removes listener on async redraw
+  }
+
+  componentWillReceiveProps (props) {
+    const actionColWidth = 185
+    const actionRowWidth = 425
+    const actionRowHeight = 130
+    if (props.lightbarFields.length > 3) {
+      if (this.state.actionWidth > actionColWidth) {
+        this.setState({ actionWidth: actionColWidth, lightbarHeight: actionRowHeight })
+      }
+    } else {
+      if (this.state.actionWidth < actionRowWidth) {
+        this.setState({ actionWidth: actionRowWidth })
+      }
+    }
   }
 
   closeLightbox () {
@@ -77,16 +102,42 @@ class Lightbar extends Component {
     this.forceUpdate()    // force redraw to clear isDragging CSS classnames
   }
 
-  exportAssets = () => {
-    const width = '460px'
-    const body = <CreateExport onCreate={this.createExport} />
-    this.props.actions.showModal({body, width})
+  isolatedAssetURL () {
+    const { isolatedId, assets, host, protocol } = this.props
+    const asset = assets.find(asset => (asset.id === isolatedId))
+    if (!asset) return
+    return asset.url(protocol, host)
   }
 
-  createExport = (event, name, exportImages, exportMetadata) => {
-    const { isolatedId } = this.props
-    const search = new AssetSearch({ filter: new AssetFilter({ terms: {'_id': [isolatedId]} }) })
-    this.props.actions.exportAssets(name, search)
+  copyIsolatedAssetLink = () => {
+    const text = this.isolatedAssetURL()
+    if (!text) return
+    copy(text)
+    console.log('Copied to clipboard: ' + text)
+    this.setState({ copyingLink: true })
+    if (this.copyTimeout) clearTimeout(this.copyTimout)
+    this.copyTimout = setTimeout(() => {
+      this.setState({ copyingLink: false })
+      this.copyTimout = null
+    }, 3000)
+  }
+
+  showFolders = (event) => {
+    this.setState({ showFolders: !this.state.showFolders })
+    event.preventDefault()
+  }
+
+  addToCollection = (folder, event) => {
+    this.setState({ showFolders: false })
+    const { showPages, isolatedId, selectedPageIds, actions } = this.props
+    const ids = showPages ? selectedPageIds : new Set([isolatedId])
+    actions.addAssetIdsToFolderId(ids, folder.id)
+    this.setState({ addingToCollection: `Added ${ids.size} to ${folder.name}` })
+    if (this.addingTimeout) clearTimeout(this.addingTimout)
+    this.addingTimeout = setTimeout(() => {
+      this.setState({ addingToCollection: null })
+      this.addingTimeout = null
+    }, 3000)
   }
 
   renderField ({title, field, displayProperties, asset}) {
@@ -120,12 +171,14 @@ class Lightbar extends Component {
   }
 
   render () {
-    const { lightbarFields, assets, isolatedId, modal } = this.props
-    const { columnWidth, actionWidth, lightbarHeight } = this.state
+    const { lightbarFields, assets, isolatedId, modal, showPages, selectedPageIds, user } = this.props
+    const { columnWidth, actionWidth, lightbarHeight, copyingLink, showFolders, addingToCollection } = this.state
     const isDraggingColumn = this.resizer.active && this.resizer.onMove === this.resizeColumn
     const isDraggingAction = this.resizer.active && this.resizer.onMove === this.resizeAction
     const asset = assets.find(asset => (asset.id === isolatedId))
     const titleFields = flatDisplayPropertiesForFields(lightbarFields, asset)
+    const nselected = selectedPageIds && selectedPageIds.size
+    const isAddToCollectionDisabled = showPages && !nselected
     return (
       <div className="Lightbar" style={{height: lightbarHeight}}>
         { modal && <Modal {...modal} /> }
@@ -142,9 +195,26 @@ class Lightbar extends Component {
           </div>
         </div>
         <div className="Lightbar-actions" style={{width: actionWidth}}>
-          <div onClick={this.exportAssets} className='Lightbar-action'>
+          <a href={this.isolatedAssetURL()} className='Lightbar-action' download={this.isolatedAssetURL()}>
             <span className='Lightbar-action-text'>Download</span>
             <i className='Lightbar-btn-icon icon-download2'/>
+          </a>
+          <div onClick={!copyingLink && this.copyIsolatedAssetLink} className='Lightbar-action'>
+            <span className='Lightbar-action-text'>Get Link</span>
+            <i className='Lightbar-btn-icon icon-link2'/>
+            { copyingLink && <div className="Lightbar-performed-action">Copied URL to clipboard</div> }
+          </div>
+          <div onClick={!isAddToCollectionDisabled && this.showFolders}
+               className={classnames('Lightbar-action', {isDisabled: isAddToCollectionDisabled})}>
+            <span className='Lightbar-action-text'>Add to Collection</span>
+            <i className='Lightbar-btn-icon icon-chevron-down'/>
+            { showFolders && (
+              <div className="Lightbar-folders" onClick={e => { e.stopPropagation() }}>
+                <Folders filterName="simple" onSelect={this.addToCollection}
+                         filter={f => (!f.isDyhi() && !f.search && ((f.childIds && f.childIds.size) || f.canAddAssetIds(selectedPageIds, assets, user)))} />
+              </div>
+            )}
+            { addingToCollection && <div className="Lightbar-performed-action">{addingToCollection}</div> }
           </div>
           <div onMouseDown={event => this.resizer.capture(this.resizeAction, this.release, actionWidth, 0, -1 /* left */)}
                className={classnames('Lightbar-action-resizer', {isDragging: isDraggingAction})} />
@@ -160,12 +230,18 @@ class Lightbar extends Component {
 export default connect(state => ({
   assets: state.assets.all,
   isolatedId: state.assets.isolatedId,
+  showPages: state.app.showPages,
+  pages: state.assets.pages,
+  selectedPageIds: state.assets.selectedPageIds,
   lightbarFields: state.app.lightbarFields,
-  modal: state.app.modal
+  modal: state.app.modal,
+  protocol: state.auth.protocol,
+  host: state.auth.host,
+  user: state.auth.user
 }), dispatch => ({
   actions: bindActionCreators({
     isolateAssetId,
     updateLightbarFields,
-    exportAssets,
+    addAssetIdsToFolderId,
     showModal }, dispatch)
 }))(Lightbar)

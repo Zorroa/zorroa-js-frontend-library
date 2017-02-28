@@ -55,7 +55,8 @@ export function multipageBadges (asset, protocol, host, stackCount) {
 
   // Show the icon & inset if we have any page badging
   if (pageBadge) {
-    iconBadge = <FileIcon ext={asset.value('source.extension')}/>
+    // Disable file type badges and only show in Table
+    // iconBadge = <FileIcon ext={asset.value('source.extension')}/>
     parentURL = asset.parentProxyURL(protocol, host)
   }
 

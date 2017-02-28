@@ -21,6 +21,8 @@ class Folders extends Component {
   static propTypes = {
     // input props
     filterName: PropTypes.string.isRequired,
+    filter: PropTypes.func,
+    onSelect: PropTypes.func,
 
     // connect props
     actions: PropTypes.object.isRequired,
@@ -85,7 +87,8 @@ class Folders extends Component {
     // If any descendants of the current folder are currently selected,
     // and user is trying to close the current folder,
     // then prevent closing the current folder
-    if (isOpen && hasChildren && folders.selectedFolderIds.size) {
+    const lockOpenIfChildSelected = false
+    if (lockOpenIfChildSelected && !isOpen && hasChildren && folders.selectedFolderIds.size) {
       // Start with the parents of all selected folders.
       var selectedFolders = Array.from(folders.selectedFolderIds).map(id => folders.all.get(id))
       var selectedParentIds = selectedFolders.map(f => f.parentId)
@@ -111,7 +114,8 @@ class Folders extends Component {
 
   // Apply standard desktop shift+meta multi-select on click and update state.
   selectFolder (folder, event) {
-    const { folders } = this.props
+    const { folders, onSelect } = this.props
+    if (onSelect) return onSelect(folder, event)
     const rootFolder = folders.all.get(Folder.ROOT_ID)
     const folderList = this.folderList(rootFolder)
     this.props.actions.selectFolderId(folder.id, event.shiftKey, event.metaKey,
@@ -238,7 +242,7 @@ class Folders extends Component {
   }
 
   folderList (folder) {
-    const { folders, filterName } = this.props
+    const { folders, filterName, filter } = this.props
     const { filterString } = this.state
     const isOpen = folders.openFolderIds.has(folder.id)
     const childIds = folder.childIds
@@ -253,6 +257,9 @@ class Folders extends Component {
       // Filter the tree at the root by the filter type passed in from Workspace
       if (folder.id === Folder.ROOT_ID) {
         children = children.filter(Folder.Filters[filterName])
+      }
+      if (filter) {
+        children = children.filter(filter)
       }
       switch (this.sortOrder()) {
         case 'alpha-asc':
@@ -293,10 +300,10 @@ class Folders extends Component {
   renderFolderList = (folderList) => (
     folderList.map(folder => {
       const key = folder.id
-      const { folders } = this.props
+      const { folders, onSelect } = this.props
       const depth = this.depth(folder)
       const isOpen = folders.openFolderIds.has(folder.id)
-      const isSelected = folders.selectedFolderIds.has(folder.id)
+      const isSelected = !onSelect && folders.selectedFolderIds.has(folder.id)
       const hasChildren = (folder.childIds && folder.childIds.size > 0) || false
       return (
         <FolderItem {...{key, depth, folder, isOpen, isSelected, hasChildren}}

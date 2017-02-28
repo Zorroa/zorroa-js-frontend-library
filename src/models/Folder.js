@@ -64,7 +64,7 @@ export default class Folder {
     return true
   }
 
-  canDropFolderIds (draggedFolderIds, folders, user) {
+  canAddChildFolderIds (draggedFolderIds, folders, user) {
     if (draggedFolderIds instanceof Set) draggedFolderIds = [...draggedFolderIds]
     if (!draggedFolderIds || !draggedFolderIds.length || !folders || !user) return false
 
@@ -82,7 +82,7 @@ export default class Folder {
     return false
   }
 
-  canDropAssetIds (draggedAssetIds, assets, user) {
+  canAddAssetIds (draggedAssetIds, assets, user) {
     if (draggedAssetIds instanceof Set) draggedAssetIds = [...draggedAssetIds]
     if (!draggedAssetIds || !draggedAssetIds.length || !assets || !user) return false
     if (!this.hasAccess(user, AclEntry.WriteAccess)) return false

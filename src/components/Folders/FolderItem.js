@@ -42,7 +42,7 @@ const target = {
       case 'FOLDER':
         console.log('Drop ' + JSON.stringify([...dragInfo.folderIds]) + ' on ' + props.folder.id)
         dragInfo.folderIds.forEach(folderId => {
-          if (folder.canDropFolderIds([folderId], folders, user)) {
+          if (folder.canAddChildFolderIds([folderId], folders, user)) {
             const folder = new Folder(props.folders.get(folderId))
             folder.parentId = props.folder.id
             props.actions.updateFolder(folder)
@@ -191,9 +191,9 @@ class FolderItem extends Component {
     const { folder, dragInfo, assets, folders, user } = this.props
     if (!dragInfo) return false
     if (dragInfo.type === 'ASSET' && dragInfo.assetIds) {
-      return folder.canDropAssetIds(dragInfo.assetIds, assets, user)
+      return folder.canAddAssetIds(dragInfo.assetIds, assets, user)
     } else if (dragInfo.type === 'FOLDER' && dragInfo.folderIds) {
-      return folder.canDropFolderIds(dragInfo.folderIds, folders, user)
+      return folder.canAddChildFolderIds(dragInfo.folderIds, folders, user)
     }
     return false
   }

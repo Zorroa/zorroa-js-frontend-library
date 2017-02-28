@@ -6,28 +6,21 @@ import classnames from 'classnames'
 import Asset from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
-import TrashedFolder from '../../models/TrashedFolder'
 import CreateExport from '../Folders/CreateExport'
-import { selectAssetIds } from '../../actions/assetsAction'
-import { removeAssetIdsFromFolderId } from '../../actions/folderAction'
 import { exportAssets } from '../../actions/jobActions'
 import { showModal } from '../../actions/appActions'
 
 class Editbar extends Component {
   static propTypes = {
     selectedAssetIds: PropTypes.instanceOf(Set),
-    selectedFolderIds: PropTypes.instanceOf(Set),
-    trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
-    folders: PropTypes.instanceOf(Map),
+    isRemoveEnabled: PropTypes.func.isRequired,
+    onRemove: PropTypes.func.isRequired,
+    onDeselectAll: PropTypes.func.isRequired,
+
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
-    leftSide: PropTypes.node.isRequired,
     query: PropTypes.instanceOf(AssetSearch),
     tableFields: PropTypes.arrayOf(PropTypes.string),
     actions: PropTypes.object
-  }
-
-  deselectAll = () => {
-    this.props.actions.selectAssetIds(null)
   }
 
   exportAssets = () => {
@@ -46,61 +39,26 @@ class Editbar extends Component {
     this.props.actions.exportAssets(name, search, fields, exportImages)
   }
 
-  removeSelected = () => {
-    const { selectedAssetIds, selectedFolderIds, actions } = this.props
-    selectedFolderIds.forEach(folderId => {
-      actions.removeAssetIdsFromFolderId(selectedAssetIds, folderId)
-    })
-  }
-
-  containsSelected () {
-    const { selectedAssetIds, selectedFolderIds, folders, assets } = this.props
-    if (!selectedAssetIds || !selectedAssetIds.size || !selectedFolderIds || !selectedFolderIds.size) return false
-    const simpleFolderIds = []
-    for (let id of selectedFolderIds) {
-      const folder = folders.get(id)
-      if (folder && !folder.isDyhi() && !folder.search) {
-        simpleFolderIds.push(folder.id)
-      }
-    }
-    for (const assetId of selectedAssetIds) {
-      const index = assets.findIndex(asset => (asset.id === assetId))
-      if (index < 0) continue
-      const asset = assets[index]
-      if (asset.memberOfAnyFolderIds(simpleFolderIds)) return true
-    }
-    return false
-  }
-
   render () {
-    const { selectedAssetIds, trashedFolders, leftSide } = this.props
-    let selectedFolderIds = this.props.selectedFolderIds
-    if (trashedFolders && trashedFolders.length) {
-      // Server does not support editing of trashed folders
-      selectedFolderIds = new Set()
-      this.props.selectedFolderIds.forEach(id => {
-        const index = trashedFolders.findIndex(trashedFolder => (trashedFolder.folderId === id))
-        if (index < 0) selectedFolderIds.add(id)
-      })
-    }
+    const { selectedAssetIds, isRemoveEnabled, onRemove, onDeselectAll, children } = this.props
     const nAssetsSelected = selectedAssetIds ? selectedAssetIds.size : 0
     const disabledSelected = !selectedAssetIds || !selectedAssetIds.size
-    const removable = !disabledSelected && this.containsSelected()
+    const removable = !disabledSelected && isRemoveEnabled()
     return (
       <div className="Editbar">
-        {leftSide}
+        {children}
         <div className="Editbar-right-side">
           <div className={classnames('Editbar-selected', {disabled: disabledSelected})}>
             {`${nAssetsSelected || 'no'} assets selected`}
-            { nAssetsSelected ? (<div onClick={this.deselectAll} className={classnames('Editbar-cancel', 'icon-cancel-circle', {disabledSelected})}/>) : null }
+            { nAssetsSelected ? (<div onClick={onDeselectAll} className={classnames('Editbar-cancel', 'icon-cancel-circle', {disabledSelected})}/>) : null }
           </div>
           <div onClick={!disabledSelected && this.exportAssets} className={classnames('Editbar-export', {disabled: disabledSelected})}>
             Export
             <span onClick={!disabledSelected && this.exportAssets} className="Editbar-icon-export" />
           </div>
-          <div onClick={removable && this.removeSelected} className={classnames('Editbar-remove', {disabled: !removable})}>
+          <div onClick={removable && onRemove} className={classnames('Editbar-remove', {disabled: !removable})}>
             Remove
-            <span onClick={removable && this.removeSelected} className={classnames('Editbar-icon-removeasset', {disabled: !removable})} />
+            <span onClick={removable && onRemove} className={classnames('Editbar-icon-removeasset', {disabled: !removable})} />
           </div>
         </div>
       </div>
@@ -109,17 +67,11 @@ class Editbar extends Component {
 }
 
 export default connect(state => ({
-  selectedAssetIds: state.assets.selectedIds,
-  trashedFolders: state.folders.trashedFolders,
-  selectedFolderIds: state.folders.selectedFolderIds,
-  folders: state.folders.all,
   assets: state.assets.all,
   query: state.assets.query,
   tableFields: state.app.tableFields
 }), dispatch => ({
   actions: bindActionCreators({
-    selectAssetIds,
-    removeAssetIdsFromFolderId,
     showModal,
     exportAssets
   }, dispatch)

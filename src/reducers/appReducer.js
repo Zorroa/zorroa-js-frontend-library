@@ -98,7 +98,7 @@ export default function app (state = initialState, action) {
     case VIDEO_VOLUME:
       return { ...state, videoVolume: action.payload }
     case SHOW_MULTIPAGE:
-      return { ...state, showMultipage: action.payload, showPages: action.payload}
+      return { ...state, showMultipage: action.payload, showPages: action.payload }
     case SHOW_PAGES:
       return { ...state, showPages: action.payload }
     case SORT_FOLDERS: {
