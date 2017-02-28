@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import Pdf from './Pdf'
 import Video from './Video'
 import Image from './Image'
+import MultiImage from './MultiImage'
 import Multipage from './Multipage'
 import Asset from '../../models/Asset'
 import { showPages } from '../../actions/appActions'
@@ -34,7 +35,10 @@ class Inspector extends Component {
 
     if (mediaType.startsWith('image') &&
       imageFormats.findIndex(format => (mediaType.endsWith(format))) >= 0) {
-      inspector = <Image url={url} onMultipage={onMultipage}/>
+      inspector = <Image url={url} onMultipage={onMultipage} />
+    } else if (mediaType.startsWith('image') && pages && pages.length) {
+      inspector = <MultiImage id={asset.id} parentId={asset.parentId()}
+                              onMultipage={onMultipage} />
     } else if (mediaType.startsWith('video')) {
       inspector = <Video url={url} onMultipage={onMultipage}
                          frames={asset.frames()} frameRate={asset.frameRate()}

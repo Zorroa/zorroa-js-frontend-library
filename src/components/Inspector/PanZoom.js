@@ -5,7 +5,10 @@ import Controlbar from './Controlbar'
 
 export default class PanZoom extends Component {
   static propTypes = {
+    title: PropTypes.string,
     showControls: PropTypes.bool,
+    onNextPage: PropTypes.func,
+    onPrevPage: PropTypes.func,
     onMultipage: PropTypes.func,
     actions: PropTypes.object,
     children: PropTypes.node.isRequired
@@ -112,7 +115,7 @@ export default class PanZoom extends Component {
   }
 
   render () {
-    const { showControls, onMultipage } = this.props
+    const { title, showControls, onPrevPage, onNextPage, onMultipage } = this.props
     const { moving } = this.state
     const epsilon = 0.01
     const zoomOutDisabled = this.panner.scale <= PanZoom.minZoom + epsilon
@@ -132,11 +135,14 @@ export default class PanZoom extends Component {
                    onMouseDown={this.startDrag} onWheel={this.zoom}>
                 { this.props.children }
               </div>
-              { showControls ? (
-                  <Controlbar onZoomOut={!zoomOutDisabled && this.zoomOut || null}
+              { showControls && (
+                  <Controlbar title={title}
+                              onZoomOut={!zoomOutDisabled && this.zoomOut || null}
                               onZoomIn={!zoomInDisabled && this.zoomIn || null}
                               onFit={!zoomToFitDisabled && this.zoomToFit || null}
-                              onMultipage={onMultipage} />) : null
+                              onMultipage={onMultipage}
+                              onNextPage={onNextPage}
+                              onPrevPage={onPrevPage} />)
               }
             </div>
           )

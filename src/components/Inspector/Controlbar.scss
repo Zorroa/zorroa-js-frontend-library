@@ -36,11 +36,17 @@
   }
 }
 
-.Controlbar-panzoom {
+.Controlbar-title {
+  @include nowrap;
   @include flexRowCenter;
 }
 
-.Controlbar-multipage {
-  border-left: 1px solid $zorroa-darkgray;
+.Controlbar-separator {
+  width: 2px;
+  height: 24px;
+  background-color: $zorroa-darkgray;
+}
+
+.Controlbar-section {
   @include flexRowCenter;
 }
