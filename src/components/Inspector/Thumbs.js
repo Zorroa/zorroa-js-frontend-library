@@ -1,29 +1,37 @@
 import React, { Component, PropTypes } from 'react'
+import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import Thumb, { page, monopageBadges } from '../Thumb'
 import Asset from '../../models/Asset'
+import { selectPageAssetIds } from '../../actions/assetsAction'
 import * as ComputeLayout from '../Assets/ComputeLayout.js'
 
 class Thumbs extends Component {
   static propTypes = {
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     thumbSize: PropTypes.number.isRequired,
+    selectedIds: PropTypes.instanceOf(Set),
     onMonopage: PropTypes.func.isRequired,
     protocol: PropTypes.string,
-    host: PropTypes.string
+    host: PropTypes.string,
+    actions: PropTypes.object.isRequired
   }
 
   state = {
     positions: [],
     scrollHeight: 0,
     scrollWidth: 0,
-    selected: new Set(),
     lastSelectedId: null
   }
 
   componentWillMount () {
     this.queueLayout()
+    this.props.actions.selectPageAssetIds() // clear
+  }
+
+  componentWillUnmount () {
+    this.props.actions.selectPageAssetIds() // avoid disable action flicker
   }
 
   componentWillReceiveProps (nextProps) {
@@ -33,7 +41,7 @@ class Thumbs extends Component {
   }
 
   select = (asset, event) => {
-    let selected = new Set(this.state.selected)
+    let selectedIds = new Set(this.props.selectedIds)
     if (event.shiftKey) {
       const { assets } = this.props
       const { lastSelectedId } = this.state
@@ -41,32 +49,32 @@ class Thumbs extends Component {
       if (lastSelectedIndex >= 0) {
         const index = assets.findIndex(a => (a.id === asset.id))
         if (index >= 0) {
-          selected = new Set()
+          selectedIds = new Set()
           const min = Math.min(index, lastSelectedIndex)
           const max = Math.max(index, lastSelectedIndex)
           for (var i = min; i <= max; ++i) {
-            selected.add(assets[i].id)
+            selectedIds.add(assets[i].id)
           }
         }
       }
     } else if (event.metaKey) {
-      if (selected.has(asset.id)) {
-        selected.delete(asset.id)
-        if (!selected.size) this.setState({lastSelectedId: null})
+      if (selectedIds.has(asset.id)) {
+        selectedIds.delete(asset.id)
+        if (!selectedIds.size) this.setState({lastSelectedId: null})
       } else {
-        selected.add(asset.id)
+        selectedIds.add(asset.id)
         this.setState({lastSelectedId: asset.id})
       }
     } else {
-      if (this.state.selected.size === 1 && selected.has(asset.id)) {
-        selected = new Set()
+      if (this.props.selectedIds && this.props.selectedIds.size === 1 && selectedIds.has(asset.id)) {
+        selectedIds = new Set()
         this.setState({lastSelectedId: null})
       } else {
-        selected = new Set([asset.id])
+        selectedIds = new Set([asset.id])
         this.setState({lastSelectedId: asset.id})
       }
     }
-    this.setState({selected})
+    this.props.actions.selectPageAssetIds(selectedIds)
   }
 
   updateElement = (element) => {
@@ -122,8 +130,8 @@ class Thumbs extends Component {
   }
 
   render () {
-    const { positions, selected } = this.state
-    const { assets, protocol, host, thumbSize } = this.props
+    const { positions } = this.state
+    const { assets, protocol, host, thumbSize, selectedIds } = this.props
     if (!positions || !assets || positions.length !== assets.length) {
       return <div className="Thumbs" ref={this.updateElement} />
     }
@@ -138,7 +146,7 @@ class Thumbs extends Component {
                           pages={[page(asset, width, height, protocol, host)]}
                           dim={dim}
                           pageBadge={pageBadge}
-                          isSelected={selected.has(asset.id)}
+                          isSelected={selectedIds && selectedIds.has(asset.id)}
                           onClick={e => this.select(asset, e)}
                           onDoubleClick={e => this.props.onMonopage(asset, e)}/>
           })}
@@ -149,7 +157,10 @@ class Thumbs extends Component {
 }
 
 export default connect(state => ({
+  selectedIds: state.assets.selectedPageIds,
   protocol: state.auth.protocol,
   host: state.auth.host,
   thumbSize: state.app.thumbSize
+}), dispatch => ({
+  actions: bindActionCreators({selectPageAssetIds}, dispatch)
 }))(Thumbs)

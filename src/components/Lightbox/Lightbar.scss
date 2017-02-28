@@ -109,8 +109,15 @@
   border: none;
   background: none;
   outline: none;
-  &:hover  { color: $zorroa-sickly-green; }
-  &:active { color: chartreuse; }
+  position: relative;
+  text-decoration: none;
+
+  &:active:not(.isDisabled) { color: chartreuse; }
+  &.isDisabled { color: $zorroa-gray;  }
+  &:hover:not(.isDisabled)  {
+    color: $zorroa-sickly-green;
+    cursor: pointer;
+  }
 }
 
 .Lightbar-action-text {
@@ -170,4 +177,35 @@
 
   &:hover { background-color: $zorroa-darkgray; }
   &.isDragging { background-color: $zorroa-darkgray; }
+}
+
+.Lightbar-folders {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 400px;
+  min-height: 300px;
+  max-height: 70vh;
+  overflow: auto;
+  border-radius: 3px;
+  box-shadow: 0 0 30px 0 black;
+  margin-top: 20px;
+  z-index: 1000;
+  background-color: $zorroa-nearwhite;
+
+  &:hover { color: $zorroa-darkgray; }
+  &:active { color: $zorroa-darkgray; }
+}
+
+.Lightbar-performed-action {
+  @include nowrap;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  box-shadow: 0 0 30px 0 black;
+  padding: 12px;
+  margin-top: 20px;
+  z-index: 1000;
+  background-color: black;
+  color: $zorroa-nearwhite;
 }

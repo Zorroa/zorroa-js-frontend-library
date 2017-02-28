@@ -104,32 +104,11 @@ class Workspace extends Component {
   render () {
     const { app, isolatedId } = this.props
 
-    const BrowsingParams = () => ({
-      header: (<span>Browsing</span>),
-      isIconified: app.leftSidebarIsIconified,
-      isOpen: app.collapsibleOpen.browsing,
-      onOpen: this.toggleCollapsible.bind(this, 'browsing'),
-      closeIcon: 'icon-foldercog'
-    })
     const CollectionParams = () => ({
-      header: (<span>Collection</span>),
+      header: (<span>Collections</span>),
       isOpen: app.collapsibleOpen.collection,
       isIconified: app.leftSidebarIsIconified,
       onOpen: this.toggleCollapsible.bind(this, 'collection'),
-      closeIcon: 'icon-collections-simple'
-    })
-    const SmartCollectionParams = () => ({
-      header: (<span>Smart Collections</span>),
-      isOpen: app.collapsibleOpen.smart,
-      isIconified: app.leftSidebarIsIconified,
-      onOpen: this.toggleCollapsible.bind(this, 'smart'),
-      closeIcon: 'icon-collections-smart'
-    })
-    const SimpleCollectionParams = () => ({
-      header: (<span>Simple Collections</span>),
-      isOpen: app.collapsibleOpen.simple,
-      isIconified: app.leftSidebarIsIconified,
-      onOpen: this.toggleCollapsible.bind(this, 'simple'),
       closeIcon: 'icon-collections-simple'
     })
     const MetadataParams = () => ({
@@ -150,25 +129,11 @@ class Workspace extends Component {
           {/*  left panel - folders */}
           <Sidebar onToggle={this.toggleLeftSidebar}
                    isIconified={app.leftSidebarIsIconified}>
-            <Collapsible {...BrowsingParams()}>
-              <Folders filterName='browsing'/>
-            </Collapsible>
-            <div className="Workspace-collections">
-              <Collapsible {...CollectionParams()}>
-                <div className="Workspace-collection">
-                  <Collapsible {...SmartCollectionParams()}>
-                    <Folders filterName='smart'/>
-                  </Collapsible>
-                </div>
-                <div className="Workspace-collection">
-                  <Collapsible {...SimpleCollectionParams()}>
-                    <Folders filterName='simple'/>
-                  </Collapsible>
-                </div>
-              </Collapsible>
-            </div>
             <Collapsible {...MetadataParams()}>
               <Metadata isIconified={app.leftSidebarIsIconified}/>
+            </Collapsible>
+              <Collapsible {...CollectionParams()}>
+              <Folders/>
             </Collapsible>
           </Sidebar>
 

@@ -1,7 +1,7 @@
 import {
   ASSET_SEARCH, ASSET_SEARCH_ERROR,
   ASSET_SORT, ASSET_ORDER, ASSET_FIELDS,
-  PAGE_SIZE, ISOLATE_ASSET, SELECT_ASSETS,
+  PAGE_SIZE, ISOLATE_ASSET, SELECT_ASSETS, SELECT_PAGES,
   SUGGEST_COMPLETIONS, SEARCH_DOCUMENT, UNAUTH_USER
 } from '../constants/actionTypes'
 
@@ -97,6 +97,9 @@ export default function (state = initialState, action) {
       api.setSelectionCounter(selectionCounter)
       return { ...state, selectedIds: action.payload, selectionCounter }
     }
+
+    case SELECT_PAGES:
+      return { ...state, selectedPageIds: action.payload }
 
     case PAGE_SIZE:
       return { ...state, pageSize: action.payload }

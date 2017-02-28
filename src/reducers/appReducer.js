@@ -40,7 +40,7 @@ const initialState = {
   videoVolume: 0.8,
   showMultipage: false,
   showPages: false,
-  sortFolders: {},
+  sortFolders: 'alpha-asc',
   userSettings: {
     tableFields: [ ...defaultTableFields ],
     metadataFields: [ ...defaultTableFields ],
@@ -98,22 +98,11 @@ export default function app (state = initialState, action) {
     case VIDEO_VOLUME:
       return { ...state, videoVolume: action.payload }
     case SHOW_MULTIPAGE:
-      return { ...state, showMultipage: action.payload, showPages: action.payload}
+      return { ...state, showMultipage: action.payload, showPages: action.payload }
     case SHOW_PAGES:
       return { ...state, showPages: action.payload }
-    case SORT_FOLDERS: {
-      const { filter, order } = action.payload
-      if (order === undefined) {
-        if (state.sort[filter]) {
-          const sort = {...state.sort}
-          delete sort[filter]
-          return sort
-        }
-      } else {
-        return {...state, sortFolders: { ...state.sort, [filter]: order }}
-      }
-      break
-    }
+    case SORT_FOLDERS:
+      return { ...state, sortFolders: action.payload }
     case USER_SETTINGS:
       return { ...state, userSettings: action.payload.metadata }
     case UNAUTH_USER:

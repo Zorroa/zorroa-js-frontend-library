@@ -9,7 +9,7 @@ import Thumbs from './Thumbs'
 import Asset from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
 import { showPages, setThumbSize, MIN_THUMBSIZE, MAX_THUMBSIZE, DELTA_THUMBSIZE, DEFAULT_THUMBSIZE } from '../../actions/appActions'
-import { isolateAssetId, searchDocument } from '../../actions/assetsAction'
+import { isolateAssetId, searchDocument, selectPageAssetIds } from '../../actions/assetsAction'
 
 class Multipage extends Component {
   static propTypes = {
@@ -19,6 +19,7 @@ class Multipage extends Component {
     thumbSize: PropTypes.number,
     query: PropTypes.instanceOf(AssetSearch),
     pages: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+    selectedPageIds: PropTypes.instanceOf(Set),
     actions: PropTypes.object,
     children: PropTypes.node.isRequired
   }
@@ -36,7 +37,7 @@ class Multipage extends Component {
     if (showMultipage && parentId && parentId.length) {
       this.props.actions.showPages(true)
     }
-    this.props.actions.searchDocument(query, parentId)
+    if (parentId) this.props.actions.searchDocument(query, parentId)
   }
 
   zoomIn = (event) => {
@@ -59,33 +60,46 @@ class Multipage extends Component {
   showDocument = (show) => {
     this.setState({showDocument: show})
     const { query, parentId } = this.props
-    this.props.actions.searchDocument(show ? null : query, parentId)
+    if (parentId) this.props.actions.searchDocument(show ? null : query, parentId)
+  }
+
+  canRemovePageFromFolder = () => {
+    return true
+  }
+
+  removePagesFromFolder = () => {
+
+  }
+
+  deselectAllPages = () => {
+    this.props.actions.selectPageAssetIds()
   }
 
   render () {
-    const { showPages, pages } = this.props
+    const { showPages, pages, selectedPageIds } = this.props
     if (showPages && pages) {
       const { thumbSize } = this.props
       const zoomOutDisabled = thumbSize < MIN_THUMBSIZE
       const zoomInDisabled = thumbSize > MAX_THUMBSIZE
       const { showDocument } = this.state
 
-      const documentSwitch = () => (
-        <div className="Multipage-document-switch">
-          <div onClick={e => this.showDocument(false)}
-               className={classnames('Multipage-document-mode left', {selected: !showDocument})}>
-            Search Results
-          </div>
-          <div onClick={e => this.showDocument(true)}
-               className={classnames('Multipage-document-mode right', {selected: showDocument})}>
-            Full Document
-          </div>
-        </div>
-      )
-
       return (
         <div className="Multipage">
-          <Editbar leftSide={documentSwitch()}/>
+          <Editbar selectedAssetIds={selectedPageIds}
+                   onDeselectAll={this.deselectAllPages}
+                   isRemoveEnabled={this.canRemovePageFromFolder}
+                   onRemove={this.removePagesFromFolder}>
+            <div className="Multipage-document-switch">
+              <div onClick={e => this.showDocument(false)}
+                   className={classnames('Multipage-document-mode left', {selected: !showDocument})}>
+                Search Results
+              </div>
+              <div onClick={e => this.showDocument(true)}
+                   className={classnames('Multipage-document-mode right', {selected: showDocument})}>
+                Full Document
+              </div>
+            </div>
+          </Editbar>
           <Thumbs assets={pages} onMonopage={this.switchToPanZoom}/>
           <Controlbar onZoomIn={!zoomInDisabled && this.zoomIn}
                       onZoomOut={!zoomOutDisabled && this.zoomOut}
@@ -102,12 +116,14 @@ export default connect(state => ({
   showMultipage: state.app.showMultipage,
   showPages: state.app.showPages,
   query: state.assets.query,
-  pages: state.assets.pages
+  pages: state.assets.pages,
+  selectedPageIds: state.assets.selectedPageIds
 }), dispatch => ({
   actions: bindActionCreators({
     setThumbSize,
     showPages,
     isolateAssetId,
+    selectPageAssetIds,
     searchDocument
   }, dispatch)
 }))(Multipage)

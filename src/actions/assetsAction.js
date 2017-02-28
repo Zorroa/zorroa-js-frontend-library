@@ -3,7 +3,8 @@ import * as assert from 'assert'
 import {
   UNAUTH_USER, ASSET_SEARCH, ASSET_SEARCH_ERROR,
   ASSET_SORT, ASSET_ORDER, ASSET_FIELDS,
-  ISOLATE_ASSET, SELECT_ASSETS, PAGE_SIZE,
+  ISOLATE_ASSET, SELECT_ASSETS,
+  SELECT_PAGES, PAGE_SIZE,
   SUGGEST_COMPLETIONS, SEARCH_DOCUMENT
 } from '../constants/actionTypes'
 import Asset from '../models/Asset'
@@ -129,6 +130,13 @@ export function isolateAssetId (id) {
 export function selectAssetIds (ids) {
   return ({
     type: SELECT_ASSETS,
+    payload: ids
+  })
+}
+
+export function selectPageAssetIds (ids) {
+  return ({
+    type: SELECT_PAGES,
     payload: ids
   })
 }
