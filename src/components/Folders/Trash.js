@@ -50,10 +50,12 @@ class Trash extends Component {
 
   restoreSelected (trashedFolder, event) {
     this.props.actions.restoreTrashedFolders(this.selectedTrashedFolderIds(trashedFolder))
+    this.dismissContextMenu(event)
   }
 
   deleteSelected (trashedFolder, event) {
     this.props.actions.deleteTrashedFolders(this.selectedTrashedFolderIds(trashedFolder))
+    this.dismissContextMenu(event)
   }
 
   selectedTrashedFolderIds (trashedFolder) {
@@ -78,7 +80,7 @@ class Trash extends Component {
   // Keep the context menu from running off the bottom of the screen
   constrainContextMenu = (ctxMenu) => {
     const { contextMenuPos } = this.state
-    if (contextMenuPos.y + ctxMenu.clientHeight > window.innerHeight) {
+    if (ctxMenu && contextMenuPos && contextMenuPos.y + ctxMenu.clientHeight > window.innerHeight) {
       this.setState({ contextMenuPos: { ...contextMenuPos, y: window.innerHeight - ctxMenu.clientHeight } })
     }
   }
