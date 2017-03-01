@@ -38,7 +38,7 @@ const initialState = {
   tableHeight: 300,
   showTable: false,
   videoVolume: 0.8,
-  showMultipage: false,
+  showMultipage: true,
   showPages: false,
   sortFolders: 'alpha-asc',
   userSettings: {
