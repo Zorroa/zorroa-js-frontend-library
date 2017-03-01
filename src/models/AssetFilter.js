@@ -10,6 +10,7 @@ export default class AssetFilter {
       this.scripts = json.scripts   // [AssetScript]
       this.colors = json.colors     // {string, [ColorFilters]
       this.links = json.links       // {string, [object]}
+      this.hamming = json.hamming   // {string, [object]}
       if (json.must) this.must = json.must.map(filter => new AssetFilter(filter))
       if (json.must_not) this.must_not = json.must_not.map(filter => new AssetFilter(filter))
       if (json.should) this.should = json.should.map(filter => new AssetFilter(filter))
@@ -25,6 +26,7 @@ export default class AssetFilter {
       (this.scripts && this.scripts.length) ||
       (this.colors && Object.keys(this.colors).length) ||
       (this.links && Object.keys(this.links).length) ||
+      (this.hamming && Object.keys(this.hamming).length) ||
       (this.must && this.must.findIndex(f => !f.empty()) >= 0) ||
       (this.must_not && this.must_not.findIndex(f => !f.empty()) >= 0) ||
       (this.should && this.should.findIndex(f => !f.empty()) >= 0)) {
@@ -72,6 +74,21 @@ export default class AssetFilter {
         }
       } else {
         this.terms = { ...filter.terms }
+      }
+    }
+    if (filter.hamming) {
+      if (this.hamming) {
+        for (let key in filter.hamming) {
+          if (key in filter.hamming) {
+            if (key in this.hamming) {
+              this.hamming[key] = union([this.hamming[key], filter.hamming[key]])
+            } else {
+              this.hamming[key] = [ ...filter.hamming[key] ]
+            }
+          }
+        }
+      } else {
+        this.hamming = { ...filter.hamming }
       }
     }
     if (filter.range) {
