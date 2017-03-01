@@ -20,7 +20,7 @@ export const SimpleSearchWidgetInfo = {
 export const FacetWidgetInfo = {
   type: 'FACET',
   icon: 'icon-bar-graph',
-  title: 'Facet: Keyword',
+  title: 'Facet',
   description: 'Match keywords and specific values for specific fields',
   element: <Facet/>,
   color: '#a11d77' // zorroa-darkish-purple
@@ -29,7 +29,7 @@ export const FacetWidgetInfo = {
 export const MapWidgetInfo = {
   type: 'MAP',
   icon: 'icon-location',
-  title: 'Map: Location',
+  title: 'Map',
   description: 'Map GPS locations on a map and select to search for matching fields',
   element: <Map/>,
   color: '#785549'
