@@ -209,7 +209,7 @@ class Folders extends Component {
       }
       let subsort = (a, b) => a.name.localeCompare(b.name)
       switch (this.sortOrder()) {
-        case 'alpha-asc': break
+        case 'alpha-asc':
           break
         case 'alpha-desc':
           subsort = (a, b) => b.name.localeCompare(a.name)

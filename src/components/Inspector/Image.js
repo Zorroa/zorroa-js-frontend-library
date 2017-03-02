@@ -4,7 +4,8 @@ import PanZoom from './PanZoom'
 
 const Image = (props) => (
   <div className="Image-frame">
-    <PanZoom onMultipage={props.onMultipage}>
+    <PanZoom title={props.title} onMultipage={props.onMultipage}
+             onNextPage={props.onNextPage} onPrevPage={props.onPrevPage}>
       <div className="Image" style={{ backgroundSize: 'fit', backgroundImage: `url(${props.url})` }} />
     </PanZoom>
   </div>
@@ -12,7 +13,10 @@ const Image = (props) => (
 
 Image.propTypes = {
   url: PropTypes.string.isRequired,
-  onMultipage: PropTypes.func
+  title: PropTypes.string,
+  onMultipage: PropTypes.func,
+  onNextPage: PropTypes.func,
+  onPrevPage: PropTypes.func
 }
 
 export default Image

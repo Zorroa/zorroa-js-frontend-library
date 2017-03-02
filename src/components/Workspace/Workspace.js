@@ -104,8 +104,6 @@ class Workspace extends Component {
   render () {
     const { app, isolatedId } = this.props
 
-    if (isolatedId) return <Lightbox/>
-
     const CollectionParams = () => ({
       header: (<span>Collections</span>),
       isOpen: app.collapsibleOpen.collection,
@@ -134,7 +132,7 @@ class Workspace extends Component {
             <Collapsible {...MetadataParams()}>
               <Metadata isIconified={app.leftSidebarIsIconified}/>
             </Collapsible>
-            <Collapsible {...CollectionParams()}>
+              <Collapsible {...CollectionParams()}>
               <Folders/>
             </Collapsible>
           </Sidebar>
@@ -160,6 +158,7 @@ class Workspace extends Component {
              onDrop={this.dropFile}>
           Drop Assets to Import
         </div>
+        { isolatedId && <Lightbox/> }
       </div>
     )
   }

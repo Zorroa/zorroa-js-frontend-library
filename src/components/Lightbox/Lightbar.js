@@ -4,7 +4,6 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 import copy from 'copy-to-clipboard'
 
-import Modal from '../Modal'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
 import Folders from '../Folders'
@@ -26,7 +25,6 @@ class Lightbar extends Component {
     showPages: PropTypes.bool,
     pages: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     lightbarFields: PropTypes.arrayOf(PropTypes.string),
-    modal: PropTypes.object,
     protocol: PropTypes.string,
     host: PropTypes.string,
     user: PropTypes.instanceOf(User),
@@ -171,20 +169,19 @@ class Lightbar extends Component {
   }
 
   render () {
-    const { lightbarFields, assets, isolatedId, modal, showPages, selectedPageIds, user } = this.props
+    const { lightbarFields, assets, isolatedId, showPages, selectedPageIds, user, pages } = this.props
     const { columnWidth, actionWidth, lightbarHeight, copyingLink, showFolders, addingToCollection } = this.state
     const isDraggingColumn = this.resizer.active && this.resizer.onMove === this.resizeColumn
     const isDraggingAction = this.resizer.active && this.resizer.onMove === this.resizeAction
-    const asset = assets.find(asset => (asset.id === isolatedId))
-    const titleFields = flatDisplayPropertiesForFields(lightbarFields, asset)
+    const asset = assets.find(asset => (asset.id === isolatedId)) || pages.find(asset => (asset.id === isolatedId))
+    const titleFields = asset && lightbarFields && flatDisplayPropertiesForFields(lightbarFields, asset)
     const nselected = selectedPageIds && selectedPageIds.size
     const isAddToCollectionDisabled = showPages && !nselected
     return (
       <div className="Lightbar" style={{height: lightbarHeight}}>
-        { modal && <Modal {...modal} /> }
         <button onClick={this.showDisplayOptions} className="Lightbar-settings icon-cog" />
         <div className="Lightbar-metadata">
-          { titleFields.map(tf => this.renderField({...tf, asset})) }
+          { titleFields && titleFields.map(tf => this.renderField({...tf, asset})) }
           <div className="Lightbar-column-resizers">
             { /* TRICKY: N columns, with accumulated scaling */
               [1, 2, 3, 4, 5, 6, 7].map(k => (
@@ -234,7 +231,6 @@ export default connect(state => ({
   pages: state.assets.pages,
   selectedPageIds: state.assets.selectedPageIds,
   lightbarFields: state.app.lightbarFields,
-  modal: state.app.modal,
   protocol: state.auth.protocol,
   host: state.auth.host,
   user: state.auth.user

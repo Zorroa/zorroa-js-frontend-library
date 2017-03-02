@@ -29,15 +29,15 @@ class Multipage extends Component {
   }
 
   state = {
-    showDocument: false
+    showDocument: true
   }
 
   componentWillMount () {
-    const { showMultipage, parentId, query } = this.props
+    const { showMultipage, parentId } = this.props
     if (showMultipage && parentId && parentId.length) {
       this.props.actions.showPages(true)
     }
-    if (parentId) this.props.actions.searchDocument(query, parentId)
+    if (parentId) this.showDocument(this.state.showDocument)
   }
 
   zoomIn = (event) => {
