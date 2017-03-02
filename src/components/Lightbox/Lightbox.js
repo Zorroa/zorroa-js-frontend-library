@@ -14,6 +14,7 @@ class Lightbox extends Component {
   }
 
   static propTypes = {
+    pages: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     isolatedId: PropTypes.string.isRequired,
     actions: PropTypes.object
@@ -43,8 +44,12 @@ class Lightbox extends Component {
   }
 
   render () {
-    const { assets, isolatedId } = this.props
-    const asset = assets && isolatedId ? assets.find(asset => (asset.id === isolatedId)) : null
+    const { assets, pages, isolatedId } = this.props
+    let asset = null
+    if (isolatedId) {
+      if (pages) asset = pages.find(asset => (asset.id === isolatedId))
+      if (!asset && assets) asset = assets.find(asset => (asset.id === isolatedId))
+    }
     return (
       <div className="lightbox flexCol fullWidth fullHeight">
         <Lightbar/>
@@ -58,6 +63,7 @@ class Lightbox extends Component {
 
 export default connect(state => ({
   assets: state.assets.all,
+  pages: state.assets.pages,
   isolatedId: state.assets.isolatedId
 }), dispatch => ({
   actions: bindActionCreators({ isolateAssetId }, dispatch)

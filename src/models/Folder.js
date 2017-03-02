@@ -92,7 +92,7 @@ export default class Folder {
     for (let i = 0; i < draggedAssetIds.length; ++i) {
       const id = draggedAssetIds[i]
       const dropAsset = assets.find(asset => (asset.id === id))
-      if (!dropAsset.memberOfAllFolderIds(folderIds)) return true
+      if (dropAsset && !dropAsset.memberOfAllFolderIds(folderIds)) return true
     }
     return false
   }
