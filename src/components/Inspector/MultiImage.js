@@ -28,7 +28,7 @@ class MultiImage extends Component {
   }
 
   componentWillReceiveProps (props) {
-    const { id, pages, protocol, host } = props
+    const { pages } = props
     if (pages) {
       const pageIndex = pages.findIndex(page => page.id === props.id)
       this.setState({pageIndex})
