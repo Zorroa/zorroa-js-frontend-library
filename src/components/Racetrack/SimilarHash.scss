@@ -82,6 +82,7 @@
     }
 
     .SimilarHash-value-table-row {
+      cursor: pointer;
       color: $zorroa-greyish-brown;
       &:hover { background-color: $zorroa-hover; }
       &.selected { background-color: $zorroa-selected; }
@@ -89,6 +90,7 @@
     }
 
     .SimilarHash-value-table-key {
+      cursor: pointer;
       @include fullHeight;
       @include fullWidth;
       position: relative;
@@ -104,6 +106,7 @@
     }
 
     .SimilarHash-value-key {
+      cursor: pointer;
       position: relative;
     }
   }
@@ -273,6 +276,19 @@
     @include flexRowCenter;
     @include flexJustifySpaceBetween;
     margin-top: 5px;
+  }
+
+  .SimilarHash-selection-hash {
+    margin: 0 4px;
+    color: $zorroa-lightgray;
+  }
+
+
+  .SimilarHash-selection-val {
+    width: 100%;
+    min-width: 100%;
+    max-width: 0; // This looks weird, but is important! It allows cells to chop content
+    @include clampText;
   }
 
   .SimilarHash-asset {

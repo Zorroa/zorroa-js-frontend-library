@@ -181,19 +181,19 @@ class SimilarHash extends Component {
                  style={{backgroundImage: `url(${selectedAsset.smallestProxy().url(protocol, host)})`}}
           />)}
         </div>
-        <div className="SimilarHash-clear-selection flexOff">
+        <div className="SimilarHash-selection-hash flexOn">
           { this.state.hashType && (
-            <div className="SimilarHash-clear-selection-inner flexColCenter">
+            <div className="SimilarHash-clear-selection-inner flexCol">
               <span>{this.state.hashType}</span>
-              <span>{this.state.hashVal}</span>
+              <div className="flexRowCenter fullWidth clampText">
+                <span className="SimilarHash-selection-val">{this.state.hashVal}</span>
+              </div>
             </div>
           )}
         </div>
         <div className="SimilarHash-clear-selection flexOff">
           { this.state.hashType && (
-            <div className="SimilarHash-clear-selection-inner flexRowCenter">
-              <div onClick={this.deselectHashType} className="SimilarHash-clear-selection-cancel icon-cancel-circle"/>
-            </div>
+            <div onClick={this.deselectHashType} className="SimilarHash-clear-selection-cancel icon-cancel-circle"/>
           )}
         </div>
       </div>
