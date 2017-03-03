@@ -1,0 +1,17 @@
+{
+"filter": {
+  "hamming": {
+    "field": "ImageHash.phashSimple",
+    "hash": "001eeff6"
+  },
+  "fuzzy": {
+    "ImageHash.phashSimple": {
+      "value": "001eeff6",
+      "fuzziness": 2
+    }
+  }
+},
+"size":10,
+"order": [
+  {"field":"ImageHash.perceptiveHash","ascending":true }
+],

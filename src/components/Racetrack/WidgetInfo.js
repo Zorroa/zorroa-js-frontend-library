@@ -7,6 +7,10 @@ import Exists from './Exists'
 import Range from './Range'
 import Filetype from './Filetype'
 import DateRange from './DateRange'
+import SimilarHash from './SimilarHash'
+
+// Pick colors from the style guide
+// https://projects.invisionapp.com/d/main#/console/8609824/184395417/preview
 
 export const SimpleSearchWidgetInfo = {
   type: 'SIMPLE_SEARCH',
@@ -78,4 +82,13 @@ export const DateRangeWidgetInfo = {
   description: 'Match a range of a date field',
   element: <DateRange/>,
   color: '#1875d1' // $zorroa-water-blue
+}
+
+export const SimilarHashWidgetInfo = {
+  type: 'SIMILARHASH',
+  icon: 'icon-pictures',
+  title: 'Similar Hash',
+  description: 'Match images with similar hash values',
+  element: <SimilarHash/>,
+  color: '#fc6c2c' // $zorroa-orangish
 }
