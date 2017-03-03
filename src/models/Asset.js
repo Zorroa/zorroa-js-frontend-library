@@ -14,9 +14,29 @@ export default class Asset {
   }
 
   source () { return this.document.source.filename }
-  url (protocol, host) {
-    return `${protocol}//${host}:8066/api/v1/assets/${this.id}/_stream`
+
+  baseURL (protocol, host, id) {
+    return `${protocol}//${host}:8066/api/v1/assets/${id}`
   }
+
+  url (protocol, host) {
+    return this.baseURL(protocol, host, this.id) + '/_stream'
+  }
+
+  closestProxyURL (protocol, host, width, height) {
+    return `${this.baseURL(protocol, host, this.id)}/proxies/closest/${width}x${height}`
+  }
+
+  largestProxyURL (protocol, host) {
+    return this.baseURL(protocol, host) + '/proxies/largest'
+  }
+
+  smallestParentProxyURL (protocol, host) {
+    const parentId = this.parentId()
+    if (!parentId) return null
+    return this.baseURL(protocol, host, parentId) + '/proxies/smallest'
+  }
+
   mediaType () { return this.document.source.mediaType || 'unknown' }
   tinyProxy () { return this.document.proxies ? this.document.proxies.tinyProxy : null }
 
@@ -123,12 +143,6 @@ export default class Asset {
   parentId () {
     if (!this.document.source || !this.document.source.clip) return null
     return this.document.source.clip.parent
-  }
-
-  parentProxyURL (protocol, host) {
-    const parentId = this.parentId()
-    if (!parentId) return null
-    return `${protocol}//${host}:8066/api/v1/assets/${parentId}/proxies/smallest`
   }
 
   // Returns true if the asset is in any of the folder ids

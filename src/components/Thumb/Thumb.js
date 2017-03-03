@@ -11,8 +11,7 @@ import { addSiblings, isolateSelectId } from '../../services/jsUtil'
 
 // Extract thumb page info from an asset
 export function page (asset, width, height, protocol, host) {
-  const proxy = asset.closestProxy(width, height)
-  const url = proxy ? proxy.url(protocol, host) : ''
+  const url = asset.closestProxyURL(protocol, host, width, height)
   const tproxy = asset.tinyProxy()
   const backgroundColor = tproxy ? tproxy[4] : '#888'
   return { url, backgroundColor }
@@ -57,7 +56,7 @@ export function multipageBadges (asset, protocol, host, stackCount) {
   if (pageBadge) {
     // Disable file type badges and only show in Table
     // iconBadge = <FileIcon ext={asset.value('source.extension')}/>
-    parentURL = asset.parentProxyURL(protocol, host)
+    parentURL = asset.smallestParentProxyURL(protocol, host)
   }
 
   return { pageBadge, iconBadge, parentURL }

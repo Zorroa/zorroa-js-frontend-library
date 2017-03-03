@@ -49,7 +49,7 @@ class Inspector extends Component {
                        documentInitParameters={{url, withCredentials: true}} />
     } else {
       const proxy = asset.biggestProxy()
-      inspector = <Image url={proxy.url(protocol, host)} onMultipage={onMultipage} />
+      inspector = <Image url={asset.largestProxyURL(protocol, host)} onMultipage={onMultipage} />
       warning = <div>{proxy.width} x {proxy.height} proxy</div>
     }
 
