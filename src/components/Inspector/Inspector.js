@@ -32,6 +32,7 @@ class Inspector extends Component {
     const imageFormats = [ 'jpeg', 'jpg', 'png', 'gif' ]
     let warning = null    // FIXME: move to Lightbar?
     let inspector = null
+    let field = 'page'
 
     if (mediaType.startsWith('image') &&
       imageFormats.findIndex(format => (mediaType.endsWith(format))) >= 0) {
@@ -40,6 +41,7 @@ class Inspector extends Component {
       inspector = <MultiImage id={asset.id} parentId={asset.parentId()}
                               onMultipage={onMultipage} />
     } else if (mediaType.startsWith('video')) {
+      field = 'frame'
       inspector = <Video url={url} onMultipage={onMultipage}
                          frames={asset.frames()} frameRate={asset.frameRate()}
                          startFrame={asset.startFrame()} stopFrame={asset.stopFrame()}/>
@@ -53,10 +55,13 @@ class Inspector extends Component {
       warning = <div>{proxy.width} x {proxy.height} proxy</div>
     }
 
+    // Multipage thumbnail ordering based on document type
+    const order = [{ field: `source.clip.${field}.start`, ascending: true }]
+
     return (
       <div className="Inspector fullWidth fullHeight flexCenter">
         <div className='Inspector-content flexOn'>
-          <Multipage parentId={asset.parentId()}>
+          <Multipage parentId={asset.parentId()} order={order}>
             { inspector }
             { warning ? <div className="Inspector-warning">{warning}</div> : null }
           </Multipage>

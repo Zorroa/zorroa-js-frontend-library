@@ -35,7 +35,8 @@ class Thumbs extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    if (this.cachedThumbSize !== nextProps.thumbSize) {
+    if (this.cachedThumbSize !== nextProps.thumbSize ||
+        this.state.positions.length !== nextProps.assets.length) {
       this.queueLayout()
     }
   }

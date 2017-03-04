@@ -23,7 +23,8 @@ class MultiImage extends Component {
 
   componentWillMount () {
     const { parentId, actions } = this.props
-    actions.searchDocument(null, parentId)
+    const order = [{ field: 'source.clip.page.start', ascending: true }]
+    actions.searchDocument(null, parentId, order)
     this.componentWillReceiveProps(this.props)
   }
 

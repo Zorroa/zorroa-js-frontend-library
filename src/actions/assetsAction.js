@@ -59,7 +59,7 @@ export function searchAssets (query) {
   }
 }
 
-export function searchDocument (query, parentId) {
+export function searchDocument (query, parentId, order) {
   assert.ok(!query || query instanceof AssetSearch)
   return dispatch => {
     const safeQuery = escapeQuery(query)
@@ -71,7 +71,7 @@ export function searchDocument (query, parentId) {
     }
     safeQuery.size = 10000
     safeQuery.from = 0
-    if (!query) safeQuery.order = [{ field: 'source.clip.page.start', ascending: true }]
+    if (!query) safeQuery.order = order
     console.log('Search Document: ' + JSON.stringify(safeQuery))
     getArchivist().post('/api/v3/assets/_search', safeQuery)
       .then(response => {

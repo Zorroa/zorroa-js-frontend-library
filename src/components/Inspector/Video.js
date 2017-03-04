@@ -130,12 +130,10 @@ class Video extends Component {
               playing={playing}
               volume={volume}
               onReady={() => this.init()}
-              onStart={() => console.log('onStart')}
               onPlay={() => this.setState({ playing: true })}
               onPause={() => this.setState({ playing: false })}
-              onBuffer={() => console.log('onBuffer')}
               onEnded={() => this.setState({ playing: false, played: 1 })}
-              onError={e => console.log('onError', e)}
+              onError={e => console.log('Video playback error: ', e)}
               onProgress={this.onProgress}
               progressFrequency={100}
             />

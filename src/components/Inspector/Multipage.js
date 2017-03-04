@@ -14,6 +14,7 @@ import { isolateAssetId, searchDocument, selectPageAssetIds } from '../../action
 class Multipage extends Component {
   static propTypes = {
     parentId: PropTypes.string,
+    order: PropTypes.arrayOf(PropTypes.object),
     showMultipage: PropTypes.bool,
     showPages: PropTypes.bool,
     thumbSize: PropTypes.number,
@@ -29,7 +30,8 @@ class Multipage extends Component {
   }
 
   state = {
-    showDocument: true
+    showDocument: true,
+    showedPages: this.props.showPages
   }
 
   componentWillMount () {
@@ -38,6 +40,14 @@ class Multipage extends Component {
       this.props.actions.showPages(true)
     }
     if (parentId) this.showDocument(this.state.showDocument)
+  }
+
+  componentWillReceiveProps (nextProps) {
+    const { showPages, parentId } = nextProps
+    if (showPages != this.state.showedPages) {
+      if (parentId) this.showDocument(this.state.showDocument)
+      this.setState({showedPages: showPages})
+    }
   }
 
   zoomIn = (event) => {
@@ -59,8 +69,8 @@ class Multipage extends Component {
 
   showDocument = (show) => {
     this.setState({showDocument: show})
-    const { query, parentId } = this.props
-    if (parentId) this.props.actions.searchDocument(show ? null : query, parentId)
+    const { query, parentId, order } = this.props
+    if (parentId) this.props.actions.searchDocument(show ? null : query, parentId, order)
   }
 
   canRemovePageFromFolder = () => {
@@ -77,7 +87,7 @@ class Multipage extends Component {
 
   render () {
     const { showPages, pages, selectedPageIds } = this.props
-    if (showPages && pages) {
+    if (showPages) {
       const { thumbSize } = this.props
       const zoomOutDisabled = thumbSize < MIN_THUMBSIZE
       const zoomInDisabled = thumbSize > MAX_THUMBSIZE
@@ -100,7 +110,7 @@ class Multipage extends Component {
               </div>
             </div>
           </Editbar>
-          <Thumbs assets={pages} onMonopage={this.switchToPanZoom}/>
+          { pages && <Thumbs assets={pages} onMonopage={this.switchToPanZoom}/> }
           <Controlbar onZoomIn={!zoomInDisabled && this.zoomIn}
                       onZoomOut={!zoomOutDisabled && this.zoomOut}
                       onMonopage={e => this.switchToPanZoom(null, e)}/>
