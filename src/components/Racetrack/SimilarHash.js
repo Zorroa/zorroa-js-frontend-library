@@ -7,28 +7,11 @@ import WidgetModel from '../../models/Widget'
 import Asset from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
+import { getAssetFields } from '../../actions/assetsAction'
 import { SimilarHashWidgetInfo } from './WidgetInfo'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
 import { showModal } from '../../actions/appActions'
 import Widget from './Widget'
-
-const HASH_TYPES = [
-  'combined',
-  'hhash',
-  'hsv',
-  'hsvHash',
-  'perceptiveHash',
-  'perceptual16',
-  'phash',
-  'phashSimple',
-  'simplePerceptiveHash',
-  'simplePerceptual16',
-  'valueHash',
-  'wavelet32',
-  'waveletHash',
-  'whash',
-  'whashSimple'
-]
 
 class SimilarHash extends Component {
   static propTypes = {
@@ -50,7 +33,7 @@ class SimilarHash extends Component {
   state = {
     isEnabled: true,
     // order: { '_count': 'desc' },
-    hashTypes: HASH_TYPES,
+    hashTypes: null,
     hashType: '',
     hashVal: '',
     minScore: 4,
@@ -60,11 +43,32 @@ class SimilarHash extends Component {
 
   componentWillMount () {
     this.componentWillReceiveProps(this.props)
+    this.props.actions.getAssetFields()
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps = (nextProps) => {
     if (!this.state.isEnabled) return
 
+    // initialize hashTypes first time through -- or maybe (TODO) later as well
+    if (!this.state.hashTypes) {
+      const { fields } = nextProps
+      if (fields) {
+        let hashTypes = []
+        for (var s in fields.string) {
+          const fieldParts = fields.string[s].split('.')
+          if (fieldParts.length === 2 && fieldParts[0] === 'ImageHash') {
+            hashTypes.push(fieldParts[1])
+          }
+        }
+        hashTypes.sort()
+        this.setState({ hashTypes })
+      }
+    }
+
+    this.syncWithAppState(nextProps)
+  }
+
+  syncWithAppState (nextProps) {
     const { id, widgets } = nextProps
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
@@ -202,15 +206,6 @@ class SimilarHash extends Component {
 
   renderChart () {
     const { hashTypes } = this.state
-    let maxCount = 0
-    // let minCount = Number.MAX_SAFE_INTEGER
-    // Extract the buckets for this widget from the global query using id
-    // const buckets = this.aggBuckets(terms)
-    // buckets.forEach(bucket => {
-    //   maxCount = Math.max(maxCount, bucket.doc_count)
-    //   minCount = Math.min(minCount, bucket.doc_count)
-    // })
-    // this.buckets = buckets
 
     return (
       <div className="SimilarHash-table">
@@ -227,7 +222,6 @@ class SimilarHash extends Component {
                   key={hashType} onClick={e => this.selectHashType(hashType, e)}>
                 <td className="SimilarHash-value-cell">
                   <div className="SimilarHash-value-table-key">
-                    <div className="SimilarHash-value-pct-bar" style={{width: `${100 * hashType.doc_count / maxCount}%`}} />
                     <div className="SimilarHash-value-key">{hashType}</div>
                   </div>
                 </td>
@@ -302,6 +296,11 @@ export default connect(
     protocol: state.auth.protocol,
     host: state.auth.host
   }), dispatch => ({
-    actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds, showModal }, dispatch)
+    actions: bindActionCreators({
+      modifyRacetrackWidget,
+      removeRacetrackWidgetIds,
+      showModal,
+      getAssetFields
+    }, dispatch)
   })
 )(SimilarHash)
