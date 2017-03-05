@@ -8,6 +8,7 @@ import app from './appReducer'
 import racetrack from './racetrackReducer'
 import permissions from './permissionsReducer'
 import jobs from './jobsReducer'
+import archivist from './archivistReducer'
 
 export default combineReducers({
   app,
@@ -17,5 +18,6 @@ export default combineReducers({
   racetrack,
   permissions,
   jobs,
+  archivist,
   form: formReducer
 })

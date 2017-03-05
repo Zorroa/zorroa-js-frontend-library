@@ -21,7 +21,7 @@ class Header extends Component {
 
   showPreferences () {
     const { user, actions } = this.props
-    const width = '460px'
+    const width = '480px'
     const body = <Preferences user={user}/>
     actions.showModal({body, width})
   }

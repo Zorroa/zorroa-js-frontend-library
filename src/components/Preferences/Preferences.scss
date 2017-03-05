@@ -21,7 +21,6 @@
   }
 
   .body {
-    padding: 20px;
   }
 
   .footer {
@@ -70,7 +69,114 @@
   }
 }
 
-.Preferences-build {
+.Preferences-user {
+  @include flexRow;
+  @include flexJustifySpaceBetween;
+  color: $zorroa-darkgray;
+  background-color: $zorroa-lightgray;
+  margin-bottom: 10px;
+  padding: 10px 20px;
+}
+
+.Preferences-curator {
+  border-bottom: 1px solid $zorroa-lightgray;
+  padding: 10px 20px;
+}
+
+.Preferences-curator-page-size {
+  @include flexRowCenter;
+  @include nowrap;
+
+  input::-webkit-slider-thumb {
+    margin-top: -6px;
+  }
+
+  input::-webkit-scrollbar-track {
+    height: 2px;
+    background: $zorroa-lightgray;
+  }
+
+  input::-webkit-slider-runnable-track {
+    height: 2px;
+    background: $zorroa-lightgray;
+  }
+
+  input:focus::-webkit-slider-runnable-track {
+    background: $zorroa-lightgray;
+  }
+}
+
+.Preferences-page-size-label {
   color: $zorroa-lightgray;
+  text-transform: uppercase;
+  margin-right: 10px;
+  font-size: 12px;
+}
+
+.Preferences-page-size-slider {
+  padding-left: 10px;
+}
+
+.Preferences-page-size-text {
+  border: 1px solid $zorroa-lightgray;
+  border-radius: 3px;
+  padding: 8px;
+  color: $zorroa-gray;
+  font-size: 14px;
+}
+
+.Preferences-reset {
+  margin-top: 20px;
+  border: none;
+  color: white;
+  border-radius: 3px;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  align-self: center;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $zorroa-darkgray;
+  }
+}
+
+.Preferences-build {
+  @include flexCol;
+  color: $zorroa-gray;
+  padding: 10px 0;
+  max-height: 300px;
+  overflow: auto;
+  font-weight: 400;
+}
+
+.Preferences-build-title {
+  font-size: 12px;
+  text-align: right;
+  color: $zorroa-lightgray;
+  text-transform: uppercase;
+}
+
+.Preferences-build-value {
+  color: $zorroa-darkgray;
+  font-weight: 100;
+}
+
+.Preferences-archivist {
+  color: $zorroa-gray;
+  font-weight: 400;
+  text-transform: uppercase;
+  padding: 10px 0;
+}
+
+.Preferences-pre {
+  text-transform: none;
   margin: 5px;
+  font-size: 12px;
+  color: $zorroa-lightgray;
+}
+
+.Preferences-status {
+  max-height: 300px;
+  overflow: auto;
+  margin: 10px 20px;
 }
