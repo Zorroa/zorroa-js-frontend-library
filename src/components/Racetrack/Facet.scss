@@ -13,34 +13,6 @@
     font-size: 20px;
   }
 
-  .Facet-header {
-    @include flexRow;
-    @include flexJustifySpaceBetween;
-    @include flexAlignItemsCenter;
-    @include fullWidth;
-    @include noSelect;
-
-    flex-shrink: 1;
-  }
-
-  .Facet-header-label {
-    @include flexRow;
-    @include flexAlignItemsCenter;
-  }
-
-  .Facet-header-title {
-    font-weight: 100;
-    margin-right: 4px;
-  }
-
-  .Facet-header-field {
-    font-weight: 400;
-  }
-
-  .Facet-settings {
-    @include zorroa-square-btn-darken(40px);
-  }
-
   .Facet-body {
     padding: 10px;
   }

@@ -7,57 +7,6 @@
     color: $zorroa-nearwhite;
   }
 
-  .Range-header {
-    @include flexRow;
-    @include flexJustifySpaceBetween;
-    @include flexAlignItemsCenter;
-    @include fullWidth;
-    @include noSelect;
-
-    flex-shrink: 1;
-    min-width: 0;
-  }
-
-  .Range-header-label {
-    @include flexRow;
-    @include flexAlignItemsCenter;
-    min-width: 0;
-  }
-
-  .Range-header-title {
-    @include flexOff;
-    font-weight: 100;
-    margin-right: 4px;
-  }
-
-  .Range-header-field {
-    @include flexShrinkOnly;
-    @include clampText;
-    min-width: 0;
-    text-transform: uppercase;
-    text-overflow: ellipsis;
-    font-weight: 400;
-  }
-
-  .Range-settings {
-    @include zorroa-square-btn-darken(40px);
-    margin: 5px 0px;
-
-    &:hover {
-      cursor: pointer;
-    }
-  }
-
-  .Range-clear-search {
-    @include zorroa-square-btn-darken(20px);
-    margin: 5px;
-    font-size: 10px;
-
-    &:hover {
-      cursor: pointer;
-    }
-  }
-
   .Range-body {
     background-color: white;
     color: $zorroa-gray;

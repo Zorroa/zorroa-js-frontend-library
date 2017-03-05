@@ -15,7 +15,7 @@ import SimilarHash from './SimilarHash'
 export const SimpleSearchWidgetInfo = {
   type: 'SIMPLE_SEARCH',
   icon: 'icon-search',
-  title: 'Simple Search',
+  title: 'Search',
   description: 'Fuzzy text search on keywords or specific fields',
   element: <SimpleSearch/>,
   color: '#73b61c' // $zorroa-sickly-green
@@ -78,7 +78,7 @@ export const FiletypeWidgetInfo = {
 export const DateRangeWidgetInfo = {
   type: 'DATERANGE',
   icon: 'icon-calendar',
-  title: 'Date Range',
+  title: 'Dates',
   description: 'Match a range of a date field',
   element: <DateRange/>,
   color: '#1875d1' // $zorroa-water-blue

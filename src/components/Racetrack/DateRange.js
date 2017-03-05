@@ -145,15 +145,9 @@ class DateRange extends Component {
 
     return (
       <Widget className='DateRange'
-              header={(
-                <div className="DateRange-header">
-                  <div className="DateRange-header-label">
-                    <span className="DateRange-header-title">{DateRangeWidgetInfo.title}{field.length ? ':' : ''}</span>
-                    <span className="DateRange-header-field">{title}</span>
-                  </div>
-                  <div onClick={this.selectField} className="DateRange-settings icon-cog"/>
-                </div>
-              )}
+              title={DateRangeWidgetInfo.title}
+              field={title}
+              onSettings={this.selectField}
               backgroundColor={DateRangeWidgetInfo.color}
               isEnabled={isEnabled}
               enableToggleFn={this.toggleEnabled}

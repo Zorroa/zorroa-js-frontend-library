@@ -8,47 +8,6 @@
   color: $zorroa-nearwhite;
 }
 
-.DateRange-header {
-  @include flexRow;
-  @include flexJustifySpaceBetween;
-  @include flexAlignItemsCenter;
-  @include fullWidth;
-  @include noSelect;
-
-  flex-shrink: 1;
-  min-width: 0;
-}
-
-.DateRange-header-label {
-  @include flexRow;
-  @include flexAlignItemsCenter;
-  min-width: 0;
-}
-
-.DateRange-header-title {
-  @include flexOff;
-  font-weight: 100;
-  margin-right: 4px;
-}
-
-.DateRange-header-field {
-  @include flexShrinkOnly;
-  @include clampText;
-  min-width: 0;
-  text-transform: uppercase;
-  text-overflow: ellipsis;
-  font-weight: 400;
-}
-
-.DateRange-settings {
-  @include zorroa-square-btn-darken(40px);
-  margin: 5px 0px;
-
-  &:hover {
-    cursor: pointer;
-  }
-}
-
 .DateRange-clear-search {
   @include zorroa-square-btn-darken(20px);
   margin: 5px;
@@ -111,7 +70,7 @@
 }
 
 .DateRange-go {
-  @include zorroa-btn(34px, 34px, $zorroa-water-blue, darken($zorroa-water-blue, 15%))
+  @include zorroa-btn(34px, 34px, $zorroa-water-blue, darken($zorroa-water-blue, 15%));
 
   color: white;
   margin-left: 6px;

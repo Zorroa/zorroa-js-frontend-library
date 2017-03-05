@@ -12,30 +12,6 @@
     font-size: 20px;
   }
 
-  .Filetype-header {
-    @include flexRow;
-    @include flexJustifySpaceBetween;
-    @include flexAlignItemsCenter;
-    @include fullWidth;
-    @include noSelect;
-
-    flex-shrink: 1;
-  }
-
-  .Filetype-header-label {
-    @include flexRow;
-    @include flexAlignItemsCenter;
-  }
-
-  .Filetype-header-title {
-    font-weight: 100;
-    margin-right: 4px;
-  }
-
-  .Filetype-header-field {
-    font-weight: 400;
-  }
-
   .Filetype-body {
   }
 

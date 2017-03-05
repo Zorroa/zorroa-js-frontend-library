@@ -115,16 +115,9 @@ class SimpleSearch extends Component {
     const title = Asset.lastNamespace(unCamelCase(field))
     return (
       <Widget className='SimpleSearch'
-              header={(
-                <div className="SimpleSearch-header">
-                  <div className="SimpleSearch-header-label">
-                    <span className="SimpleSearch-header-title">{SimpleSearchWidgetInfo.title}{field.length ? ':' : ''}</span>
-                    <span className="SimpleSearch-header-field">{title}</span>
-                    { field.length ? <div onClick={this.clearField} className="SimpleSearch-clear-search icon-cancel-circle"/> : <div/> }
-                  </div>
-                  <div onClick={this.selectField} className="SimpleSearch-settings icon-cog"/>
-                </div>
-              )}
+              title={SimpleSearchWidgetInfo.title}
+              field={title}
+              onSettings={this.selectField}
               backgroundColor={SimpleSearchWidgetInfo.color}
               isEnabled={isEnabled}
               enableToggleFn={this.toggleEnabled}

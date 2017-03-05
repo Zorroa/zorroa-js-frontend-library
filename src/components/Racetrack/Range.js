@@ -301,15 +301,9 @@ class Range extends Component {
 
     return (
       <Widget className='Range'
-              header={(
-                <div className="Range-header">
-                  <div className="Range-header-label">
-                    <span className="Range-header-title">{RangeWidgetInfo.title}{field.length ? ':' : ''}</span>
-                    <span className="Range-header-field">{title}</span>
-                  </div>
-                  <div onClick={this.selectField} className="Range-settings icon-cog"/>
-                </div>
-              )}
+              title={RangeWidgetInfo.title}
+              field={title}
+              onSettings={this.selectField}
               backgroundColor={RangeWidgetInfo.color}
               isEnabled={isEnabled}
               enableToggleFn={this.toggleEnabled}

@@ -7,47 +7,6 @@
     color: $zorroa-nearwhite;
   }
 
-  .Exists-header {
-    @include flexRow;
-    @include flexJustifySpaceBetween;
-    @include flexAlignItemsCenter;
-    @include fullWidth;
-    @include noSelect;
-
-    flex-shrink: 1;
-    min-width: 0;
-  }
-
-  .Exists-header-label {
-    @include flexRow;
-    @include flexAlignItemsCenter;
-    min-width: 0;
-  }
-
-  .Exists-header-title {
-    @include flexOff;
-    font-weight: 100;
-    margin-right: 4px;
-  }
-
-  .Exists-header-field {
-    @include flexShrinkOnly;
-    @include clampText;
-    min-width: 0;
-    text-transform: uppercase;
-    text-overflow: ellipsis;
-    font-weight: 400;
-  }
-
-  .Exists-settings {
-    @include zorroa-square-btn-darken(40px);
-    margin: 5px 0px;
-
-    &:hover {
-      cursor: pointer;
-    }
-  }
-
   .Exists-clear-search {
     @include zorroa-square-btn-darken(20px);
     margin: 5px;

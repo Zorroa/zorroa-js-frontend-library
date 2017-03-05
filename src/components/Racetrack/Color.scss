@@ -12,29 +12,6 @@
   .Widget-icon {
     font-size: 20px;
   }
-
-  .Color-header {
-    @include flexRow;
-    @include flexJustifySpaceBetween;
-    @include flexAlignItemsCenter;
-    @include fullWidth;
-    @include noSelect;
-
-    color: #fff;
-
-    flex-shrink: 1;
-  }
-
-  .Color-header-label {
-    @include flexRow;
-    @include flexAlignItemsCenter;
-  }
-
-  .Color-header-title {
-    font-weight: 100;
-    margin-right: 4px;
-  }
-
   .Color-body {
     padding: 10px;
   }

@@ -187,18 +187,9 @@ class Map extends Component {
     return (
       <Widget className="Map"
               icon={MapWidgetInfo.icon}
-              header={(
-                <div className="Map-header">
-                  <div className="Map-header-label">
-                    <div className="Map-header-title">{MapWidgetInfo.title}:</div>
-                    <div className="Map-header-field">{title}</div>
-                  </div>
-                  <div className="flexRow flexAlignItemsCenter">
-                    <div onClick={this.selectSearch} className="Map-search icon-search"/>
-                    <div onClick={this.selectLocation} className="Map-settings icon-cog"/>
-                  </div>
-                </div>
-              )}
+              title={MapWidgetInfo.title}
+              field={title}
+              onSettings={this.selectLocation}
               backgroundColor={MapWidgetInfo.color}
               isEnabled={isEnabled}
               enableToggleFn={this.toggleEnabled}

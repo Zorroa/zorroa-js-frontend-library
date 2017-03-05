@@ -300,15 +300,7 @@ class Color extends Component {
 
     return (
       <Widget className="Color"
-              header={(
-                <div className="Color-header">
-                  <div className="Color-header-label">
-                    <span className="Color-header-title">
-                      {ColorWidgetInfo.title}
-                    </span>
-                  </div>
-                </div>
-              )}
+              title={ColorWidgetInfo.title}
               backgroundColor={ColorWidgetInfo.color}
               isEnabled={isEnabled}
               isIconified={isIconified}

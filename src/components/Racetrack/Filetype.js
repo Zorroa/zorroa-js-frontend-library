@@ -287,15 +287,7 @@ class Filetype extends Component {
     const style = { height: '14px', width: isSelected ? '40px' : '90px' }
     return (
       <Widget className="Filetype"
-              header={(
-                <div className="Filetype-header">
-                  <div className="Filetype-header-label">
-                    <span className="Filetype-header-title">
-                      { FiletypeWidgetInfo.title }
-                    </span>
-                  </div>
-                </div>
-              )}
+              title={FiletypeWidgetInfo.title}
               backgroundColor={FiletypeWidgetInfo.color}
               isEnabled={isEnabled}
               enableToggleFn={this.toggleEnabled}

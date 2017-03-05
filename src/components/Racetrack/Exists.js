@@ -111,15 +111,9 @@ class Exists extends Component {
     const title = Asset.lastNamespace(unCamelCase(field))
     return (
       <Widget className='Exists'
-              header={(
-                <div className="Exists-header">
-                  <div className="Exists-header-label">
-                    <span className="Exists-header-title">{ExistsWidgetInfo.title}{field.length ? ':' : ''}</span>
-                    <span className="Exists-header-field">{title}</span>
-                  </div>
-                  <div onClick={this.selectField} className="Exists-settings icon-cog"/>
-                </div>
-              )}
+              title={ExistsWidgetInfo.title}
+              field={title}
+              onSettings={this.selectField}
               backgroundColor={ExistsWidgetInfo.color}
               isEnabled={isEnabled}
               enableToggleFn={this.toggleEnabled}

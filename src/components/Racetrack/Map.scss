@@ -26,28 +26,6 @@
     padding: 10px;
   }
 
-  .Map-header {
-    @include flexRow;
-    @include flexJustifySpaceBetween;
-    @include flexAlignItemsCenter;
-    @include fullWidth;
-    @include noSelect;
-  }
-
-  .Map-header-label {
-    @include flexRow;
-    @include flexAlignItemsCenter;
-  }
-
-  .Map-header-title {
-    font-weight: 100;
-    margin-right: 4px;
-  }
-
-  .Map-header-field {
-    font-weight: 400;
-  }
-
   .selected-term {
     position: absolute;
     top: 44px;

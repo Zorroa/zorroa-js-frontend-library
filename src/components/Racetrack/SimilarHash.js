@@ -243,19 +243,11 @@ class SimilarHash extends Component {
 
   render () {
     const { isIconified } = this.props
-    const { isEnabled } = this.state
+    const { isEnabled, hashType } = this.state
     return (
       <Widget className="SimilarHash"
-              header={(
-                <div className="SimilarHash-header">
-                  <div className="SimilarHash-header-label">
-                    <span className="SimilarHash-header-title">
-                      {SimilarHashWidgetInfo.title}:
-                    </span>
-                    <span className="SimilarHash-header-field">{this.state.hashType}</span>
-                  </div>
-                </div>
-              )}
+              title={SimilarHashWidgetInfo.title}
+              field={hashType}
               backgroundColor={SimilarHashWidgetInfo.color}
               isEnabled={isEnabled}
               enableToggleFn={this.toggleEnabled}

@@ -9,34 +9,6 @@
     font-size: 20px;
   }
 
-  .SimilarHash-header {
-    @include flexRow;
-    @include flexJustifySpaceBetween;
-    @include flexAlignItemsCenter;
-    @include fullWidth;
-    @include noSelect;
-
-    flex-shrink: 1;
-  }
-
-  .SimilarHash-header-label {
-    @include flexRow;
-    @include flexAlignItemsCenter;
-  }
-
-  .SimilarHash-header-title {
-    font-weight: 100;
-    margin-right: 4px;
-  }
-
-  .SimilarHash-header-field {
-    font-weight: 400;
-  }
-
-  .SimilarHash-settings {
-    @include zorroa-square-btn-darken(40px);
-  }
-
   .SimilarHash-body {
     padding: 10px;
   }

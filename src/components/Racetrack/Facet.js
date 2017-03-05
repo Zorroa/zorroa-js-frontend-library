@@ -468,17 +468,9 @@ class Facet extends Component {
     const title = Asset.lastNamespace(unCamelCase(field))
     return (
       <Widget className="Facet"
-              header={(
-                <div className="Facet-header">
-                  <div className="Facet-header-label">
-                    <span className="Facet-header-title">
-                      {FacetWidgetInfo.title}:
-                    </span>
-                    <span className="Facet-header-field">{title}</span>
-                  </div>
-                  <div onClick={this.selectField} className="Facet-settings icon-cog"/>
-                </div>
-              )}
+              title={FacetWidgetInfo.title}
+              field={title}
+              onSettings={this.selectField}
               backgroundColor={FacetWidgetInfo.color}
               isEnabled={isEnabled}
               enableToggleFn={this.toggleEnabled}

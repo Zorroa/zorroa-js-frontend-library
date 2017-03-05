@@ -1,9 +1,7 @@
-// @flow
-
 import React, { PropTypes } from 'react'
 import classnames from 'classnames'
 
-const WidgetHeader = ({ isEnabled, isIconified, header, icon, backgroundColor, enableToggleFn, collapseToggleFn, onClose }: WidgetHeaderProps) => {
+const WidgetHeader = ({ isEnabled, isIconified, title, field, onSettings, icon, backgroundColor, enableToggleFn, collapseToggleFn, onClose }) => {
   const iconClassNames = classnames('WidgetHeader-icon', icon, { isEnabled, isIconified })
 
   return (
@@ -11,7 +9,15 @@ const WidgetHeader = ({ isEnabled, isIconified, header, icon, backgroundColor, e
       <div className='WidgetHeader-hover'>
         <div className='WidgetHeader-toggle flexRowCenter fullWidth fullHeight' onClick={collapseToggleFn}>
           <div className={iconClassNames}/>
-          { !isIconified && header }
+          { !isIconified && (
+            <div className="WidgetHeader-header">
+              <div className="WidgetHeader-header-label">
+                <span className="WidgetHeader-header-title">{title}{field && field.length ? ':' : ''}</span>
+                { field && <span className="WidgetHeader-header-field">{field}</span> }
+              </div>
+              { onSettings && <div onClick={onSettings} className="WidgetHeader-settings icon-cog"/> }
+            </div>
+          ) }
           <div className='flexOn'/>
         </div>
         { !isIconified && (<div className={classnames('WidgetHeader-enable', {'icon-eye2': isEnabled, 'icon-eye-crossed': !isEnabled, isEnabled})} onClick={enableToggleFn}/>) }
@@ -21,21 +27,12 @@ const WidgetHeader = ({ isEnabled, isIconified, header, icon, backgroundColor, e
     )
 }
 
-type WidgetHeaderProps = {
-  isEnabled: boolean,
-  isIconified: boolean,
-  header: Element,
-  icon: any,
-  backgroundColor: any,
-  enableToggleFn: Function,
-  collapseToggleFn: Function,
-  onClose: Function
-}
-
 WidgetHeader.propTypes = {
   isEnabled: PropTypes.bool.isRequired,
   isIconified: PropTypes.bool.isRequired,
-  header: PropTypes.element.isRequired,
+  title: PropTypes.string.isRequired,
+  field: PropTypes.string,
+  onSettings: PropTypes.func,
   icon: PropTypes.string.isRequired,
   backgroundColor: PropTypes.string.isRequired,
   enableToggleFn: PropTypes.func.isRequired,
