@@ -8,7 +8,7 @@ import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import TrashedFolder from '../../models/TrashedFolder'
 import { searchAssets } from '../../actions/assetsAction'
-import { clearFoldersModified, countAssetsInFolderIds } from '../../actions/folderAction'
+import { countAssetsInFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
 import { MapWidgetInfo } from './WidgetInfo'
 
@@ -32,20 +32,13 @@ class Searcher extends Component {
   }
 
   componentWillMount () {
-    const { folders } = this.props
-    this.countedFolderIds = new Set()
-    folders && folders.forEach(folder => {
-      if (this.isCounted(folder.id)) this.countedFolderIds.add(folder.id)
-    })
+    this.pendingQueryCountIds = new Set()
+    this.pendingFullCountIds = new Set()
   }
 
   isCounted (folderId) {
     const {folderCounts, filteredFolderCounts} = this.props
     return folderCounts && folderCounts.has(folderId) && filteredFolderCounts && filteredFolderCounts.has(folderId)
-  }
-
-  componentDidUpdate () {
-    this.props.actions.clearFoldersModified()
   }
 
   // Return a filter comprised of all widget filters except one
@@ -58,6 +51,42 @@ class Searcher extends Component {
       }
     }
     return allOther
+  }
+
+  // Manage a cache of pending count ids for both full and query counts.
+  queueFolderCounts = (ids, query) => {
+    this.clearFolderCountTimer()
+    if (this.pendingQuery && query && !this.pendingQuery.equals(query)) {
+      this.pendingQueryCountIds = new Set()
+    }
+    if (query) this.pendingQuery = new AssetSearch(query)
+    if (query) {
+      this.pendingQueryCountIds = new Set([...this.pendingQueryCountIds, ...ids])
+    } else {
+      this.pendingFullCountIds = new Set([...this.pendingFullCountIds, ...ids])
+    }
+    if (this.pendingQueryCountIds.size || this.pendingFullCountIds.size) {
+      this.folderCountTimer = setTimeout(this.runFolderCount, 100)
+    }
+  }
+
+  clearFolderCountTimer = () => {
+    if (this.folderCountTimer) clearTimeout(this.folderCountTimer)
+    this.folderCountTimer = null
+  }
+
+  runFolderCountBatch (ids, query) {
+    if (!ids.size) return
+    const maxBatchSize = 50
+    const countIds = [...ids].slice(0, maxBatchSize)
+    this.props.actions.countAssetsInFolderIds(countIds, query)
+    countIds.forEach(id => ids.delete(id))
+  }
+
+  runFolderCount = () => {
+    this.runFolderCountBatch(this.pendingQueryCountIds, this.pendingQuery)
+    this.runFolderCountBatch(this.pendingFullCountIds)
+    if (!this.pendingQueryCountIds.size && !this.pendingFullCountIds.size) this.clearFolderCountTimer()
   }
 
   // The Searcher does not render any JSX, and is purely reactive.
@@ -123,14 +152,13 @@ class Searcher extends Component {
       }
       if (folders && folders.size > 1) {
         // New query, get all the filtered folder counts
-        actions.countAssetsInFolderIds([...folders.keys()], assetSearch)
+        this.queueFolderCounts(new Set([...folders.keys()]), assetSearch)
       }
     }
 
     if (modifiedFolderIds && modifiedFolderIds.size) {
-      const modifiedIds = [...modifiedFolderIds]
-      actions.countAssetsInFolderIds(modifiedIds)
-      actions.countAssetsInFolderIds(modifiedIds, assetSearch)
+      this.queueFolderCounts(modifiedFolderIds)
+      this.queueFolderCounts(modifiedFolderIds, assetSearch)
     }
 
     return null   // Just reacting to new slivers
@@ -140,7 +168,6 @@ class Searcher extends Component {
 const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators({
     searchAssets,
-    clearFoldersModified,
     countAssetsInFolderIds,
     saveUserSettings
   }, dispatch)

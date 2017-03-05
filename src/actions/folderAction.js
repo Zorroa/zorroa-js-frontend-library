@@ -1,7 +1,7 @@
 import {
   GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, UPDATE_FOLDER,
   DELETE_FOLDER, TOGGLE_FOLDER, ADD_ASSETS_TO_FOLDER,
-  REMOVE_ASSETS_FROM_FOLDER, CLEAR_FOLDERS_MODIFIED, FOLDER_COUNTS
+  REMOVE_ASSETS_FROM_FOLDER, FOLDER_COUNTS
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import { getArchivist } from './authAction'
@@ -176,16 +176,9 @@ export function removeAssetIdsFromFolderId (assetIds, folderId) {
   }
 }
 
-export function clearFoldersModified () {
-  return {
-    type: CLEAR_FOLDERS_MODIFIED,
-    payload: true
-  }
-}
-
 export function countAssetsInFolderIds (ids, search) {
   return dispatch => {
-    console.log('Count query assets in folders ' + JSON.stringify(ids))
+    console.log('Count query assets in folders ' + JSON.stringify(ids) + (search ? ' with query ' + JSON.stringify(search) : ' without search'))
     getArchivist().post(`${rootEndpoint}/_assetCounts`, { search, ids })
       .then(response => {
         const counts = response.data.counts

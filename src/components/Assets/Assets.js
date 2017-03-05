@@ -459,7 +459,7 @@ class Assets extends Component {
               <div className={`Assets-layout ${layout}`}>
                 <div className='Assets-layout-top' style={{top: 0, width: 0, height: 0}}>&nbsp;</div>
                 { assets.map((asset, index) => {
-                  const dim = positions[index]
+                  const dim = index < positions.length ? positions[index] : { width: 0, height: 0 }
                   const { width, height } = dim
                   // Render only the visible thumbnails
                   if ((!dim) || width <= 0 || height <= 0 ||
