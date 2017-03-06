@@ -26,7 +26,7 @@ class Folders extends Component {
 
     // state props
     folders: PropTypes.object.isRequired,
-    sortFolders: PropTypes.object
+    sortFolders: PropTypes.string
   }
 
   state = { filterString: '' }
@@ -122,12 +122,7 @@ class Folders extends Component {
   }
 
   deselectAll = (event) => {
-    if (!this.props.folders || !this.props.folders.all || !this.props.folders.selectedFolderIds) return
-    const selectedIds = this.props.folders.selectedFolderIds
-    const folderList = this.folderList(this.props.folders.all.get(Folder.ROOT_ID))
-    let ids = new Set()
-    selectedIds.forEach(id => { if (folderList.findIndex(f => (f.id === id)) < 0) ids.add(id) })
-    this.props.actions.selectFolderIds(ids)
+    this.props.actions.selectFolderIds()
   }
 
   sortFolders (field) {
@@ -271,12 +266,11 @@ class Folders extends Component {
   }
 
   renderFolderDeselector (folderList) {
-    const selectedFolderIds = this.props.folders && this.props.folders.selectedFolderIds || new Set()
-    const selectedFolders = folderList.filter(folder => (selectedFolderIds.has(folder.id)))
-    if (!selectedFolders || selectedFolders.length === 0) return null
+    const selectedFolderIds = this.props.folders && this.props.folders.selectedFolderIds
+    if (!selectedFolderIds || selectedFolderIds.size === 0) return null
     return (
       <div className="Folders-selected">
-        { `${selectedFolders.length} folders selected` }
+        { `${selectedFolderIds.size} folders selected` }
         <div onClick={this.deselectAll} className="Folders-deselect-all icon-cancel-circle"/>
       </div>
     )
