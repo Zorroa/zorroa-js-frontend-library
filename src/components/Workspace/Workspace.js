@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as assert from 'assert'
 import classnames from 'classnames'
+import axios from 'axios'
 
 import Modal from '../Modal'
 import Header from '../Header'
@@ -37,12 +38,38 @@ class Workspace extends Component {
   }
 
   state = {
-    isDroppable: false
+    isDroppable: false,
+    showReloader: false
   }
+
+  reloadInterval = null
 
   componentWillMount () {
     const { actions, user } = this.props
     actions.getUserPermissions(user)
+  }
+
+  componentDidMount () {
+    // every now and then, check if the server's version of curator was updated & this session is stale
+    this.reloadInterval = setInterval(this.checkForStaleVersion, 15 * 60 * 1000)
+  }
+
+  checkForStaleVersion = () => {
+    const vurl = (DEBUG) ? '/bin/version.html' : '/version.html'
+    axios.get(vurl)
+    .then(response => {
+      const SerVer = response.data.trim()
+      // console.log(`my version: ${zvVersion}  server says: ${SerVer}`)
+      this.setState({ showReloader: (SerVer !== zvVersion) })
+    })
+    .catch(error => {
+      // should this make noise? not sure
+      console.log('error requesting curator version', error)
+    })
+  }
+
+  componentWillUnmount () {
+    clearInterval(this.reloadInterval)
   }
 
   componentWillReceiveProps (nextProps) {
@@ -119,10 +146,22 @@ class Workspace extends Component {
       closeIcon: 'icon-register'
     })
 
-    const { isDroppable } = this.state
+    const { isDroppable, showReloader } = this.state
     return (
       <div className={classnames('App', 'flexCol', 'fullHeight', {isDragging: app.dragInfo})}>
         { app.modal && <Modal {...app.modal} /> }
+        { showReloader && (
+          <div className="Workspace-reloader">
+            <div className="flexRowCenter">
+              This version of Curator has been updated.
+              <button className="Workspace-reloader-reload" onClick={e => location.reload()}>
+                Reload now
+              </button>
+            </div>
+            <div className="Workspace-reloader-close icon-cross2"
+                 onClick={e => this.setState({ showReloader: false })}/>
+          </div>
+        )}
         <Header/>
         <div className="Workspace flexOn flexRow fullWidth fullHeight">
 

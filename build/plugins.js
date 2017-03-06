@@ -1,5 +1,6 @@
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const HandlebarsPlugin = require('handlebars-webpack-plugin')
 const paths = require('./paths.js')
 const childProcess = require('child_process')
 
@@ -28,6 +29,11 @@ module.exports = function getPlugins (env) {
       inject: true,
       template: paths.appHtml,
       hash: true
+    }),
+    new HandlebarsPlugin({
+      entry: paths.versionHtml,
+      output: paths.appBuild + '/version.html',
+      data: { zvVersion }
     }),
 
     // These defines act like global vars, but they are string-replaced at build time
