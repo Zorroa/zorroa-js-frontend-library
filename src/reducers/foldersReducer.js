@@ -180,6 +180,13 @@ export default function (state = initialState, action) {
           return { ...state, filteredCounts: newCounts }
         }
         return { ...state, counts: newCounts, modifiedIds }
+      } else if (search && search.empty() && ids && ids.length) {
+        // Fast path: copy the counts into the filter counts
+        const newCounts = new Map(state.filteredCounts)
+        for (let i = 0; i < ids.length; ++i) {
+          newCounts.set(ids[i], state.counts[ids[i]])
+        }
+        return { ...state, filteredCounts: newCounts }
       }
       break
     }

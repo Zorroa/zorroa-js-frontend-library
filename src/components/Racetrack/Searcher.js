@@ -55,7 +55,6 @@ class Searcher extends Component {
 
   // Manage a cache of pending count ids for both full and query counts.
   queueFolderCounts = (ids, query) => {
-    this.clearFolderCountTimer()
     if (this.pendingQuery && query && !this.pendingQuery.equals(query)) {
       this.pendingQueryCountIds = new Set()
     }
@@ -65,14 +64,15 @@ class Searcher extends Component {
     } else {
       this.pendingFullCountIds = new Set([...this.pendingFullCountIds, ...ids])
     }
+    this.resetFolderCountTimer()
+  }
+
+  resetFolderCountTimer = () => {
+    if (this.folderCountTimer) clearTimeout(this.folderCountTimer)
+    this.folderCountTimer = null
     if (this.pendingQueryCountIds.size || this.pendingFullCountIds.size) {
       this.folderCountTimer = setTimeout(this.runFolderCount, 100)
     }
-  }
-
-  clearFolderCountTimer = () => {
-    if (this.folderCountTimer) clearTimeout(this.folderCountTimer)
-    this.folderCountTimer = null
   }
 
   runFolderCountBatch (ids, query) {
@@ -86,7 +86,7 @@ class Searcher extends Component {
   runFolderCount = () => {
     this.runFolderCountBatch(this.pendingQueryCountIds, this.pendingQuery)
     this.runFolderCountBatch(this.pendingFullCountIds)
-    if (!this.pendingQueryCountIds.size && !this.pendingFullCountIds.size) this.clearFolderCountTimer()
+    this.resetFolderCountTimer()
   }
 
   // The Searcher does not render any JSX, and is purely reactive.

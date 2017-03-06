@@ -177,6 +177,13 @@ export function removeAssetIdsFromFolderId (assetIds, folderId) {
 }
 
 export function countAssetsInFolderIds (ids, search) {
+  if (search && search.empty()) {
+    // Fast path -- empty search, just set filteredCounts to counts in reducer
+    return ({
+      type: FOLDER_COUNTS,
+      payload: {search, ids }
+    })
+  }
   return dispatch => {
     console.log('Count query assets in folders ' + JSON.stringify(ids) + (search ? ' with query ' + JSON.stringify(search) : ' without search'))
     getArchivist().post(`${rootEndpoint}/_assetCounts`, { search, ids })
