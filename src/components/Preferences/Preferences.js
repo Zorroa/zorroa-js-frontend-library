@@ -6,7 +6,6 @@ import { hideModal } from '../../actions/appActions'
 import { setPageSize } from '../../actions/assetsAction'
 import { saveUserSettings } from '../../actions/authAction'
 import { archivistInfo, archivistHealth, archivistMetrics } from '../../actions/archivistAction'
-import { syntaxHighlight } from '../../services/jsUtil'
 import User from '../../models/User'
 
 class Preferences extends Component {

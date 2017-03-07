@@ -44,7 +44,7 @@ class Multipage extends Component {
 
   componentWillReceiveProps (nextProps) {
     const { showPages, parentId } = nextProps
-    if (showPages != this.state.showedPages) {
+    if (showPages !== this.state.showedPages) {
       if (parentId) this.showDocument(this.state.showDocument)
       this.setState({showedPages: showPages})
     }

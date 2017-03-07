@@ -13,7 +13,7 @@ export default function archivist (state = initialState, action) {
     case ARCHIVIST_HEALTH:
       return { ...state, health: action.payload }
     case ARCHIVIST_METRICS:
-      return { ... state, metrics: action.payload }
+      return { ...state, metrics: action.payload }
   }
   return state
 }

@@ -181,7 +181,7 @@ export function countAssetsInFolderIds (ids, search) {
     // Fast path -- empty search, just set filteredCounts to counts in reducer
     return ({
       type: FOLDER_COUNTS,
-      payload: {search, ids }
+      payload: { search, ids }
     })
   }
   return dispatch => {
