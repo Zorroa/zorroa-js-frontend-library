@@ -34,6 +34,7 @@ class SimilarHash extends Component {
     isEnabled: true,
     // order: { '_count': 'desc' },
     hashTypes: null,
+    hashCounts: null,
     hashType: '',
     hashVal: '',
     minScore: 4,
@@ -73,18 +74,12 @@ class SimilarHash extends Component {
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
     if (widget && widget.sliver) {
-      // const field = widget.sliver.aggs.similarHash.terms.field
-      // if (field !== this.state.field) {
-      //   const fieldIsDate = field && this.fieldTypes && this.fieldTypes[field] === 'date'
-      //   this.setState({field, fieldIsDate})
-      // }
-      // if (widget.sliver.filter) {
-      //   const terms = widget.sliver.filter.hamming.hashes
-      // } else {
-      //   this.setState({terms: []})
-      // }
-      // const order = widget.sliver.aggs.similarHash.terms.order
-      // if (order) this.setState({order})
+      const aggs = widget.sliver.aggs
+      // let hashCounts = {}
+      // this.state.hashTypes.forEach(h => {
+      //   hashCounts[h] = aggs[`similarHash-${h}`].doc_count
+      // })
+      // this.setState({ hashCounts })
     }
   }
 
@@ -97,9 +92,31 @@ class SimilarHash extends Component {
     const { hashType, hashVal, minScore } = this.state
     const { isEnabled } = this.state
     const type = SimilarHashWidgetInfo.type
-    // const aggs = { similarHash: { terms: { hashType, size: 100 } } }
-    // let sliver = new AssetSearch({aggs})
-    let sliver = new AssetSearch()
+    const aggs = {}
+    this.state.hashTypes.forEach(h => {
+      aggs[`similarHash-${h}`] = {
+        filter: {
+          bool : {
+            must : {
+              script : {
+                script : {
+                  inline : 'hammingDistance',
+                  lang : 'native',
+                  params : {
+                    field : `ImageHash.${h}`,
+                    hashes : [ hashVal ],
+                    bitwise: false,
+                    minScore: minScore
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    })
+
+    let sliver = new AssetSearch({aggs})
     if (hashType && hashVal) {
       sliver.filter = new AssetFilter({
         hamming: {
@@ -143,21 +160,6 @@ class SimilarHash extends Component {
     new Promise(resolve => this.setState({ hashType, hashVal, selectedAsset: null }, resolve))
     .then(() => this.modifySliver())
   }
-
-  // aggBuckets (terms) {
-  //   const { id, aggs } = this.props
-  //   let buckets = aggs && (id in aggs) ? aggs[id].similarHash.buckets : []
-
-  //   // Add in any selected terms that are not in the search agg
-  //   terms && terms.forEach(key => {
-  //     const index = buckets.findIndex(bucket => (bucket.key === key))
-  //     if (index < 0) {
-  //       buckets.unshift({key, doc_count: 1})  // FIXME: Arbitrary doc_count
-  //     }
-  //   })
-
-  //   return buckets
-  // }
 
   renderHeaderCell (column) {
     // const { order } = this.state
@@ -205,8 +207,8 @@ class SimilarHash extends Component {
   }
 
   renderChart () {
-    const { hashTypes } = this.state
-
+    const { hashTypes, hashCounts } = this.state
+    const { id, aggs } = this.props
     return (
       <div className="SimilarHash-table">
         <div className="SimilarHash-table-header">
@@ -225,7 +227,15 @@ class SimilarHash extends Component {
                     <div className="SimilarHash-value-key">{hashType}</div>
                   </div>
                 </td>
-                <td className="SimilarHash-value-count">--</td>
+                <td className="SimilarHash-value-count">{
+                  (() => {
+                    try {
+                      return aggs[id][`similarHash-${hashType}`].doc_count
+                    } catch(e) {
+                      return '--'
+                    }
+                  })()
+                }</td>
               </tr>
             )) }
             </tbody>
