@@ -28,7 +28,7 @@ export default class Asset {
   }
 
   largestProxyURL (protocol, host) {
-    return this.baseURL(protocol, host) + '/proxies/largest'
+    return this.baseURL(protocol, host, this.id) + '/proxies/largest'
   }
 
   smallestParentProxyURL (protocol, host) {

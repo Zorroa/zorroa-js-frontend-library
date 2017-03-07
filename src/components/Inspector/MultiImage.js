@@ -54,8 +54,8 @@ class MultiImage extends Component {
     const page = pages && pages[pageIndex]
     const url = page.biggestProxy().url(protocol, host)
     return <Image title={title} url={url} onMultipage={onMultipage}
-                  onNextPage={pages && pageIndex < pages.length - 1 && this.nextPage}
-                  onPrevPage={pages && pageIndex > 0 && pages.length && this.prevPage}/>
+                  onNextPage={pages && pageIndex < pages.length - 1 ? this.nextPage : null}
+                  onPrevPage={pages && pageIndex > 0 && pages.length ? this.prevPage : null}/>
   }
 }
 

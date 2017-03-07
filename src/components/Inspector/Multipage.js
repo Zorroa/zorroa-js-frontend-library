@@ -36,9 +36,8 @@ class Multipage extends Component {
 
   componentWillMount () {
     const { showMultipage, parentId } = this.props
-    if (showMultipage && parentId && parentId.length) {
-      this.props.actions.showPages(true)
-    }
+    const shouldShowPages = showMultipage && parentId && parentId.length > 0
+    this.props.actions.showPages(shouldShowPages)
     if (parentId) this.showDocument(this.state.showDocument)
   }
 
