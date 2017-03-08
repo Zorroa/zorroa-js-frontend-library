@@ -11,8 +11,8 @@ import { addSiblings, isolateSelectId } from '../../services/jsUtil'
 
 // Extract thumb page info from an asset
 export function page (asset, width, height, protocol, host) {
-  const url = asset.closestProxyURL(protocol, host, width, height)
-  const tproxy = asset.tinyProxy()
+  const url = asset && asset.closestProxyURL(protocol, host, width, height) || ''
+  const tproxy = asset && asset.tinyProxy()
   const backgroundColor = tproxy ? tproxy[4] : '#888'
   return { url, backgroundColor }
 }
