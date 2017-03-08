@@ -50,7 +50,7 @@ export function createArchivist (dispatch, protocol, host) {
 function startRequest (dispatch) {
   if (requestReceivedCounter === requestSentCounter) {
     dispatch({ type: AUTH_SYNC, payload: false })
-}
+  }
   requestSentCounter++
 }
 
@@ -197,7 +197,7 @@ export function signupUser ({ username, password }) {
 export function signoutUser (user, host) {
   return dispatch => {
     if (archivist) {
-s      archivistPost(dispatch, '/api/v1/logout', {}, {
+      archivistPost(dispatch, '/api/v1/logout', {}, {
         headers: { 'X-Requested-With': 'XMLHttpRequest' } // disable browser auth
       })
       .then(response => {
