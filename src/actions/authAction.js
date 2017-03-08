@@ -50,7 +50,9 @@ export function validateUser (user, protocol, host) {
     // Create a new archivist, if needed for a new host
     createArchivist(dispatch, protocol, host)
     if (user.id > 0) {
-      archivist.get('/api/v1/users/' + user.id)
+      archivist.get('/api/v1/users/' + user.id, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' } // disable browser auth
+      })
         .then(response => {
           authorize(dispatch, response.data)
         })
