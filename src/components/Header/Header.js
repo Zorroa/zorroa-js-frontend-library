@@ -16,6 +16,7 @@ import { showModal } from '../../actions/appActions'
 class Header extends Component {
   static propTypes = {
     user: PropTypes.instanceOf(User).isRequired,
+    sync: PropTypes.bool.isRequired,
     actions: PropTypes.object.isRequired
   }
 
@@ -34,7 +35,7 @@ class Header extends Component {
   }
 
   render () {
-    const { user } = this.props
+    const { user, sync } = this.props
     return (
       <nav className="header flexOff flexCenter fullWidth">
         <Link to="/" className='header-logo'><Logo/></Link>
@@ -63,6 +64,9 @@ class Header extends Component {
               <Link className="header-menu-item" to="/signout">Logout</Link>
             </DropdownMenu>
           </div>
+          <div className="flexOff flexRowCenter" style={{ width: '40px', height: '40px' }}>
+            <div style={{ width: '10px', height: '10px', borderRadius: '2px', backgroundColor: sync ? 'green' : 'red' }}/>
+          </div>
         </div>
 
         {/* this is stupid/ugly, but neede to keep sidebar & header logo widths in sync */}
@@ -73,7 +77,8 @@ class Header extends Component {
 }
 
 export default connect(state => ({
-  user: state.auth.user
+  user: state.auth.user,
+  sync: state.auth.sync
 }), dispatch => ({
   actions: bindActionCreators({ showModal }, dispatch)
 }))(Header)
