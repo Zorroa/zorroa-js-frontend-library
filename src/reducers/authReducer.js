@@ -2,7 +2,7 @@ import { AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR, AUTH_PERMISSIONS, AUTH_S
 import User from '../models/User'
 
 const initialState = {
-  sync: false
+  sync: true
 }
 
 export default function (state = initialState, action) {
