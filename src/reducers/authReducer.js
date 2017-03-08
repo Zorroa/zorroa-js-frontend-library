@@ -1,7 +1,11 @@
-import { AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR, AUTH_PERMISSIONS } from '../constants/actionTypes'
+import { AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR, AUTH_PERMISSIONS, AUTH_SYNC } from '../constants/actionTypes'
 import User from '../models/User'
 
-export default function (state = {}, action) {
+const initialState = {
+  sync: false
+}
+
+export default function (state = initialState, action) {
   switch (action.type) {
     case AUTH_USER:
       return { ...state, error: '', authenticated: action.payload.id > 0, user: action.payload }
@@ -16,6 +20,8 @@ export default function (state = {}, action) {
       user.permissions = action.payload
       return { ...state, user }
     }
+    case AUTH_SYNC:
+      return { ...state, sync: action.payload }
   }
 
   return state
