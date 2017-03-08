@@ -80,7 +80,7 @@ const ImageThumb = (props) => {
   const { url, backgroundColor, children } = props
   const style = {
     backgroundColor,
-    'backgroundSize': 'cover',
+    'backgroundSize': 'contain',
     'backgroundImage': `url(${url})`
   }
   return (
