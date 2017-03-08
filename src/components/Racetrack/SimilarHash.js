@@ -246,7 +246,7 @@ class SimilarHash extends Component {
     const { isEnabled, hashType } = this.state
     return (
       <Widget className="SimilarHash"
-              title={"Hash" /* NOTE custom title, not using SimilarHashWidgetInfo.title to save screen space (more room for field) */}
+              title={SimilarHashWidgetInfo.title}
               field={hashType}
               backgroundColor={SimilarHashWidgetInfo.color}
               isEnabled={isEnabled}
