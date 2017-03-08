@@ -39,6 +39,8 @@
 }
 
 .WidgetHeader-toggle {
+  max-width: 100%;
+  min-width: 0;
 }
 
 .WidgetHeader-icon {
@@ -49,6 +51,7 @@
 
 .WidgetHeader-label {
   @include clampText;
+  max-width: 0;
 }
 
 .WidgetHeader-enable {
@@ -87,42 +90,31 @@
   @include fullWidth;
   @include noSelect;
 
+  max-width: 100%;
+  @include clampText;
+
   flex-shrink: 1;
-  //min-width: 0;
 }
 
 .WidgetHeader-header-label {
   @include flexRow;
+  @include flexOn;
   @include flexAlignItemsCenter;
-  width: 100%;  // needed for WidgetHeader-header-field ellipsis
-  //min-width: 0;
 }
 
 .WidgetHeader-header-title {
-  //@include flexOff;
+  @include flexOff;
   font-weight: 100;
   margin-right: 4px;
 }
 
 .WidgetHeader-header-field {
-  font-weight: 400;
-  width: 100%;
-  min-width: 77%;
-  max-width: 0; // This looks weird, but is important! It allows cells to chop content
-  @include clampText;
   @include flexOn;
-
-  //@include flexShrinkOnly;
-  //@include clampText;
-  //min-width: 0;
-  //text-transform: uppercase;
-  //text-overflow: ellipsis;
-  //font-weight: 400;
+  font-weight: 400;
 }
 
 .WidgetHeader-settings {
   @include zorroa-square-btn-darken(40px);
-  //margin: 5px 0px;
 
   &:hover { cursor: pointer; }
 }

@@ -50,7 +50,7 @@ export function createArchivist (dispatch, protocol, host) {
 function startRequest (dispatch) {
   if (requestReceivedCounter === requestSentCounter) {
     dispatch({ type: AUTH_SYNC, payload: false })
-  }
+}
   requestSentCounter++
 }
 
@@ -100,7 +100,9 @@ export function validateUser (user, protocol, host) {
     // Create a new archivist, if needed for a new host
     createArchivist(dispatch, protocol, host)
     if (user.id > 0) {
-      archivistGet(dispatch, '/api/v1/users/' + user.id)
+      archivistGet(dispatch, '/api/v1/users/' + user.id, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' } // disable browser auth
+      })
         .then(response => {
           authorize(dispatch, response.data)
         })
@@ -123,7 +125,8 @@ export function signinUser ({ username, password, protocol, host }) {
     createArchivist(dispatch, protocol, host)
     archivistPost(dispatch, '/api/v1/login', {}, {
       withCredentials: true,
-      auth: { username, password }
+      auth: { username, password },
+      headers: { 'X-Requested-With': 'XMLHttpRequest' } // disable browser auth
     })
       .then(response => {
         authorize(dispatch, response.data)
@@ -194,7 +197,9 @@ export function signupUser ({ username, password }) {
 export function signoutUser (user, host) {
   return dispatch => {
     if (archivist) {
-      archivistPost(dispatch, '/api/v1/logout')
+s      archivistPost(dispatch, '/api/v1/logout', {}, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' } // disable browser auth
+      })
       .then(response => {
         dispatch({ type: UNAUTH_USER, payload: response.data })
         dispatch(initialize('signin', {host, username: user.username, ssl: true}))

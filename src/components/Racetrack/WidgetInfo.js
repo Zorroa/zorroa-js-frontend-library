@@ -87,7 +87,7 @@ export const DateRangeWidgetInfo = {
 export const SimilarHashWidgetInfo = {
   type: 'SIMILARHASH',
   icon: 'icon-pictures',
-  title: 'Similar Hash',
+  title: 'Similar',
   description: 'Match images with similar hash values',
   element: <SimilarHash/>,
   color: '#fc6c2c' // $zorroa-orangish
