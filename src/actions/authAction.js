@@ -73,7 +73,8 @@ export function signinUser ({ username, password, protocol, host }) {
     createArchivist(dispatch, protocol, host)
     archivist.post('/api/v1/login', {}, {
       withCredentials: true,
-      auth: { username, password }
+      auth: { username, password },
+      headers: { 'X-Requested-With': 'XMLHttpRequest' } // disable browser auth
     })
       .then(response => {
         authorize(dispatch, response.data)
@@ -144,7 +145,9 @@ export function signupUser ({ username, password }) {
 export function signoutUser (user, host) {
   return dispatch => {
     if (archivist) {
-      archivist.post('/api/v1/logout')
+      archivist.post('/api/v1/logout', {}, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' } // disable browser auth
+      })
       .then(response => {
         dispatch({ type: UNAUTH_USER, payload: response.data })
         dispatch(initialize('signin', {host, username: user.username, ssl: true}))
