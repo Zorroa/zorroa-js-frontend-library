@@ -39,6 +39,7 @@ class SimilarHash extends Component {
     hashType: '',
     hashVal: '',
     minScorePct: 50,
+    bitwise: true,
     selectedAsset: null,
     selectedAssetIds: null
   }
@@ -98,7 +99,7 @@ class SimilarHash extends Component {
 
   modifySliver = () => {
     const { hashType, hashVal, hashLengths, minScorePct } = this.state
-    const { isEnabled } = this.state
+    const { isEnabled, bitwise } = this.state
     const type = SimilarHashWidgetInfo.type
     const aggs = {}
 
@@ -114,8 +115,8 @@ class SimilarHash extends Component {
                   params: {
                     field: `ImageHash.${h}.raw`,
                     hashes: [ hashVal ],
-                    minScore: Math.round(hashLengths[h] / 2),
-                    bitwise: true
+                    minScore: Math.round(hashLengths[h] / 2) * (bitwise ? 4 : 1),
+                    bitwise
                   }
                 }
               }
@@ -125,14 +126,14 @@ class SimilarHash extends Component {
       }
     })
 
-    let sliver = new AssetSearch({aggs})
+    let sliver = new AssetSearch(/*{aggs}*/) // NB aggs break the search!
     if (hashType && hashVal) {
       sliver.filter = new AssetFilter({
         hamming: {
           field: `ImageHash.${hashType}.raw`,
           hashes: [ hashVal ],
-          minScore: Math.round((minScorePct / 100) * hashLengths[hashType]),
-          bitwise: true
+          minScore: Math.round((minScorePct / 100) * hashLengths[hashType]) * (bitwise ? 4 : 1),
+          bitwise
         }
       })
     }
@@ -265,9 +266,15 @@ class SimilarHash extends Component {
     .then(this.modifySliver)
   }
 
+  updateBitwise = (event) => {
+    const { bitwise } = this.state
+    return new Promise(resolve => this.setState({ bitwise: !bitwise }, resolve))
+    .then(this.modifySliver)
+  }
+
   render () {
     const { isIconified } = this.props
-    const { isEnabled, hashType } = this.state
+    const { isEnabled, hashType, bitwise } = this.state
     return (
       <Widget className="SimilarHash"
               title={SimilarHashWidgetInfo.title}
@@ -293,6 +300,14 @@ class SimilarHash extends Component {
                      max="100" />
             </div>
             <span className="SimilarHash-thresh-val">{`${this.state.minScorePct}%`}</span>
+          </div>
+          <div className="SimilarHash-bitwise-box">
+            <label className="SimilarHash-bitwise-label">Bit-wise
+              <input className="SimilarHash-bitwise-toggle"
+                     type="checkbox"
+                     checked={bitwise}
+                     onChange={this.updateBitwise}/>
+            </label>
           </div>
           { this.renderChart() }
           { this.renderSelection() }
