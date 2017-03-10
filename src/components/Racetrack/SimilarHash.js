@@ -12,6 +12,7 @@ import { SimilarHashWidgetInfo } from './WidgetInfo'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
 import { showModal } from '../../actions/appActions'
 import Widget from './Widget'
+import { equalSets } from '../../services/jsUtil'
 
 class SimilarHash extends Component {
   static propTypes = {
@@ -34,12 +35,12 @@ class SimilarHash extends Component {
     isEnabled: true,
     // order: { '_count': 'desc' },
     hashTypes: null,
-    hashCounts: null,
+    hashLengths: {},
     hashType: '',
     hashVal: '',
-    minScore: 4,
-    maxScore: 16,
-    selectedAsset: null
+    minScorePct: 50,
+    selectedAsset: null,
+    selectedAssetIds: null
   }
 
   componentWillMount () {
@@ -66,6 +67,19 @@ class SimilarHash extends Component {
       }
     }
 
+    // If the selection changes, and we don't have something selected yet,
+    // then do it now.
+    const newSelectedAssetIds = nextProps.selectedAssetIds
+    const oldSelectedAssetIds = this.state.selectedAssetIds
+
+    const selectionChanged = !equalSets(newSelectedAssetIds, oldSelectedAssetIds)
+
+    const { hashType, selectedAsset } = this.state
+    if (!selectedAsset && hashType && newSelectedAssetIds && newSelectedAssetIds.size && selectionChanged) {
+      requestAnimationFrame(() => this.selectHashType(hashType, {}))
+    }
+
+    this.setState({ selectedAssetIds: newSelectedAssetIds })
     this.syncWithAppState(nextProps)
   }
 
@@ -74,39 +88,34 @@ class SimilarHash extends Component {
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
     if (widget && widget.sliver) {
-      const aggs = widget.sliver.aggs
-      // let hashCounts = {}
-      // this.state.hashTypes.forEach(h => {
-      //   hashCounts[h] = aggs[`similarHash-${h}`].doc_count
-      // })
-      // this.setState({ hashCounts })
     }
   }
 
   toggleEnabled = () => {
     new Promise(resolve => this.setState({isEnabled: !this.state.isEnabled}, resolve))
-    .then(() => { this.modifySliver() })
+    .then(this.modifySliver)
   }
 
   modifySliver = () => {
-    const { hashType, hashVal, minScore } = this.state
+    const { hashType, hashVal, hashLengths, minScorePct } = this.state
     const { isEnabled } = this.state
     const type = SimilarHashWidgetInfo.type
     const aggs = {}
+
     this.state.hashTypes.forEach(h => {
       aggs[`similarHash-${h}`] = {
         filter: {
-          bool : {
-            must : {
-              script : {
-                script : {
-                  inline : 'hammingDistance',
-                  lang : 'native',
-                  params : {
-                    field : `ImageHash.${h}`,
-                    hashes : [ hashVal ],
-                    bitwise: false,
-                    minScore: minScore
+          bool: {
+            must: {
+              script: {
+                script: {
+                  inline: 'hammingDistance',
+                  lang: 'native',
+                  params: {
+                    field: `ImageHash.${h}.raw`,
+                    hashes: [ hashVal ],
+                    minScore: Math.round(hashLengths[h] / 2),
+                    bitwise: true
                   }
                 }
               }
@@ -122,7 +131,8 @@ class SimilarHash extends Component {
         hamming: {
           field: `ImageHash.${hashType}.raw`,
           hashes: [ hashVal ],
-          minScore
+          minScore: Math.round((minScorePct / 100) * hashLengths[hashType]),
+          bitwise: true
         }
       })
     }
@@ -136,8 +146,8 @@ class SimilarHash extends Component {
 
   selectHashType (hashType, event) {
     let hashVal = null
-    let maxScore = this.state.maxScore
     let selectedAsset = this.state.selectedAsset
+    let hashLengths = this.state.hashLengths
 
     const { assets, selectedAssetIds } = this.props
 
@@ -146,19 +156,23 @@ class SimilarHash extends Component {
       if (firstSelectedAssetId) {
         selectedAsset = assets.find(asset => { return firstSelectedAssetId === asset.id })
         hashVal = selectedAsset.document.ImageHash[hashType]
-        maxScore = hashVal.length
+
+        this.state.hashTypes.forEach(ht => {
+          const hv = selectedAsset.document.ImageHash[ht]
+          if (hv) hashLengths[ht] = hv.length
+        })
       }
     }
 
-    new Promise(resolve => this.setState({ hashType, hashVal, maxScore, selectedAsset }, resolve))
-    .then(() => this.modifySliver())
+    new Promise(resolve => requestAnimationFrame(resolve))
+    .then(() => new Promise(resolve => this.setState({ hashType, hashVal, hashLengths, selectedAsset }, resolve)))
+    .then(this.modifySliver)
   }
 
-  deselectHashType = (event) => {
-    const hashType = ''
+  deselectHash = (event) => {
     const hashVal = ''
-    new Promise(resolve => this.setState({ hashType, hashVal, selectedAsset: null }, resolve))
-    .then(() => this.modifySliver())
+    new Promise(resolve => this.setState({ hashVal, selectedAsset: null }, resolve))
+    .then(this.modifySliver)
   }
 
   renderHeaderCell (column) {
@@ -199,7 +213,7 @@ class SimilarHash extends Component {
         </div>
         <div className="SimilarHash-clear-selection flexOff">
           { this.state.hashType && (
-            <div onClick={this.deselectHashType} className="SimilarHash-clear-selection-cancel icon-cancel-circle"/>
+            <div onClick={this.deselectHash} className="SimilarHash-clear-selection-cancel icon-cancel-circle"/>
           )}
         </div>
       </div>
@@ -207,7 +221,7 @@ class SimilarHash extends Component {
   }
 
   renderChart () {
-    const { hashTypes, hashCounts } = this.state
+    const { hashTypes } = this.state
     const { id, aggs } = this.props
     return (
       <div className="SimilarHash-table">
@@ -231,7 +245,7 @@ class SimilarHash extends Component {
                   (() => {
                     try {
                       return aggs[id][`similarHash-${hashType}`].doc_count
-                    } catch(e) {
+                    } catch (e) {
                       return '--'
                     }
                   })()
@@ -246,9 +260,9 @@ class SimilarHash extends Component {
   }
 
   updateMinScore = (event) => {
-    const minScore = event.target.value
-    new Promise(resolve => this.setState({ minScore }, resolve))
-    .then(() => this.modifySliver())
+    const minScorePct = Math.round(parseInt(event.target.value, 10))
+    new Promise(resolve => this.setState({ minScorePct }, resolve))
+    .then(this.modifySliver)
   }
 
   render () {
@@ -273,12 +287,12 @@ class SimilarHash extends Component {
               </div>
               <input className="SimilarHash-thresh-slider flexOn"
                      type="range"
-                     value={this.state.minScore}
+                     value={this.state.minScorePct}
                      onChange={this.updateMinScore}
                      min="0"
-                     max={`${this.state.maxScore}`} />
+                     max="100" />
             </div>
-            <span className="SimilarHash-thresh-val">{`${Math.round(100 * this.state.minScore / this.state.maxScore)}%`}</span>
+            <span className="SimilarHash-thresh-val">{`${this.state.minScorePct}%`}</span>
           </div>
           { this.renderChart() }
           { this.renderSelection() }
