@@ -49,7 +49,7 @@ export function createArchivist (dispatch, protocol, host) {
 
 function startRequest (dispatch) {
   if (requestReceivedCounter === requestSentCounter) {
-    dispatch({ type: AUTH_SYNC, payload: false })
+    requestAnimationFrame(_ => dispatch({ type: AUTH_SYNC, payload: false }))
   }
   requestSentCounter++
 }
@@ -59,13 +59,13 @@ function finishRequest (dispatch, requestProm) {
   .then(response => {
     requestReceivedCounter++
     if (requestReceivedCounter === requestSentCounter) {
-      dispatch({ type: AUTH_SYNC, payload: true })
+      requestAnimationFrame(_ => dispatch({ type: AUTH_SYNC, payload: true }))
     }
     return response
   }, error => {
     requestReceivedCounter++
     if (requestReceivedCounter === requestSentCounter) {
-      dispatch({ type: AUTH_SYNC, payload: true })
+      requestAnimationFrame(_ => dispatch({ type: AUTH_SYNC, payload: true }))
     }
     return Promise.reject(error)
   })
