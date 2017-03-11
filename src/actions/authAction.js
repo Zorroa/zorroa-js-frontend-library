@@ -5,7 +5,7 @@ import * as api from '../globals/api.js'
 
 import {
   AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR, USER_SETTINGS,
-  AUTH_PERMISSIONS, METADATA_FIELDS, TABLE_FIELDS,
+  AUTH_PERMISSIONS, AUTH_SYNC, METADATA_FIELDS, TABLE_FIELDS,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
   SHOW_MULTIPAGE, VIDEO_VOLUME, PAGE_SIZE
 } from '../constants/actionTypes'
@@ -16,6 +16,8 @@ import Permission from '../models/Permission'
 // Global variable to hold axios connection
 // FIXME: Should this be state?
 var archivist
+var requestSentCounter = 0
+var requestReceivedCounter = 0
 
 // Create the global axios connection, on login or refresh.
 // Note this is not an action creator, so it should probably
@@ -40,9 +42,57 @@ export function createArchivist (dispatch, protocol, host) {
   localStorage.setItem(PROTOCOL_ITEM, protocol)
 }
 
-// Return the axios connection for other action creators
-export function getArchivist () {
-  return archivist
+// // Return the axios connection for other action creators
+// export function getArchivist () {
+//   return archivist
+// }
+
+function startRequest (dispatch) {
+  if (requestReceivedCounter === requestSentCounter) {
+    dispatch({ type: AUTH_SYNC, payload: false })
+  }
+  requestSentCounter++
+}
+
+function finishRequest (dispatch, requestProm) {
+  return requestProm
+  .then(response => {
+    requestReceivedCounter++
+    if (requestReceivedCounter === requestSentCounter) {
+      dispatch({ type: AUTH_SYNC, payload: true })
+    }
+    return response
+  }, error => {
+    requestReceivedCounter++
+    if (requestReceivedCounter === requestSentCounter) {
+      dispatch({ type: AUTH_SYNC, payload: true })
+    }
+    return Promise.reject(error)
+  })
+}
+
+export function archivistGet (dispatch, ...args) {
+  if (!archivist) return Promise.resolve()
+  startRequest(dispatch)
+  return finishRequest(dispatch, archivist.get.apply(this, args))
+}
+
+export function archivistPost (dispatch, ...args) {
+  if (!archivist) return Promise.resolve()
+  startRequest(dispatch)
+  return finishRequest(dispatch, archivist.post.apply(this, args))
+}
+
+export function archivistPut (dispatch, ...args) {
+  if (!archivist) return Promise.resolve()
+  startRequest(dispatch)
+  return finishRequest(dispatch, archivist.put.apply(this, args))
+}
+
+export function archivistRequest (dispatch, ...args) {
+  if (!archivist) return Promise.resolve()
+  startRequest(dispatch)
+  return finishRequest(dispatch, archivist.apply(this, args))
 }
 
 export function validateUser (user, protocol, host) {
@@ -50,7 +100,7 @@ export function validateUser (user, protocol, host) {
     // Create a new archivist, if needed for a new host
     createArchivist(dispatch, protocol, host)
     if (user.id > 0) {
-      archivist.get('/api/v1/users/' + user.id, {
+      archivistGet(dispatch, '/api/v1/users/' + user.id, {
         headers: { 'X-Requested-With': 'XMLHttpRequest' } // disable browser auth
       })
         .then(response => {
@@ -73,7 +123,7 @@ export function signinUser ({ username, password, protocol, host }) {
   return dispatch => {
     // Create a new archivist, if needed for a new host
     createArchivist(dispatch, protocol, host)
-    archivist.post('/api/v1/login', {}, {
+    archivistPost(dispatch, '/api/v1/login', {}, {
       withCredentials: true,
       auth: { username, password },
       headers: { 'X-Requested-With': 'XMLHttpRequest' } // disable browser auth
@@ -133,7 +183,7 @@ function authorize (dispatch, json) {
 
 export function signupUser ({ username, password }) {
   return dispatch => {
-    archivist.post('/signup', {}, { username, password })
+    archivistPost(dispatch, '/signup', {}, { username, password })
       .then(response => {
         const user = User(response.data)
         dispatch({ type: AUTH_USER, payload: user })
@@ -147,7 +197,7 @@ export function signupUser ({ username, password }) {
 export function signoutUser (user, host) {
   return dispatch => {
     if (archivist) {
-      archivist.post('/api/v1/logout', {}, {
+      archivistPost(dispatch, '/api/v1/logout', {}, {
         headers: { 'X-Requested-With': 'XMLHttpRequest' } // disable browser auth
       })
       .then(response => {
@@ -172,7 +222,7 @@ export function authError (error) {
 
 export function getUserPermissions (user) {
   return dispatch => {
-    archivist.get('/api/v1/users/' + user.id + '/permissions')
+    archivistGet(dispatch, '/api/v1/users/' + user.id + '/permissions')
       .then(response => {
         dispatch({ type: AUTH_PERMISSIONS, payload: response.data.map(json => (new Permission(json))) })
       })
@@ -187,7 +237,7 @@ export function saveUserSettings (user, metadata) {
     // FIXME: Move search to settings.search in server?
     // FIXME: Use localStore rather than server?
     const settings = { metadata }
-    archivist.put('/api/v1/users/' + user.id + '/_settings', settings)
+    archivistPut(dispatch, '/api/v1/users/' + user.id + '/_settings', settings)
       .then(response => {
         dispatch({ type: USER_SETTINGS, payload: { user, metadata } })
         console.log('Save user settings')

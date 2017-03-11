@@ -11,7 +11,7 @@ import Asset from '../models/Asset'
 import Page from '../models/Page'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
-import { getArchivist } from './authAction'
+import { archivistGet, archivistPost } from './authAction'
 
 function escapeQuery (query) {
   if (!query) return new AssetSearch()
@@ -31,7 +31,7 @@ export function searchAssets (query) {
     assert.ok(typeof query.from === 'undefined' || query.from >= 0)
     const safeQuery = escapeQuery(query)
     console.log('Search: ' + JSON.stringify(safeQuery))
-    getArchivist().post('/api/v3/assets/_search', safeQuery)
+    archivistPost(dispatch, '/api/v3/assets/_search', safeQuery)
       .then(response => {
         console.log('Query ' + JSON.stringify(safeQuery))
         console.log(response)
@@ -73,7 +73,7 @@ export function searchDocument (query, parentId, order) {
     safeQuery.from = 0
     if (!query) safeQuery.order = order
     console.log('Search Document: ' + JSON.stringify(safeQuery))
-    getArchivist().post('/api/v3/assets/_search', safeQuery)
+    archivistPost(dispatch, '/api/v3/assets/_search', safeQuery)
       .then(response => {
         console.log('Query Document' + JSON.stringify(safeQuery))
         console.log(response)
@@ -93,7 +93,7 @@ export function suggestQueryStrings (text) {
     return ({ type: SUGGEST_COMPLETIONS, payload: null })
   }
   return dispatch => {
-    getArchivist().post('/api/v2/assets/_suggest', {text})
+    archivistPost(dispatch, '/api/v2/assets/_suggest', {text})
       .then(response => {
         const suggestions = response.data.completions[0].options
         dispatch({
@@ -150,7 +150,7 @@ export function setPageSize (count) {
 
 export function getAssetFields () {
   return dispatch => {
-    getArchivist().get('/api/v1/assets/_fields')
+    archivistGet(dispatch, '/api/v1/assets/_fields')
       .then(response => {
         dispatch({
           type: ASSET_FIELDS,

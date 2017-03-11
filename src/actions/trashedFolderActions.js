@@ -3,14 +3,14 @@ import {
   EMPTY_FOLDER_TRASH, COUNT_TRASHED_FOLDERS
 } from '../constants/actionTypes'
 import TrashedFolder from '../models/TrashedFolder'
-import { getArchivist } from './authAction'
+import { archivistGet, archivistPost, archivistRequest } from './authAction'
 
 const rootEndpoint = '/api/v1/trash'
 
 export function getTrashedFolders () {
   return dispatch => {
     console.log('Get trashed folders')
-    return getArchivist().get(`${rootEndpoint}`)
+    return archivistGet(dispatch, `${rootEndpoint}`)
       .then(response => {
         const trashedFolders = response.data.map(json => (new TrashedFolder(json)))
         return dispatch({
@@ -27,7 +27,7 @@ export function getTrashedFolders () {
 export function restoreTrashedFolders (ids) {
   return dispatch => {
     console.log('Restore trashed folder ' + JSON.stringify(ids))
-    return getArchivist().post(`${rootEndpoint}/_restore`, ids)
+    return archivistPost(dispatch, `${rootEndpoint}/_restore`, ids)
       .then(response => {
         return dispatch({
           type: RESTORE_TRASHED_FOLDERS,
@@ -50,7 +50,7 @@ export function deleteTrashedFolders (ids) {
       data: ids,
       headers: { 'X-Requested-With': 'XMLHttpRequest' }
     }
-    return getArchivist()(request)
+    return archivistRequest(dispatch, request)
       .then(response => {
         return dispatch({
           type: DELETE_TRASHED_FOLDERS,
@@ -72,7 +72,7 @@ export function emptyFolderTrash () {
       url: rootEndpoint,
       headers: { 'X-Requested-With': 'XMLHttpRequest' }
     }
-    return getArchivist()(request)
+    return archivistRequest(dispatch, request)
       .then(response => {
         return dispatch({
           type: EMPTY_FOLDER_TRASH,
@@ -87,7 +87,7 @@ export function emptyFolderTrash () {
 
 export function countTrashedFolders () {
   return dispatch => {
-    return getArchivist().get(`${rootEndpoint}/_count`)
+    return archivistGet(dispatch, `${rootEndpoint}/_count`)
       .then(response => {
         return dispatch({
           type: COUNT_TRASHED_FOLDERS,

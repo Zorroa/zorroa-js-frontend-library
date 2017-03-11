@@ -28,7 +28,7 @@ describe('<Header/>', () => {
 
   beforeEach(() => {
     const user = new User({id: 1, username: 'admin', firstName: 'Joe', lastName: 'Blow', enabled: true})
-    const store = storeFake({ auth: { authenticated: true, user } })
+    const store = storeFake({ auth: { authenticated: true, user, sync: true } })
     const wrapper = mount(
       <Provider store={store}>
         <Header/>

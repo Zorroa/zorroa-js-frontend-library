@@ -8,7 +8,7 @@ import {
   GET_PIPELINES, GET_JOBS,
   MARK_JOB_DOWNLOADED, GET_PROCESSORS,
   CANCEL_JOB, RESTART_JOB } from '../constants/actionTypes'
-import { getArchivist } from './authAction'
+import { archivistGet, archivistPost, archivistRequest } from './authAction'
 import Processor from '../models/Processor'
 
 const jobEndpoint = '/api/v1/jobs'
@@ -19,7 +19,7 @@ export function exportAssets (name, search, fields, includeSource) {
   return dispatch => {
     console.log('Export: ' + JSON.stringify(search) +
     ' and fields: ' + fields ? JSON.stringify(fields) : 'none')
-    getArchivist().post('/api/v1/exports', {name, search, fields, includeSource})
+    archivistPost(dispatch, '/api/v1/exports', {name, search, fields, includeSource})
       .then(response => {
         dispatch({
           type: EXPORT_ASSETS,
@@ -35,7 +35,7 @@ export function exportAssets (name, search, fields, includeSource) {
 export function importAssets (name, pipelineId, generators) {
   return dispatch => {
     console.log('Import: ' + name + ' with pipeline id ' + pipelineId)
-    getArchivist().post(importEndpoint, {name, pipelineId, generators})
+    archivistPost(dispatch, importEndpoint, {name, pipelineId, generators})
       .then(response => {
         dispatch({
           type: IMPORT_ASSETS,
@@ -51,7 +51,7 @@ export function importAssets (name, pipelineId, generators) {
 export function getPipelines () {
   return dispatch => {
     console.log('Get pipelines')
-    getArchivist().get('/api/v1/pipelines')
+    archivistGet(dispatch, '/api/v1/pipelines')
       .then(response => {
         dispatch({
           type: GET_PIPELINES,
@@ -73,7 +73,7 @@ export function getJobs (jobFilter, from, count) {
       params: { from, count },
       headers: { 'X-Requested-With': 'XMLHttpRequest' }
     }
-    getArchivist()(request)
+    archivistRequest(dispatch, request)
       .then(response => {
         dispatch({
           type: GET_JOBS,
@@ -99,7 +99,7 @@ export function cancelJobId (jobId) {
       url: `${jobEndpoint}/${jobId}/_cancel`,
       headers: { 'X-Requested-With': 'XMLHttpRequest' }
     }
-    getArchivist()(request)
+    archivistRequest(dispatch, request)
       .then(response => {
         dispatch({
           type: CANCEL_JOB,
@@ -121,7 +121,7 @@ export function restartJobId (jobId) {
       url: `${jobEndpoint}/${jobId}/_restart`,
       headers: { 'X-Requested-With': 'XMLHttpRequest' }
     }
-    getArchivist()(request)
+    archivistRequest(dispatch, request)
       .then(response => {
         dispatch({
           type: RESTART_JOB,
@@ -148,7 +148,7 @@ export function uploadFiles (name, pipelineId, files, onUploadProgress) {
       onUploadProgress,
       data: formData
     }
-    getArchivist()(request)
+    archivistRequest(dispatch, request)
       .then(response => {
         dispatch({
           type: IMPORT_ASSETS,
@@ -163,7 +163,7 @@ export function uploadFiles (name, pipelineId, files, onUploadProgress) {
 
 export function getProcessors () {
   return dispatch => {
-    getArchivist().get('/api/v1/processors')
+    archivistGet(dispatch, '/api/v1/processors')
       .then(response => {
         dispatch({
           type: GET_PROCESSORS,

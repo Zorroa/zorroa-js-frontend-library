@@ -4,7 +4,7 @@ import {
   REMOVE_ASSETS_FROM_FOLDER, FOLDER_COUNTS
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
-import { getArchivist } from './authAction'
+import { archivistGet, archivistPut, archivistPost, archivistRequest } from './authAction'
 
 const rootEndpoint = '/api/v1/folders'
 
@@ -27,7 +27,7 @@ export function getFolderChildren (parentId, optOnDoneFn) {
   }
   return dispatch => {
     console.log('Load folder ' + parentId)
-    return getArchivist().get(`${rootEndpoint}/${parentId}/_children`)
+    return archivistGet(dispatch, `${rootEndpoint}/${parentId}/_children`)
       .then(response => {
         const children = response.data.map(folder => (new Folder(folder)))
         if (optOnDoneFn) optOnDoneFn(children)
@@ -82,7 +82,7 @@ export function selectFolderId (id, shiftKey, metaKey, folders, selectedIds) {
 export function createFolder (folder) {
   return dispatch => {
     console.log('Create folder: ' + JSON.stringify(folder))
-    getArchivist().post(`${rootEndpoint}`, folder)
+    archivistPost(dispatch, `${rootEndpoint}`, folder)
       .then(response => {
         dispatch({
           type: CREATE_FOLDER,
@@ -98,7 +98,7 @@ export function createFolder (folder) {
 export function updateFolder (folder) {
   return dispatch => {
     console.log('Update folder: ' + JSON.stringify(folder))
-    getArchivist().put(`${rootEndpoint}/${folder.id}`, folder)
+    archivistPut(dispatch, `${rootEndpoint}/${folder.id}`, folder)
       .then(response => {
         dispatch({
           type: UPDATE_FOLDER,
@@ -121,7 +121,7 @@ export function deleteFolderIds (ids) {
         url: `${rootEndpoint}/${id}`,
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
       }
-      getArchivist()(request)
+      archivistRequest(dispatch, request)
         .then(response => {
           dispatch({
             type: DELETE_FOLDER,
@@ -139,7 +139,7 @@ export function addAssetIdsToFolderId (assetIds, folderId) {
   return dispatch => {
     if (assetIds instanceof Set) assetIds = [...assetIds]
     console.log('Add assets ' + JSON.stringify(assetIds) + ' to folder ' + folderId)
-    getArchivist().post(`${rootEndpoint}/${folderId}/assets`, assetIds)
+    archivistPost(dispatch, `${rootEndpoint}/${folderId}/assets`, assetIds)
       .then(response => {
         dispatch({
           type: ADD_ASSETS_TO_FOLDER,
@@ -163,7 +163,7 @@ export function removeAssetIdsFromFolderId (assetIds, folderId) {
       headers: { 'X-Requested-With': 'XMLHttpRequest' },
       data: assetIds
     }
-    getArchivist()(request)
+    archivistRequest(dispatch, request)
       .then(response => {
         dispatch({
           type: REMOVE_ASSETS_FROM_FOLDER,
@@ -186,7 +186,7 @@ export function countAssetsInFolderIds (ids, search) {
   }
   return dispatch => {
     console.log('Count query assets in folders ' + JSON.stringify(ids) + (search ? ' with query ' + JSON.stringify(search) : ' without search'))
-    getArchivist().post(`${rootEndpoint}/_assetCounts`, { search, ids })
+    archivistPost(dispatch, `${rootEndpoint}/_assetCounts`, { search, ids })
       .then(response => {
         const counts = response.data.counts
         dispatch({

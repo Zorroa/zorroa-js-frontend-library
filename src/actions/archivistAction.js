@@ -1,10 +1,10 @@
 import { ARCHIVIST_INFO, ARCHIVIST_HEALTH, ARCHIVIST_METRICS } from '../constants/actionTypes'
-import { getArchivist } from './authAction'
+import { archivistGet } from './authAction'
 
 export function archivistInfo () {
   return dispatch => {
     console.log('Update archivist info')
-    getArchivist().get('/info')
+    archivistGet(dispatch, '/info')
       .then(response => {
         dispatch({
           type: ARCHIVIST_INFO,
@@ -20,7 +20,7 @@ export function archivistInfo () {
 export function archivistHealth () {
   return dispatch => {
     console.log('Update archivist health')
-    getArchivist().get('/health')
+    archivistGet(dispatch, '/health')
       .then(response => {
         dispatch({
           type: ARCHIVIST_HEALTH,
@@ -36,7 +36,7 @@ export function archivistHealth () {
 export function archivistMetrics () {
   return dispatch => {
     console.log('Update archivist metrics')
-    getArchivist().get('/metrics')
+    archivistGet(dispatch, '/metrics')
       .then(response => {
         dispatch({
           type: ARCHIVIST_METRICS,
