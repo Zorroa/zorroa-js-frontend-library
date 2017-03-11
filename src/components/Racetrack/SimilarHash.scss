@@ -170,7 +170,9 @@
   background-color: $zorroa-sickly-green;
 }
 
-.SimilarHash-bitwise-box {
+.SimilarHash-options-box {
+  @include flexRow;
+  @include flexAlignItemsCenter;
   padding: 5px;
 }
 
@@ -179,7 +181,6 @@
 
 .SimilarHash-bitwise-toggle {
 }
-
 
 .SimilarHash-selection {
   @include flexRowCenter;

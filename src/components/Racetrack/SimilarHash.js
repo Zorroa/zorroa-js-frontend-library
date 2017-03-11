@@ -38,10 +38,12 @@ class SimilarHash extends Component {
     hashLengths: {},
     hashType: '',
     hashVal: '',
+    hashBitwise: null,
     minScorePct: 50,
     bitwise: true,
     selectedAsset: null,
-    selectedAssetIds: null
+    selectedAssetIds: null,
+    schema: 'ImageHash' // Temp test for Juan, TODO: remove
   }
 
   componentWillMount () {
@@ -49,24 +51,33 @@ class SimilarHash extends Component {
     this.props.actions.getAssetFields()
   }
 
+  // recompute state.hashTypes based on give props & schema
+  // return promise that resolves after setState is complete
+  updateHashTypes = (props, schema) => {
+    const { fields } = props
+    if (!fields) return Promise.resolve()
+
+    const testSchema = (schema === 'Similarity')
+
+    let hashTypes = []
+    let hashBitwise = {}
+    for (var s in fields.string) {
+      const fieldParts = fields.string[s].split('.')
+      if (fieldParts.length >= 2 && fieldParts[0] === schema) {
+        const hashType = fieldParts[1]
+        hashTypes.push(hashType)
+        if (testSchema) hashBitwise[hashType] = (fieldParts[2] === 'bit')
+      }
+    }
+    hashTypes.sort()
+    return new Promise(resolve => this.setState({ hashTypes, hashBitwise }, resolve))
+  }
+
   componentWillReceiveProps = (nextProps) => {
     if (!this.state.isEnabled) return
 
     // initialize hashTypes first time through -- or maybe (TODO) later as well
-    if (!this.state.hashTypes) {
-      const { fields } = nextProps
-      if (fields) {
-        let hashTypes = []
-        for (var s in fields.string) {
-          const fieldParts = fields.string[s].split('.')
-          if (fieldParts.length === 2 && fieldParts[0] === 'ImageHash') {
-            hashTypes.push(fieldParts[1])
-          }
-        }
-        hashTypes.sort()
-        this.setState({ hashTypes })
-      }
-    }
+    if (!this.state.hashTypes) this.updateHashTypes(nextProps, this.state.schema)
 
     // If the selection changes, and we don't have something selected yet,
     // then do it now.
@@ -98,12 +109,15 @@ class SimilarHash extends Component {
   }
 
   modifySliver = () => {
-    const { hashType, hashVal, hashLengths, minScorePct } = this.state
-    const { isEnabled, bitwise } = this.state
+    const { hashType, hashVal, hashLengths, hashBitwise, minScorePct } = this.state
+    const { isEnabled, bitwise, schema } = this.state
     const type = SimilarHashWidgetInfo.type
     const aggs = {}
 
+    const isTestSchema = (schema === 'Similarity')
+
     this.state.hashTypes.forEach(h => {
+      const t = hashBitwise[h] ? 'bit' : 'byte'
       aggs[`similarHash-${h}`] = {
         filter: {
           bool: {
@@ -113,7 +127,7 @@ class SimilarHash extends Component {
                   inline: 'hammingDistance',
                   lang: 'native',
                   params: {
-                    field: `ImageHash.${h}.raw`,
+                    field: isTestSchema ? `${schema}.${h}.${t}.raw` : `${schema}.${h}.raw`,
                     hashes: [ hashVal ],
                     minScore: Math.round(hashLengths[h] / 2) * (bitwise ? 4 : 1),
                     bitwise
@@ -128,9 +142,10 @@ class SimilarHash extends Component {
 
     let sliver = new AssetSearch(/*{aggs}*/) // NB aggs break the search!
     if (hashType && hashVal) {
+      const t = hashBitwise[hashType] ? 'bit' : 'byte'
       sliver.filter = new AssetFilter({
         hamming: {
-          field: `ImageHash.${hashType}.raw`,
+          field: isTestSchema ? `${schema}.${hashType}.${t}.raw` : `${schema}.${hashType}.raw`,
           hashes: [ hashVal ],
           minScore: Math.round((minScorePct / 100) * hashLengths[hashType]) * (bitwise ? 4 : 1),
           bitwise
@@ -151,28 +166,36 @@ class SimilarHash extends Component {
     let hashLengths = this.state.hashLengths
 
     const { assets, selectedAssetIds } = this.props
+    const { schema } = this.state
+    let { bitwise } = this.state
 
     if (selectedAssetIds && selectedAssetIds.size) {
       const firstSelectedAssetId = selectedAssetIds.values().next().value
       if (firstSelectedAssetId) {
         selectedAsset = assets.find(asset => { return firstSelectedAssetId === asset.id })
-        hashVal = selectedAsset.document.ImageHash[hashType]
+        const hashObj = selectedAsset.document[schema]
+        const isTestSchema = (schema === 'Similarity')
+        hashVal = isTestSchema ? Object.values(hashObj[hashType])[0] : hashObj[hashType]
 
+        if (isTestSchema) bitwise = this.state.hashBitwise[hashType]
+
+        // compute hashLengths. simple & harmless to do every time, but cbb
         this.state.hashTypes.forEach(ht => {
-          const hv = selectedAsset.document.ImageHash[ht]
+          const hashObj = selectedAsset.document[schema]
+          if (!(ht in hashObj)) return // skip missing data
+          const hv = isTestSchema ? Object.values(hashObj[ht])[0] : hashObj[ht]
           if (hv) hashLengths[ht] = hv.length
         })
       }
     }
 
     new Promise(resolve => requestAnimationFrame(resolve))
-    .then(() => new Promise(resolve => this.setState({ hashType, hashVal, hashLengths, selectedAsset }, resolve)))
+    .then(() => new Promise(resolve => this.setState({ hashType, hashVal, hashLengths, bitwise, selectedAsset }, resolve)))
     .then(this.modifySliver)
   }
 
   deselectHash = (event) => {
-    const hashVal = ''
-    new Promise(resolve => this.setState({ hashVal, selectedAsset: null }, resolve))
+    new Promise(resolve => this.setState({ hashVal: '', selectedAsset: null }, resolve))
     .then(this.modifySliver)
   }
 
@@ -272,9 +295,23 @@ class SimilarHash extends Component {
     .then(this.modifySliver)
   }
 
+  // TODO: remove this asap [Sat Mar 11 08:14:57 2017]
+  // This is throwaway test code for Juan
+  updateSchema = (event) => {
+    let { schema } = this.state
+    if (schema === 'ImageHash') schema = 'Similarity'
+    else schema = 'ImageHash'
+
+    new Promise(resolve => this.setState({ hashType: '', hashVal: '', selectedAsset: null }, resolve))
+    .then(() => this.updateHashTypes(this.props, schema))
+    .then(() => new Promise(resolve => this.setState({ schema }, resolve)))
+    .then(this.modifySliver)
+  }
+
   render () {
     const { isIconified } = this.props
-    const { isEnabled, hashType, bitwise } = this.state
+    const { isEnabled, hashType, bitwise, schema } = this.state
+    const isTestSchema = (schema === 'Similarity')
     return (
       <Widget className="SimilarHash"
               title={SimilarHashWidgetInfo.title}
@@ -301,12 +338,20 @@ class SimilarHash extends Component {
             </div>
             <span className="SimilarHash-thresh-val">{`${this.state.minScorePct}%`}</span>
           </div>
-          <div className="SimilarHash-bitwise-box">
-            <label className="SimilarHash-bitwise-label">Bit-wise
+          <div className="SimilarHash-options-box">
+            <label className="SimilarHash-bitwise-label" style={{color: isTestSchema ? '#bbb' : '#000'}}>Bit-wise
               <input className="SimilarHash-bitwise-toggle"
                      type="checkbox"
                      checked={bitwise}
+                     disabled={isTestSchema}
                      onChange={this.updateBitwise}/>
+            </label>
+            <div className='flexOn'/>
+            <label className="SimilarHash-schema-label">test schema
+              <input className="SimilarHash-schema-toggle"
+                     type="checkbox"
+                     checked={isTestSchema}
+                     onChange={this.updateSchema}/>
             </label>
           </div>
           { this.renderChart() }
