@@ -44,7 +44,7 @@ export function searchAssets (query) {
         })
       })
       .catch(error => {
-        console.error('Error searching for assets: ' + error)
+        console.error('Error searching for assets', error)
         if (error.response && error.response.status === 401) {
           dispatch({
             type: UNAUTH_USER,
@@ -55,6 +55,11 @@ export function searchAssets (query) {
           type: ASSET_SEARCH_ERROR,
           payload: error
         })
+        if (DEBUG) {
+          if (error.response && error.response.data && error.response.data.message) {
+            console.error('You have mail: ', error.response.data.message)
+          }
+        }
       })
   }
 }
