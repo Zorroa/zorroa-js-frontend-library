@@ -103,7 +103,26 @@ class SimilarHash extends Component {
     const { id, widgets } = nextProps
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
-    if (widget && widget.sliver) {
+    if (widget && widget.sliver && widget.sliver.filter && widget.sliver.filter.hamming) {
+      const newHamming = widget.sliver.filter.hamming
+      let doUpdate = false
+      if (newHamming.field !== this.state.field) doUpdate = true
+      if (JSON.stringify(newHamming.hashes) !== JSON.stringify(this.state.hashes)) doUpdate = true
+      if (newHamming.minScore !== this.state.minScore) doUpdate = true
+      if (newHamming.bitwise !== this.state.bitwise) doUpdate = true
+
+      if (doUpdate) {
+        const fieldSplit = newHamming.field.split('.')
+        const schema = fieldSplit[0]
+        const hashType = fieldSplit[1]
+        const hashVal = newHamming.hashes[0]
+        const hashLength = this.state.hashLengths[hashType] || hashVal.length || 100
+        const bitwise = newHamming.bitwise
+        const minScore = newHamming.minScore || (Math.round((this.state.minScorePct / 100) * hashLength) * (bitwise ? 4 : 1))
+        const minScorePct = Math.round((100 * minScore / (bitwise ? 4 : 1)) / hashLength)
+
+        this.setState({ hashType, hashVal, minScorePct, bitwise, schema })
+      }
     }
   }
 
