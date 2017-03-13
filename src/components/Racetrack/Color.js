@@ -135,7 +135,8 @@ class Color extends Component {
 
     const oldN = colors.length
     if (oldN === 1) {
-      this.setState({ colors: [] }, () => this.modifySliver([]))
+      new Promise(resolve => this.setState({ colors: [] }, resolve))
+      .then(() => this.modifySliver([]))
       return
     }
 
@@ -233,8 +234,8 @@ class Color extends Component {
   }
 
   toggleEnabled = () => {
-    this.setState({isEnabled: !this.state.isEnabled},
-      () => { this.modifySliver(this.state.colors) })
+    new Promise(resolve => this.setState({isEnabled: !this.state.isEnabled}, resolve))
+    .then(() => this.modifySliver(this.state.colors))
   }
 
   resizer = null

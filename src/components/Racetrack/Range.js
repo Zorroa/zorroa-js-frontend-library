@@ -61,6 +61,10 @@ class Range extends Component {
     syncRangeWithAutoRange: false
   }
 
+  setStateProm = (newState) => {
+    return new Promise(resolve => this.setState(newState, resolve))
+  }
+
   // If the query is changed elsewhere, e.g. from the Searchbar,
   // capture the new props and update our local state to match.
   syncWithAppState (nextProps, selectFieldIfEmpty) {
@@ -103,7 +107,8 @@ class Range extends Component {
 
         const minStr = this.valToString(min)
         const maxStr = this.valToString(max)
-        this.setState({ field, min, max, minStr, maxStr }, () => { if (reQuery) this.modifySliver() })
+        this.setStateProm({ field, min, max, minStr, maxStr })
+        .then(() => { if (reQuery) this.modifySliver() })
       }
     } else {
       if (selectFieldIfEmpty) {
@@ -131,7 +136,8 @@ class Range extends Component {
   }
 
   toggleEnabled = () => {
-    this.setState({isEnabled: !this.state.isEnabled}, this.modifySliver)
+    this.setStateProm({isEnabled: !this.state.isEnabled})
+    .then(this.modifySliver)
   }
 
   modifySliver = () => {
@@ -168,7 +174,8 @@ class Range extends Component {
     let { usePrefix } = this.state
     if (field && field.length) {
       if (field === 'source.fileSize') usePrefix = 'bin'
-      this.setState({ field, syncRangeWithAutoRange: true, usePrefix }, this.modifySliver)
+      this.setStateProm({ field, syncRangeWithAutoRange: true, usePrefix })
+      .then(this.modifySliver)
     }
   }
 
@@ -263,19 +270,17 @@ class Range extends Component {
   resetAutoRange = (event) => {
     const { field } = this.state
     window.getSelection().removeAllRanges()
-    this.setState(
-      {
-        field,
-        min: null,
-        max: null,
-        minStr: null,
-        maxStr: null,
-        autoMin: null,
-        autoMax: null,
-        syncRangeWithAutoRange: true
-      },
-      this.modifySliver
-    )
+    this.setState({
+      field,
+      min: null,
+      max: null,
+      minStr: null,
+      maxStr: null,
+      autoMin: null,
+      autoMax: null,
+      syncRangeWithAutoRange: true
+    })
+    .then(this.modifySliver)
   }
 
   render () {

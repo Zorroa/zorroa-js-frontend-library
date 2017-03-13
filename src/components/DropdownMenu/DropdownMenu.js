@@ -17,21 +17,23 @@ export default class DropdownMenu extends Component {
     document.removeEventListener('click', this.hide)
   }
 
+  setStateProm = (newState) => {
+    return new Promise(resolve => this.setState(newState, resolve))
+  }
+
   show = (event) => {
     const { isVisible } = this.state
     if (isVisible) return
-    this.setState({ isVisible: true }, () => {
-      document.addEventListener('click', this.hide)
-    })
+    this.setStateProm({ isVisible: true })
+    .then(() => document.addEventListener('click', this.hide))
     if (this.props.onChange) this.props.onChange(event, true)
   }
 
   hide = (event) => {
     const { isVisible } = this.state
     if (!isVisible) return
-    this.setState({ isVisible: false }, () => {
-      document.removeEventListener('click', this.hide)
-    })
+    this.setStateProm({ isVisible: false })
+    .then(() => document.removeEventListener('click', this.hide))
     if (this.props.onChange) this.props.onChange(event, false)
   }
 

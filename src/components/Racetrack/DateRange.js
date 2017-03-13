@@ -61,7 +61,8 @@ class DateRange extends Component {
         const min = moment(minStr, format).toDate()
         const max = moment(maxStr, format).toDate()
         if (minStr !== this.state.minStr && maxStr !== this.state.maxStr) {
-          this.setState({ min, max, minStr, maxStr }, () => { requestAnimationFrame(this.modifySliver) })
+          new Promise(resolve => this.setState({ min, max, minStr, maxStr }, resolve))
+          .then(() => requestAnimationFrame(this.modifySliver))
         }
       }
     } else {
@@ -121,7 +122,8 @@ class DateRange extends Component {
   }
 
   toggleEnabled = () => {
-    this.setState({isEnabled: !this.state.isEnabled}, this.modifySliver)
+    new Promise(resolve => this.setState({isEnabled: !this.state.isEnabled}, resolve))
+    .then(this.modifySliver)
   }
 
   modifySliver = () => {

@@ -70,8 +70,8 @@ class Map extends Component {
   }
 
   toggleEnabled = () => {
-    this.setState({isEnabled: !this.state.isEnabled},
-      () => { this.modifySliver(this.state.term) })
+    new Promise(resolve => this.setState({isEnabled: !this.state.isEnabled}, resolve))
+    .then(() => this.modifySliver(this.state.term))
   }
 
   modifySliver (locationField, searchField, term) {
