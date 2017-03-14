@@ -105,6 +105,12 @@ class Table extends Component {
   componentWillMount = () => { this.resizer = new Resizer() }
   componentWillUmount = () => { this.resizer.release() }
 
+  saveTableFieldWidths () {
+    const { userSettings, actions, user, fieldWidth } = this.props
+    const settings = { ...userSettings, tableFieldWidths: fieldWidth }
+    actions.saveUserSettings(user, settings)
+  }
+
   columnResizeStart = (event, field) => {
     this.columnResizeFieldName = field
     this.resizer.capture(this.columnResizeUpdate, this.columnResizeStop,
@@ -118,6 +124,7 @@ class Table extends Component {
 
   columnResizeStop = (event) => {
     this.columnResizeFieldName = null
+    this.saveTableFieldWidths()
   }
 
   columnAutoResize = (event, field) => {
@@ -144,6 +151,7 @@ class Table extends Component {
     maxWidth = Math.max(50, Math.min(2000, maxWidth))
 
     this.props.actions.setTableFieldWidth({[field]: maxWidth})
+    this.saveTableFieldWidths()
   }
 
   toggleArrayField = (asset, field) => {
