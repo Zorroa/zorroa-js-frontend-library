@@ -7,7 +7,7 @@ import WidgetModel from '../../models/Widget'
 import Asset from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
-import { getAssetFields } from '../../actions/assetsAction'
+import { getAssetFields, searchAssetsRequestProm } from '../../actions/assetsAction'
 import { SimilarHashWidgetInfo } from './WidgetInfo'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
 import { showModal } from '../../actions/appActions'
@@ -40,10 +40,11 @@ class SimilarHash extends Component {
     hashVal: '',
     hashBitwise: null,
     minScorePct: 50,
+    aggs: {},
     bitwise: true,
     selectedAsset: null,
     selectedAssetIds: null,
-    schema: 'ImageHash' // Temp test for Juan, TODO: remove
+    schema: 'Similarity' // Temp test for Juan, TODO: remove
   }
 
   componentWillMount () {
@@ -132,36 +133,11 @@ class SimilarHash extends Component {
   }
 
   modifySliver = () => {
-    const { hashType, hashVal, hashLengths, hashBitwise, minScorePct } = this.state
+    const { hashType, hashVal, hashLengths, hashBitwise, minScorePct, selectedAsset } = this.state
     const { isEnabled, bitwise, schema } = this.state
     const type = SimilarHashWidgetInfo.type
-    const aggs = {}
 
     const isTestSchema = (schema === 'Similarity')
-
-    this.state.hashTypes.forEach(h => {
-      const t = hashBitwise[h] ? 'bit' : 'byte'
-      aggs[`similarHash-${h}`] = {
-        filter: {
-          bool: {
-            must: {
-              script: {
-                script: {
-                  inline: 'hammingDistance',
-                  lang: 'native',
-                  params: {
-                    field: isTestSchema ? `${schema}.${h}.${t}.raw` : `${schema}.${h}.raw`,
-                    hashes: [ hashVal ],
-                    minScore: Math.round(hashLengths[h] / 2) * (bitwise ? 4 : 1),
-                    bitwise
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    })
 
     let sliver = new AssetSearch(/*{aggs}*/) // NB aggs break the search!
     if (hashType && hashVal) {
@@ -177,6 +153,56 @@ class SimilarHash extends Component {
     }
     const widget = new WidgetModel({id: this.props.id, isEnabled, type, sliver})
     this.props.actions.modifyRacetrackWidget(widget)
+
+    if (selectedAsset) {
+      const assetHashes = selectedAsset.document[schema]
+      let aggProms = []
+
+      const queryAggs = {}
+      const dummyDispatch = () => {}
+      this.state.hashTypes.forEach(h => {
+        const t = hashBitwise[h] ? 'bit' : 'byte'
+        const hashVal = isTestSchema ? (assetHashes[h] ? [ assetHashes[h][t] ] : '') : [ assetHashes[h] ]
+        const bitwise = isTestSchema ? hashBitwise[h] : this.state.bitwise
+        queryAggs[h] = {
+          [`similarHash-${h}`]: {
+            filter: {
+              bool: {
+                must: {
+                  script: {
+                    script: {
+                      inline: 'hammingDistance',
+                      lang: 'native',
+                      params: {
+                        field: isTestSchema ? `${schema}.${h}.${t}.raw` : `${schema}.${h}.raw`,
+                        hashes: hashVal,
+                        minScore: Math.round((minScorePct / 100) * hashLengths[h]) * (bitwise ? 4 : 1),
+                        bitwise
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        aggProms.push(
+          searchAssetsRequestProm(dummyDispatch, new AssetSearch({ aggs: queryAggs[h], size: 1 }))
+          .catch(error => error)
+        )
+      })
+      Promise.all(aggProms)
+      .then(responses => {
+        let resultAggs = {}
+        responses.forEach((response, i, a) => {
+          if (!response || !response.data || !response.data.aggregations) return
+          // console.log('agg response', JSON.stringify(response))
+          const hashType = this.state.hashTypes[i]
+          resultAggs[hashType] = Object.values(response.data.aggregations)[0]
+        })
+        return this.setStateProm({ aggs: resultAggs })
+      })
+    }
   }
 
   removeFilter = () => {
@@ -268,8 +294,7 @@ class SimilarHash extends Component {
   }
 
   renderChart () {
-    const { hashTypes } = this.state
-    const { id, aggs } = this.props
+    const { hashTypes, aggs } = this.state
     return (
       <div className="SimilarHash-table">
         <div className="SimilarHash-table-header">
@@ -291,7 +316,7 @@ class SimilarHash extends Component {
                 <td className="SimilarHash-value-count">{
                   (() => {
                     try {
-                      return aggs[id][`similarHash-${hashType}`].doc_count
+                      return aggs[hashType].doc_count
                     } catch (e) {
                       return '--'
                     }

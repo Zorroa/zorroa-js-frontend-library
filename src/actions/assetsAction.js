@@ -24,43 +24,54 @@ function escapeQuery (query) {
   return safeQuery
 }
 
-export function searchAssets (query) {
+export function searchAssetsRequestProm (dispatch, query) {
   assert.ok(query instanceof AssetSearch)
   assert.ok(query.size)
+  assert.ok(typeof query.from === 'undefined' || query.from >= 0)
+  const safeQuery = escapeQuery(query)
+  console.log('Search: ' + JSON.stringify(safeQuery))
+
+  return archivistPost(dispatch, '/api/v3/assets/_search', safeQuery)
+  .then(response => {
+    console.log('Query ' + JSON.stringify(safeQuery))
+    console.log(response)
+    return response
+  })
+  .catch(error => {
+    console.error('Error searching for assets', error)
+    if (DEBUG) {
+      if (error.response && error.response.data && error.response.data.message) {
+        console.error('You have mail: ', error.response.data.message)
+      }
+    }
+    return Promise.reject(error) // re-throw the error, so downstream can catch
+  })
+}
+
+export function searchAssets (query) {
   return dispatch => {
-    assert.ok(typeof query.from === 'undefined' || query.from >= 0)
-    const safeQuery = escapeQuery(query)
-    console.log('Search: ' + JSON.stringify(safeQuery))
-    archivistPost(dispatch, '/api/v3/assets/_search', safeQuery)
-      .then(response => {
-        console.log('Query ' + JSON.stringify(safeQuery))
-        console.log(response)
-        const page = new Page(response.data.page)
-        const assets = response.data.list.map(asset => (new Asset(asset)))
-        const aggs = response.data.aggregations
-        dispatch({
-          type: ASSET_SEARCH,
-          payload: { query, assets, page, aggs }
-        })
+    return searchAssetsRequestProm(dispatch, query)
+    .then(response => {
+      const page = new Page(response.data.page)
+      const assets = response.data.list.map(asset => (new Asset(asset)))
+      const aggs = response.data.aggregations
+      dispatch({
+        type: ASSET_SEARCH,
+        payload: { query, assets, page, aggs }
       })
-      .catch(error => {
-        console.error('Error searching for assets', error)
-        if (error.response && error.response.status === 401) {
-          dispatch({
-            type: UNAUTH_USER,
-            payload: error.response.data
-          })
-        }
+    })
+    .catch(error => {
+      if (error.response && error.response.status === 401) {
         dispatch({
-          type: ASSET_SEARCH_ERROR,
-          payload: error
+          type: UNAUTH_USER,
+          payload: error.response.data
         })
-        if (DEBUG) {
-          if (error.response && error.response.data && error.response.data.message) {
-            console.error('You have mail: ', error.response.data.message)
-          }
-        }
+      }
+      dispatch({
+        type: ASSET_SEARCH_ERROR,
+        payload: error
       })
+    })
   }
 }
 
