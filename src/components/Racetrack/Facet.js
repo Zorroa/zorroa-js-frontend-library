@@ -408,6 +408,12 @@ class Facet extends Component {
             </div>
             <div className="Facet-value-table">
               <table>
+                <thead>
+                  <tr>
+                    <td style={{width:'80%'}}/>
+                    <td style={{width:'20%'}}/>
+                  </tr>
+                </thead>
                 <tbody>
                 { buckets && buckets.map(bucket => (
                   <tr className={classnames('Facet-value-table-row',

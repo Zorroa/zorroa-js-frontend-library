@@ -176,12 +176,37 @@
     border-radius: 2px;
   }
 
+  input::-moz-range-thumb {
+    border: none;
+    width: 6px;
+    height: 6px;
+  }
+
+  input::-moz-range-track {
+    background: $zorroa-gray;
+    border: none;
+    height: 2px;
+    outline: none;
+  }
+
+  input::-moz-range-progress {
+    background: $zorroa-sickly-green;
+    border: none;
+    height: 2px;
+    outline: none;
+  }
+
+  input[type=range]::-moz-focus-outer {
+    border: 0;  // Removes focus dotted outline
+  }
+
   .CreateFolder-perm-progress {
     @include fullWidth;
     position: absolute;
-    z-index: 1;
+    z-index: -1;
 
     -webkit-appearance: none;
+    -moz-appearance: none;
     height: 2px;
     background: none;
 
