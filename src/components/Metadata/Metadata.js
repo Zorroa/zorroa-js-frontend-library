@@ -39,16 +39,21 @@ class Metadata extends Component {
   }
 
   componentWillMount () {
-    this.updateFilteredFields(this.props, this.state)
+    this.updateFilteredFields(this.props)
     this.props.actions.getAssetFields()
   }
 
-  componentWillUpdate (nextProps, nextState) {
-    this.updateFilteredFields(nextProps, nextState)
+  componentWillReceiveProps (nextProps) {
+    this.updateFilteredFields(nextProps)
+  }
+
+  setStatePromise = (newState) => {
+    return new Promise(resolve => this.setState(newState, resolve))
   }
 
   changeFilterString = (event) => {
-    this.setState({ filterString: event.target.value })
+    this.setStatePromise({ filterString: event.target.value })
+      .then(() => this.updateFilteredFields(this.props))
   }
 
   showDisplayOptions = () => {
@@ -130,16 +135,16 @@ class Metadata extends Component {
 
   // Update the filteredFields component list, caching heavily based on all
   // the factors that affect the components: fields, open collapsibles, and aggs.
-  updateFilteredFields (props, state) {
+  updateFilteredFields (props) {
     const {fields, collapsibleOpen, aggs, existsFields} = props
-    const modifiedExists = JSON.stringify([...existsFields]) !== JSON.stringify([...state.existsFields])
+    const modifiedExists = JSON.stringify([...existsFields]) !== JSON.stringify([...this.state.existsFields])
 
     // Filter all fields by string and sort
-    const lcFilterString = state.filterString.toLowerCase()
+    const lcFilterString = this.state.filterString.toLowerCase()
     const filteredFields = fields.filter(field => (field.toLowerCase().includes(lcFilterString))).sort()
-    if (JSON.stringify(filteredFields) !== JSON.stringify(state.filteredFields) ||
-        JSON.stringify(collapsibleOpen) !== JSON.stringify(state.collapsibleOpen) ||
-        JSON.stringify(aggs) !== JSON.stringify(state.aggs) || modifiedExists) {
+    if (JSON.stringify(filteredFields) !== JSON.stringify(this.state.filteredFields) ||
+        JSON.stringify(collapsibleOpen) !== JSON.stringify(this.state.collapsibleOpen) ||
+        JSON.stringify(aggs) !== JSON.stringify(this.state.aggs) || modifiedExists) {
       // Unroll the fields iteratively into an item element array
       const filteredComponents = []
       const aggFields = []
@@ -168,8 +173,8 @@ class Metadata extends Component {
       filteredFields.forEach(field => {
         addFields(ancestors, field)
       })
-      const modifiedAggFields = JSON.stringify(aggFields) !== JSON.stringify(state.aggFields)
-      if (modifiedAggFields || modifiedExists || JSON.stringify(aggs) !== JSON.stringify(state.aggs)) {
+      const modifiedAggFields = JSON.stringify(aggFields) !== JSON.stringify(this.state.aggFields)
+      if (modifiedAggFields || modifiedExists || JSON.stringify(aggs) !== JSON.stringify(this.state.aggs)) {
         this.setState({filteredComponents})
       }
 
