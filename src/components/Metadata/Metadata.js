@@ -14,10 +14,6 @@ import { modifyRacetrackWidget, removeRacetrackWidgetIds, existsFields } from '.
 import { FacetWidgetInfo, MapWidgetInfo } from '../Racetrack/WidgetInfo'
 import { createFacetWidget, createMapWidget } from '../../models/Widget'
 
-function key ({field, namespace}) {
-  return `${field}-${namespace}`
-}
-
 class Metadata extends Component {
   static propTypes = {
     // state props
@@ -43,18 +39,17 @@ class Metadata extends Component {
     aggFields: []
   }
 
-  componentWillReceiveProps (props) {
-    this.updateFilteredFields(props)
+  componentWillMount () {
+    this.updateFilteredFields(this.props, this.state)
+    this.props.actions.getAssetFields()
   }
 
-  componentWillMount () {
-    this.updateFilteredFields(this.props)
-    this.props.actions.getAssetFields()
+  componentWillUpdate (nextProps, nextState) {
+    this.updateFilteredFields(nextProps, nextState)
   }
 
   changeFilterString = (event) => {
     this.setState({ filterString: event.target.value })
-    this.updateFilteredFields(this.props)
   }
 
   showDisplayOptions = () => {
@@ -154,16 +149,16 @@ class Metadata extends Component {
 
   // Update the filteredFields component list, caching heavily based on all
   // the factors that affect the components: fields, open collapsibles, and aggs.
-  updateFilteredFields (props) {
+  updateFilteredFields (props, state) {
     const {fields, collapsibleOpen, aggs, existsFields} = props
-    const modifiedExists = JSON.stringify([...existsFields]) !== JSON.stringify([...this.state.existsFields])
+    const modifiedExists = JSON.stringify([...existsFields]) !== JSON.stringify([...state.existsFields])
 
     // Filter all fields by string and sort
-    const lcFilterString = this.state.filterString.toLowerCase()
+    const lcFilterString = state.filterString.toLowerCase()
     const filteredFields = fields.filter(field => (field.toLowerCase().includes(lcFilterString))).sort()
-    if (JSON.stringify(filteredFields) !== JSON.stringify(this.state.filteredFields) ||
-        JSON.stringify(collapsibleOpen) !== JSON.stringify(this.state.collapsibleOpen) ||
-        JSON.stringify(aggs) !== JSON.stringify(this.state.aggs) || modifiedExists) {
+    if (JSON.stringify(filteredFields) !== JSON.stringify(state.filteredFields) ||
+        JSON.stringify(collapsibleOpen) !== JSON.stringify(state.collapsibleOpen) ||
+        JSON.stringify(aggs) !== JSON.stringify(state.aggs) || modifiedExists) {
       // Unroll the fields iteratively into an item element array
       const filteredComponents = []
       const aggFields = []
@@ -173,7 +168,7 @@ class Metadata extends Component {
         for (let i = 0; i < parents.length; ++i) {
           const namespace = parents.slice(0, i + 1).join('.')
           const index = ancestors.findIndex(ancestor => (ancestor.namespace === namespace))
-          const isOpen = collapsibleOpen[key({field, namespace})]
+          const isOpen = collapsibleOpen[namespace]
           const isSelected = existsFields.has(namespace)
           if (index < 0) {
             const hasChildren = i < parents.length - 1
@@ -181,7 +176,7 @@ class Metadata extends Component {
             ancestors.splice(i)
             ancestors.push({field, namespace})
             aggFields.push(namespace)
-          } else if (collapsibleOpen[key(ancestors[index])]) {
+          } else if (collapsibleOpen[ancestors[index].namespace]) {
             continue
           }
           if (!isOpen) break
@@ -192,8 +187,8 @@ class Metadata extends Component {
       filteredFields.forEach(field => {
         addFields(ancestors, field)
       })
-      const modifiedAggFields = JSON.stringify(aggFields) !== JSON.stringify(this.state.aggFields)
-      if (modifiedAggFields || modifiedExists || JSON.stringify(aggs) !== JSON.stringify(this.state.aggs)) {
+      const modifiedAggFields = JSON.stringify(aggFields) !== JSON.stringify(state.aggFields)
+      if (modifiedAggFields || modifiedExists || JSON.stringify(aggs) !== JSON.stringify(state.aggs)) {
         this.setState({filteredComponents})
       }
 
@@ -202,7 +197,7 @@ class Metadata extends Component {
   }
 
   renderField (field, namespace, name, depth, hasChildren, isOpen, isSelected) {
-    const id = key({field, namespace})
+    const id = `${field}-${namespace}`
     const isLeaf = this.isLeaf(field, namespace)
     return (
       <div className={classnames('Metadata-item', {isSelected, isLeaf})}
@@ -211,7 +206,7 @@ class Metadata extends Component {
            onMouseOver={e => this.hover(namespace)} onMouseOut={e => this.clearHover(namespace)} >
         <div className="Metadata-left">
           <div className={classnames('Metadata-item-toggle', {hasChildren})}
-               onClick={e => this.toggleCollapsible(id, e)}>
+               onClick={e => this.toggleCollapsible(namespace, e)}>
             { hasChildren && <div className={classnames('Metadata-toggleArrow', 'icon-triangle-down', {isOpen})}/> }
           </div>
           <div className="Metadata-item-label">
