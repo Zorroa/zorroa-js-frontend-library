@@ -3,6 +3,7 @@ import classnames from 'classnames'
 import Asset from '../../models/Asset'
 import FileIcon from '../FileIcon'
 import { humanFileSize } from '../../services/jsUtil'
+import { createFacetWidget } from '../../models/Widget'
 
 export default class TableField extends Component {
   static propTypes = {
@@ -11,6 +12,7 @@ export default class TableField extends Component {
     field: PropTypes.string.isRequired,
     isOpen: PropTypes.bool,
     onOpen: PropTypes.func,
+    onTag: PropTypes.func,
     width: PropTypes.number
   }
 
@@ -44,7 +46,7 @@ export default class TableField extends Component {
   }
 
   renderStringArray = (vals) => {
-    const { isOpen, onOpen } = this.props
+    const { isOpen, onOpen, onTag, field } = this.props
     return (
       <div className={classnames('TableField-array', {isOpen})}>
         { onOpen &&
@@ -54,7 +56,7 @@ export default class TableField extends Component {
           </div>
         }
         { vals.map((val, i) => (
-          <div className='TableField-tag' key={i}>{val}</div>
+          <div onClick={e => onTag(val, field, e)} className='TableField-tag' key={i}>{val}</div>
         ))}
       </div>
     )

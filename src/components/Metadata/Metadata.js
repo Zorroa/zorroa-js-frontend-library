@@ -11,8 +11,7 @@ import { saveUserSettings } from '../../actions/authAction'
 import { getAssetFields } from '../../actions/assetsAction'
 import { unCamelCase } from '../../services/jsUtil'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds, existsFields } from '../../actions/racetrackAction'
-import { FacetWidgetInfo, MapWidgetInfo } from '../Racetrack/WidgetInfo'
-import { createFacetWidget, createMapWidget } from '../../models/Widget'
+import { createFacetWidget, createMapWidget, fieldUsedInWidget } from '../../models/Widget'
 
 class Metadata extends Component {
   static propTypes = {
@@ -97,14 +96,14 @@ class Metadata extends Component {
 
   toggleWidget = (field, event) => {
     const { widgets, fieldTypes } = this.props
-    const index = this.widgetIndex(field)
+    const index = widgets.findIndex(widget => fieldUsedInWidget(field, widget))
     if (index >= 0) {
       this.props.actions.removeRacetrackWidgetIds([widgets[index].id])
     } else {
       const type = fieldTypes[field]
-      const assets = null
+      const terms = null
       const term = null
-      const facet = type === 'point' ? createMapWidget(field, term) : createFacetWidget(field, assets, fieldTypes)
+      const facet = type === 'point' ? createMapWidget(field, term) : createFacetWidget(field, terms, fieldTypes)
       this.props.actions.modifyRacetrackWidget(facet)
       this.props.actions.iconifyRightSidebar(false)
     }
@@ -123,24 +122,6 @@ class Metadata extends Component {
 
   clearHover = (field) => {
     this.props.actions.clearHoverField(field)
-  }
-
-  widgetIndex (field) {
-    const { widgets } = this.props
-    for (let i = 0; i < widgets.length; ++i) {
-      const widget = widgets[i]
-      switch (widget.type) {
-        case FacetWidgetInfo.type:
-          if (widget.sliver &&
-            (widget.sliver.aggs.facet.terms.field === field ||
-                widget.sliver.aggs.facet.terms.field === `${field}.raw`)) return i
-          break
-        case MapWidgetInfo.type:
-          if (widget.sliver && widget.sliver.aggs &&
-              widget.sliver.aggs.map.geohash_grid.field === field) return i
-      }
-    }
-    return -1
   }
 
   isLeaf (field, namespace) {
@@ -199,6 +180,7 @@ class Metadata extends Component {
   renderField (field, namespace, name, depth, hasChildren, isOpen, isSelected) {
     const id = `${field}-${namespace}`
     const isLeaf = this.isLeaf(field, namespace)
+    const selected = this.props.widgets.findIndex(widget => fieldUsedInWidget(field, widget)) >= 0
     return (
       <div className={classnames('Metadata-item', {isSelected, isLeaf})}
            key={id} style={{ paddingLeft: `${depth * 10}px` }}
@@ -215,7 +197,8 @@ class Metadata extends Component {
         </div>
         <div className="Metadata-right">
           <div onClick={e => this.hide(field, namespace, e)} className="Metadata-item-hide icon-cancel-circle"/>
-          {isLeaf && <div onClick={e => this.toggleWidget(field, e)} className={classnames('Metadata-item-search', 'icon-binoculars', {selected: this.widgetIndex(field) >= 0})} />}
+          {isLeaf && <div onClick={e => this.toggleWidget(field, e)}
+                          className={classnames('Metadata-item-search', 'icon-binoculars', {selected})} />}
         </div>
       </div>
     )

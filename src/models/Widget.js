@@ -31,25 +31,13 @@ export function aggField (field, fieldTypes) {
   return (isNumeric) ? field : field + '.raw'
 }
 
-export function createFacetWidget (field, assets, fieldTypes) {
+export function createFacetWidget (field, terms, fieldTypes) {
   const type = FacetWidgetInfo.type
   const isOpen = true
   const isEnabled = true
-  let terms = []
-  if (assets) {
-    for (let asset of assets) {
-      const term = asset.terms(field)
-      if (term instanceof Array) {
-        terms.concat(term)
-      } else {
-        terms.push(term)
-      }
-    }
-  }
-  // FIXME: Implicitly using the layout of a Facet widget sliver.
   const rawField = aggField(field, fieldTypes)
   const aggs = { facet: { terms: { field: rawField, size: 100 } } }
-  const filter = terms.length ? new AssetFilter({terms: {[rawField]: terms}}) : null
+  const filter = terms && terms.length ? new AssetFilter({terms: {[rawField]: terms}}) : null
   const sliver = new AssetSearch({filter, aggs})
   return new Widget({type, sliver, isEnabled, isOpen})
 }
@@ -67,6 +55,20 @@ export function createMapWidget (field, term) {
     // Add this.bounds and set agg precision
   }
   return new Widget({type, sliver, isEnabled, isOpen})
+}
+
+export function fieldUsedInWidget (field, widget) {
+  switch (widget.type) {
+    case FacetWidgetInfo.type:
+      if (widget.sliver &&
+        (widget.sliver.aggs.facet.terms.field === field ||
+        widget.sliver.aggs.facet.terms.field === `${field}.raw`)) return true
+      break
+    case MapWidgetInfo.type:
+      if (widget.sliver && widget.sliver.aggs &&
+        widget.sliver.aggs.map.geohash_grid.field === field) return true
+  }
+  return false
 }
 
 // Acts like a static variable, returning increasing unique ids

@@ -12,8 +12,11 @@ import {
   updateMetadataFields,
   updateTableFields,
   showModal,
-  setTableFieldWidth
+  setTableFieldWidth,
+  iconifyRightSidebar
 } from '../../actions/appActions'
+import { createFacetWidget, fieldUsedInWidget } from '../../models/Widget'
+import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import { sortAssets, unorderAssets, isolateAssetId } from '../../actions/assetsAction'
 import { saveUserSettings } from '../../actions/authAction'
 import TableField from './TableField'
@@ -32,6 +35,8 @@ class Table extends Component {
     selectionCounter: PropTypes.number.isRequired,
     fields: PropTypes.arrayOf(PropTypes.string).isRequired,
     fieldWidth: PropTypes.objectOf(PropTypes.number).isRequired,
+    fieldTypes: PropTypes.object,
+    widgets: PropTypes.arrayOf(PropTypes.object),
     order: PropTypes.arrayOf(PropTypes.object),
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
@@ -276,6 +281,23 @@ class Table extends Component {
     }
   }
 
+  createTagFacet = (term, field, event) => {
+    field = field && field.endsWith('.raw') ? field : field + '.raw'
+    const index = this.props.widgets.findIndex(widget => fieldUsedInWidget(field, widget))
+    let terms = [term]
+    if (index >= 0 && event.shiftKey) {       // Add to terms for shift
+      const widget = this.props.widgets[index]
+      if (widget.sliver && widget.sliver.filter && widget.sliver.filter.terms) {
+        terms = [...widget.sliver.filter.terms[field], term]
+      }
+    }
+    const widget = createFacetWidget(field, terms, this.props.fieldTypes)
+    if (index >= 0) widget.id = this.props.widgets[index].id
+    this.props.actions.modifyRacetrackWidget(widget)
+    this.props.actions.iconifyRightSidebar(false)
+    event.stopPropagation()
+  }
+
   titleForField (field) {
     const names = field.split('.')
     if (!names || names.length < 2) return field
@@ -376,6 +398,7 @@ class Table extends Component {
                        onDoubleClick={event => this.isolateToLightbox(asset)}>
                     { fields.map((field, i) => (
                       <TableField {...{ asset, field, key: field, width: fieldWidth[field] }}
+                        onTag={this.createTagFacet}
                         isOpen={this.isAssetFieldOpen(asset, field)}
                         onOpen={event => {
                           event.stopPropagation() // prevent row select when openening a field
@@ -408,6 +431,8 @@ export default connect(state => ({
   order: state.assets.order,
   fields: state.app.tableFields,
   fieldWidth: state.app.tableFieldWidth,
+  fieldTypes: state.assets.types,
+  widgets: state.racetrack.widgets,
   user: state.auth.user,
   userSettings: state.app.userSettings,
   metadataFields: state.app.metadataFields
@@ -420,6 +445,8 @@ export default connect(state => ({
     updateTableFields,
     showModal,
     setTableFieldWidth,
+    modifyRacetrackWidget,
+    iconifyRightSidebar,
     saveUserSettings
   }, dispatch)
 }))(Table)
