@@ -22,14 +22,11 @@ class DisplayOptions extends Component {
     actions: PropTypes.object
   }
 
-  constructor (props) {
-    super(props)
-    this.state = {
-      openedNamespace: '',                            // E.g. Foo.bar
-      checkedNamespaces: this.props.selectedFields,   // Array of field names
-      syncedViews: this.props.syncMetadataAndTable,   // Checkbox state
-      fieldFilter: ''                                 // Filter input state
-    }
+  state = {
+    openedNamespace: '',                            // E.g. Foo.bar
+    checkedNamespaces: this.props.selectedFields,   // Array of field names
+    syncedViews: this.props.syncMetadataAndTable || false,   // Checkbox state
+    fieldFilter: ''                                 // Filter input state
   }
 
   componentWillMount () {
@@ -133,7 +130,9 @@ class DisplayOptions extends Component {
         }
       }
     })
-    return [ ...names ]
+    return [ ...names ].sort((a, b) => {
+      return a.toLowerCase().localeCompare(b.toLowerCase())
+    })
   }
 
   // Fields only change during an active server import.

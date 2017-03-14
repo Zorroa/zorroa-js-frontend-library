@@ -1,7 +1,7 @@
 import {
   SHOW_MODAL, HIDE_MODAL, SORT_FOLDERS,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
-  METADATA_FIELDS, TABLE_FIELDS, LIGHTBAR_FIELDS,
+  METADATA_FIELDS, TABLE_FIELDS, LIGHTBAR_FIELDS, ASSET_FIELDS,
   SYNC_FIELDS, SHOW_IMPORT_SCRIPT_INFO,
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
@@ -68,6 +68,15 @@ export default function app (state = initialState, action) {
       const { collapsibleName, isOpen } = action.payload
       const collapsibleOpen = state.collapsibleOpen
       return { ...state, collapsibleOpen: { ...collapsibleOpen, [collapsibleName]: isOpen } }
+    case ASSET_FIELDS: {
+      // Remove any metadata or table fields that are not in the current repo
+      const fieldSet = new Set()
+      const fields = action.payload
+      Object.keys(fields).forEach(type => { fields[type].forEach(field => { fieldSet.add(field) }) })
+      const metadataFields = state.metadataFields.filter(field => fieldSet.has(field))
+      const tableFields = state.tableFields.filter(field => fieldSet.has(field))
+      return { ...state, metadataFields, tableFields }
+    }
     case METADATA_FIELDS:
       return { ...state, metadataFields: action.payload }
     case TABLE_FIELDS:
