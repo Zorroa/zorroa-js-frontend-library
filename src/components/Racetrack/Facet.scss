@@ -132,13 +132,13 @@
 
   .Facet-value-cell {
     padding: 0;
-    max-width: 0; // This looks weird, but is important! It allows cells to chop content
+    //max-width: 0; // This looks weird, but is important! It allows cells to chop content
     @include clampText;
   }
 
   .Facet-value-count {
     padding: 0;
-    max-width: 0; // This looks weird, but is important! It allows cells to chop content
+    //max-width: 0; // This looks weird, but is important! It allows cells to chop content
     @include clampText;
   }
 
