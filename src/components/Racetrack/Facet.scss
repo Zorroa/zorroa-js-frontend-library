@@ -70,7 +70,7 @@
       @include fullHeight;
       @include fullWidth;
       position: relative;
-      padding: 8px;
+      padding: 8px 0 8px 8px;
     }
 
     .Facet-value-pct-bar {
@@ -83,6 +83,7 @@
 
     .Facet-value-key {
       position: relative;
+      @include clampText;
     }
   }
 
@@ -132,13 +133,13 @@
 
   .Facet-value-cell {
     padding: 0;
-    //max-width: 0; // This looks weird, but is important! It allows cells to chop content
+    max-width: 0; // This looks weird, but is important! It allows cells to chop content
     @include clampText;
   }
 
   .Facet-value-count {
     padding: 0;
-    //max-width: 0; // This looks weird, but is important! It allows cells to chop content
+    max-width: 0; // This looks weird, but is important! It allows cells to chop content
     @include clampText;
   }
 
