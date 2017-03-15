@@ -1,8 +1,8 @@
 import {
   SHOW_MODAL, HIDE_MODAL, SORT_FOLDERS,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
-  METADATA_FIELDS, TABLE_FIELDS, LIGHTBAR_FIELDS, ASSET_FIELDS,
-  SYNC_FIELDS, SHOW_IMPORT_SCRIPT_INFO,
+  METADATA_FIELDS, LIGHTBAR_FIELDS, ASSET_FIELDS,
+  SHOW_IMPORT_SCRIPT_INFO,
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
   SHOW_MULTIPAGE, SHOW_PAGES, VIDEO_VOLUME,
@@ -12,7 +12,7 @@ import {
 import { DEFAULT_THUMBSIZE } from '../actions/appActions'
 
 export const defaultTableFieldWidth = 100
-export const defaultTableFields = [ 'source.filename', 'source.date', 'source.fileSize' ]
+export const defaultMetadataFields = [ 'source.filename', 'source.date', 'source.fileSize' ]
 export const defaultLightbarFields = [ 'source.filename', 'source.date' ]
 const initialState = {
   modal: null,
@@ -28,11 +28,10 @@ const initialState = {
     proxies: false,
     'proxies.proxies': false
   },
-  metadataFields: [ ...defaultTableFields ],
-  tableFields: [ ...defaultTableFields ],
+  metadataFields: [ ...defaultMetadataFields ],
   lightbarFields: [ ...defaultLightbarFields ],
   tableFieldWidth: Object.assign({},
-    ...defaultTableFields.map(field => ({ [field]: defaultTableFieldWidth }))),
+    ...defaultMetadataFields.map(field => ({ [field]: defaultTableFieldWidth }))),
   showImportScriptInfo: true,
   thumbSize: DEFAULT_THUMBSIZE,
   thumbLayout: 'masonry',
@@ -44,8 +43,7 @@ const initialState = {
   sortFolders: 'alpha-asc',
   hoverFields: new Set(),
   userSettings: {
-    tableFields: [ ...defaultTableFields ],
-    metadataFields: [ ...defaultTableFields ],
+    metadataFields: [ ...defaultMetadataFields ],
     showTable: false,
     tableHeight: 300,
     thumbSize: DEFAULT_THUMBSIZE,
@@ -74,12 +72,9 @@ export default function app (state = initialState, action) {
       const fields = action.payload
       Object.keys(fields).forEach(type => { fields[type].forEach(field => { fieldSet.add(field) }) })
       const metadataFields = state.metadataFields.filter(field => fieldSet.has(field))
-      const tableFields = state.tableFields.filter(field => fieldSet.has(field))
-      return { ...state, metadataFields, tableFields }
+      return { ...state, metadataFields }
     }
     case METADATA_FIELDS:
-      return { ...state, metadataFields: action.payload }
-    case TABLE_FIELDS:
       // set default table widths for all new fields we haven't seen or set yet
       const tableFieldWidth = {
         // Start with the default width for all fields in response.
@@ -87,11 +82,9 @@ export default function app (state = initialState, action) {
         // Override with all values we already have. Any new ones will be left at default width.
         ...state.tableFieldWidth
       }
-      return { ...state, tableFields: action.payload, tableFieldWidth }
+      return { ...state, metadataFields: action.payload, tableFieldWidth }
     case LIGHTBAR_FIELDS:
       return { ...state, lightbarFields: action.payload }
-    case SYNC_FIELDS:
-      return { ...state, syncMetadataAndTable: action.payload }
     case SHOW_IMPORT_SCRIPT_INFO:
       return { ...state, showImportScriptInfo: action.payload }
     case SET_DRAGGING:

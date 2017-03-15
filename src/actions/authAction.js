@@ -5,7 +5,7 @@ import * as api from '../globals/api.js'
 
 import {
   AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR, USER_SETTINGS,
-  AUTH_PERMISSIONS, AUTH_SYNC, METADATA_FIELDS, TABLE_FIELDS,
+  AUTH_PERMISSIONS, AUTH_SYNC, METADATA_FIELDS,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT, SET_TABLE_FIELD_WIDTH,
   SHOW_MULTIPAGE, VIDEO_VOLUME, PAGE_SIZE
 } from '../constants/actionTypes'
@@ -150,11 +150,10 @@ function authorize (dispatch, json) {
       dispatch(restoreSearch(query))
     }
     */
-    if (metadata.metadataFields) {
-      dispatch({type: METADATA_FIELDS, payload: metadata.metadataFields})
-    }
-    if (metadata.tableFields) {
-      dispatch({type: TABLE_FIELDS, payload: metadata.tableFields})
+    if (metadata.metadataFields || metadata.tableFields) {
+      const payload = metadata.metadataFields
+      if (metadata.tableFields) payload.push(...metadata.tableFields)
+      dispatch({type: METADATA_FIELDS, payload})
     }
     if (metadata.thumbSize) {
       dispatch({type: THUMB_SIZE, payload: metadata.thumbSize})

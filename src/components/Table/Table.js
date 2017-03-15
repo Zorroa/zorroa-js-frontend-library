@@ -8,20 +8,14 @@ import Asset from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
 import User from '../../models/User'
 import { unCamelCase } from '../../services/jsUtil'
-import {
-  updateMetadataFields,
-  updateTableFields,
-  showModal,
-  setTableFieldWidth,
-  iconifyRightSidebar
-} from '../../actions/appActions'
+import { setTableFieldWidth, iconifyRightSidebar } from '../../actions/appActions'
 import { createFacetWidget, fieldUsedInWidget } from '../../models/Widget'
 import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import { sortAssets, unorderAssets, isolateAssetId } from '../../actions/assetsAction'
 import { saveUserSettings } from '../../actions/authAction'
 import TableField from './TableField'
-import DisplayOptions from '../DisplayOptions'
 import Resizer from '../../services/Resizer'
+import { defaultMetadataFields } from '../../reducers/appReducer'
 
 const rowHeightPx = 30
 const tableHeaderHeight = 26
@@ -36,11 +30,11 @@ class Table extends Component {
     fields: PropTypes.arrayOf(PropTypes.string).isRequired,
     fieldWidth: PropTypes.objectOf(PropTypes.number).isRequired,
     fieldTypes: PropTypes.object,
+    hoverFields: PropTypes.instanceOf(Set),
     widgets: PropTypes.arrayOf(PropTypes.object),
     order: PropTypes.arrayOf(PropTypes.object),
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
-    metadataFields: PropTypes.arrayOf(PropTypes.string).isRequired,
     query: PropTypes.instanceOf(AssetSearch),
 
     // input props
@@ -68,34 +62,6 @@ class Table extends Component {
     this.selectionCounter = 0
     this.skipNextSelectionScroll = false
     this.resizer = null
-  }
-
-  showDisplayOptions = (event) => {
-    const width = '75%'
-    const body = <DisplayOptions title='Table Display Options'
-                                 syncLabel='Metadata'
-                                 singleSelection={false}
-                                 fieldTypes={null}
-                                 selectedFields={this.props.fields}
-                                 onUpdate={this.updateDisplayOptions}/>
-    this.props.actions.showModal({body, width})
-    event.stopPropagation()
-  }
-
-  updateDisplayOptions = (event, state) => {
-    const { metadataFields, user, actions } = this.props
-    const { syncedViews, checkedNamespaces } = state
-    // console.log('Update table display options to:\n' + JSON.stringify(state.checkedNamespaces))
-    actions.updateTableFields(checkedNamespaces)
-    if (syncedViews) {
-      actions.updateMetadataFields(checkedNamespaces)
-    }
-    const settings = {
-      ...this.props.userSettings,
-      tableFields: checkedNamespaces,
-      metadataFields: syncedViews ? checkedNamespaces : metadataFields
-    }
-    actions.saveUserSettings(user, settings)
   }
 
   tableScroll = (event) => {
@@ -187,6 +153,7 @@ class Table extends Component {
 
   recomputeRowHeights = () => {
     let { assets, fields } = this.props
+    if (!fields || !fields.length) fields = defaultMetadataFields
     let rowHeightInLines = []
     for (let i = 0; i < assets.length; i++) {
       if (this.isAssetOpen(assets[i])) {
@@ -298,15 +265,32 @@ class Table extends Component {
     event.stopPropagation()
   }
 
-  titleForField (field) {
+  renderTitle (field, fields) {
+    const types = ['point', 'bit', 'byte', 'raw']
     const names = field.split('.')
     if (!names || names.length < 2) return field
     let title = ''
+    let head, tail
     for (let i = names.length - 1; i >= 0; --i) {
+      if (i === names.length - 1 && types.findIndex(t => t === names[i]) >= 0) continue
+      if (!head) {
+        head = names[i]
+      } else if (!tail) {
+        tail = ` \u2039 ${names[i]}`
+      } else {
+        tail = tail.concat(` \u2039 ${names[i]}`)
+      }
       title = title.concat(names[i])
-      if (i > 0) title = title.concat(` \u2039 `)
+      const matchesAnotherField = fields.findIndex(f => f !== field && f.endsWith(title)) >= 0
+      if (!matchesAnotherField) break
+      if (i > 0) title = title.concat('.')
     }
-    return title
+    return (
+      <div className="Table-title">
+        <div className="Table-title-head">{unCamelCase(head)}</div>
+        { tail && <div className="Table-title-tail">&nbsp;{tail}</div> }
+      </div>
+    )
   }
 
   sortOrderClassnames (field) {
@@ -317,15 +301,18 @@ class Table extends Component {
   }
 
   headerClassnames (field) {
-    const { order } = this.props
+    const { order, hoverFields } = this.props
     const index = order && order.findIndex(order => (order.field === field))
-    return `Table-header-cell ${!order || index !== 0 ? 'unordred' : 'ordered'}`
+    const ordered = !(!order || index !== 0)
+    const hovered = hoverFields.has(field)
+    return classnames('Table-header-cell', {ordered, hovered})
   }
 
   render () {
-    const { assets, fields, fieldWidth, height, tableIsResizing, selectedAssetIds } = this.props
+    const { assets, fieldWidth, height, tableIsResizing, selectedAssetIds } = this.props
     if (!assets) return
 
+    const fields = this.props.fields && this.props.fields.length ? this.props.fields : defaultMetadataFields
     const { tableScrollTop, tableScrollHeight } = this.state
     const tableScrollBottom = tableScrollTop + tableScrollHeight
 
@@ -362,7 +349,7 @@ class Table extends Component {
                  className={this.headerClassnames(field)}
                  style={{width: `${fieldWidth[field]}px`}}>
               <div className={`Table-cell`}>
-                { this.titleForField(field) }
+                { this.renderTitle(field, fields) }
               </div>
               <i onClick={this.sortByField.bind(this, field)} className={this.sortOrderClassnames(field)}/>
               <div className='flexOn'/>
@@ -412,11 +399,6 @@ class Table extends Component {
             </div>
           </div>
         </div>
-
-        <div className="Table-settings"
-             style={{width: `${tableHeaderHeight}px`, height: `${tableHeaderHeight}px`}}>
-          <div onClick={this.showDisplayOptions} className="icon-cog"/>
-        </div>
       </div>
     )
   }
@@ -429,21 +411,18 @@ export default connect(state => ({
   selectionCounter: state.assets.selectionCounter,
   query: state.assets.query,
   order: state.assets.order,
-  fields: state.app.tableFields,
+  fields: state.app.metadataFields,
   fieldWidth: state.app.tableFieldWidth,
   fieldTypes: state.assets.types,
+  hoverFields: state.app.hoverFields,
   widgets: state.racetrack.widgets,
   user: state.auth.user,
-  userSettings: state.app.userSettings,
-  metadataFields: state.app.metadataFields
+  userSettings: state.app.userSettings
 }), dispatch => ({
   actions: bindActionCreators({
     sortAssets,
     unorderAssets,
     isolateAssetId,
-    updateMetadataFields,
-    updateTableFields,
-    showModal,
     setTableFieldWidth,
     modifyRacetrackWidget,
     iconifyRightSidebar,

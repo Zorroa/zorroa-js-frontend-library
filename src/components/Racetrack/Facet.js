@@ -180,7 +180,6 @@ class Facet extends Component {
   selectField = (event) => {
     const width = '75%'
     const body = <DisplayOptions title='Facet Fields'
-                                 syncLabel={null}
                                  singleSelection={true}
                                  fieldTypes={null}
                                  selectedFields={[]}

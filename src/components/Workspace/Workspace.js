@@ -139,7 +139,7 @@ class Workspace extends Component {
       closeIcon: 'icon-collections-simple'
     })
     const MetadataParams = () => ({
-      header: (<span>Metadata</span>),
+      header: (<span>Tags</span>),
       isOpen: app.collapsibleOpen.metadata,
       isIconified: app.leftSidebarIsIconified,
       onOpen: this.toggleCollapsible.bind(this, 'metadata'),

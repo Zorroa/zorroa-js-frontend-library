@@ -71,7 +71,6 @@ class Lightbar extends Component {
   showDisplayOptions = () => {
     const width = '75%'
     const body = <DisplayOptions title='Lightbar Display Options'
-                                 syncLabel={null}
                                  singleSelection={false}
                                  fieldTypes={null}
                                  selectedFields={this.props.lightbarFields}
