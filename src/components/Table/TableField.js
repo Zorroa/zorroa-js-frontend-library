@@ -3,7 +3,6 @@ import classnames from 'classnames'
 import Asset from '../../models/Asset'
 import FileIcon from '../FileIcon'
 import { humanFileSize } from '../../services/jsUtil'
-import { createFacetWidget } from '../../models/Widget'
 
 export default class TableField extends Component {
   static propTypes = {
