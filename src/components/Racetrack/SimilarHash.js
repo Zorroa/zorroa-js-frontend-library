@@ -12,7 +12,7 @@ import { SimilarHashWidgetInfo } from './WidgetInfo'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
 import { showModal } from '../../actions/appActions'
 import Widget from './Widget'
-import { equalSets } from '../../services/jsUtil'
+import { equalSets, makePromiseQueue } from '../../services/jsUtil'
 
 class SimilarHash extends Component {
   static propTypes = {
@@ -96,6 +96,10 @@ class SimilarHash extends Component {
       requestAnimationFrame(() => this.selectHashType(hashType, {}))
     }
 
+    if (newSelectedAssetIds && newSelectedAssetIds.size && selectionChanged) {
+      this.updateCounts(newSelectedAssetIds)
+    }
+
     this.setState({ selectedAssetIds: newSelectedAssetIds })
     this.syncWithAppState(nextProps)
   }
@@ -133,7 +137,7 @@ class SimilarHash extends Component {
   }
 
   modifySliver = () => {
-    const { hashType, hashVal, hashLengths, hashBitwise, minScorePct, selectedAsset } = this.state
+    const { hashType, hashVal, hashLengths, hashBitwise, minScorePct } = this.state
     const { isEnabled, bitwise, schema } = this.state
     const type = SimilarHashWidgetInfo.type
 
@@ -153,32 +157,48 @@ class SimilarHash extends Component {
     }
     const widget = new WidgetModel({id: this.props.id, isEnabled, type, sliver})
     this.props.actions.modifyRacetrackWidget(widget)
+  }
 
-    if (selectedAsset) {
-      const assetHashes = selectedAsset.document[schema]
-      let aggProms = []
+  updateCounts = (selectedAssetIds) => {
+    if (!selectedAssetIds || selectedAssetIds.size === 0) {
+      // Deselect: clear counts
+      return this.setStatePromise({ aggs: {} })
+    }
 
-      const queryAggs = {}
-      const dummyDispatch = () => {}
-      this.state.hashTypes.forEach(h => {
-        const t = hashBitwise[h] ? 'bit' : 'byte'
-        const hashVal = isTestSchema ? (assetHashes[h] ? [ assetHashes[h][t] ] : '') : [ assetHashes[h] ]
-        const bitwise = isTestSchema ? hashBitwise[h] : this.state.bitwise
-        queryAggs[h] = {
-          [`similarHash-${h}`]: {
-            filter: {
-              bool: {
-                must: {
+    const { isEnabled, schema } = this.state
+    if (!isEnabled) return
+
+    const firstSelectedAssetId = selectedAssetIds.values().next().value
+    const { assets } = this.props
+    const selectedAsset = assets.find(asset => { return firstSelectedAssetId === asset.id })
+    if (!selectedAsset) return
+    const isTestSchema = (schema === 'Similarity')
+    const assetHashes = selectedAsset.document[schema]
+
+    let aggData = []
+    const queryAggs = {}
+    const dummyDispatch = () => {}
+    const { minScorePct } = this.state
+    const hashTypes = Object.keys(assetHashes)
+    hashTypes.forEach(h => {
+      const testSchemaBitwise = ('bit' in assetHashes[h])
+      const t = testSchemaBitwise ? 'bit' : 'byte'
+      const hashVal = isTestSchema ? (assetHashes[h] ? assetHashes[h][t] : '') : assetHashes[h]
+      const bitwise = isTestSchema ? testSchemaBitwise : this.state.bitwise
+      queryAggs[h] = {
+        [`similarHash-${h}`]: {
+          filter: {
+            bool: {
+              must: {
+                script: {
                   script: {
-                    script: {
-                      inline: 'hammingDistance',
-                      lang: 'native',
-                      params: {
-                        field: isTestSchema ? `${schema}.${h}.${t}.raw` : `${schema}.${h}.raw`,
-                        hashes: hashVal,
-                        minScore: Math.round((minScorePct / 100) * hashLengths[h]) * (bitwise ? 4 : 1),
-                        bitwise
-                      }
+                    inline: 'hammingDistance',
+                    lang: 'native',
+                    params: {
+                      field: isTestSchema ? `${schema}.${h}.${t}.raw` : `${schema}.${h}.raw`,
+                      hashes: [ hashVal ],
+                      minScore: Math.round((minScorePct / 100) * hashVal.length) * (bitwise ? 4 : 1),
+                      bitwise
                     }
                   }
                 }
@@ -186,23 +206,25 @@ class SimilarHash extends Component {
             }
           }
         }
-        aggProms.push(
-          searchAssetsRequestProm(dummyDispatch, new AssetSearch({ aggs: queryAggs[h], size: 1 }))
-          .catch(error => error)
-        )
-      })
-      Promise.all(aggProms)
-      .then(responses => {
-        let resultAggs = {}
-        responses.forEach((response, i, a) => {
-          if (!response || !response.data || !response.data.aggregations) return
-          // console.log('agg response', JSON.stringify(response))
-          const hashType = this.state.hashTypes[i]
-          resultAggs[hashType] = Object.values(response.data.aggregations)[0]
-        })
-        return this.setStateProm({ aggs: resultAggs })
-      })
+      }
+      aggData.push({ aggs: queryAggs[h], size: 1 })
+    })
+
+    const mkProm = (aggDatum) => {
+      return searchAssetsRequestProm(dummyDispatch, new AssetSearch(aggDatum))
+      .catch(error => error)
     }
+
+    return makePromiseQueue(aggData, mkProm, -1 /* optQueueSize: use a positive number to rate-limit requests */)
+    .then(responses => {
+      let resultAggs = {}
+      responses.forEach((response, i, a) => {
+        if (!response || !response.data || !response.data.aggregations) return
+        const hashType = hashTypes[i]
+        resultAggs[hashType] = Object.values(response.data.aggregations)[0]
+      })
+      return this.setStatePromise({ aggs: resultAggs })
+    })
   }
 
   removeFilter = () => {
@@ -334,6 +356,7 @@ class SimilarHash extends Component {
   updateMinScore = (event) => {
     const minScorePct = Math.round(parseInt(event.target.value, 10))
     this.setStatePromise({ minScorePct })
+    .then(() => this.updateCounts(this.props.selectedAssetIds))
     .then(this.modifySliver)
   }
 
