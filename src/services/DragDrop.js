@@ -71,6 +71,8 @@ export function DragSource (type, {dragStart, dragEnd}) {
         const {hocActions} = props
         const dragParams = {
           onDragStart: (event) => {
+            // Required to be called by firefox
+            event.dataTransfer.setData('text/plain', 'anything')
             // Get the dragging object to add to app.state.dragInfo
             const data = dragStart(props, type, event)
             // Magic! Delay state update one frame to workaround Chrome
