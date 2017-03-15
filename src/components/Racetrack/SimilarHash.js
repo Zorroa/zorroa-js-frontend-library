@@ -51,6 +51,10 @@ class SimilarHash extends Component {
     this.props.actions.getAssetFields()
   }
 
+  setStatePromise = (newState) => {
+    return new Promise(resolve => this.setState(newState, resolve))
+  }
+
   // recompute state.hashTypes based on give props & schema
   // return promise that resolves after setState is complete
   updateHashTypes = (props, schema) => {
@@ -70,7 +74,7 @@ class SimilarHash extends Component {
       }
     }
     hashTypes.sort()
-    return new Promise(resolve => this.setState({ hashTypes, hashBitwise }, resolve))
+    return this.setStatePromise({ hashTypes, hashBitwise })
   }
 
   componentWillReceiveProps = (nextProps) => {
@@ -104,7 +108,7 @@ class SimilarHash extends Component {
   }
 
   toggleEnabled = () => {
-    new Promise(resolve => this.setState({isEnabled: !this.state.isEnabled}, resolve))
+    this.setStatePromise({isEnabled: !this.state.isEnabled})
     .then(this.modifySliver)
   }
 
@@ -190,12 +194,12 @@ class SimilarHash extends Component {
     }
 
     new Promise(resolve => requestAnimationFrame(resolve))
-    .then(() => new Promise(resolve => this.setState({ hashType, hashVal, hashLengths, bitwise, selectedAsset }, resolve)))
+    .then(() => this.setStatePromise({ hashType, hashVal, hashLengths, bitwise, selectedAsset }))
     .then(this.modifySliver)
   }
 
   deselectHash = (event) => {
-    new Promise(resolve => this.setState({ hashVal: '', selectedAsset: null }, resolve))
+    this.setStatePromise({ hashVal: '', selectedAsset: null })
     .then(this.modifySliver)
   }
 
@@ -285,13 +289,13 @@ class SimilarHash extends Component {
 
   updateMinScore = (event) => {
     const minScorePct = Math.round(parseInt(event.target.value, 10))
-    new Promise(resolve => this.setState({ minScorePct }, resolve))
+    this.setStatePromise({ minScorePct })
     .then(this.modifySliver)
   }
 
   updateBitwise = (event) => {
     const { bitwise } = this.state
-    return new Promise(resolve => this.setState({ bitwise: !bitwise }, resolve))
+    return this.setStatePromise({ bitwise: !bitwise })
     .then(this.modifySliver)
   }
 
@@ -302,9 +306,9 @@ class SimilarHash extends Component {
     if (schema === 'ImageHash') schema = 'Similarity'
     else schema = 'ImageHash'
 
-    new Promise(resolve => this.setState({ hashType: '', hashVal: '', selectedAsset: null }, resolve))
+    this.setStatePromise({ hashType: '', hashVal: '', selectedAsset: null })
     .then(() => this.updateHashTypes(this.props, schema))
-    .then(() => new Promise(resolve => this.setState({ schema }, resolve)))
+    .then(() => this.setStatePromise({ schema }))
     .then(this.modifySliver)
   }
 
