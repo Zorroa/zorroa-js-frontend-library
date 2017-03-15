@@ -410,8 +410,8 @@ class Facet extends Component {
               <table>
                 <thead>
                   <tr>
-                    <td style={{width:'80%'}}/>
-                    <td style={{width:'20%'}}/>
+                    <td style={{width: '80%'}}/>
+                    <td style={{width: '20%'}}/>
                   </tr>
                 </thead>
                 <tbody>
