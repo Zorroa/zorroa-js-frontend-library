@@ -105,6 +105,6 @@ export default class TableField extends Component {
       style.width = `${width}px`
     }
 
-    return (<div className='Table-cell' key={field} style={style}>{renderValFn(val, asset)}</div>)
+    return (<div className='Table-cell' style={style}>{renderValFn(val, asset)}</div>)
   }
 }

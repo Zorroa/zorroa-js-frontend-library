@@ -61,8 +61,8 @@ class SimpleSearch extends Component {
   }
 
   toggleEnabled = () => {
-    this.setState({isEnabled: !this.state.isEnabled},
-      () => { this.modifySliver(this.state.queryString, this.state.fuzzy, this.state.field) })
+    new Promise(resolve => this.setState({isEnabled: !this.state.isEnabled}))
+    .then(() => this.modifySliver(this.state.queryString, this.state.fuzzy, this.state.field))
   }
 
   modifySliver (queryString, fuzzy, field) {

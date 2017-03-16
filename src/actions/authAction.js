@@ -151,8 +151,10 @@ function authorize (dispatch, json) {
     }
     */
     if (metadata.metadataFields || metadata.tableFields) {
-      const payload = metadata.metadataFields
-      if (metadata.tableFields) payload.push(...metadata.tableFields)
+      const fields = new Set()
+      if (metadata.metadataFields) metadata.metadataFields.forEach(f => fields.add(f))
+      if (metadata.tableFields) metadata.tableFields.forEach(f => fields.add(f))
+      const payload = [...fields]
       dispatch({type: METADATA_FIELDS, payload})
     }
     if (metadata.thumbSize) {

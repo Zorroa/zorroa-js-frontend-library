@@ -30,7 +30,6 @@ class Table extends Component {
     fields: PropTypes.arrayOf(PropTypes.string).isRequired,
     fieldWidth: PropTypes.objectOf(PropTypes.number).isRequired,
     fieldTypes: PropTypes.object,
-    hoverFields: PropTypes.instanceOf(Set),
     widgets: PropTypes.arrayOf(PropTypes.object),
     order: PropTypes.arrayOf(PropTypes.object),
     user: PropTypes.instanceOf(User),
@@ -301,11 +300,10 @@ class Table extends Component {
   }
 
   headerClassnames (field) {
-    const { order, hoverFields } = this.props
+    const { order } = this.props
     const index = order && order.findIndex(order => (order.field === field))
     const ordered = !(!order || index !== 0)
-    const hovered = hoverFields.has(field)
-    return classnames('Table-header-cell', {ordered, hovered})
+    return classnames('Table-header-cell', {ordered})
   }
 
   render () {
@@ -414,7 +412,6 @@ export default connect(state => ({
   fields: state.app.metadataFields,
   fieldWidth: state.app.tableFieldWidth,
   fieldTypes: state.assets.types,
-  hoverFields: state.app.hoverFields,
   widgets: state.racetrack.widgets,
   user: state.auth.user,
   userSettings: state.app.userSettings

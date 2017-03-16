@@ -88,8 +88,8 @@ class Facet extends Component {
   }
 
   toggleEnabled = () => {
-    this.setState({isEnabled: !this.state.isEnabled},
-      () => { this.modifySliver(this.state.field, this.state.terms, this.state.order) })
+    new Promise(resolve => this.setState({isEnabled: !this.state.isEnabled}, resolve))
+    .then(() => this.modifySliver(this.state.field, this.state.terms, this.state.order))
   }
 
   modifySliver = (field, terms, order) => {
