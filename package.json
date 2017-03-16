@@ -1,6 +1,6 @@
 {
   "name": "zorroa-js-curator",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "this is a front end template using react, redux, and webpack built by jordan with love",
   "scripts": {
     "post-install": "rm -rf bin; npm run build",
