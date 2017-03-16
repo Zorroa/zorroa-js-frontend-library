@@ -9,6 +9,7 @@ const EDITING = 1
 const SENDING = 2
 const SENT = 3
 const SENDERROR = 4
+const OUT_OF_ORDER = 5
 
 const SUPPORT_ADDRESS = 'support@zorroa.com'
 
@@ -20,7 +21,15 @@ class Feedback extends Component {
 
   state = {
     text: '',
-    sendState: EDITING
+    sendState: window.emailjs ? EDITING : OUT_OF_ORDER
+  }
+
+  _isMounted = false
+  componentDidMount () {
+    this._isMounted = true
+  }
+  componentWillUnmount () {
+    this._isMounted = false
   }
 
   dismiss = (event) => {
@@ -52,6 +61,11 @@ class Feedback extends Component {
 
     console.log(emailBlob)
 
+    if (!window.emailjs) {
+      this.setState({ sendState: OUT_OF_ORDER })
+      return
+    }
+
     this.setState({ sendState: SENDING })
 
     // emailjs delivers email via REST request through the account zorroafeedback@gmail.com
@@ -66,15 +80,15 @@ class Feedback extends Component {
     // The email template is setup manually inside the emailjs.com account
     // emailjs.send parameters: service_id, template_id, template_parameters
     //
-    emailjs.send('default_service', 'template_4EvEfQML', emailBlob)
+    window.emailjs.send('default_service', 'template_4EvEfQML', emailBlob)
     .then(
       (response) => {
         // console.log("SUCCESS. status=%d, text=%s", response.status, response.text)
-        this.setState({ sendState: SENT })
+        if (this._isMounted) this.setState({ sendState: SENT })
       },
       (reason) => {
         // console.log("FAILED. error=", reason)
-        this.setState({ sendState: SENDERROR })
+        if (this._isMounted) this.setState({ sendState: SENDERROR })
       }
     )
   }
@@ -112,6 +126,15 @@ class Feedback extends Component {
             <span>
               Sorry, something went wrong emailing support.
               Please try again later or
+              email <a href={`mailto:${SUPPORT_ADDRESS}?Subject=Zorroa%20support%20request`} target="_top">{SUPPORT_ADDRESS}</a> directly.
+            </span>
+          </div>
+        )}
+        { (sendState === OUT_OF_ORDER) && (
+          <div className="Feedback-body">
+            <span>
+              Sorry, this feature is unavailable at this time.<br/>
+              Please check your network connectivity and try again later, or
               email <a href={`mailto:${SUPPORT_ADDRESS}?Subject=Zorroa%20support%20request`} target="_top">{SUPPORT_ADDRESS}</a> directly.
             </span>
           </div>
