@@ -61,7 +61,7 @@ class Range extends Component {
     syncRangeWithAutoRange: false
   }
 
-  setStateProm = (newState) => {
+  setStatePromise = (newState) => {
     return new Promise(resolve => this.setState(newState, resolve))
   }
 
@@ -107,7 +107,7 @@ class Range extends Component {
 
         const minStr = this.valToString(min)
         const maxStr = this.valToString(max)
-        this.setStateProm({ field, min, max, minStr, maxStr })
+        this.setStatePromise({ field, min, max, minStr, maxStr })
         .then(() => { if (reQuery) this.modifySliver() })
       }
     } else {
@@ -136,7 +136,7 @@ class Range extends Component {
   }
 
   toggleEnabled = () => {
-    this.setStateProm({isEnabled: !this.state.isEnabled})
+    this.setStatePromise({isEnabled: !this.state.isEnabled})
     .then(this.modifySliver)
   }
 
@@ -174,7 +174,7 @@ class Range extends Component {
     let { usePrefix } = this.state
     if (field && field.length) {
       if (field === 'source.fileSize') usePrefix = 'bin'
-      this.setStateProm({ field, syncRangeWithAutoRange: true, usePrefix })
+      this.setStatePromise({ field, syncRangeWithAutoRange: true, usePrefix })
       .then(this.modifySliver)
     }
   }
@@ -270,7 +270,7 @@ class Range extends Component {
   resetAutoRange = (event) => {
     const { field } = this.state
     window.getSelection().removeAllRanges()
-    this.setState({
+    this.setStatePromise({
       field,
       min: null,
       max: null,

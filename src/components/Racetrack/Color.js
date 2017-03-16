@@ -34,6 +34,10 @@ class Color extends Component {
     isServerHSL: true // see toggleServerHSL
   }
 
+  setStatePromise = (newState) => {
+    return new Promise(resolve => this.setState(newState, resolve))
+  }
+
   // sync local state with existing app state
   syncLocalColorWithAppState (nextProps) {
     if (!this.state.isEnabled) return
@@ -135,7 +139,7 @@ class Color extends Component {
 
     const oldN = colors.length
     if (oldN === 1) {
-      new Promise(resolve => this.setState({ colors: [] }, resolve))
+      this.setStatePromise({ colors: [] })
       .then(() => this.modifySliver([]))
       return
     }
@@ -234,7 +238,7 @@ class Color extends Component {
   }
 
   toggleEnabled = () => {
-    new Promise(resolve => this.setState({isEnabled: !this.state.isEnabled}, resolve))
+    this.setStatePromise({isEnabled: !this.state.isEnabled})
     .then(() => this.modifySliver(this.state.colors))
   }
 
