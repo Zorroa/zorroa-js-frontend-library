@@ -47,6 +47,7 @@ class Workspace extends Component {
   componentWillMount () {
     const { actions, user } = this.props
     actions.getUserPermissions(user)
+    this.loadEmailJs()
   }
 
   componentDidMount () {
@@ -66,6 +67,34 @@ class Workspace extends Component {
       // should this make noise? not sure
       console.log('error requesting curator version', error)
     })
+  }
+
+  loadEmailJs = () => {
+    // Use of globals here to make this a singleton:
+    // - avoid re-running this code even on Workspace unmount/remount
+    // - make this function dependency-free; no actions or app state
+    if (window.zorroaEmailJSLoadAttempted) return
+    window.zorroaEmailJSLoadAttempted = true
+
+    // http://stackoverflow.com/a/7719185/1424242
+    var loadScript = (src) => {
+      return new Promise(function (resolve, reject) {
+        var s
+        s = document.createElement('script')
+        s.src = src
+        s.onload = resolve
+        s.onerror = reject
+        document.head.appendChild(s)
+      })
+    }
+
+    // wait for above-the-fold loads to finish
+    new Promise(resolve => setTimeout(resolve, 1000))
+    .then(() => loadScript('https://cdn.emailjs.com/dist/email.min.js'))
+    // emailjs needs a moment to init before window.emailjs will be defined
+    .then(() => new Promise(resolve => setTimeout(resolve, 1000)))
+    .then(() => window.emailjs.init('user_WBcDrP5QF9DWgdWTE6DvB'))
+    .catch(err => console.error('Zorroa email js', err))
   }
 
   componentWillUnmount () {
