@@ -38,9 +38,7 @@ export function multipageBadges (asset, protocol, host, stackCount) {
   const pageCount = asset.pageCount() || stackCount
   const startPage = asset.startPage()
   const stopPage = asset.stopPage()
-  if (asset.mediaType().includes('video')) {
-    pageBadge = <Duration duration={asset.duration()}/>
-  } else if (pageCount > 1) {
+  if (pageCount > 1) {
     if (stackCount > 0 && stackCount !== pageCount) {
       pageBadge = <div className="Thumb-page-label">{stackCount} of {pageCount}</div>
     } else if (stackCount === pageCount) {
@@ -50,6 +48,8 @@ export function multipageBadges (asset, protocol, host, stackCount) {
     } else if (startPage && stopPage) {
       pageBadge = <div className="Thumb-page-label">{startPage} - {stopPage}</div>
     }
+  } else if (asset.mediaType().includes('video')) {
+    pageBadge = <Duration duration={asset.duration()}/>
   }
 
   // Show the icon & inset if we have any page badging
@@ -178,6 +178,7 @@ class Thumb extends Component {
             <div key={`${url}-${index}`}
                  className={classnames('Thumb-stack', `Thumb-stack-${index}`)}>
               <ImageThumb url={url} backgroundColor={backgroundColor}/>
+              { this.renderBadges() }
             </div>
           )
         })}
@@ -185,7 +186,6 @@ class Thumb extends Component {
           <ImageThumb url={parentURL}/>
         </div>
         { this.renderOverlays() }
-        { this.renderBadges() }
       </div>
     )
   }

@@ -11,6 +11,7 @@ export default class TableField extends Component {
     field: PropTypes.string.isRequired,
     isOpen: PropTypes.bool,
     onOpen: PropTypes.func,
+    onTag: PropTypes.func,
     width: PropTypes.number
   }
 
@@ -44,7 +45,7 @@ export default class TableField extends Component {
   }
 
   renderStringArray = (vals) => {
-    const { isOpen, onOpen } = this.props
+    const { isOpen, onOpen, onTag, field } = this.props
     return (
       <div className={classnames('TableField-array', {isOpen})}>
         { onOpen &&
@@ -54,7 +55,7 @@ export default class TableField extends Component {
           </div>
         }
         { vals.map((val, i) => (
-          <div className='TableField-tag' key={i}>{val}</div>
+          <div onClick={e => onTag(val, field, e)} className='TableField-tag' key={i}>{val}</div>
         ))}
       </div>
     )
@@ -104,6 +105,6 @@ export default class TableField extends Component {
       style.width = `${width}px`
     }
 
-    return (<div className='Table-cell' key={field} style={style}>{renderValFn(val, asset)}</div>)
+    return (<div className='Table-cell' style={style}>{renderValFn(val, asset)}</div>)
   }
 }

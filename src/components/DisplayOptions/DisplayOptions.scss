@@ -55,19 +55,6 @@
       text-overflow: ellipsis;
     }
 
-    .DisplayOptions-sync {
-      @include flexShrinkOnly;
-      @include noSelect;
-      @include clampText;
-
-      color: white;
-      margin-left: 6px;
-
-      &:hover {
-        color: $zorroa-sickly-green;
-      }
-    }
-
     .DisplayOptions-close {
       @include zorroa-square-btn-lighten(40px);
     }

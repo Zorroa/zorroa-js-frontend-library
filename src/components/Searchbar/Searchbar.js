@@ -54,7 +54,8 @@ class Searchbar extends Component {
   render () {
     const { query, suggestions } = this.props
     const { queryString } = this.state
-    const value = query && query.query && query.query !== queryString ? query.query : undefined
+    const value = query && query.query && query.query !== queryString ? query.query
+      : (query && query.query === undefined && queryString ? '' : undefined)
     return (
       <div className="Searchbar">
         <div className="Searchbar-body flexCenter">

@@ -93,7 +93,6 @@ class DateRange extends Component {
   selectField = (event) => {
     const width = '75%'
     const body = <DisplayOptions title='Search Field'
-                                 syncLabel={null}
                                  singleSelection={true}
                                  fieldTypes={['date']}
                                  selectedFields={[]}

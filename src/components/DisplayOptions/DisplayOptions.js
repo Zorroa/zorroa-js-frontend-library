@@ -3,9 +3,8 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
-import Toggle from '../Toggle'
 import { getAssetFields } from '../../actions/assetsAction'
-import { hideModal, syncMetadataAndTableFields } from '../../actions/appActions'
+import { hideModal } from '../../actions/appActions'
 import { unCamelCase } from '../../services/jsUtil'
 
 class DisplayOptions extends Component {
@@ -15,39 +14,24 @@ class DisplayOptions extends Component {
     onUpdate: PropTypes.func.isRequired,
     singleSelection: PropTypes.bool,                  // true forces radio mode
     title: PropTypes.string.isRequired,               // E.g. 'Metadata Display Options'
-    syncLabel: PropTypes.string,                      // Opposite of title, e.g. 'Table'
     fieldTypes: PropTypes.arrayOf(PropTypes.string),  // Optional list of types, e.g. ['point']
     fields: PropTypes.object,                         // state.assets.fields
-    syncMetadataAndTable: PropTypes.bool,             // state.app.syncMetadataAndTable
     actions: PropTypes.object
   }
 
-  constructor (props) {
-    super(props)
-    this.state = {
-      openedNamespace: '',                            // E.g. Foo.bar
-      checkedNamespaces: this.props.selectedFields,   // Array of field names
-      syncedViews: this.props.syncMetadataAndTable,   // Checkbox state
-      fieldFilter: ''                                 // Filter input state
-    }
+  state = {
+    openedNamespace: '',                            // E.g. Foo.bar
+    checkedNamespaces: this.props.selectedFields,   // Array of field names
+    fieldFilter: ''                                 // Filter input state
   }
 
   componentWillMount () {
     this.props.actions.getAssetFields()
   }
 
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.syncMetadataAndTable) {
-      this.setState({ syncedViews: nextProps.syncMetadataAndTable })
-    }
-  }
-
   // Update clicked, invoked callbacks to apply state and dismiss
   update (event) {
     this.props.onUpdate(event, this.state)
-    if (this.state.syncedViews !== this.props.syncMetadataAndTable) {
-      this.props.actions.syncMetadataAndTableFields(this.state.syncedViews)
-    }
     this.cancel(event)
   }
 
@@ -104,15 +88,6 @@ class DisplayOptions extends Component {
     this.setState({ checkedNamespaces })
   }
 
-  // Update the state of the syncView toggle
-  syncViews = (event) => {
-    this.setState({ syncedViews: event.target.checked })
-  }
-
-  toggleSync = (event) => {
-    this.setState({ syncedViews: !this.state.syncedViews })
-  }
-
   // Return the field names for the specified namespace
   namesForNamespace (namespace) {
     let names = new Set()
@@ -133,7 +108,9 @@ class DisplayOptions extends Component {
         }
       }
     })
-    return [ ...names ]
+    return [ ...names ].sort((a, b) => {
+      return a.toLowerCase().localeCompare(b.toLowerCase())
+    })
   }
 
   // Fields only change during an active server import.
@@ -226,7 +203,7 @@ class DisplayOptions extends Component {
 
   render () {
     const { openedNamespace, fieldFilter } = this.state
-    const { title, syncLabel, singleSelection, fieldTypes } = this.props
+    const { title, singleSelection, fieldTypes } = this.props
     const names = this.namesForNamespace()
     const childCounts = this.allChildCounts()
     const disabled = (singleSelection && this.state.checkedNamespaces.length !== 1) || (!names || names.length === 0)
@@ -238,10 +215,6 @@ class DisplayOptions extends Component {
             <div className="DisplayOptions-settings icon-cog"/>
             <div className="DisplayOptions-title">{title}</div>
             <div className="flexOn"/>
-            { syncLabel && <Toggle checked={this.state.syncedViews} onChange={this.syncViews} backgroundColor='black' /> }
-            { syncLabel && (
-              <div className="DisplayOptions-sync" onClick={this.toggleSync}>Sync with {syncLabel} View</div>
-            )}
             <div className="DisplayOptions-close icon-cross2" onClick={this.cancel.bind(this)}/>
           </div>
           <div className="DisplayOptions-subheader flexRow flexAlignItemsEnd">
@@ -287,11 +260,10 @@ class DisplayOptions extends Component {
 }
 
 export default connect(state => ({
-  fields: state.assets.fields,
-  syncMetadataAndTable: state.app.syncMetadataAndTable
+  fields: state.assets.fields
 }), dispatch => ({
   actions: bindActionCreators({
     getAssetFields,
-    hideModal,
-    syncMetadataAndTableFields }, dispatch)
+    hideModal
+  }, dispatch)
 }))(DisplayOptions)

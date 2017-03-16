@@ -92,7 +92,6 @@ class SimpleSearch extends Component {
   selectField = (event) => {
     const width = '75%'
     const body = <DisplayOptions title='Search Field'
-                                 syncLabel={null}
                                  singleSelection={true}
                                  fieldTypes={null}
                                  selectedFields={[]}

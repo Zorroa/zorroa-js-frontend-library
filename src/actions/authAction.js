@@ -5,8 +5,8 @@ import * as api from '../globals/api.js'
 
 import {
   AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR, USER_SETTINGS,
-  AUTH_PERMISSIONS, AUTH_SYNC, METADATA_FIELDS, TABLE_FIELDS,
-  THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
+  AUTH_PERMISSIONS, AUTH_SYNC, METADATA_FIELDS,
+  THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT, SET_TABLE_FIELD_WIDTH,
   SHOW_MULTIPAGE, VIDEO_VOLUME, PAGE_SIZE
 } from '../constants/actionTypes'
 import { USER_ITEM, HOST_ITEM, PROTOCOL_ITEM } from '../constants/localStorageItems'
@@ -49,7 +49,7 @@ export function createArchivist (dispatch, protocol, host) {
 
 function startRequest (dispatch) {
   if (requestReceivedCounter === requestSentCounter) {
-    dispatch({ type: AUTH_SYNC, payload: false })
+    requestAnimationFrame(_ => dispatch({ type: AUTH_SYNC, payload: false }))
   }
   requestSentCounter++
 }
@@ -59,13 +59,13 @@ function finishRequest (dispatch, requestProm) {
   .then(response => {
     requestReceivedCounter++
     if (requestReceivedCounter === requestSentCounter) {
-      dispatch({ type: AUTH_SYNC, payload: true })
+      requestAnimationFrame(_ => dispatch({ type: AUTH_SYNC, payload: true }))
     }
     return response
   }, error => {
     requestReceivedCounter++
     if (requestReceivedCounter === requestSentCounter) {
-      dispatch({ type: AUTH_SYNC, payload: true })
+      requestAnimationFrame(_ => dispatch({ type: AUTH_SYNC, payload: true }))
     }
     return Promise.reject(error)
   })
@@ -150,11 +150,12 @@ function authorize (dispatch, json) {
       dispatch(restoreSearch(query))
     }
     */
-    if (metadata.metadataFields) {
-      dispatch({type: METADATA_FIELDS, payload: metadata.metadataFields})
-    }
-    if (metadata.tableFields) {
-      dispatch({type: TABLE_FIELDS, payload: metadata.tableFields})
+    if (metadata.metadataFields || metadata.tableFields) {
+      const fields = new Set()
+      if (metadata.metadataFields) metadata.metadataFields.forEach(f => fields.add(f))
+      if (metadata.tableFields) metadata.tableFields.forEach(f => fields.add(f))
+      const payload = [...fields]
+      dispatch({type: METADATA_FIELDS, payload})
     }
     if (metadata.thumbSize) {
       dispatch({type: THUMB_SIZE, payload: metadata.thumbSize})
@@ -176,6 +177,9 @@ function authorize (dispatch, json) {
     }
     if (metadata.pageSize) {
       dispatch({type: PAGE_SIZE, payload: metadata.pageSize})
+    }
+    if (metadata.tableFieldWidths) {
+      dispatch({type: SET_TABLE_FIELD_WIDTH, payload: metadata.tableFieldWidths})
     }
   }
   browserHistory.push('/')

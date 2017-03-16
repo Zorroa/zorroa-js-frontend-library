@@ -37,17 +37,6 @@
       padding-left: 8px;
       padding-right: 24px;
     }
-
-    .Metadata-settings {
-      @include zorroa-square-btn-darken(36px);
-      color: $zorroa-gray;
-      &:hover {
-        color: #000;
-      }
-      .icon-cog {
-        color: $zorroa-darkwhite;
-      }
-    }
   }
 
   .body {
@@ -83,55 +72,70 @@
     @include flexRow;
   }
 
-  .Metadata-item-search {
-    @include zorroa-square-btn-darken(20px);
-    color: $zorroa-lightgray;
-    margin: 4px;
-    font-size: 10px;
-
-    &.selected {
-      color: $zorroa-sickly-green;
-    }
-  }
-
-  .Metadata-item-hide {
-    @include flexRowCenter;
-  }
-
-  .Metadata-item-hide {
-    @include flexOff;
-    @include flexRowCenter;
-    width: 20px;
-    height: 20px;
-    border-radius: 2px;
-    font-size: 10px;
-    margin-left: 5px;
-    margin-right: 5px;
-    font-size: 10px;
-    color: transparent;
-    background-color: transparent;
-
-    &:not(.disabled):hover {
-      font-size: 12px;
-      background-color: $zorroa-lightgray;
-      color: $zorroa-greyish-brown;
-    }
-
-    &.disabled {
-      color: $zorroa-lightgray;
-    }
-
-    &:hover {
-      color: $zorroa-gray;
-    }
-  }
-
-  &:nth-child(even) {
+  &:nth-child(odd) {
     background-color: #f1f1f1;
   }
 
   &.isSelected { background-color: $zorroa-selected; }
   &:hover { background-color: $zorroa-hover; }
+}
+
+.Metadata-item-search {
+  @include flexOff;
+  @include flexRowCenter;
+  margin: 4px;
+  font-size: 10px;
+  color: transparent;
+  width: 20px;
+  height: 20px;
+  border-radius: 2px;
+  font-weight: 700;
+
+  .Metadata-item.isLeaf & {
+    color: $zorroa-lightgray;
+  }
+
+  .Metadata-item.isLeaf:hover & {
+    background-color: $zorroa-lightgray;
+    color: white;
+  }
+
+  &.isSelected {
+    color: $zorroa-sickly-green !important;
+  }
+}
+
+.Metadata-item-favorite {
+  @include flexOff;
+  @include flexRowCenter;
+  width: 20px;
+  height: 20px;
+  border-radius: 2px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-left: 5px;
+  margin-right: 5px;
+  color: transparent;
+  background-color: transparent;
+  cursor: pointer;
+
+  &.isSelected {
+    color: $zorroa-gray;
+  }
+
+  &:hover {
+    font-size: 12px;
+    background-color: $zorroa-lightgray;
+    color: $zorroa-greyish-brown;
+  }
+
+  &.disabled {
+    color: $zorroa-lightgray;
+  }
+
+  &:not(.disabled):hover {
+    color: $zorroa-gray;
+  }
 }
 
 $FolderItemHeight : 25px;
@@ -156,5 +160,96 @@ $FolderItemHeight : 25px;
   transform: rotate(-90deg);
   &.isOpen {
     transform: none;
+  }
+}
+
+.Metadata-view {
+  @include flexRow;
+  @include flexJustifySpaceBetween;
+  @include flexAlignItemsCenter;
+  margin-bottom: 8px;
+  height: 20px;
+}
+
+.Metadata-favorites {
+  @include flexRowCenter;
+  margin-left: 4px;
+}
+
+.Metadata-favorites-favorites {
+  @include flexRowCenter;
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+  color: $zorroa-gray;
+  background-color: $zorroa-nearwhite;
+  padding: 4px;
+  cursor: pointer;
+  height: 20px;
+
+  .Metadata-favorites.isSelected & {
+    color: white;
+    background-color: $zorroa-gray;
+  }
+
+  &:hover {
+    color: white;
+    background-color: $zorroa-lightgray;
+  }
+}
+
+.Metadata-favorites-label {
+  font-size: 10px;
+  margin-left: 4px;
+  text-transform: uppercase;
+  @include noSelect;
+  cursor: pointer;
+}
+
+.Metadata-favorites-icon {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.Metadata-favorites-all {
+  @include flexRowCenter;
+  @include noSelect;
+  cursor: pointer;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+  padding: 4px;
+  font-size: 10px;
+  text-transform: uppercase;
+  height: 20px;
+
+  color: white;
+  background-color: $zorroa-gray;
+
+  .Metadata-favorites.isSelected & {
+    color: $zorroa-gray;
+    background-color: $zorroa-nearwhite;
+  }
+
+  .Metadata-favorites.isSelected:hover & {
+    color: white;
+    background-color: $zorroa-lightgray;
+  }
+}
+
+.Metadata-selected {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  color: $zorroa-lightgray;
+  font-size: 12px;
+  margin-right: 8px;
+}
+
+.Metadata-deselect-all {
+  font-size: 10px;
+  margin-left: 2px;
+  border-radius: 3px;
+  @include zorroa-square-btn(20px);
+  &:hover {
+    background-color: $zorroa-nearwhite;
+    color: $zorroa-sickly-green;
   }
 }

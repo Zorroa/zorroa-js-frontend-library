@@ -101,7 +101,6 @@ class Map extends Component {
   selectLocation = (event) => {
     const width = '75%'
     const body = <DisplayOptions title='Map Location Field'
-                                 syncLabel={null}
                                  singleSelection={true}
                                  fieldTypes={['point']}
                                  selectedFields={[this.state.locationField]}
@@ -113,7 +112,6 @@ class Map extends Component {
   selectSearch = (event) => {
     const width = '75%'
     const body = <DisplayOptions title='Map Search Field'
-                                 syncLabel={null}
                                  singleSelection={true}
                                  fieldTypes={null}
                                  selectedFields={[this.state.searchField]}

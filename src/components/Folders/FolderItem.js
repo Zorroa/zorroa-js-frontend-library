@@ -77,7 +77,7 @@ class FolderItem extends Component {
     filteredCounts: PropTypes.instanceOf(Map),
     user: PropTypes.instanceOf(User),
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
-    tableFields: PropTypes.arrayOf(PropTypes.string),
+    metadataFields: PropTypes.arrayOf(PropTypes.string),
     actions: PropTypes.object
   }
 
@@ -169,10 +169,10 @@ class FolderItem extends Component {
   }
 
   createExport = (event, name, exportImages, exportTable) => {
-    const { selectedFolderIds, tableFields } = this.props
+    const { selectedFolderIds, metadataFields } = this.props
     const filter = new AssetFilter({links: {folder: [...selectedFolderIds]}})
     const search = new AssetSearch({filter})
-    const fields = exportTable && tableFields
+    const fields = exportTable && metadataFields
     this.props.actions.exportAssets(name, search, fields, exportImages)
   }
 
@@ -356,7 +356,7 @@ export default connect(state => ({
   selectedFolderIds: state.folders.selectedFolderIds,
   user: state.auth.user,
   dragInfo: state.app.dragInfo,
-  tableFields: state.app.tableFields
+  metadataFields: state.app.metadataFields
 }), dispatch => ({
   actions: bindActionCreators({
     selectFolderIds,
