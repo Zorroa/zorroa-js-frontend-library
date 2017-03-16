@@ -1,17 +1,76 @@
 {
-"filter": {
-  "hamming": {
-    "field": "ImageHash.phashSimple",
-    "hash": "001eeff6"
+  "postFilter": {
+    "hamming": {
+      "field": "ImageHash.combined.raw",
+      "hashes": [
+        "00f00f00ffdbc9084be1404fe"
+      ],
+      "minScore": "9"
+    }
   },
-  "fuzzy": {
-    "ImageHash.phashSimple": {
-      "value": "001eeff6",
-      "fuzziness": 2
+  "filter": {
+    "function_score" : {
+      "functions" : [ {
+        "script_score" : {
+          "script" : {
+            "inline" : "hammingDistance",
+            "lang" : "native",
+            "params" : {
+              "field" : "ImageHash.combined.raw",
+              "hashes" : [ "00f00f00fffb2000b0010ffff" ],
+              "bitwise": false,
+              "minScore": 1000000
+            }
+          }
+        }
+      } ],
+      "score_mode": "max",
+      "min_score" : 100000.0
+    }
+  },
+  "size": 1,
+  "aggs": {
+    "HammyAgg": {
+      "filter": {
+        "bool" : {
+          "must" : {
+            "function_score" : {
+              "functions" : [ {
+                "script_score" : {
+                  "script" : {
+                    "inline" : "hammingDistance",
+                    "lang" : "native",
+                    "params" : {
+                      "field" : "ImageHash.combined.raw",
+                      "hashes" : [ "00f00f00fffb2000b0010ffff" ],
+                      "bitwise": false,
+                      "minScore": 1000000
+                    }
+                  }
+                }
+              } ],
+              "score_mode": "max",
+              "min_score" : 100000.0
+            }
+          }
+        }
+      }
+    },
+    "SpammyAgg": {
+      "filters": {
+        "filter": {
+        "filter": {
+          "hamming": {
+            "field": "ImageHash.combined.raw",
+            "hashes": [
+              "00f00f00ffdbc9084be1404fe"
+            ],
+            "minScore": "9",
+            "bitwise": false
+          }
+        }
+        }
+      }
     }
   }
-},
-"size":10,
-"order": [
-  {"field":"ImageHash.perceptiveHash","ascending":true }
-],
+}

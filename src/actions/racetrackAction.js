@@ -10,7 +10,8 @@ import {
   ExistsWidgetInfo,
   RangeWidgetInfo,
   DateRangeWidgetInfo,
-  FiletypeWidgetInfo
+  FiletypeWidgetInfo,
+  SimilarHashWidgetInfo
 } from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
 
@@ -126,6 +127,15 @@ export function restoreSearch (search) {
     sliver.filter = new AssetFilter({colors: search.filter.colors})
     const color = new Widget({type, sliver})
     widgets.push(color)
+  }
+
+  // Create a SimilarHash widget if there's a hash query
+  if (search.filter && search.filter.hamming) {
+    const type = SimilarHashWidgetInfo.type
+    let sliver = new AssetSearch()
+    sliver.filter = new AssetFilter({ hamming: search.filter.hamming })
+    const similarHashWidget = new Widget({type, sliver})
+    widgets.push(similarHashWidget)
   }
 
   // Reset the racetrack to the new widget

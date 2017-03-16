@@ -88,6 +88,8 @@ export function addSiblings (assetIds, allAssets) {
 }
 
 export function equalSets (as, bs) {
+  if (!as && !bs) return true
+  if ((!as && bs) || (!bs && as)) return false
   if (as.size !== bs.size) return false
   for (var a of as) if (!bs.has(a)) return false
   return true

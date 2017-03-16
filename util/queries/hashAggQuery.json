@@ -1,0 +1,25 @@
+{
+  "size": 1,
+  "aggs": {
+    "HammyAgg": {
+      "filter": {
+        "bool" : {
+          "must" : {
+            "script" : {
+              "script" : {
+                "inline" : "hammingDistance",
+                "lang" : "native",
+                "params" : {
+                  "field" : "ImageHash.combined.raw",
+                  "hashes" : [ "0f9012028fcf0f8e02006dade" ],
+                  "bitwise": false,
+                  "minScore": 5
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
