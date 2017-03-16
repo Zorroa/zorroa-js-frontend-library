@@ -243,7 +243,7 @@ class SimilarHash extends Component {
     if (selectedAssetIds && selectedAssetIds.size) {
       const firstSelectedAssetId = selectedAssetIds.values().next().value
       if (firstSelectedAssetId) {
-        selectedAsset = assets.find(asset => { return firstSelectedAssetId === asset.id })
+        selectedAsset = assets.find(asset => { return firstSelectedAssetId === asset.id }) || selectedAsset
         const hashObj = selectedAsset.document[schema]
         const isTestSchema = (schema === 'Similarity')
         hashVal = isTestSchema ? Object.values(hashObj[hashType])[0] : hashObj[hashType]
