@@ -90,19 +90,11 @@ class Workspace extends Component {
 
     // wait for above-the-fold loads to finish
     new Promise(resolve => setTimeout(resolve, 1000))
-    .then(() => {
-      console.log('load emailjs')
-      loadScript('https://cdn.emailjs.com/dist/email.min.js')
-    })
+    .then(() => loadScript('https://cdn.emailjs.com/dist/email.min.js'))
     // emailjs needs a moment to init before window.emailjs will be defined
     .then(() => new Promise(resolve => setTimeout(resolve, 1000)))
-    .then(() => {
-      // console.log('init emailjs')
-      window.emailjs.init('user_WBcDrP5QF9DWgdWTE6DvB')
-    })
-    .catch(err => {
-      console.error('Zorroa email js', err)
-    })
+    .then(() => window.emailjs.init('user_WBcDrP5QF9DWgdWTE6DvB'))
+    .catch(err => console.error('Zorroa email js', err))
   }
 
   componentWillUnmount () {
