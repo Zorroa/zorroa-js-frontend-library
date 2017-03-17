@@ -39,6 +39,7 @@
 // Allow the workspace to fill the full height of App
 .Workspace {
   background-color: $zorroa-nearwhite;
+  overflow: hidden;
 
   & .Workspace-vertical-separator {
     height: 100%;
