@@ -95,12 +95,4 @@ bumpVersion() {
   fi
 }
 
-deploy() {
-  # deploy.sh should be sitting next to this script, so figure out where we are
-  # http://stackoverflow.com/a/246128/1424242
-  DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-  $DIR/deploy.sh
-}
-
-deployCheck && build && bumpVersion && deploy
+deployCheck && build && bumpVersion
