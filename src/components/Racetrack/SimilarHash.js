@@ -83,11 +83,6 @@ class SimilarHash extends Component {
 
     const selectionChanged = !equalSets(newSelectedAssetIds, oldSelectedAssetIds)
 
-    const { hashName, selectedAsset } = this.state
-    if (!selectedAsset && hashName && newSelectedAssetIds && newSelectedAssetIds.size && selectionChanged) {
-      requestAnimationFrame(() => this.selectHash(hashName, {}))
-    }
-
     if (newSelectedAssetIds && newSelectedAssetIds.size && selectionChanged) {
       this.updateCounts(newSelectedAssetIds)
     }
