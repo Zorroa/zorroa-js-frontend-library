@@ -12,7 +12,9 @@ export default class TableField extends Component {
     isOpen: PropTypes.bool,
     onOpen: PropTypes.func,
     onTag: PropTypes.func,
-    width: PropTypes.number
+    width: PropTypes.number,
+    left: PropTypes.string, // if given, then position becomes absolute
+    top: PropTypes.string // if given, then position becomes absolute
   }
 
   renderFileType = (vals, asset) => (
@@ -76,7 +78,7 @@ export default class TableField extends Component {
   }
 
   render = () => {
-    const { asset, field, width } = this.props
+    const { asset, field, width, left, top } = this.props
     const val = asset.rawValue(field)
     let renderValFn = this.renderGeneral
     let padding = '8px 4px'
@@ -103,6 +105,11 @@ export default class TableField extends Component {
     // Without width is for the .Table-cell-test, auto width for measuring cells
     if (width) {
       style.width = `${width}px`
+    }
+    if (left && top) {
+      style.left = left
+      style.top = top
+      style.position = 'absolute'
     }
 
     return (<div className='Table-cell' style={style}>{renderValFn(val, asset)}</div>)

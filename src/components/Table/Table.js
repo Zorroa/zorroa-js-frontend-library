@@ -50,7 +50,9 @@ class Table extends Component {
 
     this.state = {
       tableScrollTop: 0,
+      tableScrollLeft: 0,
       tableScrollHeight: 0,
+      tableScrollWidth: 2000,
       assetFieldOpen: {}
     }
 
@@ -69,7 +71,11 @@ class Table extends Component {
     document.getElementsByClassName('Table-header')[0].style.left =
       `-${event.target.scrollLeft}px`
 
-    this.setState({tableScrollTop: event.target.scrollTop, tableScrollHeight: event.target.clientHeight})
+    this.setState({
+      tableScrollTop: event.target.scrollTop,
+      tableScrollLeft: event.target.scrollLeft,
+      tableScrollHeight: event.target.clientHeight
+    })
   }
 
   componentWillMount = () => { this.resizer = new Resizer() }
@@ -322,8 +328,12 @@ class Table extends Component {
     requestAnimationFrame(() => {
       var tableScroll = this.refs.tableScroll
       var tableScrollHeight = tableScroll ? tableScroll.clientHeight : 0
+      var tableScrollWidth = tableScroll ? tableScroll.clientWidth : 2000
       if (tableScrollHeight && tableScrollHeight !== this.state.tableScrollHeight) {
         this.setState({tableScrollHeight})
+      }
+      if (tableScrollWidth && tableScrollWidth !== this.state.tableScrollWidth) {
+        this.setState({tableScrollWidth})
       }
     })
 
@@ -339,13 +349,41 @@ class Table extends Component {
     let tableStyle = { height } //, minHeight: height, maxHeight: height }
     if (tableIsResizing) tableStyle.pointerEvents = 'none'
 
+    // pre-compute which columns are visible
+    let sumOfFieldWidths = 0
+    let firstVisibleFieldIndex = -1
+    let lastVisibleFieldIndex = -1
+    let fieldLeft = []
+    let visibleFields = []
+    for (let i = 0; i < fields.length; i++) {
+      fieldLeft.push(sumOfFieldWidths)
+      const field = fields[i]
+      const width = fieldWidth[field]
+      // Is right side of field left of the table's left edge?
+      if (sumOfFieldWidths + width < this.state.tableScrollLeft) {
+        firstVisibleFieldIndex = i + 1
+      }
+      // Is left side of field right of the table's right edge?
+      if (sumOfFieldWidths < this.state.tableScrollLeft + this.state.tableScrollWidth) {
+        lastVisibleFieldIndex = i
+      }
+      sumOfFieldWidths += width
+      let fieldIsVisible = false
+      if (i === 0) fieldIsVisible = true
+      if (i === fields.length - 1) fieldIsVisible = true
+      if (i >= firstVisibleFieldIndex && i <= lastVisibleFieldIndex) fieldIsVisible = true
+      if (fieldIsVisible) visibleFields.push(i)
+    }
+
     return (
       <div className="Table" style={tableStyle}>
-        <div className='Table-header' style={{height: `${tableHeaderHeight}px`}}>
-          { fields.map((field, i) => (
-            <div key={i}
+        <div className='Table-header' style={{height: `${tableHeaderHeight}px`, width: `${sumOfFieldWidths}px`}}>
+          { visibleFields.map((fieldIndex) => {
+            const field = fields[fieldIndex]
+            return (
+            <div key={fieldIndex}
                  className={this.headerClassnames(field)}
-                 style={{width: `${fieldWidth[field]}px`}}>
+                 style={{width: `${fieldWidth[field]}px`, left: `${fieldLeft[fieldIndex]}px`, top: '0px', position: 'absolute'}}>
               <div className={`Table-cell`}>
                 { this.renderTitle(field, fields) }
               </div>
@@ -357,7 +395,7 @@ class Table extends Component {
                 <div className='Table-header-resizer-handle'/>
               </div>
             </div>
-          ))}
+          ) }) }
         </div>
         <div className='Table-scroll-clip'
              style={{
@@ -378,19 +416,23 @@ class Table extends Component {
                 return (
                   <div key={asset.id}
                        className={classnames('Table-row', { even: !!(index % 2), isSelected })}
-                       style={{top: `${rowTopPx}px`, height: `${rowBottomPx - rowTopPx}px`}}
+                       style={{top: `${rowTopPx}px`, height: `${rowBottomPx - rowTopPx}px`, width: `${sumOfFieldWidths}px`}}
                        onClick={event => this.select(asset, event)}
                        onDoubleClick={event => this.isolateToLightbox(asset)}>
-                    { fields.map((field, i) => (
-                      <TableField {...{ asset, field, key: field, width: fieldWidth[field] }}
-                        onTag={this.createTagFacet}
-                        isOpen={this.isAssetFieldOpen(asset, field)}
-                        onOpen={event => {
-                          event.stopPropagation() // prevent row select when openening a field
-                          this.toggleArrayField(asset, field)
-                        }}
-                      />
-                    ))}
+                    { visibleFields.map((fieldIndex) => {
+                      const field = fields[fieldIndex]
+                      const width = fieldWidth[field]
+                      return (
+                        <TableField {...{ asset, field, key: field, width, left: `${fieldLeft[fieldIndex]}px`, top: `0px` }}
+                          onTag={this.createTagFacet}
+                          isOpen={this.isAssetFieldOpen(asset, field)}
+                          onOpen={event => {
+                            event.stopPropagation() // prevent row select when openening a field
+                            this.toggleArrayField(asset, field)
+                          }}
+                        />
+                      ) }
+                    )}
                   </div>)
               })}
               <div id='Table-cell-test' className='Table-cell'/>
