@@ -13,12 +13,12 @@
       @include flexOn;
       @include flexRow;
       position: relative;
-      margin: 8px 0px 8px 4px;
+      margin: 8px 4px 8px 8px;
 
       .icon-search {
         position: absolute;
         right: 8px;
-        font-size: 16px;
+        font-size: 15px;
         margin-top: auto;
         margin-bottom: auto;
         top: 0;
@@ -30,12 +30,12 @@
 
     input {
       @include flexOn;
-      height: 30px;
+      height: 26px;
       border-radius: 3px;
       background: none;
       border: 1px solid $zorroa-lightgray;
       padding-left: 8px;
-      padding-right: 24px;
+      padding-right: 42px;
     }
   }
 
@@ -55,7 +55,9 @@
 
 .Metadata-item {
   margin-left: 8px;
+  margin-right: 8px;
   font-size: 14px;
+  border-bottom: 1px solid $zorroa-nearwhite;
 
   @include flexRow;
   @include flexJustifySpaceBetween;
@@ -63,46 +65,42 @@
 
   .Metadata-item-label {
     @include flexRow;
+    color: $zorroa-greyish-brown;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    &.hasChildren { font-weight: 500; }
   }
 
   .Metadata-item-right {
     @include flexRow;
   }
 
-  &:nth-child(odd) {
-    background-color: #f1f1f1;
-  }
-
   &.isSelected { background-color: $zorroa-selected; }
   &:hover { background-color: $zorroa-hover; }
+
 }
 
-.Metadata-item-search {
-  @include flexOff;
+.Metadata-item-pad {
+  width: 14px;
+  height: 25px;
+  border-right: 1px solid $zorroa-lightgray;
+}
+
+.Metadata-cancel-filter {
   @include flexRowCenter;
-  margin: 4px;
   font-size: 10px;
-  color: transparent;
-  width: 20px;
-  height: 20px;
-  border-radius: 2px;
-  font-weight: 700;
+  color: $zorroa-lightgray;
+  position: absolute;
+  right: 30px;
+  margin-top: auto;
+  margin-bottom: auto;
+  top: 0;
+  bottom: 0;
+  height: 16px;
+  cursor: pointer;
 
-  .Metadata-item.isLeaf & {
-    color: $zorroa-lightgray;
-  }
-
-  .Metadata-item.isLeaf:hover & {
-    background-color: $zorroa-lightgray;
-    color: white;
-  }
-
-  &.isSelected {
-    color: $zorroa-sickly-green !important;
-  }
+  &:hover { color: $zorroa-gray; }
 }
 
 .Metadata-item-favorite {
@@ -111,30 +109,21 @@
   width: 20px;
   height: 20px;
   border-radius: 2px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   margin-left: 5px;
-  margin-right: 5px;
+  margin-right: 3px;
   color: transparent;
   background-color: transparent;
   cursor: pointer;
 
   &.isSelected {
-    color: $zorroa-gray;
+    color: $zorroa-nearwhite;
   }
 
   &:hover {
-    font-size: 12px;
-    background-color: $zorroa-lightgray;
-    color: $zorroa-greyish-brown;
-  }
-
-  &.disabled {
-    color: $zorroa-lightgray;
-  }
-
-  &:not(.disabled):hover {
-    color: $zorroa-gray;
+    background-color: $zorroa-nearwhite;
+    color: $zorroa-golden-yellow;
   }
 }
 
@@ -156,100 +145,27 @@ $FolderItemHeight : 25px;
   .FolderItem.isSelected.isDropTarget.dragHover & { color: white; background-color: darken($zorroa-sickly-green, 15%); }
 }
 
-.Metadata-toggleArrow {
-  transform: rotate(-90deg);
-  &.isOpen {
-    transform: none;
-  }
-}
-
-.Metadata-view {
-  @include flexRow;
-  @include flexJustifySpaceBetween;
-  @include flexAlignItemsCenter;
-  margin-bottom: 8px;
-  height: 20px;
+.Metadata-toggle-open {
+  padding-left: 1px;
+  color: $zorroa-gray;
 }
 
 .Metadata-favorites {
   @include flexRowCenter;
   margin-left: 4px;
-}
-
-.Metadata-favorites-favorites {
-  @include flexRowCenter;
-  border-top-left-radius: 3px;
-  border-bottom-left-radius: 3px;
+  margin-right: 8px;
+  border-radius: 3px;
   color: $zorroa-gray;
   background-color: $zorroa-nearwhite;
-  padding: 4px;
+  width: 26px;
+  height: 26px;
   cursor: pointer;
-  height: 20px;
+  border: none;
 
-  .Metadata-favorites.isSelected & {
-    color: white;
-    background-color: $zorroa-gray;
-  }
+  &.isSelected { color: $zorroa-golden-yellow; }
 
   &:hover {
-    color: white;
-    background-color: $zorroa-lightgray;
-  }
-}
-
-.Metadata-favorites-label {
-  font-size: 10px;
-  margin-left: 4px;
-  text-transform: uppercase;
-  @include noSelect;
-  cursor: pointer;
-}
-
-.Metadata-favorites-icon {
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.Metadata-favorites-all {
-  @include flexRowCenter;
-  @include noSelect;
-  cursor: pointer;
-  border-top-right-radius: 3px;
-  border-bottom-right-radius: 3px;
-  padding: 4px;
-  font-size: 10px;
-  text-transform: uppercase;
-  height: 20px;
-
-  color: white;
-  background-color: $zorroa-gray;
-
-  .Metadata-favorites.isSelected & {
-    color: $zorroa-gray;
-    background-color: $zorroa-nearwhite;
-  }
-
-  .Metadata-favorites.isSelected:hover & {
-    color: white;
-    background-color: $zorroa-lightgray;
-  }
-}
-
-.Metadata-selected {
-  @include flexRow;
-  @include flexAlignItemsCenter;
-  color: $zorroa-lightgray;
-  font-size: 12px;
-  margin-right: 8px;
-}
-
-.Metadata-deselect-all {
-  font-size: 10px;
-  margin-left: 2px;
-  border-radius: 3px;
-  @include zorroa-square-btn(20px);
-  &:hover {
-    background-color: $zorroa-nearwhite;
-    color: $zorroa-sickly-green;
+    background-color: transparent;
+    border: 1px solid $zorroa-lightgray;
   }
 }

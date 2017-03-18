@@ -7,7 +7,7 @@ const CollapsibleHeader = ({ isOpen, isParent, isIconified, isSelected, header, 
   const iconClassNames = classnames('CollapsibleHeader-icon', 'flexOff', 'flexRowCenter', { isOpen, isIconified, isSelected })
 
   return (
-    <div className={classnames('CollapsibleHeader', 'flexRow', 'flexAlignItemsCenter', 'fullWidth', { isSelected })}>
+    <div className={classnames('CollapsibleHeader', 'flexRow', 'flexAlignItemsCenter', 'fullWidth', { isOpen, isSelected })}>
       <div className={classnames('CollapsibleHeader-select', 'flexOn', 'flexRow', 'flexAlignItemsCenter', 'fullWidth', 'fullHeight', { isIconified })} onClick={onSelect || onOpen}>
         { hasIcon && (<div className={iconClassNames}><i className={iconClass}/></div>) }
         { !isIconified && (<div className='CollapsibleHeader-label'>{header}</div>) }

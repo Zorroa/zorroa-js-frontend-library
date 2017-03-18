@@ -1,12 +1,11 @@
 import {
   MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS,
-  EXISTS_FIELDS, UNAUTH_USER } from '../constants/actionTypes'
+  UNAUTH_USER } from '../constants/actionTypes'
 import Widget from '../models/Widget'
 import * as assert from 'assert'
 
 const initialState = {
-  widgets: [],
-  existsFields: new Set()
+  widgets: []
 }
 
 export default function (state = initialState, action) {
@@ -35,11 +34,6 @@ export default function (state = initialState, action) {
       assert.ok(Array.isArray(widgets))
       assert.ok(!widgets.length || widgets[0] instanceof Widget)
       return { ...state, widgets }
-    }
-    case EXISTS_FIELDS: {
-      const existsFields = action.payload
-      assert.ok(existsFields instanceof Set)
-      return { ...state, existsFields }
     }
     case UNAUTH_USER:
       return initialState

@@ -9,7 +9,7 @@ import { iconifyRightSidebar, updateMetadataFields,
 import { saveUserSettings } from '../../actions/authAction'
 import { getAssetFields } from '../../actions/assetsAction'
 import { unCamelCase } from '../../services/jsUtil'
-import { modifyRacetrackWidget, removeRacetrackWidgetIds, existsFields } from '../../actions/racetrackAction'
+import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
 import { createFacetWidget, createMapWidget, fieldUsedInWidget } from '../../models/Widget'
 
 class Metadata extends Component {
@@ -18,7 +18,6 @@ class Metadata extends Component {
     metadataFields: PropTypes.arrayOf(PropTypes.string).isRequired,
     widgets: PropTypes.arrayOf(PropTypes.object),
     collapsibleOpen: PropTypes.object,
-    existsFields: PropTypes.instanceOf(Set),
     fieldTypes: PropTypes.object,
     aggs: PropTypes.object,
     user: PropTypes.instanceOf(User),
@@ -30,7 +29,6 @@ class Metadata extends Component {
     filterString: '',
     filteredFields: [],
     showFavorites: true,
-    existsFields: this.props.existsFields,
     filteredComponents: [],
     collapsibleOpen: {},
     aggs: {},
@@ -53,6 +51,11 @@ class Metadata extends Component {
 
   changeFilterString = (event) => {
     this.setStatePromise({ filterString: event.target.value })
+      .then(() => this.updateFilteredFields(this.props))
+  }
+
+  cancelFilter = (event) => {
+    this.setStatePromise({ filterString: '' })
       .then(() => this.updateFilteredFields(this.props))
   }
 
@@ -97,29 +100,15 @@ class Metadata extends Component {
     event.stopPropagation()
   }
 
-  showFavorites = (show) => {
-    this.setStatePromise({showFavorites: show})
+  toggleFavorites = () => {
+    this.setStatePromise({showFavorites: !this.state.showFavorites})
       .then(() => this.updateFilteredFields(this.props))
-  }
-
-  deselectAll = () => {
-    this.props.actions.existsFields(new Set())
   }
 
   toggleCollapsible = (key, event) => {
     const { actions, collapsibleOpen } = this.props
     actions.toggleCollapsible(key, !collapsibleOpen[key])
     event.stopPropagation()
-  }
-
-  select = (field) => {
-    const existsFields = new Set(this.props.existsFields)
-    if (existsFields.has(field)) {
-      existsFields.delete(field)
-    } else {
-      existsFields.add(field)
-    }
-    this.props.actions.existsFields(existsFields)
   }
 
   toggleWidget = (field, event) => {
@@ -151,10 +140,6 @@ class Metadata extends Component {
       .then(() => this.updateFilteredFields(this.props))
   }
 
-  deselectAll = () => {
-    this.props.actions.existsFields(new Set())
-  }
-
   isLeaf (field, namespace) {
     return field === namespace || field === `${namespace}.raw`
   }
@@ -162,8 +147,7 @@ class Metadata extends Component {
   // Update the filteredFields component list, caching heavily based on all
   // the factors that affect the components: fields, open collapsibles, and aggs.
   updateFilteredFields (props) {
-    const {fieldTypes, collapsibleOpen, aggs, existsFields, metadataFields} = props
-    const modifiedExists = JSON.stringify([...existsFields]) !== JSON.stringify([...this.state.existsFields])
+    const {fieldTypes, collapsibleOpen, aggs, metadataFields} = props
     const modifiedFavorites = JSON.stringify(metadataFields) !== JSON.stringify(this.state.metadataFields)
 
     // Filter all fields by string and sort
@@ -172,7 +156,7 @@ class Metadata extends Component {
     const filteredFields = fields.filter(field => (field.toLowerCase().includes(lcFilterString))).sort()
     if (JSON.stringify(filteredFields) !== JSON.stringify(this.state.filteredFields) ||
         JSON.stringify(collapsibleOpen) !== JSON.stringify(this.state.collapsibleOpen) ||
-        JSON.stringify(aggs) !== JSON.stringify(this.state.aggs) || modifiedExists || modifiedFavorites) {
+        JSON.stringify(aggs) !== JSON.stringify(this.state.aggs) || modifiedFavorites) {
       // Unroll the fields iteratively into an item element array
       const filteredComponents = []
       const aggFields = []
@@ -183,11 +167,12 @@ class Metadata extends Component {
           const namespace = parents.slice(0, i + 1).join('.')
           const index = ancestors.findIndex(ancestor => (ancestor.namespace === namespace))
           const isOpen = collapsibleOpen[namespace]
-          const isSelected = existsFields.has(namespace)
           if (index < 0) {
             const hasChildren = i < parents.length - 1
             const isFavorite = this.isFavorite(fieldTypes, hasChildren, namespace, metadataFields)
-            filteredComponents.push(this.renderField(field, namespace, parents[i], i, hasChildren, isOpen, isSelected, isFavorite))
+            const isLeaf = this.isLeaf(field, namespace)
+            const isSearched = isLeaf && props.widgets.findIndex(widget => fieldUsedInWidget(field, widget)) >= 0
+            filteredComponents.push(this.renderField(field, namespace, parents[i], i, hasChildren, isOpen, isSearched, isFavorite))
             ancestors.splice(i)
             ancestors.push({field, namespace})
             aggFields.push(namespace)
@@ -203,50 +188,44 @@ class Metadata extends Component {
         addFields(ancestors, field)
       })
       const modifiedAggFields = JSON.stringify(aggFields) !== JSON.stringify(this.state.aggFields)
-      if (modifiedAggFields || modifiedExists || modifiedFavorites ||
+      if (modifiedAggFields || modifiedFavorites ||
         JSON.stringify(aggs) !== JSON.stringify(this.state.aggs)) {
         this.setState({filteredComponents})
       }
 
-      this.setState({filteredFields, collapsibleOpen, aggs, existsFields, aggFields, metadataFields})
+      this.setState({filteredFields, collapsibleOpen, aggs, aggFields, metadataFields})
     }
+  }
+
+  renderPads (depth) {
+    if (depth <= 0) return null
+    let pads = []
+    for (let i = 0; i < depth; ++i) pads.push(<div className="Metadata-item-pad"/>)
+    return pads
   }
 
   renderField (field, namespace, name, depth, hasChildren, isOpen, isSelected, isFavorite) {
     const id = `${field}-${namespace}`
     const isLeaf = this.isLeaf(field, namespace)
-    const isSearched = isLeaf && this.props.widgets.findIndex(widget => fieldUsedInWidget(field, widget)) >= 0
     return (
       <div className={classnames('Metadata-item', {isSelected, isLeaf})}
-           key={id} style={{ paddingLeft: `${depth * 14}px` }}
-           onClick={e => this.select(namespace)}
+           key={id}
+           onClick={e => hasChildren ? this.toggleCollapsible(namespace, e) : this.toggleWidget(field, e)}
            onMouseOver={e => this.hover(namespace)} onMouseOut={e => this.clearHover(namespace)} >
         <div className="Metadata-left">
+          { this.renderPads(depth) }
           <div className={classnames('Metadata-item-toggle', {hasChildren})}
                onClick={e => this.toggleCollapsible(namespace, e)}>
-            { hasChildren && <div className={classnames('Metadata-toggleArrow', 'icon-triangle-down', {isOpen})}/> }
+            { hasChildren && <div className={classnames('Metadata-toggle-open', `icon-square-${isOpen ? 'minus' : 'plus'}`)}/> }
           </div>
-          <div className="Metadata-item-label">
+          <div className={classnames('Metadata-item-label', {hasChildren})}>
             {unCamelCase(name)}
           </div>
         </div>
         <div className="Metadata-right">
           <div onClick={e => this.favorite(field, namespace, e)}
-               className={classnames('Metadata-item-favorite', 'icon-star', {isSelected: isFavorite})}/>
-          <div onClick={isLeaf && (e => this.toggleWidget(field, e))}
-               className={classnames('Metadata-item-search', 'icon-binoculars', {isSelected: isSearched})} />
+               className={classnames('Metadata-item-favorite', 'icon-star-filled', {isSelected: isFavorite})}/>
         </div>
-      </div>
-    )
-  }
-
-  renderDeselector () {
-    const { existsFields } = this.state
-    if (!existsFields || existsFields.size === 0) return null
-    return (
-      <div className="Metadata-selected">
-        { `${existsFields.size} fields selected` }
-        <div onClick={this.deselectAll} className="Metadata-deselect-all icon-cancel-circle"/>
       </div>
     )
   }
@@ -258,19 +237,14 @@ class Metadata extends Component {
         <div className="Metadata-header">
           <div className="Metadata-filter">
             <input type="text" onChange={this.changeFilterString}
-                   value={filterString} placeholder="Filter Metadata" />
+                   value={filterString} placeholder="Filter Tags" />
+            { filterString && filterString.length && <div onClick={this.cancelFilter} className="Metadata-cancel-filter icon-cancel-circle"/> }
             <div className="icon-search"/>
           </div>
-        </div>
-        <div className="Metadata-view">
-          <div className={classnames('Metadata-favorites', {isSelected: showFavorites})}>
-            <div onClick={e => this.showFavorites(true)} className="Metadata-favorites-favorites">
-              <div className={`Metadata-favorites-icon icon-star${showFavorites ? '' : '-empty'}`}/>
-              <div className="Metadata-favorites-label">Favorites</div>
-            </div>
-            <div onClick={e => this.showFavorites(false)} className="Metadata-favorites-all">All</div>
-          </div>
-          { this.renderDeselector() }
+          <div onClick={this.toggleFavorites}
+               className={classnames('Metadata-favorites',
+                 `icon-star-${showFavorites ? 'filled' : 'empty'}`,
+                 {isSelected: showFavorites})}/>
         </div>
         <div className="body">
           {filteredComponents}
@@ -284,7 +258,6 @@ export default connect(state => ({
   metadataFields: state.app.metadataFields,
   widgets: state.racetrack.widgets,
   collapsibleOpen: state.app.collapsibleOpen,
-  existsFields: state.racetrack.existsFields,
   fieldTypes: state.assets.types,
   aggs: state.assets.aggs,
   user: state.auth.user,
@@ -298,7 +271,6 @@ export default connect(state => ({
     toggleCollapsible,
     modifyRacetrackWidget,
     removeRacetrackWidgetIds,
-    existsFields,
     hoverField,
     clearHoverField
   }, dispatch)

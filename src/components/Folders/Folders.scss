@@ -51,7 +51,7 @@
   background: none;
   border: 1px solid $zorroa-lightgray;
   padding: 8px;
-  padding-right: 24px;
+  padding-right: 42px;
   font-size: 12px;
 }
 
@@ -125,4 +125,20 @@
     background-color: $zorroa-nearwhite;
     color: $zorroa-sickly-green;
   }
+}
+
+.Folders-cancel-filter {
+  @include flexRowCenter;
+  font-size: 10px;
+  color: $zorroa-lightgray;
+  position: absolute;
+  right: 30px;
+  margin-top: auto;
+  margin-bottom: auto;
+  top: 0;
+  bottom: 0;
+  height: 16px;
+  cursor: pointer;
+
+  &:hover { color: $zorroa-gray; }
 }

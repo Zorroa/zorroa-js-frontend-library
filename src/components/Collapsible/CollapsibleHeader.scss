@@ -2,8 +2,10 @@
 
 .Collapsible {
   .scroller > & {
-    margin-bottom: 3px;
+    margin-bottom: 5px;
   }
+  border-radius: 3px;
+  overflow:hidden;
 }
 
 .CollapsibleHeader {
@@ -12,8 +14,13 @@
   text-transform: uppercase;
   overflow: hidden;
 
-  color: $zorroa-gray;
+  color: $zorroa-greyish-brown;
   background-color: $zorroa-darkwhite;
+
+  &.isOpen {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
 
   &.isSelected {
     color: white;
@@ -21,8 +28,7 @@
   }
 
   &:hover {
-    color: white;
-    background-color: darken($zorroa-darkwhite, 15%);
+    background-color: $zorroa-whitegray;
   }
 }
 

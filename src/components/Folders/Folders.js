@@ -121,6 +121,10 @@ class Folders extends Component {
     this.setState({ filterString })
   }
 
+  cancelFilter = (event) => {
+    this.setState({ filterString: '' })
+  }
+
   deselectAll = (event) => {
     this.props.actions.selectFolderIds()
   }
@@ -278,6 +282,7 @@ class Folders extends Component {
 
   render () {
     const { folders } = this.props
+    const { filterString } = this.state
     const rootLoaded = folders.all.has(Folder.ROOT_ID)
     if (!rootLoaded) return null
     const folderList = this.folderList(folders.all.get(Folder.ROOT_ID))
@@ -287,10 +292,12 @@ class Folders extends Component {
         <div className="Folders-controls">
           <div className="Folders-filter-add">
             <div className="Folders-filter">
-              <input className="Folders-filter-input" type="text" value={this.state.filterString}
+              <input className="Folders-filter-input" type="text" value={filterString}
                      onChange={this.filterFolders}
                      placeholder='Filter collections' />
+              { filterString && filterString.length && <div onClick={this.cancelFilter} className="Folders-cancel-filter icon-cancel-circle"/> }
               <div className="icon-search"/>
+
             </div>
             <div className={classnames('Folders-controls-add',
               {disabled: !this.isAddFolderEnabled()})}

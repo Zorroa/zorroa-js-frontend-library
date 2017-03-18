@@ -145,7 +145,7 @@ class Workspace extends Component {
       isOpen: app.collapsibleOpen.metadata,
       isIconified: app.leftSidebarIsIconified,
       onOpen: this.toggleCollapsible.bind(this, 'metadata'),
-      closeIcon: 'icon-register'
+      closeIcon: 'icon-binoculars'
     })
 
     const { isDroppable, showReloader } = this.state
@@ -170,11 +170,11 @@ class Workspace extends Component {
           {/*  left panel - folders */}
           <Sidebar onToggle={this.toggleLeftSidebar}
                    isIconified={app.leftSidebarIsIconified}>
+            <Collapsible {...CollectionParams()}>
+              <Folders/>
+            </Collapsible>
             <Collapsible {...MetadataParams()}>
               <Metadata isIconified={app.leftSidebarIsIconified}/>
-            </Collapsible>
-              <Collapsible {...CollectionParams()}>
-              <Folders/>
             </Collapsible>
           </Sidebar>
 

@@ -26,7 +26,6 @@ class Searcher extends Component {
     filteredFolderCounts: PropTypes.instanceOf(Map),
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
     order: PropTypes.arrayOf(PropTypes.object),
-    existsFields: PropTypes.object,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired
@@ -101,7 +100,7 @@ class Searcher extends Component {
   render () {
     const {
       widgets, actions, folders, selectedFolderIds, query, pageSize,
-      modifiedFolderIds, trashedFolders, order, existsFields } = this.props
+      modifiedFolderIds, trashedFolders, order } = this.props
     let assetSearch = new AssetSearch({order})
     if (widgets && widgets.length) {
       let postFilter = new AssetFilter()
@@ -138,13 +137,6 @@ class Searcher extends Component {
         const filter = new AssetFilter({links: {folder: nonTrashedFolderIds}})
         assetSearch.merge(new AssetSearch({filter}))
       }
-    }
-
-    // Add filters for each exists field
-    if (existsFields && existsFields.size) {
-      const should = [...existsFields].map(field => new AssetFilter({exists: [field]}))
-      const filter = new AssetFilter({should})
-      assetSearch.merge(new AssetSearch({filter}))
     }
 
     // Do not send the query unless it is different than the last returned query
@@ -194,7 +186,6 @@ const mapStateToProps = state => ({
   selectedFolderIds: state.folders.selectedFolderIds,
   modifiedFolderIds: state.folders.modifiedIds,
   trashedFolders: state.folders.trashedFolders,
-  existsFields: state.racetrack.existsFields,
   user: state.auth.user,
   userSettings: state.app.userSettings
 })
