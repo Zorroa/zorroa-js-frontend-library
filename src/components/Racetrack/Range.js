@@ -4,15 +4,12 @@ import { connect } from 'react-redux'
 import * as assert from 'assert'
 import classnames from 'classnames'
 
-import WidgetModel from '../../models/Widget'
+import { createRangeWidget } from '../../models/Widget'
 import Asset from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
-import AssetFilter from '../../models/AssetFilter'
 import { RangeWidgetInfo } from './WidgetInfo'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
-import { showModal } from '../../actions/appActions'
 import Widget from './Widget'
-import DisplayOptions from '../DisplayOptions'
 import { unCamelCase } from '../../services/jsUtil'
 import Resizer from '../../services/Resizer'
 
@@ -67,7 +64,7 @@ class Range extends Component {
 
   // If the query is changed elsewhere, e.g. from the Searchbar,
   // capture the new props and update our local state to match.
-  syncWithAppState (nextProps, selectFieldIfEmpty) {
+  syncWithAppState (nextProps) {
     if (!this.state.isEnabled) return
     const { id, widgets } = nextProps
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
@@ -103,16 +100,22 @@ class Range extends Component {
               }
             }
           }
+        } else if (!this.state.syncRangeWithAutoRange) {
+          min = Number.MAX_SAFE_INTEGER
+          max = -Number.MAX_SAFE_INTEGER
+          this.setStatePromise({ min, max, syncRangeWithAutoRange: true })
+            .then(() => { this.modifySliver() })
         }
 
-        const minStr = this.valToString(min)
-        const maxStr = this.valToString(max)
-        this.setStatePromise({ field, min, max, minStr, maxStr })
-        .then(() => { if (reQuery) this.modifySliver() })
+        const usePrefix = field && field.length && field === 'source.fileSize' ? 'bin' : null
+        const minStr = min ? this.valToString(min) : null
+        const maxStr = max ? this.valToString(max) : null
+        this.setStatePromise({ field, min, max, minStr, maxStr, usePrefix })
+          .then(() => { if (reQuery) this.modifySliver() })
       }
     } else {
       if (selectFieldIfEmpty) {
-        this.selectField()
+        this.removeFilter()
       }
     }
   }
@@ -123,7 +126,7 @@ class Range extends Component {
 
   componentWillMount () {
     this.resizer = new Resizer()
-    this.syncWithAppState(this.props, true)
+    this.syncWithAppState(this.props)
   }
 
   componentWillUnmount () {
@@ -143,39 +146,10 @@ class Range extends Component {
   modifySliver = () => {
     const { field, min, max, isEnabled } = this.state
     if (!field) return
-    const type = RangeWidgetInfo.type
-
-    // let's auto-range this puppy
-    const aggs = { [field]: { stats: { field } } }
-    let sliver = new AssetSearch({ aggs })
-    // assert.ok(min !== null && max !== null)
-    if (field) {
-      const range = { [field]: { 'gte': min, 'lte': max } }
-      sliver.filter = new AssetFilter({ range })
-    }
-    const widget = new WidgetModel({ id: this.props.id, type, sliver, isEnabled })
+    const widget = createRangeWidget(field, 'double', min, max)
+    widget.id = this.props.id
+    widget.isEnabled = isEnabled
     this.props.actions.modifyRacetrackWidget(widget)
-  }
-
-  selectField = (event) => {
-    const width = '75%'
-    const body = <DisplayOptions title='Search Field'
-                                 singleSelection={true}
-                                 fieldTypes={['integer', 'double', 'long']}
-                                 selectedFields={[]}
-                                 onUpdate={this.updateDisplayOptions}/>
-    this.props.actions.showModal({body, width})
-    event && event.stopPropagation()
-  }
-
-  updateDisplayOptions = (event, state) => {
-    const field = state.checkedNamespaces && state.checkedNamespaces.length && state.checkedNamespaces[0]
-    let { usePrefix } = this.state
-    if (field && field.length) {
-      if (field === 'source.fileSize') usePrefix = 'bin'
-      this.setStatePromise({ field, syncRangeWithAutoRange: true, usePrefix })
-      .then(this.modifySliver)
-    }
   }
 
   inputUpdate = (event) => {
@@ -307,7 +281,6 @@ class Range extends Component {
       <Widget className='Range'
               title={RangeWidgetInfo.title}
               field={title}
-              onSettings={this.selectField}
               backgroundColor={RangeWidgetInfo.color}
               isEnabled={isEnabled}
               enableToggleFn={this.toggleEnabled}
@@ -395,7 +368,7 @@ class Range extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds, showModal }, dispatch)
+  actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds }, dispatch)
 })
 
 const mapStateToProps = state => ({
