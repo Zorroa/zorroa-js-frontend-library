@@ -26,6 +26,8 @@ class Searcher extends Component {
     filteredFolderCounts: PropTypes.instanceOf(Map),
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
     order: PropTypes.arrayOf(PropTypes.object),
+    similarField: PropTypes.string,
+    similarValues: PropTypes.arrayOf(PropTypes.string),
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired
@@ -100,7 +102,8 @@ class Searcher extends Component {
   render () {
     const {
       widgets, actions, folders, selectedFolderIds, query, pageSize,
-      modifiedFolderIds, trashedFolders, order } = this.props
+      modifiedFolderIds, trashedFolders, order,
+      similarField, similarValues } = this.props
     let assetSearch = new AssetSearch({order})
     if (widgets && widgets.length) {
       let postFilter = new AssetFilter()
@@ -137,6 +140,20 @@ class Searcher extends Component {
         const filter = new AssetFilter({links: {folder: nonTrashedFolderIds}})
         assetSearch.merge(new AssetSearch({filter}))
       }
+    }
+
+    // Force similar ordering
+    if (similarField && similarValues && similarValues.length) {
+      const minScore = 0
+      assetSearch.order = undefined
+      const filter = new AssetFilter({
+        hamming: {
+          field: similarField,
+          hashes: similarValues,
+          minScore
+        }
+      })
+      assetSearch.merge(new AssetSearch({filter}))
     }
 
     // Do not send the query unless it is different than the last returned query
@@ -186,6 +203,8 @@ const mapStateToProps = state => ({
   selectedFolderIds: state.folders.selectedFolderIds,
   modifiedFolderIds: state.folders.modifiedIds,
   trashedFolders: state.folders.trashedFolders,
+  similarField: state.racetrack.similarField,
+  similarValues: state.racetrack.similarValues,
   user: state.auth.user,
   userSettings: state.app.userSettings
 })

@@ -99,17 +99,22 @@
   margin-left: 10px;
   color: $zorroa-lightgray;
 
+  .SortingSelector-title {
+    margin-right: 10px;
+  }
+
   .SortingSelector-sort {
     @include nowrap;
 
-    margin-left: 10px;
+    margin-right: 10px;
     color: $zorroa-gray;
 
     &:hover {
-      color: $zorroa-sickly-green;
+      color: $zorroa-darkgray;
+      text-decoration: underline;
     }
 
-    &.SortingSelector-enabled {
+    &.SortingSelector-selected {
       cursor: pointer;
       color: $zorroa-sickly-green;
       text-decoration: underline;
@@ -117,6 +122,15 @@
 
     &.SortingSelector-disabled {
       color: $zorroa-lightgray;
+      text-decoration: none;
+    }
+  }
+
+  .SortingSelector-similar {
+    @include flexRowCenter;
+    color: $zorroa-darkgray;
+    &:hover {
+      color: $zorroa-sickly-green;
     }
   }
 }

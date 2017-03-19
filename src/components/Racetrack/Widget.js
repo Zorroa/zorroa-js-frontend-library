@@ -15,7 +15,7 @@ export default class Widget extends Component {
     isOpen: PropTypes.bool,
     onClose: PropTypes.func.isRequired,
     className: PropTypes.string,
-    enableToggleFn: PropTypes.func.isRequired
+    enableToggleFn: PropTypes.func
   }
 
   constructor (props) {

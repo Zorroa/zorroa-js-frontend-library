@@ -1,11 +1,13 @@
 import {
   MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS,
-  UNAUTH_USER } from '../constants/actionTypes'
+  SIMILAR_FIELD, SIMILAR_VALUES, ASSET_FIELDS, UNAUTH_USER } from '../constants/actionTypes'
 import Widget from '../models/Widget'
 import * as assert from 'assert'
 
 const initialState = {
-  widgets: []
+  widgets: [],
+  similarField: null,
+  similarValues: []
 }
 
 export default function (state = initialState, action) {
@@ -34,6 +36,46 @@ export default function (state = initialState, action) {
       assert.ok(Array.isArray(widgets))
       assert.ok(!widgets.length || widgets[0] instanceof Widget)
       return { ...state, widgets }
+    }
+    case SIMILAR_FIELD: {
+      const similarField = action.payload
+      return { ...state, similarField }
+    }
+    case SIMILAR_VALUES: {
+      const similarValues = action.payload
+      assert.ok(Array.isArray(similarValues))
+      return { ...state, similarValues }
+    }
+    case ASSET_FIELDS: {
+      // Scan available asset fields for the preferred or a valid field
+      let similarField = state.similarField || 'Similarity.TensorFlow.byte'
+      let found = false
+      const types = Object.keys(action.payload)
+      for (let i = 0; !found && i < types.length; ++i) {
+        const type = types[i]
+        const fields = action.payload[type]
+        for (let j = 0; !found && j < fields.length; ++j) {
+          if (fields[j] === state.similarField) {
+            found = true
+          }
+        }
+      }
+      if (!found) {
+        similarField = null
+      }
+      if (!similarField) {
+        const types = Object.keys(action.payload)
+        for (let i = 0; !similarField && i < types.length; ++i) {
+          const type = types[i]
+          const fields = action.payload[type]
+          for (let j = 0; !similarField && j < fields.length; ++j) {
+            if (fields[j].startsWith('Similarity')) {
+              similarField = fields[j]
+            }
+          }
+        }
+      }
+      return { ...state, similarField }
     }
     case UNAUTH_USER:
       return initialState
