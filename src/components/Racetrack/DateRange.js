@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import * as assert from 'assert'
 import DateTimePicker from 'react-widgets/lib/DateTimePicker'
 
-import { createDateWidget } from '../../models/Widget'
+import { createDateRangeWidget } from '../../models/Widget'
 import Asset from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
 import { DateRangeWidgetInfo } from './WidgetInfo'
@@ -57,8 +57,8 @@ class DateRange extends Component {
         const keys = Object.keys(range)
         assert.ok(keys.length === 1) // there should only be one entry here
         const field = keys[0]
-        const minStr = range[field].gte
-        const maxStr = range[field].lte
+        const minStr = range[field].gte || moment().subtract(1, 'days').format(format)
+        const maxStr = range[field].lte || moment().format(format)
         const min = moment(minStr, format).toDate()
         const max = moment(maxStr, format).toDate()
         if (minStr !== this.state.minStr && maxStr !== this.state.maxStr) {
@@ -111,7 +111,7 @@ class DateRange extends Component {
   modifySliver = () => {
     const { field, min, max, minStr, maxStr, isEnabled } = this.state
     if (!field || !min || !max || !minStr || !maxStr) return
-    const widget = createDateWidget(field, 'date', minStr, maxStr)
+    const widget = createDateRangeWidget(field, 'date', minStr, maxStr)
     widget.id = this.props.id
     widget.isEnabled = isEnabled
     this.props.actions.modifyRacetrackWidget(widget)

@@ -108,8 +108,8 @@ class Range extends Component {
         }
 
         const usePrefix = field && field.length && field === 'source.fileSize' ? 'bin' : null
-        const minStr = min ? this.valToString(min) : null
-        const maxStr = max ? this.valToString(max) : null
+        const minStr = min !== undefined ? this.valToString(min) : null
+        const maxStr = max !== undefined ? this.valToString(max) : null
         this.setStatePromise({ field, min, max, minStr, maxStr, usePrefix })
           .then(() => { if (reQuery) this.modifySliver() })
       }
