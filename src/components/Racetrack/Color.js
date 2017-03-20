@@ -4,20 +4,17 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
-import WidgetModel from '../../models/Widget'
-import AssetSearch from '../../models/AssetSearch'
-import AssetFilter from '../../models/AssetFilter'
+import { createColorWidget } from '../../models/Widget'
 import { ColorWidgetInfo } from './WidgetInfo'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
 import Widget from './Widget'
 import Resizer from '../../services/Resizer'
-import { hexToRgb, rgbToHex, HSL2HSV, RGB2HSL, HSL2RGB } from '../../services/color'
+import { hexToRgb, rgbToHex, RGB2HSL, HSL2RGB } from '../../services/color'
 
 const COLOR_SLIDER_HEIGHT = 180
 const COLOR_RESIZER_HEIGHT = 5
 
 const RATIO_MAX_FACTOR = 1.5  // maxRatio in query is this factor times user ratio
-const RATIO_MIN_FACTOR = 0.25 // minRatio in query is this factor times user ratio
 const LUMA_OVERLAY_THRESHOLD = 0.5
 
 class Color extends Component {
@@ -78,33 +75,9 @@ class Color extends Component {
   }
 
   modifySliver (colors) {
-    const { isEnabled } = this.state
-    const type = ColorWidgetInfo.type
-    const sliver = new AssetSearch()
-
-    if (colors.length) {
-      sliver.filter = new AssetFilter({colors: {colors: colors.map(color => {
-        const hsv = (this.state.isServerHSL) ? color.hsl : HSL2HSV(color.hsl) // see toggleServerHSL
-
-        return {
-          hue: Math.floor(hsv[0]),
-          saturation: Math.floor(hsv[1]),
-          brightness: Math.floor(hsv[2]),
-
-          hueRange: 24,
-          saturationRange: 75, // we have no saturation control, so allow a wide variety
-          brightnessRange: 25,
-
-          ratio: color.ratio, // [0..1] range
-          minRatio: color.ratio * RATIO_MIN_FACTOR * 100, // [0..100] range
-          maxRatio: color.ratio * RATIO_MAX_FACTOR * 100,  // [0..100] range
-
-          key: color.key
-        }
-      })}})
-    }
-
-    const widget = new WidgetModel({id: this.props.id, type, sliver, isEnabled})
+    const widget = createColorWidget('colors', 'nested', colors, this.state.isServerHSL)
+    widget.id = this.props.id
+    widget.isEnabled = this.state.isEnabled
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
@@ -350,9 +323,8 @@ class Color extends Component {
                 const { hsl, key } = color
                 const lightOverlay = this.HSLLuma(hsl) < LUMA_OVERLAY_THRESHOLD
                 return (
-                  <div className={classnames('Color-slider-entry', 'fullWidth', { lightOverlay })}>
+                  <div key={key} className={classnames('Color-slider-entry', 'fullWidth', { lightOverlay })}>
                     <div className='Color-slider-color flexRowCenter'
-                         key={key}
                          style={{width: '100%',
                                  height: `${Math.round(color.ratio * COLOR_SLIDER_HEIGHT - colorHeightAdjust)}px`,
                                  backgroundColor: `hsl(${hsl[0]}, ${hsl[1]}%, ${hsl[2]}%)`}}>

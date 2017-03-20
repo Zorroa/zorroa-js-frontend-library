@@ -10,7 +10,8 @@ import { saveUserSettings } from '../../actions/authAction'
 import { getAssetFields } from '../../actions/assetsAction'
 import { unCamelCase } from '../../services/jsUtil'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
-import { createFacetWidget, createMapWidget, fieldUsedInWidget } from '../../models/Widget'
+import { createFacetWidget, createMapWidget, fieldUsedInWidget, widgetTypeForField } from '../../models/Widget'
+import * as WidgetInfo from '../Racetrack/WidgetInfo'
 
 class Metadata extends Component {
   static propTypes = {
@@ -111,18 +112,36 @@ class Metadata extends Component {
     event.stopPropagation()
   }
 
+  createWidget (field) {
+    const { fieldTypes } = this.props
+    const fieldType = fieldTypes[field]
+    const type = widgetTypeForField(field, fieldType)
+    const infos = Object.keys(WidgetInfo)
+    for (let i = 0; i < infos.length; ++i) {
+      const info = WidgetInfo[infos[i]]
+      if (info.type === type) return info.create(field, fieldType)
+    }
+  }
+
+  widgetTypeIcon (type) {
+    const infos = Object.keys(WidgetInfo)
+    for (let i = 0; i < infos.length; ++i) {
+      const info = WidgetInfo[infos[i]]
+      if (info.type === type) return info.icon
+    }
+  }
+
   toggleWidget = (field, event) => {
     const { widgets, fieldTypes } = this.props
     const index = widgets.findIndex(widget => fieldUsedInWidget(field, widget))
     if (index >= 0) {
       this.props.actions.removeRacetrackWidgetIds([widgets[index].id])
     } else {
-      const type = fieldTypes[field]
-      const terms = null
-      const term = null
-      const facet = type === 'point' ? createMapWidget(field, term) : createFacetWidget(field, terms, fieldTypes)
-      this.props.actions.modifyRacetrackWidget(facet)
-      this.props.actions.iconifyRightSidebar(false)
+      const widget = this.createWidget(field)
+      if (widget) {
+        this.props.actions.modifyRacetrackWidget(widget)
+        this.props.actions.iconifyRightSidebar(false)
+      }
     }
     event.stopPropagation()
   }
@@ -172,7 +191,10 @@ class Metadata extends Component {
             const isFavorite = this.isFavorite(fieldTypes, hasChildren, namespace, metadataFields)
             const isLeaf = this.isLeaf(field, namespace)
             const isSearched = isLeaf && props.widgets.findIndex(widget => fieldUsedInWidget(field, widget)) >= 0
-            filteredComponents.push(this.renderField(field, namespace, parents[i], i, hasChildren, isOpen, isSearched, isFavorite))
+            const widgetType = !hasChildren && widgetTypeForField(field, fieldTypes[field])
+            const widgetIcon = this.widgetTypeIcon(widgetType)
+            filteredComponents.push(this.renderField(field, namespace, parents[i],
+              i, hasChildren, isOpen, isSearched, isFavorite, widgetIcon))
             ancestors.splice(i)
             ancestors.push({field, namespace})
             aggFields.push(namespace)
@@ -204,7 +226,7 @@ class Metadata extends Component {
     return pads
   }
 
-  renderField (field, namespace, name, depth, hasChildren, isOpen, isSelected, isFavorite) {
+  renderField (field, namespace, name, depth, hasChildren, isOpen, isSelected, isFavorite, widgetIcon) {
     const id = `${field}-${namespace}`
     const isLeaf = this.isLeaf(field, namespace)
     return (
@@ -223,6 +245,7 @@ class Metadata extends Component {
           </div>
         </div>
         <div className="Metadata-right">
+          <div className={classnames('Metadata-item-widget', widgetIcon)} />
           <div onClick={e => this.favorite(field, namespace, e)}
                className={classnames('Metadata-item-favorite', 'icon-star-filled', {isSelected: isFavorite})}/>
         </div>

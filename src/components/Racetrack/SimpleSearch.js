@@ -2,16 +2,14 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import WidgetModel from '../../models/Widget'
+import { createSearchWidget } from '../../models/Widget'
 import Asset from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
 import { SimpleSearchWidgetInfo } from './WidgetInfo'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
-import { showModal } from '../../actions/appActions'
 import { unCamelCase } from '../../services/jsUtil'
 import Widget from './Widget'
 import Toggle from '../Toggle'
-import DisplayOptions from '../DisplayOptions'
 
 // Manage the query string for the current AssetSearch.
 // Monitors the global query and updates slivers when the search is changed.
@@ -66,13 +64,8 @@ class SimpleSearch extends Component {
   }
 
   modifySliver (queryString, fuzzy, field) {
-    const { isEnabled } = this.state
-    const type = SimpleSearchWidgetInfo.type
-    const sliver = new AssetSearch({query: queryString, fuzzy})
-    if (field.length) {
-      sliver.queryFields = { [field]: 1 }
-    }
-    const widget = new WidgetModel({id: this.props.id, type, sliver, isEnabled})
+    const widget = createSearchWidget(field, null, queryString, fuzzy)
+    widget.id = this.props.id
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
@@ -89,25 +82,6 @@ class SimpleSearch extends Component {
     event && event.stopPropagation()
   }
 
-  selectField = (event) => {
-    const width = '75%'
-    const body = <DisplayOptions title='Search Field'
-                                 singleSelection={true}
-                                 fieldTypes={null}
-                                 selectedFields={[]}
-                                 onUpdate={this.updateDisplayOptions}/>
-    this.props.actions.showModal({body, width})
-    event && event.stopPropagation()
-  }
-
-  updateDisplayOptions = (event, state) => {
-    const field = state.checkedNamespaces && state.checkedNamespaces.length && state.checkedNamespaces[0]
-    if (field && field.length) {
-      this.setState({ field })
-      this.modifySliver(this.state.queryString, this.state.fuzzy, field)
-    }
-  }
-
   render () {
     const { fuzzy, field, isEnabled } = this.state
     const { isIconified } = this.props
@@ -116,7 +90,6 @@ class SimpleSearch extends Component {
       <Widget className='SimpleSearch'
               title={SimpleSearchWidgetInfo.title}
               field={title}
-              onSettings={this.selectField}
               backgroundColor={SimpleSearchWidgetInfo.color}
               isEnabled={isEnabled}
               enableToggleFn={this.toggleEnabled}
@@ -151,7 +124,7 @@ const queryField = props => (
 )
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds, showModal }, dispatch)
+  actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds }, dispatch)
 })
 
 const mapStateToProps = state => ({

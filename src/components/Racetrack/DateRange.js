@@ -4,15 +4,12 @@ import { connect } from 'react-redux'
 import * as assert from 'assert'
 import DateTimePicker from 'react-widgets/lib/DateTimePicker'
 
-import WidgetModel from '../../models/Widget'
+import { createDateRangeWidget } from '../../models/Widget'
 import Asset from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
-import AssetFilter from '../../models/AssetFilter'
 import { DateRangeWidgetInfo } from './WidgetInfo'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
-import { showModal } from '../../actions/appActions'
 import Widget from './Widget'
-import DisplayOptions from '../DisplayOptions'
 import { unCamelCase } from '../../services/jsUtil'
 import Resizer from '../../services/Resizer'
 
@@ -43,9 +40,13 @@ class DateRange extends Component {
     maxStr: null
   }
 
+  setStatePromise = (newState) => {
+    return new Promise(resolve => this.setState(newState, resolve))
+  }
+
   // If the query is changed elsewhere, e.g. from the Searchbar,
   // capture the new props and update our local state to match.
-  syncWithAppState (nextProps, selectFieldIfEmpty) {
+  syncWithAppState (nextProps) {
     if (!this.state.isEnabled) return
     const { id, widgets } = nextProps
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
@@ -56,19 +57,21 @@ class DateRange extends Component {
         const keys = Object.keys(range)
         assert.ok(keys.length === 1) // there should only be one entry here
         const field = keys[0]
-        const minStr = range[field].gte
-        const maxStr = range[field].lte
+        const minStr = range[field].gte || moment().subtract(1, 'days').format(format)
+        const maxStr = range[field].lte || moment().format(format)
         const min = moment(minStr, format).toDate()
         const max = moment(maxStr, format).toDate()
         if (minStr !== this.state.minStr && maxStr !== this.state.maxStr) {
-          new Promise(resolve => this.setState({ min, max, minStr, maxStr }, resolve))
-          .then(() => requestAnimationFrame(this.modifySliver))
+          this.setStatePromise({ min, max, minStr, maxStr })
+            .then(() => requestAnimationFrame(this.modifySliver))
+        }
+        if (field != this.state.field) {
+          this.setStatePromise({ field })
+            .then(() => requestAnimationFrame(this.modifySliver))
         }
       }
     } else {
-      if (selectFieldIfEmpty) {
-        this.selectField()
-      }
+      this.removeFilter()
     }
   }
 
@@ -78,7 +81,7 @@ class DateRange extends Component {
 
   componentWillMount () {
     this.resizer = new Resizer()
-    this.syncWithAppState(this.props, true)
+    this.syncWithAppState(this.props)
   }
 
   componentWillUnmount () {
@@ -88,26 +91,6 @@ class DateRange extends Component {
   // Remove our sliver if the close button in our header is clicked
   removeFilter = () => {
     this.props.actions.removeRacetrackWidgetIds([this.props.id])
-  }
-
-  selectField = (event) => {
-    const width = '75%'
-    const body = <DisplayOptions title='Search Field'
-                                 singleSelection={true}
-                                 fieldTypes={['date']}
-                                 selectedFields={[]}
-                                 onUpdate={this.updateDisplayOptions}/>
-    this.props.actions.showModal({body, width})
-    event && event.stopPropagation()
-  }
-
-  updateDisplayOptions = (event, state) => {
-    const field = state.checkedNamespaces && state.checkedNamespaces.length && state.checkedNamespaces[0]
-    let { usePrefix } = this.state
-    if (field && field.length) {
-      if (field === 'source.fileSize') usePrefix = 'bin'
-      this.setState({ field, usePrefix })
-    }
   }
 
   setMin = (optDate, dateStr) => {
@@ -128,14 +111,9 @@ class DateRange extends Component {
   modifySliver = () => {
     const { field, min, max, minStr, maxStr, isEnabled } = this.state
     if (!field || !min || !max || !minStr || !maxStr) return
-    const type = DateRangeWidgetInfo.type
-
-    let sliver = new AssetSearch({ })
-    if (field) {
-      const range = { [field]: { 'gte': minStr, 'lte': maxStr } }
-      sliver.filter = new AssetFilter({ range })
-    }
-    const widget = new WidgetModel({ id: this.props.id, type, sliver, isEnabled })
+    const widget = createDateRangeWidget(field, 'date', minStr, maxStr)
+    widget.id = this.props.id
+    widget.isEnabled = isEnabled
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
@@ -148,7 +126,6 @@ class DateRange extends Component {
       <Widget className='DateRange'
               title={DateRangeWidgetInfo.title}
               field={title}
-              onSettings={this.selectField}
               backgroundColor={DateRangeWidgetInfo.color}
               isEnabled={isEnabled}
               enableToggleFn={this.toggleEnabled}
@@ -183,7 +160,7 @@ class DateRange extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds, showModal }, dispatch)
+  actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds }, dispatch)
 })
 
 const mapStateToProps = state => ({

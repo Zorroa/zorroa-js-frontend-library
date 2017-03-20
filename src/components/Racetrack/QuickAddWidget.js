@@ -3,12 +3,14 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
-import Widget from '../../models/Widget'
+import DisplayOptions from '../DisplayOptions'
 import * as WidgetInfo from './WidgetInfo'
 import { modifyRacetrackWidget } from '../../actions/racetrackAction'
+import { showModal } from '../../actions/appActions'
 
 class QuickAddWidget extends Component {
   static propTypes = {
+    fieldTypes: PropTypes.object,
     actions: PropTypes.object
   }
 
@@ -17,23 +19,42 @@ class QuickAddWidget extends Component {
     selectedWidgetType: null
   }
 
-  pushWidgetType (type) {
-    this.props.actions.modifyRacetrackWidget(new Widget({type}))
-    this.dismiss()
+  addWidget = (widgetInfo, event) => {
+    if (widgetInfo.fieldTypes && !widgetInfo.fieldTypes.length) {
+      this.updateDisplayOptions(event, {}, widgetInfo)
+      this.dismiss(event)
+      return
+    }
+    const width = '75%'
+    const body = <DisplayOptions title='Search Field'
+                                 singleSelection={true}
+                                 fieldTypes={widgetInfo.fieldTypes}
+                                 selectedFields={[]}
+                                 onUpdate={(event, state) => this.updateDisplayOptions(event, state, widgetInfo)}/>
+    this.props.actions.showModal({body, width})
+    event && event.stopPropagation()
+  }
+
+  updateDisplayOptions = (event, state, widgetInfo) => {
+    const field = state.checkedNamespaces && state.checkedNamespaces.length && state.checkedNamespaces[0]
+    const fieldType = this.props.fieldTypes[field]
+    const widget = widgetInfo.create(field, fieldType)
+    this.props.actions.modifyRacetrackWidget(widget)
+    this.dismiss(event)
   }
 
   changeFilterText = (event) => {
     this.setState({ filterText: event.target.value, selectedWidgetType: null })
   }
 
-  selectCurrent = () => {
+  selectCurrent = (event) => {
     const { selectedWidgetType } = this.state
     if (selectedWidgetType) {
-      this.pushWidgetType(selectedWidgetType)
+      this.addWidget(selectedWidgetInfo, event)
     } else {
       const widgetInfos = this.widgetInfos()
       if (!widgetInfos || !widgetInfos.length) return
-      this.pushWidgetType(widgetInfos[0].type)
+      this.addWidget(widgetInfos[0], event)
     }
     this.setState({ filterText: '' })
     this.blur()
@@ -116,7 +137,7 @@ class QuickAddWidget extends Component {
         { widgetInfos.length ? (
           <div className="QuickAddWidget-list">
             { widgetInfos.map(widgetInfo => (
-              <div onMouseDown={this.pushWidgetType.bind(this, widgetInfo.type)}
+              <div onMouseDown={e => this.addWidget(widgetInfo, e)}
                    style={{backgroundColor: widgetInfo.color}}
                    className={classnames('QuickAddWidget-item',
                      {selected: widgetInfo.type === selectedWidgetType})}
@@ -133,6 +154,7 @@ class QuickAddWidget extends Component {
 }
 
 export default connect(state => ({
+  fieldTypes: state.assets.types
 }), dispatch => ({
-  actions: bindActionCreators({ modifyRacetrackWidget }, dispatch)
+  actions: bindActionCreators({ modifyRacetrackWidget, showModal }, dispatch)
 }))(QuickAddWidget)

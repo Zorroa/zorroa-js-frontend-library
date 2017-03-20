@@ -3,9 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
-import WidgetModel from '../../models/Widget'
-import AssetSearch from '../../models/AssetSearch'
-import AssetFilter from '../../models/AssetFilter'
+import { createFiletypeWidget } from '../../models/Widget'
 import { FiletypeWidgetInfo } from './WidgetInfo'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
 import { showModal } from '../../actions/appActions'
@@ -108,15 +106,9 @@ class Filetype extends Component {
   }
 
   modifySliver = (exts) => {
-    const { isEnabled } = this.state
-    const type = FiletypeWidgetInfo.type
-    const order = { '_term': 'asc' }
-    const aggs = { filetype: { terms: { field: extField, order, size: 100 } } }
-    let sliver = new AssetSearch({aggs})
-    if (exts && exts.length) {
-      sliver.filter = new AssetFilter({terms: {[extField]: exts}})
-    }
-    const widget = new WidgetModel({id: this.props.id, type, sliver, isEnabled})
+    const widget = createFiletypeWidget(extField, 'string', exts)
+    widget.id = this.props.id
+    widget.isEnabled = this.state.isEnabled
     this.props.actions.modifyRacetrackWidget(widget)
   }
 

@@ -4,13 +4,14 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 import Toggle from '../Toggle'
-import Widget from '../../models/Widget'
+import DisplayOptions from '../DisplayOptions'
 import * as WidgetInfo from './WidgetInfo'
 import { modifyRacetrackWidget } from '../../actions/racetrackAction'
-import { hideModal } from '../../actions/appActions'
+import { showModal, hideModal } from '../../actions/appActions'
 
 class AddWidget extends Component {
   static propTypes = {
+    fieldTypes: PropTypes.object,
     actions: PropTypes.object
   }
 
@@ -20,9 +21,26 @@ class AddWidget extends Component {
   }
 
   addWidget = (widgetInfo, event) => {
-    const type = widgetInfo.type
-    this.props.actions.modifyRacetrackWidget(new Widget({type}))
-    this.dismiss(event)
+    if (widgetInfo.fieldTypes && !widgetInfo.fieldTypes.length) {
+      this.updateDisplayOptions(event, {}, widgetInfo)
+      this.dismiss(event)
+      return
+    }
+    const width = '75%'
+    const body = <DisplayOptions title='Search Field'
+                                 singleSelection={true}
+                                 fieldTypes={widgetInfo.fieldTypes}
+                                 selectedFields={[]}
+                                 onUpdate={(event, state) => this.updateDisplayOptions(event, state, widgetInfo)}/>
+    this.props.actions.showModal({body, width})
+    event && event.stopPropagation()
+  }
+
+  updateDisplayOptions = (event, state, widgetInfo) => {
+    const field = state.checkedNamespaces && state.checkedNamespaces.length && state.checkedNamespaces[0]
+    const fieldType = this.props.fieldTypes[field]
+    const widget = widgetInfo.create(field, fieldType)
+    this.props.actions.modifyRacetrackWidget(widget)
   }
 
   toggleShowDescriptions = (event) => {
@@ -109,6 +127,7 @@ class AddWidget extends Component {
 }
 
 export default connect(state => ({
+  fieldTypes: state.assets.types
 }), dispatch => ({
-  actions: bindActionCreators({ modifyRacetrackWidget, hideModal }, dispatch)
+  actions: bindActionCreators({ modifyRacetrackWidget, showModal, hideModal }, dispatch)
 }))(AddWidget)

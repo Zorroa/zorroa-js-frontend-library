@@ -4,16 +4,12 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Text, Sector } from 'recharts'
 
-import WidgetModel, { aggField } from '../../models/Widget'
+import { createFacetWidget, aggField } from '../../models/Widget'
 import Asset from '../../models/Asset'
-import AssetSearch from '../../models/AssetSearch'
-import AssetFilter from '../../models/AssetFilter'
 import { FacetWidgetInfo } from './WidgetInfo'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
-import { showModal } from '../../actions/appActions'
 import Widget from './Widget'
 import { unCamelCase } from '../../services/jsUtil'
-import DisplayOptions from '../DisplayOptions'
 
 const BAR_CHART = 'icon-list'
 const PIE_CHART = 'icon-pie-chart'
@@ -52,7 +48,10 @@ class Facet extends Component {
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
     if (widget && widget.sliver) {
-      const field = aggField(widget.sliver.aggs.facet.terms.field, this.props.fieldTypes)
+      const f = widget.sliver.aggs.facet.terms.field
+      const fraw = f && f.length && f.replace(/\.raw/, '')
+      const fieldType = fraw && this.props.fieldTypes && this.props.fieldTypes[fraw]
+      const field = aggField(f, fieldType)
       if (field !== this.state.field) {
         this.setState({field})
       }
@@ -83,7 +82,7 @@ class Facet extends Component {
       const order = widget.sliver.aggs.facet.terms.order
       if (order) this.setState({order})
     } else {
-      this.selectField()
+      this.removeFilter()
     }
   }
 
@@ -93,14 +92,10 @@ class Facet extends Component {
   }
 
   modifySliver = (field, terms, order) => {
-    const { isEnabled } = this.state
-    const type = FacetWidgetInfo.type
-    const aggs = { facet: { terms: { field, order, size: 100 } } }
-    let sliver = new AssetSearch({aggs})
-    if (terms && terms.length) {
-      sliver.filter = new AssetFilter({terms: {[field]: terms}})
-    }
-    const widget = new WidgetModel({id: this.props.id, isEnabled, type, sliver})
+    const fieldType = this.props.fieldTypes[field.replace(/\.raw$/, '')]
+    const widget = createFacetWidget(field, fieldType, terms, order)
+    widget.isEnabled = this.state.isEnabled
+    widget.id = this.props.id
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
@@ -177,17 +172,6 @@ class Facet extends Component {
     this.selectTerm(name, event)
   }
 
-  selectField = (event) => {
-    const width = '75%'
-    const body = <DisplayOptions title='Facet Fields'
-                                 singleSelection={true}
-                                 fieldTypes={null}
-                                 selectedFields={[]}
-                                 onUpdate={this.updateDisplayOptions}/>
-    this.props.actions.showModal({body, width})
-    event && event.stopPropagation()
-  }
-
   deselectAllTerms = (event) => {
     this.modifySliver(this.state.field, [], this.state.order)
   }
@@ -205,15 +189,6 @@ class Facet extends Component {
     let newOrder = this.rotateOrder(order, sortField[column], dir[column])
     this.setState({ order: newOrder })
     this.modifySliver(field, terms, newOrder)
-  }
-
-  updateDisplayOptions = (event, state) => {
-    const base = state.checkedNamespaces && state.checkedNamespaces.length && state.checkedNamespaces[0]
-    if (base && base.length) {
-      const terms = []
-      const field = aggField(base, this.props.fieldTypes)
-      this.modifySliver(field, terms, this.state.order)
-    }
   }
 
   aggBuckets (terms) {
@@ -475,7 +450,6 @@ class Facet extends Component {
       <Widget className="Facet"
               title={FacetWidgetInfo.title}
               field={title}
-              onSettings={this.selectField}
               backgroundColor={FacetWidgetInfo.color}
               isEnabled={isEnabled}
               enableToggleFn={this.toggleEnabled}
@@ -500,6 +474,6 @@ export default connect(
     fieldTypes: state.assets && state.assets.types,
     widgets: state.racetrack && state.racetrack.widgets
   }), dispatch => ({
-    actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds, showModal }, dispatch)
+    actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds }, dispatch)
   })
 )(Facet)

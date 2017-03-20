@@ -7,14 +7,12 @@ import Geohash from 'latlon-geohash'
 import geoJSON from './OGA_Licences_WGS84.geojson'
 
 import Widget from './Widget'
-import DisplayOptions from '../DisplayOptions'
-import WidgetModel from '../../models/Widget'
+import WidgetModel, { createMapWidget } from '../../models/Widget'
 import Asset from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import { MapWidgetInfo } from './WidgetInfo'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
-import { showModal } from '../../actions/appActions'
 import { unCamelCase } from '../../services/jsUtil'
 
 const accessToken = 'pk.eyJ1IjoiZGFud2V4bGVyIiwiYSI6IldaWnNGM28ifQ.e18uSb539LjXseysIC7KSw'
@@ -65,7 +63,7 @@ class Map extends Component {
       }
       this.setState({locationField, searchField})
     } else {
-      this.selectLocation()
+      this.removeFilter()
     }
   }
 
@@ -75,17 +73,9 @@ class Map extends Component {
   }
 
   modifySliver (locationField, searchField, term) {
-    const { isEnabled } = this.state
-    const type = MapWidgetInfo.type
-    const aggs = { map: { geohash_grid: { field: locationField, precision: 7 } } }
-    let sliver = new AssetSearch({aggs})
-    if (term && term.length) {
-      const terms = {[searchField + '.raw']: [term]}
-      const bounds = { [locationField]: {top_left: 'hash', bottom_right: 'hash'} }
-      sliver.filter = new AssetFilter({terms, geo_bounding_box: bounds})
-      // Add this.bounds and set agg precision
-    }
-    const widget = new WidgetModel({id: this.props.id, type, sliver, isEnabled})
+    const widget = createMapWidget(locationField, 'point', term)
+    widget.id = this.props.id
+    widget.isEnabled = this.state.isEnabled
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
@@ -96,42 +86,6 @@ class Map extends Component {
 
   onZoom = (map, event) => {
     this.zoom = map.getZoom()
-  }
-
-  selectLocation = (event) => {
-    const width = '75%'
-    const body = <DisplayOptions title='Map Location Field'
-                                 singleSelection={true}
-                                 fieldTypes={['point']}
-                                 selectedFields={[this.state.locationField]}
-                                 onUpdate={this.updateLocationField}/>
-    this.props.actions.showModal({body, width})
-    event && event.stopPropagation()
-  }
-
-  selectSearch = (event) => {
-    const width = '75%'
-    const body = <DisplayOptions title='Map Search Field'
-                                 singleSelection={true}
-                                 fieldTypes={null}
-                                 selectedFields={[this.state.searchField]}
-                                 onUpdate={this.updateSearchField}/>
-    this.props.actions.showModal({body, width})
-    event.stopPropagation()
-  }
-
-  updateLocationField = (event, state) => {
-    const locationField = state.checkedNamespaces && state.checkedNamespaces.length && state.checkedNamespaces[0]
-    this.setState({locationField})
-    const { searchField, term } = this.state
-    this.modifySliver(locationField, searchField, term)
-  }
-
-  updateSearchField = (event, state) => {
-    const searchField = state.checkedNamespaces && state.checkedNamespaces.length && state.checkedNamespaces[0]
-    this.setState({searchField})
-    const { locationField, term } = this.state
-    this.modifySliver(locationField, searchField, term)
   }
 
   selectAsset (asset) {
@@ -187,7 +141,6 @@ class Map extends Component {
               icon={MapWidgetInfo.icon}
               title={MapWidgetInfo.title}
               field={title}
-              onSettings={this.selectLocation}
               backgroundColor={MapWidgetInfo.color}
               isEnabled={isEnabled}
               enableToggleFn={this.toggleEnabled}
@@ -265,6 +218,6 @@ export default connect(
     aggs: state.assets && state.assets.aggs,
     widgets: state.racetrack && state.racetrack.widgets
   }), dispatch => ({
-    actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds, showModal }, dispatch)
+    actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds }, dispatch)
   })
 )(Map)

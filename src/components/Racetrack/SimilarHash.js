@@ -4,10 +4,9 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 import * as assert from 'assert'
 
-import WidgetModel from '../../models/Widget'
+import { createSimilarityWidget } from '../../models/Widget'
 import Asset from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
-import AssetFilter from '../../models/AssetFilter'
 import { getAssetFields, searchAssetsRequestProm } from '../../actions/assetsAction'
 import { SimilarHashWidgetInfo } from './WidgetInfo'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
@@ -120,21 +119,9 @@ class SimilarHash extends Component {
 
   modifySliver = () => {
     const { hashName, hashVal, minScore, hashTypes } = this.state
-    const { isEnabled } = this.state
-    const type = SimilarHashWidgetInfo.type
-
-    let sliver = new AssetSearch(/*{aggs}*/) // NB aggs break the search!
-    if (hashName && hashVal) {
-      assert.ok(hashTypes[hashName])
-      sliver.filter = new AssetFilter({
-        hamming: {
-          field: `${SCHEMA}.${hashName}.${hashTypes[hashName]}.raw`,
-          hashes: [ hashVal ],
-          minScore
-        }
-      })
-    }
-    const widget = new WidgetModel({id: this.props.id, isEnabled, type, sliver})
+    const widget = createSimilarityWidget(hashName, 'string', hashVal, minScore, hashTypes)
+    widget.id = this.props.id
+    widget.isEnabled = this.state.isEnabled
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
