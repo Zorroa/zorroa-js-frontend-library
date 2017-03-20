@@ -24,7 +24,7 @@ export default class Asset {
   }
 
   closestProxyURL (protocol, host, width, height) {
-    return `${this.baseURL(protocol, host, this.id)}/proxies/closest/${width}x${height}`
+    return `${this.baseURL(protocol, host, this.id)}/proxies/closest/${Math.round(width)}x${Math.round(height)}`
   }
 
   largestProxyURL (protocol, host) {
