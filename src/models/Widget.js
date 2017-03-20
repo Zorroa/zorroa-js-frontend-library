@@ -39,7 +39,7 @@ export function widgetTypeForField (field, type) {
   if (type === 'string' && parents[0] === 'Similarity' && parents.length === 2) {
     return SimilarHashWidgetInfo.type
   }
-  if (type === 'nested' && parents[0] === 'color' && parents.length === 1) {
+  if (type === 'nested' && parents[0] === 'colors' && parents.length === 1) {
     return ColorWidgetInfo.type
   }
   if (type === 'string' && parents[0] === 'source' && parents.length === 2 && parents[1] === 'extension') {
