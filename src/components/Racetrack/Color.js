@@ -75,7 +75,7 @@ class Color extends Component {
   }
 
   modifySliver (colors) {
-    const widget = createColorWidget('colors', 'nested', colors)
+    const widget = createColorWidget('colors', 'nested', colors, this.state.isServerHSL)
     widget.id = this.props.id
     widget.isEnabled = this.state.isEnabled
     this.props.actions.modifyRacetrackWidget(widget)
@@ -323,9 +323,8 @@ class Color extends Component {
                 const { hsl, key } = color
                 const lightOverlay = this.HSLLuma(hsl) < LUMA_OVERLAY_THRESHOLD
                 return (
-                  <div key={color} className={classnames('Color-slider-entry', 'fullWidth', { lightOverlay })}>
+                  <div key={key} className={classnames('Color-slider-entry', 'fullWidth', { lightOverlay })}>
                     <div className='Color-slider-color flexRowCenter'
-                         key={key}
                          style={{width: '100%',
                                  height: `${Math.round(color.ratio * COLOR_SLIDER_HEIGHT - colorHeightAdjust)}px`,
                                  backgroundColor: `hsl(${hsl[0]}, ${hsl[1]}%, ${hsl[2]}%)`}}>
