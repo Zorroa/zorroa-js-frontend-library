@@ -112,9 +112,3 @@
   @include flexOn;
   font-weight: 400;
 }
-
-.WidgetHeader-settings {
-  @include zorroa-square-btn-darken(40px);
-
-  &:hover { cursor: pointer; }
-}

@@ -323,7 +323,7 @@ class Color extends Component {
                 const { hsl, key } = color
                 const lightOverlay = this.HSLLuma(hsl) < LUMA_OVERLAY_THRESHOLD
                 return (
-                  <div className={classnames('Color-slider-entry', 'fullWidth', { lightOverlay })}>
+                  <div key={color} className={classnames('Color-slider-entry', 'fullWidth', { lightOverlay })}>
                     <div className='Color-slider-color flexRowCenter'
                          key={key}
                          style={{width: '100%',

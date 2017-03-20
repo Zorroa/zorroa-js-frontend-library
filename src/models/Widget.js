@@ -1,5 +1,6 @@
-import { FacetWidgetInfo, MapWidgetInfo, DateRangeWidgetInfo, RangeWidgetInfo,
-  SimilarHashWidgetInfo, FiletypeWidgetInfo, ColorWidgetInfo } from '../components/Racetrack/WidgetInfo'
+import { SimpleSearchWidgetInfo, ExistsWidgetInfo, FacetWidgetInfo,
+  MapWidgetInfo, DateRangeWidgetInfo, RangeWidgetInfo, SimilarHashWidgetInfo,
+  FiletypeWidgetInfo, ColorWidgetInfo } from '../components/Racetrack/WidgetInfo'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
 import { HSL2HSV } from '../services/color'
@@ -53,6 +54,27 @@ export function widgetTypeForField (field, type) {
     case 'long':
       return RangeWidgetInfo.type
   }
+}
+
+export function createSearchWidget (field, fieldType, queryString, fuzzy) {
+  const type = SimpleSearchWidgetInfo.type
+  const sliver = new AssetSearch({query: queryString, fuzzy})
+  if (field.length) {
+    sliver.queryFields = { [field]: 1 }
+  }
+  const isEnabled = true
+  return new Widget({type, sliver, isEnabled})
+}
+
+export function createExistsWidget (field, fieldType, isMissing) {
+  const type = ExistsWidgetInfo.type
+  const sliver = new AssetSearch()
+  if (field) {
+    const key = (isMissing) ? 'missing' : 'exists'
+    sliver.filter = new AssetFilter({ [key]: [ field ] })
+  }
+  const isEnabled = true
+  return new Widget({ type, sliver, isEnabled })
 }
 
 export function createFacetWidget (field, fieldType, terms, order) {
@@ -124,6 +146,7 @@ export function createSimilarityWidget (hashName, fieldType, hashVal, minScore, 
 }
 
 export function createFiletypeWidget (field, fieldType, exts) {
+  if (!field || !field.length) field = 'source.extension'
   const type = FiletypeWidgetInfo.type
   const order = { '_term': 'asc' }
   const aggs = { filetype: { terms: { field, order, size: 100 } } }
@@ -135,15 +158,15 @@ export function createFiletypeWidget (field, fieldType, exts) {
   return new Widget({type, sliver, isEnabled})
 }
 
-export function createColorWidget (field, fieldType, colors) {
+export function createColorWidget (field, fieldType, colors, isServerHSL) {
   const type = ColorWidgetInfo.type
   const sliver = new AssetSearch()
   const RATIO_MAX_FACTOR = 1.5  // maxRatio in query is this factor times user ratio
   const RATIO_MIN_FACTOR = 0.25 // minRatio in query is this factor times user ratio
 
-  if (colors.length) {
+  if (colors && colors.length) {
     sliver.filter = new AssetFilter({colors: {colors: colors.map(color => {
-      const hsv = (this.state.isServerHSL) ? color.hsl : HSL2HSV(color.hsl) // see toggleServerHSL
+      const hsv = (isServerHSL) ? color.hsl : HSL2HSV(color.hsl) // see toggleServerHSL
 
       return {
         hue: Math.floor(hsv[0]),

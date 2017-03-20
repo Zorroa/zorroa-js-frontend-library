@@ -9,7 +9,6 @@ export default class Widget extends Component {
     icon: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     field: PropTypes.string,
-    onSettings: PropTypes.func,
     backgroundColor: PropTypes.string.isRequired,
     isEnabled: PropTypes.bool.isRequired,
     isIconified: PropTypes.bool.isRequired,
@@ -37,13 +36,12 @@ export default class Widget extends Component {
 
   render () {
     const { isOpen } = this.state
-    const { children, icon, title, field, onSettings, backgroundColor, isEnabled, isIconified, onClose, enableToggleFn } = this.props
+    const { children, icon, title, field, backgroundColor, isEnabled, isIconified, onClose, enableToggleFn } = this.props
 
     const WidgetHeaderParams = {
       icon,
       title,
       field,
-      onSettings,
       backgroundColor,
       isEnabled,
       isIconified,

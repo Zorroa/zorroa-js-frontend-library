@@ -2,16 +2,13 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import WidgetModel from '../../models/Widget'
+import { createExistsWidget } from '../../models/Widget'
 import Asset from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
-import AssetFilter from '../../models/AssetFilter'
 import { ExistsWidgetInfo } from './WidgetInfo'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
-import { showModal } from '../../actions/appActions'
 import Widget from './Widget'
 import Toggle from '../Toggle'
-import DisplayOptions from '../DisplayOptions'
 import { unCamelCase } from '../../services/jsUtil'
 
 class Exists extends Component {
@@ -41,11 +38,7 @@ class Exists extends Component {
       const field = (isMissing) ? widget.sliver.filter.missing[0] : widget.sliver.filter.exists[0]
       this.setState({ field, isMissing })
     } else {
-      if (selectFieldIfEmpty) {
-        this.selectField()
-      } else {
-        this.removeFilter()
-      }
+      this.removeFilter()
     }
   }
 
@@ -68,34 +61,9 @@ class Exists extends Component {
   }
 
   modifySliver = (field, isMissing) => {
-    const { isEnabled } = this.state
-    const type = ExistsWidgetInfo.type
-    const sliver = new AssetSearch()
-    if (field) {
-      const key = (isMissing) ? 'missing' : 'exists'
-      sliver.filter = new AssetFilter({ [key]: [ field ] })
-    }
-    const widget = new WidgetModel({ id: this.props.id, type, sliver, isEnabled })
+    const widget = createExistsWidget(field, null, isMissing)
+    widget.id = this.props.id
     this.props.actions.modifyRacetrackWidget(widget)
-  }
-
-  selectField = (event) => {
-    const width = '75%'
-    const body = <DisplayOptions title='Search Field'
-                                 singleSelection={true}
-                                 fieldTypes={null}
-                                 selectedFields={[]}
-                                 onUpdate={this.updateDisplayOptions}/>
-    this.props.actions.showModal({body, width})
-    event && event.stopPropagation()
-  }
-
-  updateDisplayOptions = (event, state) => {
-    const field = state.checkedNamespaces && state.checkedNamespaces.length && state.checkedNamespaces[0]
-    if (field && field.length) {
-      this.setState({ field })
-      this.modifySliver(field, this.state.isMissing)
-    }
   }
 
   toggleMissing = (event) => {
@@ -112,7 +80,6 @@ class Exists extends Component {
       <Widget className='Exists'
               title={ExistsWidgetInfo.title}
               field={title}
-              onSettings={this.selectField}
               backgroundColor={ExistsWidgetInfo.color}
               isEnabled={isEnabled}
               enableToggleFn={this.toggleEnabled}
@@ -132,7 +99,7 @@ class Exists extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds, showModal }, dispatch)
+  actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds }, dispatch)
 })
 
 const mapStateToProps = state => ({

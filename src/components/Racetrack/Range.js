@@ -114,9 +114,7 @@ class Range extends Component {
           .then(() => { if (reQuery) this.modifySliver() })
       }
     } else {
-      if (selectFieldIfEmpty) {
-        this.removeFilter()
-      }
+      this.removeFilter()
     }
   }
 
