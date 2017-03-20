@@ -62,7 +62,8 @@ class AddWidget extends Component {
 
   static widgetInfos = (widgets, filterText) => {
     const filter = filterText.toLowerCase()
-    const singletonTypes = new Set([ WidgetInfo.SimilarHashWidgetInfo.type ])
+    const singletonTypes = new Set([ WidgetInfo.SimilarHashWidgetInfo.type,
+      WidgetInfo.FiletypeWidgetInfo.type ])
     const singletons = new Set()
     widgets.forEach(widget => {
       if (singletonTypes.has(widget.type)) singletons.add(widget.type)
