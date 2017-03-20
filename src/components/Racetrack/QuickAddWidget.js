@@ -5,12 +5,14 @@ import classnames from 'classnames'
 
 import DisplayOptions from '../DisplayOptions'
 import * as WidgetInfo from './WidgetInfo'
+import AddWidget from './AddWidget'
 import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import { showModal } from '../../actions/appActions'
 
 class QuickAddWidget extends Component {
   static propTypes = {
     fieldTypes: PropTypes.object,
+    widgets: PropTypes.arrayOf(PropTypes.object),
     actions: PropTypes.object
   }
 
@@ -113,13 +115,10 @@ class QuickAddWidget extends Component {
   }
 
   widgetInfos () {
+    const { widgets } = this.props
     const { filterText } = this.state
-    const filter = filterText.toLowerCase()
-    return this.focused || filter.length ? Object.keys(WidgetInfo)
-      .map(k => WidgetInfo[k])
-      .filter(widgetInfo => (
-      widgetInfo.title.toLowerCase().includes(filter)
-    )) : []
+    if (!this.focused && !filterText.length) return []
+    return AddWidget.widgetInfos(widgets, filterText)
   }
 
   render () {
@@ -154,7 +153,8 @@ class QuickAddWidget extends Component {
 }
 
 export default connect(state => ({
-  fieldTypes: state.assets.types
+  fieldTypes: state.assets.types,
+  widgets: state.racetrack.widgets
 }), dispatch => ({
   actions: bindActionCreators({ modifyRacetrackWidget, showModal }, dispatch)
 }))(QuickAddWidget)

@@ -12,6 +12,7 @@ import { showModal, hideModal } from '../../actions/appActions'
 class AddWidget extends Component {
   static propTypes = {
     fieldTypes: PropTypes.object,
+    widgets: PropTypes.arrayOf(PropTypes.object),
     actions: PropTypes.object
   }
 
@@ -59,15 +60,21 @@ class AddWidget extends Component {
     this.setState({filterText: ''})
   }
 
-  widgetInfos () {
-    const { filterText } = this.state
+  static widgetInfos = (widgets, filterText) => {
     const filter = filterText.toLowerCase()
+    const singletonTypes = new Set([ WidgetInfo.SimilarHashWidgetInfo.type ])
+    const singletons = new Set()
+    widgets.forEach(widget => {
+      if (singletonTypes.has(widget.type)) singletons.add(widget.type)
+    })
     return Object.keys(WidgetInfo).map(k => WidgetInfo[k]).filter(widgetInfo => (
+      !singletons.has(widgetInfo.type)) &&
       widgetInfo.title.toLowerCase().includes(filter)
-    ))
+    )
   }
 
   render () {
+    const { widgets } = this.props
     const { filterText, showDescriptions } = this.state
     const isEmptyFilter = !filterText || !filterText.length
     return (
@@ -101,7 +108,7 @@ class AddWidget extends Component {
             <div className="text-val">{showDescriptions ? 'On' : 'Off'}</div>
           </div>
           <div className="widget-grid">
-            { this.widgetInfos().map(widgetInfo => (
+            { AddWidget.widgetInfos(widgets, filterText).map(widgetInfo => (
               <div className="widget" key={widgetInfo.type}>
                 <div className="title-bar" style={{backgroundColor: widgetInfo.color}}
                      onClick={showDescriptions ? null : this.addWidget.bind(this, widgetInfo)}>
@@ -127,7 +134,8 @@ class AddWidget extends Component {
 }
 
 export default connect(state => ({
-  fieldTypes: state.assets.types
+  fieldTypes: state.assets.types,
+  widgets: state.racetrack.widgets
 }), dispatch => ({
   actions: bindActionCreators({ modifyRacetrackWidget, showModal, hideModal }, dispatch)
 }))(AddWidget)

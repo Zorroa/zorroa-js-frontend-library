@@ -46,13 +46,9 @@ export default function (state = initialState, action) {
       assert.ok(Array.isArray(similarValues))
       return { ...state, similarValues }
     }
+    case ASSET_ORDER:
     case ASSET_SORT: {
       return { ...state, similarValues: [] }
-    }
-    case ASSET_ORDER: {
-      const order = action.payload
-      if (order && order.length) return { ...state, similarValues: [] }
-      break
     }
     case ASSET_FIELDS: {
       // Scan available asset fields for the preferred or a valid field

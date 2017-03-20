@@ -450,10 +450,12 @@ class Assets extends Component {
     }
 
     // Only enable similar button if selected assets have the right hash
+    // WARNING -- PERFORMANCE -- Worst case linear search on all assets
     let canSortSimilar = selectedIds && selectedIds.size > 0
     if (canSortSimilar) {
       selectedIds.forEach(id => {
-        const asset = assets.find(a => (a.id === id))
+        const asset = canSortSimilar &&   // Skip linear sort after 1st miss
+          assets.find(a => (a.id === id))
         if (!asset || !asset.rawValue(similarField)) canSortSimilar = false
       })
     }
