@@ -49,7 +49,8 @@ class Facet extends Component {
     const widget = widgets && widgets[index]
     if (widget && widget.sliver) {
       const f = widget.sliver.aggs.facet.terms.field
-      const fieldType = this.props.fieldTypes[f]
+      const fraw = f && f.length && f.replace(/\.raw/, '')
+      const fieldType = fraw && this.props.fieldTypes && this.props.fieldTypes[fraw]
       const field = aggField(f, fieldType)
       if (field !== this.state.field) {
         this.setState({field})
@@ -91,7 +92,7 @@ class Facet extends Component {
   }
 
   modifySliver = (field, terms, order) => {
-    const fieldType = this.props.fieldTypes[field]
+    const fieldType = this.props.fieldTypes[field.replace(/\.raw$/, '')]
     const widget = createFacetWidget(field, fieldType, terms, order)
     widget.isEnabled = this.state.isEnabled
     widget.id = this.props.id
