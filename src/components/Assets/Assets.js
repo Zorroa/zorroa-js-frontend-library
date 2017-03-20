@@ -408,7 +408,6 @@ class Assets extends Component {
   }
 
   sortAssets = (field, ascending) => {
-    this.props.actions.similarValues([])
     this.props.actions.sortAssets(field, ascending)
   }
 

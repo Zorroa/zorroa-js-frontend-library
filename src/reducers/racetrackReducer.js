@@ -1,6 +1,6 @@
 import {
   MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS,
-  SIMILAR_FIELD, SIMILAR_VALUES, ASSET_FIELDS, UNAUTH_USER } from '../constants/actionTypes'
+  SIMILAR_FIELD, SIMILAR_VALUES, ASSET_ORDER, ASSET_SORT, ASSET_FIELDS, UNAUTH_USER } from '../constants/actionTypes'
 import Widget from '../models/Widget'
 import * as assert from 'assert'
 
@@ -45,6 +45,14 @@ export default function (state = initialState, action) {
       const similarValues = action.payload
       assert.ok(Array.isArray(similarValues))
       return { ...state, similarValues }
+    }
+    case ASSET_SORT: {
+      return { ...state, similarValues: [] }
+    }
+    case ASSET_ORDER: {
+      const order = action.payload
+      if (order && order.length) return { ...state, similarValues: [] }
+      break
     }
     case ASSET_FIELDS: {
       // Scan available asset fields for the preferred or a valid field
