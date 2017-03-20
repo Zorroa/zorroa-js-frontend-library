@@ -7,7 +7,7 @@ const SortingSelector = (props) => (
     <div onClick={e => { props.sortAssets() }}
          className={classnames('SortingSelector-sort',
            {'SortingSelector-enabled': !props.order || !props.order.length})}>
-      Relevance
+      Latest
     </div>
     <div onClick={e => { props.sortAssets('source.filename', true) }}
          className={classnames('SortingSelector-sort',
