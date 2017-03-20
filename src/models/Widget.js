@@ -36,7 +36,7 @@ export function aggField (field, fieldType) {
 
 export function widgetTypeForField (field, type) {
   const parents = field.split('.')
-  if (type === 'string' && parents[0] === 'Similarity' && parents.length === 2) {
+  if (type === 'string' && parents[0] === 'Similarity' && parents.length === 3) {
     return SimilarHashWidgetInfo.type
   }
   if (type === 'nested' && parents[0] === 'colors' && parents.length === 1) {

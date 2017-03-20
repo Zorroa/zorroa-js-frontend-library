@@ -10,7 +10,7 @@ import { saveUserSettings } from '../../actions/authAction'
 import { getAssetFields } from '../../actions/assetsAction'
 import { unCamelCase } from '../../services/jsUtil'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
-import { createFacetWidget, createMapWidget, fieldUsedInWidget, widgetTypeForField } from '../../models/Widget'
+import { fieldUsedInWidget, widgetTypeForField } from '../../models/Widget'
 import * as WidgetInfo from '../Racetrack/WidgetInfo'
 
 class Metadata extends Component {
