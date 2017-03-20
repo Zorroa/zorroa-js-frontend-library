@@ -50,7 +50,7 @@ export const ColorWidgetInfo = {
 
 export const ExistsWidgetInfo = {
   type: 'EXISTS',
-  icon: 'icon-map',
+  icon: 'custom-icon-exists',
   title: 'Exists',
   description: 'Match assets with specific fields that exist or are missing',
   element: <Exists/>,

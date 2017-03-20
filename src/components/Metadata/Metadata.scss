@@ -118,7 +118,7 @@
   cursor: pointer;
 
   &.isSelected {
-    color: $zorroa-nearwhite;
+    color: $zorroa-lightgray;
   }
 
   &:hover {
@@ -166,6 +166,6 @@ $FolderItemHeight : 25px;
 
   &:hover {
     background-color: transparent;
-    border: 1px solid $zorroa-lightgray;
+    border: 1px solid $zorroa-nearwhite;
   }
 }
