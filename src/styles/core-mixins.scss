@@ -131,6 +131,7 @@ $zorroa-Sidebar-width : 340px;
   @include nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
 }
 
 @mixin noSelect {

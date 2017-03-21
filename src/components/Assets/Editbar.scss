@@ -6,6 +6,7 @@
   @include fullWidth;
   @include flexJustifySpaceBetween;
   @include flexAlignItemsCenter;
+  @include clampText;
 
   height: 48px;
 
@@ -21,10 +22,12 @@
     margin-left: 8px;
     text-transform: uppercase;
     @include noSelect;
+    @include clampText;
   }
 
   .Editbar-right-side {
     @include flexRow;
+    @include clampText;
     margin-right: 12px;
   }
 
@@ -34,6 +37,7 @@
     font-size: 12px;
     @include flexRow;
     @include flexAlignItemsCenter;
+    @include clampText;
 
     &.disabled {
       color: $zorroa-lightgray;
@@ -62,6 +66,7 @@
     text-transform: uppercase;
     @include flexRow;
     @include flexAlignItemsCenter;
+    @include clampText;
 
     &.disabled {
       color: $zorroa-lightgray;
@@ -78,6 +83,7 @@
     text-transform: uppercase;
     @include flexRow;
     @include flexAlignItemsCenter;
+    @include clampText;
 
     &:not(.disabled):hover {
       color: $zorroa-sickly-green;
@@ -92,6 +98,9 @@
 
 .SortingSelector {
   @include flexRow;
+  @include flexAlignItemsCenter;
+  @include flexShrinkOnly;
+  @include clampText;
 
   text-transform: uppercase;
   font-size: 12px;
@@ -100,11 +109,12 @@
   color: $zorroa-lightgray;
 
   .SortingSelector-title {
+    @include clampText;
     margin-right: 10px;
   }
 
   .SortingSelector-sort {
-    @include nowrap;
+    @include clampText;
 
     margin-right: 10px;
     color: $zorroa-gray;
@@ -130,6 +140,7 @@
 
   .SortingSelector-similar {
     @include flexRowCenter;
+    @include clampText;
     color: $zorroa-darkgray;
     &:hover {
       color: $zorroa-sickly-green;
