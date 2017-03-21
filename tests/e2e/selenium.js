@@ -182,6 +182,15 @@ export function showLog (driver) {
 }
 
 // ----------------------------------------------------------------------
+export function waitForRequestSync (driver, optTimeout) {
+  // Make sure we wait until the request is finished, wait for not busy
+  return driver.wait(_ =>
+    driver.executeScript('return window.zorroa.getRequestsSynced()')
+      .then(synced => { DEBUG && console.log({synced}); return !!synced }),
+    optTimeout)
+}
+
+// ----------------------------------------------------------------------
 export function waitForAssetsCounterChange (driver, actionFn, optTimeout) {
   var assetsCounter = 0
 
@@ -294,19 +303,38 @@ export function login (driver) {
 }
 
 // ----------------------------------------------------------------------
+// wait until a css selector is visible (or timeout)
+export function getCssElementVisible (driver, selector) {
+  return driver.findElement(By.css(selector))
+  .then((ele) => ele.isDisplayed(), () => false)
+}
+
+// ----------------------------------------------------------------------
+// wait until a css selector is visible (or timeout)
+export function waitForCssElementVisible (driver, selector, optTimeout) {
+  return driver.wait(_ => getCssElementVisible(driver, selector), optTimeout)
+  // An alternative way to wait -- TODO determine if there's a reason to go one way or the other
+  // .then(_ => driver.wait(until.elementLocated(By.css(selector)), 15000))
+  .then(_ => expectCssElementIsVisible(driver, selector))
+}
+
+// ----------------------------------------------------------------------
+// wait until a css selector is visible (or timeout)
+export function waitForCssElementNotVisible (driver, selector, optTimeout) {
+  return driver.wait(_ => getCssElementVisible(driver, selector).then(x => !x), optTimeout)
+  .then(_ => expectCssElementIsNotVisible(driver, selector))
+}
+
+// ----------------------------------------------------------------------
 // assert (expect) that a css selector is visible
 // if not, the css selector is displayed in the error message
 export function expectCssElementIsVisible (driver, selector) {
   return driver
   .then(_ => driver.findElement(By.css(selector)))
   .then(
-    function _elementFound (element) {
-      return element.isDisplayed()
-    },
-    function _elementNotFound () {
-      expect(selector).toBe('selector not found')
-      return false
-    })
+    (ele) => ele.isDisplayed(), // element found
+    () => { expect(selector).toBe('selector not found'); return false } // element not found
+  )
   .then(isDisplayed => {
     DEBUG && console.log(`checking ${selector} (isDisplayed: ${isDisplayed})`)
     return expect(JSON.stringify({ selector, isDisplayed }))
@@ -318,15 +346,7 @@ export function expectCssElementIsVisible (driver, selector) {
 // assert (expect) that a css selector is visible
 // if not, the css selector is displayed in the error message
 export function expectCssElementIsNotVisible (driver, selector) {
-  return driver
-  .then(_ => driver.findElement(By.css(selector)))
-  .then(
-    function _elementFound (element) {
-      return element.isDisplayed()
-    },
-    function _elementNotFound () {
-      return false
-    })
+  return getCssElementVisible(driver, selector)
   .then(isDisplayed => {
     DEBUG && console.log(`checking ${selector} (isDisplayed: ${isDisplayed})`)
     return expect(JSON.stringify({ selector, isDisplayed }))
@@ -373,6 +393,14 @@ export function expectElementIsNotVisible (driver, element, elementName) {
 }
 
 // ----------------------------------------------------------------------
+export function clickCssElement (driver, selector) {
+  return expectCssElementIsVisible(driver, selector)
+  .then(_ => driver.findElement(By.css(selector)).click())
+}
+
+// ----------------------------------------------------------------------
+// Get a whole bunch of elements at once.
+// Returns an object of elements indexed by selector
 export function findCssElements (selectors) {
   var elements = {}
   var proms = []
@@ -380,7 +408,10 @@ export function findCssElements (selectors) {
   selectors.forEach((selector, index) => {
     proms.push(
       driver.findElement(By.css(selector))
-      .then(ele => { elements[selector] = ele })
+      .then(
+        ele => { elements[selector] = ele }, // element found
+        _ => { elements[selector] = null } // element not found
+      )
     )
   })
 
