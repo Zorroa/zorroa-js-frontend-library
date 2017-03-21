@@ -110,6 +110,7 @@
     color: $zorroa-gray;
 
     &:hover {
+      cursor: pointer;
       color: $zorroa-darkgray;
       text-decoration: underline;
     }
@@ -121,6 +122,7 @@
     }
 
     &.SortingSelector-disabled {
+      cursor: not-allowed;
       color: $zorroa-lightgray;
       text-decoration: none;
     }
