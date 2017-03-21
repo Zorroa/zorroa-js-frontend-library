@@ -65,7 +65,7 @@ class DateRange extends Component {
           this.setStatePromise({ min, max, minStr, maxStr })
             .then(() => requestAnimationFrame(this.modifySliver))
         }
-        if (field != this.state.field) {
+        if (field !== this.state.field) {
           this.setStatePromise({ field })
             .then(() => requestAnimationFrame(this.modifySliver))
         }

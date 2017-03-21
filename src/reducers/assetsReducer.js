@@ -1,6 +1,6 @@
 import {
   ASSET_SEARCH, ASSET_SEARCH_ERROR,
-  ASSET_SORT, ASSET_ORDER, ASSET_FIELDS,
+  ASSET_SORT, ASSET_ORDER, ASSET_FIELDS, SIMILAR_VALUES,
   PAGE_SIZE, ISOLATE_ASSET, SELECT_ASSETS, SELECT_PAGES,
   SUGGEST_COMPLETIONS, SEARCH_DOCUMENT, UNAUTH_USER
 } from '../constants/actionTypes'
@@ -85,12 +85,18 @@ export default function (state = initialState, action) {
     case ASSET_ORDER:
       return { ...state, order: action.payload }
 
+    case SIMILAR_VALUES:
+      const hashes = action.payload
+      if (hashes.length) return { ...state, order: null }
+      break
+
     case ASSET_FIELDS: {
       const fields = action.payload
       const types = {}
       Object.keys(fields).forEach(type => { fields[type].forEach(field => { types[field] = type }) })
       return { ...state, fields, types }
     }
+
     case ISOLATE_ASSET:
       return { ...state, isolatedId: action.payload, pages: action.payload ? state.pages : null }
 

@@ -1,3 +1,5 @@
+import * as assert from 'assert'
+
 import { SimpleSearchWidgetInfo, ExistsWidgetInfo, FacetWidgetInfo,
   MapWidgetInfo, DateRangeWidgetInfo, RangeWidgetInfo, SimilarHashWidgetInfo,
   FiletypeWidgetInfo, ColorWidgetInfo } from '../components/Racetrack/WidgetInfo'
@@ -36,7 +38,7 @@ export function aggField (field, fieldType) {
 
 export function widgetTypeForField (field, type) {
   const parents = field.split('.')
-  if (type === 'string' && parents[0] === 'Similarity' && parents.length === 2) {
+  if (type === 'string' && parents[0] === 'Similarity' && parents.length === 3) {
     return SimilarHashWidgetInfo.type
   }
   if (type === 'nested' && parents[0] === 'colors' && parents.length === 1) {
@@ -135,7 +137,7 @@ export function createSimilarityWidget (hashName, fieldType, hashVal, minScore, 
     assert.ok(hashTypes[hashName])
     sliver.filter = new AssetFilter({
       hamming: {
-        field: `${SCHEMA}.${hashName}.${hashTypes[hashName]}.raw`,
+        field: `Similarity.${hashName}.${hashTypes[hashName]}.raw`,
         hashes: [ hashVal ],
         minScore
       }

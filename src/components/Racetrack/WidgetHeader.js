@@ -19,7 +19,7 @@ const WidgetHeader = ({ isEnabled, isIconified, title, field, icon, backgroundCo
           ) }
           <div className='flexOn'/>
         </div>
-        { !isIconified && (<div className={classnames('WidgetHeader-enable', {'icon-eye2': isEnabled, 'icon-eye-crossed': !isEnabled, isEnabled})} onClick={enableToggleFn}/>) }
+        { !isIconified && enableToggleFn && (<div className={classnames('WidgetHeader-enable', {'icon-eye2': isEnabled, 'icon-eye-crossed': !isEnabled, isEnabled})} onClick={enableToggleFn}/>) }
         { !isIconified && (<div className='WidgetHeader-close icon-cross2' onClick={onClose}/>) }
       </div>
     </div>
@@ -33,7 +33,7 @@ WidgetHeader.propTypes = {
   field: PropTypes.string,
   icon: PropTypes.string.isRequired,
   backgroundColor: PropTypes.string.isRequired,
-  enableToggleFn: PropTypes.func.isRequired,
+  enableToggleFn: PropTypes.func,
   collapseToggleFn: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired
 }

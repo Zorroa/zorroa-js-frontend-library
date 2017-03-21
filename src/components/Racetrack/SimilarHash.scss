@@ -8,73 +8,7 @@
   .Widget-icon {
     font-size: 20px;
   }
-}
 
-.SimilarHash-body {
-  padding: 10px;
-}
-
-.SimilarHash-sort {
-  table {}
-}
-
-.SimilarHash-clear-selection {
-  @include flexRowCenter;
-  height: 100%;
-  font-size: 13px;
-  color: $zorroa-lightgray;
-}
-
-.SimilarHash-clear-selection-cancel {
-  @include flexRowCenter;
-  &:hover { background-color: $zorroa-lightgray; color: white; }
-  width: 30px;
-  height: 30px;
-  border-radius: 3px;
-  margin-left: 2px;
-  font-size: 16px;
-}
-
-.SimilarHash-value-table {
-  @include flexOn;
-  width: 100%;
-  max-width: 100%;
-  max-height: 300px;
-  border-bottom: 1px solid #aaa;
-  border-spacing: 0;
-  padding: 2px 0 2px 2px;
-  overflow: hidden;
-  overflow-y: auto;
-
-  .SimilarHash-value-table-row:nth-child(odd) {
-    background-color: $zorroa-nearwhite;
-  }
-
-  .SimilarHash-value-table-row {
-    cursor: pointer;
-    color: $zorroa-greyish-brown;
-    &:hover { background-color: $zorroa-hover; }
-    &.selected { background-color: $zorroa-selected; }
-    &.selected:hover { background-color: $zorroa-hover; }
-  }
-
-  .SimilarHash-value-table-key {
-    cursor: pointer;
-    @include fullHeight;
-    @include fullWidth;
-    position: relative;
-    padding: 8px;
-  }
-
-  .SimilarHash-value-key {
-    cursor: pointer;
-    position: relative;
-    @include clampText;
-  }
-}
-
-  // Custom scrollbar styles from Amber
-.SimilarHash {
   ::-webkit-scrollbar {
     width: 5px;
   }
@@ -85,127 +19,33 @@
     border-spacing: 0;
     padding-right: 10px;
   }
+}
 
-  td:last-child {
-    text-align: right;
-    width: 60px;
+.SimilarHash-table {
+
+  .SimilarHash-value-table-row:nth-child(odd) {
+    background-color: $zorroa-nearwhite;
   }
+
+  .SimilarHash-value-table-row {
+    height: 25px;
+    cursor: pointer;
+    color: $zorroa-greyish-brown;
+    &:hover { background-color: $zorroa-hover; }
+    &.selected { background-color: $zorroa-selected; }
+    &.selected:hover { background-color: $zorroa-hover; }
+    &.disabled { color: $zorroa-lightgray; }
+  }
+}
+
+.SimilarHash-body {
+  padding: 10px;
 }
 
 .SimilarHash-value-cell {
-  padding: 0;
+  padding-left: 4px;
+  padding-right: 4px;
   max-width: 0; // This looks weird, but is important! It allows cells to chop content
   @include clampText;
 }
 
-.SimilarHash-value-count {
-  padding: 0;
-  max-width: 0; // This looks weird, but is important! It allows cells to chop content
-  @include clampText;
-}
-
-.SimilarHash-table-header {
-  @include flexRow;
-  @include flexAlignItemsCenter;
-  @include flexJustifySpaceBetween;
-  margin-bottom: 6px;
-  margin-left: 10px;
-  margin-right: 4px;
-}
-
-.SimilarHash-table-header-cell {
-  @include flexRow;
-  @include flexAlignItemsCenter;
-  line-height: 1;
-}
-
-.SimilarHash-table-header-cell:last-child {
-  text-align: right;
-  width: 60px;
-}
-
-.SimilarHash-table-header-title {
-  font-size: 12px;
-  text-transform: uppercase;
-  color: $zorroa-gray;
-  background-color: white;
-  text-align: left;
-  font-family: "Roboto Condensed";
-  font-weight: 300;
-}
-
-.SimilarHash-table-header-count {
-  @include flexRowCenter;
-
-  width: 14px;
-  height: 20px;
-  font-size: 10px;
-  color: $zorroa-lightgray;
-  padding-right: 2px; // This compensates for the slight offset of icon-sort*
-  margin-left: 2px;
-  border-radius: 3px;
-  &:hover {
-    color: white;
-    background-color: $zorroa-sickly-green;
-  }
-}
-
-.SimilarHash-thresh-slider-box {
-  @include flexOn;
-  position: relative;
-  margin: 0px 5px;
-}
-
-.SimilarHash-thresh-slider-line-box {
-  @include flexRowCenter;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-}
-.SimilarHash-thresh-slider-line {
-  width: 100%;
-  height: 1px;
-  background-color: $zorroa-sickly-green;
-}
-
-.SimilarHash-options-box {
-  @include flexRow;
-  @include flexAlignItemsCenter;
-  padding: 5px;
-}
-
-.SimilarHash-bitwise-label {
-}
-
-.SimilarHash-bitwise-toggle {
-}
-
-.SimilarHash-selection {
-  @include flexRowCenter;
-  @include flexJustifySpaceBetween;
-  margin-top: 5px;
-}
-
-.SimilarHash-selection-hash {
-  margin: 0 4px;
-  color: $zorroa-lightgray;
-}
-
-
-.SimilarHash-selection-val {
-  width: 100%;
-  min-width: 100%;
-  max-width: 0; // This looks weird, but is important! It allows cells to chop content
-  @include clampText;
-}
-
-.SimilarHash-asset {
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  width: 64px;
-  height: 64px;
-}

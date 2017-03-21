@@ -9,7 +9,7 @@ import Thumb, { page, monopageBadges, multipageBadges } from '../Thumb'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
 import { isolateAssetId, selectAssetIds, sortAssets } from '../../actions/assetsAction'
-import { resetRacetrackWidgets } from '../../actions/racetrackAction'
+import { resetRacetrackWidgets, similarValues } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
 import { setThumbSize, setThumbLayout, showTable, setTableHeight, showMultipage } from '../../actions/appActions'
@@ -45,6 +45,8 @@ class Assets extends Component {
     folders: PropTypes.instanceOf(Map),
     selectedFolderIds: PropTypes.instanceOf(Set),
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
+    similarField: PropTypes.string,
+    similarValues: PropTypes.arrayOf(PropTypes.string),
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     protocol: PropTypes.string,
@@ -405,6 +407,73 @@ class Assets extends Component {
     return clampedTableHeight
   }
 
+  sortAssets = (field, ascending) => {
+    this.props.actions.sortAssets(field, ascending)
+  }
+
+  sortSimilar = () => {
+    const { assets, selectedIds, similarField } = this.props
+    const similarValues = []
+    selectedIds.forEach(id => {
+      const asset = assets.find(a => a.id === id)
+      if (asset) {
+        const hash = asset.value(similarField)
+        if (hash) similarValues.push(hash)
+      }
+    })
+    this.props.actions.similarValues(similarValues)
+    console.log('Sort by similar: ' + JSON.stringify(similarValues))
+  }
+
+  renderEditbar () {
+    const { assets, order, selectedIds, similarField, similarValues } = this.props
+
+    const similarActive = similarField && similarField.length > 0 && similarValues && similarValues.length > 0
+    let similarValuesSelected = selectedIds && selectedIds.size === similarValues.length
+    if (similarValuesSelected) {
+      for (let i = 0; i < similarValues.length; ++i) {
+        const v = similarValues[i]
+        // value must be in the first N assets, not entire asset list
+        let foundV = false
+        for (let j = 0; j < similarValues.length; ++j) {
+          const asset = assets[j]
+          if (selectedIds.has(asset.id) && asset.value(similarField) === v) {
+            foundV = true
+            break
+          }
+        }
+        if (!foundV) {
+          similarValuesSelected = false
+          break
+        }
+      }
+    }
+
+    // Only enable similar button if selected assets have the right hash
+    // WARNING -- PERFORMANCE -- Worst case linear search on all assets
+    let canSortSimilar = selectedIds && selectedIds.size > 0 && similarField && similarField.length > 0
+    if (canSortSimilar) {
+      selectedIds.forEach(id => {
+        const asset = canSortSimilar &&   // Skip linear sort after 1st miss
+          assets.find(a => (a.id === id))
+        if (!asset || !asset.rawValue(similarField)) canSortSimilar = false
+      })
+    }
+
+    return (
+      <Editbar selectedAssetIds={selectedIds}
+               onDeselectAll={this.deselectAll}
+               isRemoveEnabled={this.selectedFolderContainsSelectedAssets}
+               onRemove={this.removeAssetsFromSelectedFolders}>
+        <SortingSelector sortAssets={this.sortAssets} order={order}
+                         showAlphabetical={!similarField || !similarField.length}
+                         showSimilar={similarField && similarField.length > 0}
+                         similarActive={similarActive} similarValuesSelected={similarValuesSelected}
+                         sortSimilar={canSortSimilar ? this.sortSimilar : null} />
+      </Editbar>
+    )
+  }
+
   renderAssets () {
     const { assets, selectedIds, totalCount, layout, showMultipage, protocol, host, thumbSize } = this.props
     const { positions, multipage, collapsed, tableIsResizing } = this.state
@@ -506,7 +575,7 @@ class Assets extends Component {
   }
 
   render () {
-    const { assets, totalCount, tableHeight, showTable, showMultipage, layout, thumbSize, assetsCounter, order, selectedIds } = this.props
+    const { assets, totalCount, tableHeight, showTable, showMultipage, layout, thumbSize, assetsCounter } = this.props
     const { collapsed, tableIsResizing } = this.state
 
     // Trigger layout if assets change.
@@ -524,12 +593,7 @@ class Assets extends Component {
 
     return (
       <div className="Assets" ref="Assets">
-        <Editbar selectedAssetIds={selectedIds}
-                 onDeselectAll={this.deselectAll}
-                 isRemoveEnabled={this.selectedFolderContainsSelectedAssets}
-                 onRemove={this.removeAssetsFromSelectedFolders}>
-          <SortingSelector sortAssets={this.props.actions.sortAssets} order={order}/>
-        </Editbar>
+        {this.renderEditbar()}
         {this.renderAssets()}
         { showTable && (
           <div className='Assets-tableResize'
@@ -578,6 +642,8 @@ export default connect(state => ({
   showTable: state.app.showTable,
   tableHeight: state.app.tableHeight,
   showMultipage: state.app.showMultipage,
+  similarField: state.racetrack.similarField,
+  similarValues: state.racetrack.similarValues,
   protocol: state.auth.protocol,
   host: state.auth.host
 }), dispatch => ({
@@ -586,6 +652,7 @@ export default connect(state => ({
     selectAssetIds,
     sortAssets,
     resetRacetrackWidgets,
+    similarValues,
     selectFolderIds,
     setThumbSize,
     setThumbLayout,
