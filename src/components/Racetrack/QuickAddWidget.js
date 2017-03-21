@@ -17,7 +17,7 @@ class QuickAddWidget extends Component {
 
   state = {
     filterText: '',
-    selectedWidgetType: null
+    selectedWidgetInfo: null
   }
 
   addWidget = (widgetInfo, event) => {
@@ -45,13 +45,13 @@ class QuickAddWidget extends Component {
   }
 
   changeFilterText = (event) => {
-    this.setState({ filterText: event.target.value, selectedWidgetType: null })
+    this.setState({ filterText: event.target.value, selectedWidgetInfo: null })
   }
 
   selectCurrent = (event) => {
-    const { selectedWidgetType } = this.state
-    if (selectedWidgetType) {
-      this.addWidget(selectedWidgetType, event)
+    const { selectedWidgetInfo } = this.state
+    if (selectedWidgetInfo) {
+      this.addWidget(selectedWidgetInfo, event)
     } else {
       const widgetInfos = this.widgetInfos()
       if (!widgetInfos || !widgetInfos.length) return
@@ -62,28 +62,28 @@ class QuickAddWidget extends Component {
   }
 
   previous = () => {
-    const { selectedWidgetType } = this.state
+    const { selectedWidgetInfo } = this.state
     const widgetInfos = this.widgetInfos()
     if (!widgetInfos || !widgetInfos.length) return
-    if (!selectedWidgetType || !selectedWidgetType.length) {
-      this.setState({selectedWidgetType: widgetInfos[0].type})
+    if (!selectedWidgetInfo) {
+      this.setState({selectedWidgetInfo: widgetInfos[0]})
     }
-    const index = widgetInfos.findIndex(widgetInfo => (widgetInfo.type === selectedWidgetType))
+    const index = widgetInfos.findIndex(widgetInfo => (widgetInfo.type === selectedWidgetInfo.type))
     if (index > 0) {
-      this.setState({selectedWidgetType: widgetInfos[index - 1].type})
+      this.setState({selectedWidgetInfo: widgetInfos[index - 1]})
     }
   }
 
   next = () => {
-    const { selectedWidgetType } = this.state
+    const { selectedWidgetInfo } = this.state
     const widgetInfos = this.widgetInfos()
     if (!widgetInfos || !widgetInfos.length) return
-    if (!selectedWidgetType || !selectedWidgetType.length) {
-      this.setState({selectedWidgetType: widgetInfos[0].type})
+    if (!selectedWidgetInfo) {
+      this.setState({selectedWidgetInfo: widgetInfos[0]})
     }
-    const index = widgetInfos.findIndex(widgetInfo => (widgetInfo.type === selectedWidgetType))
+    const index = selectedWidgetInfo ? widgetInfos.findIndex(widgetInfo => (widgetInfo.type === selectedWidgetInfo.type)) : -1
     if (index < widgetInfos.length - 1) {
-      this.setState({selectedWidgetType: widgetInfos[index + 1].type})
+      this.setState({selectedWidgetInfo: widgetInfos[index + 1]})
     }
   }
 
@@ -101,7 +101,7 @@ class QuickAddWidget extends Component {
   focus = () => {
     // FIXME: Storing focus as state breaks clicking on widget items.
     this.focused = true
-    this.setState({selectedWidgetType: null, filterText: ''})
+    this.setState({selectedWidgetInfo: null, filterText: ''})
   }
 
   blur = () => {
@@ -110,7 +110,7 @@ class QuickAddWidget extends Component {
 
   dismiss = () => {
     this.focused = false
-    this.setState({selectedWidgetType: null, filterText: ''})
+    this.setState({selectedWidgetInfo: null, filterText: ''})
   }
 
   widgetInfos () {
@@ -121,7 +121,7 @@ class QuickAddWidget extends Component {
   }
 
   render () {
-    const { selectedWidgetType } = this.state
+    const { selectedWidgetInfo } = this.state
     const widgetInfos = this.widgetInfos()
     return (
       <div className="QuickAddWidget">
@@ -138,7 +138,7 @@ class QuickAddWidget extends Component {
               <div onMouseDown={e => this.addWidget(widgetInfo, e)}
                    style={{backgroundColor: widgetInfo.color}}
                    className={classnames('QuickAddWidget-item',
-                     {selected: widgetInfo.type === selectedWidgetType})}
+                     {selected: selectedWidgetInfo && widgetInfo.type === selectedWidgetInfo.type})}
                    key={widgetInfo.type}>
                 <span className={`QuickAddWidget-item-icon ${widgetInfo.icon}`}></span>
                 <span>{widgetInfo.title}</span>

@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 import { SimilarHashWidgetInfo } from './WidgetInfo'
-import { removeRacetrackWidgetIds, similarField } from '../../actions/racetrackAction'
+import { removeRacetrackWidgetIds, similarField, similarValues } from '../../actions/racetrackAction'
 import Widget from './Widget'
 import Asset from '../../models/Asset'
 
@@ -67,6 +67,16 @@ class SimilarHash extends Component {
 
   selectHash (hashName) {
     const similarField = hashName ? `${SCHEMA}.${hashName}.${this.state.hashTypes[hashName]}` : null
+    const { assets, selectedAssetIds } = this.props
+    const similarValues = []
+    selectedAssetIds.forEach(id => {
+      const asset = assets.find(a => a.id === id)
+      if (asset) {
+        const hash = asset.value(similarField)
+        if (hash) similarValues.push(hash)
+      }
+    })
+    this.props.actions.similarValues(similarValues)
     this.props.actions.similarField(similarField)
   }
 
@@ -128,7 +138,8 @@ export default connect(
   }), dispatch => ({
     actions: bindActionCreators({
       removeRacetrackWidgetIds,
-      similarField
+      similarField,
+      similarValues
     }, dispatch)
   })
 )(SimilarHash)
