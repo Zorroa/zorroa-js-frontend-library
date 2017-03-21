@@ -4,7 +4,6 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 import DisplayOptions from '../DisplayOptions'
-import * as WidgetInfo from './WidgetInfo'
 import AddWidget from './AddWidget'
 import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import { showModal } from '../../actions/appActions'
@@ -52,7 +51,7 @@ class QuickAddWidget extends Component {
   selectCurrent = (event) => {
     const { selectedWidgetType } = this.state
     if (selectedWidgetType) {
-      this.addWidget(selectedWidgetInfo, event)
+      this.addWidget(selectedWidgetType, event)
     } else {
       const widgetInfos = this.widgetInfos()
       if (!widgetInfos || !widgetInfos.length) return

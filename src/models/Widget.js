@@ -1,3 +1,5 @@
+import * as assert from 'assert'
+
 import { SimpleSearchWidgetInfo, ExistsWidgetInfo, FacetWidgetInfo,
   MapWidgetInfo, DateRangeWidgetInfo, RangeWidgetInfo, SimilarHashWidgetInfo,
   FiletypeWidgetInfo, ColorWidgetInfo } from '../components/Racetrack/WidgetInfo'
@@ -135,7 +137,7 @@ export function createSimilarityWidget (hashName, fieldType, hashVal, minScore, 
     assert.ok(hashTypes[hashName])
     sliver.filter = new AssetFilter({
       hamming: {
-        field: `${SCHEMA}.${hashName}.${hashTypes[hashName]}.raw`,
+        field: `Similarity.${hashName}.${hashTypes[hashName]}.raw`,
         hashes: [ hashVal ],
         minScore
       }

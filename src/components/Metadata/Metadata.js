@@ -132,7 +132,7 @@ class Metadata extends Component {
   }
 
   toggleWidget = (field, event) => {
-    const { widgets, fieldTypes } = this.props
+    const { widgets } = this.props
     const index = widgets.findIndex(widget => fieldUsedInWidget(field, widget))
     if (index >= 0) {
       this.props.actions.removeRacetrackWidgetIds([widgets[index].id])
