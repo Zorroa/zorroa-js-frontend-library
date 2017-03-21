@@ -5,7 +5,7 @@ import React from 'react'
 import { render } from 'react-dom'
 import { Router, browserHistory } from 'react-router'
 import { Provider } from 'react-redux'
-import { createStore, applyMiddleware } from 'redux'
+import { createStore, applyMiddleware, compose } from 'redux'
 import multi from 'redux-multi'
 import thunk from 'redux-thunk'
 import ReduxPromise from 'redux-promise'
@@ -33,8 +33,15 @@ const log = debug('application:bootstrap')
 
 log('creating state container')
 const middleware = [thunk, multi, ReduxPromise]
-const createStoreWithMiddleware = applyMiddleware(...middleware)(createStore)
-const store = createStoreWithMiddleware(reducers)
+// Add support in DEBUG builds for Redux DevTools
+// In Chrome, you only need the extension: https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd
+// Redux DevTools site: http://extension.remotedev.io/
+// This code modified using Redux DevTools setup instructions here:
+// http://extension.remotedev.io/#usage (1.2 Advanced store setup)
+const composeEnhancers = (DEBUG && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) || compose
+const store = createStore(reducers, /* preloadedState, */ composeEnhancers(
+  applyMiddleware(...middleware)
+))
 
 log('creating application node')
 const applicationNode = (
