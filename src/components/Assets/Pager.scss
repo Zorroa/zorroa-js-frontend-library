@@ -52,34 +52,16 @@
       @media screen and (max-width: 1300px) { content: 'LOAD'; }
     }
   }
-
-  .Pager-page-size {
-    margin-left: 4px;
-    margin-right: 4px;
-    color: #777;
-    font-size: 12px;
-
-    @media screen and (max-width: 1300px) { display: none; }
-
-    &.pager-page-size-selected {
-      color: #71b623;
-    }
-
-    button {
-      margin: 22px 10px;
-      border-top: none;
-      border-left: none;
-      border-right: none;
-      border-bottom: 1px solid;
-      border-radius: 0;
-      padding: 0;
-      font-weight: 400;
-    }
-  }
 }
 
 .Pager-hidden {
   background: none;
   position: relative;
   height: 1px;      // Otherwise scrolling fails?
+}
+
+.Pager-waiting {
+  position: relative;
+  margin-top: 12px;
+  margin-bottom: 8px;
 }

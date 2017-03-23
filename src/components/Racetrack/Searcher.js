@@ -17,7 +17,6 @@ import { MapWidgetInfo } from './WidgetInfo'
 class Searcher extends Component {
   static propTypes = {
     query: PropTypes.instanceOf(AssetSearch),
-    pageSize: PropTypes.number.isRequired,
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
     folders: PropTypes.instanceOf(Map),
     selectedFolderIds: PropTypes.object,
@@ -101,7 +100,7 @@ class Searcher extends Component {
   // Note that post-filter is less efficient than a standard filter.
   render () {
     const {
-      widgets, actions, folders, selectedFolderIds, query, pageSize,
+      widgets, actions, folders, selectedFolderIds, query,
       modifiedFolderIds, trashedFolders, order,
       similarField, similarValues } = this.props
     let assetSearch = new AssetSearch({order})
@@ -161,7 +160,7 @@ class Searcher extends Component {
     // FIXME: Count trashed folders once the server adds support
     const searchModified = this.inflightQuery ? !this.inflightQuery.equals(assetSearch) : (!query || !assetSearch.equals(query))
     if (searchModified) {
-      assetSearch.size = pageSize || AssetSearch.defaultPageSize
+      assetSearch.size = AssetSearch.autoPageSize
       actions.searchAssets(assetSearch, query)
       this.inflightQuery = assetSearch
       if (query) {
@@ -192,7 +191,6 @@ const mapDispatchToProps = dispatch => ({
 
 const mapStateToProps = state => ({
   query: state.assets.query,
-  pageSize: state.assets.pageSize,
   order: state.assets.order,
   widgets: state.racetrack.widgets,
   folders: state.folders.all,

@@ -3,7 +3,6 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import { hideModal } from '../../actions/appActions'
-import { setPageSize } from '../../actions/assetsAction'
 import { saveUserSettings } from '../../actions/authAction'
 import { archivistInfo, archivistHealth, archivistMetrics } from '../../actions/archivistAction'
 import User from '../../models/User'
@@ -15,7 +14,6 @@ class Preferences extends Component {
     info: PropTypes.object,
     health: PropTypes.object,
     metrics: PropTypes.object,
-    pageSize: PropTypes.number,
     actions: PropTypes.object
   }
 
@@ -35,13 +33,8 @@ class Preferences extends Component {
     this.props.actions.saveUserSettings(this.props.user, {})
   }
 
-  setPageSize = (event) => {
-    const pageSize = Math.min(Math.max(100, event.target.value), 10000)
-    this.props.actions.setPageSize(pageSize)
-  }
-
   render () {
-    const { user, pageSize, info, health, metrics } = this.props
+    const { user, info, health, metrics } = this.props
     return (
       <div className="Preferences">
         <div className="Preferences-header">
@@ -58,14 +51,6 @@ class Preferences extends Component {
             <span>{user.email}</span>
           </div>
           <div className="Preferences-curator flexCol">
-            <div className="Preferences-curator-page-size">
-              <span className="Preferences-page-size-label">Page Size</span>
-              <input className="Preferences-page-size-text" size="5"
-                     type="text" value={pageSize} onChange={this.setPageSize}/>
-              <input className="Preferences-page-size-slider" type="range"
-                     onChange={this.setPageSize}
-                     value={pageSize} min="100" max="10000" step="100" />
-            </div>
             <button className="Preferences-reset" onClick={this.reset}>Reset Defaults</button>
           </div>
           <div className="Preferences-status">
@@ -93,11 +78,9 @@ class Preferences extends Component {
 export default connect(state => ({
   info: state.archivist.info,
   health: state.archivist.health,
-  metrics: state.archivist.metrics,
-  pageSize: state.assets.pageSize
+  metrics: state.archivist.metrics
 }), dispatch => ({
   actions: bindActionCreators({
-    setPageSize,
     saveUserSettings,
     archivistInfo,
     archivistHealth,

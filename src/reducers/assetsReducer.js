@@ -1,7 +1,7 @@
 import {
   ASSET_SEARCH, ASSET_AGGS, ASSET_SEARCH_ERROR,
   ASSET_SORT, ASSET_ORDER, ASSET_FIELDS, SIMILAR_VALUES,
-  PAGE_SIZE, ISOLATE_ASSET, SELECT_ASSETS, SELECT_PAGES,
+  ISOLATE_ASSET, SELECT_ASSETS, SELECT_PAGES,
   SUGGEST_COMPLETIONS, SEARCH_DOCUMENT, UNAUTH_USER
 } from '../constants/actionTypes'
 
@@ -9,8 +9,6 @@ import AssetSearch from '../models/AssetSearch'
 import * as api from '../globals/api.js'
 
 const initialState = {
-  pageSize: AssetSearch.defaultPageSize,
-
   // These "counters" increment whenever the query or selection changes.
   // The value itself has no meaning, these are used to respond to query
   // or selection changes. (See Assets & Table for examples)
@@ -113,9 +111,6 @@ export default function (state = initialState, action) {
 
     case SELECT_PAGES:
       return { ...state, selectedPageIds: action.payload }
-
-    case PAGE_SIZE:
-      return { ...state, pageSize: action.payload }
 
     case SUGGEST_COMPLETIONS:
       return { ...state, suggestions: action.payload }

@@ -4,7 +4,7 @@ import {
   UNAUTH_USER, ASSET_SEARCH, ASSET_AGGS, ASSET_SEARCH_ERROR,
   ASSET_SORT, ASSET_ORDER, ASSET_FIELDS,
   ISOLATE_ASSET, SELECT_ASSETS,
-  SELECT_PAGES, PAGE_SIZE,
+  SELECT_PAGES,
   SUGGEST_COMPLETIONS, SEARCH_DOCUMENT
 } from '../constants/actionTypes'
 import Asset from '../models/Asset'
@@ -185,13 +185,6 @@ export function selectPageAssetIds (ids) {
   return ({
     type: SELECT_PAGES,
     payload: ids
-  })
-}
-
-export function setPageSize (count) {
-  return ({
-    type: PAGE_SIZE,
-    payload: count
   })
 }
 

@@ -3,12 +3,13 @@ import Measure from 'react-measure'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import keydown from 'react-keydown'
+import classnames from 'classnames'
 import * as assert from 'assert'
 
 import Thumb, { page, monopageBadges, multipageBadges } from '../Thumb'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
-import { isolateAssetId, selectAssetIds, sortAssets } from '../../actions/assetsAction'
+import { isolateAssetId, selectAssetIds, sortAssets, searchAssets } from '../../actions/assetsAction'
 import { resetRacetrackWidgets, similarValues } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
@@ -17,12 +18,11 @@ import Pager from './Pager'
 import Footer from './Footer'
 import Table from '../Table'
 import Editbar from './Editbar'
-import SortingSelector from './SortingSelector'
 import * as ComputeLayout from './ComputeLayout.js'
 import AssetSearch from '../../models/AssetSearch'
 import Resizer from '../../services/Resizer'
 import TrashedFolder from '../../models/TrashedFolder'
-import { addSiblings, equalSets } from '../../services/jsUtil'
+import { addSiblings, equalSets, unCamelCase } from '../../services/jsUtil'
 import * as api from '../../globals/api.js'
 
 const assetsScrollPadding = 8
@@ -426,7 +426,7 @@ class Assets extends Component {
   }
 
   renderEditbar () {
-    const { assets, order, selectedIds, similarField, similarValues } = this.props
+    const { assets, order, selectedIds, similarField, similarValues, query } = this.props
 
     const similarActive = similarField && similarField.length > 0 && similarValues && similarValues.length > 0
     let similarValuesSelected = selectedIds && selectedIds.size === similarValues.length
@@ -435,7 +435,7 @@ class Assets extends Component {
         const v = similarValues[i]
         // value must be in the first N assets, not entire asset list
         let foundV = false
-        for (let j = 0; j < similarValues.length; ++j) {
+        for (let j = 0; j < similarValues.length && j < assets.length; ++j) {
           const asset = assets[j]
           if (selectedIds.has(asset.id) && asset.value(similarField) === v) {
             foundV = true
@@ -459,23 +459,56 @@ class Assets extends Component {
         if (!asset || !asset.rawValue(similarField)) canSortSimilar = false
       })
     }
+    const sortSimilar = canSortSimilar ? this.sortSimilar : null
+
+    const columnName = order && order.length && order[0].field !== 'source.filename' ? unCamelCase(Asset.lastNamespace(order[0].field)) : 'Table Column'
 
     return (
       <Editbar selectedAssetIds={selectedIds}
                onDeselectAll={this.deselectAll}
                isRemoveEnabled={this.selectedFolderContainsSelectedAssets}
                onRemove={this.removeAssetsFromSelectedFolders}>
-        <SortingSelector sortAssets={this.sortAssets} order={order}
-                         showAlphabetical={!similarField || !similarField.length}
-                         showSimilar={similarField && similarField.length > 0}
-                         similarActive={similarActive} similarValuesSelected={similarValuesSelected}
-                         sortSimilar={canSortSimilar ? this.sortSimilar : null} />
+        <div className="SortingSelector">
+          <div className="SortingSelector-title">Sort By</div>
+          <div onClick={this.sortAssets}
+               className={classnames('SortingSelector-sort',
+                 {'SortingSelector-selected': !similarActive &&
+                 (!order || !order.length)})}>
+            { !query || query.empty() ? 'Latest' : 'Rank' }
+          </div>
+          { similarField && similarField.length > 0 &&
+          <div onClick={sortSimilar} className="SortingSelector-similar">
+            { similarActive && !similarValuesSelected &&
+            <div onClick={sortSimilar}
+                 className="icon-settings_backup_restore">&thinsp;</div> }
+            <div className={classnames('SortingSelector-sort',
+              { 'SortingSelector-selected': similarActive,
+                'SortingSelector-disabled': !sortSimilar
+              })}>
+              Similar
+            </div>
+          </div>
+          }
+          { !similarField || !similarField.length &&
+          <div onClick={e => { this.sortAssets('source.filename', true) }}
+               className={classnames('SortingSelector-sort',
+                 {'SortingSelector-enabled': order && order.length >= 1 &&
+                 order[0].field === 'source.filename'})}>
+            Alphabetical {order && order.length >= 1 && order[0].field === 'source.filename' && !order[0].ascending ? '(Z-A)' : '(A-Z)'}
+          </div>
+          }
+          <div className={classnames('SortingSelector-sort',
+            {'SortingSelector-selected': order && order.length && order[0].field !== 'source.filename'},
+            {'SortingSelector-disabled': !order || !order.length || order[0].field === 'source.filename'})}>
+            {columnName}
+          </div>
+        </div>
       </Editbar>
     )
   }
 
   renderAssets () {
-    const { assets, selectedIds, totalCount, layout, showMultipage, protocol, host, thumbSize } = this.props
+    const { assets, selectedIds, totalCount, layout, showMultipage, protocol, host, thumbSize, query } = this.props
     const { positions, multipage, collapsed, tableIsResizing } = this.state
     api.setTableIsResizing(tableIsResizing)
 
@@ -531,11 +564,19 @@ class Assets extends Component {
                   const dim = index < positions.length ? positions[index] : { width: 0, height: 0 }
                   const { width, height } = dim
                   // Render only the visible thumbnails
-                  if ((!dim) || width <= 0 || height <= 0 ||
-                      (assetsScrollPadding + dim.y > this.state.assetsScrollTop + this.state.assetsScrollHeight) ||
+                  if ((assetsScrollPadding + dim.y > this.state.assetsScrollTop + this.state.assetsScrollHeight) ||
                       (assetsScrollPadding + dim.y + height < this.state.assetsScrollTop)) {
                     return null
                   }
+                  if (index < positions.length && index === assets.length - 1 && assets.length < totalCount && assets.length % AssetSearch.maxPageSize && this.loaded !== assets.length) {
+                    this.loaded = assets.length
+                    var nextPageQuery = new AssetSearch(query)
+                    nextPageQuery.from = assets.length
+                    nextPageQuery.size = AssetSearch.autoPageSize
+                    console.log('Loading ' + nextPageQuery.size + ' from ' + nextPageQuery.from)
+                    this.props.actions.searchAssets(nextPageQuery)
+                  }
+                  if (!dim || width <= 0 || height <= 0) return null
                   const parentId = asset.parentId()
                   const indexes = parentId && multipage[parentId]
                   const badgeHeight = thumbSize < 100 ? 15 : 25
@@ -651,6 +692,7 @@ export default connect(state => ({
     isolateAssetId,
     selectAssetIds,
     sortAssets,
+    searchAssets,
     resetRacetrackWidgets,
     similarValues,
     selectFolderIds,
