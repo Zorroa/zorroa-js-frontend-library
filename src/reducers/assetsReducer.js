@@ -5,7 +5,6 @@ import {
   SUGGEST_COMPLETIONS, SEARCH_DOCUMENT, UNAUTH_USER
 } from '../constants/actionTypes'
 
-import AssetSearch from '../models/AssetSearch'
 import * as api from '../globals/api.js'
 
 const initialState = {

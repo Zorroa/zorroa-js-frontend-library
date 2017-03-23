@@ -4,7 +4,7 @@ export function unCamelCase (str) {
   // Convert upper and lower underscore to camel case
   if (str.indexOf('_') >= 0 && (str === str.toUpperCase() || str === str.toLowerCase())) {
     // convert all-upper-under to camelcase
-    buf = str.toLowerCase().replace(/[-_]([a-z,A-Z])/g, function (g) { return g[1].toUpperCase(); });
+    buf = str.toLowerCase().replace(/[-_]([a-z,A-Z])/g, function (g) { return g[1].toUpperCase() })
   } else {
     buf = str
   }
