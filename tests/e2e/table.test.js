@@ -39,16 +39,16 @@ describe('Table', function () {
 
   it('user should be able to log in', function () {
     DEBUG && console.log('user should be able to log in')
-    return selenium.login(driver)
+    return selenium.login()
 
     // Make sure Workspace, header, Assets are visible
-    .then(_ => selenium.expectCssElementIsVisible(driver, '.header'))
-    .then(_ => selenium.expectCssElementIsVisible(driver, '.Workspace'))
-    .then(_ => selenium.expectCssElementIsVisible(driver, '.Assets'))
+    .then(_ => selenium.expectCssElementIsVisible('.header'))
+    .then(_ => selenium.expectCssElementIsVisible('.Workspace'))
+    .then(_ => selenium.expectCssElementIsVisible('.Assets'))
 
     // Wait for the default server query to return, and start displaying assets
     .then(_ => driver.wait(until.elementLocated(By.css('.assets-footer')), 15000))
-    .then(_ => selenium.expectCssElementIsVisible(driver, '.assets-footer'))
+    .then(_ => selenium.expectCssElementIsVisible('.assets-footer'))
   })
 
   // ------------------------------------
@@ -71,32 +71,32 @@ describe('Table', function () {
       DEBUG && console.log({n, dy, yoffset})
       var prom = driver
       .then(_ => driver.actions().mouseDown(elements[fromEleName]).perform())
-      .then(_ => selenium.showLog(driver))
+      .then(_ => selenium.showLog())
 
       // Dummy mouse move events make the remote Sauce runs more stable
       // .then(_ => driver.actions().mouseMove({x: 0, y: 0}).perform())
-      // .then(_ => selenium.showLog(driver))
+      // .then(_ => selenium.showLog())
       .then(_ => driver.actions().mouseMove({x: 0, y: 0}).perform())
-      .then(_ => selenium.showLog(driver))
+      .then(_ => selenium.showLog())
 
-      .then(_ => selenium.waitForJsFnVal(driver, 'window.zorroa.getTableIsResizing', true, 10000))
-      .then(_ => selenium.showLog(driver))
+      .then(_ => selenium.waitForJsFnVal('window.zorroa.getTableIsResizing', true, 10000))
+      .then(_ => selenium.showLog())
 
       for (let i = 0; i < n; i++) {
         // prom = prom.then(_ => DEBUG && console.log({x: 0, y: dy}))
         prom = prom.then(_ => driver.actions().mouseMove({x: 0, y: dy}).perform())
-        // prom = prom.then(_ => selenium.showLog(driver))
+        // prom = prom.then(_ => selenium.showLog())
       }
 
-      prom = prom.then(_ => selenium.showLog(driver))
+      prom = prom.then(_ => selenium.showLog())
 
       prom = prom
       .then(_ => driver.actions().mouseMove({x: 0, y: 0}).perform())
-      .then(_ => selenium.showLog(driver))
+      .then(_ => selenium.showLog())
       .then(_ => driver.actions().mouseUp().perform())
-      .then(_ => selenium.showLog(driver))
-      .then(_ => selenium.waitForJsFnVal(driver, 'window.zorroa.getTableIsResizing', false, 10000))
-      .then(_ => selenium.showLog(driver))
+      .then(_ => selenium.showLog())
+      .then(_ => selenium.waitForJsFnVal('window.zorroa.getTableIsResizing', false, 10000))
+      .then(_ => selenium.showLog())
 
       return prom
     }
@@ -107,13 +107,13 @@ describe('Table', function () {
     .then(_ => driver.wait(until.elementLocated(By.css('.assets-footer')), 15000))
 
     // Table shouldn't be visible initially
-    .then(_ => selenium.expectCssElementIsNotVisible(driver, '.Table'))
+    .then(_ => selenium.expectCssElementIsNotVisible('.Table'))
 
     // Open the Table
     .then(_ => driver.findElement(By.css('.TableToggle')))
     .then(ele => { TableToggle = ele })
     .then(_ => TableToggle.click())
-    .then(_ => selenium.expectCssElementIsVisible(driver, '.Table'))
+    .then(_ => selenium.expectCssElementIsVisible('.Table'))
 
     .then(_ => selenium.findCssElements(['.Table', '.header', '.assets-footer', '.assets-scroll', '.Assets-tableResize']))
     .then(eles => { elements = eles })
@@ -141,6 +141,6 @@ describe('Table', function () {
 
     // Close the Table
     .then(_ => TableToggle.click())
-    .then(_ => selenium.expectCssElementIsNotVisible(driver, '.Table'))
+    .then(_ => selenium.expectCssElementIsNotVisible('.Table'))
   })
 })
