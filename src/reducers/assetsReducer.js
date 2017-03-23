@@ -1,5 +1,5 @@
 import {
-  ASSET_SEARCH, ASSET_SEARCH_ERROR,
+  ASSET_SEARCH, ASSET_AGGS, ASSET_SEARCH_ERROR,
   ASSET_SORT, ASSET_ORDER, ASSET_FIELDS, SIMILAR_VALUES,
   PAGE_SIZE, ISOLATE_ASSET, SELECT_ASSETS, SELECT_PAGES,
   SUGGEST_COMPLETIONS, SEARCH_DOCUMENT, UNAUTH_USER
@@ -53,12 +53,17 @@ function inject (src, idx, arr) {
 export default function (state = initialState, action) {
   switch (action.type) {
     case ASSET_SEARCH: {
-      const { query, assets, page, aggs } = action.payload
+      const { query, assets, page } = action.payload
       const all = state.all && page && page.from ? inject(state.all, page.from, assets) : assets
       const totalCount = page && page.totalCount ? page.totalCount : 0
       const assetsCounter = state.assetsCounter + 1
       api.setAssetsCounter(assetsCounter)
-      return { ...state, all, aggs, query, totalCount, isolatedId: null, suggestions: null, assetsCounter }
+      return { ...state, all, query, totalCount, isolatedId: null, suggestions: null, assetsCounter }
+    }
+
+    case ASSET_AGGS: {
+      const { aggs } = action.payload
+      return { ...state, aggs }
     }
 
     case SEARCH_DOCUMENT: {
