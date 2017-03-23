@@ -99,8 +99,8 @@ class Racetrack extends Component {
     return (
       <div className="Racetrack-footer flexOff">
         <div className="Racetrack-footer-group">
-          <button disabled={disabled} onClick={this.saveRacetrack} className="Racetrack-footer-save-button">Save</button>
-          <button disabled={disabled} onClick={this.clearRacetrack}>Clear</button>
+          <button disabled={disabled} onClick={this.saveRacetrack} className="Racetrack-footer-save">Save</button>
+          <button disabled={disabled} onClick={this.clearRacetrack} className="Racetrack-footer-clear">Clear</button>
         </div>
       </div>
     )

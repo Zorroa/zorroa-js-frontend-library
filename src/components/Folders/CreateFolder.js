@@ -275,7 +275,7 @@ class CreateFolder extends Component {
             )}
           </div>
           <div className="CreateFolder-footer flexRow flexJustifyCenter">
-            <button className={classnames('default', {disabled: (!name || !name.length)})} onClick={this.saveFolder}>Save</button>
+            <button className={classnames('CreateFolder-save default', {disabled: (!name || !name.length)})} onClick={this.saveFolder}>Save</button>
             <button onClick={this.dismiss}>Cancel</button>
           </div>
           { (onLink || onDelete) && (
