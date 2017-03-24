@@ -1,7 +1,7 @@
 import * as assert from 'assert'
 
 import {
-  UNAUTH_USER, ASSET_SEARCH, ASSET_SEARCH_ERROR,
+  UNAUTH_USER, ASSET_SEARCH, ASSET_AGGS, ASSET_SEARCH_ERROR,
   ASSET_SORT, ASSET_ORDER, ASSET_FIELDS,
   ISOLATE_ASSET, SELECT_ASSETS,
   SELECT_PAGES, PAGE_SIZE,
@@ -48,16 +48,47 @@ export function searchAssetsRequestProm (dispatch, query) {
   })
 }
 
-export function searchAssets (query) {
+export function searchAssets (query, lastQuery) {
   return dispatch => {
-    return searchAssetsRequestProm(dispatch, query)
-    .then(response => {
-      const page = new Page(response.data.page)
-      const assets = response.data.list.map(asset => (new Asset(asset)))
-      const aggs = response.data.aggregations
-      dispatch({
-        type: ASSET_SEARCH,
-        payload: { query, assets, page, aggs }
+    const promises = []
+    const mainQueryChanged = !lastQuery || query.query !== lastQuery.query || query.filter !== lastQuery.filter
+    const postFilterChanged = query.postFilter && !query.postFilter.empty() && (!lastQuery.postFilter || query.postFilter !== lastQuery.postFilter)
+    if (mainQueryChanged || postFilterChanged) {
+      const mainQuery = new AssetSearch(query)
+      mainQuery.aggs = null
+      mainQuery.postFilter = null
+      if (query.filter && query.postFilter) {
+        mainQuery.filter.merge(query.postFilter)
+      } else if (query.postFilter) {
+        mainQuery.filter = query.postFilter
+      }
+      promises.push(searchAssetsRequestProm(dispatch, mainQuery))
+    }
+    const aggsChanged = !lastQuery || !lastQuery.aggs || JSON.stringify(query.aggs) !== JSON.stringify(lastQuery.aggs)
+    if (!query.from /* first page only */ && query.aggs && (mainQueryChanged || aggsChanged)) {
+      const aggQuery = new AssetSearch(query)
+      aggQuery.postFilter = null
+      aggQuery.from = 0
+      aggQuery.size = 1
+      promises.push(searchAssetsRequestProm(dispatch, aggQuery))
+    }
+    return Promise.all(promises)
+    .then(responses => {
+      responses.forEach(response => {
+        if (response.data.aggregations) {
+          const aggs = response.data.aggregations
+          dispatch({
+            type: ASSET_AGGS,
+            payload: { aggs }
+          })
+        } else {
+          const page = new Page(response.data.page)
+          const assets = response.data.list.map(asset => (new Asset(asset)))
+          dispatch({
+            type: ASSET_SEARCH,
+            payload: { query, assets, page }
+          })
+        }
       })
     })
     .catch(error => {

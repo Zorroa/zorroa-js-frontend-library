@@ -162,7 +162,7 @@ class Searcher extends Component {
     const searchModified = this.inflightQuery ? !this.inflightQuery.equals(assetSearch) : (!query || !assetSearch.equals(query))
     if (searchModified) {
       assetSearch.size = pageSize || AssetSearch.defaultPageSize
-      actions.searchAssets(assetSearch)
+      actions.searchAssets(assetSearch, query)
       this.inflightQuery = assetSearch
       if (query) {
         // FIXME: Disable saving search to user settings to avoid conflicts
@@ -172,9 +172,7 @@ class Searcher extends Component {
         // New query, get all the filtered folder counts
         this.queueFolderCounts(new Set([...folders.keys()]), assetSearch)
       }
-    }
-
-    if (modifiedFolderIds && modifiedFolderIds.size) {
+    } else if (modifiedFolderIds && modifiedFolderIds.size) {
       this.queueFolderCounts(modifiedFolderIds)
       this.queueFolderCounts(modifiedFolderIds, assetSearch)
     }

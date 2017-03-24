@@ -30,7 +30,7 @@ class Multipage extends Component {
   }
 
   state = {
-    showDocument: true,
+    showDocument: false,
     showedPages: this.props.showPages
   }
 
