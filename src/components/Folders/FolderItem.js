@@ -248,7 +248,7 @@ class FolderItem extends Component {
             ))}
           { singleFolderSelected && !folder.isDyhi() && folder.search &&
           <div onClick={this.restoreSearch}
-               className="FolderItem-context-item"
+               className="FolderItem-context-item FolderItem-context-restore-widgets"
                onContextMenu={this.dismissContextMenu}>
             <div className="icon-settings_backup_restore"/><div>Restore Widgets</div></div> }
           { singleFolderSelected &&
@@ -278,7 +278,7 @@ class FolderItem extends Component {
             <div>Edit...</div>
           </div> }
           <div onClick={this.removeFolder}
-               className="FolderItem-context-item"
+               className="FolderItem-context-item FolderItem-context-remove-folder"
                onContextMenu={this.dismissContextMenu}>
             <div className="icon-trash2"/>
             <div>Remove folder</div>

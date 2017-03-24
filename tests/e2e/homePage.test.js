@@ -40,7 +40,7 @@ describe('Home Page', function () {
   it('signin page should have a header and login form', function () {
     DEBUG && console.log('------ signin page should have a header and login form')
     // return the driver (a thenable) so that jest will wait
-    return selenium.logout(driver)
+    return selenium.logout()
 
     .then(_ => driver.get(selenium.BASE_URL))
 
@@ -50,14 +50,14 @@ describe('Home Page', function () {
     .then(attr => expect(attr).toMatch(/auth-logo/))
 
     // Make sure we have username & password fields
-    .then(_ => selenium.expectCssElementIsVisible(driver, 'input[name="username"]'))
-    .then(_ => selenium.expectCssElementIsVisible(driver, 'input[name="password"]'))
+    .then(_ => selenium.expectCssElementIsVisible('input[name="username"]'))
+    .then(_ => selenium.expectCssElementIsVisible('input[name="password"]'))
   })
 
   it('forgot password should redirect to /signup', function () {
     DEBUG && console.log('------ forgot password should redirect to /signup')
-    return selenium.logout(driver)
-    .then(_ => selenium.expectCssElementIsVisible(driver, '.auth-forgot'))
+    return selenium.logout()
+    .then(_ => selenium.expectCssElementIsVisible('.auth-forgot'))
     .then(_ => driver.findElement(By.css('.auth-forgot')).click())
     .then(_ => driver.getCurrentUrl())
     .then(url => expect(url).toBe(`${selenium.BASE_URL}/signup`))
@@ -65,6 +65,6 @@ describe('Home Page', function () {
 
   it('user should be able to log in', function () {
     DEBUG && console.log('------ forgot password should redirect to /signup')
-    return selenium.login(driver)
+    return selenium.login()
   })
 })

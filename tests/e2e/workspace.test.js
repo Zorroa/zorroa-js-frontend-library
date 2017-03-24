@@ -38,7 +38,7 @@ describe('Workspace', function () {
   // ----------------------------------------------------------------------
 
   it('user should be able to log in', function () {
-    return selenium.login(driver)
+    return selenium.login()
   })
 
   // ------------------------------------
@@ -56,14 +56,14 @@ describe('Workspace', function () {
     return driver
 
     // Make sure Workspace, header, Assets are visible
-    .then(_ => selenium.expectCssElementIsVisible(driver, '.header'))
-    .then(_ => selenium.expectCssElementIsVisible(driver, '.Workspace'))
-    .then(_ => selenium.expectCssElementIsVisible(driver, '.Assets'))
+    .then(_ => selenium.expectCssElementIsVisible('.header'))
+    .then(_ => selenium.expectCssElementIsVisible('.Workspace'))
+    .then(_ => selenium.expectCssElementIsVisible('.Assets'))
 
     // Wait for the default server query to return, and start displaying assets
     .then(_ => driver.wait(until.elementLocated(By.css('.assets-footer')), 15000))
 
-    .then(_ => selenium.expectCssElementIsVisible(driver, '.assets-footer'))
+    .then(_ => selenium.expectCssElementIsVisible('.assets-footer'))
 
     // Snag the sidebar elements, make sure they're visible
     .then(_ => driver.findElement(By.css('.Sidebar:not(.isRightEdge)')))
@@ -76,10 +76,10 @@ describe('Workspace', function () {
     .then(e => { rightSidebarToggle = e })
     .then(_ => {
       var proms = []
-      proms.push(selenium.expectElementIsVisible(driver, leftSidebar, 'leftSidebar'))
-      proms.push(selenium.expectElementIsVisible(driver, leftSidebarToggle, 'leftSidebarToggle'))
-      proms.push(selenium.expectElementIsVisible(driver, rightSidebar, 'rightSidebarToggle'))
-      proms.push(selenium.expectElementIsVisible(driver, rightSidebarToggle, 'rightSidebarToggle'))
+      proms.push(selenium.expectElementIsVisible(leftSidebar, 'leftSidebar'))
+      proms.push(selenium.expectElementIsVisible(leftSidebarToggle, 'leftSidebarToggle'))
+      proms.push(selenium.expectElementIsVisible(rightSidebar, 'rightSidebarToggle'))
+      proms.push(selenium.expectElementIsVisible(rightSidebarToggle, 'rightSidebarToggle'))
       return Promise.all(proms)
     })
 
@@ -126,20 +126,19 @@ describe('Workspace', function () {
     .then(_ => driver.findElement(By.css(suggestionsSelector)))
     .then(element => { suggestions = element })
 
-    .then(_ => selenium.expectElementIsVisible(driver, suggestions, suggestionsSelector))
+    .then(_ => selenium.expectElementIsVisible(suggestions, suggestionsSelector))
     .then(_ => suggestions.findElements(By.css('.Suggestions-suggestion')))
     .then(elementArray => expect(elementArray.length).toBeGreaterThan(0))
 
     // Make sure a search works and returns assets
-    .then(_ => selenium.waitForAssetsCounterChange(driver, _ => searchbarSearch.sendKeys(Key.ENTER), 15000))
+    .then(_ => selenium.waitForAssetsCounterChange(_ => searchbarSearch.sendKeys(Key.ENTER), 15000))
     .then(_ => driver.findElement(By.css('.Assets-layout')))
     .then(element => element.findElements(By.css('.Thumb')))
     .then(elementArray => expect(elementArray.length).toBeGreaterThan(0))
 
     // Make sure a bad search returns 0 assets
     .then(_ => searchbarSearch.clear())
-    .then(_ => selenium.waitForAssetsCounterChange(driver,
-      _ => searchbarSearch.sendKeys(Date.now().toString(), Key.ENTER), 15000))
-    .then(_ => selenium.expectCssElementIsVisible(driver, '.assets-layout-empty'))
+    .then(_ => selenium.waitForAssetsCounterChange(_ => searchbarSearch.sendKeys(Date.now().toString(), Key.ENTER), 15000))
+    .then(_ => selenium.expectCssElementIsVisible('.assets-layout-empty'))
   })
 })

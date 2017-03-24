@@ -2,6 +2,7 @@ require('babel-register')({})
 // import * as assert from 'assert'
 import * as selenium from './selenium.js'
 var driver
+const { By, Key, until } = selenium.webdriver
 
 const DEBUG = false
 
@@ -38,30 +39,87 @@ describe('Collections', function () {
 
   it('user logs in', function () {
     DEBUG && console.log('user logs in')
-    return selenium.login(driver)
+    return selenium.login()
 
     // Wait for the default server query to return, and start displaying assets
-    .then(_ => selenium.waitForRequestSync(driver, 15000))
-    .then(_ => selenium.waitForCssElementVisible(driver, '.assets-footer', 15000))
+    .then(_ => selenium.waitForRequestSync(15000))
+    .then(_ => selenium.waitForCssElementVisible('.assets-footer', 15000))
   })
 
   it('open collections panel, empty any trash', function () {
     return driver
 
     // Open the collections panel (TODO: check if already open)
-    .then(_ => selenium.clickCssElement(driver, '.Collections'))
-    .then(_ => selenium.waitForCssElementVisible(driver, '.Folders-controls', 15000))
+    .then(_ => selenium.clickCssElement('.Collections'))
+    .then(_ => selenium.waitForCssElementVisible('.Folders-controls', 15000))
 
     // If there's any trash, empty it now
-    .then(_ => selenium.getCssElementVisible(driver, '.Collections .Trash'))
+    .then(_ => selenium.getCssElementVisible('.Collections .Trash'))
     .then(isVisible => {
       if (!isVisible) return
 
-      return selenium.clickCssElement(driver, '.Collections .Trash-toggle')
-      .then(_ => selenium.waitForCssElementVisible(driver, '.Collections .Trash-empty', 15000))
-      .then(_ => selenium.clickCssElement(driver, '.Collections .Trash-empty'))
-      .then(_ => selenium.waitForRequestSync(driver, 15000))
-      .then(_ => selenium.waitForCssElementNotVisible(driver, '.Collections .Trash', 15000))
+      selenium.clickCssElement('.Collections .Trash-toggle')
+      selenium.waitForCssElementVisible('.Collections .Trash-empty', 15000)
+      selenium.clickCssElement('.Collections .Trash-empty')
+      selenium.waitForRequestSync(15000)
+      selenium.waitForCssElementNotVisible('.Collections .Trash', 15000)
+
+      return driver
     })
+  })
+
+  it('create a new search, then delete it (assumes trash is empty)', function () {
+    let timeStr = Date.now().toString()
+    let searchStr = '_selenium_' + timeStr
+    let searchBar
+
+    // Search for something we know exists
+    driver.findElement(By.css('.Suggestions-search')).then(ele => { searchBar = ele })
+    driver.then(_ => searchBar.clear())
+    driver.then(_ => searchBar.sendKeys('dumbo', Key.ENTER))
+    selenium.waitForRequestSync()
+
+    // Open the racetrack
+    selenium.clickCssElement('.Sidebar-open-close-button.isRightEdge')
+    selenium.waitForCssElementVisible('.Racetrack')
+
+    // Save the search
+    selenium.clickCssElement('.Racetrack-footer-save')
+    selenium.waitForCssElementVisible('.modal .CreateFolder')
+    driver.findElement(By.css('.CreateFolder-input-title-input')).then(ele => ele.sendKeys(searchStr))
+    selenium.clickCssElement('.CreateFolder-save')
+    driver.wait(until.elementLocated(By.xpath(`//*[contains(text(), '${searchStr}')]`)))
+
+    // Clear the racetrack
+    selenium.clickCssElement('.Racetrack-footer-clear')
+    selenium.waitForCssElementVisible('.Racetrack-empty')
+
+    // Restore the saved search
+    let folder
+    let folderXpath = `//*[contains(text(), '${searchStr}')]` // http://stackoverflow.com/a/30648604/1424242
+    driver.findElement(By.xpath(folderXpath)).then(ele => { folder = ele })
+    driver.then(_ => driver.actions().click(folder, 2).perform()) // right-click
+    selenium.waitForCssElementVisible('.FolderItem-context-menu')
+    selenium.clickCssElement('.FolderItem-context-restore-widgets')
+    selenium.waitForCssElementNotVisible('.Racetrack-empty')
+    selenium.expectCssElementIsVisible('.Racetrack-filters')
+
+    // Delete the saved search
+    driver.then(_ => driver.actions().click(folder, 2).perform()) // right-click
+    selenium.waitForCssElementVisible('.FolderItem-context-menu')
+    selenium.clickCssElement('.FolderItem-context-remove-folder')
+    selenium.waitForCssElementVisible('.Collections .Trash', 15000)
+
+    // empty trash
+    selenium.getCssElementVisible('.Collections .Trash-empty')
+    .then(isVisible => {
+      if (!isVisible) return selenium.clickCssElement('.Collections .Trash-toggle')
+    })
+    selenium.waitForCssElementVisible('.Collections .Trash-empty', 15000)
+    selenium.clickCssElement('.Collections .Trash-empty')
+    selenium.waitForIdle(15000)
+    selenium.waitForCssElementNotVisible('.Collections .Trash', 15000)
+
+    return driver
   })
 })

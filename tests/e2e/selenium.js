@@ -1,7 +1,35 @@
+require('babel-register')({})
 
-import * as assert from 'assert'
+/*
+This provides utilities for selenium tests, normally included by a jest test file
+
+But you can run selenium manually and use the node REPL like so:
+
+// start node & launch browser:
+cat <(echo "var selenium = require('./tests/e2e/selenium.js')") - | ./node_modules/babel-cli/bin/babel-node.js --presets node6
+
+// ... do your thing ... examples:
+
+selenium.clickCssElement('.Suggestions-search');0
+driver.findElement(By.xpath(`//*[contains(text(), '_selenium_1490203108449')]`)).then(_=>'yes',_=>'no').then(console.log);0
+driver.wait(until.elementLocated(By.xpath(`//*[contains(text(), '_selenium_1490203108449')]`))).then(e=>{ e.click(); return 'yes'},_=>'no').then(console.log);0
+
+// exit gracefully:
+quit()
+*/
 
 const DEBUG = false
+
+// provide dummy versions of the jest deps in this file
+// this is used for manual testing, i.e., when running this file directly from node w/o jest
+const runningManually = (!global.expect)
+global.jasmine = global.jasmine || {}
+global.jest = global.jest || ({ autoMockOff: _ => {} })
+global.expect = global.expect || (_ => {
+  return {
+    toBe: _ => {}
+  }
+})
 
 // ----------------------------------------------------------------------
 
@@ -36,6 +64,7 @@ var testStopDate = Date.now()
 var testRunTimeMS = 0
 
 ;(function _monitorTestResults () {
+  if (!global.jasmineRequire) return
   // http://stackoverflow.com/a/33795262/1424242
   var MyReporter = function () { jasmineRequire.JsApiReporter.apply(this, arguments) }
   MyReporter.prototype = jasmineRequire.JsApiReporter.prototype
@@ -83,7 +112,7 @@ export function startBrowserAndDriver (_suite) {
   jest.autoMockOff()
 
   suite = _suite
-  assert.ok(suite && suite.description)
+  expect(suite && !!suite.description).toBe(true)
 
   if (USE_SAUCE) {
     // run tests using travis+sauce
@@ -156,7 +185,7 @@ export function stopBrowserAndDriver () {
 }
 
 // ----------------------------------------------------------------------
-export function waitForUrlChange (driver, optTimeout) {
+export function waitForUrlChange (optTimeout) {
   var oldUrl
   return driver.getCurrentUrl()
   .then(url => { oldUrl = url })
@@ -164,7 +193,7 @@ export function waitForUrlChange (driver, optTimeout) {
 }
 
 // ----------------------------------------------------------------------
-export function waitForUrl (driver, expectedURL, optTimeout) {
+export function waitForUrl (expectedURL, optTimeout) {
   return driver.wait(_ => {
     return driver.getCurrentUrl().then(url => {
       // console.log('waiting', url, expectedURL)
@@ -174,7 +203,7 @@ export function waitForUrl (driver, expectedURL, optTimeout) {
 }
 
 // ----------------------------------------------------------------------
-export function showLog (driver) {
+export function showLog () {
   return driver.executeScript('return window.zorroa.getLog()')
   .then(log => {
     if (DEBUG && log && log.length) console.log(log)
@@ -182,7 +211,7 @@ export function showLog (driver) {
 }
 
 // ----------------------------------------------------------------------
-export function waitForRequestSync (driver, optTimeout) {
+export function waitForRequestSync (optTimeout) {
   // Make sure we wait until the request is finished, wait for not busy
   return driver.wait(_ =>
     driver.executeScript('return window.zorroa.getRequestsSynced()')
@@ -191,7 +220,25 @@ export function waitForRequestSync (driver, optTimeout) {
 }
 
 // ----------------------------------------------------------------------
-export function waitForAssetsCounterChange (driver, actionFn, optTimeout) {
+export function waitForBusy (optTimeout) {
+  // Make sure we wait until a request has started
+  return driver.wait(_ =>
+    driver.executeScript('return window.zorroa.getRequestsSynced()')
+      .then(synced => { DEBUG && console.log({synced}); return !synced }),
+    optTimeout)
+}
+
+// ----------------------------------------------------------------------
+export function waitForIdle (optTimeout) {
+  // Make sure we wait until the request is finished, wait for not busy
+  return driver.wait(_ =>
+    driver.executeScript('return window.zorroa.getRequestsSynced()')
+      .then(synced => { DEBUG && console.log({synced}); return !!synced }),
+    optTimeout)
+}
+
+// ----------------------------------------------------------------------
+export function waitForAssetsCounterChange (actionFn, optTimeout) {
   var assetsCounter = 0
 
   return driver
@@ -216,7 +263,7 @@ export function waitForAssetsCounterChange (driver, actionFn, optTimeout) {
 // Optional actions can be passed that run before or after the first js function call
 // The optional pre action runs before the first js function call. It can return a promise if async
 // Optional post action runs after the first js function call. Can return promise if async
-export function waitForJsFnChange (driver, jsFnName, optPreActionFn, optPostActionFn, optTimeout) {
+export function waitForJsFnChange (jsFnName, optPreActionFn, optPostActionFn, optTimeout) {
   var jsFnFirstResult
 
   return driver
@@ -241,7 +288,7 @@ export function waitForJsFnChange (driver, jsFnName, optPreActionFn, optPostActi
 // ----------------------------------------------------------------------
 // This function will call the named js function repeatedly
 // until the return value equals the given expected result
-export function waitForJsFnVal (driver, jsFnName, jsFnExpectedValue, optTimeoutMS) {
+export function waitForJsFnVal (jsFnName, jsFnExpectedValue, optTimeoutMS) {
   var count = 0
   return driver
   .then(driver.wait(_ => {
@@ -256,14 +303,14 @@ export function waitForJsFnVal (driver, jsFnName, jsFnExpectedValue, optTimeoutM
 }
 
 // ----------------------------------------------------------------------
-export function logout (driver) {
+export function logout () {
   // de-auth and log out
   DEBUG && console.log('logout')
 
   return driver.manage().deleteAllCookies()
 
   // return driver.get(`${BASE_URL}/signout`)
-  // .then(_ => waitForUrlChange(driver, 5000))
+  // .then(_ => waitForUrlChange(5000))
 
   // make sure we're on /signin
   // .then(_ => driver.getCurrentUrl())
@@ -271,8 +318,8 @@ export function logout (driver) {
 }
 
 // ----------------------------------------------------------------------
-export function login (driver) {
-  return logout(driver)
+export function login () {
+  return logout()
   .then(_ => driver.get(`${BASE_URL}/signin`))
   .then(_ => driver.executeScript('window.zorroa.setSeleniumTesting(true)'))
   .then(_ => driver.findElement(By.css('input[name="username"]')).sendKeys('admin'))
@@ -281,7 +328,7 @@ export function login (driver) {
   .then(_ => driver.findElement(By.css('input[name="ssl"]')).isSelected())
   .then(isSelected => !isSelected && driver.findElement(By.css('input[name="ssl"]')).click())
   .then(_ => driver.findElement(By.css('.auth-button-primary')).click())
-  .then(_ => waitForUrl(driver, `${BASE_URL}/`, 15000))
+  .then(_ => waitForUrl(`${BASE_URL}/`, 15000))
   .then(_ => driver.getCurrentUrl())
   .then(url => { return expect(url).toBe(`${BASE_URL}/`) })
 
@@ -293,7 +340,7 @@ export function login (driver) {
   // .then(
   //   function _elementFound (element) {
   //     console.log('got clear')
-  //     return waitForAssetsCounterChange(driver, _ => element.click())
+  //     return waitForAssetsCounterChange(_ => element.click())
   //   },
   //   function _elementNotFound () {
   //   /* no clear button means everything's ready */
@@ -304,31 +351,31 @@ export function login (driver) {
 
 // ----------------------------------------------------------------------
 // wait until a css selector is visible (or timeout)
-export function getCssElementVisible (driver, selector) {
+export function getCssElementVisible (selector) {
   return driver.findElement(By.css(selector))
   .then((ele) => ele.isDisplayed(), () => false)
 }
 
 // ----------------------------------------------------------------------
 // wait until a css selector is visible (or timeout)
-export function waitForCssElementVisible (driver, selector, optTimeout) {
-  return driver.wait(_ => getCssElementVisible(driver, selector), optTimeout)
+export function waitForCssElementVisible (selector, optTimeout) {
+  return driver.wait(_ => getCssElementVisible(selector), optTimeout)
   // An alternative way to wait -- TODO determine if there's a reason to go one way or the other
   // .then(_ => driver.wait(until.elementLocated(By.css(selector)), 15000))
-  .then(_ => expectCssElementIsVisible(driver, selector))
+  .then(_ => expectCssElementIsVisible(selector))
 }
 
 // ----------------------------------------------------------------------
 // wait until a css selector is visible (or timeout)
-export function waitForCssElementNotVisible (driver, selector, optTimeout) {
-  return driver.wait(_ => getCssElementVisible(driver, selector).then(x => !x), optTimeout)
-  .then(_ => expectCssElementIsNotVisible(driver, selector))
+export function waitForCssElementNotVisible (selector, optTimeout) {
+  return driver.wait(_ => getCssElementVisible(selector).then(x => !x), optTimeout)
+  .then(_ => expectCssElementIsNotVisible(selector))
 }
 
 // ----------------------------------------------------------------------
 // assert (expect) that a css selector is visible
 // if not, the css selector is displayed in the error message
-export function expectCssElementIsVisible (driver, selector) {
+export function expectCssElementIsVisible (selector) {
   return driver
   .then(_ => driver.findElement(By.css(selector)))
   .then(
@@ -345,8 +392,8 @@ export function expectCssElementIsVisible (driver, selector) {
 // ----------------------------------------------------------------------
 // assert (expect) that a css selector is visible
 // if not, the css selector is displayed in the error message
-export function expectCssElementIsNotVisible (driver, selector) {
-  return getCssElementVisible(driver, selector)
+export function expectCssElementIsNotVisible (selector) {
+  return getCssElementVisible(selector)
   .then(isDisplayed => {
     DEBUG && console.log(`checking ${selector} (isDisplayed: ${isDisplayed})`)
     return expect(JSON.stringify({ selector, isDisplayed }))
@@ -358,7 +405,7 @@ export function expectCssElementIsNotVisible (driver, selector) {
 // assert (expect) that a webdriver WebElement is visible
 // elementName is whatever string you want to pass to identify
 // this element in the error message & make it easy to fix
-export function expectElementIsVisible (driver, element, elementName) {
+export function expectElementIsVisible (element, elementName) {
   return driver
   .then(_ => element.isDisplayed())
   .then(isDisplayed => {
@@ -377,7 +424,7 @@ export function expectElementIsVisible (driver, element, elementName) {
 // assert (expect) that a webdriver WebElement is visible
 // elementName is whatever string you want to pass to identify
 // this element in the error message & make it easy to fix
-export function expectElementIsNotVisible (driver, element, elementName) {
+export function expectElementIsNotVisible (element, elementName) {
   return driver
   .then(_ => element.isDisplayed())
   .then(isDisplayed => {
@@ -393,8 +440,8 @@ export function expectElementIsNotVisible (driver, element, elementName) {
 }
 
 // ----------------------------------------------------------------------
-export function clickCssElement (driver, selector) {
-  return expectCssElementIsVisible(driver, selector)
+export function clickCssElement (selector) {
+  return expectCssElementIsVisible(selector)
   .then(_ => driver.findElement(By.css(selector)).click())
 }
 
@@ -416,4 +463,32 @@ export function findCssElements (selectors) {
   })
 
   return Promise.all(proms).then(_ => elements)
+}
+
+// Setup global env when running manually
+if (runningManually) {
+  process.on('uncaughtException', function (err) {
+    // handle the error safely
+    console.error(err)
+  })
+  var cleanup = _ => {
+    console.log('cleanup')
+    if (global.driver) {
+      logout()
+      stopBrowserAndDriver()
+      return global.driver.then(_ => { global.driver = null })
+    }
+  }
+  process.on('exit', cleanup)
+  process.on('SIGINT', cleanup)
+  const { By, until, Key } = webdriver
+  global.By = By
+  global.until = until
+  global.Key = Key
+
+  global.driver = startBrowserAndDriver()
+  login()
+  global.quit = _ => { return cleanup().then(_ => process.exit()) }
+  process.stdin.resume() // so the program will not close instantly
+  require('util').inspect = function () { return '' } // prevent REPL from displaying return values -- I don't want to see Promises
 }
