@@ -9,6 +9,16 @@ window.zorroa = {}
 
 // ----------------------------------------------------------------------
 
+export var requestSentCounter = 0
+export var requestReceivedCounter = 0
+
+export function getRequestsSynced () {
+  return requestSentCounter === requestReceivedCounter
+}
+window.zorroa.getRequestsSynced = getRequestsSynced
+
+// ----------------------------------------------------------------------
+
 var selectionCounter = 0
 export function getSelectionCounter () {
   return selectionCounter

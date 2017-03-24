@@ -16,8 +16,6 @@ import Permission from '../models/Permission'
 // Global variable to hold axios connection
 // FIXME: Should this be state?
 var archivist
-var requestSentCounter = 0
-var requestReceivedCounter = 0
 
 // Create the global axios connection, on login or refresh.
 // Note this is not an action creator, so it should probably
@@ -48,23 +46,23 @@ export function createArchivist (dispatch, protocol, host) {
 // }
 
 function startRequest (dispatch) {
-  if (requestReceivedCounter === requestSentCounter) {
+  if (api.getRequestsSynced()) {
     requestAnimationFrame(_ => dispatch({ type: AUTH_SYNC, payload: false }))
   }
-  requestSentCounter++
+  api.requestSentCounter++
 }
 
 function finishRequest (dispatch, requestProm) {
   return requestProm
   .then(response => {
-    requestReceivedCounter++
-    if (requestReceivedCounter === requestSentCounter) {
+    api.requestReceivedCounter++
+    if (api.getRequestsSynced()) {
       requestAnimationFrame(_ => dispatch({ type: AUTH_SYNC, payload: true }))
     }
     return response
   }, error => {
-    requestReceivedCounter++
-    if (requestReceivedCounter === requestSentCounter) {
+    api.requestReceivedCounter++
+    if (api.getRequestsSynced()) {
       requestAnimationFrame(_ => dispatch({ type: AUTH_SYNC, payload: true }))
     }
     return Promise.reject(error)
