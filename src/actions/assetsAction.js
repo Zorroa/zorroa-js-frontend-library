@@ -62,7 +62,7 @@ export function searchAssets (query, lastQuery) {
       } else if (query.postFilter) {
         mainQuery.filter = query.postFilter
       }
-      promises.push (searchAssetsRequestProm(dispatch, mainQuery))
+      promises.push(searchAssetsRequestProm(dispatch, mainQuery))
     }
     const aggsChanged = !lastQuery || !lastQuery.aggs || JSON.stringify(query.aggs) !== JSON.stringify(lastQuery.aggs)
     if (!query.from /* first page only */ && query.aggs && (mainQueryChanged || aggsChanged)) {
@@ -70,7 +70,7 @@ export function searchAssets (query, lastQuery) {
       aggQuery.postFilter = null
       aggQuery.from = 0
       aggQuery.size = 1
-      promises.push (searchAssetsRequestProm(dispatch, aggQuery))
+      promises.push(searchAssetsRequestProm(dispatch, aggQuery))
     }
     return Promise.all(promises)
     .then(responses => {
