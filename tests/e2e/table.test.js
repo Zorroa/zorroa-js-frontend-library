@@ -65,7 +65,8 @@ describe('Table', function () {
     var elements
 
     const dragVertFn = (fromEleName, toEleName, yoffset) => {
-      var n = Math.abs(yoffset / 50)
+      const stepSize = 25
+      var n = Math.abs(yoffset / stepSize)
       var dy = yoffset / n
 
       DEBUG && console.log({n, dy, yoffset})
