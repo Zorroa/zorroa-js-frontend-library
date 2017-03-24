@@ -65,8 +65,7 @@ describe('Table', function () {
     var elements
 
     const dragVertFn = (fromEleName, toEleName, yoffset) => {
-      const stepSize = 25
-      var n = Math.abs(yoffset / stepSize)
+      var n = Math.abs(yoffset / 50)
       var dy = yoffset / n
 
       DEBUG && console.log({n, dy, yoffset})
@@ -124,7 +123,7 @@ describe('Table', function () {
     .then(height => { assetsScrollHeight = height })
 
     // Expand the Table as far as it will go
-    .then(_ => dragVertFn('.Assets-tableResize', '.header', -500))
+    .then(_ => dragVertFn('.Assets-tableResize', '.header', -2000))
 
     // Check that the table size changed, and that the assets scroll is at the expected minimum
     .then(_ => elements['.assets-scroll'].getCssValue('height'))
@@ -134,7 +133,7 @@ describe('Table', function () {
     })
 
     // Shrink the Table as far as it will go
-    .then(_ => dragVertFn('.Assets-tableResize', '.assets-footer', 500))
+    .then(_ => dragVertFn('.Assets-tableResize', '.assets-footer', 2000))
 
     // Check that the Table height is at the expected minimum
     .then(_ => elements['.Table'].getCssValue('height'))
