@@ -94,9 +94,23 @@ describe('Collections', function () {
     selenium.clickCssElement('.Racetrack-footer-clear')
     selenium.waitForCssElementVisible('.Racetrack-empty')
 
-    // Restore the saved search
+    // Rename the saved search
     let folder
     let folderXpath = `//*[contains(text(), '${searchStr}')]` // http://stackoverflow.com/a/30648604/1424242
+    driver.findElement(By.xpath(folderXpath)).then(ele => { folder = ele })
+    driver.then(_ => driver.actions().click(folder, 2).perform()) // right-click
+    selenium.waitForCssElementVisible('.FolderItem-context-edit')
+    selenium.clickCssElement('.FolderItem-context-edit')
+    selenium.waitForCssElementVisible('.CreateFolder-input-title-input')
+    driver.findElement(By.css('.CreateFolder-input-title-input')).then(ele => ele.clear())
+    selenium.clickCssElement('.CreateFolder-input-title-input')
+    driver.findElement(By.css('.CreateFolder-input-title-input')).then(ele => ele.sendKeys(`${searchStr}-renamed`))
+    selenium.clickCssElement('.CreateFolder-save')
+    selenium.waitForIdle()
+    selenium.waitForXpathVisible(`//*[contains(text(), '${searchStr}-renamed')]`)
+
+    // Restore the saved search
+    folderXpath = `//*[contains(text(), '${searchStr}-renamed')]` // http://stackoverflow.com/a/30648604/1424242
     driver.findElement(By.xpath(folderXpath)).then(ele => { folder = ele })
     driver.then(_ => driver.actions().click(folder, 2).perform()) // right-click
     selenium.waitForCssElementVisible('.FolderItem-context-menu')
@@ -106,7 +120,7 @@ describe('Collections', function () {
 
     // Delete the saved search
     driver.then(_ => driver.actions().click(folder, 2).perform()) // right-click
-    selenium.waitForCssElementVisible('.FolderItem-context-menu')
+    selenium.waitForCssElementVisible('.FolderItem-context-remove-folder')
     selenium.clickCssElement('.FolderItem-context-remove-folder')
     selenium.waitForCssElementVisible('.Collections .Trash', 15000)
 
