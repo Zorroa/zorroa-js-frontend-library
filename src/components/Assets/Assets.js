@@ -43,7 +43,6 @@ class Assets extends Component {
     tableHeight: PropTypes.number.isRequired,
     showMultipage: PropTypes.bool.isRequired,
     folders: PropTypes.instanceOf(Map),
-    selectedFolderIds: PropTypes.instanceOf(Set),
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
     similarField: PropTypes.string,
     similarValues: PropTypes.arrayOf(PropTypes.string),
@@ -164,46 +163,6 @@ class Assets extends Component {
 
   deselectAll = () => {
     this.props.actions.selectAssetIds(null)
-  }
-
-  filteredFolders = () => {
-    const { trashedFolders } = this.props
-    let selectedFolderIds = this.props.selectedFolderIds
-    if (trashedFolders && trashedFolders.length) {
-      // Server does not support editing of trashed folders
-      selectedFolderIds = new Set()
-      this.props.selectedFolderIds.forEach(id => {
-        const index = trashedFolders.findIndex(trashedFolder => (trashedFolder.folderId === id))
-        if (index < 0) selectedFolderIds.add(id)
-      })
-    }
-    return selectedFolderIds
-  }
-
-  selectedFolderContainsSelectedAssets = () => {
-    const { selectedIds, selectedFolderIds, folders, assets } = this.props
-    if (!selectedIds || !selectedIds.size || !selectedFolderIds || !selectedFolderIds.size) return false
-    const simpleFolderIds = []
-    for (let id of selectedFolderIds) {
-      const folder = folders.get(id)
-      if (folder && !folder.isDyhi() && !folder.search) {
-        simpleFolderIds.push(folder.id)
-      }
-    }
-    for (const assetId of selectedIds) {
-      const index = assets.findIndex(asset => (asset.id === assetId))
-      if (index < 0) continue
-      const asset = assets[index]
-      if (asset.memberOfAnyFolderIds(simpleFolderIds)) return true
-    }
-    return false
-  }
-
-  removeAssetsFromSelectedFolders = () => {
-    const { selectedIds, selectedFolderIds, actions } = this.props
-    selectedFolderIds.forEach(folderId => {
-      actions.removeAssetIdsFromFolderId(selectedIds, folderId)
-    })
   }
 
   toggleShowTable = () => {
@@ -468,10 +427,8 @@ class Assets extends Component {
 
     return (
       <Editbar selectedAssetIds={selectedIds}
-               onDeselectAll={this.deselectAll}
-               isRemoveEnabled={this.selectedFolderContainsSelectedAssets}
-               onRemove={this.removeAssetsFromSelectedFolders}>
-        <object className={classnames("Assets-loading", {sync})} data={loader}/>
+               onDeselectAll={this.deselectAll}>
+        <object className={classnames('Assets-loading', {sync})} data={loader}/>
         <div className="SortingSelector">
           <div className="SortingSelector-title">Sort By</div>
           <div onClick={this.sortAssets}
@@ -513,7 +470,7 @@ class Assets extends Component {
 
   renderAssets () {
     const { assets, selectedIds, totalCount, layout, showMultipage, protocol, host, thumbSize, query } = this.props
-    const { positions, multipage, collapsed, tableIsResizing } = this.state
+    const { positions, multipage, tableIsResizing } = this.state
     api.setTableIsResizing(tableIsResizing)
 
     if (!assets || !assets.length) {
@@ -607,8 +564,6 @@ class Assets extends Component {
                 })}
                 <Pager total={totalCount}
                        loaded={assets.length}
-                       collapsed={collapsed}
-                       onUncollapse={this.uncollapse}
                        top={layoutHeight + 12 /* 12 px padding */ }
                        />
               </div>
@@ -682,7 +637,6 @@ export default connect(state => ({
   totalCount: state.assets.totalCount,
   folders: state.folders.all,
   trashedFolders: state.folders.trashedFolders,
-  selectedFolderIds: state.folders.selectedFolderIds,
   sync: state.auth.sync,
   user: state.auth.user,
   userSettings: state.app.userSettings,

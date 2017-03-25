@@ -176,6 +176,7 @@ class Searcher extends Component {
       this.queueFolderCounts(modifiedFolderIds, assetSearch)
     }
 
+    if (this.inflightQuery && query && this.inflightQuery.equals(query)) this.inflightQuery = null
     return null   // Just reacting to new slivers
   }
 }
