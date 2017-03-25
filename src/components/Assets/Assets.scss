@@ -75,12 +75,13 @@
 .thumb-layout {
   margin: 10px;
   white-space: nowrap;
+  border-radius: 3px;
+  overflow: hidden;
 
   .thumb-layout-button {
     color: #000;
     width: 40px;
     height: 40px;
-    border-radius: 3px;
     border: none;
     outline: none;
     font-size: 20px;
@@ -93,6 +94,7 @@
   .thumb-layout-enabled {
     color: #fff;
     background-color: $zorroa-sickly-green;
+    box-shadow: 0 0 2px 0 rgba(0,0,0,0.40);
     &:hover { background-color: darken($zorroa-sickly-green, 15%); }
   }
 }
@@ -105,8 +107,16 @@
   cursor: row-resize;
 }
 
+.Assets-loading {
+  width: 14px;
+  height: 14px;
+  margin-left: 8px;
+  &.sync {
+    visibility: hidden;
+  }
+}
+
 .TableToggle {
-  background-color: #fff;
   margin: 10px;
 
   .TableToggle-button {

@@ -47,7 +47,7 @@ class JobMenu extends Component {
       return (job.type === jobType && job.state === Job.Active)
     }) >= 0
     if (containsActiveJob) {
-      this.monitorJobsInterval = setInterval(this.refreshJobs, 1500)
+      this.monitorJobsInterval = setInterval(this.refreshJobs, 10000)
     }
   }
 
@@ -191,7 +191,7 @@ class JobMenu extends Component {
       if (job.type === jobType && job.state === Job.Active) activeJobs++
     })
     if (activeJobs) {
-      const ellipsis = require('./ellipsis.gif')
+      const ellipsis = require('./ellipsis.svg')
       return <img className="JobMenu-active-badge" src={ellipsis}/>
     }
     if (undownloadedExports) {

@@ -9,7 +9,7 @@ $FolderItemHeight : 25px;
   @include fullWidth;
 
   position: relative; // fbo .FolderItem-dropzone, who's position: absolute
-
+  cursor: pointer;
   height: $FolderItemHeight;
 
   &:not(.isOpen) .FolderItem-toggleArrow {

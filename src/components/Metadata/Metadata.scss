@@ -39,28 +39,38 @@
     }
   }
 
-  .body {
+  .Metadata-body {
+    margin-bottom: 10px;
   }
 }
 
 .Metadata-left {
   @include flexRow;
   @include flexAlignItemsCenter;
+  margin-left: 4px;
+  border-bottom: 1px solid $zorroa-nearwhite;
+}
+
+.Metadata-middle {
+  @include flexOn;
+  height: 25px;
+  border-bottom: 1px solid $zorroa-nearwhite;
 }
 
 .Metadata-right {
   @include flexRow;
   @include flexAlignItemsCenter;
+  border-bottom: 1px solid $zorroa-nearwhite;
 }
 
 .Metadata-item {
   margin-left: 8px;
   margin-right: 8px;
+  margin-bottom: -1px;  // Forces borders together
   font-size: 14px;
-  border-bottom: 1px solid $zorroa-nearwhite;
+  cursor: pointer;
 
   @include flexRow;
-  @include flexJustifySpaceBetween;
   @include flexAlignItemsCenter;
 
   .Metadata-item-label {
@@ -78,7 +88,6 @@
 
   &.isSelected { background-color: $zorroa-selected; }
   &:hover { background-color: $zorroa-hover; }
-
 }
 
 .Metadata-item-pad {
@@ -138,7 +147,6 @@ $FolderItemHeight : 25px;
 
   cursor: pointer;
 
-  &.hasChildren:hover { color: white; background-color: $zorroa-darkgray; }
   .FolderItem.isSelected & { background-color: $zorroa-selected; }
   .FolderItem.isSelected &.hasChildren:hover { color: white; background-color: $zorroa-darkgray; }
   .FolderItem.isDropTarget.dragHover & { color: white; background-color: $zorroa-sickly-green; }
@@ -146,7 +154,7 @@ $FolderItemHeight : 25px;
 }
 
 .Metadata-toggle-open {
-  padding-left: 1px;
+  margin-left: -7px;
   color: $zorroa-gray;
 }
 

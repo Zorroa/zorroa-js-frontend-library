@@ -47,6 +47,7 @@ class Assets extends Component {
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
     similarField: PropTypes.string,
     similarValues: PropTypes.arrayOf(PropTypes.string),
+    sync: PropTypes.bool.isRequired,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     protocol: PropTypes.string,
@@ -426,7 +427,7 @@ class Assets extends Component {
   }
 
   renderEditbar () {
-    const { assets, order, selectedIds, similarField, similarValues, query } = this.props
+    const { assets, order, selectedIds, similarField, similarValues, query, sync } = this.props
 
     const similarActive = similarField && similarField.length > 0 && similarValues && similarValues.length > 0
     let similarValuesSelected = selectedIds && selectedIds.size === similarValues.length
@@ -463,11 +464,14 @@ class Assets extends Component {
 
     const columnName = order && order.length && order[0].field !== 'source.filename' ? unCamelCase(Asset.lastNamespace(order[0].field)) : 'Table Column'
 
+    const loader = require('./loader-rolling.svg')
+
     return (
       <Editbar selectedAssetIds={selectedIds}
                onDeselectAll={this.deselectAll}
                isRemoveEnabled={this.selectedFolderContainsSelectedAssets}
                onRemove={this.removeAssetsFromSelectedFolders}>
+        <object className={classnames("Assets-loading", {sync})} data={loader}/>
         <div className="SortingSelector">
           <div className="SortingSelector-title">Sort By</div>
           <div onClick={this.sortAssets}
@@ -620,7 +624,10 @@ class Assets extends Component {
     const { collapsed, tableIsResizing } = this.state
 
     // Trigger layout if assets change.
-    if (assetsCounter !== this.assetsCounter) this.queueAssetsLayout()
+    if (assetsCounter !== this.assetsCounter) {
+      this.queueAssetsLayout()
+      this.scrollToSelection()
+    }
     this.assetsCounter = assetsCounter
 
     // If the selection change triggered this update, scroll to the new selection
@@ -676,6 +683,7 @@ export default connect(state => ({
   folders: state.folders.all,
   trashedFolders: state.folders.trashedFolders,
   selectedFolderIds: state.folders.selectedFolderIds,
+  sync: state.auth.sync,
   user: state.auth.user,
   userSettings: state.app.userSettings,
   thumbSize: state.app.thumbSize,
