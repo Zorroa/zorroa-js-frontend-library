@@ -94,8 +94,8 @@ class Racetrack extends Component {
 
   renderFooter (isIconified) {
     if (isIconified) return null
-    const { widgets } = this.props
-    const disabled = !widgets || !widgets.length
+    const { query } = this.props
+    const disabled = !query || query.empty()
     return (
       <div className="Racetrack-footer flexOff">
         <div className="Racetrack-footer-group">

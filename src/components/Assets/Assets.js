@@ -411,7 +411,7 @@ class Assets extends Component {
 
     // Only enable similar button if selected assets have the right hash
     // WARNING -- PERFORMANCE -- Worst case linear search on all assets
-    let canSortSimilar = selectedIds && selectedIds.size > 0 && similarField && similarField.length > 0
+    let canSortSimilar = selectedIds && selectedIds.size > 0 && similarField && similarField.length > 0 && !similarValuesSelected
     if (canSortSimilar) {
       selectedIds.forEach(id => {
         const asset = canSortSimilar &&   // Skip linear sort after 1st miss
@@ -439,13 +439,11 @@ class Assets extends Component {
           </div>
           { similarField && similarField.length > 0 &&
           <div onClick={sortSimilar} className="SortingSelector-similar">
-            { similarActive && !similarValuesSelected &&
+            { sortSimilar && similarActive && !similarValuesSelected && selectedIds && selectedIds.size > 0 &&
             <div onClick={sortSimilar}
-                 className="icon-settings_backup_restore">&thinsp;</div> }
+                 className="SortingSelector-icon icon-settings_backup_restore">&thinsp;</div> }
             <div className={classnames('SortingSelector-sort',
-              { 'SortingSelector-selected': similarActive,
-                'SortingSelector-disabled': !sortSimilar
-              })}>
+              { 'SortingSelector-selected': similarActive })}>
               Similar
             </div>
           </div>
