@@ -71,7 +71,7 @@ export default class AssetSearch {
 
   equals (assetSearch, skip) {
     const s = skip || new Set(['from', 'size', 'scroll'])
-      const replacer = (key, value) => (s.has(key) ? undefined : value)
+    const replacer = (key, value) => (s.has(key) ? undefined : value)
     return JSON.stringify(new AssetSearch(this), replacer) === JSON.stringify(new AssetSearch(assetSearch), replacer)
   }
 

@@ -414,14 +414,13 @@ class Assets extends Component {
   }
 
   sortSimilar = () => {
-    const { assets, selectedIds, similarField } = this.props
     const { cachedSelectedHashes } = this.state
     this.props.actions.similarValues(cachedSelectedHashes)
     console.log('Sort by similar: ' + JSON.stringify(cachedSelectedHashes))
   }
 
   renderEditbar () {
-    const { assets, order, selectedIds, similarField, similarValues, query, sync } = this.props
+    const { order, selectedIds, similarField, similarValues, query, sync } = this.props
     const { cachedSelectedHashes } = this.state
 
     const similarActive = similarField && similarField.length > 0 && similarValues && similarValues.length > 0

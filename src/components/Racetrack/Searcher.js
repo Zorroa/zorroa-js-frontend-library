@@ -7,7 +7,7 @@ import Widget from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import TrashedFolder from '../../models/TrashedFolder'
-import { searchAssets, getAssetFields } from '../../actions/assetsAction'
+import { searchAssets, getAssetFields, requiredFields } from '../../actions/assetsAction'
 import { countAssetsInFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
 import { MapWidgetInfo } from './WidgetInfo'
@@ -162,20 +162,7 @@ class Searcher extends Component {
     // Limit results to favorited fields, since we only display values
     // in those fields in the Table and Lightbar
     if (metadataFields) {
-      const requiredFields = [
-        'proxies', 'clip', 'pages', 'links', 'id',
-        'source.filename', 'source.mediaType', 'source.extension', 'source.clip',
-        'image.width', 'image.height', 'image.pages',
-        'video.width', 'video.height', 'video.pages', 'video.framerate', 'video.frames']
-      const fields = new Set([...metadataFields, ...lightbarFields])
-      fieldTypes && Object.keys(fieldTypes).forEach(field => {
-        for (let i = 0; i < requiredFields.length; ++i) {
-          if (field.startsWith(requiredFields[i])) {
-            fields.add(field)
-            break
-          }
-        }
-      })
+      const fields = requiredFields([...metadataFields, ...lightbarFields], fieldTypes)
       assetSearch.fields = [...fields]
     }
 
