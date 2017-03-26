@@ -10,6 +10,6 @@ describe('permissionsReducer', () => {
     ]
     const action = { type: GET_ALL_PERMISSIONS, payload: permissions }
     expect(permissionsReducer({}, action))
-      .toEqual({ all: permissions })
+      .toEqual({ all: permissions, isAdministrator: false, isDeveloper: false, isManager: false })
   })
 })
