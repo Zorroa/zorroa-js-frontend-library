@@ -11,6 +11,7 @@ import Searchbar from '../../components/Searchbar'
 import DropdownMenu from '../../components/DropdownMenu'
 import Preferences from '../../components/Preferences'
 import Feedback from '../../components/Feedback'
+import Developer from '../../components/Developer'
 import { showModal } from '../../actions/appActions'
 
 class Header extends Component {
@@ -19,7 +20,7 @@ class Header extends Component {
     actions: PropTypes.object.isRequired
   }
 
-  showPreferences () {
+  showPreferences = () => {
     const { user, actions } = this.props
     const width = '480px'
     const body = <Preferences user={user}/>
@@ -31,6 +32,12 @@ class Header extends Component {
     const width = '460px'
     const body = <Feedback user={user}/>
     actions.showModal({body, width})
+  }
+
+  showDeveloper = () => {
+    const width = '800px'
+    const body = <Developer/>
+    this.props.actions.showModal({body, width})
   }
 
   render () {
@@ -57,8 +64,11 @@ class Header extends Component {
           </div>
           <div className="header-menu header-menu-user icon-zorroa-person-06">
             <DropdownMenu label={(<div>{user.username}</div>)}>
-              <div className="header-menu-item" onClick={this.showPreferences.bind(this)}>
-                Preferences
+              <div className="header-menu-item" onClick={this.showPreferences}>
+                Preferences...
+              </div>
+              <div className="header-menu-item" onClick={this.showDeveloper}>
+                Developer...
               </div>
               <Link className="header-menu-item" to="/signout">Logout</Link>
             </DropdownMenu>
