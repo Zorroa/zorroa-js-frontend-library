@@ -69,8 +69,10 @@ export default class AssetSearch {
     }
   }
 
-  equals (assetSearch) {
-    return JSON.stringify(new AssetSearch(this), equalsReplacer) === JSON.stringify(new AssetSearch(assetSearch), equalsReplacer)
+  equals (assetSearch, skip) {
+    const s = skip || new Set(['from', 'size', 'scroll'])
+      const replacer = (key, value) => (s.has(key) ? undefined : value)
+    return JSON.stringify(new AssetSearch(this), replacer) === JSON.stringify(new AssetSearch(assetSearch), replacer)
   }
 
   empty () {
@@ -90,12 +92,4 @@ export default class AssetSearch {
 // Combine an array of arrays into an array with unique elements
 function union (arr) {
   return [ ...new Set([].concat(...arr)) ]
-}
-
-// Skip over from & size for equality comparison
-function equalsReplacer (key, value) {
-  if (key === 'from' || key === 'size' || key === 'scroll') {
-    return undefined
-  }
-  return value
 }
