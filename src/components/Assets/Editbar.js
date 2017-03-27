@@ -48,19 +48,21 @@ class Editbar extends Component {
     const removable = !disabledSelected && isRemoveEnabled()
     return (
       <div className="Editbar">
-        {children}
+        <div className="flexRowCenter">
+          {children}
+        </div>
         <div className="Editbar-right-side">
           <div className={classnames('Editbar-selected', {disabled: disabledSelected})}>
-            {`${nAssetsSelected || 'no'} assets selected`}
+            { nAssetsSelected ? `${nAssetsSelected} assets selected` : '' }
             { nAssetsSelected ? (<div onClick={onDeselectAll} className={classnames('Editbar-cancel', 'icon-cancel-circle', {disabledSelected})}/>) : null }
           </div>
           <div onClick={!disabledSelected && this.exportAssets} className={classnames('Editbar-export', {disabled: disabledSelected})}>
             Export
-            <span onClick={!disabledSelected && this.exportAssets} className="Editbar-icon-export" />
+            <span onClick={!disabledSelected && this.exportAssets} className="icon-export" />
           </div>
           <div onClick={removable && onRemove} className={classnames('Editbar-remove', {disabled: !removable})}>
             Remove
-            <span onClick={removable && onRemove} className={classnames('Editbar-icon-removeasset', {disabled: !removable})} />
+            <span onClick={removable && onRemove} className={classnames('icon-removeasset', {disabled: !removable})} />
           </div>
         </div>
       </div>

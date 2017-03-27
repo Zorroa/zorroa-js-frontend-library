@@ -222,7 +222,7 @@ class Metadata extends Component {
   renderPads (depth) {
     if (depth <= 0) return null
     let pads = []
-    for (let i = 0; i < depth; ++i) pads.push(<div className="Metadata-item-pad"/>)
+    for (let i = 0; i < depth; ++i) pads.push(<div key={i} className="Metadata-item-pad"/>)
     return pads
   }
 
@@ -234,8 +234,8 @@ class Metadata extends Component {
            key={id}
            onClick={e => hasChildren ? this.toggleCollapsible(namespace, e) : this.toggleWidget(field, e)}
            onMouseOver={e => this.hover(namespace)} onMouseOut={e => this.clearHover(namespace)} >
+        { this.renderPads(depth) }
         <div className="Metadata-left">
-          { this.renderPads(depth) }
           <div className={classnames('Metadata-item-toggle', {hasChildren})}
                onClick={e => this.toggleCollapsible(namespace, e)}>
             { hasChildren && <div className={classnames('Metadata-toggle-open', `icon-square-${isOpen ? 'minus' : 'plus'}`)}/> }
@@ -244,6 +244,7 @@ class Metadata extends Component {
             {unCamelCase(name)}
           </div>
         </div>
+        <div className="Metadata-middle"/>
         <div className="Metadata-right">
           <div className={classnames('Metadata-item-widget', widgetIcon)} />
           <div onClick={e => this.favorite(field, namespace, e)}
@@ -269,7 +270,7 @@ class Metadata extends Component {
                  `icon-star-${showFavorites ? 'filled' : 'empty'}`,
                  {isSelected: showFavorites})}/>
         </div>
-        <div className="body">
+        <div className="Metadata-body">
           {filteredComponents}
         </div>
       </div>

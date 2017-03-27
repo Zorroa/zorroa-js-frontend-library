@@ -60,7 +60,9 @@
     }
 
     .Facet-value-table-row {
+      padding-right: 10px;
       color: $zorroa-greyish-brown;
+      cursor: pointer;
       &:hover { background-color: $zorroa-hover; }
       &.selected { background-color: $zorroa-selected; }
       &.selected:hover { background-color: $zorroa-hover; }
@@ -123,7 +125,6 @@
     width: 100%;
     border: 0;
     border-spacing: 0;
-    padding-right: 10px;
   }
 
   td:last-child {
@@ -138,7 +139,7 @@
   }
 
   .Facet-value-count {
-    padding: 0;
+    padding: 0 10px 0 0;
     max-width: 0; // This looks weird, but is important! It allows cells to chop content
     @include clampText;
   }
@@ -183,6 +184,8 @@
     padding-right: 2px; // This compensates for the slight offset of icon-sort*
     margin-left: 2px;
     border-radius: 3px;
+    cursor: pointer;
+
     &:hover {
       color: white;
       background-color: $zorroa-sickly-green;
@@ -226,4 +229,21 @@
   .rotN90Flip {
     transform: rotate(-90deg) scaleY(-1);
   }
+}
+
+.Facet-empty {
+  @include flexColCenter;
+  margin-top: 10px;
+}
+
+.Facet-empty-icon {
+  font-size: 64px;
+  color: $zorroa-lightgray;
+  margin-bottom: 20px;
+}
+
+.Facet-empty-info {
+  font-size: 16px;
+  text-transform: uppercase;
+  color: $zorroa-lightgray;
 }
