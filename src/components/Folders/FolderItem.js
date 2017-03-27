@@ -210,11 +210,11 @@ class FolderItem extends Component {
     const { selectedFolderIds, folder, folders } = this.props
     const simpleFolderIds = []
     if (!selectedFolderIds.has(folder.id)) {
-      simpleFolderIds.push(folder.id)
+      if (folder.isSimpleCollection()) simpleFolderIds.push(folder.id)
     } else {
       for (let id of selectedFolderIds) {
         const folder = folders.get(id)
-        if (folder && !folder.isDyhi() && !folder.search) {
+        if (folder && folder.isSimpleCollection()) {
           simpleFolderIds.push(folder.id)
         }
       }
@@ -295,6 +295,7 @@ class FolderItem extends Component {
 
     const selectedAssets = selectedAssetIds && selectedAssetIds.size > 0
     const selectedAssetsNotInFolder = selectedAssets && this.selectedAssetNotInSelectedFolder()
+    const addableAssets = selectedAssetsNotInFolder && this.simpleFolderIds().length > 0
     const removableAssets = selectedAssets && this.selectedFolderContainsSelectedAssets()
     const canAddChild = singleFolderSelected && !folder.isDyhi() && !folder.search && folder.hasAccess(user, AclEntry.WriteAccess)
 
@@ -343,7 +344,7 @@ class FolderItem extends Component {
                  className="FolderItem-context-item"
                  onContextMenu={this.dismissContextMenu}>
               <div className={classnames('icon-folder-add', {disabled: !canAddChild})} />
-              <div>Create Child</div>
+              <div>Create Sub-folder</div>
             </div> }
           <div onClick={this.moveTo}
                className="FolderItem-context-item disabled"
@@ -357,8 +358,8 @@ class FolderItem extends Component {
             <div className="icon-star-empty"/>
             <div>Favorite</div>
           </div>
-          <div onClick={selectedAssetsNotInFolder && this.addAssetsToFolders}
-               className={classnames('FolderItem-context-item', {disabled: !selectedAssetsNotInFolder})}>
+          <div onClick={addableAssets && this.addAssetsToFolders}
+               className={classnames('FolderItem-context-item', {disabled: !addableAssets})}>
             <div className="icon-plus2"/>
             <div>Add Assets</div>
           </div>
