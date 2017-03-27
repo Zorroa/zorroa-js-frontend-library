@@ -55,7 +55,7 @@ if (USE_SAUCE) {
 export const BASE_URL = 'http://localhost:8080'
 
 // let selenium tests run. jest's default is an unreasonable 5 seconds
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 90000
+jasmine.DEFAULT_TIMEOUT_INTERVAL = (DEBUG && !USE_SAUCE) ? 10000 : 60000
 
 var allTestsPassed = true
 var failedTests = []
@@ -211,30 +211,38 @@ export function showLog () {
 }
 
 // ----------------------------------------------------------------------
-export function waitForRequestSync (optTimeout) {
-  // Make sure we wait until the request is finished, wait for not busy
-  return driver.wait(_ =>
-    driver.executeScript('return window.zorroa.getRequestsSynced()')
-      .then(synced => { DEBUG && console.log({synced}); return !!synced }),
-    optTimeout)
-}
-
-// ----------------------------------------------------------------------
 export function waitForBusy (optTimeout) {
   // Make sure we wait until a request has started
-  return driver.wait(_ =>
-    driver.executeScript('return window.zorroa.getRequestsSynced()')
-      .then(synced => { DEBUG && console.log({synced}); return !synced }),
-    optTimeout)
+  return driver.wait(
+    _ => {
+      let busy
+      return driver
+      // .then(_ => new Promise(resolve => setTimeout(resolve, 200)))
+      .then(_ => driver.executeScript('return window.zorroa.getRequestsSynced()'))
+      .then(s => { busy = !s })
+      // .then(_ => { DEBUG && console.log('waitForBusy', {busy}) })
+      .then(_ => busy)
+    }
+    , optTimeout
+  )
 }
 
 // ----------------------------------------------------------------------
 export function waitForIdle (optTimeout) {
   // Make sure we wait until the request is finished, wait for not busy
-  return driver.wait(_ =>
-    driver.executeScript('return window.zorroa.getRequestsSynced()')
-      .then(synced => { DEBUG && console.log({synced}); return !!synced }),
-    optTimeout)
+  return driver.then(_ => { DEBUG && console.log('waitForIdle') })
+  .then(_ => driver.wait(
+    _ => {
+      let idle
+      return driver
+      // .then(_ => new Promise(resolve => setTimeout(resolve, 200)))
+      .then(_ => driver.executeScript('return window.zorroa.getRequestsSynced()'))
+      .then(s => { idle = !!s })
+      // .then(_ => { DEBUG && console.log('waitForIdle', {idle}) })
+      .then(_ => idle)
+    }
+    , optTimeout
+  ))
 }
 
 // ----------------------------------------------------------------------
@@ -331,6 +339,7 @@ export function login () {
   .then(_ => waitForUrl(`${BASE_URL}/`, 15000))
   .then(_ => driver.getCurrentUrl())
   .then(url => { return expect(url).toBe(`${BASE_URL}/`) })
+  .then(_ => { console.log('logged in') })
 
   // // If there's a saved search from last session, then clear it
   // // [Started but temporarily disabled until we figure out
@@ -483,6 +492,22 @@ export function expectElementIsNotVisible (element, elementName) {
 export function clickCssElement (selector) {
   return expectCssElementIsVisible(selector)
   .then(_ => driver.findElement(By.css(selector)).click())
+}
+
+// ----------------------------------------------------------------------
+export function clickXpathElement (selector) {
+  return expectXpathElementIsVisible(selector)
+  .then(_ => driver.findElement(By.xpath(selector)).click())
+}
+
+// ----------------------------------------------------------------------
+// TODO: have this check the open state; allow explicit open or close
+export function getFolderNamed (folderName) {
+  // Find the FolderItem-toggle attached to a FolderItem with a descendant matching the given text
+  // http://stackoverflow.com/a/1390680/1424242
+  const xpath = `//div[contains(concat(" ", @class, " "), " FolderItem ") and descendant::*[contains(text(), "${folderName}")]]`
+  return driver.then(_ => { DEBUG && (console.log(`getFolderNamed ${folderName}`)) })
+  .then(_ => driver.findElement(By.xpath(xpath)))
 }
 
 // ----------------------------------------------------------------------

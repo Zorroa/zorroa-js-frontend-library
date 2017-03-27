@@ -55,16 +55,16 @@ function startRequest (dispatch) {
 function finishRequest (dispatch, requestProm) {
   return requestProm
   .then(response => {
-    api.incRequestReceivedCounter()
-    if (api.getRequestsSynced()) {
-      requestAnimationFrame(_ => dispatch({ type: AUTH_SYNC, payload: true }))
-    }
+    requestAnimationFrame(_ => {
+      api.incRequestReceivedCounter()
+      if (api.getRequestsSynced()) dispatch({ type: AUTH_SYNC, payload: true })
+    })
     return response
   }, error => {
-    api.incRequestReceivedCounter()
-    if (api.getRequestsSynced()) {
-      requestAnimationFrame(_ => dispatch({ type: AUTH_SYNC, payload: true }))
-    }
+    requestAnimationFrame(_ => {
+      api.incRequestReceivedCounter()
+      if (api.getRequestsSynced()) dispatch({ type: AUTH_SYNC, payload: true })
+    })
     return Promise.reject(error)
   })
 }
