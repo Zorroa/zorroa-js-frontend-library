@@ -9,6 +9,14 @@ import ResetPassword from './components/auth/ResetPassword'
 import ForgotPassword from './components/auth/ForgotPassword'
 import Workspace from './components/Workspace'
 
+const DropboxAuth = () => {
+  localStorage.setItem('DropboxURL', window.location.toString())
+  window.close()
+  return (
+    <div>Dropbox Authorized</div>
+  )
+}
+
 export default (
   <Route path='/' component={App}>
     <IndexRoute component={RequireAuth(Workspace, '/signin')} />
@@ -16,5 +24,6 @@ export default (
     <Route path="signout" component={Signout} />
     <Route path="forgot" component={ForgotPassword} />
     <Route path="password" component={ResetPassword} />
+    <Route path="dbxauth" component={DropboxAuth} />
   </Route>
 )

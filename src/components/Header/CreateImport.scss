@@ -643,3 +643,29 @@ $dropcolor: rgba(115, 182, 28, 0.1);
 
 .CreateImport-upload-name {
 }
+
+.CreateImport-activity-switcher {
+  @include flexRowCenter;
+  @include fullWidth;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.CreateImport-activity-item {
+  background-color: $zorroa-lightgray;
+  color: white;
+  padding: 5px 10px;
+  margin-left: 4px;
+  margin-right: 4px;
+  border-radius: 3px;
+
+  &:hover {
+    color: white;
+    background-color: $zorroa-gray;
+  }
+
+  &.selected {
+    color: white;
+    background-color: $zorroa-sickly-green;
+  }
+}

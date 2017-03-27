@@ -9,6 +9,7 @@ import { humanFileSize } from '../../services/jsUtil'
 import Pipeline from '../../models/Pipeline'
 import Processor from '../../models/Processor'
 import Toggle from '../Toggle'
+import DropboxChooser from '../DropboxChooser'
 
 class CreateImport extends Component {
   static propTypes = {
@@ -19,12 +20,16 @@ class CreateImport extends Component {
     actions: PropTypes.object
   }
 
+  static DnDSource = 'dnd'
+  static ServerSource = 'server'
+  static DropboxSource = 'dropbox'
+
   state = {
     name: '',               // import name
     pipelineId: -1,         // shared pipeline
     uploadFiles: [],        // pending File array
     isDroppable: false,     // true when file over drop target
-    showServerPath: false,  // upload files vs. server path mode
+    source: CreateImport.DnDSource,
     serverPath: '',         // text in server path input
     serverPaths: [],        // list of added server paths
     filterText: ''          // pipeline filter
@@ -52,10 +57,13 @@ class CreateImport extends Component {
 
   checkForSubmit = (event) => {
     if (event.key === 'Enter' && this.state.name && this.state.name.length) {
-      if (this.state.showServerPath) {
-        this.createServerPathImport(event)
-      } else {
-        this.createUploadFileImport(event)
+      switch (this.state.source) {
+        case CreateImport.DnDSource:
+          return this.createUploadFileImport(event)
+        case CreateImport.ServerSource:
+          return this.createServerPathImport(event)
+        case CreateImport.DropboxSource:
+          return this.createDropboxImport(event)
       }
     } else if (event.key === 'Escape') {
       this.dismiss()
@@ -138,10 +146,6 @@ class CreateImport extends Component {
     console.log('Select pipline ' + pipelineId + ' ' + pipeline.name)
   }
 
-  selectServerPath = (event) => {
-    this.setState({showServerPath: true})
-  }
-
   changeServerPath = (event) => {
     this.setState({serverPath: event.target.value})
   }
@@ -170,12 +174,16 @@ class CreateImport extends Component {
     this.setState({serverPaths, serverPath: ''})
   }
 
-  backToDropFiles = (event) => {
-    this.setState({showServerPath: false})
-  }
-
   toggleScriptInfo = (event) => {
     this.props.actions.showImportScriptInfo(!this.props.showScriptInfo)
+  }
+
+  selectSource = (source, event) => {
+    this.setState({source})
+  }
+
+  selectDropbox = (files) => {
+    console.log('Select Dropbox files: ' + JSON.stringify(files))
   }
 
   removeUploadFile (file, event) {
@@ -185,11 +193,11 @@ class CreateImport extends Component {
   }
 
   isDisabled () {
-    const { pipelineId, name, uploadFiles, serverPaths, showServerPath, progressEvent } = this.state
+    const { pipelineId, name, uploadFiles, serverPaths, source, progressEvent } = this.state
     if (progressEvent) return true
     if (pipelineId <= 0 || !name || !name.length) return true
-    if (showServerPath && !serverPaths.length) return true
-    if (!showServerPath && (!uploadFiles || !uploadFiles.length)) return true
+    if (source === CreateImport.ServerSource && !serverPaths.length) return true
+    if (source === CreateImport.DnDSource && (!uploadFiles || !uploadFiles.length)) return true
     return false
   }
 
@@ -218,92 +226,110 @@ class CreateImport extends Component {
   }
 
   renderActivityRegion () {
-    const { uploadFiles, showServerPath, serverPaths, serverPath, isDroppable } = this.state
-    if (!showServerPath && uploadFiles.length) {
-      return (
-        <div className="CreateImport-activity-region">
-          <div className="CreateImport-uploads">
-            <div className={classnames('CreateImport-uploads-dropzone', {isDroppable})}
-                 onDragOver={this.dragOver}
-                 onDragEnter={this.dragEnter}
-                 onDragLeave={this.dragLeave}
-                 onDrop={this.dropFile}>
-              Drop Assets to Import
-            </div>
-            <table className="CreateImport-upload-table">
-              <tbody>
-              { uploadFiles.map((file, i) => (
-                <tr key={i} className="CreateImport-upload">
-                  <td className="CreateImport-upload-status"><div className="icon-file-empty"/></td>
-                  <td className="CreateImport-upload-name">{file.name}</td>
-                  <td className="CreateImport-upload-size">{humanFileSize(file.size)}</td>
-                  <td className="CreateImport-upload-type">{file.type}</td>
-                  <td className="CreateImport-upload-progress">{this.renderProgress(i)}</td>
-                  <td onClick={this.removeUploadFile.bind(this, file)} className="CreateImport-upload-cancel"><div className="icon-cancel-circle"/></td>
-                </tr>
-              ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )
-    } else if (showServerPath) {
-      return (
-        <div className="CreateImport-activity-region">
-          <div onClick={this.backToDropFiles} className="CreateImport-server-back">
-            ‹ back to drag & drop
-          </div>
-          <div className="CreateImport-server-paths">
-            <div className="CreateImport-server-path-label">
-              Enter Path:
-            </div>
-            <div className="CreateImport-server-path-path">
-              <input className="CreateImport-server-path-input" type="text"
-                     value={serverPath} placeholder="Name"
-                     onChange={this.changeServerPath}
-                     onKeyDown={this.checkForPathSubmit} />
-              <div className="CreateImport-server-path-list">
-                { serverPaths.map((path, i) => (
-                  <div key={i} className="CreateImport-server-path-item">
-                    {path}
-                    <div className="icon-cancel-circle" onClick={this.removeServerPath.bind(this, path)}/>
-                  </div>
-                ))}
+    const { uploadFiles, source, serverPaths, serverPath, isDroppable } = this.state
+    switch (source) {
+      case CreateImport.DnDSource:
+        if (uploadFiles.length) {
+          return (
+            <div className="CreateImport-activity-region">
+              <div className="CreateImport-uploads">
+                <div
+                  className={classnames('CreateImport-uploads-dropzone', {isDroppable})}
+                  onDragOver={this.dragOver}
+                  onDragEnter={this.dragEnter}
+                  onDragLeave={this.dragLeave}
+                  onDrop={this.dropFile}>
+                  Drop Assets to Import
+                </div>
+                <table className="CreateImport-upload-table">
+                  <tbody>
+                  { uploadFiles.map((file, i) => (
+                    <tr key={i} className="CreateImport-upload">
+                      <td className="CreateImport-upload-status">
+                        <div className="icon-file-empty"/>
+                      </td>
+                      <td className="CreateImport-upload-name">{file.name}</td>
+                      <td
+                        className="CreateImport-upload-size">{humanFileSize(file.size)}</td>
+                      <td className="CreateImport-upload-type">{file.type}</td>
+                      <td
+                        className="CreateImport-upload-progress">{this.renderProgress(i)}</td>
+                      <td onClick={this.removeUploadFile.bind(this, file)}
+                          className="CreateImport-upload-cancel">
+                        <div className="icon-cancel-circle"/>
+                      </td>
+                    </tr>
+                  ))}
+                  </tbody>
+                </table>
               </div>
             </div>
-            <div onClick={this.addServerPath} className={classnames('CreateImport-server-path-add-path', {isDisabled: !serverPath.length})}>
-              Add path
+          )
+        }
+        return (
+          <div className="CreateImport-activity-region">
+            <div
+              className={classnames('CreateImport-dropzone', {isDroppable})}
+              onDragEnter={this.dragEnter}
+              onDragOver={this.dragOver}
+              onDragLeave={this.dragLeave}
+              onDrop={this.dropFile}>
+              Drag & Drop Assets to Import
+              <div className="CreateImport-dropzone-options">
+                <div className="CreateImport-dropzone-option-label">
+                  Or Browse Files
+                </div>
+                <div className="CreateImport-dropzone-select-file">
+                  <input className="CreateImport-dropzone-select-file-input"
+                         type="file"
+                         multiple id="source"
+                         onChange={this.changeFile}/>
+                  <label htmlFor="source"
+                         className="CreateImport-dropzone-select-file-label">
+                    Select Files
+                  </label>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      )
+        )
+
+      case CreateImport.ServerSource:
+        return (
+          <div className="CreateImport-activity-region">
+            <div className="CreateImport-server-paths">
+              <div className="CreateImport-server-path-label">
+                Enter Path:
+              </div>
+              <div className="CreateImport-server-path-path">
+                <input className="CreateImport-server-path-input" type="text"
+                       value={serverPath} placeholder="Name"
+                       onChange={this.changeServerPath}
+                       onKeyDown={this.checkForPathSubmit} />
+                <div className="CreateImport-server-path-list">
+                  { serverPaths.map((path, i) => (
+                    <div key={i} className="CreateImport-server-path-item">
+                      {path}
+                      <div className="icon-cancel-circle" onClick={this.removeServerPath.bind(this, path)}/>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div onClick={this.addServerPath} className={classnames('CreateImport-server-path-add-path', {isDisabled: !serverPath.length})}>
+                Add path
+              </div>
+            </div>
+          </div>
+        )
+
+      case CreateImport.DropboxSource:
+        return (
+          <div className="CreateImport-activity-region">
+            <DropboxChooser appKey="6fifppvd9maxou9" onSelect={this.selectDropbox}>
+            </DropboxChooser>
+          </div>
+        )
     }
-    return (
-      <div className="CreateImport-activity-region">
-        <div className={classnames('CreateImport-dropzone', {isDroppable})}
-             onDragEnter={this.dragEnter}
-             onDragOver={this.dragOver}
-             onDragLeave={this.dragLeave}
-             onDrop={this.dropFile}>
-          Drag & Drop Assets to Import
-          <div className="CreateImport-dropzone-options">
-            <div className="CreateImport-dropzone-option-label">
-              Or Browse Files
-            </div>
-            <div className="CreateImport-dropzone-select-file">
-              <input className="CreateImport-dropzone-select-file-input" type="file"
-                     multiple webkitdirectory directory id="source" onChange={this.changeFile}/>
-              <label htmlFor="source" className="CreateImport-dropzone-select-file-label">
-                Select Files
-              </label>
-            </div>
-          </div>
-        </div>
-        <div onClick={this.selectServerPath} className="CreateImport-dropzone-server-path">
-          File server path ›
-        </div>
-      </div>
-    )
   }
 
   renderPipelines () {
@@ -365,10 +391,16 @@ class CreateImport extends Component {
   }
 
   render () {
-    const { showServerPath } = this.state
+    const { source } = this.state
     const isDisabled = this.isDisabled()
-    const createAction = !isDisabled && (
-      showServerPath ? this.createServerPathImport : this.createUploadFileImport)
+    let createAction = null
+    if (!isDisabled) {
+      switch (source) {
+        case CreateImport.DnDSource: createAction = this.createUploadFileImport; break
+        case CreateImport.ServerSource: createAction = this.createServerPathImport; break
+        case CreateImport.DropboxSource: createAction = this.createDropboxImport; break
+      }
+    }
     return (
       <div className="CreateImport">
         <div className="CreateImport-header">
@@ -387,6 +419,20 @@ class CreateImport extends Component {
             <div onClick={this.clearName} className="CreateImport-package-name-cancel icon-cancel-circle"/>
           </div>
           { this.renderActivityRegion() }
+          <div className="CreateImport-activity-switcher">
+            <div onClick={e => this.selectSource(CreateImport.DnDSource, e)}
+                 className={classnames('CreateImport-activity-item', {selected: source === CreateImport.DnDSource})}>
+              Local
+            </div>
+            <div onClick={e => this.selectSource(CreateImport.ServerSource, e)}
+                 className={classnames('CreateImport-activity-item', {selected: source === CreateImport.ServerSource})}>
+              Server
+            </div>
+            <div onClick={e => this.selectSource(CreateImport.DropboxSource, e)}
+                 className={classnames('CreateImport-activity-item', {selected: source === CreateImport.DropboxSource})}>
+              Dropbox
+            </div>
+          </div>
           { this.renderPipelines() }
         </div>
         <div className="CreateImport-footer">
