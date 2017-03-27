@@ -373,6 +373,9 @@ class Assets extends Component {
       if (positionIndex !== undefined) selectedPositionIndex.push(positionIndex)
     }
     selectedPositionIndex = selectedPositionIndex.sort()
+    // If we have selected assets that aren't on the current page, this array
+    // may be empty. If so, bail out here.
+    if (!selectedPositionIndex.length) return
 
     const firstIndex = selectedPositionIndex[0]
     const lastIndex = selectedPositionIndex[selectedPositionIndex.length - 1]
