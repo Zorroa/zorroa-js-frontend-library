@@ -143,7 +143,7 @@ class FolderItem extends Component {
 
   removeFolder = (event) => {
     const { selectedFolderIds, folder } = this.props
-    const folderIds = new Set(selectedFolderIds.has(folder.id) ? selectedFolderIds : folder.id)
+    const folderIds = new Set(selectedFolderIds && selectedFolderIds.has(folder.id) ? [...selectedFolderIds] : [folder.id])
     this.props.actions.deleteFolderIds(folderIds)
     this.dismissContextMenu(event)
   }
