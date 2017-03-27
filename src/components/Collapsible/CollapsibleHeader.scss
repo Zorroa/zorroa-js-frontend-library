@@ -13,7 +13,7 @@
   height: 40px;
   text-transform: uppercase;
   overflow: hidden;
-
+  cursor: pointer;
   color: $zorroa-greyish-brown;
   background-color: $zorroa-darkwhite;
 
@@ -54,7 +54,7 @@
   @include noSelect;
   @include flexRow;
   @include flexAlignItemsCenter;
-  cursor: default;
+  cursor: pointer;
 }
 
 .CollapsibleHeader-open {

@@ -62,6 +62,7 @@
     .Facet-value-table-row {
       padding-right: 10px;
       color: $zorroa-greyish-brown;
+      cursor: pointer;
       &:hover { background-color: $zorroa-hover; }
       &.selected { background-color: $zorroa-selected; }
       &.selected:hover { background-color: $zorroa-hover; }
@@ -183,6 +184,8 @@
     padding-right: 2px; // This compensates for the slight offset of icon-sort*
     margin-left: 2px;
     border-radius: 3px;
+    cursor: pointer;
+
     &:hover {
       color: white;
       background-color: $zorroa-sickly-green;
