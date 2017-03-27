@@ -1,0 +1,38 @@
+@import '../../styles/core-mixins.scss';
+
+.DropboxChooser {
+  @include flexCol;
+  border-radius: 3px;
+  border: 1px solid $zorroa-nearwhite;
+  max-height: 160px;
+  overflow: auto;
+}
+
+.DropboxChooser-title {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include fullWidth;
+  color: white;
+  background-color: $zorroa-water-blue;
+  padding: 6px;
+}
+
+.DropboxChooser-title-label {
+  margin-left: 8px;
+}
+
+.DropboxChooser-wait {
+  width: 72px;
+}
+
+.DropboxChooser-file {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  color: $zorroa-greyish-brown;
+}
+
+.DropboxChooser-file-icon {
+  @include flexRowCenter;
+  padding: 6px;
+  color: $zorroa-gray;
+}
