@@ -269,7 +269,7 @@ class Assets extends Component {
   }
 
   updateSelectedHashes = (similarField, selectedIds) => {
-    if (selectedIds && selectedIds.size) {
+    if (similarField && similarField.length && selectedIds && selectedIds.size) {
       const { cachedSelectedIds } = this.state
       if (cachedSelectedIds && equalSets(selectedIds, cachedSelectedIds)) return
       const dummyDispatch = () => {}
