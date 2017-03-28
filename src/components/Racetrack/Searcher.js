@@ -7,7 +7,7 @@ import Widget from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import TrashedFolder from '../../models/TrashedFolder'
-import { searchAssets, getAssetFields } from '../../actions/assetsAction'
+import { searchAssets, getAssetFields, requiredFields } from '../../actions/assetsAction'
 import { countAssetsInFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
 import { MapWidgetInfo } from './WidgetInfo'
@@ -27,6 +27,9 @@ class Searcher extends Component {
     order: PropTypes.arrayOf(PropTypes.object),
     similarField: PropTypes.string,
     similarValues: PropTypes.arrayOf(PropTypes.string),
+    fieldTypes: PropTypes.object,
+    metadataFields: PropTypes.arrayOf(PropTypes.string),
+    lightbarFields: PropTypes.arrayOf(PropTypes.string),
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired
@@ -102,7 +105,8 @@ class Searcher extends Component {
     const {
       widgets, actions, folders, selectedFolderIds, query,
       modifiedFolderIds, trashedFolders, order,
-      similarField, similarValues } = this.props
+      similarField, similarValues,
+      metadataFields, lightbarFields, fieldTypes } = this.props
     let assetSearch = new AssetSearch({order})
     if (widgets && widgets.length) {
       let postFilter = new AssetFilter()
@@ -155,6 +159,13 @@ class Searcher extends Component {
       assetSearch.merge(new AssetSearch({filter}))
     }
 
+    // Limit results to favorited fields, since we only display values
+    // in those fields in the Table and Lightbar
+    if (metadataFields) {
+      const fields = requiredFields([...metadataFields, ...lightbarFields], fieldTypes)
+      assetSearch.fields = [...fields]
+    }
+
     // Do not send the query unless it is different than the last returned query
     // FIXME: If assetSearch.empty() filtered counts == total, but tricky to flush cache
     // FIXME: Count trashed folders once the server adds support
@@ -202,6 +213,9 @@ const mapStateToProps = state => ({
   trashedFolders: state.folders.trashedFolders,
   similarField: state.racetrack.similarField,
   similarValues: state.racetrack.similarValues,
+  fieldTypes: state.assets.types,
+  metadataFields: state.app.metadataFields,
+  lightbarFields: state.app.lightbarFields,
   user: state.auth.user,
   userSettings: state.app.userSettings
 })

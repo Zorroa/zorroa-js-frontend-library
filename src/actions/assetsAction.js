@@ -24,6 +24,26 @@ function escapeQuery (query) {
   return safeQuery
 }
 
+export function requiredFields (fields, fieldTypes) {
+  const requiredSearchPrefixes = [
+    'proxies', 'clip', 'pages', 'links', 'id',
+    'source.filename', 'source.mediaType', 'source.extension', 'source.clip',
+    'image.width', 'image.height', 'image.pages',
+    'video.width', 'video.height', 'video.pages', 'video.framerate', 'video.frames'
+  ]
+
+  const req = new Set([...fields])
+  fieldTypes && Object.keys(fieldTypes).forEach(field => {
+    for (let i = 0; i < requiredSearchPrefixes.length; ++i) {
+      if (field.startsWith(requiredSearchPrefixes[i])) {
+        req.add(field)
+        break
+      }
+    }
+  })
+  return [...req]
+}
+
 export function searchAssetsRequestProm (dispatch, query) {
   assert.ok(query instanceof AssetSearch)
   assert.ok(query.size)
@@ -51,8 +71,9 @@ export function searchAssetsRequestProm (dispatch, query) {
 export function searchAssets (query, lastQuery) {
   return dispatch => {
     const promises = []
-    const mainQueryChanged = !lastQuery || query.query !== lastQuery.query || query.filter !== lastQuery.filter
-    const postFilterChanged = query.postFilter && (!lastQuery || !lastQuery.postFilter || query.postFilter !== lastQuery.postFilter)
+    const skip = new Set(['from', 'size', 'scroll', 'postFilter', 'aggs'])
+    const mainQueryChanged = !lastQuery || !query.equals(lastQuery, skip)
+    const postFilterChanged = query.postFilter && !query.postFilter.empty() && (!lastQuery.postFilter || JSON.stringify(query.postFilter) !== JSON.stringify(lastQuery.postFilter))
     if (mainQueryChanged || postFilterChanged) {
       const mainQuery = new AssetSearch(query)
       mainQuery.aggs = null
@@ -106,7 +127,7 @@ export function searchAssets (query, lastQuery) {
   }
 }
 
-export function searchDocument (query, parentId, order) {
+export function searchDocument (query, parentId) {
   assert.ok(!query || query instanceof AssetSearch)
   return dispatch => {
     const safeQuery = escapeQuery(query)
@@ -118,7 +139,6 @@ export function searchDocument (query, parentId, order) {
     }
     safeQuery.size = 10000
     safeQuery.from = 0
-    if (!query) safeQuery.order = order
     console.log('Search Document: ' + JSON.stringify(safeQuery))
     archivistPost(dispatch, '/api/v3/assets/_search', safeQuery)
       .then(response => {

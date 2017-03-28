@@ -9,7 +9,7 @@ import * as assert from 'assert'
 import Thumb, { page, monopageBadges, multipageBadges } from '../Thumb'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
-import { isolateAssetId, selectAssetIds, sortAssets, searchAssets } from '../../actions/assetsAction'
+import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, searchAssetsRequestProm } from '../../actions/assetsAction'
 import { resetRacetrackWidgets, similarValues } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
@@ -20,9 +20,10 @@ import Table from '../Table'
 import Editbar from './Editbar'
 import * as ComputeLayout from './ComputeLayout.js'
 import AssetSearch from '../../models/AssetSearch'
+import AssetFilter from '../../models/AssetFilter'
 import Resizer from '../../services/Resizer'
 import TrashedFolder from '../../models/TrashedFolder'
-import { addSiblings, equalSets, unCamelCase } from '../../services/jsUtil'
+import { addSiblings, equalSets, unCamelCase, makePromiseQueue } from '../../services/jsUtil'
 import * as api from '../../globals/api.js'
 
 const assetsScrollPadding = 8
@@ -69,7 +70,9 @@ class Assets extends Component {
       tableIsResizing: false,
       positions: [],
       multipage: {},
-      collapsed: 0
+      collapsed: 0,
+      cachedSelectedIds: null,
+      cachedSelectedHashes: null
     }
 
     this.newTableHeight = 0
@@ -249,6 +252,7 @@ class Assets extends Component {
     }
     this.updateAssetsScrollSizeInterval = setInterval(this.updateAssetsScrollSize, 150)
     this.resizer = new Resizer()
+    this.updateSelectedHashes(this.props.similarField, this.props.selectedIds)
   }
 
   componentWillUnmount = () => {
@@ -258,6 +262,39 @@ class Assets extends Component {
     // clear any pending layout
     this.clearAssetsLayoutTimer()
     this.resizer.release()
+  }
+
+  componentWillReceiveProps = (nextProps) => {
+    this.updateSelectedHashes(nextProps.similarField, nextProps.selectedIds)
+  }
+
+  updateSelectedHashes = (similarField, selectedIds) => {
+    if (selectedIds && selectedIds.size) {
+      const { cachedSelectedIds } = this.state
+      if (cachedSelectedIds && equalSets(selectedIds, cachedSelectedIds)) return
+      const dummyDispatch = () => {}
+      const mkProm = (query) => {
+        return searchAssetsRequestProm(dummyDispatch, query)
+          .catch(error => error) // this catch ensures one error doesn't spoil the batch
+      }
+      const filter = new AssetFilter({terms: {'_id': [...selectedIds]}})
+      const fields = [similarField]
+      const query = new AssetSearch({filter, fields, size: selectedIds.size})
+      makePromiseQueue([query], mkProm, 1 /* limit to one */)
+        .then(responses => {
+          const assets = responses[0].data.list.map(json => (new Asset(json)))
+          const cachedSelectedHashes = assets.map(asset => (asset.rawValue(similarField)))
+          return this.setState({cachedSelectedHashes})
+        })
+
+      // Update state now to avoid re-sending
+      this.setState({cachedSelectedIds: new Set(selectedIds)})
+    } else {
+      // Clear the cache
+      const cachedSelectedIds = null
+      const cachedSelectedHashes = null
+      this.setState({cachedSelectedIds, cachedSelectedHashes})
+    }
   }
 
   onAssetsScrollScroll = (event) => {
@@ -310,6 +347,11 @@ class Assets extends Component {
   clearAssetsLayoutTimer = () => {
     if (this.assetsLayoutTimer) clearTimeout(this.assetsLayoutTimer)
     this.assetsLayoutTimer = null
+  }
+
+  @keydown('tab')
+  scrollToNextSelection () {
+    this.scrollToSelection()
   }
 
   scrollToSelection = () => {
@@ -372,53 +414,20 @@ class Assets extends Component {
   }
 
   sortSimilar = () => {
-    const { assets, selectedIds, similarField } = this.props
-    const similarValues = []
-    selectedIds.forEach(id => {
-      const asset = assets.find(a => a.id === id)
-      if (asset) {
-        const hash = asset.value(similarField)
-        if (hash) similarValues.push(hash)
-      }
-    })
-    this.props.actions.similarValues(similarValues)
-    console.log('Sort by similar: ' + JSON.stringify(similarValues))
+    const { cachedSelectedHashes } = this.state
+    this.props.actions.similarValues(cachedSelectedHashes)
+    console.log('Sort by similar: ' + JSON.stringify(cachedSelectedHashes))
   }
 
   renderEditbar () {
-    const { assets, order, selectedIds, similarField, similarValues, query, sync } = this.props
+    const { order, selectedIds, similarField, similarValues, query, sync } = this.props
+    const { cachedSelectedHashes } = this.state
 
     const similarActive = similarField && similarField.length > 0 && similarValues && similarValues.length > 0
-    let similarValuesSelected = selectedIds && selectedIds.size === similarValues.length
-    if (similarValuesSelected) {
-      for (let i = 0; i < similarValues.length; ++i) {
-        const v = similarValues[i]
-        // value must be in the first N assets, not entire asset list
-        let foundV = false
-        for (let j = 0; j < similarValues.length && j < assets.length; ++j) {
-          const asset = assets[j]
-          if (selectedIds.has(asset.id) && asset.value(similarField) === v) {
-            foundV = true
-            break
-          }
-        }
-        if (!foundV) {
-          similarValuesSelected = false
-          break
-        }
-      }
-    }
+    let similarValuesSelected = similarValues && cachedSelectedHashes && equalSets(new Set([...similarValues]), new Set([...cachedSelectedHashes]))
 
     // Only enable similar button if selected assets have the right hash
-    // WARNING -- PERFORMANCE -- Worst case linear search on all assets
-    let canSortSimilar = selectedIds && selectedIds.size > 0 && similarField && similarField.length > 0 && !similarValuesSelected
-    if (canSortSimilar) {
-      selectedIds.forEach(id => {
-        const asset = canSortSimilar &&   // Skip linear sort after 1st miss
-          assets.find(a => (a.id === id))
-        if (!asset || !asset.rawValue(similarField)) canSortSimilar = false
-      })
-    }
+    let canSortSimilar = selectedIds && selectedIds.size > 0 && similarField && similarField.length > 0 && !similarValuesSelected && cachedSelectedHashes && cachedSelectedHashes.length > 0
     const sortSimilar = canSortSimilar ? this.sortSimilar : null
 
     const columnName = order && order.length && order[0].field !== 'source.filename' ? unCamelCase(Asset.lastNamespace(order[0].field)) : 'Table Column'
@@ -653,6 +662,7 @@ export default connect(state => ({
     selectAssetIds,
     sortAssets,
     searchAssets,
+    searchAssetsRequestProm,
     resetRacetrackWidgets,
     similarValues,
     selectFolderIds,

@@ -10,8 +10,7 @@ import {
   ExistsWidgetInfo,
   RangeWidgetInfo,
   DateRangeWidgetInfo,
-  FiletypeWidgetInfo,
-  SimilarHashWidgetInfo
+  FiletypeWidgetInfo
 } from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
 
