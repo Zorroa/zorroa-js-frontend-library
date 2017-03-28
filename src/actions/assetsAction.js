@@ -52,7 +52,7 @@ export function searchAssets (query, lastQuery) {
   return dispatch => {
     const promises = []
     const mainQueryChanged = !lastQuery || query.query !== lastQuery.query || query.filter !== lastQuery.filter
-    const postFilterChanged = query.postFilter && !query.postFilter.empty() && (!lastQuery.postFilter || query.postFilter !== lastQuery.postFilter)
+    const postFilterChanged = query.postFilter && (!lastQuery || !lastQuery.postFilter || query.postFilter !== lastQuery.postFilter)
     if (mainQueryChanged || postFilterChanged) {
       const mainQuery = new AssetSearch(query)
       mainQuery.aggs = null
