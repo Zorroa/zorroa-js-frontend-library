@@ -9,13 +9,24 @@ window.zorroa = {}
 
 // ----------------------------------------------------------------------
 
-export var requestSentCounter = 0
-export var requestReceivedCounter = 0
+var requestSentCounter = 0
+var requestReceivedCounter = 0
 
 export function getRequestsSynced () {
+  // log(`getRequestsSynced ${requestSentCounter} ${requestReceivedCounter}`)
   return requestSentCounter === requestReceivedCounter
 }
 window.zorroa.getRequestsSynced = getRequestsSynced
+
+export function incRequestSentCounter () { requestSentCounter++ }
+export function incRequestReceivedCounter () { requestReceivedCounter++ }
+export function getRequestSentCounter () { return requestSentCounter }
+export function getRequestReceivedCounter () { return requestReceivedCounter }
+
+window.zorroa.getRequestSentCounter = getRequestSentCounter
+window.zorroa.getRequestReceivedCounter = getRequestReceivedCounter
+window.zorroa.incRequestSentCounter = incRequestSentCounter
+window.zorroa.incRequestReceivedCounter = incRequestReceivedCounter
 
 // ----------------------------------------------------------------------
 
