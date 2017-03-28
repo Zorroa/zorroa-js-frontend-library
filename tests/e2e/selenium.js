@@ -350,19 +350,38 @@ export function login () {
 }
 
 // ----------------------------------------------------------------------
-// wait until a css selector is visible (or timeout)
-export function getCssElementVisible (selector) {
-  return driver.findElement(By.css(selector))
+// wait until an element is visible (or timeout)
+export function getElementVisible (by, selector) {
+  return driver.findElement(by(selector))
   .then((ele) => ele.isDisplayed(), () => false)
 }
 
 // ----------------------------------------------------------------------
 // wait until a css selector is visible (or timeout)
+export function getCssElementVisible (selector) {
+  return getElementVisible(By.css, selector)
+}
+
+// ----------------------------------------------------------------------
+// wait until an xpath selector is visible (or timeout)
+export function getXpathVisible (selector) {
+  return getElementVisible(By.xpath, selector)
+}
+
+// ----------------------------------------------------------------------
+// wait until an element is visible (or timeout)
 export function waitForCssElementVisible (selector, optTimeout) {
   return driver.wait(_ => getCssElementVisible(selector), optTimeout)
   // An alternative way to wait -- TODO determine if there's a reason to go one way or the other
   // .then(_ => driver.wait(until.elementLocated(By.css(selector)), 15000))
   .then(_ => expectCssElementIsVisible(selector))
+}
+
+// ----------------------------------------------------------------------
+// wait until an xpath selector is visible (or timeout)
+export function waitForXpathVisible (selector, optTimeout) {
+  return driver.wait(_ => getXpathVisible(selector), optTimeout)
+  .then(_ => expectXpathElementIsVisible(selector))
 }
 
 // ----------------------------------------------------------------------
@@ -373,11 +392,18 @@ export function waitForCssElementNotVisible (selector, optTimeout) {
 }
 
 // ----------------------------------------------------------------------
-// assert (expect) that a css selector is visible
-// if not, the css selector is displayed in the error message
-export function expectCssElementIsVisible (selector) {
+// wait until an xpath selector is visible (or timeout)
+export function waitForXpathNotVisible (selector, optTimeout) {
+  return driver.wait(_ => getXpathVisible(selector).then(x => !x), optTimeout)
+  .then(_ => expectXpathElementIsNotVisible(selector))
+}
+
+// ----------------------------------------------------------------------
+// assert (expect) that a selector is visible
+// if not, the selector is displayed in the error message
+export function expectSelectorIsVisible (by, selector) {
   return driver
-  .then(_ => driver.findElement(By.css(selector)))
+  .then(_ => driver.findElement(by(selector)))
   .then(
     (ele) => ele.isDisplayed(), // element found
     () => { expect(selector).toBe('selector not found'); return false } // element not found
@@ -387,6 +413,20 @@ export function expectCssElementIsVisible (selector) {
     return expect(JSON.stringify({ selector, isDisplayed }))
     .toBe(JSON.stringify({ selector, isDisplayed: true }))
   })
+}
+
+// ----------------------------------------------------------------------
+// assert (expect) that a css selector is visible
+// if not, the css selector is displayed in the error message
+export function expectCssElementIsVisible (selector) {
+  return expectSelectorIsVisible(By.css, selector)
+}
+
+// ----------------------------------------------------------------------
+// assert (expect) that a xpath selector is visible
+// if not, the xpath selector is displayed in the error message
+export function expectXpathElementIsVisible (selector) {
+  return expectSelectorIsVisible(By.xpath, selector)
 }
 
 // ----------------------------------------------------------------------

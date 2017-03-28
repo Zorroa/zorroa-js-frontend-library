@@ -370,7 +370,7 @@ class FolderItem extends Component {
           </div>
           { singleFolderSelected &&
           <div onClick={this.edit}
-               className="FolderItem-context-item"
+               className="FolderItem-context-item FolderItem-context-edit"
                onContextMenu={this.dismissContextMenu}>
             <div className="icon-pencil"/>
             <div>Edit...</div>
