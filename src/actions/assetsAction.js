@@ -26,7 +26,7 @@ function escapeQuery (query) {
 
 export function requiredFields (fields, fieldTypes) {
   const requiredSearchPrefixes = [
-    'proxies', 'clip', 'pages', 'links', 'id',
+    'id',
     'source.filename', 'source.mediaType', 'source.extension', 'source.clip',
     'image.width', 'image.height', 'image.pages',
     'video.width', 'video.height', 'video.pages', 'video.frameRate', 'video.frames'
@@ -41,6 +41,10 @@ export function requiredFields (fields, fieldTypes) {
       }
     }
   })
+  req.add('links*')
+  req.add('clip*')
+  req.add('pages*')
+  req.add('proxies*')
   return [...req]
 }
 
