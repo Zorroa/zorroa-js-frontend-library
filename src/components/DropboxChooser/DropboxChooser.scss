@@ -11,10 +11,15 @@
 .DropboxChooser-title {
   @include flexRow;
   @include flexAlignItemsCenter;
+  @include flexJustifySpaceBetween;
   @include fullWidth;
   color: white;
   background-color: $zorroa-water-blue;
   padding: 6px;
+}
+
+.DropboxChooser-title-left {
+  @include flexRowCenter;
 }
 
 .DropboxChooser-title-label {
@@ -29,10 +34,21 @@
   @include flexRow;
   @include flexAlignItemsCenter;
   color: $zorroa-greyish-brown;
+
+  &.selected {
+    background-color: $zorroa-selected;
+  }
 }
 
 .DropboxChooser-file-icon {
   @include flexRowCenter;
   padding: 6px;
   color: $zorroa-gray;
+}
+
+.DropboxChooser-logout {
+  color: white;
+  font-size: 12px;
+  text-transform: uppercase;
+  &:hover { color: $zorroa-lightgray; }
 }

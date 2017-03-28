@@ -32,6 +32,8 @@ class CreateImport extends Component {
     source: CreateImport.DnDSource,
     serverPath: '',         // text in server path input
     serverPaths: [],        // list of added server paths
+    dropboxFiles: new Map(),// list of selected dropbox paths
+    dropboxAccessKey: '',   // access key for analyst processing
     filterText: ''          // pipeline filter
   }
 
@@ -73,6 +75,7 @@ class CreateImport extends Component {
   createServerPathImport = (event) => {
     if (this.isDisabled()) return
     const { name, pipelineId, serverPaths } = this.state
+    if (!serverPaths || !serverPaths.length) return
     const generatorName = 'com.zorroa.core.generator.FileSystemGenerator'
     const generator = this.props.processors.find(p => (p.name === generatorName))
     const generators = serverPaths.map(path => generator.ref({path}))
@@ -83,7 +86,25 @@ class CreateImport extends Component {
   createUploadFileImport = (event) => {
     if (this.isDisabled()) return
     const { name, pipelineId, uploadFiles } = this.state
+    if (!uploadFiles || !uploadFiles.length) return
     this.props.actions.uploadFiles(name, pipelineId, uploadFiles, this.uploadProgress)
+  }
+
+  createDropboxImport = (event) => {
+    if (this.isDisabled()) return
+    const { name, pipelineId, dropboxFiles } = this.state
+    const accessKey = this.state.dropboxAccessKey
+    if (!dropboxFiles || !dropboxFiles.size) return
+    const pipeline = this.props.pipelines.find(pipeline => (pipeline.id === pipelineId))
+    const dropboxDownloadClass = 'com.zorroa.core.processor.DropboxDownloader'
+    const dropboxDownload = this.props.processors.find(p => (p.name === dropboxDownloadClass))
+    const dropboxDownloadRef = dropboxDownload && dropboxDownload.ref({ accessKey })
+    const processors = [ dropboxDownloadRef, ...pipeline.processors ]
+    const generatorName = 'com.zorroa.core.generator.DropboxGenerator'
+    const generator = this.props.processors.find(p => (p.name === generatorName))
+    const generators = [...dropboxFiles.values()].map(file => generator.ref({path: file.path_lower, accessKey}))
+    this.props.actions.importAssets(name, null, generators, processors)
+    this.dismiss(event)
   }
 
   uploadProgress = (progressEvent) => {
@@ -182,8 +203,9 @@ class CreateImport extends Component {
     this.setState({source})
   }
 
-  selectDropbox = (files) => {
-    console.log('Select Dropbox files: ' + JSON.stringify(files))
+  selectDropbox = (dropboxFiles, accessKey) => {
+    console.log('Select Dropbox files: ' + JSON.stringify(dropboxFiles))
+    this.setState({dropboxFiles, dropboxAccessKey: accessKey })
   }
 
   removeUploadFile (file, event) {
@@ -193,11 +215,12 @@ class CreateImport extends Component {
   }
 
   isDisabled () {
-    const { pipelineId, name, uploadFiles, serverPaths, source, progressEvent } = this.state
+    const { pipelineId, name, uploadFiles, serverPaths, dropboxFiles, source, progressEvent } = this.state
     if (progressEvent) return true
     if (pipelineId <= 0 || !name || !name.length) return true
     if (source === CreateImport.ServerSource && !serverPaths.length) return true
     if (source === CreateImport.DnDSource && (!uploadFiles || !uploadFiles.length)) return true
+    if (source === CreateImport.DropboxSource && (!dropboxFiles || !dropboxFiles.size)) return true
     return false
   }
 
@@ -325,7 +348,7 @@ class CreateImport extends Component {
       case CreateImport.DropboxSource:
         return (
           <div className="CreateImport-activity-region">
-            <DropboxChooser appKey="6fifppvd9maxou9" onSelect={this.selectDropbox}>
+            <DropboxChooser appKey="6fifppvd9maxou9" onChange={this.selectDropbox}>
             </DropboxChooser>
           </div>
         )

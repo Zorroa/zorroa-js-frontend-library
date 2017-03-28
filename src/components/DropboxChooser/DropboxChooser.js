@@ -1,11 +1,13 @@
 import React, { Component, PropTypes } from 'react'
 import Dropbox from 'dropbox'
+import classnames from 'classnames'
 
 import domUtils from '../../services/domUtils'
 
 export default class DropboxChooser extends Component {
   static propTypes = {
     appKey: PropTypes.string.isRequired,
+    onChange: PropTypes.func.isRequired,
     path: PropTypes.string
   }
 
@@ -14,11 +16,13 @@ export default class DropboxChooser extends Component {
   }
 
   state = {
+    files: [],
     cursor: '',
     entries: [],
     loading: false,
-    accessToken: '',
-    authUrl: ''
+    accessToken: localStorage.getItem('DropboxAccessToken'),
+    authUrl: '',
+    selectedFiles: new Map()
   }
 
   authorized = (ev) => {
@@ -26,12 +30,30 @@ export default class DropboxChooser extends Component {
       const message = ev.newValue
       const response = domUtils.parseQueryString(message)
       const accessToken = response['http://localhost:8080/dbxauth#access_token']
+      localStorage.setItem('DropboxAccessToken', accessToken)
       console.log('Received: ' + accessToken)
       this.authenticating = false
       this.setState({accessToken, loading: true})
-      localStorage.removeItem(ev.key)
       this.loadFiles(accessToken)
     }
+  }
+
+  deauthorize = () => {
+    localStorage.removeItem('DropboxURL')
+    localStorage.removeItem('DropboxAccessToken')
+    this.setState({files: [], cursor: '', entries: [], accessToken: '', authUrl: '', selectedFiles: new Map()})
+    this.authorize()
+  }
+
+  authorize = () => {
+    const { appKey } = this.props
+    // const authUrl = 'http://localhost:8066/#access_token=gnXMnC4kaSAAAAAAAAABcjGEFV6hNSMs-L3xJ3D6qGF9SFNW2LJ2YcdSUTwNX4h8&token_type=bearer&uid=542065014&account_id=dbid%3AAAALlZIpNztmWVNtxx53n-gH4N0bhq_YnJQ'
+    // Set the login anchors href using dbx.getAuthenticationUrl()
+    const dbx = new Dropbox({ clientId: appKey })
+    const state = Math.random().toString(36).substring(7)
+    const authUrl = dbx.getAuthenticationUrl('http://localhost:8080/dbxauth', state)
+    console.log('Auth URL: ' + authUrl)
+    this.setState({authUrl})
   }
 
   loadFiles = (accessToken) => {
@@ -52,23 +74,16 @@ export default class DropboxChooser extends Component {
   }
 
   componentWillMount () {
-    const { accessKey } = this.state
-    const { appKey, path } = this.props
+    const { accessToken } = this.state
 
     // Listen for changes to local storage to capture return URL from
     // Dropbox OAuth2 redirect in popup window
     window.addEventListener('storage', this.authorized)
 
-    if (accessKey && accessKey.length) {
-      this.loadFiles(accessKey)
+    if (accessToken && accessToken.length) {
+      this.loadFiles(accessToken)
     } else {
-      // const authUrl = 'http://localhost:8066/#access_token=gnXMnC4kaSAAAAAAAAABcjGEFV6hNSMs-L3xJ3D6qGF9SFNW2LJ2YcdSUTwNX4h8&token_type=bearer&uid=542065014&account_id=dbid%3AAAALlZIpNztmWVNtxx53n-gH4N0bhq_YnJQ'
-      // Set the login anchors href using dbx.getAuthenticationUrl()
-      const dbx = new Dropbox({ clientId: appKey })
-      const state = Math.random().toString(36).substring(7)
-      const authUrl = dbx.getAuthenticationUrl('http://localhost:8080/dbxauth', state)
-      console.log('Auth URL: ' + authUrl)
-      this.setState({authUrl})
+      this.authorize()
     }
   }
 
@@ -85,8 +100,20 @@ export default class DropboxChooser extends Component {
     window.open(authUrl, 'Zorroa Dropbox', strWindowFeatures)
   }
 
+  selectFile = (file, event) => {
+    console.log('Select file: ' + file)
+    const selectedFiles = new Map(this.state.selectedFiles)
+    if (selectedFiles.has(file.id)) {
+      selectedFiles.delete(file.id)
+    } else {
+      selectedFiles.set(file.id, file)
+    }
+    this.setState({selectedFiles})
+    this.props.onChange(selectedFiles, this.state.accessToken)
+  }
+
   render () {
-    const { files, loading, accessToken } = this.state
+    const { files, loading, accessToken, selectedFiles } = this.state
     const wait = require('../Assets/ellipsis.gif')
     if (!accessToken || !accessToken.length) {
       this.popupAuthenticator()
@@ -94,12 +121,16 @@ export default class DropboxChooser extends Component {
     return (
       <div className="DropboxChooser">
         <div className="DropboxChooser-title">
-          <div className="icon-folder-subfolders"/>
-          <div className="DropboxChooser-title-label">Dropbox Chooser</div>
+          <div className="DropboxChooser-title-left">
+            <div className="icon-folder-subfolders"/>
+            <div className="DropboxChooser-title-label">Dropbox Chooser</div>
+          </div>
+          <div className="DropboxChooser-logout" onClick={this.deauthorize}>Logout</div>
         </div>
         { (loading || this.authenticating) && <img src={wait} className="DropboxChooser-wait"/> }
         { files && files.map(file => (
-          <div key={file.id} className="DropboxChooser-file">
+          <div key={file.id} onClick={e => this.selectFile(file, e)}
+               className={classnames('DropboxChooser-file', {selected: selectedFiles.has(file.id)})}>
             <div className={`DropboxChooser-file-icon icon-${file['.tag'] === 'folder' ? 'folder' : 'file-empty'}`}/>
             {file.name}
           </div>
