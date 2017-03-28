@@ -83,48 +83,6 @@
   padding: 10px 20px;
 }
 
-.Preferences-curator-page-size {
-  @include flexRowCenter;
-  @include nowrap;
-
-  input::-webkit-slider-thumb {
-    margin-top: -6px;
-  }
-
-  input::-webkit-scrollbar-track {
-    height: 2px;
-    background: $zorroa-lightgray;
-  }
-
-  input::-webkit-slider-runnable-track {
-    height: 2px;
-    background: $zorroa-lightgray;
-  }
-
-  input:focus::-webkit-slider-runnable-track {
-    background: $zorroa-lightgray;
-  }
-}
-
-.Preferences-page-size-label {
-  color: $zorroa-lightgray;
-  text-transform: uppercase;
-  margin-right: 10px;
-  font-size: 12px;
-}
-
-.Preferences-page-size-slider {
-  padding-left: 10px;
-}
-
-.Preferences-page-size-text {
-  border: 1px solid $zorroa-lightgray;
-  border-radius: 3px;
-  padding: 8px;
-  color: $zorroa-gray;
-  font-size: 14px;
-}
-
 .Preferences-reset {
   margin-top: 20px;
   border: none;
@@ -166,13 +124,6 @@
   font-weight: 400;
   text-transform: uppercase;
   padding: 10px 0;
-}
-
-.Preferences-pre {
-  text-transform: none;
-  margin: 5px;
-  font-size: 12px;
-  color: $zorroa-lightgray;
 }
 
 .Preferences-status {

@@ -7,13 +7,16 @@ import { connect } from 'react-redux'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
 import Folder from '../../models/Folder'
+import AclEntry from '../../models/Acl'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import CreateExport from './CreateExport'
 import CreateFolder from './CreateFolder'
 import {
+  createFolder,
   selectFolderIds,
   addAssetIdsToFolderId,
+  removeAssetIdsFromFolderId,
   deleteFolderIds,
   updateFolder } from '../../actions/folderAction'
 import { showModal } from '../../actions/appActions'
@@ -72,6 +75,7 @@ class FolderItem extends Component {
 
     // state props
     selectedFolderIds: PropTypes.object,
+    selectedAssetIds: PropTypes.object,
     folders: PropTypes.instanceOf(Map),
     counts: PropTypes.instanceOf(Map),
     filteredCounts: PropTypes.instanceOf(Map),
@@ -88,12 +92,6 @@ class FolderItem extends Component {
 
   showContextMenu = (event) => {
     event.preventDefault()
-
-    // Isolate-select if the clicked folder is not selected
-    const { folder, selectedFolderIds, onSelect } = this.props
-    if (!selectedFolderIds.has(folder.id)) {
-      onSelect({shiftKey: false, metaKey: false}, folder)
-    }
     this.setState({
       isContextMenuVisible: true,
       contextMenuPos: { x: event.pageX, y: event.pageY }
@@ -118,6 +116,21 @@ class FolderItem extends Component {
     this.dismissContextMenu(event)
   }
 
+  createChild = (event) => {
+    this.dismissContextMenu(event)
+    const width = '300px'
+    const body = <CreateFolder title='Create Collection'
+                               acl={[]}
+                               onCreate={this.createChildFolder}/>
+    this.props.actions.showModal({body, width})
+  }
+
+  createChildFolder = (name, acl, search) => {
+    const parentId = this.props.folder.id
+    const folder = new Folder({ name, parentId, acl, search })
+    this.props.actions.createFolder(folder)
+  }
+
   moveTo = (event) => {
     console.log('Move folder to...')
     this.dismissContextMenu(event)
@@ -129,8 +142,8 @@ class FolderItem extends Component {
   }
 
   removeFolder = (event) => {
-    const folderIds = new Set(this.props.selectedFolderIds)
-    folderIds.add(this.props.folder.id)
+    const { selectedFolderIds, folder } = this.props
+    const folderIds = new Set(selectedFolderIds && selectedFolderIds.has(folder.id) ? [...selectedFolderIds] : [folder.id])
     this.props.actions.deleteFolderIds(folderIds)
     this.dismissContextMenu(event)
   }
@@ -169,11 +182,72 @@ class FolderItem extends Component {
   }
 
   createExport = (event, name, exportImages, exportTable) => {
-    const { selectedFolderIds, metadataFields } = this.props
-    const filter = new AssetFilter({links: {folder: [...selectedFolderIds]}})
+    const { selectedFolderIds, metadataFields, folder } = this.props
+    const folderIds = selectedFolderIds.has(folder.id) ? new Set(this.props.selectedFolderIds) : [folder.id]
+    const filter = new AssetFilter({links: {folder: [...folderIds]}})
     const search = new AssetSearch({filter})
     const fields = exportTable && metadataFields
     this.props.actions.exportAssets(name, search, fields, exportImages)
+  }
+
+  addAssetsToFolders = () => {
+    const { selectedAssetIds, actions } = this.props
+    this.dismissContextMenu(event)
+    this.simpleFolderIds().forEach(folderId => {
+      actions.addAssetIdsToFolderId(selectedAssetIds, folderId)
+    })
+  }
+
+  removeAssetsFromFolders = () => {
+    const { selectedAssetIds, actions } = this.props
+    this.dismissContextMenu(event)
+    this.simpleFolderIds().forEach(folderId => {
+      actions.removeAssetIdsFromFolderId(selectedAssetIds, folderId)
+    })
+  }
+
+  simpleFolderIds = () => {
+    const { selectedFolderIds, folder, folders } = this.props
+    const simpleFolderIds = []
+    if (!selectedFolderIds.has(folder.id)) {
+      if (folder.isSimpleCollection()) simpleFolderIds.push(folder.id)
+    } else {
+      for (let id of selectedFolderIds) {
+        const folder = folders.get(id)
+        if (folder && folder.isSimpleCollection()) {
+          simpleFolderIds.push(folder.id)
+        }
+      }
+    }
+    return simpleFolderIds
+  }
+
+  selectedAssetNotInSelectedFolder = () => {
+    const { selectedAssetIds, assets } = this.props
+    if (!selectedAssetIds || !selectedAssetIds.size) return false
+    const simpleFolderIds = this.simpleFolderIds()
+    if (!simpleFolderIds.length) return false
+    for (const assetId of selectedAssetIds) {
+      const index = assets.findIndex(asset => (asset.id === assetId))
+      if (index < 0) continue
+      const asset = assets[index]
+      if (!asset.memberOfAllFolderIds(simpleFolderIds)) return true
+    }
+    return false
+  }
+
+  selectedFolderContainsSelectedAssets = () => {
+    const { selectedAssetIds, assets } = this.props
+    if (!selectedAssetIds || !selectedAssetIds.size) return false
+    const simpleFolderIds = this.simpleFolderIds()
+    if (!simpleFolderIds.length) return false
+    for (const assetId of selectedAssetIds) {
+      const index = assets.findIndex(asset => (asset.id === assetId))
+      if (index < 0) continue
+      const asset = assets[index]
+      if (asset.memberOfAnyFolderIds(simpleFolderIds)) return true
+    }
+    return false
   }
 
   // Count direct folder descendents, which is known, unlike recursive,
@@ -208,7 +282,7 @@ class FolderItem extends Component {
   }
 
   renderContextMenu () {
-    const { folder, selectedFolderIds, user } = this.props
+    const { folder, selectedFolderIds, selectedAssetIds, user } = this.props
     if (!this.state.isContextMenuVisible) {
       return
     }
@@ -218,6 +292,13 @@ class FolderItem extends Component {
     const subfolderCount = this.subfolderCount(folder.id)
     const subfolderLabel = subfolderCount === 0 ? 'No subfolders' : (subfolderCount === 1 ? '1 subfolder' : `${subfolderCount} subfolders`)
     const { contextMenuPos } = this.state
+
+    const selectedAssets = selectedAssetIds && selectedAssetIds.size > 0
+    const selectedAssetsNotInFolder = selectedAssets && this.selectedAssetNotInSelectedFolder()
+    const addableAssets = selectedAssetsNotInFolder && this.simpleFolderIds().length > 0
+    const removableAssets = selectedAssets && this.selectedFolderContainsSelectedAssets()
+    const canAddChild = singleFolderSelected && !folder.isDyhi() && !folder.search && folder.hasAccess(user, AclEntry.WriteAccess)
+
     // FIXME: Get Link, Move to, and Favorite are disabled until implemented
     return (
       <div>
@@ -258,6 +339,13 @@ class FolderItem extends Component {
             <div className="icon-export"/>
             <div>Export folder</div>
           </div> }
+          { singleFolderSelected && !folder.isDyhi() && !folder.search &&
+            <div onClick={canAddChild && this.createChild}
+                 className="FolderItem-context-item"
+                 onContextMenu={this.dismissContextMenu}>
+              <div className={classnames('icon-folder-add', {disabled: !canAddChild})} />
+              <div>Create Sub-folder</div>
+            </div> }
           <div onClick={this.moveTo}
                className="FolderItem-context-item disabled"
                onContextMenu={this.dismissContextMenu}>
@@ -269,6 +357,16 @@ class FolderItem extends Component {
                onContextMenu={this.dismissContextMenu}>
             <div className="icon-star-empty"/>
             <div>Favorite</div>
+          </div>
+          <div onClick={addableAssets && this.addAssetsToFolders}
+               className={classnames('FolderItem-context-item', {disabled: !addableAssets})}>
+            <div className="icon-plus2"/>
+            <div>Add Assets</div>
+          </div>
+          <div onClick={removableAssets && this.removeAssetsFromFolders}
+               className={classnames('FolderItem-context-item', {disabled: !removableAssets})}>
+            <div className="icon-removeasset"/>
+            <div>Remove Assets</div>
           </div>
           { singleFolderSelected &&
           <div onClick={this.edit}
@@ -354,13 +452,16 @@ export default connect(state => ({
   counts: state.folders.counts,
   filteredCounts: state.folders.filteredCounts,
   selectedFolderIds: state.folders.selectedFolderIds,
+  selectedAssetIds: state.assets.selectedIds,
   user: state.auth.user,
   dragInfo: state.app.dragInfo,
   metadataFields: state.app.metadataFields
 }), dispatch => ({
   actions: bindActionCreators({
+    createFolder,
     selectFolderIds,
     addAssetIdsToFolderId,
+    removeAssetIdsFromFolderId,
     exportAssets,
     showModal,
     deleteFolderIds,

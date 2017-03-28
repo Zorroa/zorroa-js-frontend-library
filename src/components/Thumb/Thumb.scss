@@ -53,7 +53,7 @@
 
 .Thumb {
   position: absolute;
-
+  cursor: pointer;
   &.isSelected {
     outline: 3px solid $zorroa-sickly-green;
   }

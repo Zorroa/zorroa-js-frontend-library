@@ -7,7 +7,7 @@ import Widget from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import TrashedFolder from '../../models/TrashedFolder'
-import { searchAssets, getAssetFields } from '../../actions/assetsAction'
+import { searchAssets, getAssetFields, requiredFields } from '../../actions/assetsAction'
 import { countAssetsInFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
 import { MapWidgetInfo } from './WidgetInfo'
@@ -17,7 +17,6 @@ import { MapWidgetInfo } from './WidgetInfo'
 class Searcher extends Component {
   static propTypes = {
     query: PropTypes.instanceOf(AssetSearch),
-    pageSize: PropTypes.number.isRequired,
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
     folders: PropTypes.instanceOf(Map),
     selectedFolderIds: PropTypes.object,
@@ -28,6 +27,9 @@ class Searcher extends Component {
     order: PropTypes.arrayOf(PropTypes.object),
     similarField: PropTypes.string,
     similarValues: PropTypes.arrayOf(PropTypes.string),
+    fieldTypes: PropTypes.object,
+    metadataFields: PropTypes.arrayOf(PropTypes.string),
+    lightbarFields: PropTypes.arrayOf(PropTypes.string),
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired
@@ -101,9 +103,10 @@ class Searcher extends Component {
   // Note that post-filter is less efficient than a standard filter.
   render () {
     const {
-      widgets, actions, folders, selectedFolderIds, query, pageSize,
+      widgets, actions, folders, selectedFolderIds, query,
       modifiedFolderIds, trashedFolders, order,
-      similarField, similarValues } = this.props
+      similarField, similarValues,
+      metadataFields, lightbarFields, fieldTypes } = this.props
     let assetSearch = new AssetSearch({order})
     if (widgets && widgets.length) {
       let postFilter = new AssetFilter()
@@ -156,12 +159,19 @@ class Searcher extends Component {
       assetSearch.merge(new AssetSearch({filter}))
     }
 
+    // Limit results to favorited fields, since we only display values
+    // in those fields in the Table and Lightbar
+    if (metadataFields) {
+      const fields = requiredFields([...metadataFields, ...lightbarFields], fieldTypes)
+      assetSearch.fields = [...fields]
+    }
+
     // Do not send the query unless it is different than the last returned query
     // FIXME: If assetSearch.empty() filtered counts == total, but tricky to flush cache
     // FIXME: Count trashed folders once the server adds support
     const searchModified = this.inflightQuery ? !this.inflightQuery.equals(assetSearch) : (!query || !assetSearch.equals(query))
     if (searchModified) {
-      assetSearch.size = pageSize || AssetSearch.defaultPageSize
+      assetSearch.size = AssetSearch.autoPageSize
       actions.searchAssets(assetSearch, query)
       this.inflightQuery = assetSearch
       if (query) {
@@ -177,6 +187,7 @@ class Searcher extends Component {
       this.queueFolderCounts(modifiedFolderIds, assetSearch)
     }
 
+    if (this.inflightQuery && query && this.inflightQuery.equals(query)) this.inflightQuery = null
     return null   // Just reacting to new slivers
   }
 }
@@ -192,7 +203,6 @@ const mapDispatchToProps = dispatch => ({
 
 const mapStateToProps = state => ({
   query: state.assets.query,
-  pageSize: state.assets.pageSize,
   order: state.assets.order,
   widgets: state.racetrack.widgets,
   folders: state.folders.all,
@@ -203,6 +213,9 @@ const mapStateToProps = state => ({
   trashedFolders: state.folders.trashedFolders,
   similarField: state.racetrack.similarField,
   similarValues: state.racetrack.similarValues,
+  fieldTypes: state.assets.types,
+  metadataFields: state.app.metadataFields,
+  lightbarFields: state.app.lightbarFields,
   user: state.auth.user,
   userSettings: state.app.userSettings
 })

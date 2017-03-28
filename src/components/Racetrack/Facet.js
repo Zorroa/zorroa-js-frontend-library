@@ -191,9 +191,13 @@ class Facet extends Component {
     this.modifySliver(field, terms, newOrder)
   }
 
-  aggBuckets (terms) {
+  baseBuckets () {
     const { id, aggs } = this.props
-    let buckets = aggs && (id in aggs) ? aggs[id].facet.buckets : []
+    return aggs && (id in aggs) ? aggs[id].facet.buckets : []
+  }
+
+  aggBuckets (terms) {
+    const buckets = this.baseBuckets()
 
     // Add in any selected terms that are not in the search agg
     terms && terms.forEach(key => {
@@ -315,6 +319,7 @@ class Facet extends Component {
   }
 
   renderClearSelection () {
+    if (!this.baseBuckets().length) return
     const { terms } = this.state
     if (!terms || terms.length === 0) return <div className="Facet-clear-selection"/>
     return (
@@ -361,6 +366,16 @@ class Facet extends Component {
     let minCount = Number.MAX_SAFE_INTEGER
     // Extract the buckets for this widget from the global query using id
     const buckets = this.mergeOtherBuckets(this.aggBuckets(terms), chartType === BAR_CHART ? MAX_BAR_BUCKETS : MAX_PIE_BUCKETS)
+    if (!buckets || !buckets.length) {
+      return (
+        <div className="Facet-empty">
+          <div className="Facet-empty-icon icon-brokenegg"/>
+          <div className="Facet-empty-info">
+            No results
+          </div>
+        </div>
+      )
+    }
     buckets.forEach(bucket => {
       maxCount = Math.max(maxCount, bucket.doc_count)
       minCount = Math.min(minCount, bucket.doc_count)
@@ -442,6 +457,16 @@ class Facet extends Component {
     )
   }
 
+  renderChartTypes () {
+    const buckets = this.baseBuckets()
+    if (!buckets || !buckets.length) return
+    return (
+      <div className="Facet-footer flexRow flexJustifyCenter">
+        { chartTypes.map(type => this.renderChartIcon(type)) }
+      </div>
+    )
+  }
+
   render () {
     const { isIconified } = this.props
     const { isEnabled, field } = this.state
@@ -459,9 +484,7 @@ class Facet extends Component {
         <div className="Facet-body flexCol">
           { this.renderChart() }
           { this.renderClearSelection() }
-          <div className="Facet-footer flexRow flexJustifyCenter">
-            { chartTypes.map(type => this.renderChartIcon(type)) }
-          </div>
+          { this.renderChartTypes() }
         </div>
       </Widget>
     )

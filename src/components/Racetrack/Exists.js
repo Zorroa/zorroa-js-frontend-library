@@ -63,6 +63,7 @@ class Exists extends Component {
   modifySliver = (field, isMissing) => {
     const widget = createExistsWidget(field, null, isMissing)
     widget.id = this.props.id
+    widget.isEnabled = this.state.isEnabled
     this.props.actions.modifyRacetrackWidget(widget)
   }
 

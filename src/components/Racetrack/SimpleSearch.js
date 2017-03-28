@@ -30,6 +30,10 @@ class SimpleSearch extends Component {
     field: queryField(this.props)
   }
 
+  setStatePromise = (newState) => {
+    return new Promise(resolve => this.setState(newState, resolve))
+  }
+
   // If the query is changed elsewhere, e.g. from the Searchbar,
   // capture the new props and update our local state to match.
   componentWillReceiveProps (nextProps) {
@@ -59,13 +63,14 @@ class SimpleSearch extends Component {
   }
 
   toggleEnabled = () => {
-    new Promise(resolve => this.setState({isEnabled: !this.state.isEnabled}))
-    .then(() => this.modifySliver(this.state.queryString, this.state.fuzzy, this.state.field))
+    this.setStatePromise({isEnabled: !this.state.isEnabled})
+      .then(() => this.modifySliver(this.state.queryString, this.state.fuzzy, this.state.field))
   }
 
   modifySliver (queryString, fuzzy, field) {
     const widget = createSearchWidget(field, null, queryString, fuzzy)
     widget.id = this.props.id
+    widget.isEnabled = this.state.isEnabled
     this.props.actions.modifyRacetrackWidget(widget)
   }
 

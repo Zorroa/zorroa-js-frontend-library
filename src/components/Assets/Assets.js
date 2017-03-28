@@ -3,12 +3,13 @@ import Measure from 'react-measure'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import keydown from 'react-keydown'
+import classnames from 'classnames'
 import * as assert from 'assert'
 
 import Thumb, { page, monopageBadges, multipageBadges } from '../Thumb'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
-import { isolateAssetId, selectAssetIds, sortAssets } from '../../actions/assetsAction'
+import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, searchAssetsRequestProm } from '../../actions/assetsAction'
 import { resetRacetrackWidgets, similarValues } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
@@ -17,12 +18,12 @@ import Pager from './Pager'
 import Footer from './Footer'
 import Table from '../Table'
 import Editbar from './Editbar'
-import SortingSelector from './SortingSelector'
 import * as ComputeLayout from './ComputeLayout.js'
 import AssetSearch from '../../models/AssetSearch'
+import AssetFilter from '../../models/AssetFilter'
 import Resizer from '../../services/Resizer'
 import TrashedFolder from '../../models/TrashedFolder'
-import { addSiblings, equalSets } from '../../services/jsUtil'
+import { addSiblings, equalSets, unCamelCase, makePromiseQueue } from '../../services/jsUtil'
 import * as api from '../../globals/api.js'
 
 const assetsScrollPadding = 8
@@ -43,10 +44,10 @@ class Assets extends Component {
     tableHeight: PropTypes.number.isRequired,
     showMultipage: PropTypes.bool.isRequired,
     folders: PropTypes.instanceOf(Map),
-    selectedFolderIds: PropTypes.instanceOf(Set),
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
     similarField: PropTypes.string,
     similarValues: PropTypes.arrayOf(PropTypes.string),
+    sync: PropTypes.bool.isRequired,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     protocol: PropTypes.string,
@@ -69,7 +70,9 @@ class Assets extends Component {
       tableIsResizing: false,
       positions: [],
       multipage: {},
-      collapsed: 0
+      collapsed: 0,
+      cachedSelectedIds: null,
+      cachedSelectedHashes: null
     }
 
     this.newTableHeight = 0
@@ -165,46 +168,6 @@ class Assets extends Component {
     this.props.actions.selectAssetIds(null)
   }
 
-  filteredFolders = () => {
-    const { trashedFolders } = this.props
-    let selectedFolderIds = this.props.selectedFolderIds
-    if (trashedFolders && trashedFolders.length) {
-      // Server does not support editing of trashed folders
-      selectedFolderIds = new Set()
-      this.props.selectedFolderIds.forEach(id => {
-        const index = trashedFolders.findIndex(trashedFolder => (trashedFolder.folderId === id))
-        if (index < 0) selectedFolderIds.add(id)
-      })
-    }
-    return selectedFolderIds
-  }
-
-  selectedFolderContainsSelectedAssets = () => {
-    const { selectedIds, selectedFolderIds, folders, assets } = this.props
-    if (!selectedIds || !selectedIds.size || !selectedFolderIds || !selectedFolderIds.size) return false
-    const simpleFolderIds = []
-    for (let id of selectedFolderIds) {
-      const folder = folders.get(id)
-      if (folder && !folder.isDyhi() && !folder.search) {
-        simpleFolderIds.push(folder.id)
-      }
-    }
-    for (const assetId of selectedIds) {
-      const index = assets.findIndex(asset => (asset.id === assetId))
-      if (index < 0) continue
-      const asset = assets[index]
-      if (asset.memberOfAnyFolderIds(simpleFolderIds)) return true
-    }
-    return false
-  }
-
-  removeAssetsFromSelectedFolders = () => {
-    const { selectedIds, selectedFolderIds, actions } = this.props
-    selectedFolderIds.forEach(folderId => {
-      actions.removeAssetIdsFromFolderId(selectedIds, folderId)
-    })
-  }
-
   toggleShowTable = () => {
     const { showTable, user, userSettings, actions } = this.props
     actions.showTable(!showTable)
@@ -289,6 +252,7 @@ class Assets extends Component {
     }
     this.updateAssetsScrollSizeInterval = setInterval(this.updateAssetsScrollSize, 150)
     this.resizer = new Resizer()
+    this.updateSelectedHashes(this.props.similarField, this.props.selectedIds)
   }
 
   componentWillUnmount = () => {
@@ -298,6 +262,39 @@ class Assets extends Component {
     // clear any pending layout
     this.clearAssetsLayoutTimer()
     this.resizer.release()
+  }
+
+  componentWillReceiveProps = (nextProps) => {
+    this.updateSelectedHashes(nextProps.similarField, nextProps.selectedIds)
+  }
+
+  updateSelectedHashes = (similarField, selectedIds) => {
+    if (selectedIds && selectedIds.size) {
+      const { cachedSelectedIds } = this.state
+      if (cachedSelectedIds && equalSets(selectedIds, cachedSelectedIds)) return
+      const dummyDispatch = () => {}
+      const mkProm = (query) => {
+        return searchAssetsRequestProm(dummyDispatch, query)
+          .catch(error => error) // this catch ensures one error doesn't spoil the batch
+      }
+      const filter = new AssetFilter({terms: {'_id': [...selectedIds]}})
+      const fields = [similarField]
+      const query = new AssetSearch({filter, fields, size: selectedIds.size})
+      makePromiseQueue([query], mkProm, 1 /* limit to one */)
+        .then(responses => {
+          const assets = responses[0].data.list.map(json => (new Asset(json)))
+          const cachedSelectedHashes = assets.map(asset => (asset.rawValue(similarField)))
+          return this.setState({cachedSelectedHashes})
+        })
+
+      // Update state now to avoid re-sending
+      this.setState({cachedSelectedIds: new Set(selectedIds)})
+    } else {
+      // Clear the cache
+      const cachedSelectedIds = null
+      const cachedSelectedHashes = null
+      this.setState({cachedSelectedIds, cachedSelectedHashes})
+    }
   }
 
   onAssetsScrollScroll = (event) => {
@@ -350,6 +347,11 @@ class Assets extends Component {
   clearAssetsLayoutTimer = () => {
     if (this.assetsLayoutTimer) clearTimeout(this.assetsLayoutTimer)
     this.assetsLayoutTimer = null
+  }
+
+  @keydown('tab')
+  scrollToNextSelection () {
+    this.scrollToSelection()
   }
 
   scrollToSelection = () => {
@@ -412,71 +414,70 @@ class Assets extends Component {
   }
 
   sortSimilar = () => {
-    const { assets, selectedIds, similarField } = this.props
-    const similarValues = []
-    selectedIds.forEach(id => {
-      const asset = assets.find(a => a.id === id)
-      if (asset) {
-        const hash = asset.value(similarField)
-        if (hash) similarValues.push(hash)
-      }
-    })
-    this.props.actions.similarValues(similarValues)
-    console.log('Sort by similar: ' + JSON.stringify(similarValues))
+    const { cachedSelectedHashes } = this.state
+    this.props.actions.similarValues(cachedSelectedHashes)
+    console.log('Sort by similar: ' + JSON.stringify(cachedSelectedHashes))
   }
 
   renderEditbar () {
-    const { assets, order, selectedIds, similarField, similarValues } = this.props
+    const { order, selectedIds, similarField, similarValues, query, sync } = this.props
+    const { cachedSelectedHashes } = this.state
 
     const similarActive = similarField && similarField.length > 0 && similarValues && similarValues.length > 0
-    let similarValuesSelected = selectedIds && selectedIds.size === similarValues.length
-    if (similarValuesSelected) {
-      for (let i = 0; i < similarValues.length; ++i) {
-        const v = similarValues[i]
-        // value must be in the first N assets, not entire asset list
-        let foundV = false
-        for (let j = 0; j < similarValues.length; ++j) {
-          const asset = assets[j]
-          if (selectedIds.has(asset.id) && asset.value(similarField) === v) {
-            foundV = true
-            break
-          }
-        }
-        if (!foundV) {
-          similarValuesSelected = false
-          break
-        }
-      }
-    }
+    let similarValuesSelected = similarValues && cachedSelectedHashes && equalSets(new Set([...similarValues]), new Set([...cachedSelectedHashes]))
 
     // Only enable similar button if selected assets have the right hash
-    // WARNING -- PERFORMANCE -- Worst case linear search on all assets
-    let canSortSimilar = selectedIds && selectedIds.size > 0 && similarField && similarField.length > 0
-    if (canSortSimilar) {
-      selectedIds.forEach(id => {
-        const asset = canSortSimilar &&   // Skip linear sort after 1st miss
-          assets.find(a => (a.id === id))
-        if (!asset || !asset.rawValue(similarField)) canSortSimilar = false
-      })
-    }
+    let canSortSimilar = selectedIds && selectedIds.size > 0 && similarField && similarField.length > 0 && !similarValuesSelected && cachedSelectedHashes && cachedSelectedHashes.length > 0
+    const sortSimilar = canSortSimilar ? this.sortSimilar : null
+
+    const columnName = order && order.length && order[0].field !== 'source.filename' ? unCamelCase(Asset.lastNamespace(order[0].field)) : 'Table Column'
+
+    const loader = require('./loader-rolling.svg')
 
     return (
       <Editbar selectedAssetIds={selectedIds}
-               onDeselectAll={this.deselectAll}
-               isRemoveEnabled={this.selectedFolderContainsSelectedAssets}
-               onRemove={this.removeAssetsFromSelectedFolders}>
-        <SortingSelector sortAssets={this.sortAssets} order={order}
-                         showAlphabetical={!similarField || !similarField.length}
-                         showSimilar={similarField && similarField.length > 0}
-                         similarActive={similarActive} similarValuesSelected={similarValuesSelected}
-                         sortSimilar={canSortSimilar ? this.sortSimilar : null} />
+               onDeselectAll={this.deselectAll}>
+        <object className={classnames('Assets-loading', {sync})} data={loader}/>
+        <div className="SortingSelector">
+          <div className="SortingSelector-title">Sort By</div>
+          <div onClick={this.sortAssets}
+               className={classnames('SortingSelector-sort',
+                 {'SortingSelector-selected': !similarActive &&
+                 (!order || !order.length)})}>
+            { !query || query.empty() ? 'Latest' : 'Rank' }
+          </div>
+          { similarField && similarField.length > 0 &&
+          <div onClick={sortSimilar} className="SortingSelector-similar">
+            { sortSimilar && similarActive && !similarValuesSelected && selectedIds && selectedIds.size > 0 &&
+            <div onClick={sortSimilar}
+                 className="SortingSelector-icon icon-settings_backup_restore">&thinsp;</div> }
+            <div className={classnames('SortingSelector-sort',
+              { 'SortingSelector-selected': similarActive })}>
+              Similar
+            </div>
+          </div>
+          }
+          { !similarField || !similarField.length &&
+          <div onClick={e => { this.sortAssets('source.filename', true) }}
+               className={classnames('SortingSelector-sort',
+                 {'SortingSelector-enabled': order && order.length >= 1 &&
+                 order[0].field === 'source.filename'})}>
+            Alphabetical {order && order.length >= 1 && order[0].field === 'source.filename' && !order[0].ascending ? '(Z-A)' : '(A-Z)'}
+          </div>
+          }
+          <div className={classnames('SortingSelector-sort',
+            {'SortingSelector-selected': order && order.length && order[0].field !== 'source.filename'},
+            {'SortingSelector-disabled': !order || !order.length || order[0].field === 'source.filename'})}>
+            {columnName}
+          </div>
+        </div>
       </Editbar>
     )
   }
 
   renderAssets () {
-    const { assets, selectedIds, totalCount, layout, showMultipage, protocol, host, thumbSize } = this.props
-    const { positions, multipage, collapsed, tableIsResizing } = this.state
+    const { assets, selectedIds, totalCount, layout, showMultipage, protocol, host, thumbSize, query } = this.props
+    const { positions, multipage, tableIsResizing } = this.state
     api.setTableIsResizing(tableIsResizing)
 
     if (!assets || !assets.length) {
@@ -531,11 +532,19 @@ class Assets extends Component {
                   const dim = index < positions.length ? positions[index] : { width: 0, height: 0 }
                   const { width, height } = dim
                   // Render only the visible thumbnails
-                  if ((!dim) || width <= 0 || height <= 0 ||
-                      (assetsScrollPadding + dim.y > this.state.assetsScrollTop + this.state.assetsScrollHeight) ||
+                  if ((assetsScrollPadding + dim.y > this.state.assetsScrollTop + this.state.assetsScrollHeight) ||
                       (assetsScrollPadding + dim.y + height < this.state.assetsScrollTop)) {
                     return null
                   }
+                  if (index < positions.length && index === assets.length - 1 && assets.length < totalCount && assets.length % AssetSearch.maxPageSize && this.loaded !== assets.length) {
+                    this.loaded = assets.length
+                    var nextPageQuery = new AssetSearch(query)
+                    nextPageQuery.from = assets.length
+                    nextPageQuery.size = AssetSearch.autoPageSize
+                    console.log('Loading ' + nextPageQuery.size + ' from ' + nextPageQuery.from)
+                    this.props.actions.searchAssets(nextPageQuery)
+                  }
+                  if (!dim || width <= 0 || height <= 0) return null
                   const parentId = asset.parentId()
                   const indexes = parentId && multipage[parentId]
                   const badgeHeight = thumbSize < 100 ? 15 : 25
@@ -562,8 +571,6 @@ class Assets extends Component {
                 })}
                 <Pager total={totalCount}
                        loaded={assets.length}
-                       collapsed={collapsed}
-                       onUncollapse={this.uncollapse}
                        top={layoutHeight + 12 /* 12 px padding */ }
                        />
               </div>
@@ -579,7 +586,10 @@ class Assets extends Component {
     const { collapsed, tableIsResizing } = this.state
 
     // Trigger layout if assets change.
-    if (assetsCounter !== this.assetsCounter) this.queueAssetsLayout()
+    if (assetsCounter !== this.assetsCounter) {
+      this.queueAssetsLayout()
+      this.scrollToSelection()
+    }
     this.assetsCounter = assetsCounter
 
     // If the selection change triggered this update, scroll to the new selection
@@ -634,7 +644,7 @@ export default connect(state => ({
   totalCount: state.assets.totalCount,
   folders: state.folders.all,
   trashedFolders: state.folders.trashedFolders,
-  selectedFolderIds: state.folders.selectedFolderIds,
+  sync: state.auth.sync,
   user: state.auth.user,
   userSettings: state.app.userSettings,
   thumbSize: state.app.thumbSize,
@@ -651,6 +661,8 @@ export default connect(state => ({
     isolateAssetId,
     selectAssetIds,
     sortAssets,
+    searchAssets,
+    searchAssetsRequestProm,
     resetRacetrackWidgets,
     similarValues,
     selectFolderIds,

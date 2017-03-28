@@ -10,8 +10,7 @@ import {
   ExistsWidgetInfo,
   RangeWidgetInfo,
   DateRangeWidgetInfo,
-  FiletypeWidgetInfo,
-  SimilarHashWidgetInfo
+  FiletypeWidgetInfo
 } from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
 
@@ -52,7 +51,6 @@ export function similarValues (values) {
 }
 
 // Reconstruct Racetrack widgets from a search.
-// Currently only supports SimpleSearch and Facet.
 export function restoreSearch (search) {
   let widgets = []
 
@@ -136,15 +134,15 @@ export function restoreSearch (search) {
     widgets.push(color)
   }
 
+  // Return promises to update the racetrack for the new search
+  const promises = [resetRacetrackWidgets(widgets)]
+
   // Create a SimilarHash widget if there's a hash query
   if (search.filter && search.filter.hamming) {
-    const type = SimilarHashWidgetInfo.type
-    let sliver = new AssetSearch()
-    sliver.filter = new AssetFilter({ hamming: search.filter.hamming })
-    const similarHashWidget = new Widget({type, sliver})
-    widgets.push(similarHashWidget)
+    promises.push(similarField(search.filter.hamming.field))
+    promises.push(similarValues(search.filter.hamming.hashes))
   }
 
   // Reset the racetrack to the new widget
-  return resetRacetrackWidgets(widgets)
+  return promises
 }

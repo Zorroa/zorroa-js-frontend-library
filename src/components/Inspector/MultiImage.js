@@ -1,10 +1,8 @@
 import React, { Component, PropTypes } from 'react'
-import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import Image from './Image'
 import Asset from '../../models/Asset'
-import { searchDocument } from '../../actions/assetsAction'
 
 class MultiImage extends Component {
   static propTypes = {
@@ -22,9 +20,6 @@ class MultiImage extends Component {
   }
 
   componentWillMount () {
-    const { parentId, actions } = this.props
-    const order = [{ field: 'source.clip.page.start', ascending: true }]
-    actions.searchDocument(null, parentId, order)
     this.componentWillReceiveProps(this.props)
   }
 
@@ -63,8 +58,4 @@ export default connect(state => ({
   protocol: state.auth.protocol,
   host: state.auth.host,
   pages: state.assets.pages
-}), dispatch => ({
-  actions: bindActionCreators({
-    searchDocument
-  }, dispatch)
 }))(MultiImage)

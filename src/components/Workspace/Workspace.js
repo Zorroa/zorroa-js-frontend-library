@@ -152,7 +152,7 @@ class Workspace extends Component {
 
     const { isDroppable, showReloader } = this.state
     return (
-      <div className={classnames('App', 'flexCol', 'fullHeight', {isDragging: app.dragInfo})}>
+      <div onDragEnter={this.dragEnter} className={classnames('App', 'flexCol', 'fullHeight', {isDragging: app.dragInfo})}>
         { app.modal && <Modal {...app.modal} /> }
         { showReloader && (
           <div className="Workspace-reloader">

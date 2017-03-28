@@ -15,8 +15,8 @@ class Editbar extends Component {
     children: PropTypes.node,
 
     selectedAssetIds: PropTypes.instanceOf(Set),
-    isRemoveEnabled: PropTypes.func.isRequired,
-    onRemove: PropTypes.func.isRequired,
+    isRemoveEnabled: PropTypes.func,
+    onRemove: PropTypes.func,
     onDeselectAll: PropTypes.func.isRequired,
 
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
@@ -45,23 +45,26 @@ class Editbar extends Component {
     const { selectedAssetIds, isRemoveEnabled, onRemove, onDeselectAll, children } = this.props
     const nAssetsSelected = selectedAssetIds ? selectedAssetIds.size : 0
     const disabledSelected = !selectedAssetIds || !selectedAssetIds.size
-    const removable = !disabledSelected && isRemoveEnabled()
+    const removable = !disabledSelected && isRemoveEnabled && isRemoveEnabled()
     return (
       <div className="Editbar">
-        {children}
+        <div className="flexRowCenter">
+          {children}
+        </div>
         <div className="Editbar-right-side">
           <div className={classnames('Editbar-selected', {disabled: disabledSelected})}>
-            {`${nAssetsSelected || 'no'} assets selected`}
+            { nAssetsSelected ? `${nAssetsSelected} assets selected` : '' }
             { nAssetsSelected ? (<div onClick={onDeselectAll} className={classnames('Editbar-cancel', 'icon-cancel-circle', {disabledSelected})}/>) : null }
           </div>
           <div onClick={!disabledSelected && this.exportAssets} className={classnames('Editbar-export', {disabled: disabledSelected})}>
             Export
-            <span onClick={!disabledSelected && this.exportAssets} className="Editbar-icon-export" />
+            <span onClick={!disabledSelected && this.exportAssets} className="icon-export" />
           </div>
+          { onRemove &&
           <div onClick={removable && onRemove} className={classnames('Editbar-remove', {disabled: !removable})}>
             Remove
-            <span onClick={removable && onRemove} className={classnames('Editbar-icon-removeasset', {disabled: !removable})} />
-          </div>
+            <span onClick={removable && onRemove} className={classnames('icon-removeasset', {disabled: !removable})} />
+          </div> }
         </div>
       </div>
     )

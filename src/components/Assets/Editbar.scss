@@ -146,4 +146,9 @@
       color: $zorroa-sickly-green;
     }
   }
+
+  .SortingSelector-icon {
+    &:hover { color: $zorroa-sickly-green; }
+    .SortingSelector-selected:hover & { color: $zorroa-sickly-green; }
+  }
 }

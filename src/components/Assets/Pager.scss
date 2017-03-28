@@ -1,85 +1,13 @@
 @import '../../styles/core-mixins.scss';
 
 .Pager {
-  position: relative;
-  font-size: 14px;
-  color: $zorroa-greyish-brown;
-  background-color: #fff;
-  border-radius: 3px;
-  margin-top: 12px;
-  margin-bottom: 8px;
-
-  button {
-    padding: 10px 22px;
-    border: 1px solid $zorroa-greyish-brown;
-    background: none;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    border-radius: 3px;
-    outline: none;
-    font-weight: 700;
-    font-size: 12px;
-    cursor: pointer;
-  }
-
-  button:hover {
-    color: #71b623;
-    border: 1px solid #71b623;
-  }
-
-  button:active {
-    color: #fff;
-    border: 0;
-    background-color: #71b623;
-  }
-
-  .Pager-showing-page {
-    display: flex;
-    margin-left: 12px;
-    color: #777;
-  }
-
-  .Pager-showing-text {
-    &:after {
-      content: 'SHOWING ';
-      @media screen and (max-width: 1300px) { content: ''; }
-    }
-  }
-
-  .Pager-sets-text {
-    &:after {
-      content: 'LOAD SETS OF';
-      @media screen and (max-width: 1300px) { content: 'LOAD'; }
-    }
-  }
-
-  .Pager-page-size {
-    margin-left: 4px;
-    margin-right: 4px;
-    color: #777;
-    font-size: 12px;
-
-    @media screen and (max-width: 1300px) { display: none; }
-
-    &.pager-page-size-selected {
-      color: #71b623;
-    }
-
-    button {
-      margin: 22px 10px;
-      border-top: none;
-      border-left: none;
-      border-right: none;
-      border-bottom: 1px solid;
-      border-radius: 0;
-      padding: 0;
-      font-weight: 400;
-    }
-  }
-}
-
-.Pager-hidden {
   background: none;
   position: relative;
   height: 1px;      // Otherwise scrolling fails?
+}
+
+.Pager-waiting {
+  position: relative;
+  margin-top: 12px;
+  margin-bottom: 8px;
 }

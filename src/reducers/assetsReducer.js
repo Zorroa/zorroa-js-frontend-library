@@ -1,16 +1,16 @@
 import {
   ASSET_SEARCH, ASSET_AGGS, ASSET_SEARCH_ERROR,
   ASSET_SORT, ASSET_ORDER, ASSET_FIELDS, SIMILAR_VALUES,
-  PAGE_SIZE, ISOLATE_ASSET, SELECT_ASSETS, SELECT_PAGES,
+  ISOLATE_ASSET, SELECT_ASSETS, SELECT_PAGES,
+  ADD_ASSETS_TO_FOLDER, REMOVE_ASSETS_FROM_FOLDER,
   SUGGEST_COMPLETIONS, SEARCH_DOCUMENT, UNAUTH_USER
 } from '../constants/actionTypes'
 
-import AssetSearch from '../models/AssetSearch'
 import * as api from '../globals/api.js'
+import Asset from '../models/Asset'
+import AssetSearch from '../models/AssetSearch'
 
 const initialState = {
-  pageSize: AssetSearch.defaultPageSize,
-
   // These "counters" increment whenever the query or selection changes.
   // The value itself has no meaning, these are used to respond to query
   // or selection changes. (See Assets & Table for examples)
@@ -114,11 +114,60 @@ export default function (state = initialState, action) {
     case SELECT_PAGES:
       return { ...state, selectedPageIds: action.payload }
 
-    case PAGE_SIZE:
-      return { ...state, pageSize: action.payload }
-
     case SUGGEST_COMPLETIONS:
       return { ...state, suggestions: action.payload }
+
+    case ADD_ASSETS_TO_FOLDER: {
+      // Update the asset's folder list so asset-in-folder checks work
+      const { folderId } = action.payload
+      const all = [...state.all]
+      const assetIds = action.payload.data.success
+      assetIds.forEach(id => {
+        const index = all.findIndex(asset => (asset.id === id))
+        if (index >= 0) {
+          const asset = new Asset(all[index])
+          asset.addFolderIds([folderId])
+          all[index] = asset
+        }
+      })
+
+      // Flush the query cache if one of the selected folders was modified
+      let query = state.query
+      if (query && query.filter && query.filter.links && query.filter.links.folder) {
+        const index = query.filter.links.folder.findIndex(id => (id === folderId))
+        if (index >= 0) {
+          query = new AssetSearch(query)
+          query.filter.links.folder = null
+        }
+      }
+      return { ...state, all, query }
+    }
+
+    case REMOVE_ASSETS_FROM_FOLDER: {
+      // Update the asset's folder list so asset-in-folder checks work
+      const { folderId } = action.payload
+      const all = [...state.all]
+      const assetIds = action.payload.data.success
+      assetIds.forEach(id => {
+        const index = all.findIndex(asset => (asset.id === id))
+        if (index >= 0) {
+          const asset = new Asset(all[index])
+          asset.removeFolderIds([folderId])
+          all[index] = asset
+        }
+      })
+
+      // Flush the query cache if one of the selected folders was modified
+      let query = state.query
+      if (query && query.filter && query.filter.links && query.filter.links.folder) {
+        const index = query.filter.links.folder.findIndex(id => (id === folderId))
+        if (index >= 0) {
+          query = new AssetSearch(query)
+          query.filter.links.folder = null
+        }
+      }
+      return { ...state, all, query }
+    }
 
     case UNAUTH_USER:
       return initialState

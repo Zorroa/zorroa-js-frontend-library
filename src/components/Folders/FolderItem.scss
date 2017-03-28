@@ -9,7 +9,7 @@ $FolderItemHeight : 25px;
   @include fullWidth;
 
   position: relative; // fbo .FolderItem-dropzone, who's position: absolute
-
+  cursor: pointer;
   height: $FolderItemHeight;
 
   &:not(.isOpen) .FolderItem-toggleArrow {
@@ -73,6 +73,7 @@ $FolderItemHeight : 25px;
   @include noSelect;
   margin-left: 10px;
   color: $zorroa-greyish-brown;
+  cursor: pointer;
 }
 
 .FolderItem-counts {
@@ -174,7 +175,6 @@ $FolderItemHeight : 25px;
     border-bottom: none;
   }
 }
-
 
 .FolderItem-context-menu-background {
   position: fixed;

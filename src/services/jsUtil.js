@@ -1,5 +1,15 @@
 export function unCamelCase (str) {
-  return str && str
+  if (!str) return
+  let buf
+  // Convert upper and lower underscore to camel case
+  if (str.indexOf('_') >= 0 && (str === str.toUpperCase() || str === str.toLowerCase())) {
+    // convert all-upper-under to camelcase
+    buf = str.toLowerCase().replace(/[-_]([a-z,A-Z])/g, function (g) { return g[1].toUpperCase() })
+  } else {
+    buf = str
+  }
+
+  return buf
     // insert a space between lower & upper
     .replace(/([a-z])([A-Z])/g, '$1 $2')
     // space before last upper in a sequence followed by lower

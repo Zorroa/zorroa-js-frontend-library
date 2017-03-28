@@ -2,9 +2,11 @@
 
 .JobMenu-active-badge {
   position: absolute;
-  right: 20px;
-  top: -6px;
+  right: 24px;
+  top: -8px;
   z-index: 1;
+  width: 20px;
+  height: 20px;
 }
 
 .JobMenu-badge {

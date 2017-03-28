@@ -167,6 +167,27 @@ export default class Asset {
     return true
   }
 
+  addFolderIds (folderIds) {
+    const folders = this.document && this.document.links && this.document.links.folder
+    if (!folders || !folders.length) {
+      if (!this.document.links) this.document.links = {}
+      this.document.links.folder = [...folderIds]
+    } else {
+      const newFolderIds = new Set([...folderIds])
+      folderIds.forEach(id => newFolderIds.add(id))
+      this.document.links.folder = [...newFolderIds]
+    }
+  }
+
+  removeFolderIds (folderIds) {
+    const folders = this.document && this.document.links && this.document.links.folder
+    if (folders && folders.length) {
+      const newFolderIds = new Set([...folders])
+      folderIds.forEach(id => newFolderIds.delete(id))
+      this.document.links.folder = [...newFolderIds]
+    }
+  }
+
   static lastNamespace (field) {
     if (field && field.length) {
       const namespaces = field.split('.')
