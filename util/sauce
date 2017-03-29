@@ -21,7 +21,7 @@ readyfile=$TMP/readyfile
 # If user doesn't have sauce connect, get it
 # If this breaks, update the version & links from using
 # https://wiki.saucelabs.com/display/DOCS/Sauce+Connect+Proxy
-SC_VERSION=4.4.3
+SC_VERSION=4.4.5
 SC_PLATFORM=osx
 case "$OSTYPE" in
   linux*)
