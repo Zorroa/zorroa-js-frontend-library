@@ -68,7 +68,7 @@ export default class DropboxChooser extends Component {
     const dbx = new Dropbox({ accessToken })
     dbx.usersGetCurrentAccount()
       .then((response) => {
-      console.log(response)
+        console.log(response)
         this.setState({userAccount: response})
       })
 
@@ -106,10 +106,10 @@ export default class DropboxChooser extends Component {
     const { authUrl } = this.state
     const w = 420
     const h = 460
-    const wLeft = window.screenLeft ? window.screenLeft : window.screenX;
-    const wTop = window.screenTop ? window.screenTop : window.screenY;
-    const left = wLeft + (window.innerWidth / 2) - (w / 2);
-    const top = wTop + (window.innerHeight / 2) - (h / 2);
+    const wLeft = window.screenLeft ? window.screenLeft : window.screenX
+    const wTop = window.screenTop ? window.screenTop : window.screenY
+    const left = wLeft + (window.innerWidth / 2) - (w / 2)
+    const top = wTop + (window.innerHeight / 2) - (h / 2)
     const strWindowFeatures = `left=${left},top=${top},width=${w},height=${h},dialog=yes,resizable=no,status=no,dependent=yes,toolbar=no,location=no,directories=no,menubar=no,copyhistory=no`
     window.open(authUrl, 'Zorroa Dropbox', strWindowFeatures)
   }

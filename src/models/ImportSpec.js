@@ -1,5 +1,5 @@
 export default class ImportSpec {
-  constructor({name, generator, args, pipeline, pipelineId}) {
+  constructor ({name, generators, args, pipeline, pipelineId}) {
     this.name = name
     this.generators = generators      // Array of ProcessorRef
     this.args = args                  // Global script args

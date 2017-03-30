@@ -34,7 +34,7 @@ class CreateImport extends Component {
     source: CreateImport.DnDSource,
     serverPath: '',         // text in server path input
     serverPaths: [],        // list of added server paths
-    dropboxFiles: new Map(),// list of selected dropbox paths
+    dropboxFiles: new Map(), // list of selected dropbox paths
     dropboxAccessKey: '',   // access key for analyst processing
     filterText: ''          // pipeline filter
   }
@@ -213,7 +213,7 @@ class CreateImport extends Component {
 
   selectDropbox = (dropboxFiles, accessKey) => {
     console.log('Select Dropbox files: ' + JSON.stringify(dropboxFiles))
-    this.setState({dropboxFiles, dropboxAccessKey: accessKey })
+    this.setState({ dropboxFiles, dropboxAccessKey: accessKey })
   }
 
   removeUploadFile (file, event) {
