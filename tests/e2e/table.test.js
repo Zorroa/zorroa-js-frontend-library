@@ -4,7 +4,7 @@ import * as selenium from './selenium.js'
 var driver
 const { By, until } = selenium.webdriver
 
-const DEBUG = false
+const DEBUG = true
 
 describe('Table', function () {
   // For all jest functions that are passed a function parameter

@@ -4,7 +4,7 @@ import * as selenium from './selenium.js'
 var driver
 const { By, until, Key } = selenium.webdriver
 
-const DEBUG = false
+const DEBUG = true
 
 describe('Workspace', function () {
   // For all jest functions that are passed a function parameter
@@ -122,7 +122,7 @@ describe('Workspace', function () {
     .then(_ => searchbarSearch.sendKeys('dumbo'))
 
     // Make sure the suggestions panel appears & has a valid suggestion
-    .then(_ => driver.wait(until.elementLocated(By.css(suggestionsSelector)), 1000))
+    .then(_ => driver.wait(until.elementLocated(By.css(suggestionsSelector)), 5000))
     .then(_ => driver.findElement(By.css(suggestionsSelector)))
     .then(element => { suggestions = element })
 
