@@ -63,7 +63,7 @@ export default class Job {
     if (!this.tasks) return -1
     const pct = this.tasks.percentCompleted()
     if (pct <= 0) return -1
-    return elapsed / pct
+    return 100 * elapsed / pct
   }
 
   timeRemainingString () {

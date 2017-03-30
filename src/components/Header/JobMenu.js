@@ -5,20 +5,28 @@ import classnames from 'classnames'
 
 import Job, { JobFilter } from '../../models/Job'
 import User from '../../models/User'
+import Asset from '../../models/Asset'
 import { showModal } from '../../actions/appActions'
+import { getAssetFields } from '../../actions/assetsAction'
 import { getJobs, markJobDownloaded, cancelJobId, restartJobId } from '../../actions/jobActions'
 import DropdownMenu from '../../components/DropdownMenu'
 import CreateImport from './CreateImport'
 import JobTable from './JobTable'
+import FirstImportTip from './FirstImportTip'
 
 class JobMenu extends Component {
   static propTypes = {
     jobType: PropTypes.string.isRequired,
     jobs: PropTypes.object,
+    assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     user: PropTypes.instanceOf(User).isRequired,
     protocol: PropTypes.string,
     host: PropTypes.string,
     actions: PropTypes.object.isRequired
+  }
+
+  state = {
+    tipShown: false
   }
 
   monitorJobsInterval = null
@@ -47,7 +55,7 @@ class JobMenu extends Component {
       return (job.type === jobType && job.state === Job.Active)
     }) >= 0
     if (containsActiveJob) {
-      this.monitorJobsInterval = setInterval(this.refreshJobs, 10000)
+      this.monitorJobsInterval = setInterval(this.refreshJobs, 5000)
     }
   }
 
@@ -60,6 +68,7 @@ class JobMenu extends Component {
     // We only get the top N jobs, irrespective of the filter.
     // FIXME: fix the server to return the top N filtered jobs
     actions.getJobs(jobFilter, 0, 30)
+    actions.getAssetFields()
   }
 
   cancelJob (job) {
@@ -78,6 +87,7 @@ class JobMenu extends Component {
     const width = '800px'
     const body = <CreateImport/>
     this.props.actions.showModal({body, width})
+    this.setState({tipShown: true})
   }
 
   viewAllJobs = (event) => {
@@ -89,8 +99,7 @@ class JobMenu extends Component {
   renderJobStatus (job) {
     switch (job.state) {
       case Job.Active: {
-        const estimate = job.timeRemainingString()
-        return <div className="JobMenu-timing">Time remaining: {estimate}</div>
+        return <div className="JobMenu-timing">{job.timeRemaining() < 0 ? '' : `Time remaining: ${job.timeRemainingString()}`}</div>
       }
       case Job.Cancelled:
         return (
@@ -126,7 +135,7 @@ class JobMenu extends Component {
 
   renderProgress (job) {
     if (job.state !== Job.Active) return
-    const progress = 100 * job.percentCompleted()
+    const progress = job.percentCompleted()
     return (
       <div className="JobMenu-progress">
         <progress max={100} value={progress}/>
@@ -167,7 +176,7 @@ class JobMenu extends Component {
       )
     }
     this.monitorJobs()
-    const maxJobs = 10
+    const maxJobs = 5
     const filteredJobs = allJobs.slice(0, maxJobs)
     return (
       <div className="JobMenu-jobs">
@@ -200,7 +209,9 @@ class JobMenu extends Component {
   }
 
   render () {
-    const { jobType } = this.props
+    const { jobType, jobs, assets } = this.props
+    const showTip = jobType === Job.Import && !this.state.tipShown && assets && !assets.length &&
+      (!jobs || Object.values(jobs).filter(job => (job.type === Job.Import)).length === 0)
     return (
       <div className="header-menu header-menu-jobs">
         { this.renderJobBadge() }
@@ -213,6 +224,7 @@ class JobMenu extends Component {
           ) : null }
           { this.renderJobs() }
         </DropdownMenu>
+        { showTip && <FirstImportTip onCreateImport={this.createImport}/> }
       </div>
     )
   }
@@ -221,11 +233,13 @@ class JobMenu extends Component {
 export default connect(state => ({
   user: state.auth.user,
   jobs: state.jobs && state.jobs.all,
+  assets: state.assets.all,
   protocol: state.auth && state.auth.protocol,
   host: state.auth && state.auth.host
 }), dispatch => ({
   actions: bindActionCreators({
     getJobs,
+    getAssetFields,
     markJobDownloaded,
     cancelJobId,
     restartJobId,

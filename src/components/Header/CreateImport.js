@@ -8,6 +8,7 @@ import { importAssets, getPipelines, getProcessors, uploadFiles } from '../../ac
 import { humanFileSize } from '../../services/jsUtil'
 import Pipeline from '../../models/Pipeline'
 import Processor from '../../models/Processor'
+import User from '../../models/User'
 import Toggle from '../Toggle'
 import DropboxChooser from '../DropboxChooser'
 
@@ -17,6 +18,7 @@ class CreateImport extends Component {
     pipelines: PropTypes.arrayOf(PropTypes.instanceOf(Pipeline)),
     processors: PropTypes.arrayOf(PropTypes.instanceOf(Processor)),
     showScriptInfo: PropTypes.bool,
+    user: PropTypes.instanceOf(User).isRequired,
     actions: PropTypes.object
   }
 
@@ -38,9 +40,15 @@ class CreateImport extends Component {
   }
 
   componentWillMount () {
-    this.props.actions.getPipelines()
-    this.props.actions.getProcessors()
-    if (this.props.initialFiles) this.addFiles(this.props.initialFiles)
+    const { initialFiles, user, actions } = this.props
+    actions.getPipelines()
+    actions.getProcessors()
+    if (initialFiles) this.addFiles(initialFiles)
+    if (user && user.lastName) {
+      const now = new Date()
+      const name = `${user.lastName} ${now.toLocaleString('en-GB')}`
+      this.setState({name})
+    }
   }
 
   componentWillReceiveProps (nextProps) {
@@ -473,7 +481,8 @@ class CreateImport extends Component {
 export default connect(state => ({
   showScriptInfo: state.app.showImportScriptInfo,
   pipelines: state.jobs.pipelines,
-  processors: state.jobs.processors
+  processors: state.jobs.processors,
+  user: state.auth.user
 }), dispatch => ({
   actions: bindActionCreators({
     importAssets,

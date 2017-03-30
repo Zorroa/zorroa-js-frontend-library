@@ -5,7 +5,7 @@
   border-radius: 3px;
   border: 1px solid $zorroa-nearwhite;
   max-height: 160px;
-  overflow: auto;
+  margin-bottom: 10px;
 }
 
 .DropboxChooser-title {
@@ -14,8 +14,10 @@
   @include flexJustifySpaceBetween;
   @include fullWidth;
   color: white;
-  background-color: $zorroa-water-blue;
+  background-color: cornflowerblue;
   padding: 6px;
+  min-height: 25px;
+  border-bottom: 1px solid $zorroa-nearwhite;
 }
 
 .DropboxChooser-title-left {
@@ -28,12 +30,20 @@
 
 .DropboxChooser-wait {
   width: 72px;
+  align-self: center;
+}
+
+.DropboxChooser-body {
+  @include flexCol;
+  overflow: auto;
 }
 
 .DropboxChooser-file {
   @include flexRow;
   @include flexAlignItemsCenter;
   color: $zorroa-greyish-brown;
+  height: 1.25em;
+  min-height: 1.25em;
 
   &.selected {
     background-color: $zorroa-selected;

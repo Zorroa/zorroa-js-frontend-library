@@ -1,0 +1,58 @@
+@import '../../styles/core-mixins';
+
+.FirstImportTip {
+  position: absolute;
+  top: 100px;
+  left: -460px;
+  width: 460px;
+  z-index: 1001;
+  color: $zorroa-nearwhite;
+  background-color: $zorroa-sickly-green;
+  border-radius: 3px;
+  padding: 30px;
+  box-shadow: 10px 10px 32px -10px rgba(0,0,0,0.75);
+  @include flexColCenter;
+}
+
+.FirstImportTip-arrow {
+  position: absolute;
+  right: -55px;
+  top: -50px;
+  width: 80px;
+  height: 80px;
+  transform: rotate(-90deg);
+  filter: drop-shadow( -3px 3px 3px #888);
+}
+
+.FirstImportTip-title {
+  font-size: 18px;
+  font-weight: 200;
+  margin-bottom: 20px;
+}
+
+.FirstImportTip-body {
+  font-size: 12px;
+  font-weight: 100;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.FirstImportTip-text {
+  text-align: center;
+  line-height: 1.5em;
+}
+
+.FirstImportTip-button {
+  border-radius: 3px;
+  border: 1px solid $zorroa-nearwhite;
+  padding: 8px 20px;
+  margin-top: 20px;
+  text-transform: uppercase;
+  font-weight: 200;
+  font-size: 12px;
+
+  &:hover {
+    background-color: $zorroa-nearwhite;
+    color: $zorroa-sickly-green;
+  }
+}

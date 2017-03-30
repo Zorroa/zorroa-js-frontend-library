@@ -109,11 +109,6 @@ class AddWidget extends Component {
             </div>
             <div className="icon-search"/>
           </div>
-          <div className="protip">
-            <div>Pro tip! Use</div>
-            <div className="key-equiv">alt+s</div>
-            <div>to show this window at any time.</div>
-          </div>
         </div>
         <div className="body">
           <div className="search-info">

@@ -8,14 +8,7 @@ import RequireAuth from './components/auth/RequireAuth'
 import ResetPassword from './components/auth/ResetPassword'
 import ForgotPassword from './components/auth/ForgotPassword'
 import Workspace from './components/Workspace'
-
-const DropboxAuth = () => {
-  localStorage.setItem('DropboxURL', window.location.toString())
-  window.close()
-  return (
-    <div>Dropbox Authorized</div>
-  )
-}
+import { DropboxAuth } from './components/DropboxChooser'
 
 export default (
   <Route path='/' component={App}>
