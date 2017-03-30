@@ -34,7 +34,8 @@ class Metadata extends Component {
     collapsibleOpen: {},
     aggs: {},
     aggFields: [],
-    metadataFields: this.props.metadataFields
+    metadataFields: this.props.metadataFields,
+    searchedFields: null
   }
 
   componentWillMount () {
@@ -166,20 +167,25 @@ class Metadata extends Component {
   // Update the filteredFields component list, caching heavily based on all
   // the factors that affect the components: fields, open collapsibles, and aggs.
   updateFilteredFields (props) {
-    const {fieldTypes, collapsibleOpen, aggs, metadataFields} = props
+    const {fieldTypes, collapsibleOpen, aggs, metadataFields, widgets} = props
     const modifiedFavorites = JSON.stringify(metadataFields) !== JSON.stringify(this.state.metadataFields)
-
+    let modifiedWidgets = false
+    this.state.searchedFields && this.state.searchedFields.forEach(field => {
+      if (widgets.findIndex(widget => fieldUsedInWidget(field, widget)) < 0) modifiedWidgets = true
+    })
+    let searchedFields = null
     // Filter all fields by string and sort
     const fields = this.state.showFavorites ? metadataFields : Object.keys(fieldTypes)
     const lcFilterString = this.state.filterString.toLowerCase()
     const filteredFields = fields.filter(field => (field.toLowerCase().includes(lcFilterString))).sort()
     if (JSON.stringify(filteredFields) !== JSON.stringify(this.state.filteredFields) ||
         JSON.stringify(collapsibleOpen) !== JSON.stringify(this.state.collapsibleOpen) ||
-        JSON.stringify(aggs) !== JSON.stringify(this.state.aggs) || modifiedFavorites) {
+        JSON.stringify(aggs) !== JSON.stringify(this.state.aggs) || modifiedFavorites || modifiedWidgets) {
       // Unroll the fields iteratively into an item element array
       const filteredComponents = []
       const aggFields = []
       let ancestors = []
+      searchedFields = []
       const addFields = (ancestors, field) => {
         const parents = field.split('.')
         for (let i = 0; i < parents.length; ++i) {
@@ -190,7 +196,8 @@ class Metadata extends Component {
             const hasChildren = i < parents.length - 1
             const isFavorite = this.isFavorite(fieldTypes, hasChildren, namespace, metadataFields)
             const isLeaf = this.isLeaf(field, namespace)
-            const isSearched = isLeaf && props.widgets.findIndex(widget => fieldUsedInWidget(field, widget)) >= 0
+            const isSearched = isLeaf && widgets.findIndex(widget => fieldUsedInWidget(field, widget)) >= 0
+            if (isSearched) searchedFields.push(field)
             const widgetType = !hasChildren && widgetTypeForField(field, fieldTypes[field])
             const widgetIcon = this.widgetTypeIcon(widgetType)
             filteredComponents.push(this.renderField(field, namespace, parents[i],
@@ -210,12 +217,12 @@ class Metadata extends Component {
         addFields(ancestors, field)
       })
       const modifiedAggFields = JSON.stringify(aggFields) !== JSON.stringify(this.state.aggFields)
-      if (modifiedAggFields || modifiedFavorites ||
+      if (modifiedAggFields || modifiedFavorites || modifiedWidgets ||
         JSON.stringify(aggs) !== JSON.stringify(this.state.aggs)) {
         this.setState({filteredComponents})
       }
 
-      this.setState({filteredFields, collapsibleOpen, aggs, aggFields, metadataFields})
+      this.setState({filteredFields, collapsibleOpen, aggs, aggFields, metadataFields, searchedFields})
     }
   }
 

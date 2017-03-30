@@ -75,7 +75,7 @@ class Workspace extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    if (nextProps.modal && this.state.isDroppable) {
+    if (nextProps.app.modal && this.state.isDroppable) {
       this.setState({isDroppable: false})
     }
   }
