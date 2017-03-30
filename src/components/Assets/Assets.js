@@ -310,8 +310,8 @@ class Assets extends Component {
     if (!assets) return
 
     const assetSizes = assets.map(asset => {
-      const width = asset.width() || (asset.proxies && asset.proxies[0].width) || 1
-      const height = asset.height() || (asset.proxies && asset.proxies[0].height) || 1
+      const width = (asset.proxies && asset.proxies[0].width) || asset.width() || 1
+      const height = (asset.proxies && asset.proxies[0].height) || asset.height() || 1
       return { width, height, parentId: asset.parentId(), id: asset.id }
     })
 
