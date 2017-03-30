@@ -539,7 +539,7 @@ class Assets extends Component {
                       (assetsScrollPadding + dim.y + height < this.state.assetsScrollTop)) {
                     return null
                   }
-                  if (index === assets.length - 1 && assets.length < totalCount &&
+                  if (index < positions.length && index === assets.length - 1 && assets.length < totalCount &&
                     assets.length % AssetSearch.maxPageSize && this.loaded !== assets.length) {
                     this.loaded = assets.length
                     var nextPageQuery = new AssetSearch(query)
