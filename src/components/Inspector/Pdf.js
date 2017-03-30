@@ -50,8 +50,7 @@ export default class Pdf extends Component {
     const newDocInit = newProps.documentInitParameters
     const docInit = this.props.documentInitParameters
 
-    if ((newDocInit && newDocInit !== docInit) ||
-      (newDocInit && docInit && newDocInit.url !== docInit.url)) {
+    if (newDocInit && docInit && newDocInit.url !== docInit.url) {
       this.loadPDFDocument(newProps)
     }
 
@@ -68,6 +67,7 @@ export default class Pdf extends Component {
     }
     if (this.documentPromise) {
       this.documentPromise.cancel()
+      this.documentPromise = null
     }
   }
 
