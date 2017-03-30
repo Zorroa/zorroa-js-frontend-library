@@ -19,5 +19,6 @@
     cursor: pointer;
     color: $zorroa-sickly-green;
     font-size: 20px; // TODO: see if we can delete this when bootstrap is gone
+    &:hover { color: $zorroa-gray; }
   }
 }
