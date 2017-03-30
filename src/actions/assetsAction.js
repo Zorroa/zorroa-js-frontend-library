@@ -68,12 +68,15 @@ export function searchAssetsRequestProm (dispatch, query) {
   })
 }
 
-export function searchAssets (query, lastQuery) {
+export function searchAssets (query, lastQuery, force) {
   return dispatch => {
     const promises = []
     const skip = new Set(['from', 'size', 'scroll', 'postFilter', 'aggs'])
-    const mainQueryChanged = !lastQuery || !query.equals(lastQuery, skip)
-    const postFilterChanged = query.postFilter && !query.postFilter.empty() && (!lastQuery.postFilter || JSON.stringify(query.postFilter) !== JSON.stringify(lastQuery.postFilter))
+    const mainQueryChanged = force || !lastQuery || !query.equals(lastQuery, skip)
+    const postFilterChanged = force ||
+      (query.postFilter && lastQuery && lastQuery.postFilter && JSON.stringify(query.postFilter) !== JSON.stringify(lastQuery.postFilter)) ||
+      (!query.postFilter && lastQuery && lastQuery.postFilter && !lastQuery.postFilter.empty()) ||
+      ((!lastQuery || !lastQuery.postFilter) && query.postFilter && !query.postFilter.empty())
     if (mainQueryChanged || postFilterChanged) {
       const mainQuery = new AssetSearch(query)
       mainQuery.aggs = null
