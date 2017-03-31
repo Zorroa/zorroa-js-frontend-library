@@ -83,6 +83,7 @@ class Assets extends Component {
     this.assetsLayoutTimer = null
     this.assetsCounter = 0
     this.resizer = null
+    this.loaded = 0
   }
 
   // Adjust the selection set for the specified asset using
@@ -337,6 +338,7 @@ class Assets extends Component {
       this.scrollToSelection()
     }
     this.scrollToSelectionAfterLayout = false
+    this.loaded = 0
   }
 
   queueAssetsLayout = () => {
@@ -433,11 +435,12 @@ class Assets extends Component {
     const columnName = order && order.length && order[0].field !== 'source.filename' ? unCamelCase(Asset.lastNamespace(order[0].field)) : 'Table Column'
 
     const loader = require('./loader-rolling.svg')
+    const syncer = sync ? <div className="Assets-loading sync"/> : <img className="Assets-loading" src={loader}/>
 
     return (
       <Editbar selectedAssetIds={selectedIds}
                onDeselectAll={this.deselectAll}>
-        <object className={classnames('Assets-loading', {sync})} data={loader}/>
+        { syncer }
         <div className="SortingSelector">
           <div className="SortingSelector-title">Sort By</div>
           <div onClick={this.sortAssets}
@@ -484,8 +487,8 @@ class Assets extends Component {
       return (
         <div className="assets-layout-empty flexCol flexJustifyCenter flexAlignItemsCenter">
           <div className="assets-layout-icon icon-search"/>
-          <div>No results</div>
-          <button onClick={this.clearSearch}>Clear Search</button>
+          { query && !query.empty() && <div>No results</div> }
+          { query && !query.empty() && <button onClick={this.clearSearch}>Clear Search</button> }
         </div>)
     }
 
@@ -536,7 +539,8 @@ class Assets extends Component {
                       (assetsScrollPadding + dim.y + height < this.state.assetsScrollTop)) {
                     return null
                   }
-                  if (index < positions.length && index === assets.length - 1 && assets.length < totalCount && assets.length % AssetSearch.maxPageSize && this.loaded !== assets.length) {
+                  if (index < positions.length && index === assets.length - 1 && assets.length < totalCount &&
+                    assets.length % AssetSearch.maxPageSize && this.loaded !== assets.length) {
                     this.loaded = assets.length
                     var nextPageQuery = new AssetSearch(query)
                     nextPageQuery.from = assets.length

@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import { suggestQueryStrings } from '../../actions/assetsAction'
+import { suggestQueryStrings, searchAssets } from '../../actions/assetsAction'
 import { resetRacetrackWidgets } from '../../actions/racetrackAction'
 import { SimpleSearchWidgetInfo } from '../Racetrack/WidgetInfo'
 import Widget from '../../models/Widget'
@@ -51,6 +51,12 @@ class Searchbar extends Component {
     this.props.actions.resetRacetrackWidgets(widgets)
   }
 
+  forceSearch = () => {
+    const { query, actions } = this.props
+    const force = true
+    actions.searchAssets(query, query, force)
+  }
+
   render () {
     const { query, suggestions } = this.props
     const { queryString } = this.state
@@ -63,7 +69,7 @@ class Searchbar extends Component {
                        value={value}
                        onChange={this.suggest}
                        onSelect={this.search} />
-          <button onClick={this.selectCurrentQueryString} className="search-button icon-search" />
+          <button onClick={this.forceSearch} className="search-button icon-search" />
         </div>
       </div>
     )
@@ -71,7 +77,7 @@ class Searchbar extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({ resetRacetrackWidgets, suggestQueryStrings }, dispatch)
+  actions: bindActionCreators({ resetRacetrackWidgets, suggestQueryStrings, searchAssets }, dispatch)
 })
 
 const mapStateToProps = state => ({
