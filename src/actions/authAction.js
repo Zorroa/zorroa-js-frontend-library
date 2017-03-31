@@ -49,22 +49,22 @@ function startRequest (dispatch) {
   if (api.getRequestsSynced()) {
     requestAnimationFrame(_ => dispatch({ type: AUTH_SYNC, payload: false }))
   }
-  api.requestSentCounter++
+  api.incRequestSentCounter()
 }
 
 function finishRequest (dispatch, requestProm) {
   return requestProm
   .then(response => {
-    api.requestReceivedCounter++
-    if (api.getRequestsSynced()) {
-      requestAnimationFrame(_ => dispatch({ type: AUTH_SYNC, payload: true }))
-    }
+    requestAnimationFrame(_ => {
+      api.incRequestReceivedCounter()
+      if (api.getRequestsSynced()) dispatch({ type: AUTH_SYNC, payload: true })
+    })
     return response
   }, error => {
-    api.requestReceivedCounter++
-    if (api.getRequestsSynced()) {
-      requestAnimationFrame(_ => dispatch({ type: AUTH_SYNC, payload: true }))
-    }
+    requestAnimationFrame(_ => {
+      api.incRequestReceivedCounter()
+      if (api.getRequestsSynced()) dispatch({ type: AUTH_SYNC, payload: true })
+    })
     return Promise.reject(error)
   })
 }

@@ -359,12 +359,12 @@ class FolderItem extends Component {
             <div>Favorite</div>
           </div>
           <div onClick={addableAssets && this.addAssetsToFolders}
-               className={classnames('FolderItem-context-item', {disabled: !addableAssets})}>
+               className={classnames('FolderItem-context-item FolderItem-context-add-assets', {disabled: !addableAssets})}>
             <div className="icon-plus2"/>
             <div>Add Assets</div>
           </div>
           <div onClick={removableAssets && this.removeAssetsFromFolders}
-               className={classnames('FolderItem-context-item', {disabled: !removableAssets})}>
+               className={classnames('FolderItem-context-item FolderItem-context-remove-assets', {disabled: !removableAssets})}>
             <div className="icon-removeasset"/>
             <div>Remove Assets</div>
           </div>

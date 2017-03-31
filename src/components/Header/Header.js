@@ -57,20 +57,20 @@ class Header extends Component {
               <a href="http://zorroa.com/docs/help" target="_blank" className="header-menu-item" >Help</a>
               <a href="http://zorroa.com/docs/tutorials" target="_blank" className="header-menu-item" >Tutorials</a>
               <a href="http://zorroa.com/docs/release-notes" target="_blank" className="header-menu-item" >Release Notes</a>
-              <div className="header-menu-item" onClick={this.showFeedback}>
+              <div className="header-menu-item header-menu-feedback" onClick={this.showFeedback}>
                 Send Feedback
               </div>
             </DropdownMenu>
           </div>
           <div className="header-menu header-menu-user icon-zorroa-person-06">
             <DropdownMenu label={(<div>{user.username}</div>)}>
-              <div className="header-menu-item" onClick={this.showPreferences}>
+              <div className="header-menu-item header-menu-prefs" onClick={this.showPreferences}>
                 Preferences...
               </div>
-              <div className="header-menu-item" onClick={this.showDeveloper}>
+              <div className="header-menu-item header-menu-dev" onClick={this.showDeveloper}>
                 Developer...
               </div>
-              <Link className="header-menu-item" to="/signout">Logout</Link>
+              <Link className="header-menu-item header-menu-logout" to="/signout">Logout</Link>
             </DropdownMenu>
           </div>
         </div>

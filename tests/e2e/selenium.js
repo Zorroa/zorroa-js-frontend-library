@@ -25,9 +25,10 @@ const DEBUG = false
 const runningManually = (!global.expect)
 global.jasmine = global.jasmine || {}
 global.jest = global.jest || ({ autoMockOff: _ => {} })
-global.expect = global.expect || (_ => {
+global.expect = global.expect || (x => {
   return {
-    toBe: _ => {}
+    toBe: y => { if (!(x == y)) console.error(`${x} is not ${y}`, new Error().stack) },
+    toBeGreaterThan: y => { if (!(x > y)) console.error(`${x} is not greater than ${y}`, new Error().stack) }
   }
 })
 
@@ -55,7 +56,7 @@ if (USE_SAUCE) {
 export const BASE_URL = 'http://localhost:8080'
 
 // let selenium tests run. jest's default is an unreasonable 5 seconds
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 90000
+jasmine.DEFAULT_TIMEOUT_INTERVAL = (DEBUG && !USE_SAUCE) ? 10000 : 60000
 
 var allTestsPassed = true
 var failedTests = []
@@ -185,21 +186,19 @@ export function stopBrowserAndDriver () {
 }
 
 // ----------------------------------------------------------------------
-export function waitForUrlChange (optTimeout) {
-  var oldUrl
-  return driver.getCurrentUrl()
-  .then(url => { oldUrl = url })
-  .then(_ => driver.wait(_ => driver.getCurrentUrl().then(newUrl => newUrl !== oldUrl), optTimeout))
-}
-
-// ----------------------------------------------------------------------
 export function waitForUrl (expectedURL, optTimeout) {
-  return driver.wait(_ => {
-    return driver.getCurrentUrl().then(url => {
-      // console.log('waiting', url, expectedURL)
-      return url === expectedURL
-    })
-  }, optTimeout)
+  driver.then(_ => { DEBUG && console.log(`waitForUrl ${expectedURL}`) })
+  driver.then(_ =>
+    driver.wait(_ => {
+      return driver.getCurrentUrl().then(url => {
+        // console.log('waiting', url, expectedURL)
+        if (url === expectedURL) return true
+        return new Promise(r => setTimeout(_ => r(false), 100)) // if urls dont match, slow down
+      })
+    }, optTimeout, `waitForUrl timeout ${expectedURL}`)
+  )
+
+  return driver
 }
 
 // ----------------------------------------------------------------------
@@ -211,30 +210,38 @@ export function showLog () {
 }
 
 // ----------------------------------------------------------------------
-export function waitForRequestSync (optTimeout) {
-  // Make sure we wait until the request is finished, wait for not busy
-  return driver.wait(_ =>
-    driver.executeScript('return window.zorroa.getRequestsSynced()')
-      .then(synced => { DEBUG && console.log({synced}); return !!synced }),
-    optTimeout)
-}
-
-// ----------------------------------------------------------------------
 export function waitForBusy (optTimeout) {
   // Make sure we wait until a request has started
-  return driver.wait(_ =>
-    driver.executeScript('return window.zorroa.getRequestsSynced()')
-      .then(synced => { DEBUG && console.log({synced}); return !synced }),
-    optTimeout)
+  return driver.wait(
+    _ => {
+      let busy
+      return driver
+      // .then(_ => new Promise(resolve => setTimeout(resolve, 200)))
+      .then(_ => driver.executeScript('return window.zorroa.getRequestsSynced()'))
+      .then(s => { busy = !s })
+      // .then(_ => { DEBUG && console.log('waitForBusy', {busy}) })
+      .then(_ => busy)
+    }
+    , optTimeout, 'waitForBusy timeout'
+  )
 }
 
 // ----------------------------------------------------------------------
 export function waitForIdle (optTimeout) {
   // Make sure we wait until the request is finished, wait for not busy
-  return driver.wait(_ =>
-    driver.executeScript('return window.zorroa.getRequestsSynced()')
-      .then(synced => { DEBUG && console.log({synced}); return !!synced }),
-    optTimeout)
+  return driver.then(_ => { DEBUG && console.log('waitForIdle') })
+  .then(_ => driver.wait(
+    _ => {
+      let idle
+      return driver
+      // .then(_ => new Promise(resolve => setTimeout(resolve, 200)))
+      .then(_ => driver.executeScript('return window.zorroa.getRequestsSynced()'))
+      .then(s => { idle = !!s })
+      // .then(_ => { DEBUG && console.log('waitForIdle', {idle}) })
+      .then(_ => idle)
+    }
+    , optTimeout, 'waitForIdle timeout'
+  ))
 }
 
 // ----------------------------------------------------------------------
@@ -255,7 +262,7 @@ export function waitForAssetsCounterChange (actionFn, optTimeout) {
       // DEBUG && console.log({ac, assetsCounter, ne: ac !== assetsCounter})
       return ac !== assetsCounter
     })
-  ), optTimeout)
+  ), optTimeout, 'waitForAssetsCounterChange timeout')
 }
 
 // ----------------------------------------------------------------------
@@ -282,7 +289,7 @@ export function waitForJsFnChange (jsFnName, optPreActionFn, optPostActionFn, op
       DEBUG && console.log({jsFnResult, jsFnFirstResult, ne: jsFnResult !== jsFnFirstResult})
       return jsFnResult !== jsFnFirstResult
     })
-  ), optTimeout)
+  ), optTimeout, `waitForJsFnChange (${jsFnName}) timeout`)
 }
 
 // ----------------------------------------------------------------------
@@ -299,27 +306,21 @@ export function waitForJsFnVal (jsFnName, jsFnExpectedValue, optTimeoutMS) {
       count++
       return jsFnResult === jsFnExpectedValue
     })
-  }), optTimeoutMS)
+  }), optTimeoutMS, `waitForJsFnChange (${jsFnName}) timeout`)
 }
 
 // ----------------------------------------------------------------------
 export function logout () {
   // de-auth and log out
-  DEBUG && console.log('logout')
-
-  return driver.manage().deleteAllCookies()
-
-  // return driver.get(`${BASE_URL}/signout`)
-  // .then(_ => waitForUrlChange(5000))
-
-  // make sure we're on /signin
-  // .then(_ => driver.getCurrentUrl())
-  // .then(url => expect(url).toMatch(/\/signin/))
+  driver.then(_ => { DEBUG && console.log('logout') })
+  driver.get(`${BASE_URL}`).then(_ => driver.manage().deleteAllCookies())
+  return driver
 }
 
 // ----------------------------------------------------------------------
 export function login () {
   return logout()
+  .then(_ => { DEBUG && console.log('loggin in') })
   .then(_ => driver.get(`${BASE_URL}/signin`))
   .then(_ => driver.executeScript('window.zorroa.setSeleniumTesting(true)'))
   .then(_ => driver.findElement(By.css('input[name="username"]')).sendKeys('admin'))
@@ -330,7 +331,8 @@ export function login () {
   .then(_ => driver.findElement(By.css('.auth-button-primary')).click())
   .then(_ => waitForUrl(`${BASE_URL}/`, 15000))
   .then(_ => driver.getCurrentUrl())
-  .then(url => { return expect(url).toBe(`${BASE_URL}/`) })
+  .then(url => { expect(url).toBe(`${BASE_URL}/`) })
+  .then(_ => { console.log('logged in') })
 
   // // If there's a saved search from last session, then clear it
   // // [Started but temporarily disabled until we figure out
@@ -410,8 +412,9 @@ export function expectSelectorIsVisible (by, selector) {
   )
   .then(isDisplayed => {
     DEBUG && console.log(`checking ${selector} (isDisplayed: ${isDisplayed})`)
-    return expect(JSON.stringify({ selector, isDisplayed }))
-    .toBe(JSON.stringify({ selector, isDisplayed: true }))
+    expect(JSON.stringify({ selector, isDisplayed }))
+     .toBe(JSON.stringify({ selector, isDisplayed: true }))
+    return isDisplayed
   })
 }
 
@@ -436,8 +439,9 @@ export function expectCssElementIsNotVisible (selector) {
   return getCssElementVisible(selector)
   .then(isDisplayed => {
     DEBUG && console.log(`checking ${selector} (isDisplayed: ${isDisplayed})`)
-    return expect(JSON.stringify({ selector, isDisplayed }))
-    .toBe(JSON.stringify({ selector, isDisplayed: false }))
+    expect(JSON.stringify({ selector, isDisplayed }))
+     .toBe(JSON.stringify({ selector, isDisplayed: false }))
+    return isDisplayed
   })
 }
 
@@ -450,8 +454,9 @@ export function expectElementIsVisible (element, elementName) {
   .then(_ => element.isDisplayed())
   .then(isDisplayed => {
     DEBUG && (console.log(`checking ${elementName} (isDisplayed: ${isDisplayed})`))
-    return expect(JSON.stringify({ elementName, isDisplayed }))
-    .toBe(JSON.stringify({ elementName, isDisplayed: true }))
+    expect(JSON.stringify({ elementName, isDisplayed }))
+     .toBe(JSON.stringify({ elementName, isDisplayed: true }))
+    return isDisplayed
   })
 
   // This is the intent above, but jest's toMatchObject function
@@ -469,8 +474,9 @@ export function expectElementIsNotVisible (element, elementName) {
   .then(_ => element.isDisplayed())
   .then(isDisplayed => {
     DEBUG && (console.log(`checking ${elementName} (isDisplayed: ${isDisplayed})`))
-    return expect(JSON.stringify({ elementName, isDisplayed }))
-    .toBe(JSON.stringify({ elementName, isDisplayed: true }))
+    expect(JSON.stringify({ elementName, isDisplayed }))
+     .toBe(JSON.stringify({ elementName, isDisplayed: true }))
+    return isDisplayed
   })
 
   // This is the intent above, but jest's toMatchObject function
@@ -483,6 +489,22 @@ export function expectElementIsNotVisible (element, elementName) {
 export function clickCssElement (selector) {
   return expectCssElementIsVisible(selector)
   .then(_ => driver.findElement(By.css(selector)).click())
+}
+
+// ----------------------------------------------------------------------
+export function clickXpathElement (selector) {
+  return expectXpathElementIsVisible(selector)
+  .then(_ => driver.findElement(By.xpath(selector)).click())
+}
+
+// ----------------------------------------------------------------------
+// TODO: have this check the open state; allow explicit open or close
+export function getFolderNamed (folderName) {
+  // Find the FolderItem-toggle attached to a FolderItem with a descendant matching the given text
+  // http://stackoverflow.com/a/1390680/1424242
+  const xpath = `//div[contains(concat(" ", @class, " "), " FolderItem ") and descendant::*[contains(text(), "${folderName}")]]`
+  return driver.then(_ => { DEBUG && (console.log(`getFolderNamed ${folderName}`)) })
+  .then(_ => driver.findElement(By.xpath(xpath)))
 }
 
 // ----------------------------------------------------------------------
