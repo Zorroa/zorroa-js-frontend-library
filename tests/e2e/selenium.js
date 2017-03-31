@@ -1,4 +1,4 @@
-require('babel-register')({})
+// require('babel-register')({})
 
 /*
 This provides utilities for selenium tests, normally included by a jest test file
@@ -28,7 +28,8 @@ global.jest = global.jest || ({ autoMockOff: _ => {} })
 global.expect = global.expect || (x => {
   return {
     toBe: y => { if (!(x == y)) console.error(`${x} is not ${y}`, new Error().stack) },
-    toBeGreaterThan: y => { if (!(x > y)) console.error(`${x} is not greater than ${y}`, new Error().stack) }
+    toBeGreaterThan: y => { if (!(x > y)) console.error(`${x} is not greater than ${y}`, new Error().stack) },
+    toBeLessThan: y => { if (!(x < y)) console.error(`${x} is not less than ${y}`, new Error().stack) }
   }
 })
 
@@ -508,6 +509,17 @@ export function getFolderNamed (folderName) {
 }
 
 // ----------------------------------------------------------------------
+// TODO: have this check the open state; allow explicit open or close
+export function getTagNamed (tagName) {
+  // Find the Metadata-item-toggle attached to a Metadata-item with a descendant matching the given text
+  // http://stackoverflow.com/a/1390680/1424242
+  const xpath = `//div[contains(concat(" ", @class, " "), " Metadata-item ") and descendant::*[contains(text(), "${tagName}")]]`
+  return driver.then(_ => { DEBUG && (console.log(`getTagNamed ${tagName}`)) })
+  .then(_ => driver.findElement(By.xpath(xpath)))
+}
+
+
+// ----------------------------------------------------------------------
 // Get a whole bunch of elements at once.
 // Returns an object of elements indexed by selector
 export function findCssElements (selectors) {
@@ -536,9 +548,9 @@ if (runningManually) {
   var cleanup = _ => {
     console.log('cleanup')
     if (global.driver) {
-      logout()
-      stopBrowserAndDriver()
-      return global.driver.then(_ => { global.driver = null })
+      return global.driver.then(_ => logout())
+      .then(_ => stopBrowserAndDriver())
+      .then(_ => { global.driver = null })
     }
   }
   process.on('exit', cleanup)
@@ -548,8 +560,8 @@ if (runningManually) {
   global.until = until
   global.Key = Key
 
-  global.driver = startBrowserAndDriver()
-  login()
+  global.driver = startBrowserAndDriver({ description: 'dummy suite' })
+  driver.then(_ => login())
   global.quit = _ => { return cleanup().then(_ => process.exit()) }
   process.stdin.resume() // so the program will not close instantly
   require('util').inspect = function () { return '' } // prevent REPL from displaying return values -- I don't want to see Promises
