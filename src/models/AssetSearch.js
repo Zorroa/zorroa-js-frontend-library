@@ -76,15 +76,15 @@ export default class AssetSearch {
   }
 
   empty () {
-    if (this.query && this.query.length) {
-      return false
-    }
-    if (this.filter && !this.filter.empty()) {
-      return false
-    }
-    if (this.postFilter && !this.postFilter.empty()) {
-      return false
-    }
+    if (this.query && this.query.length) return false
+    if (this.filter && !this.filter.empty()) return false
+    if (this.postFilter && !this.postFilter.empty()) return false
+    return true
+  }
+
+  emptyFilters () {
+    if (this.filter && !this.filter.empty()) return false
+    if (this.postFilter && !this.postFilter.empty()) return false
     return true
   }
 }

@@ -32,8 +32,16 @@ class Multipage extends Component {
   }
 
   state = {
-    showDocument: false,
+    // No scoring query (queryString, hamming, order), AND all pages in doc
+    showDocument: this.initialShowDocument(this.props.query),
     showedPages: this.props.showPages
+  }
+
+  initialShowDocument (query) {
+    // FIXME: Should include all pages in doc, unknown until we get the pages
+    return (!query.queryString || !query.queryString.length) &&
+      (!query.order || !query.order.length) &&
+      (!query.filter || !query.filter.hamming)
   }
 
   componentWillMount () {

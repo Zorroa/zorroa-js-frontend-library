@@ -27,6 +27,11 @@ class DisplayOptions extends Component {
 
   componentWillMount () {
     this.props.actions.getAssetFields()
+    const fields = this.allFields()
+    if (fields.length === 1) {
+      this.props.onUpdate(null, {checkedNamespaces: fields})
+      this.cancel(null)
+    }
   }
 
   // Update clicked, invoked callbacks to apply state and dismiss

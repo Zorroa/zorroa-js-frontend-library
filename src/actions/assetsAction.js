@@ -29,7 +29,7 @@ export function requiredFields (fields, fieldTypes) {
     'proxies', 'clip', 'pages', 'links', 'id',
     'source.filename', 'source.mediaType', 'source.extension', 'source.clip',
     'image.width', 'image.height', 'image.pages',
-    'video.width', 'video.height', 'video.pages', 'video.framerate', 'video.frames'
+    'video.width', 'video.height', 'video.pages', 'video.frameRate', 'video.frames'
   ]
 
   const req = new Set([...fields])

@@ -26,6 +26,10 @@ class Video extends Component {
     actions: PropTypes.object
   }
 
+  static defaultProps = {
+    frameRate: 30
+  }
+
   state = {
     playing: true,
     volume: this.props.videoVolume,

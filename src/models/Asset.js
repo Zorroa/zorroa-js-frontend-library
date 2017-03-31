@@ -78,7 +78,7 @@ export default class Asset {
     if (this.document.video) return this.stopFrame() - this.startFrame()
   }
   duration () {     // seconds in this clip -- a subset of the entire film
-    if (this.document.video) return this.frameRange() / this.frameRate()
+    if (this.document.video) return this.frameRange() / (this.frameRate() || 30)
   }
   startFrame () {   // start frame for this clip -- >= 0
     if (this.document.video) {
