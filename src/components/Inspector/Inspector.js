@@ -46,9 +46,10 @@ class Inspector extends Component {
                          frames={asset.frames()} frameRate={asset.frameRate()}
                          startFrame={asset.startFrame()} stopFrame={asset.stopFrame()}/>
     } else if (mediaType === 'application/pdf') {
+      const rangeChunkSize = 65536 * 64
       inspector = <Pdf page={asset.startPage()} thumbSize={thumbSize}
                        onMultipage={onMultipage}
-                       documentInitParameters={{url, withCredentials: true}} />
+                       documentInitParameters={{url, withCredentials: true, rangeChunkSize}} />
     } else {
       const proxy = asset.biggestProxy()
       inspector = <Image url={asset.largestProxyURL(protocol, host)} onMultipage={onMultipage} />
