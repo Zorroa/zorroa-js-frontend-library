@@ -38,21 +38,21 @@ describe('Collections', function () {
   // ----------------------------------------------------------------------
 
   var emptyTrash = function () {
-    return selenium.getCssElementVisible('.Collections .Trash')
+    return selenium.getCssElementVisible('.Collections-collapsible .Trash')
     .then(trashVisible => {
       if (!trashVisible) return driver.then(_ => { DEBUG && console.log('no trash to empty 1') })
       return selenium.getCssElementVisible('.Trash-body')
       .then(trashBodyVisible => {
         if (!trashBodyVisible) return selenium.clickCssElement('.Trash-toggle')
       })
-      .then(_ => selenium.getCssElementVisible('.Collections .Trash-empty'))
+      .then(_ => selenium.getCssElementVisible('.Collections-collapsible .Trash-empty'))
       .then(trashEmptyVisible => {
         if (!trashEmptyVisible) return driver.then(_ => { DEBUG && console.log('no trash to empty 2') })
         driver.then(_ => { DEBUG && console.log('emptying trash') })
-        selenium.waitForCssElementVisible('.Collections .Trash-empty', 5000)
-        selenium.clickCssElement('.Collections .Trash-empty')
+        selenium.waitForCssElementVisible('.Collections-collapsible .Trash-empty', 5000)
+        selenium.clickCssElement('.Collections-collapsible .Trash-empty')
         selenium.waitForIdle(15000)
-        selenium.waitForCssElementNotVisible('.Collections .Trash', 5000)
+        selenium.waitForCssElementNotVisible('.Collections-collapsible .Trash', 5000)
         return driver
       })
     })
@@ -72,8 +72,8 @@ describe('Collections', function () {
   it('open collections panel', function () {
     return driver
     .then(_ => { DEBUG && console.log('Open the collections panel (TODO: check if already open)') })
-    .then(_ => selenium.waitForCssElementVisible('.Collections .CollapsibleHeader', 5000))
-    .then(_ => selenium.clickCssElement('.Collections .CollapsibleHeader'))
+    .then(_ => selenium.waitForCssElementVisible('.Collections-collapsible .CollapsibleHeader', 5000))
+    .then(_ => selenium.clickCssElement('.Collections-collapsible .CollapsibleHeader'))
     // .then(_ => selenium.waitForBusy())
     .then(_ => selenium.waitForIdle())
     .then(_ => selenium.waitForCssElementVisible('.FolderItem', 15000))
@@ -141,7 +141,7 @@ describe('Collections', function () {
     selenium.waitForCssElementVisible('.FolderItem-context-remove-folder')
     selenium.clickCssElement('.FolderItem-context-remove-folder')
     selenium.waitForCssElementNotVisible('.FolderItem-context-menu', 5000)
-    selenium.waitForCssElementVisible('.Collections .Trash', 15000)
+    selenium.waitForCssElementVisible('.Collections-collapsible .Trash', 15000)
 
     driver.then(_ => emptyTrash())
 
@@ -175,7 +175,7 @@ describe('Collections', function () {
           selenium.waitForCssElementVisible('.FolderItem-context-remove-folder')
           selenium.clickCssElement('.FolderItem-context-remove-folder')
           selenium.waitForCssElementNotVisible('.FolderItem-context-remove-folder', 5000)
-          selenium.waitForCssElementVisible('.Collections .Trash', 15000)
+          selenium.waitForCssElementVisible('.Collections-collapsible .Trash', 15000)
           driver.then(_ => emptyTrash())
           return driver.then(deleteOldFolders)
         },
@@ -249,7 +249,7 @@ describe('Collections', function () {
     selenium.waitForCssElementVisible('.FolderItem-context-remove-folder')
     selenium.clickCssElement('.FolderItem-context-remove-folder')
     selenium.waitForCssElementNotVisible('.FolderItem-context-remove-folder', 5000)
-    selenium.waitForCssElementVisible('.Collections .Trash', 15000)
+    selenium.waitForCssElementVisible('.Collections-collapsible .Trash', 15000)
 
     driver.then(_ => emptyTrash())
 
