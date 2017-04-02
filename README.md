@@ -116,20 +116,48 @@ Tips for making testing quicker & easier:
 
 - Never use sleep(), hardcoded amounts of time are extremely brittle
 - Use explicit waits liberally (for DOM conditions or events)
--- For example, if you load a page and try to click something on it immeidately, it may not be created or visible or ready on the first frame. Wait until it has been located and is visible.
--- You will probably have to write app code to help the tests understand how to wait whenever the app makes server calls.
-- Use assertions liberally, e.g., Jest's expect(). Tests should fail early.
--- Especially after a wait, make sure a test fails as early as possible, and with as specific a message about what went wrong as possible.
--- I usually pair every explicit wait with an assert/expect using the same condition. Remember any wait will time out and continue when the wait condition isn't met.
-- Factor common interactions into reusable pieces. (Duh?) Lots of people are calling this the ["page objects pattern"](http://docs.seleniumhq.org/docs/06_test_design_considerations.jsp#page-object-design-pattern).
-- selenium.js contains some factored test utility functions, some specific to Zorroa. api.js contains frontend app-side functions that the tests are allowed to call. Use them. Add new ones! Examples:
--- `login()` / `logout()` -- Logs into a Zorroa app. login() logs out first, use this whenever you need to have a fresh session. (Will matter more when we have multiple user accounts.)
--- `waitForAssetsCounterChange()` -- Wait for new search query results
--- `waitForJsFnVal()` -- Wait until the given function returns the given value
--- `expectCssElementIsVisible()` -- Wait until the given css selector is visible
-- When Jest tests run on Sauce labs in parallel, they break, so Jest has been set to run tests serially. TODO: figure out how to run tests in parallel.
+-- For example, if you load a page and try to click something on it immeidately, it may not be created or visible or ready on the first frame. Wait until it has been located and is visible, e.g., see waitForCssElementVisible()
+- Use assertions liberally, e.g., Jest's expect(). Tests should fail quick & early.
+- selenium.js: factored test utility functions, some specific to Zorroa.
+-- `login()` / `logout()` -- Logs into a Zorroa app. login() logs out first, use this whenever you need to have a fresh session.
+-- `waitForIdle()` -- Wait for any pending server requests to complete
+-- `waitForCssElementVisible()` -- Wait until the given css selector is visible
+- api.js: functions that the tests are allowed to call directly.
+- Jest tests run on Sauce labs serially. Parallel currently breaks.
 - You will see any console.log() calls made from the test.js file in your shell.
-- console.log() calls in the app are absorbed & hidden. Look at api.js:log(),getLog() if you need to see debug prints from the app in your Selenium tests.
+- use api.log(),api.getLog() to see app side debug prints in Selenium tests.
+-- console.log() calls made from the app are absorbed & hidden.
+- Take care not to break promise chains accidentally. Here are some bugs I've introduced accidentally:
+-- I've forgetten to return a promise in a test (the 'it' function)
+--- symptom: browser doesn't quit after test
+--- symptom: text printing after test results print
+-- I've messed up caching & function call order. As a convenience, most functions of ours & webdriver's will implicitly wait on driver.then(). But I'm learning to be careful because using that convenient syntax has dangers. Static parameters are fine, but when passing variables, it's easy to accidentally make the call before your variable has resolved.
+    --- Incorrect:
+    ```
+    let url
+    driver.getCurrentUrl().then(u => { url = u })
+    selenium.waitForUrl(`${url}signin`) // "url" passed before being assigned
+    ```
+
+    -- Correct:
+    ```
+    let url
+    driver.getCurrentUrl().then(u => { url = u })
+    driver.then(_ => selenium.waitForUrl(`${url}signin`)) // "url" passed after being assigned
+    ```
+
+- When resolving with a value, you must chain .then directly to retrieve the value, NOT driver.then().
+    -- Incorrect:
+    ```
+    driver.findElement(By.css('.class'))
+    driver.then(ele => { ... }) // ele will be a promise, not an element
+    ```
+
+    -- Correct:
+    ```
+    driver.findElement(By.css('.class'))
+      .then(ele => { ... }) // ele will be an element
+    ```
 
 ### Running Selenium tests manually:
 
