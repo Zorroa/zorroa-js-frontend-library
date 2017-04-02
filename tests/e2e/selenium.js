@@ -487,6 +487,13 @@ export function expectElementIsNotVisible (element, elementName) {
 }
 
 // ----------------------------------------------------------------------
+export function doesCssElementHaveClass (selector, className) {
+  return driver.findElement(By.css(selector)).getAttribute('class')
+  .then(classes => new RegExp('\\b' + className + '\\b').test(classes))
+}
+
+
+// ----------------------------------------------------------------------
 export function clickCssElement (selector) {
   return expectCssElementIsVisible(selector)
   .then(_ => driver.findElement(By.css(selector)).click())

@@ -40,7 +40,7 @@ describe('Tags', function () {
   var openTagsPanel = function () {
     driver.then(_ => { DEBUG && console.log('open the tags panel') })
     driver.then(_ => selenium.waitForCssElementVisible('.Metadata-collapsible', 5000))
-    driver.then(_ => doesCssElementHaveClass('.Metadata-collapsible', 'isOpen'))
+    driver.then(_ => selenium.doesCssElementHaveClass('.Metadata-collapsible', 'isOpen'))
       .then(isOpen => {
         if (!isOpen) {
           driver.then(_ => selenium.clickCssElement('.Metadata-collapsible'))
@@ -57,7 +57,7 @@ describe('Tags', function () {
     selenium.waitForCssElementVisible('.Metadata-favorites')
     driver.findElement(By.css('.Metadata-favorites')).getAttribute('class')
       .then(classes => { console.log({classes}) })
-    driver.then(_ => doesCssElementHaveClass('.Metadata-favorites', 'isSelected'))
+    driver.then(_ => selenium.doesCssElementHaveClass('.Metadata-favorites', 'isSelected'))
       .then(isSelected => {
         driver.then(_ => console.log({isSelected}))
         if (!isSelected) return false
@@ -68,11 +68,6 @@ describe('Tags', function () {
       })
     driver.then(_ => selenium.waitForCssElementVisible('.Metadata-item'))
     return driver
-  }
-
-  var doesCssElementHaveClass = function (selector, className) {
-    return driver.findElement(By.css(selector)).getAttribute('class')
-    .then(classes => new RegExp('\\b' + className + '\\b').test(classes))
   }
 
   it('user logs in', function () {
