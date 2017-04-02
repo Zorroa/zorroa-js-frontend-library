@@ -492,6 +492,42 @@ export function doesCssElementHaveClass (selector, className) {
   .then(classes => new RegExp('\\b' + className + '\\b').test(classes))
 }
 
+// ----------------------------------------------------------------------
+export function expectCssElementHasClass (selector, className) {
+  return doesCssElementHaveClass(selector, className).then(hasClass => {
+    expect(JSON.stringify({ selector, hasClass }))
+      .toBe(JSON.stringify({ selector, hasClass:true }))
+    return hasClass
+  })
+}
+
+// ----------------------------------------------------------------------
+export function expectCssElementDoesntHaveClass (selector, className) {
+  return doesCssElementHaveClass(selector, className).then(hasClass => {
+    expect(JSON.stringify({ selector, hasClass }))
+      .toBe(JSON.stringify({ selector, hasClass:false }))
+    return hasClass
+  })
+}
+
+// ----------------------------------------------------------------------
+export function waitForCssElementToHaveClass (selector, className, optTimeout) {
+  driver.wait(_ => doesCssElementHaveClass(selector, className),
+    optTimeout, `waitForCssElementToHaveClass timeout ${selector} ${className}`)
+  driver.then(_ => expectCssElementHasClass(selector, className))
+  return driver
+}
+
+// ----------------------------------------------------------------------
+export function waitForCssElementToNotHaveClass (selector, className, optTimeout) {
+  driver.wait(
+    _ => {
+      return doesCssElementHaveClass(selector, className).then(hasClass => !hasClass)
+    },
+    optTimeout, `waitForCssElementToNotHaveClass timeout ${selector} ${className}`)
+  driver.then(_ => expectCssElementDoesntHaveClass(selector, className))
+  return driver
+}
 
 // ----------------------------------------------------------------------
 export function clickCssElement (selector) {
