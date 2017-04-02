@@ -151,7 +151,7 @@ describe('Collections', function () {
   it('add & remove assets', function () {
     let allUsersFolder
     let myUserFolder
-    const myUserName = 'selenium'
+    const myUserName = `selenium-${Date.now()}`
 
     driver.then(_ => { DEBUG && console.log('find & toggle the Users folder') })
     selenium.getFolderNamed('Users').then(ele => { allUsersFolder = ele })
