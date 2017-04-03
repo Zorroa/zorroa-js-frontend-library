@@ -19,7 +19,9 @@ quit()
 */
 
 const DEBUG = false
-// process.env.SELENIUM_PROMISE_MNAGER = 0 // this doesn't work here, but does in the shell
+
+// selenium promise manager is deprecated; use this to start testing. also works in the shell
+// process.env.SELENIUM_PROMISE_MANAGER = 0
 
 // provide dummy versions of the jest deps in this file
 // this is used for manual testing, i.e., when running this file directly from node w/o jest
@@ -486,9 +488,24 @@ export function expectElementIsNotVisible (element, elementName) {
 }
 
 // ----------------------------------------------------------------------
-export function doesCssElementHaveClass (selector, className) {
-  return driver.findElement(By.css(selector)).getAttribute('class')
+export function doesElementHaveClass (element, className) {
+  return element.getAttribute('class')
   .then(classes => new RegExp('\\b' + className + '\\b').test(classes))
+}
+
+// ----------------------------------------------------------------------
+export function doesCssElementHaveClass (selector, className) {
+  return driver.findElement(By.css(selector))
+  .then(ele => doesElementHaveClass(ele, className))
+}
+
+// ----------------------------------------------------------------------
+export function expectElementHasClass (element, elementName, className) {
+  return doesElementHaveClass(element, className).then(hasClass => {
+    expect(JSON.stringify({ elementName, hasClass }))
+      .toBe(JSON.stringify({ elementName, hasClass:true }))
+    return hasClass
+  })
 }
 
 // ----------------------------------------------------------------------
@@ -507,6 +524,16 @@ export function expectCssElementDoesntHaveClass (selector, className) {
       .toBe(JSON.stringify({ selector, hasClass:false }))
     return hasClass
   })
+}
+
+// ----------------------------------------------------------------------
+// wait until pass element has the class 'className'
+// the elementName argument is only used for logging & errors
+export function waitForElementToHaveClass (element, elementName, className, optTimeout) {
+  driver.wait(_ => doesElementHaveClass(element, className),
+    optTimeout, `waitForElementToHaveClass timeout ${elementName} ${className}`)
+  driver.then(_ => expectElementHasClass(element, elementName, className))
+  return driver
 }
 
 // ----------------------------------------------------------------------
