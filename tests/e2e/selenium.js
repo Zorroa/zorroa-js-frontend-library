@@ -19,6 +19,7 @@ quit()
 */
 
 const DEBUG = false
+// process.env.SELENIUM_PROMISE_MNAGER = 0 // this doesn't work here, but does in the shell
 
 // provide dummy versions of the jest deps in this file
 // this is used for manual testing, i.e., when running this file directly from node w/o jest
@@ -374,30 +375,28 @@ export function getXpathVisible (selector) {
 // ----------------------------------------------------------------------
 // wait until an element is visible (or timeout)
 export function waitForCssElementVisible (selector, optTimeout) {
-  return driver.wait(_ => getCssElementVisible(selector), optTimeout)
-  // An alternative way to wait -- TODO determine if there's a reason to go one way or the other
-  // .then(_ => driver.wait(until.elementLocated(By.css(selector)), 15000))
+  return driver.wait(_ => getCssElementVisible(selector), optTimeout, `timeout waiting for ${selector} to be visible`)
   .then(_ => expectCssElementIsVisible(selector))
 }
 
 // ----------------------------------------------------------------------
 // wait until an xpath selector is visible (or timeout)
 export function waitForXpathVisible (selector, optTimeout) {
-  return driver.wait(_ => getXpathVisible(selector), optTimeout)
+  return driver.wait(_ => getXpathVisible(selector), optTimeout, `timeout waiting for ${selector} to be visible`)
   .then(_ => expectXpathElementIsVisible(selector))
 }
 
 // ----------------------------------------------------------------------
 // wait until a css selector is visible (or timeout)
 export function waitForCssElementNotVisible (selector, optTimeout) {
-  return driver.wait(_ => getCssElementVisible(selector).then(x => !x), optTimeout)
+  return driver.wait(_ => getCssElementVisible(selector).then(x => !x), optTimeout, `timeout waiting for ${selector} to not be visible`)
   .then(_ => expectCssElementIsNotVisible(selector))
 }
 
 // ----------------------------------------------------------------------
 // wait until an xpath selector is visible (or timeout)
 export function waitForXpathNotVisible (selector, optTimeout) {
-  return driver.wait(_ => getXpathVisible(selector).then(x => !x), optTimeout)
+  return driver.wait(_ => getXpathVisible(selector).then(x => !x), optTimeout, `timeout waiting for ${selector} to not be visible`)
   .then(_ => expectXpathElementIsNotVisible(selector))
 }
 
