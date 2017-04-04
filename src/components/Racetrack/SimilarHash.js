@@ -84,7 +84,7 @@ class SimilarHash extends Component {
     const { assets, selectedAssetIds } = this.props
     const { hashTypes } = this.state
     if (!hashTypes) return null
-    const hashNames = Object.keys(hashTypes).sort()
+    const hashNames = Object.keys(hashTypes).sort((a, b) => a.localeCompare(b))
     return (
       <table>
         <tbody className="SimilarHash-table">

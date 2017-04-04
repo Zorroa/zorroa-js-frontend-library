@@ -177,7 +177,7 @@ class Metadata extends Component {
     // Filter all fields by string and sort
     const fields = this.state.showFavorites ? metadataFields : Object.keys(fieldTypes)
     const lcFilterString = this.state.filterString.toLowerCase()
-    const filteredFields = fields.filter(field => (field.toLowerCase().includes(lcFilterString))).sort()
+    const filteredFields = fields.filter(field => (field.toLowerCase().includes(lcFilterString))).sort((a, b) => a.localeCompare(b))
     if (JSON.stringify(filteredFields) !== JSON.stringify(this.state.filteredFields) ||
         JSON.stringify(collapsibleOpen) !== JSON.stringify(this.state.collapsibleOpen) ||
         JSON.stringify(aggs) !== JSON.stringify(this.state.aggs) || modifiedFavorites || modifiedWidgets) {
