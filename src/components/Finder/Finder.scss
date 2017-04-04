@@ -1,0 +1,42 @@
+@import '../../styles/core-mixins.scss';
+
+.Finder {
+  @include flexCol;
+}
+
+.Finder-file {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  min-height: 25px;
+  &.selected {
+    background-color: $zorroa-selected;
+  }
+}
+
+.Finder-file-name {
+  @include fullWidth;
+  height: 25px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  color: $zorroa-greyish-brown;
+  border-bottom: 1px solid $zorroa-nearwhite;
+
+  &:hover {
+    background-color: $zorroa-hover;
+  }
+
+}
+
+.Finder-file-icon {
+  @include flexRowCenter;
+  padding: 4px;
+  width: 25px;
+  height: 25px;
+  &:hover { background-color: $zorroa-gray; color: white; }
+}
+
+.Finder-pad {
+  min-width: 14px;
+  height: 25px;
+  border-right: 1px solid $zorroa-lightgray;
+}

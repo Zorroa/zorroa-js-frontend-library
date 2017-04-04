@@ -18,8 +18,11 @@ import { iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible, showModal, 
 import { getUserPermissions, updatePassword, changePassword } from '../../actions/authAction'
 import ChangePassword from '../auth/ChangePassword'
 import User from '../../models/User'
+import Job from '../../models/Job'
+import Asset from '../../models/Asset'
 import Lightbox from '../Lightbox'
 import Feedback from '../Feedback'
+import Import, { LOCAL_IMPORT } from '../Import'
 
 class Workspace extends Component {
   static displayName () {
@@ -37,7 +40,9 @@ class Workspace extends Component {
     app: PropTypes.object.isRequired,
     user: PropTypes.instanceOf(User),
     isolatedId: PropTypes.string,
-    changePassword: PropTypes.bool
+    changePassword: PropTypes.bool,
+    jobs: PropTypes.object,
+    assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
   }
 
   state = {
@@ -85,6 +90,13 @@ class Workspace extends Component {
       const body = <ChangePassword onChangePassword={this.updatePassword} onCancel={this.cancelPasswordUpdate}/>
       this.props.actions.showModal({body, width})
     }
+    if (!nextProps.app.modal && !this.state.tipShown && nextProps.assets && !nextProps.assets.length &&
+      (!nextProps.jobs || Object.values(nextProps.jobs).filter(job => (job.type === Job.Import)).length === 0)) {
+      this.setState({tipShown: true})
+      const width = '600px';
+      const body = <Import onSelect={this.selectImport} userFirstName={nextProps.user.firstName}/>
+      this.props.actions.showModal({body, width})
+    }
   }
 
   updatePassword = (password) => {
@@ -94,6 +106,12 @@ class Workspace extends Component {
   cancelPasswordUpdate = () => {
     this.props.actions.changePassword(false)
     this.props.actions.hideModal()
+  }
+
+  selectImport = (mode, event) => {
+    if (mode) {
+      this.createImport(event, mode)
+    }
   }
 
   toggleLeftSidebar = () => {
@@ -138,9 +156,10 @@ class Workspace extends Component {
     }
   }
 
-  dropFile = (event) => {
+  createImport = (event, mode) => {
+    const files = mode === LOCAL_IMPORT && event && event.dataTransfer ? event.dataTransfer.files : null
     const width = '800px'
-    const body = <CreateImport initialFiles={event.dataTransfer.files}/>
+    const body = <CreateImport initialFiles={files} mode={mode}/>
     this.props.actions.showModal({body, width})
     this.setState({isDroppable: false})
     event.preventDefault()
@@ -214,7 +233,7 @@ class Workspace extends Component {
         <div className={classnames('App-dropzone', {isDroppable})}
              onDragOver={this.dragOver}
              onDragLeave={this.dragLeave}
-             onDrop={this.dropFile}>
+             onDrop={this.createImport}>
           Drop Assets to Import
         </div>
         { isolatedId && <Lightbox/> }
@@ -227,7 +246,9 @@ export default connect(state => ({
   app: state.app,
   user: state.auth.user,
   isolatedId: state.assets.isolatedId,
-  changePassword: state.auth.changePassword
+  changePassword: state.auth.changePassword,
+  assets: state.assets.all,
+  jobs: state.jobs.all
 }), dispatch => ({
   actions: bindActionCreators({
     iconifyLeftSidebar,

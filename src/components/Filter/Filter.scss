@@ -1,0 +1,37 @@
+@import '../../styles/core-mixins.scss';
+
+.Filter {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  margin-left: 20px;
+  position: relative;
+
+  .icon-search {
+    color: $zorroa-gray;
+  }
+}
+
+.Filter-input {
+  width: 200px;
+  border: none;
+  border-bottom: 1px solid $zorroa_gray;
+  padding-bottom: 4px;
+  background: transparent;
+}
+
+.Filter-clear {
+  @include flexRowCenter;
+  position: absolute;
+  right: 20px;
+  padding: 4px;
+  top: 0;
+  bottom: 0;
+  margin-top: auto;
+  margin-bottom: auto;
+  color: $zorroa-gray;
+  font-size: 10px;
+  border-radius: 3px;
+
+  &:hover { color: $zorroa-sickly-green; }
+  &.disabled { visibility: hidden; }
+}

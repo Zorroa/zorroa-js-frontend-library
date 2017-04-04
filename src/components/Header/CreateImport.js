@@ -3,40 +3,35 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
-import { hideModal, showImportScriptInfo } from '../../actions/appActions'
+import { hideModal } from '../../actions/appActions'
 import { importAssets, getPipelines, getProcessors, uploadFiles } from '../../actions/jobActions'
 import { humanFileSize } from '../../services/jsUtil'
 import Pipeline from '../../models/Pipeline'
 import Processor from '../../models/Processor'
 import User from '../../models/User'
-import Toggle from '../Toggle'
+import Expando from '../Expando'
 import DropboxChooser from '../DropboxChooser'
+import { LOCAL_IMPORT, SERVER_IMPORT, CLOUD_IMPORT } from '../Import'
 
 class CreateImport extends Component {
   static propTypes = {
     initialFiles: PropTypes.instanceOf(FileList),
     pipelines: PropTypes.arrayOf(PropTypes.instanceOf(Pipeline)),
     processors: PropTypes.arrayOf(PropTypes.instanceOf(Processor)),
-    showScriptInfo: PropTypes.bool,
     user: PropTypes.instanceOf(User).isRequired,
     actions: PropTypes.object
   }
-
-  static DnDSource = 'dnd'
-  static ServerSource = 'server'
-  static DropboxSource = 'dropbox'
 
   state = {
     name: '',               // import name
     pipelineId: -1,         // shared pipeline
     uploadFiles: [],        // pending File array
     isDroppable: false,     // true when file over drop target
-    source: CreateImport.DnDSource,
+    source: this.props.mode || LOCAL_IMPORT,
     serverPath: '',         // text in server path input
     serverPaths: [],        // list of added server paths
     dropboxFiles: new Map(), // list of selected dropbox paths
-    dropboxAccessKey: '',   // access key for analyst processing
-    filterText: ''          // pipeline filter
+    dropboxAccessKey: ''    // access key for analyst processing
   }
 
   componentWillMount () {
@@ -68,11 +63,11 @@ class CreateImport extends Component {
   checkForSubmit = (event) => {
     if (event.key === 'Enter' && this.state.name && this.state.name.length) {
       switch (this.state.source) {
-        case CreateImport.DnDSource:
+        case LOCAL_IMPORT:
           return this.createUploadFileImport(event)
-        case CreateImport.ServerSource:
+        case SERVER_IMPORT:
           return this.createServerPathImport(event)
-        case CreateImport.DropboxSource:
+        case CLOUD_IMPORT:
           return this.createDropboxImport(event)
       }
     } else if (event.key === 'Escape') {
@@ -165,11 +160,7 @@ class CreateImport extends Component {
     this.setState({isDroppable: false})
   }
 
-  changeFilterText = (event) => {
-    this.setState({filterText: event.target.value})
-  }
-
-  selectPipeline (pipeline, event) {
+  selectPipeline = (pipeline, event) => {
     const pipelineId = pipeline.id
     this.setState({pipelineId})
     console.log('Select pipline ' + pipelineId + ' ' + pipeline.name)
@@ -203,10 +194,6 @@ class CreateImport extends Component {
     this.setState({serverPaths, serverPath: ''})
   }
 
-  toggleScriptInfo = (event) => {
-    this.props.actions.showImportScriptInfo(!this.props.showScriptInfo)
-  }
-
   selectSource = (source, event) => {
     this.setState({source})
   }
@@ -226,9 +213,9 @@ class CreateImport extends Component {
     const { pipelineId, name, uploadFiles, serverPaths, dropboxFiles, source, progressEvent } = this.state
     if (progressEvent) return true
     if (pipelineId <= 0 || !name || !name.length) return true
-    if (source === CreateImport.ServerSource && !serverPaths.length) return true
-    if (source === CreateImport.DnDSource && (!uploadFiles || !uploadFiles.length)) return true
-    if (source === CreateImport.DropboxSource && (!dropboxFiles || !dropboxFiles.size)) return true
+    if (source === SERVER_IMPORT && !serverPaths.length) return true
+    if (source === LOCAL_IMPORT && (!uploadFiles || !uploadFiles.length)) return true
+    if (source === CLOUD_IMPORT && (!dropboxFiles || !dropboxFiles.size)) return true
     return false
   }
 
@@ -259,7 +246,7 @@ class CreateImport extends Component {
   renderActivityRegion () {
     const { uploadFiles, source, serverPaths, serverPath, isDroppable } = this.state
     switch (source) {
-      case CreateImport.DnDSource:
+      case LOCAL_IMPORT:
         if (uploadFiles.length) {
           return (
             <div className="CreateImport-activity-region">
@@ -325,7 +312,7 @@ class CreateImport extends Component {
           </div>
         )
 
-      case CreateImport.ServerSource:
+      case SERVER_IMPORT:
         return (
           <div className="CreateImport-activity-region">
             <div className="CreateImport-server-paths">
@@ -353,7 +340,7 @@ class CreateImport extends Component {
           </div>
         )
 
-      case CreateImport.DropboxSource:
+      case CLOUD_IMPORT:
         return (
           <div className="CreateImport-activity-region">
             <DropboxChooser appKey="6fifppvd9maxou9" onChange={this.selectDropbox}>
@@ -363,73 +350,15 @@ class CreateImport extends Component {
     }
   }
 
-  renderPipelines () {
-    const { pipelines, showScriptInfo } = this.props
-    const { pipelineId, filterText } = this.state
-    const lcFilterText = filterText.toLowerCase()
-    const filteredPipelines = pipelines && pipelines.filter(pipeline => (
-      pipeline.name.toLowerCase().includes(lcFilterText) ||
-      pipeline.description.toLowerCase().includes(lcFilterText)
-    ))
-    return (
-      <div className="CreateImport-pipelines">
-        <div className="CreateImport-pipelines-header">
-          <div className="CreateImport-pipeline-filter">
-            <input className="CreateImport-pipeline-input"
-                   placeholder="Filter processor scripts"
-                   value={filterText} onChange={this.changeFilterText}/>
-            <div className="icon-search"/>
-          </div>
-          <div className="CreateImport-pipeline-script-info">
-            <div className="CreateImport-pipeline-script-info-label">
-              Show Script Information
-            </div>
-            <Toggle checked={showScriptInfo} onChange={this.toggleScriptInfo} />
-            <div onClick={this.toggleScriptInfo}
-                 className={classnames('CreateImport-pipeline-script-info-state', {showScriptInfo})}>
-              {showScriptInfo ? 'ON' : 'OFF'}
-            </div>
-          </div>
-        </div>
-        <div className="CreateImport-pipelines-body" >
-          { filteredPipelines ? filteredPipelines.map(pipeline => (
-            <div key={pipeline.id} className={classnames('CreateImport-pipeline', {isSelected: pipeline.id === pipelineId})}>
-              <div onClick={!showScriptInfo && this.selectPipeline.bind(this, pipeline)}
-                   className={classnames('CreateImport-pipeline-header', {showScriptInfo})}>
-                <div className="CreateImport-pipeline-title">
-                  <div className="icon-script"/>
-                  <div className="CreateImport-pipeline-name">
-                    {pipeline.name}
-                  </div>
-                </div>
-                <div className="CreateImport-pipeline-info icon-question"
-                     onClick={this.pipelineInfo} />
-              </div>
-              <div className={classnames('CreateImport-pipeline-body', {showScriptInfo})}>
-                <div className="CreateImport-pipeline-description">
-                  {pipeline.description}
-                </div>
-                <div onClick={this.selectPipeline.bind(this, pipeline)}
-                     className="CreateImport-pipeline-select">
-                  Select
-                </div>
-              </div>
-            </div>
-          )) : null }
-        </div>
-      </div>
-    )
-  }
-
   render () {
-    const { source } = this.state
+    const { source, name } = this.state
     const isDisabled = this.isDisabled()
     let createAction = null
     if (!isDisabled) {
       switch (source) {
-        case CreateImport.DnDSource: createAction = this.createUploadFileImport; break
-        case CreateImport.ServerSource: createAction = this.createServerPathImport; break
-        case CreateImport.DropboxSource: createAction = this.createDropboxImport; break
+        case LOCAL_IMPORT: createAction = this.createUploadFileImport; break
+        case SERVER_IMPORT: createAction = this.createServerPathImport; break
+        case CLOUD_IMPORT: createAction = this.createDropboxImport; break
       }
     }
     return (
@@ -445,26 +374,26 @@ class CreateImport extends Component {
           <div className="CreateImport-package-label">Import name</div>
           <div className="CreateImport-package-name">
             <input className="CreateImport-package-name-input" type="text"
-                   value={this.state.name} placeholder="Name"
+                   value={name} placeholder="Name"
                    onChange={this.changeName} onKeyDown={this.checkForSubmit}/>
             <div onClick={this.clearName} className="CreateImport-package-name-cancel icon-cancel-circle"/>
           </div>
           { this.renderActivityRegion() }
           <div className="CreateImport-activity-switcher">
-            <div onClick={e => this.selectSource(CreateImport.DnDSource, e)}
-                 className={classnames('CreateImport-activity-item', {selected: source === CreateImport.DnDSource})}>
+            <div onClick={e => this.selectSource(LOCAL_IMPORT, e)}
+                 className={classnames('CreateImport-activity-item', {selected: source === LOCAL_IMPORT})}>
               Local
             </div>
-            <div onClick={e => this.selectSource(CreateImport.ServerSource, e)}
-                 className={classnames('CreateImport-activity-item', {selected: source === CreateImport.ServerSource})}>
+            <div onClick={e => this.selectSource(SERVER_IMPORT, e)}
+                 className={classnames('CreateImport-activity-item', {selected: source === SERVER_IMPORT})}>
               Server
             </div>
-            <div onClick={e => this.selectSource(CreateImport.DropboxSource, e)}
-                 className={classnames('CreateImport-activity-item', {selected: source === CreateImport.DropboxSource})}>
+            <div onClick={e => this.selectSource(CLOUD_IMPORT, e)}
+                 className={classnames('CreateImport-activity-item', {selected: source === CLOUD_IMPORT})}>
               Dropbox
             </div>
           </div>
-          { this.renderPipelines() }
+          <Expando onSelect={this.selectPipeline} items={this.props.pipelines}/>
         </div>
         <div className="CreateImport-footer">
           <button onClick={createAction}
@@ -479,7 +408,6 @@ class CreateImport extends Component {
 }
 
 export default connect(state => ({
-  showScriptInfo: state.app.showImportScriptInfo,
   pipelines: state.jobs.pipelines,
   processors: state.jobs.processors,
   user: state.auth.user
@@ -489,7 +417,6 @@ export default connect(state => ({
     getPipelines,
     getProcessors,
     uploadFiles,
-    hideModal,
-    showImportScriptInfo
+    hideModal
   }, dispatch)
 }))(CreateImport)

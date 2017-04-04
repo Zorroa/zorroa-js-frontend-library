@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import Dropbox from 'dropbox'
-import classnames from 'classnames'
 import domUtils from '../../services/domUtils'
+import Finder from "../Finder";
 
 export const DropboxAuth = () => {
   const response = domUtils.parseQueryString(window.location.toString())
@@ -10,6 +10,9 @@ export const DropboxAuth = () => {
   window.close()
   return <div>Dropbox Authorized</div>
 }
+
+const ROOT_ID = 0
+const ROOT_PATH = ''
 
 export default class DropboxChooser extends Component {
   static propTypes = {
@@ -23,7 +26,7 @@ export default class DropboxChooser extends Component {
   }
 
   state = {
-    files: [],
+    files: new Map(),
     cursor: '',
     entries: [],
     loading: false,
@@ -39,15 +42,14 @@ export default class DropboxChooser extends Component {
       const accessToken = ev.newValue
       console.log('Received: ' + accessToken)
       this.authenticating = false
-      this.setState({accessToken, loading: true})
-      this.loadFiles(accessToken)
+      this.setState({accessToken, loading: true}, () => { this.loadFiles(ROOT_PATH, ROOT_ID)})
     }
   }
 
   deauthorize = () => {
     localStorage.removeItem('DropboxURL')
     localStorage.removeItem('DropboxAccessToken')
-    this.setState({files: [], cursor: '', entries: [], accessToken: '', authUrl: '', selectedFiles: new Map()})
+    this.setState({files: new Map(), cursor: '', entries: [], accessToken: '', authUrl: '', selectedFiles: new Map()})
     this.authorize()
   }
 
@@ -62,9 +64,10 @@ export default class DropboxChooser extends Component {
     this.setState({authUrl})
   }
 
-  loadFiles = (accessToken) => {
+  loadFiles = (path, parentId) => {
     // Create an instance of Dropbox with the access token and use it to
     // fetch and render the files in the users root directory.
+    const { accessToken } = this.state
     const dbx = new Dropbox({ accessToken })
     dbx.usersGetCurrentAccount()
       .then((response) => {
@@ -72,28 +75,49 @@ export default class DropboxChooser extends Component {
         this.setState({userAccount: response})
       })
 
-    dbx.filesListFolder({path: ''})
+    dbx.filesListFolder({path})
       .then((response) => {
         console.log(response)
-        const files = response.entries
+        const files = new Map(this.state.files)
+        const childIds = new Set()
+        response.entries.forEach(f => {
+          const item = {
+            id: f.id,
+            childIds: f['.tag'] === 'folder' ? new Set() : undefined,
+            name: f.name,
+            metadata: f
+          }
+          files.set(f.id, item)
+          childIds.add(f.id)
+        })
+        const parent = files.get(parentId)
+        const newParent = parent ? { ...parent } : { id: ROOT_ID, name: 'Root'}
+        newParent.childIds = childIds
+        files.set(parentId, newParent)
         const cursor = response.cursor
         this.setState({files, cursor, loading: false})
       })
       .catch((error) => {
         console.log(error)
-        this.setState({files: [], loading: false})
+        this.setState({files: new Map(), loading: false})
       })
   }
 
-  componentWillMount () {
-    const { accessToken } = this.state
+  loadDirectory = (id, opened, event) => {
+    const file = this.state.files.get(id)
+    if (file && file.metadata && file.metadata.path_lower.length > 1) {
+      this.loadFiles(file.metadata.path_lower, id)
+    }
+  }
 
+  componentWillMount () {
     // Listen for changes to local storage to capture return URL from
     // Dropbox OAuth2 redirect in popup window
     window.addEventListener('storage', this.authorized)
 
+    const { accessToken } = this.state
     if (accessToken && accessToken.length) {
-      this.loadFiles(accessToken)
+      this.loadFiles(ROOT_PATH, ROOT_ID)
     } else {
       this.authorize()
     }
@@ -127,7 +151,7 @@ export default class DropboxChooser extends Component {
   }
 
   render () {
-    const { files, loading, accessToken, selectedFiles, userAccount } = this.state
+    const { files, loading, accessToken, userAccount } = this.state
     const wait = require('../Assets/ellipsis.gif')
     if (!accessToken || !accessToken.length) {
       this.popupAuthenticator()
@@ -143,13 +167,7 @@ export default class DropboxChooser extends Component {
         </div>
         <div className="DropboxChooser-body">
           { (loading || this.authenticating) && <img src={wait} className="DropboxChooser-wait"/> }
-          { files && files.map(file => (
-            <div key={file.id} onClick={e => this.selectFile(file, e)}
-                 className={classnames('DropboxChooser-file', {selected: selectedFiles.has(file.id)})}>
-              <div className={`DropboxChooser-file-icon icon-${file['.tag'] === 'folder' ? 'folder' : 'file-empty'}`}/>
-              {file.name}
-            </div>
-          ))}
+          <Finder items={files} onSelect={this.selectFile} onOpen={this.loadDirectory} />
         </div>
       </div>
     )
