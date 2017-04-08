@@ -6,7 +6,7 @@ const paths = require('./paths')
 const ENV = 'DEV'
 
 module.exports = {
-  devtool: 'source-map',
+  devtool: 'eval-cheap-module-source-map',
   entry: [
     require.resolve('webpack-dev-server/client') + '?/',
     require.resolve('webpack/hot/dev-server'),
