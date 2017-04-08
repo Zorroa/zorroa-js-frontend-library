@@ -19,7 +19,6 @@ describe('assetsReducer', () => {
       query,
       all: assets,
       totalCount: 1,
-      isolatedId: null,
       suggestions: null,
       assetsCounter: 1
     }
@@ -43,7 +42,6 @@ describe('assetsReducer', () => {
       query,
       all: concatAssets,
       totalCount: 2,
-      isolatedId: null,
       suggestions: null,
       assetsCounter: 2
     }
