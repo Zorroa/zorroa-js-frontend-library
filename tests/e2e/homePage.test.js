@@ -54,17 +54,17 @@ describe('Home Page', function () {
     .then(_ => selenium.expectCssElementIsVisible('input[name="password"]'))
   })
 
-  it('forgot password should redirect to /signup', function () {
-    DEBUG && console.log('------ forgot password should redirect to /signup')
+  it('forgot password should redirect to /forgot', function () {
+    DEBUG && console.log('------ forgot password should redirect to /forgot')
     return selenium.logout()
     .then(_ => selenium.expectCssElementIsVisible('.auth-forgot'))
     .then(_ => driver.findElement(By.css('.auth-forgot')).click())
     .then(_ => driver.getCurrentUrl())
-    .then(url => expect(url).toBe(`${selenium.BASE_URL}/signup`))
+    .then(url => expect(url).toBe(`${selenium.BASE_URL}/forgot`))
   })
 
   it('user should be able to log in', function () {
-    DEBUG && console.log('------ forgot password should redirect to /signup')
+    DEBUG && console.log('------ forgot password should redirect to /forgot')
     return selenium.login()
   })
 })

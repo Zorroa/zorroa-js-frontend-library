@@ -10,7 +10,8 @@ import { signinUser, authError } from '../../../actions/authAction'
 class Signin extends Component {
   static propTypes = {
     error: PropTypes.string,
-    defaults: PropTypes.object
+    defaults: PropTypes.object,
+    actions: PropTypes.object
   }
 
   state = {
@@ -58,7 +59,7 @@ class Signin extends Component {
   }
 
   changeSSL = (event) => {
-    this.setState({ ssl: !this.state.ssl})
+    this.setState({ ssl: !this.state.ssl })
     this.clearError()
   }
 
@@ -95,25 +96,25 @@ class Signin extends Component {
           <div className="auth-form">
             { this.renderAlert() }
             <div className="auth-field">
-              <input className="auth-input" type="text" value={username}
+              <input className="auth-input" type="text" value={username} name="username"
                      onChange={this.changeUsername} onKeyDown={!disabled && this.submit}/>
               <label className="auth-label">Username</label>
             </div>
             <div className="auth-field">
-              <input className="auth-input" type="password" value={password}
+              <input className="auth-input" type="password" value={password} name="password"
                      onChange={this.changePassword} onKeyDown={!disabled && this.submit}/>
               <label className="auth-label">Password</label>
             </div>
             { !PROD && (
               <div className="auth-field">
-                <input className="auth-input" type="text" value={host}
+                <input className="auth-input" type="text" value={host} name="host"
                        onChange={this.changeHost} onKeyDown={!disabled && this.submit}/>
                 <label className="auth-label">Archivist</label>
               </div>
             )}
             { !PROD && (
               <div className="auth-field">
-                <input type="checkbox" checked={ssl} onChange={this.changeSSL}/>
+                <input type="checkbox" checked={ssl} onChange={this.changeSSL} name="ssl"/>
                 <label className="auth-label">Use SSL (HTTPS) for HOST</label>
               </div>
             )}

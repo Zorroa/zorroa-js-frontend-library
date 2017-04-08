@@ -192,8 +192,7 @@ export function forgotPassword (email) {
     })
       .then(response => {
         dispatch({ type: UNAUTH_USER, payload: response.data })
-        dispatch(initialize('signin', {host, username: user.username, ssl: true}))
-        localStorage.setItem(USER_ITEM, JSON.stringify(new User({...user, id: -1})))
+        browserHistory.push('/signin')
       })
       .catch(error => dispatch(authError('Cannot reset ' + email + ': ' + error)))
   }
@@ -214,11 +213,9 @@ export function updatePassword (user, password) {
     })
       .then(response => {
         dispatch({ type: UNAUTH_USER, payload: response.data })
-        dispatch({ type: AUTH_DEFAULTS, payload: {host, username: user.username, ssl: true}})
-        localStorage.setItem(USER_ITEM, JSON.stringify(new User({...user, id: -1})))
         browserHistory.push('/signin')
       })
-      .catch(error => dispatch(authError('Cannot reset ' + email + ': ' + error)))
+      .catch(error => dispatch(authError('Cannot update ' + user.username + ' password: ' + error)))
   }
 }
 
@@ -230,7 +227,7 @@ export function signoutUser (user, host) {
       })
       .then(response => {
         dispatch({ type: UNAUTH_USER, payload: response.data })
-        dispatch({ type: AUTH_DEFAULTS, payload: {host, username: user.username, ssl: true}})
+        dispatch({ type: AUTH_DEFAULTS, payload: {host, username: user.username, ssl: true} })
         localStorage.setItem(USER_ITEM, JSON.stringify(new User({...user, id: -1})))
       })
       .catch(error => dispatch(authError(error)))
