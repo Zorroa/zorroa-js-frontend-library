@@ -18,6 +18,10 @@ export function unCamelCase (str) {
     .replace(/^./, function (str) { return str.toUpperCase() })
 }
 
+export function isValidEmail (email) {
+  return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)
+}
+
 export function formatDuration (seconds, fps) {
   const date = new Date(seconds * 1000)
   const hh = date.getUTCHours()

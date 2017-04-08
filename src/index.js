@@ -9,12 +9,11 @@ import { createStore, applyMiddleware, compose } from 'redux'
 import multi from 'redux-multi'
 import thunk from 'redux-thunk'
 import ReduxPromise from 'redux-promise'
-import { initialize } from 'redux-form'
 
 import routes from './routes'
 import reducers from './reducers'
 import { USER_ITEM, HOST_ITEM, PROTOCOL_ITEM } from './constants/localStorageItems'
-import { validateUser } from './actions/authAction'
+import { validateUser, signinDefaults } from './actions/authAction'
 import User from './models/User'
 
 // Include all our app-wide style classes
@@ -58,7 +57,7 @@ const host = localStorage.getItem(HOST_ITEM)
 const protocol = localStorage.getItem(PROTOCOL_ITEM)
 if (user && host) {
   // Initialize form to avoid faking user & host in state.auth triggering Searcher
-  store.dispatch(initialize('signin', {host, username: user.username, ssl: true}))
+  store.dispatch(signinDefaults(user.username, host, true))
   store.dispatch(validateUser(user, protocol, host))
 }
 
