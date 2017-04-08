@@ -14,6 +14,7 @@ import { updateLightbarFields, showModal } from '../../actions/appActions'
 import { flatDisplayPropertiesForFields } from '../../models/DisplayProperties'
 import { isolateAssetId } from '../../actions/assetsAction'
 import { addAssetIdsToFolderId } from '../../actions/folderAction'
+import { saveUserSettings } from '../../actions/authAction'
 
 class Lightbar extends Component {
   static displayName = 'Lightbar'
@@ -28,6 +29,7 @@ class Lightbar extends Component {
     protocol: PropTypes.string,
     host: PropTypes.string,
     user: PropTypes.instanceOf(User),
+    userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object
   }
 
@@ -79,8 +81,12 @@ class Lightbar extends Component {
   }
 
   updateDisplayOptions = (event, state) => {
-    console.log('Update lightbar display options to:\n' + JSON.stringify(state.checkedNamespaces))
-    this.props.actions.updateLightbarFields(state.checkedNamespaces)
+    const lightbarFields = state.checkedNamespaces
+    console.log('Update lightbar display options to:\n' + JSON.stringify(lightbarFields))
+    this.props.actions.updateLightbarFields(lightbarFields)
+    const { user, userSettings } = this.props
+    const settings = { ...userSettings, lightbarFields }
+    this.props.actions.saveUserSettings(user, settings)
   }
 
   resizeLightbar = (resizeX, resizeY) => {
@@ -232,11 +238,13 @@ export default connect(state => ({
   lightbarFields: state.app.lightbarFields,
   protocol: state.auth.protocol,
   host: state.auth.host,
-  user: state.auth.user
+  user: state.auth.user,
+  userSettings: state.app.userSettings
 }), dispatch => ({
   actions: bindActionCreators({
     isolateAssetId,
     updateLightbarFields,
     addAssetIdsToFolderId,
+    saveUserSettings,
     showModal }, dispatch)
 }))(Lightbar)

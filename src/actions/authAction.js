@@ -6,7 +6,7 @@ import {
   AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR, USER_SETTINGS,
   AUTH_PERMISSIONS, AUTH_SYNC, METADATA_FIELDS,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT, SET_TABLE_FIELD_WIDTH,
-  SHOW_MULTIPAGE, VIDEO_VOLUME, AUTH_CHANGE_PASSWORD, AUTH_DEFAULTS
+  SHOW_MULTIPAGE, VIDEO_VOLUME, AUTH_CHANGE_PASSWORD, AUTH_DEFAULTS, LIGHTBAR_FIELDS
 } from '../constants/actionTypes'
 import { USER_ITEM, HOST_ITEM, PROTOCOL_ITEM } from '../constants/localStorageItems'
 import User from '../models/User'
@@ -180,6 +180,9 @@ function authorize (dispatch, json) {
     }
     if (metadata.tableFieldWidths) {
       dispatch({type: SET_TABLE_FIELD_WIDTH, payload: metadata.tableFieldWidths})
+    }
+    if (metadata.lightbarFields) {
+      dispatch({type: LIGHTBAR_FIELDS, payload: metadata.lightbarFields})
     }
   }
   browserHistory.push('/')
