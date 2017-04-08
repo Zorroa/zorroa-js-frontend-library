@@ -34,7 +34,7 @@ class Folders extends Component {
   componentWillMount () {
     const rootFolder = this.props.folders.all.get(Folder.ROOT_ID)
     if (!rootFolder.childIds || !rootFolder.childIds.size) {
-      this.loadChildren(Folder.ROOT_ID)
+      this.loadChildren(rootFolder)
     }
   }
 
@@ -42,8 +42,9 @@ class Folders extends Component {
     return this.props.sortFolders || 'alpha-asc'
   }
 
-  loadChildren (id) {
-    this.props.actions.getFolderChildren(id)
+  loadChildren (folder) {
+    folder.childIds = new Set()   // Warning: modifying app state to avoid multiple loads
+    this.props.actions.getFolderChildren(folder.id)
   }
 
   toggleFolder = (folder) => {
@@ -76,7 +77,7 @@ class Folders extends Component {
 
     const doOpen = !isOpen
     this.props.actions.toggleFolder(folder.id, doOpen)
-    if (doOpen) this.loadChildren(folder.id)
+    if (doOpen) this.loadChildren(folder)
   }
 
   // Apply standard desktop shift+meta multi-select on click and update state.
@@ -199,7 +200,7 @@ class Folders extends Component {
         grandkids = grandkids.concat(this.folderList(child))
       })
     } else if (!childIds && isOpen) {
-      this.loadChildren(folder.id)
+      this.loadChildren(folder)
     }
 
     // Filter the list, showing parent if any descendents match
