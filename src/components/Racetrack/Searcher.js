@@ -107,6 +107,7 @@ class Searcher extends Component {
       modifiedFolderIds, trashedFolders, order,
       similarField, similarValues,
       metadataFields, lightbarFields, fieldTypes } = this.props
+    if (!fieldTypes) return null
     let assetSearch = new AssetSearch({order})
     if (widgets && widgets.length) {
       let postFilter = new AssetFilter()
@@ -169,8 +170,10 @@ class Searcher extends Component {
     // Do not send the query unless it is different than the last returned query
     // FIXME: If assetSearch.empty() filtered counts == total, but tricky to flush cache
     // FIXME: Count trashed folders once the server adds support
-    const searchModified = this.inflightQuery ? !this.inflightQuery.equals(assetSearch) : (!query || !assetSearch.equals(query))
-    if (searchModified) {
+    const skip = new Set(['fields', 'from', 'size', 'scroll'])
+    const missingField = this.inflightQuery ? this.inflightQuery.missingField(assetSearch.fields) : (!query || query.missingField(assetSearch.fields))
+    const searchModified = this.inflightQuery ? !this.inflightQuery.equals(assetSearch, skip) : (!query || !assetSearch.equals(query, skip))
+    if (searchModified || missingField) {
       assetSearch.size = AssetSearch.autoPageSize
       actions.searchAssets(assetSearch, query)
       this.inflightQuery = assetSearch

@@ -87,6 +87,16 @@ export default class AssetSearch {
     if (this.postFilter && !this.postFilter.empty()) return false
     return true
   }
+
+  missingField(fields) {
+    if (!fields) return false
+    if (!this.fields) return true
+    for (let i = 0; i < fields.length; ++i) {
+      const field = fields[i]
+      if (this.fields.findIndex(f => (f === field)) < 0) return true
+    }
+    return false
+  }
 }
 
 // Combine an array of arrays into an array with unique elements

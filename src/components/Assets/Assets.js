@@ -338,7 +338,6 @@ class Assets extends Component {
       this.scrollToSelection()
     }
     this.scrollToSelectionAfterLayout = false
-    this.loaded = 0
   }
 
   queueAssetsLayout = () => {
