@@ -106,16 +106,16 @@ class Signin extends Component {
               <label className="auth-label">Password</label>
             </div>
             { !PROD && (
-              <div className="auth-field">
-                <input className="auth-input" type="text" value={host} name="host"
-                       onChange={this.changeHost} onKeyDown={!disabled && this.submit}/>
-                <label className="auth-label">Archivist</label>
-              </div>
-            )}
-            { !PROD && (
-              <div className="auth-field">
-                <input type="checkbox" checked={ssl} onChange={this.changeSSL} name="ssl"/>
-                <label className="auth-label">Use SSL (HTTPS) for HOST</label>
+              <div className="auth-host">
+                <div className="auth-field">
+                  <input className="auth-input flexOn" type="text" value={host} name="host"
+                         onChange={this.changeHost} onKeyDown={!disabled && this.submit}/>
+                  <label className="auth-label">Archivist</label>
+                </div>
+                <div className="flexRowCenter">
+                  <input type="checkbox" checked={ssl} onChange={this.changeSSL} name="ssl"/>
+                  <label className="auth-label">SSL</label>
+                </div>
               </div>
             )}
             <div className={classnames('auth-button-primary', {disabled})} onClick={!disabled && this.signin}>Login</div>

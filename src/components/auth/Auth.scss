@@ -83,7 +83,7 @@
 .auth-message {
   font-size: 14px;
   color: $zorroa-greyish-brown;
-  margin-top:60;
+  margin-top: 60px;
 }
 
 .auth-validation-error {
@@ -120,4 +120,10 @@
   color: $zorroa-gray;
   margin-top: 50px;
   margin-bottom: 30px;
+}
+
+.auth-host {
+  @include flexRowCenter;
+  @include fullWidth;
+  margin-left: -8px;
 }
