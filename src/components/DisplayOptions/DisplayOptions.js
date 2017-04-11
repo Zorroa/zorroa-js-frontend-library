@@ -114,7 +114,7 @@ class DisplayOptions extends Component {
       }
     })
     return [ ...names ].sort((a, b) => {
-      return a.toLowerCase().localeCompare(b.toLowerCase())
+      return a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'})
     })
   }
 

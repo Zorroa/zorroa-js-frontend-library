@@ -180,12 +180,12 @@ class Folders extends Component {
       if (filter) {
         children = children.filter(filter)
       }
-      let subsort = (a, b) => a.name.localeCompare(b.name)
+      let subsort = (a, b) => a.name.localeCompare(b.name, undefined, {numeric: true})
       switch (this.sortOrder()) {
         case 'alpha-asc':
           break
         case 'alpha-desc':
-          subsort = (a, b) => b.name.localeCompare(a.name)
+          subsort = (a, b) => b.name.localeCompare(a.name, undefined, {numeric: true})
           break
         case 'time-asc':
           subsort = (a, b) => a.timeModified < b.timeModified ? -1 : (a.timeModified > b.timeModified ? 1 : 0)
