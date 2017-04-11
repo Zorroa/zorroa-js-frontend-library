@@ -542,7 +542,7 @@ class Assets extends Component {
                     return null
                   }
                   if (index < positions.length && index === assets.length - 1 && assets.length < totalCount &&
-                    assets.length % AssetSearch.maxPageSize && this.loaded !== assets.length) {
+                    this.loaded !== assets.length) {
                     this.loaded = assets.length
                     var nextPageQuery = new AssetSearch(query)
                     nextPageQuery.from = assets.length

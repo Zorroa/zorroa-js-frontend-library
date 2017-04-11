@@ -14,15 +14,6 @@ class Pager extends Component {
     query: PropTypes.instanceOf(AssetSearch).isRequired
   }
 
-  handleLoadPage () {
-    const {query, loaded} = this.props
-    var nextPageQuery = new AssetSearch(query)
-    nextPageQuery.from = loaded
-    nextPageQuery.size = AssetSearch.autoPageSize
-    console.log('Loading ' + nextPageQuery.size + ' from ' + nextPageQuery.from)
-    this.props.actions.searchAssets(nextPageQuery)
-  }
-
   render () {
     const {loaded, total} = this.props
     if (loaded < total) {

@@ -3,7 +3,6 @@ import AssetFilter from './AssetFilter'
 export default class AssetSearch {
 
   static autoPageSize = 100
-  static maxPageSize = 1000
 
   constructor (json) {
     if (json) {
