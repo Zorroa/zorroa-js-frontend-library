@@ -1,10 +1,14 @@
 import React, { Component, PropTypes } from 'react'
 import classnames from 'classnames'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import { updatePassword } from '../../../actions/authAction'
 
-export default class ChangePassword extends Component {
+import Logo from '../../Logo'
+
+class ChangePassword extends Component {
   static propTypes = {
-    onChangePassword: PropTypes.func.isRequired,
-    onCancel: PropTypes.func.isRequired
+    onCancel: PropTypes.func
   }
 
   state = {
@@ -21,7 +25,7 @@ export default class ChangePassword extends Component {
   }
 
   updatePassword = (event) => {
-    this.props.onChangePassword(this.state.password)
+    this.props.actions.updatePassword(this.state.password)
   }
 
   cancel = (event) => {
@@ -36,31 +40,48 @@ export default class ChangePassword extends Component {
     const { password, password2 } = this.state
     const mismatch = password.length && password !== password2
     const disabled = !password.length || mismatch
+    const fullscreen = !this.props.onCancel
     return (
-      <div className="ChangePassword">
-        <div className="ChangePassword-header">
-          <div className="ChangePassword-settings icon-cog"/>
-          <div className="ChangePassword-title">Change Password</div>
-          <div className="flexOn"/>
-          <div className="ChangePassword-close icon-cross2" onClick={this.cancel}/>
-        </div>
+      <div className={classnames('ChangePassword', {fullscreen})}>
+        { !fullscreen && (
+          <div className="ChangePassword-header">
+            <div className="ChangePassword-settings icon-cog"/>
+            <div className="ChangePassword-title">Change Password</div>
+            <div className="flexOn"/>
+            <div className="ChangePassword-close icon-cross2" onClick={this.cancel}/>
+          </div>
+        )}
         <div className="ChangePassword-body">
-          <div className="auth-field">
-            <input className="auth-input" type="password" value={password}
-                   onChange={this.changePassword} onKeyDown={!disabled && this.submit}/>
-            <label className="auth-label">Password</label>
+          { fullscreen && (
+            <div className="auth-logo">
+              <Logo/>
+            </div>
+          )}
+          <div className="auth-form">
+            <div className="auth-error">{mismatch ? 'Passwords do not match' : ''}</div>
+            <div className="auth-field">
+              <input className="auth-input" type="password" value={password}
+                     onChange={this.changePassword} onKeyDown={!disabled && this.submit}/>
+              <label className="auth-label">Password</label>
+            </div>
+            <div className="auth-field">
+              <input className="auth-input" type="password" value={password2}
+                     onChange={this.changePassword2} onKeyDown={!disabled && this.submit}/>
+              <label className="auth-label">Re-enter Password</label>
+            </div>
+            <div className={classnames('auth-button-primary', {disabled})}
+                 onClick={!disabled && this.updatePassword}>Update</div>
+            { !fullscreen && <div className="auth-forgot" onClick={this.cancel}>Cancel</div> }
           </div>
-          <div className="auth-field">
-            <input className="auth-input" type="password" value={password2}
-                   onChange={this.changePassword2} onKeyDown={!disabled && this.submit}/>
-            <label className="auth-label">Re-enter Password</label>
-          </div>
-          <div className="auth-error">{mismatch ? 'Passwords do not match' : ''}</div>
-          <div className={classnames('auth-button-primary', {disabled})}
-               onClick={!disabled && this.updatePassword}>Update</div>
-          <div className="auth-forgot" onClick={this.cancel}>Cancel</div>
         </div>
       </div>
     )
   }
 }
+
+export default connect(state => ({
+}), dispatch => ({
+  actions: bindActionCreators({
+    updatePassword
+  }, dispatch)
+}))(ChangePassword)

@@ -29,7 +29,7 @@ class ForgotPassword extends Component {
   }
 
   update = (event) => {
-    this.props.actions.forgotPassword()
+    this.props.actions.forgotPassword(this.state.email)
   }
 
   cancel = (event) => {

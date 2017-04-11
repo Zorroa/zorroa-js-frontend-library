@@ -5,6 +5,7 @@ import App from './components/App'
 import Signin from './components/auth/Signin'
 import Signout from './components/auth/Signout'
 import RequireAuth from './components/auth/RequireAuth'
+import ChangePassword from './components/auth/ChangePassword'
 import ForgotPassword from './components/auth/ForgotPassword'
 import Workspace from './components/Workspace'
 
@@ -14,5 +15,6 @@ export default (
     <Route path="signin" component={Signin} />
     <Route path="signout" component={Signout} />
     <Route path="forgot" component={ForgotPassword} />
+    <Route path="password" component={ChangePassword} />
   </Route>
 )

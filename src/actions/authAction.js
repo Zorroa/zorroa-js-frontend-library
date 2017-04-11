@@ -190,7 +190,7 @@ function authorize (dispatch, json) {
 
 export function forgotPassword (email) {
   return dispatch => {
-    archivistPost(dispatch, '/api/v1/forgot', {email}, {
+    archivistPost(dispatch, '/api/v1/send-password-reset-email', {email}, {
       headers: { 'X-Requested-With': 'XMLHttpRequest' } // disable browser auth
     })
       .then(response => {
