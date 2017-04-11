@@ -208,25 +208,24 @@ describe('Folder dnd', function () {
     .then(_ => selenium.waitForCssElementNotVisible('.modal .CreateFolder'))
     .then(_ => selenium.waitForIdle())
 
-    // // this is breaking the test?
-    // .then(_ => { DEBUG && console.log('add a sub-folder sub3 of sub1') })
-    // .then(_ => selenium.getFolderNamed('sub1'))
-    // // select folder & then right-click.
-    // // If sub1's parent is selected, the context menu for sub1 will not contain 'create sub-folder'
-    // // Filed as bug #143002343. Once fixed, we can remove the select in order to regression test
-    // .then(folderEle => {
-    //   return folderEle.click()
-    //   .then(_ => selenium.waitForElementToHaveClass(folderEle, 'sub1 folder', 'isSelected', 10000))
-    //   .then(_ => driver.actions().click(folderEle, 2).perform()) // right-click
-    // })
-    // .then(_ => selenium.waitForCssElementVisible('.FolderItem-context-create-subfolder'))
-    // .then(_ => selenium.clickCssElement('.FolderItem-context-create-subfolder'))
-    // .then(_ => selenium.waitForCssElementVisible('.modal .CreateFolder'))
-    // .then(_ => driver.findElement(By.css('.CreateFolder-input-title-input')))
-    // .then(ele => ele.sendKeys('sub3'))
-    // .then(_ => selenium.clickCssElement('.CreateFolder-save'))
-    // .then(_ => selenium.waitForCssElementNotVisible('.modal .CreateFolder'))
-    // .then(_ => selenium.waitForIdle())
+    .then(_ => { DEBUG && console.log('add a sub-folder sub3 of sub1') })
+    .then(_ => selenium.getFolderNamed('sub1'))
+    // select folder & then right-click.
+    // If sub1's parent is selected, the context menu for sub1 will not contain 'create sub-folder'
+    // Filed as bug #143002343. Once fixed, we can remove the select in order to regression test
+    .then(folderEle => {
+      return folderEle.click()
+      .then(_ => selenium.waitForElementToHaveClass(folderEle, 'sub1 folder', 'isSelected', 10000))
+      .then(_ => driver.actions().click(folderEle, 2).perform()) // right-click
+    })
+    .then(_ => selenium.waitForCssElementVisible('.FolderItem-context-create-subfolder'))
+    .then(_ => selenium.clickCssElement('.FolderItem-context-create-subfolder'))
+    .then(_ => selenium.waitForCssElementVisible('.modal .CreateFolder'))
+    .then(_ => driver.findElement(By.css('.CreateFolder-input-title-input')))
+    .then(ele => ele.sendKeys('sub3'))
+    .then(_ => selenium.clickCssElement('.CreateFolder-save'))
+    .then(_ => selenium.waitForCssElementNotVisible('.modal .CreateFolder'))
+    .then(_ => selenium.waitForIdle())
 
     // // this doesn't work yet
     // .then(_ => { DEBUG && console.log('move sub3 to be under sub2') })

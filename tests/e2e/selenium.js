@@ -60,7 +60,7 @@ if (USE_SAUCE) {
 export const BASE_URL = 'http://localhost:8080'
 
 // let selenium tests run. jest's default is an unreasonable 5 seconds
-jasmine.DEFAULT_TIMEOUT_INTERVAL = (DEBUG && !USE_SAUCE) ? 10000 : 60000
+jasmine.DEFAULT_TIMEOUT_INTERVAL = (DEBUG && !USE_SAUCE) ? 30000 : 90000
 
 var allTestsPassed = true
 var failedTests = []
@@ -236,13 +236,14 @@ export function waitForIdle (optTimeout) {
   return driver.then(_ => { DEBUG && console.log('waitForIdle') })
   .then(_ => driver.wait(
     _ => {
-      let idle
       return driver
-      // .then(_ => new Promise(resolve => setTimeout(resolve, 200)))
+      .then(_ => { return new Promise(resolve => setTimeout(resolve, 500)) })
       .then(_ => driver.executeScript('return window.zorroa.getRequestsSynced()'))
-      .then(s => { idle = !!s })
-      // .then(_ => { DEBUG && console.log('waitForIdle', {idle}) })
-      .then(_ => idle)
+      .then(s => {
+        const idle = !!s
+        DEBUG && console.log('waitForIdle', {idle})
+        return idle
+      })
     }
     , optTimeout, 'waitForIdle timeout'
   ))
