@@ -1,4 +1,6 @@
-import { AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR, AUTH_PERMISSIONS, AUTH_SYNC } from '../constants/actionTypes'
+import {
+  AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR, AUTH_PERMISSIONS,
+  AUTH_SYNC, AUTH_CHANGE_PASSWORD, AUTH_DEFAULTS } from '../constants/actionTypes'
 import User from '../models/User'
 
 const initialState = {
@@ -22,6 +24,11 @@ export default function (state = initialState, action) {
     }
     case AUTH_SYNC:
       return { ...state, sync: action.payload }
+    case AUTH_DEFAULTS:
+      return { ...state, defaults: action.payload }
+    case AUTH_CHANGE_PASSWORD: {
+      return { ...state, changePassword: action.payload }
+    }
   }
 
   return state

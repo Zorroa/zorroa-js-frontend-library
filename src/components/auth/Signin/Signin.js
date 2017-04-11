@@ -1,107 +1,138 @@
 import React, { Component, PropTypes } from 'react'
-import { Link } from 'react-router'
+import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { reduxForm, Field } from 'redux-form'
+import { Link } from 'react-router'
 import classnames from 'classnames'
 
-import Logo from '../../../components/Logo'
-import * as actions from '../../../actions/authAction'
+import Logo from '../../Logo'
+import { signinUser, authError } from '../../../actions/authAction'
 
 class Signin extends Component {
   static propTypes = {
-    signinUser: PropTypes.func.isRequired,
-    handleSubmit: PropTypes.func.isRequired,
-    pristine: PropTypes.bool,
-    submitting: PropTypes.bool,
-    errorMessage: PropTypes.string
+    error: PropTypes.string,
+    defaults: PropTypes.object,
+    actions: PropTypes.object
   }
 
   state = {
     errTime: 0,
-    submitTime: 0
+    username: '',
+    password: '',
+    host: '',
+    ssl: false
   }
 
-  handleFormSubmit ({ username, password, ssl, host }) {
+  componentWillMount () {
+    if (this.props.defaults) {
+      this.setState({...this.props.defaults})
+    }
+    this.clearError()
+  }
+
+  clearError = () => {
+    this.props.actions.authError()
+  }
+
+  signin = (event) => {
+    const { username, password, ssl, host } = this.state
     const protocol = ssl ? 'https:' : 'http:'
+    this.props.actions.signinUser(username, password, protocol, host)
+    this.forceUpdate()
+  }
+
+  changeUsername = (event) => {
+    this.setState({username: event.target.value})
+    this.clearError()
+  }
+
+  changePassword = (event) => {
+    this.setState({password: event.target.value})
+    this.clearError()
+  }
+
+  changeHost = (event) => {
+    const bareHost = event.target.value
     // strip the protocol & port if this is copy/pasted
-    let bareHost
-    if (host) bareHost = host.replace(/http.?:\/\//, '').replace(/:8066.*/, '')
-    this.props.signinUser({ username, password, protocol, host: bareHost })
-    // this is only to force a re-render
-    this.setState({submitTime: Date.now()})
+    const host = bareHost.replace(/http.?:\/\//, '').replace(/:[0-9]{2,4}.*/, '')
+    this.setState({host})
+    this.clearError()
+  }
+
+  changeSSL = (event) => {
+    this.setState({ ssl: !this.state.ssl })
+    this.clearError()
+  }
+
+  submit = (event) => {
+    if (event.key === 'Enter') {
+      this.signin()
+    }
   }
 
   renderAlert () {
+    const { error } = this.props
     let changed = false
     let msg = ''
-    if (this.props.errorMessage) {
+    if (error) {
       if (Date.now() - this.state.errTime > 300) {
         changed = true
         setTimeout(() => { this.setState({ errTime: Date.now() }) }, 0)
       }
-      console.log(this.props.errorMessage)
-      msg = (<div className="auth-error-msg">The username and/or password don&rsquo;t match. Please try again or use the <Link className="" to="/signup">forgot password</Link> link.</div>)
+      console.log(error)
+      msg = (<div className="auth-error-msg">The username and/or password don&rsquo;t match. Please try again or use the <Link className="" to="/forgot">forgot password</Link> link.</div>)
     }
     return (<div className={classnames('auth-error', {changed})}>{msg}</div>)
   }
 
-  renderField ({ input, label, type, meta: { touched, error } }) {
-    let msg = touched && error ? error : (<span>&nbsp;</span>)
-    let inputClass = `auth-input auth-${type}`
-    return (
-      <div className="auth-field">
-        <input {...input} type={type} className={inputClass} />
-        <label className="auth-label">{label}</label>
-        <div className="auth-validation-error">{msg}</div>
-      </div>
-    )
-  }
-
   render () {
-    const { handleSubmit, pristine, submitting } = this.props
-
+    const { username, password, host, ssl } = this.state
+    const disabled = !username || !username.length || (!PROD && (!host || !host.length))
     return (
-      <div className="auth flexCenter">
-        <div className="auth-box flexColCenter">
-          <div className="auth-logo flexCenter">
+      <div className="auth">
+        <div className="auth-box">
+          <div className="auth-logo">
             <Logo/>
           </div>
-          <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))} className="auth-form flexColCenter flexJustifySpaceBetween">
-            {this.renderAlert()}
-            <Field name="username" label="Username" component={this.renderField} type="text" />
-            <Field name="password" label="Password" component={this.renderField} type="password"/>
-            { !PROD && <Field name="host" label="Host" component={this.renderField} type="text" /> }
-            { !PROD && <div className="auth-field"><Field name="ssl" label="SSL" component="input" type="checkbox" /><label className="auth-label">Use SSL (HTTPS) for HOST</label></div>}
-            <button action="submit" disabled={pristine || submitting} className="auth-button-primary">LOGIN</button>
-          </form>
-          <Link className="auth-forgot" to="/signup">Forgot Password?</Link>
+          <div className="auth-form">
+            { this.renderAlert() }
+            <div className="auth-field">
+              <input className="auth-input" type="text" value={username} name="username"
+                     onChange={this.changeUsername} onKeyDown={!disabled && this.submit}/>
+              <label className="auth-label">Username</label>
+            </div>
+            <div className="auth-field">
+              <input className="auth-input" type="password" value={password} name="password"
+                     onChange={this.changePassword} onKeyDown={!disabled && this.submit}/>
+              <label className="auth-label">Password</label>
+            </div>
+            { !PROD && (
+              <div className="auth-host">
+                <div className="auth-field">
+                  <input className="auth-input flexOn" type="text" value={host} name="host"
+                         onChange={this.changeHost} onKeyDown={!disabled && this.submit}/>
+                  <label className="auth-label">Archivist</label>
+                </div>
+                <div className="flexRowCenter">
+                  <input type="checkbox" checked={ssl} onChange={this.changeSSL} name="ssl"/>
+                  <label className="auth-label">SSL</label>
+                </div>
+              </div>
+            )}
+            <div className={classnames('auth-button-primary', {disabled})} onClick={!disabled && this.signin}>Login</div>
+          </div>
+          <Link className="auth-forgot" to="/forgot">Forgot Password?</Link>
         </div>
       </div>
     )
   }
 }
 
-const validate = values => {
-  const errors = {}
-  if (!values.username) {
-    errors.username = 'Please enter a username'
-  }
-  if (!values.password) {
-    errors.password = 'Please enter a password'
-  }
-  if (!values.host) {
-    errors.host = 'Please enter a hostname'
-  }
-  return errors
-}
-
-const form = reduxForm({
-  form: 'signin',
-  validate
-})
-
-export default connect(
-  state => ({
-    errorMessage: state.auth.error
-  }), actions
-)(form(Signin))
+export default connect(state => ({
+  error: state.auth.error,
+  defaults: state.auth.defaults
+}), dispatch => ({
+  actions: bindActionCreators({
+    signinUser,
+    authError
+  }, dispatch)
+}))(Signin)
