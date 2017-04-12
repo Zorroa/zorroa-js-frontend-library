@@ -8,6 +8,7 @@ import { resetPassword } from '../../../actions/authAction'
 class ResetPassword extends Component {
   static propTypes = {
     actions: PropTypes.object,
+    error: PropTypes.string,
     location: PropTypes.object
   }
 
@@ -33,13 +34,14 @@ class ResetPassword extends Component {
       <ChangePassword
         onChangePassword={this.changePassword}
         onCancel={this.cancel}
-        fullscreen={true}/>
+        fullscreen={true}
+        error={this.props.error}/>
     )
   }
 }
 
 export default connect(state => ({
-
+  error: state.auth.error
 }), dispatch => ({
   actions: bindActionCreators({
     resetPassword

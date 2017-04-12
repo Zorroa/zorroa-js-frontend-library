@@ -7,7 +7,8 @@ export default class ChangePassword extends Component {
   static propTypes = {
     onChangePassword: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
-    fullscreen: PropTypes.bool.isRequired
+    fullscreen: PropTypes.bool.isRequired,
+    error: PropTypes.string
   }
 
   state = {
@@ -40,6 +41,7 @@ export default class ChangePassword extends Component {
     const mismatch = password.length && password !== password2
     const disabled = !password.length || mismatch
     const fullscreen = this.props.fullscreen
+    const error = this.props.error || (mismatch ? 'Passwords do not match' : '')
     return (
       <div className={classnames('ChangePassword', {fullscreen})}>
         { !fullscreen && (
@@ -57,7 +59,7 @@ export default class ChangePassword extends Component {
             </div>
           )}
           <div className="auth-form">
-            <div className="auth-error">{mismatch ? 'Passwords do not match' : ''}</div>
+            <div className="auth-error">{error}</div>
             <div className="auth-field">
               <input className="auth-input" type="password" value={password}
                      onChange={this.changePassword} onKeyDown={!disabled && this.submit}/>

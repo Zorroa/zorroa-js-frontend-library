@@ -6,11 +6,12 @@ import classnames from 'classnames'
 import Logo from '../../Logo'
 import User from '../../../models/User'
 import { isValidEmail } from '../../../services/jsUtil'
-import { forgotPassword } from '../../../actions/authAction'
+import { forgotPassword, authError } from '../../../actions/authAction'
 
 class ForgotPassword extends Component {
   static propTypes = {
     user: PropTypes.instanceOf(User),
+    error: PropTypes.string,
     actions: PropTypes.object
   }
 
@@ -22,6 +23,10 @@ class ForgotPassword extends Component {
     return {
       router: PropTypes.object
     }
+  }
+
+  componentWillMount () {
+    this.props.actions.authError()    // clear any existing errors
   }
 
   changeEmail = (event) => {
@@ -41,7 +46,7 @@ class ForgotPassword extends Component {
   }
 
   render () {
-    const { user } = this.props
+    const { user, error } = this.props
     const { email } = this.state
     const disabled = !email || !email.length || !isValidEmail(email)
     return (
@@ -51,6 +56,7 @@ class ForgotPassword extends Component {
             <Logo/>
           </div>
           <div className="auth-form">
+            <div className="auth-error">{error}</div>
             <div className="auth-field">
               <div className="auth-forgot-label">Enter your email below to reset your password:</div>
               <input className="auth-input" type="text" value={email}
@@ -67,7 +73,8 @@ class ForgotPassword extends Component {
 }
 
 export default connect(state => ({
-  user: state.auth.user
+  user: state.auth.user,
+  error: state.auth.error
 }), dispatch => ({
-  actions: bindActionCreators({ forgotPassword }, dispatch)
+  actions: bindActionCreators({ forgotPassword, authError }, dispatch)
 }))(ForgotPassword)

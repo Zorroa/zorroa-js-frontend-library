@@ -134,7 +134,7 @@ export function signinUser (username, password, protocol, host) {
       .then(response => {
         authorize(dispatch, response.data)
       })
-      .catch(error => dispatch(authError('Bad Login Info: ' + error)))
+      .catch(error => dispatch(authError('Bad Login Info: ' + error.response.data.message)))
   }
 }
 
@@ -197,7 +197,7 @@ export function forgotPassword (email) {
         dispatch({ type: UNAUTH_USER, payload: response.data })
         browserHistory.push('/signin')
       })
-      .catch(error => dispatch(authError('Cannot reset ' + email + ': ' + error)))
+      .catch(error => dispatch(authError('Cannot reset ' + email + ': ' + error.response.data.message)))
   }
 }
 
@@ -218,7 +218,7 @@ export function updatePassword (user, password) {
         dispatch({ type: UNAUTH_USER, payload: response.data })
         browserHistory.push('/signin')
       })
-      .catch(error => dispatch(authError('Cannot update ' + user.username + ' password: ' + error)))
+      .catch(error => dispatch(authError('Cannot update ' + user.username + ' password: ' + error.response.data.message)))
   }
 }
 
@@ -234,7 +234,7 @@ export function resetPassword (password, token, protocol, host) {
       .then(response => {
         authorize(dispatch, response.data)
       })
-      .catch(error => dispatch(authError('Cannot reset password: ' + error)))
+      .catch(error => dispatch(authError('Cannot reset password: ' + error.response.data.message)))
   }
 }
 
