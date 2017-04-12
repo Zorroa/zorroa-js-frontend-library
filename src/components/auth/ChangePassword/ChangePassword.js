@@ -7,7 +7,7 @@ export default class ChangePassword extends Component {
   static propTypes = {
     onChangePassword: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
-    fullscreen: PropTypes.bool.isRequired,
+    fullscreen: PropTypes.bool,
     error: PropTypes.string
   }
 

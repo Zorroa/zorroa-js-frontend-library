@@ -134,7 +134,7 @@ export function signinUser (username, password, protocol, host) {
       .then(response => {
         authorize(dispatch, response.data)
       })
-      .catch(error => dispatch(authError('Bad Login Info: ' + error.response.data.message)))
+      .catch(error => dispatch(authError('Bad Login Info', error)))
   }
 }
 
@@ -197,7 +197,7 @@ export function forgotPassword (email) {
         dispatch({ type: UNAUTH_USER, payload: response.data })
         browserHistory.push('/signin')
       })
-      .catch(error => dispatch(authError('Cannot reset ' + email + ': ' + error.response.data.message)))
+      .catch(error => dispatch(authError('Cannot reset ' + email, error)))
   }
 }
 
@@ -218,7 +218,7 @@ export function updatePassword (user, password) {
         dispatch({ type: UNAUTH_USER, payload: response.data })
         browserHistory.push('/signin')
       })
-      .catch(error => dispatch(authError('Cannot update ' + user.username + ' password: ' + error.response.data.message)))
+      .catch(error => dispatch(authError('Cannot update ' + user.username + ' password', error)))
   }
 }
 
@@ -234,7 +234,7 @@ export function resetPassword (password, token, protocol, host) {
       .then(response => {
         authorize(dispatch, response.data)
       })
-      .catch(error => dispatch(authError('Cannot reset password: ' + error.response.data.message)))
+      .catch(error => dispatch(authError('Cannot reset password', error)))
   }
 }
 
@@ -249,7 +249,7 @@ export function signoutUser (user, host) {
         dispatch({ type: AUTH_DEFAULTS, payload: {host, username: user.username, ssl: true} })
         localStorage.setItem(USER_ITEM, JSON.stringify(new User({...user, id: -1})))
       })
-      .catch(error => dispatch(authError(error)))
+      .catch(error => dispatch(authError('Cannot signout', error)))
     } else {
       dispatch({ type: UNAUTH_USER, payload: {} })
       localStorage.setItem(USER_ITEM, JSON.stringify(new User({...user, id: -1})))
@@ -257,10 +257,15 @@ export function signoutUser (user, host) {
   }
 }
 
-export function authError (error) {
+export function authError (msg, error) {
+  let payload
+  if (msg && error) {
+    const message = error.message ? error.message : (error.response && error.response.data ? error.response.data.message : 'Unknown error')
+    payload = msg + ': ' + message
+  }
   return {
     type: AUTH_ERROR,
-    payload: error
+    payload
   }
 }
 

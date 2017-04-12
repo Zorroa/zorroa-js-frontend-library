@@ -88,7 +88,7 @@ class Workspace extends Component {
   }
 
   updatePassword = (password) => {
-    this.props.actions.updatePassword(password)
+    this.props.actions.updatePassword(this.props.user, password)
   }
 
   cancelPasswordUpdate = () => {

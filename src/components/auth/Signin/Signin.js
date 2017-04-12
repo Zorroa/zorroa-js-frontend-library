@@ -79,7 +79,7 @@ class Signin extends Component {
         setTimeout(() => { this.setState({ errTime: Date.now() }) }, 0)
       }
       console.log(error)
-      msg = (<div className="auth-error-msg">The username and/or password don&rsquo;t match. Please try again or use the <Link className="" to="/forgot">forgot password</Link> link.</div>)
+      msg = (<div className="auth-error-msg">{error}. Please try again or use the <Link className="" to="/forgot">forgot password</Link> link.</div>)
     }
     return (<div className={classnames('auth-error', {changed})}>{msg}</div>)
   }
