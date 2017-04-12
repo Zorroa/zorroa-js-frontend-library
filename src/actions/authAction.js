@@ -134,7 +134,7 @@ export function signinUser (username, password, protocol, host) {
       .then(response => {
         authorize(dispatch, response.data)
       })
-      .catch(error => dispatch(authError('Bad Login Info: ' + error)))
+      .catch(error => dispatch(authError('Bad Login Info: ' + error.response.data.message)))
   }
 }
 
@@ -190,14 +190,14 @@ function authorize (dispatch, json) {
 
 export function forgotPassword (email) {
   return dispatch => {
-    archivistPost(dispatch, '/api/v1/forgot', {email}, {
+    archivistPost(dispatch, '/api/v1/send-password-reset-email', {email}, {
       headers: { 'X-Requested-With': 'XMLHttpRequest' } // disable browser auth
     })
       .then(response => {
         dispatch({ type: UNAUTH_USER, payload: response.data })
         browserHistory.push('/signin')
       })
-      .catch(error => dispatch(authError('Cannot reset ' + email + ': ' + error)))
+      .catch(error => dispatch(authError('Cannot reset ' + email + ': ' + error.response.data.message)))
   }
 }
 
@@ -218,7 +218,23 @@ export function updatePassword (user, password) {
         dispatch({ type: UNAUTH_USER, payload: response.data })
         browserHistory.push('/signin')
       })
-      .catch(error => dispatch(authError('Cannot update ' + user.username + ' password: ' + error)))
+      .catch(error => dispatch(authError('Cannot update ' + user.username + ' password: ' + error.response.data.message)))
+  }
+}
+
+export function resetPassword (password, token, protocol, host) {
+  return dispatch => {
+    createArchivist(dispatch, protocol, host)
+    archivistPost(dispatch, '/api/v1/reset-password', {password}, {
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',   // disable browser auth
+        'X-Archivist-Recovery-Token': token
+      }
+    })
+      .then(response => {
+        authorize(dispatch, response.data)
+      })
+      .catch(error => dispatch(authError('Cannot reset password: ' + error.response.data.message)))
   }
 }
 

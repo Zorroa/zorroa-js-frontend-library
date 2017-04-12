@@ -82,8 +82,7 @@ class Workspace extends Component {
     }
     if (!nextProps.app.modal && (nextProps.changePassword || (nextProps.user && nextProps.user.changePassword))) {
       const width = '300px'
-      const cancel = nextProps.user.changePassword ? null : this.cancelPasswordUpdate
-      const body = <ChangePassword onChangePassword={this.updatePassword} onCancel={cancel}/>
+      const body = <ChangePassword onChangePassword={this.updatePassword} onCancel={this.cancelPasswordUpdate}/>
       this.props.actions.showModal({body, width})
     }
   }
