@@ -1,14 +1,13 @@
 import React, { Component, PropTypes } from 'react'
 import classnames from 'classnames'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
-import { updatePassword } from '../../../actions/authAction'
 
 import Logo from '../../Logo'
 
-class ChangePassword extends Component {
+export default class ChangePassword extends Component {
   static propTypes = {
-    onCancel: PropTypes.func
+    onChangePassword: PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired,
+    fullscreen: PropTypes.bool.isRequired
   }
 
   state = {
@@ -25,7 +24,7 @@ class ChangePassword extends Component {
   }
 
   updatePassword = (event) => {
-    this.props.actions.updatePassword(this.state.password)
+    this.props.onChangePassword(this.state.password)
   }
 
   cancel = (event) => {
@@ -40,7 +39,7 @@ class ChangePassword extends Component {
     const { password, password2 } = this.state
     const mismatch = password.length && password !== password2
     const disabled = !password.length || mismatch
-    const fullscreen = !this.props.onCancel
+    const fullscreen = this.props.fullscreen
     return (
       <div className={classnames('ChangePassword', {fullscreen})}>
         { !fullscreen && (
@@ -78,10 +77,3 @@ class ChangePassword extends Component {
     )
   }
 }
-
-export default connect(state => ({
-}), dispatch => ({
-  actions: bindActionCreators({
-    updatePassword
-  }, dispatch)
-}))(ChangePassword)

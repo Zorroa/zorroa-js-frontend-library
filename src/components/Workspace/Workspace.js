@@ -15,7 +15,7 @@ import Metadata from '../Metadata'
 import Collapsible from '../Collapsible'
 import CreateImport from '../Header/CreateImport'
 import { iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible, showModal, hideModal } from '../../actions/appActions'
-import { getUserPermissions, changePassword } from '../../actions/authAction'
+import { getUserPermissions, updatePassword, changePassword } from '../../actions/authAction'
 import ChangePassword from '../auth/ChangePassword'
 import User from '../../models/User'
 import Lightbox from '../Lightbox'
@@ -82,10 +82,13 @@ class Workspace extends Component {
     }
     if (!nextProps.app.modal && (nextProps.changePassword || (nextProps.user && nextProps.user.changePassword))) {
       const width = '300px'
-      const cancel = nextProps.user.changePassword ? null : this.cancelPasswordUpdate
-      const body = <ChangePassword onCancel={cancel}/>
+      const body = <ChangePassword onChangePassword={this.updatePassword} onCancel={this.cancelPasswordUpdate}/>
       this.props.actions.showModal({body, width})
     }
+  }
+
+  updatePassword = (password) => {
+    this.props.actions.updatePassword(password)
   }
 
   cancelPasswordUpdate = () => {
@@ -231,6 +234,7 @@ export default connect(state => ({
     iconifyRightSidebar,
     toggleCollapsible,
     getUserPermissions,
+    updatePassword,
     changePassword,
     showModal,
     hideModal

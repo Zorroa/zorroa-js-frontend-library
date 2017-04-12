@@ -222,6 +222,21 @@ export function updatePassword (user, password) {
   }
 }
 
+export function resetPassword (password, token) {
+  return dispatch => {
+    archivistPost(dispatch, '/api/v1/reset-password', {password}, {
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',   // disable browser auth
+        'X-Archivist-Recovery-Token': token
+      }
+    })
+      .then(response => {
+        authorize(dispatch, response.data)
+      })
+      .catch(error => dispatch(authError('Cannot reset password: ' + error)))
+  }
+}
+
 export function signoutUser (user, host) {
   return dispatch => {
     if (archivist) {
