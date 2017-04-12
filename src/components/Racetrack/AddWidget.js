@@ -6,6 +6,7 @@ import classnames from 'classnames'
 import Toggle from '../Toggle'
 import DisplayOptions from '../DisplayOptions'
 import * as WidgetInfo from './WidgetInfo'
+import Permission from '../../models/Permission'
 import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import { showModal, hideModal } from '../../actions/appActions'
 
@@ -13,6 +14,7 @@ class AddWidget extends Component {
   static propTypes = {
     fieldTypes: PropTypes.object,
     widgets: PropTypes.arrayOf(PropTypes.object),
+    permissions: PropTypes.arrayOf(Permission),
     actions: PropTypes.object
   }
 
@@ -60,7 +62,8 @@ class AddWidget extends Component {
     this.setState({filterText: ''})
   }
 
-  static widgetInfos = (widgets, filterText) => {
+  // static because this filter is also used in QuickAddWidget
+  static widgetInfos = (widgets, filterText, permissions) => {
     const filter = filterText.toLowerCase()
     const singletonTypes = new Set([ WidgetInfo.SimilarHashWidgetInfo.type,
       WidgetInfo.FiletypeWidgetInfo.type ])
@@ -70,12 +73,22 @@ class AddWidget extends Component {
     })
     return Object.keys(WidgetInfo).map(k => WidgetInfo[k]).filter(widgetInfo => (
       !singletons.has(widgetInfo.type)) &&
-      widgetInfo.title.toLowerCase().includes(filter)
+      widgetInfo.title.toLowerCase().includes(filter) &&
+      AddWidget.hasPermission(widgetInfo.permissions, permissions)
     )
   }
 
+  static hasPermission = (widgetPermissions, permissions) => {
+    if (!widgetPermissions) return true
+    for (let i = 0; i < widgetPermissions.length; ++i) {
+      const permission = widgetPermissions[i]
+      if (permissions.findIndex(p => (p.name === permission.name && p.type === permission.type)) >= 0) return true
+    }
+    return false
+  }
+
   render () {
-    const { widgets } = this.props
+    const { widgets, permissions } = this.props
     const { filterText, showDescriptions } = this.state
     const isEmptyFilter = !filterText || !filterText.length
     return (
@@ -109,7 +122,7 @@ class AddWidget extends Component {
             <div className="text-val">{showDescriptions ? 'On' : 'Off'}</div>
           </div>
           <div className="widget-grid">
-            { AddWidget.widgetInfos(widgets, filterText).map(widgetInfo => (
+            { AddWidget.widgetInfos(widgets, filterText, permissions).map(widgetInfo => (
               <div className="widget" key={widgetInfo.type}>
                 <div className="title-bar" style={{backgroundColor: widgetInfo.color}}
                      onClick={showDescriptions ? null : this.addWidget.bind(this, widgetInfo)}>
@@ -136,7 +149,8 @@ class AddWidget extends Component {
 
 export default connect(state => ({
   fieldTypes: state.assets.types,
-  widgets: state.racetrack.widgets
+  widgets: state.racetrack.widgets,
+  permissions: state.permissions.all
 }), dispatch => ({
   actions: bindActionCreators({ modifyRacetrackWidget, showModal, hideModal }, dispatch)
 }))(AddWidget)

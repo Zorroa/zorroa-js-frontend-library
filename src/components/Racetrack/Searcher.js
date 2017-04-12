@@ -181,13 +181,15 @@ class Searcher extends Component {
         // FIXME: Disable saving search to user settings to avoid conflicts
         // actions.saveUserSettings(user, { ...userSettings, search: assetSearch })
       }
-      if (folders && folders.size > 1) {
+      if (folders && folders.size > 1 && assetSearch && !assetSearch.empty()) {
         // New query, get all the filtered folder counts
         this.queueFolderCounts(new Set([...folders.keys()]), assetSearch)
       }
     } else if (modifiedFolderIds && modifiedFolderIds.size) {
       this.queueFolderCounts(modifiedFolderIds)
-      this.queueFolderCounts(modifiedFolderIds, assetSearch)
+      if (assetSearch && !assetSearch.empty()) {
+        this.queueFolderCounts(modifiedFolderIds, assetSearch)
+      }
     }
 
     if (this.inflightQuery && query && this.inflightQuery.equals(query)) this.inflightQuery = null
