@@ -588,13 +588,19 @@ class Assets extends Component {
   }
 
   render () {
-    const { assets, totalCount, tableHeight, showTable, showMultipage, layout, thumbSize, assetsCounter } = this.props
+    const { assets, query, totalCount, tableHeight, showTable, showMultipage, layout, thumbSize, assetsCounter } = this.props
     const { collapsed, tableIsResizing } = this.state
 
     // Trigger layout if assets change.
     if (assetsCounter !== this.assetsCounter) {
       this.queueAssetsLayout()
-      this.scrollToSelection()
+
+      // Only scroll to selection if we haven't already loaded the selection.
+      // Invalidate the auto-load cache each time we have a new bare search.
+      if (!query.from) {
+        this.loaded = 0
+        this.scrollToSelection()
+      }
     }
     this.assetsCounter = assetsCounter
 
