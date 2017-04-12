@@ -222,8 +222,9 @@ export function updatePassword (user, password) {
   }
 }
 
-export function resetPassword (password, token) {
+export function resetPassword (password, token, protocol, host) {
   return dispatch => {
+    createArchivist(dispatch, protocol, host)
     archivistPost(dispatch, '/api/v1/reset-password', {password}, {
       headers: {
         'X-Requested-With': 'XMLHttpRequest',   // disable browser auth

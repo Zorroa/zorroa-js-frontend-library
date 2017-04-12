@@ -70,7 +70,7 @@ export default class ChangePassword extends Component {
             </div>
             <div className={classnames('auth-button-primary', {disabled})}
                  onClick={!disabled && this.updatePassword}>Update</div>
-            { !fullscreen && <div className="auth-forgot" onClick={this.cancel}>Cancel</div> }
+            <div className="auth-forgot" onClick={this.cancel}>Cancel</div>
           </div>
         </div>
       </div>

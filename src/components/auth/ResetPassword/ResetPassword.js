@@ -19,7 +19,9 @@ class ResetPassword extends Component {
 
   changePassword = (password) => {
     const token = this.props.location && this.props.location.query && this.props.location.query.token
-    this.props.actions.resetPassword(password, token)
+    const protocol = window.location.protocol
+    const host = window.location.host
+    this.props.actions.resetPassword(password, token, protocol, host)
   }
 
   cancel = (event) => {
