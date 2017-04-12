@@ -19,9 +19,9 @@ const Controlbar = (props) => (
     { (props.title || showPages(props)) && (showZoom(props) || showMultipage(props)) && <div className="Controlbar-separator" /> }
     { showZoom(props) && (
         <div className="Controlbar-section">
-          <button disabled={!props.onZoomOut} className="icon-zoom-out" onClick={props.onZoomOut} />
-          <button disabled={!props.onFit} className="icon-expand3" onClick={props.onFit} />
-          <button disabled={!props.onZoomIn} className="icon-zoom-in" onClick={props.onZoomIn} />
+          <button disabled={!props.onZoomOut} className="Controlbar-zoom-out icon-zoom-out" onClick={props.onZoomOut} />
+          <button disabled={!props.onFit} className="Controlbar-zoom-reset icon-expand3" onClick={props.onFit} />
+          <button disabled={!props.onZoomIn} className="Controlbar-zoom-in icon-zoom-in" onClick={props.onZoomIn} />
         </div>
       ) }
     { showZoom(props) && showMultipage(props) && <div className="Controlbar-separator" /> }
