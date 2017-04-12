@@ -59,7 +59,8 @@ export default function (state = initialState, action) {
         const type = types[i]
         const fields = action.payload[type]
         for (let j = 0; !found && j < fields.length; ++j) {
-          if (fields[j] === state.similarField) {
+          if (fields[j].toLowerCase() === similarField.toLowerCase()) {
+            similarField = fields[j]  // In case toLowerCase masked the field
             found = true
           }
         }
@@ -73,7 +74,7 @@ export default function (state = initialState, action) {
           const type = types[i]
           const fields = action.payload[type]
           for (let j = 0; !similarField && j < fields.length; ++j) {
-            if (fields[j].startsWith('Similarity')) {
+            if (fields[j].toLowerCase().startsWith('similarity')) {
               similarField = fields[j]
             }
           }
