@@ -179,8 +179,10 @@ describe('Tags', function () {
     selenium.clickCssElement('.Metadata-item-colors')
     selenium.waitForCssElementVisible('.Racetrack-empty')
 
-    driver.then(_ => { DEBUG && console.log('make sure source.basename tag brings up facet widget') })
+    driver.then(_ => { DEBUG && console.log('open source tag folder') })
     selenium.getTagNamed('Source').then(ele => ele.click())
+
+    driver.then(_ => { DEBUG && console.log('make sure source.basename tag brings up facet widget') })
     selenium.waitForCssElementVisible('.Metadata-item-source-basename')
     selenium.expectCssElementHasClass('.Metadata-item-source-basename', 'isLeaf')
     // there are 2 assetType tags (since assetType is first) - the top most one is the tag folder
@@ -204,7 +206,32 @@ describe('Tags', function () {
     selenium.clickCssElement('.Widget.Facet .WidgetHeader-close')
     selenium.waitForCssElementVisible('.Racetrack-empty')
 
-    // TODO: test date, range, file type widgets (any others?)
+    driver.then(_ => { DEBUG && console.log('make sure source.date tag brings up date widget') })
+    selenium.waitForCssElementVisible('.Metadata-item-source-date')
+    selenium.expectCssElementHasClass('.Metadata-item-source-date', 'isLeaf')
+    selenium.clickCssElement('.Metadata-item-source-date .Metadata-item-widget')
+    selenium.waitForCssElementVisible('.Widget.DateRange')
+    driver.then(_ => { DEBUG && console.log('delete daterange widget') })
+    selenium.clickCssElement('.Widget.DateRange .WidgetHeader-close')
+    selenium.waitForCssElementVisible('.Racetrack-empty')
+
+    driver.then(_ => { DEBUG && console.log('make sure source.fileSize tag brings up range widget') })
+    selenium.waitForCssElementVisible('.Metadata-item-source-fileSize')
+    selenium.expectCssElementHasClass('.Metadata-item-source-fileSize', 'isLeaf')
+    selenium.clickCssElement('.Metadata-item-source-fileSize .Metadata-item-widget')
+    selenium.waitForCssElementVisible('.Widget.Range')
+    driver.then(_ => { DEBUG && console.log('delete Range widget') })
+    selenium.clickCssElement('.Widget.Range .WidgetHeader-close')
+    selenium.waitForCssElementVisible('.Racetrack-empty')
+
+    driver.then(_ => { DEBUG && console.log('make sure source.extension tag brings up range widget') })
+    selenium.waitForCssElementVisible('.Metadata-item-source-extension')
+    selenium.expectCssElementHasClass('.Metadata-item-source-extension', 'isLeaf')
+    selenium.clickCssElement('.Metadata-item-source-extension .Metadata-item-widget')
+    selenium.waitForCssElementVisible('.Widget.Filetype')
+    driver.then(_ => { DEBUG && console.log('delete Filetype widget') })
+    selenium.clickCssElement('.Widget.Filetype .WidgetHeader-close')
+    selenium.waitForCssElementVisible('.Racetrack-empty')
 
     return driver
   })
