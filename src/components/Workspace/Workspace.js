@@ -155,7 +155,7 @@ class Workspace extends Component {
       isIconified: app.leftSidebarIsIconified,
       onOpen: this.toggleCollapsible.bind(this, 'collection'),
       closeIcon: 'icon-collections-simple',
-      className: 'Collections'
+      className: 'Collections-collapsible'
     })
     const MetadataParams = () => ({
       header: (<span>Tags</span>),
@@ -163,7 +163,7 @@ class Workspace extends Component {
       isIconified: app.leftSidebarIsIconified,
       onOpen: this.toggleCollapsible.bind(this, 'metadata'),
       closeIcon: 'icon-binoculars',
-      className: 'Metadata'
+      className: 'Metadata-collapsible'
     })
 
     const { isDroppable, showReloader } = this.state

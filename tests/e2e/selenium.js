@@ -1,4 +1,4 @@
-require('babel-register')({})
+// require('babel-register')({})
 
 /*
 This provides utilities for selenium tests, normally included by a jest test file
@@ -20,6 +20,9 @@ quit()
 
 const DEBUG = false
 
+// selenium promise manager is deprecated; use this to start testing. also works in the shell
+// process.env.SELENIUM_PROMISE_MANAGER = 0
+
 // provide dummy versions of the jest deps in this file
 // this is used for manual testing, i.e., when running this file directly from node w/o jest
 const runningManually = (!global.expect)
@@ -28,7 +31,8 @@ global.jest = global.jest || ({ autoMockOff: _ => {} })
 global.expect = global.expect || (x => {
   return {
     toBe: y => { if (!(x == y)) console.error(`${x} is not ${y}`, new Error().stack) },
-    toBeGreaterThan: y => { if (!(x > y)) console.error(`${x} is not greater than ${y}`, new Error().stack) }
+    toBeGreaterThan: y => { if (!(x > y)) console.error(`${x} is not greater than ${y}`, new Error().stack) },
+    toBeLessThan: y => { if (!(x < y)) console.error(`${x} is not less than ${y}`, new Error().stack) }
   }
 })
 
@@ -56,7 +60,7 @@ if (USE_SAUCE) {
 export const BASE_URL = 'http://localhost:8080'
 
 // let selenium tests run. jest's default is an unreasonable 5 seconds
-jasmine.DEFAULT_TIMEOUT_INTERVAL = (DEBUG && !USE_SAUCE) ? 10000 : 60000
+jasmine.DEFAULT_TIMEOUT_INTERVAL = (DEBUG && !USE_SAUCE) ? 30000 : 90000
 
 var allTestsPassed = true
 var failedTests = []
@@ -232,13 +236,14 @@ export function waitForIdle (optTimeout) {
   return driver.then(_ => { DEBUG && console.log('waitForIdle') })
   .then(_ => driver.wait(
     _ => {
-      let idle
       return driver
-      // .then(_ => new Promise(resolve => setTimeout(resolve, 200)))
+      .then(_ => { return new Promise(resolve => setTimeout(resolve, 500)) })
       .then(_ => driver.executeScript('return window.zorroa.getRequestsSynced()'))
-      .then(s => { idle = !!s })
-      // .then(_ => { DEBUG && console.log('waitForIdle', {idle}) })
-      .then(_ => idle)
+      .then(s => {
+        const idle = !!s
+        DEBUG && console.log('waitForIdle', {idle})
+        return idle
+      })
     }
     , optTimeout, 'waitForIdle timeout'
   ))
@@ -373,30 +378,28 @@ export function getXpathVisible (selector) {
 // ----------------------------------------------------------------------
 // wait until an element is visible (or timeout)
 export function waitForCssElementVisible (selector, optTimeout) {
-  return driver.wait(_ => getCssElementVisible(selector), optTimeout)
-  // An alternative way to wait -- TODO determine if there's a reason to go one way or the other
-  // .then(_ => driver.wait(until.elementLocated(By.css(selector)), 15000))
+  return driver.wait(_ => getCssElementVisible(selector), optTimeout, `timeout waiting for ${selector} to be visible`)
   .then(_ => expectCssElementIsVisible(selector))
 }
 
 // ----------------------------------------------------------------------
 // wait until an xpath selector is visible (or timeout)
 export function waitForXpathVisible (selector, optTimeout) {
-  return driver.wait(_ => getXpathVisible(selector), optTimeout)
+  return driver.wait(_ => getXpathVisible(selector), optTimeout, `timeout waiting for ${selector} to be visible`)
   .then(_ => expectXpathElementIsVisible(selector))
 }
 
 // ----------------------------------------------------------------------
 // wait until a css selector is visible (or timeout)
 export function waitForCssElementNotVisible (selector, optTimeout) {
-  return driver.wait(_ => getCssElementVisible(selector).then(x => !x), optTimeout)
+  return driver.wait(_ => getCssElementVisible(selector).then(x => !x), optTimeout, `timeout waiting for ${selector} to not be visible`)
   .then(_ => expectCssElementIsNotVisible(selector))
 }
 
 // ----------------------------------------------------------------------
 // wait until an xpath selector is visible (or timeout)
 export function waitForXpathNotVisible (selector, optTimeout) {
-  return driver.wait(_ => getXpathVisible(selector).then(x => !x), optTimeout)
+  return driver.wait(_ => getXpathVisible(selector).then(x => !x), optTimeout, `timeout waiting for ${selector} to not be visible`)
   .then(_ => expectXpathElementIsNotVisible(selector))
 }
 
@@ -486,6 +489,74 @@ export function expectElementIsNotVisible (element, elementName) {
 }
 
 // ----------------------------------------------------------------------
+export function doesElementHaveClass (element, className) {
+  return element.getAttribute('class')
+  .then(classes => new RegExp('\\b' + className + '\\b').test(classes))
+}
+
+// ----------------------------------------------------------------------
+export function doesCssElementHaveClass (selector, className) {
+  return driver.findElement(By.css(selector))
+  .then(ele => doesElementHaveClass(ele, className))
+}
+
+// ----------------------------------------------------------------------
+export function expectElementHasClass (element, elementName, className) {
+  return doesElementHaveClass(element, className).then(hasClass => {
+    expect(JSON.stringify({ elementName, hasClass }))
+      .toBe(JSON.stringify({ elementName, hasClass:true }))
+    return hasClass
+  })
+}
+
+// ----------------------------------------------------------------------
+export function expectCssElementHasClass (selector, className) {
+  return doesCssElementHaveClass(selector, className).then(hasClass => {
+    expect(JSON.stringify({ selector, hasClass }))
+      .toBe(JSON.stringify({ selector, hasClass:true }))
+    return hasClass
+  })
+}
+
+// ----------------------------------------------------------------------
+export function expectCssElementDoesntHaveClass (selector, className) {
+  return doesCssElementHaveClass(selector, className).then(hasClass => {
+    expect(JSON.stringify({ selector, hasClass }))
+      .toBe(JSON.stringify({ selector, hasClass:false }))
+    return hasClass
+  })
+}
+
+// ----------------------------------------------------------------------
+// wait until pass element has the class 'className'
+// the elementName argument is only used for logging & errors
+export function waitForElementToHaveClass (element, elementName, className, optTimeout) {
+  driver.wait(_ => doesElementHaveClass(element, className),
+    optTimeout, `waitForElementToHaveClass timeout ${elementName} ${className}`)
+  driver.then(_ => expectElementHasClass(element, elementName, className))
+  return driver
+}
+
+// ----------------------------------------------------------------------
+export function waitForCssElementToHaveClass (selector, className, optTimeout) {
+  driver.wait(_ => doesCssElementHaveClass(selector, className),
+    optTimeout, `waitForCssElementToHaveClass timeout ${selector} ${className}`)
+  driver.then(_ => expectCssElementHasClass(selector, className))
+  return driver
+}
+
+// ----------------------------------------------------------------------
+export function waitForCssElementToNotHaveClass (selector, className, optTimeout) {
+  driver.wait(
+    _ => {
+      return doesCssElementHaveClass(selector, className).then(hasClass => !hasClass)
+    },
+    optTimeout, `waitForCssElementToNotHaveClass timeout ${selector} ${className}`)
+  driver.then(_ => expectCssElementDoesntHaveClass(selector, className))
+  return driver
+}
+
+// ----------------------------------------------------------------------
 export function clickCssElement (selector) {
   return expectCssElementIsVisible(selector)
   .then(_ => driver.findElement(By.css(selector)).click())
@@ -506,6 +577,17 @@ export function getFolderNamed (folderName) {
   return driver.then(_ => { DEBUG && (console.log(`getFolderNamed ${folderName}`)) })
   .then(_ => driver.findElement(By.xpath(xpath)))
 }
+
+// ----------------------------------------------------------------------
+// TODO: have this check the open state; allow explicit open or close
+export function getTagNamed (tagName) {
+  // Find the Metadata-item-toggle attached to a Metadata-item with a descendant matching the given text
+  // http://stackoverflow.com/a/1390680/1424242
+  const xpath = `//div[contains(concat(" ", @class, " "), " Metadata-item ") and descendant::*[contains(text(), "${tagName}")]]`
+  return driver.then(_ => { DEBUG && (console.log(`getTagNamed ${tagName}`)) })
+  .then(_ => driver.findElement(By.xpath(xpath)))
+}
+
 
 // ----------------------------------------------------------------------
 // Get a whole bunch of elements at once.
@@ -536,9 +618,9 @@ if (runningManually) {
   var cleanup = _ => {
     console.log('cleanup')
     if (global.driver) {
-      logout()
-      stopBrowserAndDriver()
-      return global.driver.then(_ => { global.driver = null })
+      return global.driver.then(_ => logout())
+      .then(_ => stopBrowserAndDriver())
+      .then(_ => { global.driver = null })
     }
   }
   process.on('exit', cleanup)
@@ -548,8 +630,8 @@ if (runningManually) {
   global.until = until
   global.Key = Key
 
-  global.driver = startBrowserAndDriver()
-  login()
+  global.driver = startBrowserAndDriver({ description: 'dummy suite' })
+  driver.then(_ => login())
   global.quit = _ => { return cleanup().then(_ => process.exit()) }
   process.stdin.resume() // so the program will not close instantly
   require('util').inspect = function () { return '' } // prevent REPL from displaying return values -- I don't want to see Promises
