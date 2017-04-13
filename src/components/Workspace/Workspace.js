@@ -14,8 +14,9 @@ import Racetrack from '../Racetrack'
 import Metadata from '../Metadata'
 import Collapsible from '../Collapsible'
 import CreateImport from '../Header/CreateImport'
-import { iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible, showModal } from '../../actions/appActions'
-import { getUserPermissions } from '../../actions/authAction'
+import { iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible, showModal, hideModal } from '../../actions/appActions'
+import { getUserPermissions, updatePassword, changePassword } from '../../actions/authAction'
+import ChangePassword from '../auth/ChangePassword'
 import User from '../../models/User'
 import Lightbox from '../Lightbox'
 import Feedback from '../Feedback'
@@ -35,7 +36,8 @@ class Workspace extends Component {
     // state props
     app: PropTypes.object.isRequired,
     user: PropTypes.instanceOf(User),
-    isolatedId: PropTypes.string
+    isolatedId: PropTypes.string,
+    changePassword: PropTypes.bool
   }
 
   state = {
@@ -78,6 +80,20 @@ class Workspace extends Component {
     if (nextProps.app.modal && this.state.isDroppable) {
       this.setState({isDroppable: false})
     }
+    if (!nextProps.app.modal && (nextProps.changePassword || (nextProps.user && nextProps.user.changePassword))) {
+      const width = '300px'
+      const body = <ChangePassword onChangePassword={this.updatePassword} onCancel={this.cancelPasswordUpdate}/>
+      this.props.actions.showModal({body, width})
+    }
+  }
+
+  updatePassword = (password) => {
+    this.props.actions.updatePassword(this.props.user, password)
+  }
+
+  cancelPasswordUpdate = () => {
+    this.props.actions.changePassword(false)
+    this.props.actions.hideModal()
   }
 
   toggleLeftSidebar = () => {
@@ -210,13 +226,17 @@ class Workspace extends Component {
 export default connect(state => ({
   app: state.app,
   user: state.auth.user,
-  isolatedId: state.assets.isolatedId
+  isolatedId: state.assets.isolatedId,
+  changePassword: state.auth.changePassword
 }), dispatch => ({
   actions: bindActionCreators({
     iconifyLeftSidebar,
     iconifyRightSidebar,
     toggleCollapsible,
     getUserPermissions,
-    showModal
+    updatePassword,
+    changePassword,
+    showModal,
+    hideModal
   }, dispatch)
 }))(Workspace)

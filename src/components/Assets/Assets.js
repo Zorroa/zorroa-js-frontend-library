@@ -338,7 +338,6 @@ class Assets extends Component {
       this.scrollToSelection()
     }
     this.scrollToSelectionAfterLayout = false
-    this.loaded = 0
   }
 
   queueAssetsLayout = () => {
@@ -543,7 +542,7 @@ class Assets extends Component {
                     return null
                   }
                   if (index < positions.length && index === assets.length - 1 && assets.length < totalCount &&
-                    assets.length % AssetSearch.maxPageSize && this.loaded !== assets.length) {
+                    this.loaded !== assets.length) {
                     this.loaded = assets.length
                     var nextPageQuery = new AssetSearch(query)
                     nextPageQuery.from = assets.length
@@ -589,13 +588,19 @@ class Assets extends Component {
   }
 
   render () {
-    const { assets, totalCount, tableHeight, showTable, showMultipage, layout, thumbSize, assetsCounter } = this.props
+    const { assets, query, totalCount, tableHeight, showTable, showMultipage, layout, thumbSize, assetsCounter } = this.props
     const { collapsed, tableIsResizing } = this.state
 
     // Trigger layout if assets change.
     if (assetsCounter !== this.assetsCounter) {
       this.queueAssetsLayout()
-      this.scrollToSelection()
+
+      // Only scroll to selection if we haven't already loaded the selection.
+      // Invalidate the auto-load cache each time we have a new bare search.
+      if (!query.from) {
+        this.loaded = 0
+        this.scrollToSelection()
+      }
     }
     this.assetsCounter = assetsCounter
 

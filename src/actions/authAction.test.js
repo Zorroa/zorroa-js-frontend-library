@@ -16,12 +16,13 @@ describe('authActions', () => {
 
   describe('authActionSync', () => {
     it('should generate an error message', () => {
+      const error = { message: 'oh oh' }
       const errmsg = 'something bad'
       const expectedAction = {
         type: types.AUTH_ERROR,
-        payload: errmsg
+        payload: errmsg + ': ' + error.message
       }
-      expect(actions.authError(errmsg)).toEqual(expectedAction)
+      expect(actions.authError(errmsg, error)).toEqual(expectedAction)
     })
   })
 

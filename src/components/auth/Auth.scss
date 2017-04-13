@@ -1,12 +1,14 @@
-@import '../../styles/core-mixins.scss';
+@import '../../styles/core-mixins';
 
 .auth {
+  @include flexCenter;
   background-color: $zorroa-nearwhite;
   height: 100vh;
   width: 100vw;
 }
 
 .auth-box {
+  @include flexColCenter;
   background-color: #fff;
   padding: 50px;
   width: 400px;
@@ -36,15 +38,17 @@
 }
 
 .auth-logo {
+  @include flexCenter;
 }
 
 .auth-forgot {
   display: inline-block;
   font-family: Roboto-Light, sans-serif;
-  font-size: 14px;
+  font-size: 12px;
   margin-top: 16px;
-  color: $zorroa-greyish-brown;
+  color: $zorroa-lightgray;
   text-decoration: none;
+  &:hover { color: $zorroa-sickly-green; }
 }
 
 .auth-button-primary {
@@ -56,23 +60,30 @@
   border: 1px solid transparent;
   cursor: pointer;
   background-color: $zorroa-sickly-green;
+  text-transform: uppercase;
+  &.disabled { background-color: $zorroa-gray; }
   &:hover { background-color: darken($zorroa-sickly-green, 15%); }
   &:active { background-color: darken($zorroa-water-blue, 15%); }
 }
 
 .auth-form {
+  @include flexColCenter;
+  @include flexJustifySpaceBetween;
   width: 100%;
 }
 
 .auth-field {
   width: 100%;
-  margin: 4px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-left: 4px;
+  margin-right: 4px;
 }
 
 .auth-message {
   font-size: 14px;
   color: $zorroa-greyish-brown;
-  margin-top:60;
+  margin-top: 60px;
 }
 
 .auth-validation-error {
@@ -103,4 +114,16 @@
 
 .signout-message {
   margin: 4em;
+}
+
+.auth-forgot-label {
+  color: $zorroa-gray;
+  margin-top: 50px;
+  margin-bottom: 30px;
+}
+
+.auth-host {
+  @include flexRowCenter;
+  @include fullWidth;
+  margin-left: -8px;
 }

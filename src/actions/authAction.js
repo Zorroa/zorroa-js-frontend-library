@@ -1,13 +1,12 @@
 import axios from 'axios'
 import { browserHistory } from 'react-router'
-import { initialize } from 'redux-form'
 import * as api from '../globals/api.js'
 
 import {
   AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR, USER_SETTINGS,
   AUTH_PERMISSIONS, AUTH_SYNC, METADATA_FIELDS,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT, SET_TABLE_FIELD_WIDTH,
-  SHOW_MULTIPAGE, VIDEO_VOLUME
+  SHOW_MULTIPAGE, VIDEO_VOLUME, AUTH_CHANGE_PASSWORD, AUTH_DEFAULTS, LIGHTBAR_FIELDS
 } from '../constants/actionTypes'
 import { USER_ITEM, HOST_ITEM, PROTOCOL_ITEM } from '../constants/localStorageItems'
 import User from '../models/User'
@@ -108,7 +107,6 @@ export function validateUser (user, protocol, host) {
           if (error && error.response && error.response.status === 401) {
             dispatch({type: UNAUTH_USER, payload: error.response.data})
           } else {
-            dispatch(authError('Cannot validate user ' + user.username + ': ' + error))
             browserHistory.push('/signin')
           }
         })
@@ -116,7 +114,14 @@ export function validateUser (user, protocol, host) {
   }
 }
 
-export function signinUser ({ username, password, protocol, host }) {
+export function signinDefaults (username, host, ssl) {
+  return ({
+    type: AUTH_DEFAULTS,
+    payload: {username, host, ssl}
+  })
+}
+
+export function signinUser (username, password, protocol, host) {
   // Submit username+password to server
   return dispatch => {
     // Create a new archivist, if needed for a new host
@@ -129,7 +134,7 @@ export function signinUser ({ username, password, protocol, host }) {
       .then(response => {
         authorize(dispatch, response.data)
       })
-      .catch(error => dispatch(authError('Bad Login Info: ' + error)))
+      .catch(error => dispatch(authError('Bad Login Info', error)))
   }
 }
 
@@ -176,20 +181,61 @@ function authorize (dispatch, json) {
     if (metadata.tableFieldWidths) {
       dispatch({type: SET_TABLE_FIELD_WIDTH, payload: metadata.tableFieldWidths})
     }
+    if (metadata.lightbarFields) {
+      dispatch({type: LIGHTBAR_FIELDS, payload: metadata.lightbarFields})
+    }
   }
   browserHistory.push('/')
 }
 
-export function signupUser ({ username, password }) {
+export function forgotPassword (email, protocol, host) {
   return dispatch => {
-    archivistPost(dispatch, '/signup', {}, { username, password })
+    createArchivist(dispatch, protocol, host)
+    archivistPost(dispatch, '/api/v1/send-password-reset-email', {email}, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' } // disable browser auth
+    })
       .then(response => {
-        const user = User(response.data)
-        dispatch({ type: AUTH_USER, payload: user })
-        localStorage.setItem(USER_ITEM, JSON.stringify(user))
-        browserHistory.push('/')
+        dispatch({ type: UNAUTH_USER, payload: response.data })
+        browserHistory.push('/signin')
       })
-      .catch(error => dispatch(authError('Cannot signin: ' + error)))
+      .catch(error => dispatch(authError('Cannot reset ' + email, error)))
+  }
+}
+
+export function changePassword (state) {
+  return {
+    type: AUTH_CHANGE_PASSWORD,
+    payload: state
+  }
+}
+
+export function updatePassword (user, password) {
+  return dispatch => {
+    user = new User({ ...user, password })
+    archivistPut(dispatch, '/api/v1/users/' + user.id, user, {
+      headers: {'X-Requested-With': 'XMLHttpRequest'} // disable browser auth
+    })
+      .then(response => {
+        dispatch({ type: UNAUTH_USER, payload: response.data })
+        browserHistory.push('/signin')
+      })
+      .catch(error => dispatch(authError('Cannot update ' + user.username + ' password', error)))
+  }
+}
+
+export function resetPassword (password, token, protocol, host) {
+  return dispatch => {
+    createArchivist(dispatch, protocol, host)
+    archivistPost(dispatch, '/api/v1/reset-password', {password}, {
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',   // disable browser auth
+        'X-Archivist-Recovery-Token': token
+      }
+    })
+      .then(response => {
+        authorize(dispatch, response.data)
+      })
+      .catch(error => dispatch(authError('Cannot reset password', error)))
   }
 }
 
@@ -201,10 +247,10 @@ export function signoutUser (user, host) {
       })
       .then(response => {
         dispatch({ type: UNAUTH_USER, payload: response.data })
-        dispatch(initialize('signin', {host, username: user.username, ssl: true}))
+        dispatch({ type: AUTH_DEFAULTS, payload: {host, username: user.username, ssl: true} })
         localStorage.setItem(USER_ITEM, JSON.stringify(new User({...user, id: -1})))
       })
-      .catch(error => dispatch(authError(error)))
+      .catch(error => dispatch(authError('Cannot signout', error)))
     } else {
       dispatch({ type: UNAUTH_USER, payload: {} })
       localStorage.setItem(USER_ITEM, JSON.stringify(new User({...user, id: -1})))
@@ -212,10 +258,15 @@ export function signoutUser (user, host) {
   }
 }
 
-export function authError (error) {
+export function authError (msg, error) {
+  let payload
+  if (msg && error) {
+    const message = error.message ? error.message : (error.response && error.response.data ? error.response.data.message : 'Unknown error')
+    payload = msg + ': ' + message
+  }
   return {
     type: AUTH_ERROR,
-    payload: error
+    payload
   }
 }
 

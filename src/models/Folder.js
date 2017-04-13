@@ -24,7 +24,9 @@ export default class Folder {
       this.dyhiRoot = json.dyhiRoot
       this.acl = json.acl && json.acl.map(entry => (new AclEntry(entry)))
       this.search = json.search && new AssetSearch(json.search)
-      this.childIds = null // set of childIds.
+      this.childCount = json.childCount   // server-managed
+
+      this.childIds = null // client-created set of childIds in reducer
     }
   }
 

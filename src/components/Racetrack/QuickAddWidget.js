@@ -5,19 +5,26 @@ import classnames from 'classnames'
 
 import DisplayOptions from '../DisplayOptions'
 import AddWidget from './AddWidget'
+import Permission from '../../models/Permission'
 import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import { showModal } from '../../actions/appActions'
+import { getAllPermissions } from '../../actions/permissionsAction'
 
 class QuickAddWidget extends Component {
   static propTypes = {
     fieldTypes: PropTypes.object,
     widgets: PropTypes.arrayOf(PropTypes.object),
+    permissions: PropTypes.arrayOf(PropTypes.instanceOf(Permission)),
     actions: PropTypes.object
   }
 
   state = {
     filterText: '',
     selectedWidgetInfo: null
+  }
+
+  componentWillMount () {
+    this.props.actions.getAllPermissions()
   }
 
   addWidget = (widgetInfo, event) => {
@@ -114,10 +121,10 @@ class QuickAddWidget extends Component {
   }
 
   widgetInfos () {
-    const { widgets } = this.props
+    const { widgets, permissions } = this.props
     const { filterText } = this.state
     if (!this.focused && !filterText.length) return []
-    return AddWidget.widgetInfos(widgets, filterText)
+    return AddWidget.widgetInfos(widgets, filterText, permissions)
   }
 
   render () {
@@ -153,7 +160,11 @@ class QuickAddWidget extends Component {
 
 export default connect(state => ({
   fieldTypes: state.assets.types,
-  widgets: state.racetrack.widgets
+  widgets: state.racetrack.widgets,
+  permissions: state.permissions.all
 }), dispatch => ({
-  actions: bindActionCreators({ modifyRacetrackWidget, showModal }, dispatch)
+  actions: bindActionCreators({
+    modifyRacetrackWidget,
+    getAllPermissions,
+    showModal }, dispatch)
 }))(QuickAddWidget)

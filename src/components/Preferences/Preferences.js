@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import JSONTree from 'react-json-tree'
 
 import { hideModal } from '../../actions/appActions'
-import { saveUserSettings } from '../../actions/authAction'
+import { saveUserSettings, changePassword } from '../../actions/authAction'
 import { archivistInfo, archivistHealth, archivistMetrics } from '../../actions/archivistAction'
 import User from '../../models/User'
 
@@ -55,6 +55,11 @@ class Preferences extends Component {
     this.props.actions.saveUserSettings(this.props.user, {})
   }
 
+  changePassword = (event) => {
+    this.props.actions.changePassword(true)
+    this.dismiss()
+  }
+
   render () {
     const { user, info, health, metrics } = this.props
     return (
@@ -73,7 +78,8 @@ class Preferences extends Component {
             <span>{user.email}</span>
           </div>
           <div className="Preferences-curator flexCol">
-            <button className="Preferences-reset" onClick={this.reset}>Reset Defaults</button>
+            <button className="Preferences-reset" onClick={this.reset}>Reset Default Settings</button>
+            <button className="Preferences-reset" onClick={this.changePassword}>Change Password</button>
           </div>
           <div className="Preferences-status">
             <div className='Preferences-build'>
@@ -104,6 +110,7 @@ export default connect(state => ({
 }), dispatch => ({
   actions: bindActionCreators({
     saveUserSettings,
+    changePassword,
     archivistInfo,
     archivistHealth,
     archivistMetrics,

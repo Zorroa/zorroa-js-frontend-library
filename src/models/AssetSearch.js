@@ -3,7 +3,6 @@ import AssetFilter from './AssetFilter'
 export default class AssetSearch {
 
   static autoPageSize = 100
-  static maxPageSize = 1000
 
   constructor (json) {
     if (json) {
@@ -86,6 +85,16 @@ export default class AssetSearch {
     if (this.filter && !this.filter.empty()) return false
     if (this.postFilter && !this.postFilter.empty()) return false
     return true
+  }
+
+  missingField(fields) {
+    if (!fields) return false
+    if (!this.fields) return true
+    for (let i = 0; i < fields.length; ++i) {
+      const field = fields[i]
+      if (this.fields.findIndex(f => (f === field)) < 0) return true
+    }
+    return false
   }
 }
 

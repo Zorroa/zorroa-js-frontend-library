@@ -25,19 +25,42 @@ function escapeQuery (query) {
 }
 
 export function requiredFields (fields, fieldTypes) {
-  const requiredSearchPrefixes = [
-    'proxies', 'clip', 'pages', 'links', 'id',
-    'source.filename', 'source.mediaType', 'source.extension', 'source.clip',
+  const required = [
+    'id',
+    'source.filename', 'source.mediaType', 'source.extension',
     'image.width', 'image.height', 'image.pages',
     'video.width', 'video.height', 'video.pages', 'video.frameRate', 'video.frames'
   ]
+  const prefix = [
+    'links', 'clip', 'source.clip', 'pages', 'proxies'
+  ]
 
-  const req = new Set([...fields])
+  const req = new Set()
   fieldTypes && Object.keys(fieldTypes).forEach(field => {
-    for (let i = 0; i < requiredSearchPrefixes.length; ++i) {
-      if (field.startsWith(requiredSearchPrefixes[i])) {
-        req.add(field)
+    let addedPrefix = false
+    for (let i = 0; i < prefix.length; ++i) {
+      if (field.startsWith(prefix[i])) {
+        req.add(`${prefix[i]}*`)
+        addedPrefix = true
         break
+      }
+    }
+    if (!addedPrefix) {
+      let addedField = false
+      for (let i = 0; i < required.length; ++i) {
+        if (field === required[i]) {
+          req.add(field)
+          addedField = true
+          break
+        }
+      }
+      if (!addedField) {
+        for (let i = 0; i < fields.length; ++i) {
+          if (field === fields[i]) {
+            req.add(field)
+            break
+          }
+        }
       }
     }
   })

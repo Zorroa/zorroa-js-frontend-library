@@ -107,6 +107,7 @@ class Searcher extends Component {
       modifiedFolderIds, trashedFolders, order,
       similarField, similarValues,
       metadataFields, lightbarFields, fieldTypes } = this.props
+    if (!fieldTypes) return null
     let assetSearch = new AssetSearch({order})
     if (widgets && widgets.length) {
       let postFilter = new AssetFilter()
@@ -169,8 +170,10 @@ class Searcher extends Component {
     // Do not send the query unless it is different than the last returned query
     // FIXME: If assetSearch.empty() filtered counts == total, but tricky to flush cache
     // FIXME: Count trashed folders once the server adds support
-    const searchModified = this.inflightQuery ? !this.inflightQuery.equals(assetSearch) : (!query || !assetSearch.equals(query))
-    if (searchModified) {
+    const skip = new Set(['fields', 'from', 'size', 'scroll'])
+    const missingField = this.inflightQuery ? this.inflightQuery.missingField(assetSearch.fields) : (!query || query.missingField(assetSearch.fields))
+    const searchModified = this.inflightQuery ? !this.inflightQuery.equals(assetSearch, skip) : (!query || !assetSearch.equals(query, skip))
+    if (searchModified || missingField) {
       assetSearch.size = AssetSearch.autoPageSize
       actions.searchAssets(assetSearch, query)
       this.inflightQuery = assetSearch
@@ -178,13 +181,15 @@ class Searcher extends Component {
         // FIXME: Disable saving search to user settings to avoid conflicts
         // actions.saveUserSettings(user, { ...userSettings, search: assetSearch })
       }
-      if (folders && folders.size > 1) {
+      if (folders && folders.size > 1 && assetSearch && !assetSearch.empty()) {
         // New query, get all the filtered folder counts
         this.queueFolderCounts(new Set([...folders.keys()]), assetSearch)
       }
     } else if (modifiedFolderIds && modifiedFolderIds.size) {
       this.queueFolderCounts(modifiedFolderIds)
-      this.queueFolderCounts(modifiedFolderIds, assetSearch)
+      if (assetSearch && !assetSearch.empty()) {
+        this.queueFolderCounts(modifiedFolderIds, assetSearch)
+      }
     }
 
     if (this.inflightQuery && query && this.inflightQuery.equals(query)) this.inflightQuery = null

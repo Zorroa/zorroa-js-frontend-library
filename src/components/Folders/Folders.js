@@ -34,7 +34,7 @@ class Folders extends Component {
   componentWillMount () {
     const rootFolder = this.props.folders.all.get(Folder.ROOT_ID)
     if (!rootFolder.childIds || !rootFolder.childIds.size) {
-      this.loadChildren(Folder.ROOT_ID)
+      this.loadChildren(rootFolder)
     }
   }
 
@@ -42,41 +42,15 @@ class Folders extends Component {
     return this.props.sortFolders || 'alpha-asc'
   }
 
-  loadChildren (id) {
-    const { folders } = this.props
-
-    this.props.actions.getFolderChildren(id)
-    .then(action => {
-      if (!action || !action.payload || !action.payload.children) return
-
-      const children = action.payload.children
-      let proms = []
-
-      // If we never loaded these children before, do it once now
-      // This is to find out whether the children have children, so we can
-      // show or hide UI for toggling folders
-      // TODO: the grandchildren requests are network-heavy, and
-      // can be removed if/when we have an API call to query folder counts
-      if (children) {
-        children.forEach(child => {
-          // only load child's children if we haven't loaded this child before
-          // or if the child has no children, so empty folders have a chance to update
-          const childFolder = folders.all.get(child.id)
-          if (!childFolder || !childFolder.childIds || !childFolder.childIds.size) {
-            proms.push(this.props.actions.getFolderChildren(child.id))
-          }
-        })
-      }
-
-      Promise.all(proms)
-      .then(() => { console.log(`Folder children all done loading for ${id}`) })
-    })
+  loadChildren (folder) {
+    folder.childIds = new Set()   // Warning: modifying app state to avoid multiple loads
+    this.props.actions.getFolderChildren(folder.id)
   }
 
   toggleFolder = (folder) => {
     const { folders } = this.props
     const isOpen = folders.openFolderIds.has(folder.id)
-    const hasChildren = folder.childIds && folder.childIds.size > 0
+    const hasChildren = folder.childCount > 0
 
     // If any descendants of the current folder are currently selected,
     // and user is trying to close the current folder,
@@ -103,7 +77,7 @@ class Folders extends Component {
 
     const doOpen = !isOpen
     this.props.actions.toggleFolder(folder.id, doOpen)
-    if (doOpen) this.loadChildren(folder.id)
+    if (doOpen) this.loadChildren(folder)
   }
 
   // Apply standard desktop shift+meta multi-select on click and update state.
@@ -206,12 +180,12 @@ class Folders extends Component {
       if (filter) {
         children = children.filter(filter)
       }
-      let subsort = (a, b) => a.name.localeCompare(b.name)
+      let subsort = (a, b) => a.name.localeCompare(b.name, undefined, {numeric: true})
       switch (this.sortOrder()) {
         case 'alpha-asc':
           break
         case 'alpha-desc':
-          subsort = (a, b) => b.name.localeCompare(a.name)
+          subsort = (a, b) => b.name.localeCompare(a.name, undefined, {numeric: true})
           break
         case 'time-asc':
           subsort = (a, b) => a.timeModified < b.timeModified ? -1 : (a.timeModified > b.timeModified ? 1 : 0)
@@ -226,7 +200,7 @@ class Folders extends Component {
         grandkids = grandkids.concat(this.folderList(child))
       })
     } else if (!childIds && isOpen) {
-      this.loadChildren(folder.id)
+      this.loadChildren(folder)
     }
 
     // Filter the list, showing parent if any descendents match
@@ -251,7 +225,7 @@ class Folders extends Component {
       const depth = this.depth(folder)
       const isOpen = folders.openFolderIds.has(folder.id)
       const isSelected = !onSelect && folders.selectedFolderIds.has(folder.id)
-      const hasChildren = (folder.childIds && folder.childIds.size > 0) || false
+      const hasChildren = folder.childCount > 0
       return (
         <FolderItem {...{key, depth, folder, isOpen, isSelected, hasChildren}}
                     onToggle={this.toggleFolder.bind(this, folder)}
