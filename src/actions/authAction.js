@@ -188,8 +188,9 @@ function authorize (dispatch, json) {
   browserHistory.push('/')
 }
 
-export function forgotPassword (email) {
+export function forgotPassword (email, protocol, host) {
   return dispatch => {
+    createArchivist(dispatch, protocol, host)
     archivistPost(dispatch, '/api/v1/send-password-reset-email', {email}, {
       headers: { 'X-Requested-With': 'XMLHttpRequest' } // disable browser auth
     })

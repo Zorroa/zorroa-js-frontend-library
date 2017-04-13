@@ -34,7 +34,9 @@ class ForgotPassword extends Component {
   }
 
   update = (event) => {
-    this.props.actions.forgotPassword(this.state.email)
+    const protocol = window.location.protocol
+    const host = window.location.host
+    this.props.actions.forgotPassword(this.state.email, protocol, host)
   }
 
   cancel = (event) => {
