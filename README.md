@@ -127,11 +127,13 @@ Tips for making testing quicker & easier:
 - You will see any console.log() calls made from the test.js file in your shell.
 - use api.log(),api.getLog() to see app side debug prints in Selenium tests.
 -- console.log() calls made from the app are absorbed & hidden.
-- Take care not to break promise chains accidentally. Here are some bugs I've introduced accidentally:
+- Take care not to break promise chains accidentally. (Information about how Selenium handles promises, with lots of examples here: http://seleniumhq.github.io/selenium/docs/api/javascript/module/selenium-webdriver/lib/promise.html) Here are some bugs I've introduced accidentally:
+-- I've used Selenium's convenient promise manager, and discovered that thrown exceptions and errors sometimes get swallowed by Jest, and cause the test to hang until timeout. This is very undesirable; we want errors to propagate quickly and give informative feedback. We also pay for time spent in Saucelabs tests, so timeouts are expensive.
+--- Use the verbose form of promises and return a huge explicit promise chain, don't use the webdriver's syntactic sugar. (BTW, webdriver's promise manager is deprecated anyway.)
 -- I've forgetten to return a promise in a test (the 'it' function)
 --- symptom: browser doesn't quit after test
 --- symptom: text printing after test results print
--- I've messed up caching & function call order. As a convenience, most functions of ours & webdriver's will implicitly wait on driver.then(). But I'm learning to be careful because using that convenient syntax has dangers. Static parameters are fine, but when passing variables, it's easy to accidentally make the call before your variable has resolved.
+-- I've messed up caching & function call order. As a convenience, most functions of ours & webdriver's will implicitly wait on driver.then(). But I'm learning to be careful because using that convenient syntax has dangers. Static parameters are fine, but when passing variables, it's easy to accidentally make the call before your variable has resolved. Note that use of webdriver's promise manager contributes to this issue.
     --- Incorrect:
     ```
     let url
@@ -146,7 +148,14 @@ Tips for making testing quicker & easier:
     driver.then(_ => selenium.waitForUrl(`${url}signin`)) // "url" passed after being assigned
     ```
 
-- When resolving with a value, you must chain .then directly to retrieve the value, NOT driver.then().
+    -- Preferred:
+    ```
+    let url
+    driver.getCurrentUrl().then(u => { url = u })
+    .then(_ => selenium.waitForUrl(`${url}signin`)) // "url" passed after being assigned
+    ```
+
+- When resolving with a value, you must chain .then directly to retrieve the value, NOT driver.then(). Note that use of webdriver's promise manager contributes to this issue.
     -- Incorrect:
     ```
     driver.findElement(By.css('.class'))
