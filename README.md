@@ -116,12 +116,12 @@ Tips for making testing quicker & easier:
 
 - Never use sleep(), hardcoded amounts of time are extremely brittle
 - Use explicit waits liberally (for DOM conditions or events)
--- For example, if you load a page and try to click something on it immeidately, it may not be created or visible or ready on the first frame. Wait until it has been located and is visible, e.g., see waitForCssElementVisible()
+-- For example, if you load a page and try to click something on it immeidately, it may not be created or visible or ready on the first frame. Wait until it has been located and is visible, e.g., see waitForElementVisible()
 - Use assertions liberally, e.g., Jest's expect(). Tests should fail quick & early.
 - selenium.js: factored test utility functions, some specific to Zorroa.
 -- `login()` / `logout()` -- Logs into a Zorroa app. login() logs out first, use this whenever you need to have a fresh session.
 -- `waitForIdle()` -- Wait for any pending server requests to complete
--- `waitForCssElementVisible()` -- Wait until the given css selector is visible
+-- `waitForElementVisible()` -- Wait until the given css selector is visible
 - api.js: functions that the tests are allowed to call directly.
 - Jest tests run on Sauce labs serially. Parallel currently breaks.
 - You will see any console.log() calls made from the test.js file in your shell.

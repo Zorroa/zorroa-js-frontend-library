@@ -50,14 +50,14 @@ describe('Home Page', function () {
     .then(attr => expect(attr).toMatch(/auth-logo/))
 
     // Make sure we have username & password fields
-    .then(_ => selenium.expectCssElementIsVisible('input[name="username"]'))
-    .then(_ => selenium.expectCssElementIsVisible('input[name="password"]'))
+    .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('input[name="username"]')))
+    .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('input[name="password"]')))
   })
 
   it('forgot password should redirect to /forgot', function () {
     DEBUG && console.log('------ forgot password should redirect to /forgot')
     return selenium.logout()
-    .then(_ => selenium.expectCssElementIsVisible('.auth-forgot'))
+    .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.auth-forgot')))
     .then(_ => driver.findElement(By.css('.auth-forgot')).click())
     .then(_ => driver.getCurrentUrl())
     .then(url => expect(url).toBe(`${selenium.BASE_URL}/forgot`))
