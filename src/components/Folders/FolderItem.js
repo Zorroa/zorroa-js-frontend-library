@@ -308,20 +308,20 @@ class FolderItem extends Component {
              style={{ top: contextMenuPos.y, left: contextMenuPos.x }}
              ref={ this.constrainContextMenu }>
           { singleFolderSelected &&
-          <div className="FolderItem-context-item disabled"
+          <div className="FolderItem-context-item FolderItem-context-subfolders disabled"
                onContextMenu={this.dismissContextMenu}>
             <div className="icon-folder-subfolders"/>
             <div>{subfolderLabel}</div>
           </div> }
           { singleFolderSelected && !folder.isDyhi() && (
             folder.isPrivate(user, user.permissions) ? (
-              <div className="FolderItem-context-item disabled"
+              <div className="FolderItem-context-item FolderItem-context-private disabled"
                    onContextMenu={this.dismissContextMenu}>
                 <div className="icon-private"/>
                 <div>Private Collection</div>
               </div>
             ) : (
-              <div className="FolderItem-context-item disabled"
+              <div className="FolderItem-context-item FolderItem-context-public disabled"
                    onContextMenu={this.dismissContextMenu}>
                 <div className="icon-public"/>
                 <div>Public Collection</div>
@@ -334,26 +334,26 @@ class FolderItem extends Component {
             <div className="icon-settings_backup_restore"/><div>Restore Widgets</div></div> }
           { singleFolderSelected &&
           <div onClick={this.exportFolder}
-               className="FolderItem-context-item"
+               className="FolderItem-context-item FolderItem-context-export"
                onContextMenu={this.dismissContextMenu}>
             <div className="icon-export"/>
             <div>Export folder</div>
           </div> }
           { singleFolderSelected && !folder.isDyhi() && !folder.search &&
             <div onClick={canAddChild && this.createChild}
-                 className="FolderItem-context-item"
+                 className="FolderItem-context-item FolderItem-context-create-subfolder"
                  onContextMenu={this.dismissContextMenu}>
               <div className={classnames('icon-folder-add', {disabled: !canAddChild})} />
               <div>Create Sub-folder</div>
             </div> }
           <div onClick={this.moveTo}
-               className="FolderItem-context-item disabled"
+               className="FolderItem-context-item FolderItem-context-move disabled"
                onContextMenu={this.dismissContextMenu}>
             <div className="icon-folder-move"/>
             <div>Move to...</div>
           </div>
           <div onClick={this.favorite}
-               className="FolderItem-context-item disabled"
+               className="FolderItem-context-item FolderItem-context-favorite disabled"
                onContextMenu={this.dismissContextMenu}>
             <div className="icon-star-empty"/>
             <div>Favorite</div>
