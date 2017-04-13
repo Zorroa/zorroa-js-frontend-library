@@ -48,19 +48,19 @@ describe('Collections', function () {
       .then(_ => selenium.getCssElementVisible('.Collections-collapsible .Trash-empty'))
       .then(trashEmptyVisible => {
         if (!trashEmptyVisible) return driver.then(_ => { DEBUG && console.log('no trash to empty 2') })
-        driver.then(_ => { DEBUG && console.log('emptying trash') })
-        selenium.waitForCssElementVisible('.Collections-collapsible .Trash-empty', 5000)
-        selenium.clickCssElement('.Collections-collapsible .Trash-empty')
-        selenium.waitForIdle(15000)
-        selenium.waitForCssElementNotVisible('.Collections-collapsible .Trash', 5000)
-        return driver
+        return driver.then(_ => { DEBUG && console.log('emptying trash') })
+        .then(_ => selenium.waitForCssElementVisible('.Collections-collapsible .Trash-empty', 5000))
+        .then(_ => selenium.clickCssElement('.Collections-collapsible .Trash-empty'))
+        .then(_ => selenium.waitForIdle(15000))
+        .then(_ => selenium.waitForCssElementNotVisible('.Collections-collapsible .Trash', 5000))
       })
     })
   }
 
   // open the collections panel if not already open
   var openCollectionsPanel = function () {
-    return driver.then(_ => { DEBUG && console.log('open the collections panel') })
+    return driver
+    .then(_ => { DEBUG && console.log('open the collections panel') })
     .then(_ => selenium.waitForCssElementVisible('.Collections-collapsible', 5000))
     .then(_ => selenium.doesCssElementHaveClass('.Collections-collapsible', 'isOpen'))
       .then(isOpen => {
