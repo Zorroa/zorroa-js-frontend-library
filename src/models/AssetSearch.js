@@ -87,7 +87,7 @@ export default class AssetSearch {
     return true
   }
 
-  missingField(fields) {
+  missingField (fields) {
     if (!fields) return false
     if (!this.fields) return true
     for (let i = 0; i < fields.length; ++i) {

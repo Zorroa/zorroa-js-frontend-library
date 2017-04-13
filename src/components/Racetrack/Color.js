@@ -325,9 +325,11 @@ class Color extends Component {
                 return (
                   <div key={key} className={classnames('Color-slider-entry', 'fullWidth', { lightOverlay })}>
                     <div className='Color-slider-color flexRowCenter'
-                         style={{width: '100%',
-                                 height: `${Math.round(color.ratio * COLOR_SLIDER_HEIGHT - colorHeightAdjust)}px`,
-                                 backgroundColor: `hsl(${hsl[0]}, ${hsl[1]}%, ${hsl[2]}%)`}}>
+                         style={{
+                           width: '100%',
+                           height: `${Math.round(color.ratio * COLOR_SLIDER_HEIGHT - colorHeightAdjust)}px`,
+                           backgroundColor: `hsl(${hsl[0]}, ${hsl[1]}%, ${hsl[2]}%)`
+                         }}>
                       <div className='Color-slider-pct flexOff'>
                         {`${Math.round(color.ratio * 100)}%`}
                       </div>
