@@ -188,8 +188,9 @@ class DisplayOptions extends Component {
     const checked = parentState === 'ON' || this.state.checkedNamespaces.indexOf(key) >= 0
     const checkable = !singleSelection || !hasChildren
     const indeterminate = parentState === 'MIXED'
+    const keyClass = key.replace(/\./g, '-')
     const classname = classnames('DisplayOptions-namespace', 'flexRow',
-      'flexJustifySpaceBetween', 'flexAlignItemsCenter',
+      'flexJustifySpaceBetween', 'flexAlignItemsCenter', `DisplayOptions-namespace-${keyClass}`,
       { selected: selected, disable: disable, hasChildren: hasChildren })
     return (
       <div key={key} onClick={hasChildren && this.openNamespace.bind(this, key)} className={classname}>
@@ -255,7 +256,7 @@ class DisplayOptions extends Component {
             })}
           </div>
           <div className="DisplayOptions-footer flexRow fullWidth flexJustifyCenter">
-            <button className={classnames('default', { disabled })} onClick={!disabled && this.update.bind(this)}>Update</button>
+            <button className={classnames('default', 'DisplayOptions-update', { disabled })} onClick={!disabled && this.update.bind(this)}>Update</button>
             <button onClick={this.cancel.bind(this)}>Cancel</button>
           </div>
         </div>

@@ -123,7 +123,7 @@ class AddWidget extends Component {
           </div>
           <div className="widget-grid">
             { AddWidget.widgetInfos(widgets, filterText, permissions).map(widgetInfo => (
-              <div className="widget" key={widgetInfo.type}>
+              <div className={`widget widget-${widgetInfo.type}`} key={widgetInfo.type}>
                 <div className="title-bar" style={{backgroundColor: widgetInfo.color}}
                      onClick={showDescriptions ? null : this.addWidget.bind(this, widgetInfo)}>
                   <div className="flexRowCenter">

@@ -46,33 +46,34 @@ describe('Workspace', function () {
   // ------------------------------------
 
   it('check basic workspace layout', function () {
-    driver.then(_ => { DEBUG && console.log('------ check basic workspace layout') })
-
     var leftSidebar
     var leftSidebarToggle
     var rightSidebar
     var rightSidebarToggle
 
-    driver.then(_ => { DEBUG && console.log('Make sure Workspace, header, Assets are visible') })
-    selenium.expectCssElementIsVisible('.header')
-    selenium.expectCssElementIsVisible('.Workspace')
-    selenium.expectCssElementIsVisible('.Assets')
+    return driver
+    .then(_ => { DEBUG && console.log('------ check basic workspace layout') })
 
-    driver.then(_ => { DEBUG && console.log('Wait for the default server query to return, and start displaying assets') })
-    driver.wait(until.elementLocated(By.css('.assets-footer')), 15000, 'timeout looking for .assets-footer')
+    .then(_ => { DEBUG && console.log('Make sure Workspace, header, Assets are visible') })
+    .then(_ => selenium.expectCssElementIsVisible('.header'))
+    .then(_ => selenium.expectCssElementIsVisible('.Workspace'))
+    .then(_ => selenium.expectCssElementIsVisible('.Assets'))
 
-    selenium.expectCssElementIsVisible('.assets-footer')
+    .then(_ => { DEBUG && console.log('Wait for the default server query to return, and start displaying assets') })
+    .then(_ => driver.wait(until.elementLocated(By.css('.assets-footer')), 15000, 'timeout looking for .assets-footer'))
 
-    driver.then(_ => { DEBUG && console.log('Snag the sidebar elements, make sure theyre visible') })
-    driver.findElement(By.css('.Sidebar:not(.isRightEdge)'))
-    .then(e => { leftSidebar = e })
+    .then(_ => selenium.expectCssElementIsVisible('.assets-footer'))
+
+    .then(_ => { DEBUG && console.log('Snag the sidebar elements, make sure theyre visible') })
+    .then(_ => driver.findElement(By.css('.Sidebar:not(.isRightEdge)')))
+      .then(e => { leftSidebar = e })
     .then(_ => leftSidebar.findElement(By.css('.Sidebar-open-close-button')))
-    .then(e => { leftSidebarToggle = e })
+      .then(e => { leftSidebarToggle = e })
 
-    driver.findElement(By.css('.Sidebar.isRightEdge'))
-    .then(e => { rightSidebar = e })
+    .then(_ => driver.findElement(By.css('.Sidebar.isRightEdge')))
+      .then(e => { rightSidebar = e })
     .then(_ => rightSidebar.findElement(By.css('.Sidebar-open-close-button')))
-    .then(e => { rightSidebarToggle = e })
+      .then(e => { rightSidebarToggle = e })
     .then(_ => {
       var proms = []
       proms.push(selenium.expectElementIsVisible(leftSidebar, 'leftSidebar'))
@@ -82,104 +83,103 @@ describe('Workspace', function () {
       return Promise.all(proms)
     })
 
-    driver.then(_ => { DEBUG && console.log('Make sure left sidebar is open, right sidebar is closed') })
-    driver.then(_ => leftSidebar.getSize())
-    .then(({width, height}) => { expect(width).toBeGreaterThan(100) })
+    .then(_ => { DEBUG && console.log('Make sure left sidebar is open, right sidebar is closed') })
+    .then(_ => leftSidebar.getSize())
+      .then(({width, height}) => { expect(width).toBeGreaterThan(100) })
     .then(_ => rightSidebar.getSize())
-    .then(({width, height}) => { expect(width).toBeLessThan(100) })
+      .then(({width, height}) => { expect(width).toBeLessThan(100) })
 
-    driver.then(_ => { DEBUG && console.log('toggle both sidebars') })
-    driver.then(_ => {
+    .then(_ => { DEBUG && console.log('toggle both sidebars') })
+    .then(_ => {
       leftSidebarToggle.click()
       rightSidebarToggle.click()
     })
 
-    driver.then(_ => { DEBUG && console.log('Make sure left sidebar is closed, right sidebar is open') })
-    driver.then(_ => leftSidebar.getSize())
-    .then(({width, height}) => { expect(width).toBeLessThan(100) })
+    .then(_ => { DEBUG && console.log('Make sure left sidebar is closed, right sidebar is open') })
+    .then(_ => leftSidebar.getSize())
+      .then(({width, height}) => { expect(width).toBeLessThan(100) })
     .then(_ => rightSidebar.getSize())
-    .then(({width, height}) => { expect(width).toBeGreaterThan(100) })
+      .then(({width, height}) => { expect(width).toBeGreaterThan(100) })
 
-    driver.then(_ => { DEBUG && console.log('toggle both sidebars again, return to default state') })
-    driver.then(_ => {
+    .then(_ => { DEBUG && console.log('toggle both sidebars again, return to default state') })
+    .then(_ => {
       leftSidebarToggle.click()
       rightSidebarToggle.click()
     })
-
-    return driver
   })
 
   it('test the Searchbar', function () {
-    driver.then(_ => { DEBUG && console.log('------ test the Searchbar') })
     const suggestionsSelector = '.Suggestions-suggestions'
     var searchbarSearch
     var suggestions
 
-    driver.then(_ => { DEBUG && console.log('Search for something we know exists') })
-    driver.findElement(By.css('.Suggestions-search')).then(e => { searchbarSearch = e })
-    driver.then(_ => searchbarSearch.sendKeys('dumbo'))
-
-    driver.then(_ => { DEBUG && console.log('Make sure the suggestions panel appears & has a valid suggestion') })
-    selenium.waitForCssElementVisible(suggestionsSelector, 5000)
-    driver.findElements(By.css('.Suggestions-suggestion')).then(elements => { expect(elements.length).toBeGreaterThan(0) })
-
-    driver.then(_ => { DEBUG && console.log('Make sure a search works and returns assets') })
-    selenium.waitForAssetsCounterChange(_ => searchbarSearch.sendKeys(Key.ENTER), 15000)
-    driver.findElement(By.css('.Assets-layout')).then(e => e.findElements(By.css('.Thumb'))).then(es => { expect(es.length).toBeGreaterThan(0) })
-
-    driver.then(_ => { DEBUG && console.log('Make sure a bad search returns 0 assets') })
-    driver.then(_ => searchbarSearch.clear())
-    selenium.waitForAssetsCounterChange(_ => searchbarSearch.sendKeys(Date.now().toString(), Key.ENTER), 15000)
-    selenium.expectCssElementIsVisible('.assets-layout-empty')
-
-    selenium.clickCssElement('.Suggestions-clear')
-    selenium.waitForIdle()
-
     return driver
+    .then(_ => { DEBUG && console.log('------ test the Searchbar') })
+    .then(_ => { DEBUG && console.log('Search for something we know exists') })
+    .then(_ => driver.findElement(By.css('.Suggestions-search')).then(e => { searchbarSearch = e }))
+    .then(_ => searchbarSearch.sendKeys('dumbo'))
+
+    .then(_ => { DEBUG && console.log('Make sure the suggestions panel appears & has a valid suggestion') })
+    .then(_ => selenium.waitForCssElementVisible(suggestionsSelector, 5000))
+    .then(_ => driver.findElements(By.css('.Suggestions-suggestion')))
+      .then(elements => { expect(elements.length).toBeGreaterThan(0) })
+
+    .then(_ => { DEBUG && console.log('Make sure a search works and returns assets') })
+    .then(_ => selenium.waitForAssetsCounterChange(_ => searchbarSearch.sendKeys(Key.ENTER), 15000))
+    .then(_ => driver.findElement(By.css('.Assets-layout')))
+      .then(e => e.findElements(By.css('.Thumb')))
+      .then(es => { expect(es.length).toBeGreaterThan(0) })
+
+    .then(_ => { DEBUG && console.log('Make sure a bad search returns 0 assets') })
+    .then(_ => searchbarSearch.clear())
+    .then(_ => selenium.waitForAssetsCounterChange(_ => searchbarSearch.sendKeys(Date.now().toString(), Key.ENTER), 15000))
+    .then(_ => selenium.expectCssElementIsVisible('.assets-layout-empty'))
+
+    .then(_ => selenium.clickCssElement('.Suggestions-clear'))
+    .then(_ => selenium.waitForIdle())
   })
 
   it('test the admin menu', function () {
-    driver.then(_ => { DEBUG && console.log('') })
-
-    driver.then(_ => { DEBUG && console.log('admin menu preferences') })
-    selenium.expectCssElementIsVisible('.header-menu-user')
-    selenium.clickCssElement('.header-menu-user')
-    selenium.waitForCssElementVisible('.header-menu-prefs')
-    selenium.clickCssElement('.header-menu-prefs')
-    selenium.waitForCssElementVisible('.Preferences')
-    selenium.waitForCssElementVisible('.Preferences-header')
-    selenium.waitForCssElementVisible('.Preferences-user')
-    selenium.waitForCssElementVisible('.Preferences-curator')
-    selenium.waitForCssElementVisible('.Preferences .footer button')
-    selenium.clickCssElement('.Preferences .footer button')
-    selenium.waitForCssElementNotVisible('.Preferences')
-
-    driver.then(_ => { DEBUG && console.log('admin menu developer') })
-    selenium.expectCssElementIsVisible('.header-menu-user')
-    selenium.clickCssElement('.header-menu-user')
-    selenium.waitForCssElementVisible('.header-menu-dev')
-    selenium.clickCssElement('.header-menu-dev')
-    selenium.waitForCssElementVisible('.Developer')
-    selenium.waitForCssElementVisible('.Developer-title')
-    selenium.waitForCssElementVisible('.Developer-query')
-    selenium.waitForCssElementVisible('.Developer-assets')
-    selenium.waitForCssElementVisible('.Developer-controls')
-    selenium.waitForCssElementVisible('.Developer-done')
-    selenium.clickCssElement('.Developer-done')
-
     return driver
+    .then(_ => { DEBUG && console.log('') })
+
+    .then(_ => { DEBUG && console.log('admin menu preferences') })
+    .then(_ => selenium.expectCssElementIsVisible('.header-menu-user'))
+    .then(_ => selenium.clickCssElement('.header-menu-user'))
+    .then(_ => selenium.waitForCssElementVisible('.header-menu-prefs'))
+    .then(_ => selenium.clickCssElement('.header-menu-prefs'))
+    .then(_ => selenium.waitForCssElementVisible('.Preferences'))
+    .then(_ => selenium.waitForCssElementVisible('.Preferences-header'))
+    .then(_ => selenium.waitForCssElementVisible('.Preferences-user'))
+    .then(_ => selenium.waitForCssElementVisible('.Preferences-curator'))
+    .then(_ => selenium.waitForCssElementVisible('.Preferences .footer button'))
+    .then(_ => selenium.clickCssElement('.Preferences .footer button'))
+    .then(_ => selenium.waitForCssElementNotVisible('.Preferences'))
+
+    .then(_ => { DEBUG && console.log('admin menu developer') })
+    .then(_ => selenium.expectCssElementIsVisible('.header-menu-user'))
+    .then(_ => selenium.clickCssElement('.header-menu-user'))
+    .then(_ => selenium.waitForCssElementVisible('.header-menu-dev'))
+    .then(_ => selenium.clickCssElement('.header-menu-dev'))
+    .then(_ => selenium.waitForCssElementVisible('.Developer'))
+    .then(_ => selenium.waitForCssElementVisible('.Developer-title'))
+    .then(_ => selenium.waitForCssElementVisible('.Developer-query'))
+    .then(_ => selenium.waitForCssElementVisible('.Developer-assets'))
+    .then(_ => selenium.waitForCssElementVisible('.Developer-controls'))
+    .then(_ => selenium.waitForCssElementVisible('.Developer-done'))
+    .then(_ => selenium.clickCssElement('.Developer-done'))
   })
 
   it('log out', () => {
     let url
-    driver.then(_ => { DEBUG && console.log('log out') })
-    driver.getCurrentUrl().then(u => { url = u })
-    selenium.expectCssElementIsVisible('.header-menu-user')
-    selenium.clickCssElement('.header-menu-user')
-    selenium.waitForCssElementVisible('.header-menu-logout')
-    selenium.clickCssElement('.header-menu-logout')
-    driver.then(_ => selenium.waitForUrl(`${url}signin`, 15000))
 
     return driver
+    .then(_ => { DEBUG && console.log('log out') })
+    .then(_ => driver.getCurrentUrl().then(u => { url = u }))
+    .then(_ => selenium.expectCssElementIsVisible('.header-menu-user'))
+    .then(_ => selenium.clickCssElement('.header-menu-user'))
+    .then(_ => selenium.waitForCssElementVisible('.header-menu-logout'))
+    .then(_ => selenium.clickCssElement('.header-menu-logout'))
+    .then(_ => selenium.waitForUrl(`${url}signin`, 15000))
   })
 })
