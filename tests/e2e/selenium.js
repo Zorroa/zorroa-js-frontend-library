@@ -414,7 +414,7 @@ export function expectSelectorIsVisible (by, selector) {
     () => { expect(selector).toBe('selector not found'); return false } // element not found
   )
   .then(isDisplayed => {
-    DEBUG && console.log(`checking ${selector} (isDisplayed: ${isDisplayed})`)
+    DEBUG && console.log(`checking for is visible ${selector} (isDisplayed: ${isDisplayed})`)
     expect(JSON.stringify({ selector, isDisplayed }))
      .toBe(JSON.stringify({ selector, isDisplayed: true }))
     return isDisplayed
@@ -441,7 +441,7 @@ export function expectXpathElementIsVisible (selector) {
 export function expectCssElementIsNotVisible (selector) {
   return getCssElementVisible(selector)
   .then(isDisplayed => {
-    DEBUG && console.log(`checking ${selector} (isDisplayed: ${isDisplayed})`)
+    DEBUG && console.log(`checking for not visible ${selector} (isDisplayed: ${isDisplayed})`)
     expect(JSON.stringify({ selector, isDisplayed }))
      .toBe(JSON.stringify({ selector, isDisplayed: false }))
     return isDisplayed
@@ -456,7 +456,7 @@ export function expectElementIsVisible (element, elementName) {
   return driver
   .then(_ => element.isDisplayed())
   .then(isDisplayed => {
-    DEBUG && (console.log(`checking ${elementName} (isDisplayed: ${isDisplayed})`))
+    DEBUG && (console.log(`checking for visible ${elementName} (isDisplayed: ${isDisplayed})`))
     expect(JSON.stringify({ elementName, isDisplayed }))
      .toBe(JSON.stringify({ elementName, isDisplayed: true }))
     return isDisplayed
@@ -476,7 +476,7 @@ export function expectElementIsNotVisible (element, elementName) {
   return driver
   .then(_ => element.isDisplayed())
   .then(isDisplayed => {
-    DEBUG && (console.log(`checking ${elementName} (isDisplayed: ${isDisplayed})`))
+    DEBUG && (console.log(`checking for not visible ${elementName} (isDisplayed: ${isDisplayed})`))
     expect(JSON.stringify({ elementName, isDisplayed }))
      .toBe(JSON.stringify({ elementName, isDisplayed: true }))
     return isDisplayed
@@ -487,6 +487,136 @@ export function expectElementIsNotVisible (element, elementName) {
   // .then(isDisplayed => expect({isDisplayed, elementName})
   //   .toMatchObject({isDisplayed:true, elementName}))
 }
+
+
+
+
+
+
+
+
+
+
+// ----------------------------------------------------------------------
+// wait until an element is Enabled (or timeout)
+export function getElementEnabled (by, selector) {
+  return driver.findElement(by(selector))
+  .then((ele) => ele.isEnabled(), () => false)
+}
+
+// ----------------------------------------------------------------------
+// wait until a css selector is Enabled (or timeout)
+export function getCssElementEnabled (selector) {
+  return getElementEnabled(By.css, selector)
+}
+
+// ----------------------------------------------------------------------
+// wait until an xpath selector is Enabled (or timeout)
+export function getXpathEnabled (selector) {
+  return getElementEnabled(By.xpath, selector)
+}
+
+// ----------------------------------------------------------------------
+// wait until an element is Enabled (or timeout)
+export function waitForCssElementEnabled (selector, optTimeout) {
+  return driver.wait(_ => getCssElementEnabled(selector), optTimeout, `timeout waiting for ${selector} to be Enabled`)
+  .then(_ => expectCssElementIsEnabled(selector))
+}
+
+// ----------------------------------------------------------------------
+// wait until an xpath selector is Enabled (or timeout)
+export function waitForXpathEnabled (selector, optTimeout) {
+  return driver.wait(_ => getXpathEnabled(selector), optTimeout, `timeout waiting for ${selector} to be Enabled`)
+  .then(_ => expectXpathElementIsEnabled(selector))
+}
+
+// ----------------------------------------------------------------------
+// wait until a css selector is disabled (or timeout)
+export function waitForCssElementDisabled (selector, optTimeout) {
+  return driver
+  .wait(_ => getCssElementEnabled(selector).then(x => !x), optTimeout, `timeout waiting for ${selector} to be disabled`)
+  .then(_ => expectCssElementIsDisabled(selector))
+}
+
+// ----------------------------------------------------------------------
+// wait until an xpath selector is disabled (or timeout)
+export function waitForXpathDisabled (selector, optTimeout) {
+  return driver.wait(_ => getXpathEnabled(selector).then(x => !x), optTimeout, `timeout waiting for ${selector} to be disabled`)
+  .then(_ => expectXpathElementIsDisabled(selector))
+}
+
+// ----------------------------------------------------------------------
+// assert (expect) that a selector is Enabled
+// if not, the selector is displayed in the error message
+export function expectSelectorIsEnabled (by, selector) {
+  return driver
+  .then(_ => driver.findElement(by(selector)))
+  .then(
+    (ele) => ele.isEnabled(), // element found
+    () => { expect(selector).toBe('selector not found'); return false } // element not found
+  )
+  .then(isEnabled => {
+    DEBUG && console.log(`checking for enabled ${selector} (isEnabled: ${isEnabled})`)
+    expect(JSON.stringify({ selector, isEnabled }))
+     .toBe(JSON.stringify({ selector, isEnabled: true }))
+    return isEnabled
+  })
+}
+
+// ----------------------------------------------------------------------
+// assert (expect) that a selector is disabled
+// if not, the selector is displayed in the error message
+export function expectSelectorIsDisabled (by, selector) {
+  return driver
+  .then(_ => driver.findElement(by(selector)))
+  .then(
+    (ele) => ele.isEnabled(), // element found
+    () => { expect(selector).toBe('selector not found'); return false } // element not found
+  )
+  .then(isEnabled => {
+    DEBUG && console.log(`checking for disabled ${selector} (isEnabled: ${isEnabled})`)
+    expect(JSON.stringify({ selector, isEnabled }))
+     .toBe(JSON.stringify({ selector, isEnabled: false }))
+    return !isEnabled
+  })
+}
+
+// ----------------------------------------------------------------------
+// assert (expect) that a css selector is Enabled
+// if not, the css selector is displayed in the error message
+export function expectCssElementIsEnabled (selector) {
+  return expectSelectorIsEnabled(By.css, selector)
+}
+
+// ----------------------------------------------------------------------
+// assert (expect) that a xpath selector is Enabled
+// if not, the xpath selector is displayed in the error message
+export function expectXpathElementIsEnabled (selector) {
+  return expectSelectorIsEnabled(By.xpath, selector)
+}
+
+// ----------------------------------------------------------------------
+// assert (expect) that a css selector is disabled
+// if not, the css selector is displayed in the error message
+export function expectCssElementIsDisabled (selector) {
+  return expectSelectorIsDisabled(By.css, selector)
+}
+
+// ----------------------------------------------------------------------
+// assert (expect) that a xpath selector is disabled
+// if not, the xpath selector is displayed in the error message
+export function expectXpathElementIsDisabled (selector) {
+  return expectSelectorIsDisabled(By.xpath, selector)
+}
+
+
+
+
+
+
+
+
+
 
 // ----------------------------------------------------------------------
 export function doesElementHaveClass (element, className) {
