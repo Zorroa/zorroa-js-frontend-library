@@ -357,10 +357,11 @@ export function login () {
 }
 
 // ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // wait until an element is visible (or timeout)
 export function getElementVisible (by, selector) {
   return driver.findElement(by(selector))
-  .then((ele) => ele.isDisplayed(), () => false)
+  .then(ele => ele.isDisplayed(), _ => false)
 }
 
 // ----------------------------------------------------------------------
@@ -373,6 +374,15 @@ export function getCssElementVisible (selector) {
 // wait until an xpath selector is visible (or timeout)
 export function getXpathVisible (selector) {
   return getElementVisible(By.xpath, selector)
+}
+
+// ----------------------------------------------------------------------
+// wait until an element isVisible == goal (or timeout)
+export function waitForElementVisibleToBe (by, selector, goal, optTimeout) {
+  return driver
+  .then(_ => { DEBUG && console.log(`waiting for ${selector} to be visible ${goal}`) })
+  .then(_ => driver.wait(_ => getElementVisible(by, selector), optTimeout, `timeout waiting for ${selector} to be visible`))
+  .then(_ => expectElementVisibleToBe(by, selector, goal))
 }
 
 // ----------------------------------------------------------------------
@@ -417,6 +427,24 @@ export function expectSelectorIsVisible (by, selector) {
     DEBUG && console.log(`checking for is visible ${selector} (isDisplayed: ${isDisplayed})`)
     expect(JSON.stringify({ selector, isDisplayed }))
      .toBe(JSON.stringify({ selector, isDisplayed: true }))
+    return isDisplayed
+  })
+}
+
+// ----------------------------------------------------------------------
+// assert (expect) that a selector is visible
+// if not, the selector is displayed in the error message
+export function expectElementVisibleToBe (by, selector, goal) {
+  return driver
+  .then(_ => driver.findElement(by(selector)))
+  .then(
+    (ele) => ele.isDisplayed(), // element found
+    () => { expect(selector).toBe('selector not found'); return false } // element not found
+  )
+  .then(isDisplayed => {
+    DEBUG && console.log(`checking for isVisible=${goal} ${selector} (isDisplayed: ${isDisplayed})`)
+    expect(JSON.stringify({ selector, isDisplayed }))
+     .toBe(JSON.stringify({ selector, isDisplayed: goal }))
     return isDisplayed
   })
 }
@@ -488,15 +516,7 @@ export function expectElementIsNotVisible (element, elementName) {
   //   .toMatchObject({isDisplayed:true, elementName}))
 }
 
-
-
-
-
-
-
-
-
-
+// ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // wait until an element is Enabled (or timeout)
 export function getElementEnabled (by, selector) {
@@ -609,15 +629,42 @@ export function expectXpathElementIsDisabled (selector) {
   return expectSelectorIsDisabled(By.xpath, selector)
 }
 
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// wait until an element is selected (or timeout)
+export function getElementSelected (by, selector) {
+  return driver.findElement(by(selector))
+  .then((ele) => ele.isSelected(), () => false)
+}
 
+// ----------------------------------------------------------------------
+// wait until an element is selected (or timeout)
+export function waitForElementSelectedToBe (by, selector, goal, optTimeout) {
+  return driver
+  .then(_ => { DEBUG && console.log(`waiting for ${selector} to be selected ${goal}`) })
+  .then(_ => driver.wait(_ => getElementSelected(by, selector), optTimeout, `timeout waiting for ${selector} to be selected`))
+  .then(_ => expectElementSelectedToBe(by, selector, goal))
+}
 
+// ----------------------------------------------------------------------
+// assert (expect) that a selector is selected
+// if not, the selector is displayed in the error message
+export function expectElementSelectedToBe (by, selector, goal) {
+  return driver
+  .then(_ => { DEBUG && console.log(`checking for selected=${goal} ${selector} (isSelected: ${isSelected})`) })
+  .then(_ => driver.findElement(by(selector)))
+  .then(
+    (ele) => ele.isSelected(), // element found
+    () => { expect(selector).toBe('selector not found'); return false } // element not found
+  )
+  .then(isSelected => {
+    expect(JSON.stringify({ selector, isSelected }))
+     .toBe(JSON.stringify({ selector, isSelected: goal }))
+    return isSelected
+  })
+}
 
-
-
-
-
-
-
+// ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 export function doesElementHaveClass (element, className) {
   return element.getAttribute('class')
