@@ -38,19 +38,17 @@ describe('Table', function () {
   // ----------------------------------------------------------------------
 
   it('user should be able to log in', function () {
-    driver.then(_ => { DEBUG && console.log('user should be able to log in') })
-    selenium.login()
+    return driver.then(_ => { DEBUG && console.log('user should be able to log in') })
+    .then(_ => selenium.login())
 
-    driver.then(_ => { DEBUG && console.log('Make sure Workspace, header, Assets are visible') })
-    selenium.expectCssElementIsVisible('.header')
-    selenium.expectCssElementIsVisible('.Workspace')
-    selenium.expectCssElementIsVisible('.Assets')
+    .then(_ => { DEBUG && console.log('Make sure Workspace, header, Assets are visible') })
+    .then(_ => selenium.expectCssElementIsVisible('.header'))
+    .then(_ => selenium.expectCssElementIsVisible('.Workspace'))
+    .then(_ => selenium.expectCssElementIsVisible('.Assets'))
 
-    driver.then(_ => { DEBUG && console.log('Wait for the default server query to return, and start displaying assets') })
-    driver.wait(until.elementLocated(By.css('.assets-footer')), 15000)
-    selenium.expectCssElementIsVisible('.assets-footer')
-
-    return driver
+    .then(_ => { DEBUG && console.log('Wait for the default server query to return, and start displaying assets') })
+    .then(_ => driver.wait(until.elementLocated(By.css('.assets-footer')), 15000))
+    .then(_ => selenium.expectCssElementIsVisible('.assets-footer'))
   })
 
   // ------------------------------------
@@ -58,8 +56,6 @@ describe('Table', function () {
   // ------------------------------------
 
   it('test the Table', function () {
-    driver.then(_ => { DEBUG && console.log('test the Table') })
-
     var TableToggle
     var assetsScrollHeight
     var expectedMinAssetsScrollHeight = '62px' // see Assets.js:footerEditbarAndPaddingHeight
@@ -103,46 +99,46 @@ describe('Table', function () {
       return prom
     }
 
-    driver.then(_ => { DEBUG && console.log('Wait for the footer (done above, but do it again to reduce deps, allow test-only, etc.)') })
-    driver.then(_ => driver.wait(until.elementLocated(By.css('.assets-footer')), 15000))
+    return driver
+    .then(_ => { DEBUG && console.log('test the Table') })
+    .then(_ => { DEBUG && console.log('Wait for the footer (done above, but do it again to reduce deps, allow test-only, etc.)') })
+    .then(_ => driver.wait(until.elementLocated(By.css('.assets-footer')), 15000))
 
-    driver.then(_ => { DEBUG && console.log('Table shouldnt be visible initially') })
-    driver.then(_ => selenium.expectCssElementIsNotVisible('.Table'))
+    .then(_ => { DEBUG && console.log('Table shouldnt be visible initially') })
+    .then(_ => selenium.expectCssElementIsNotVisible('.Table'))
 
-    driver.then(_ => { DEBUG && console.log('Open the Table') })
-    driver.then(_ => driver.findElement(By.css('.TableToggle')))
+    .then(_ => { DEBUG && console.log('Open the Table') })
+    .then(_ => driver.findElement(By.css('.TableToggle')))
       .then(ele => { TableToggle = ele })
-    driver.then(_ => TableToggle.click())
-    driver.then(_ => selenium.expectCssElementIsVisible('.Table'))
+    .then(_ => TableToggle.click())
+    .then(_ => selenium.expectCssElementIsVisible('.Table'))
 
-    driver.then(_ => selenium.findCssElements(['.Table', '.header', '.assets-footer', '.assets-scroll', '.Assets-tableResize']))
+    .then(_ => selenium.findCssElements(['.Table', '.header', '.assets-footer', '.assets-scroll', '.Assets-tableResize']))
       .then(eles => { elements = eles })
 
-    driver.then(_ => { DEBUG && console.log('Check the height of assets-scroll before we resize the Table') })
-    driver.then(_ => elements['.assets-scroll'].getCssValue('height'))
+    .then(_ => { DEBUG && console.log('Check the height of assets-scroll before we resize the Table') })
+    .then(_ => elements['.assets-scroll'].getCssValue('height'))
       .then(height => { assetsScrollHeight = height })
 
-    driver.then(_ => { DEBUG && console.log('Expand the Table as far as it will go') })
-    driver.then(_ => dragVertFn('.Assets-tableResize', '.header', -2000))
+    .then(_ => { DEBUG && console.log('Expand the Table as far as it will go') })
+    .then(_ => dragVertFn('.Assets-tableResize', '.header', -2000))
 
-    driver.then(_ => { DEBUG && console.log('Check that the table size changed, and that the assets scroll is at the expected minimum') })
-    driver.then(_ => elements['.assets-scroll'].getCssValue('height'))
+    .then(_ => { DEBUG && console.log('Check that the table size changed, and that the assets scroll is at the expected minimum') })
+    .then(_ => elements['.assets-scroll'].getCssValue('height'))
       .then(height => {
         expect(height).not.toBe(assetsScrollHeight)
         expect(height).toBe(expectedMinAssetsScrollHeight)
       })
 
-    driver.then(_ => { DEBUG && console.log('Shrink the Table as far as it will go') })
-    driver.then(_ => dragVertFn('.Assets-tableResize', '.assets-footer', 2000))
+    .then(_ => { DEBUG && console.log('Shrink the Table as far as it will go') })
+    .then(_ => dragVertFn('.Assets-tableResize', '.assets-footer', 2000))
 
-    driver.then(_ => { DEBUG && console.log('Check that the Table height is at the expected minimum') })
-    driver.then(_ => elements['.Table'].getCssValue('height'))
+    .then(_ => { DEBUG && console.log('Check that the Table height is at the expected minimum') })
+    .then(_ => elements['.Table'].getCssValue('height'))
       .then(height => expect(height).toBe(expectedMinTableHeight))
 
-    driver.then(_ => { DEBUG && console.log('Close the Table') })
-    driver.then(_ => TableToggle.click())
-    driver.then(_ => selenium.expectCssElementIsNotVisible('.Table'))
-
-    return driver
+    .then(_ => { DEBUG && console.log('Close the Table') })
+    .then(_ => TableToggle.click())
+    .then(_ => selenium.expectCssElementIsNotVisible('.Table'))
   })
 })
