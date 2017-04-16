@@ -13,7 +13,7 @@ export default class LocalChooser extends Component {
 
   state = {
     isDroppable: false,     // true when file over drop target
-    uploadFiles: [],        // pending File array
+    uploadFiles: []         // pending File array
   }
 
   componentWillMount () {
@@ -183,11 +183,11 @@ export default class LocalChooser extends Component {
     const disabled = (progressEvent && !uploadsCompleted) || !uploadFiles.length
     const step = onImport ? 2 : 3
     let title = onImport ? 'Upload' : 'Dismiss'
-    if (onImport && uploadFiles.length) title += ` ${uploadFiles.length} File${uploadFiles.length > 1 ? 's': ''}`
+    if (onImport && uploadFiles.length) title += ` ${uploadFiles.length} File${uploadFiles.length > 1 ? 's' : ''}`
     return (
       <div className="LocalChooser">
         <div className="Import-back" onClick={onBack}>
-          <div className="icon-chevron-right" style={{transform:'rotate(180deg)'}}/>
+          <div className="icon-chevron-right" style={{transform: 'rotate(180deg)'}}/>
           Back
         </div>
         <div className="Import-title">
@@ -198,7 +198,7 @@ export default class LocalChooser extends Component {
           { uploadFiles.length ? this.renderFileList() : this.renderDropzone() }
         </div>
         <div className="LocalChooser-start">
-          <div className={classnames('Import-button', {disabled})} onClick={!disabled && (onImport ? (e => onImport(uploadFiles, this.uploadProgress, e)) : (e => onDone(e)))}>
+          <div className={classnames('Import-button', {disabled})} onClick={!disabled && (onImport ? e => onImport(uploadFiles, this.uploadProgress, e) : e => onDone(e))}>
             {title}
           </div>
         </div>

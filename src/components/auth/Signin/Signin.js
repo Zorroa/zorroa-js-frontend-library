@@ -127,7 +127,7 @@ class Signin extends Component {
               </div>
             )}
             <div className="auth-eula">
-              <input type="checkbox" className="auth-eula-input" checked={acceptEULA} onChange={this.toggleEULA}/>
+              <input type="checkbox" className="auth-eula-input" name="eula" checked={acceptEULA} onChange={this.toggleEULA}/>
               <div className="auth-eula-label">I accept the Zorroa <a href="http://zorroa.com/eula">terms of use</a></div>
             </div>
             <div className={classnames('auth-button-primary', {disabled})} onClick={!disabled && this.signin}>Login</div>

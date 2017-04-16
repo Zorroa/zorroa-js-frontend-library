@@ -55,7 +55,7 @@ export default class DropboxChooser extends Component {
           childIds.add(f.id)
         })
         const parent = files.get(parentId)
-        const newParent = parent ? { ...parent } : { id: ROOT_ID, path: ROOT_PATH, name: '/'}
+        const newParent = parent ? { ...parent } : { id: ROOT_ID, path: ROOT_PATH, name: '/' }
         newParent.childIds = childIds
         files.set(parentId, newParent)
         const cursor = response.cursor

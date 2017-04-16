@@ -12,14 +12,14 @@ const clouds = [ DROPBOX_CLOUD, GDRIVE_CLOUD, BOX_CLOUD ]
 
 const ImportCloud = (props) => {
   const auths = [
-    new DropboxAuthenticator("6fifppvd9maxou9", accessToken => props.onSelect(DROPBOX_CLOUD, accessToken)),
+    new DropboxAuthenticator('6fifppvd9maxou9', accessToken => props.onSelect(DROPBOX_CLOUD, accessToken)),
     null,
     null
   ]
   return (
     <div className="ImportCloud">
       <div className="Import-back" onClick={props.onBack}>
-        <div className="icon-chevron-right" style={{transform:'rotate(180deg)'}}/>
+        <div className="icon-chevron-right" style={{transform: 'rotate(180deg)'}}/>
         Back
       </div>
       <div className="Import-title">

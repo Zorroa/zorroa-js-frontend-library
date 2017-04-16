@@ -42,7 +42,7 @@ class Workspace extends Component {
     isolatedId: PropTypes.string,
     changePassword: PropTypes.bool,
     jobs: PropTypes.object,
-    assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+    assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset))
   }
 
   state = {
@@ -93,7 +93,7 @@ class Workspace extends Component {
     if (!nextProps.app.modal && !this.state.tipShown && nextProps.assets && !nextProps.assets.length &&
       !countOfJobsOfType(nextProps.jobs, Job.Import)) {
       this.setState({tipShown: true})
-      const width = '65vw';
+      const width = '65vw'
       const body = <Import/>
       this.props.actions.showModal({body, width})
     }

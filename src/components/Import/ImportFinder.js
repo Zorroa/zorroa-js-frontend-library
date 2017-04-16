@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import classnames from 'classnames'
 
 import Filter from '../Filter'
-import DropboxChooser from "./DropboxChooser"
+import DropboxChooser from './DropboxChooser'
 
 export default class ImportFinder extends Component {
   static propTypes = {
@@ -74,7 +74,7 @@ export default class ImportFinder extends Component {
     return (
       <div className="ImportFinder">
         <div className="Import-back" onClick={onBack}>
-          <div className="icon-chevron-right" style={{transform:'rotate(180deg)'}}/>
+          <div className="icon-chevron-right" style={{transform: 'rotate(180deg)'}}/>
           Back
         </div>
         <div className="Import-title">

@@ -69,7 +69,7 @@ class Import extends Component {
 
   selectSource = (source) => {
     if (source === DROPBOX_CLOUD || source === GDRIVE_CLOUD || source === BOX_CLOUD) {
-      this.setState({ source: CLOUD_IMPORT, cloud: source, step: 2 /*authenticate*/ })
+      this.setState({ source: CLOUD_IMPORT, cloud: source, step: 2 })
     } else {
       this.setState({ source, step: 2 })
     }
@@ -173,7 +173,7 @@ class Import extends Component {
   renderStep3 () {
     const { source, cloud, accessToken } = this.state
     switch (source) {
-      case CLOUD_IMPORT: return <ImportFinder mode={cloud} accessToken={accessToken} onImport={this.createImport} onBack={e => {this.setState({cloud: ''}); this.setStep(2)}}/>
+      case CLOUD_IMPORT: return <ImportFinder mode={cloud} accessToken={accessToken} onImport={this.createImport} onBack={e => { this.setState({cloud: ''}); this.setStep(2) }}/>
       case SERVER_IMPORT: return <div>Link to Cloudproxy</div>
       case LOCAL_IMPORT: return <LocalChooser onDone={e => this.setStep(4)} onBack={e => this.setStep(2)}/>
     }
@@ -206,9 +206,9 @@ class Import extends Component {
       return (
         <div className="Import-footer">
           Want to get assets from a
-          <Link className="Import-source-link" to="/?import=server">a server</Link>
+          <div className="Import-source-link" onClick={e => { this.setState({source: SERVER_IMPORT}) }}>a server</div>
           or
-          <Link className="Import-source-link" to="/?import=mycomputer">your computer</Link>
+          <div className="Import-source-link" onClick={e => { this.setState({source: LOCAL_IMPORT}) }}>your computer</div>
           instead of a cloud service?
           <div className="Import-hint">You can also add more sources later.</div>
         </div>

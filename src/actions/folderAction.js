@@ -5,7 +5,6 @@ import {
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import { archivistGet, archivistPut, archivistPost, archivistRequest } from './authAction'
-import { selectId } from '../services/jsUtil'
 
 const rootEndpoint = '/api/v1/folders'
 
