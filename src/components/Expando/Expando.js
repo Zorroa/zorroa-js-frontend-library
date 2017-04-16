@@ -58,7 +58,9 @@ export default class Expando extends Component {
     return (
       <div className="Expando">
         <div className="Expando-header">
-          <Filter value={filter} onChange={this.changeFilter} onClear={filter ? this.clearFilter : null} />
+          <Filter value={filter} onChange={this.changeFilter}
+                  onClear={filter ? this.clearFilter : null}
+                  placeholder="Filter processor scripts" />
           <div className="Expando-item-script-info">
             <div className="Expando-item-script-info-label">
               Show Script Information

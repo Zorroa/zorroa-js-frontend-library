@@ -1,10 +1,16 @@
-@import '../../styles/core-mixins.scss';
+@import '../../styles/core-mixins';
 
 .DropboxChooser {
-  @include flexCol;
   border-radius: 3px;
   border: 1px solid $zorroa-nearwhite;
   margin-bottom: 10px;
+  height: 100%;
+  overflow: auto;
+
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include fullWidth;
+  @include flexOn;
 }
 
 .DropboxChooser-title {
@@ -32,11 +38,6 @@
   align-self: center;
 }
 
-.DropboxChooser-body {
-  @include flexCol;
-  overflow: auto;
-}
-
 .DropboxChooser-file {
   @include flexRow;
   @include flexAlignItemsCenter;
@@ -60,4 +61,9 @@
   font-size: 12px;
   text-transform: uppercase;
   &:hover { color: $zorroa-lightgray; }
+}
+
+.DropboxChooser-icon {
+  margin-right: 4px;
+  width: 14px;
 }

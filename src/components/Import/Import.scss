@@ -1,11 +1,9 @@
 @import '../../styles/core-mixins';
 
 .Import {
-  width: 600px;
   background-color: white;
   @include flexCol;
   border-radius: 3px;
-  padding: 20px;
 }
 
 .Import-intro {
@@ -17,49 +15,63 @@
   }
 }
 
-.Import-first-time {
+.Import-header {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include flexJustifySpaceBetween;
+  padding: 20px;
+  margin-bottom: 40px;
+  border-bottom: 1px solid $zorroa-nearwhite;
+}
 
+.Import-footer {
+  @include flexRowCenter;
+  padding: 30px;
+  border-top: 1px solid $zorroa-nearwhite;
+  font-size: 12px;
+  color: $zorroa-lightgray;
+}
+
+.Import-footer-lead {
+  color: $zorroa-gray;
+  margin-right: 0.5em;
 }
 
 .Import-title {
-  font-weight: 700;
+  @include flexRowCenter;
+  font-weight: 500;
+  font-size: 22px;
   color: $zorroa-greyish-brown;
   margin-bottom: 20px;
-  @include fullWidth;
 }
 
-.Import-locations {
-  @include fullWidth;
-  @include flexColCenter;
+.Import-step {
+  color: $zorroa-sickly-green;
+  margin-right: 0.5em;
 }
 
-.Import-location {
-  &:not(:last-child) {
-    margin-bottom: 50px;
-  }
-  position: relative;
-}
-
-.Import-location-overlay {
+.Import-back {
   @include flexRowCenter;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  align-self: flex-start;
+  color: $zorroa-lightgray;
+  text-transform: uppercase;
+  margin-left: 50px;
+  min-height: 1.5em;
+  &:hover { color: $zorroa-sickly-green; }
+  div { margin-right: 4px; }
 }
 
-.Import-location-button {
-  text-transform: uppercase;
+.Import-button {
   font-size: 12px;
+  padding: 10px 20px;
   background-color: $zorroa-sickly-green;
-  color: white;
+  color: $zorroa-nearwhite;
   border-radius: 3px;
-  padding-left: 24px;
-  padding-right: 24px;
-  padding-top: 8px;
-  padding-bottom: 8px;
+  text-transform: uppercase;
+  pointer-events: auto;
+  text-decoration: none;
   @include nowrap;
 
   &:hover { background-color: $zorroa-gray; }
+  &.disabled { background-color: $zorroa-lightgray; }
 }

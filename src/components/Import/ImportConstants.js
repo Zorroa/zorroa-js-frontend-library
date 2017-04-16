@@ -1,0 +1,6 @@
+export const CLOUD_IMPORT = 'CLOUD_IMPORT'
+export const SERVER_IMPORT = 'SERVER_IMPORT'
+export const LOCAL_IMPORT = 'LOCAL_IMPORT'
+export const DROPBOX_CLOUD = 'DROPBOX_CLOUD'
+export const BOX_CLOUD = 'BOX_CLOUD'
+export const GDRIVE_CLOUD = 'GDRIVE_CLOUD'

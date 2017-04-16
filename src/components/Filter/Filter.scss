@@ -3,20 +3,35 @@
 .Filter {
   @include flexRow;
   @include flexAlignItemsCenter;
-  margin-left: 20px;
-  position: relative;
 
   .icon-search {
     color: $zorroa-gray;
+  }
+
+  &.box {
+    @include fullWidth;
+    padding-right: 4px;
+    position: relative;
+    border-radius: 3px;
+    border: 1px solid $zorroa-lightgray;
   }
 }
 
 .Filter-input {
   width: 200px;
   border: none;
+
   border-bottom: 1px solid $zorroa_gray;
   padding-bottom: 4px;
+  padding-top: 4px;
+  padding-left: 4px;
+  padding-right: 20px;
   background: transparent;
+
+  .Filter.box & {
+    border: none;
+    @include fullWidth;
+  }
 }
 
 .Filter-clear {

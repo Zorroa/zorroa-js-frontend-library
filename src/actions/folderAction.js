@@ -5,6 +5,7 @@ import {
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import { archivistGet, archivistPut, archivistPost, archivistRequest } from './authAction'
+import { selectId } from '../services/jsUtil'
 
 const rootEndpoint = '/api/v1/folders'
 
@@ -53,29 +54,7 @@ export function selectFolderIds (ids) {
 // TrashedFolder.folderId is used instead of Folder.id rather than instanceof.
 export function selectFolderId (id, shiftKey, metaKey, folders, selectedIds) {
   console.log('selectFolder')
-  let selectedFolderIds = null
-  if (shiftKey) {
-    const firstSelectedIndex = folders.findIndex(folder => (selectedIds.has(folder.id) || selectedIds.has(folder.folderId)))
-    if (firstSelectedIndex >= 0) {
-      const selectedIndex = folders.findIndex(f => (id === f.id || id === f.folderId))
-      const minIndex = Math.min(selectedIndex, firstSelectedIndex)
-      const maxIndex = Math.max(selectedIndex, firstSelectedIndex)
-      const contigIds = folders.slice(minIndex, maxIndex + 1).map(folder => (folder.folderId || folder.id))
-      selectedFolderIds = new Set(contigIds)
-    } else {
-      selectedFolderIds = new Set([id])
-    }
-  } else if (metaKey) {
-    selectedFolderIds = new Set(selectedIds)
-    selectedFolderIds[selectedFolderIds.has(id) ? 'delete' : 'add'](id)
-  } else {
-    // single click of a single selected folder should deselect
-    if (selectedIds && selectedIds.size === 1 && selectedIds.has(id)) {
-      selectedFolderIds = new Set()
-    } else {
-      selectedFolderIds = new Set([id])
-    }
-  }
+  let selectedFolderIds = selectedIds(id, shiftKey, metaKey, folders, selectedIds)
   return selectFolderIds(selectedFolderIds)
 }
 

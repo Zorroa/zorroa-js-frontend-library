@@ -109,6 +109,39 @@ export function equalSets (as, bs) {
   return true
 }
 
+// id - newly selected
+// shift/meta - event modifiers
+// items - array of {id}
+// selectedIds - current set of selected ids
+//
+// returns newly selected set using standard UI selection behavior
+export function selectId (id, shiftKey, metaKey, items, selectedIds) {
+  let ids = null
+  if (shiftKey) {
+    const firstSelectedIndex = items.findIndex(item => (selectedIds.has(item.id) || selectedIds.has(item.folderId)))
+    if (firstSelectedIndex >= 0) {
+      const selectedIndex = items.findIndex(f => (id === f.id || id === f.folderId))
+      const minIndex = Math.min(selectedIndex, firstSelectedIndex)
+      const maxIndex = Math.max(selectedIndex, firstSelectedIndex)
+      const contigIds = items.slice(minIndex, maxIndex + 1).map(item => (item.folderId || item.id))
+      ids = new Set(contigIds)
+    } else {
+      ids = new Set([id])
+    }
+  } else if (metaKey) {
+    ids = new Set(selectedIds)
+    ids[ids.has(id) ? 'delete' : 'add'](id)
+  } else {
+    // single click of a single selected folder should deselect
+    if (selectedIds && selectedIds.size === 1 && selectedIds.has(id)) {
+      ids = new Set()
+    } else {
+      ids = new Set([id])
+    }
+  }
+  return ids
+}
+
 /* ----------------------------------------------------------------------
 Execute a sequence of promises, with a max limit
 on the number of promises in flight at once.

@@ -13,16 +13,16 @@ import Folders from '../Folders'
 import Racetrack from '../Racetrack'
 import Metadata from '../Metadata'
 import Collapsible from '../Collapsible'
-import CreateImport from '../Header/CreateImport'
 import { iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible, showModal, hideModal } from '../../actions/appActions'
 import { getUserPermissions, updatePassword, changePassword } from '../../actions/authAction'
 import ChangePassword from '../auth/ChangePassword'
 import User from '../../models/User'
-import Job from '../../models/Job'
+import Job, { countOfJobsOfType } from '../../models/Job'
 import Asset from '../../models/Asset'
 import Lightbox from '../Lightbox'
 import Feedback from '../Feedback'
-import Import, { LOCAL_IMPORT } from '../Import'
+import Import from '../Import'
+import { LOCAL_IMPORT } from '../Import/ImportConstants'
 
 class Workspace extends Component {
   static displayName () {
@@ -91,10 +91,10 @@ class Workspace extends Component {
       this.props.actions.showModal({body, width})
     }
     if (!nextProps.app.modal && !this.state.tipShown && nextProps.assets && !nextProps.assets.length &&
-      (!nextProps.jobs || Object.values(nextProps.jobs).filter(job => (job.type === Job.Import)).length === 0)) {
+      !countOfJobsOfType(nextProps.jobs, Job.Import)) {
       this.setState({tipShown: true})
-      const width = '600px';
-      const body = <Import onSelect={this.selectImport} userFirstName={nextProps.user.firstName}/>
+      const width = '65vw';
+      const body = <Import/>
       this.props.actions.showModal({body, width})
     }
   }
@@ -106,12 +106,6 @@ class Workspace extends Component {
   cancelPasswordUpdate = () => {
     this.props.actions.changePassword(false)
     this.props.actions.hideModal()
-  }
-
-  selectImport = (mode, event) => {
-    if (mode) {
-      this.createImport(event, mode)
-    }
   }
 
   toggleLeftSidebar = () => {
@@ -156,10 +150,11 @@ class Workspace extends Component {
     }
   }
 
-  createImport = (event, mode) => {
-    const files = mode === LOCAL_IMPORT && event && event.dataTransfer ? event.dataTransfer.files : null
-    const width = '800px'
-    const body = <CreateImport initialFiles={files} mode={mode}/>
+  createLocalImport = (event) => {
+    const source = LOCAL_IMPORT
+    const files = source === LOCAL_IMPORT && event && event.dataTransfer ? event.dataTransfer.files : null
+    const width = '65vw'
+    const body = <Import files={files} source={source} step={2} lastStep={3}/>
     this.props.actions.showModal({body, width})
     this.setState({isDroppable: false})
     event.preventDefault()
@@ -233,7 +228,7 @@ class Workspace extends Component {
         <div className={classnames('App-dropzone', {isDroppable})}
              onDragOver={this.dragOver}
              onDragLeave={this.dragLeave}
-             onDrop={this.createImport}>
+             onDrop={this.createLocalImport}>
           Drop Assets to Import
         </div>
         { isolatedId && <Lightbox/> }

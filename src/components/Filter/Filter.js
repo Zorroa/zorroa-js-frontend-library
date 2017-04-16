@@ -1,12 +1,12 @@
 import React, { PropTypes } from 'react'
 
 const Filter = (props) => (
-  <div className="Filter">
+  <div className={`Filter ${props.className}`}>
     <input className="Filter-input"
-           placeholder="Filter processor scripts"
+           placeholder={props.placeholder}
            value={props.value} onChange={props.onChange}/>
     <div onClick={props.onSearch} className="icon-search"/>
-    { props.onClear && <div onClick={props.onClear} className="Filter-clear icon-cancel-circle"/> }
+    { props.value && props.value.length && props.onClear && <div onClick={props.onClear} className="Filter-clear icon-cancel-circle"/> }
   </div>
 )
 
@@ -15,6 +15,8 @@ Filter.propTypes = {
   onChange: PropTypes.func.isRequired,
   onClear: PropTypes.func,
   onSearch: PropTypes.func,
+  className: PropTypes.string,
+  placeholder: PropTypes.string
 }
 
 export default Filter

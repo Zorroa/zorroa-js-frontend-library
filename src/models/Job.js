@@ -80,6 +80,16 @@ export default class Job {
   }
 }
 
+export function jobsOfType(jobs, type) {
+  if (!jobs) return
+  return Object.values(jobs).filter(job => (job.type === type))
+}
+
+export function countOfJobsOfType(jobs, type) {
+  if (!jobs) return 0
+  return jobsOfType(jobs, type).length
+}
+
 export class JobFilter {
   constructor ({ state, type, userId }) {
     this.state = state

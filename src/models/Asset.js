@@ -13,7 +13,7 @@ export default class Asset {
     }
   }
 
-  source () { return this.document.source.filename }
+  source () { return this.document.source && this.document.source.filename }
 
   baseURL (protocol, host, id) {
     return `${protocol}//${host}:8066/api/v1/assets/${id}`
@@ -37,8 +37,8 @@ export default class Asset {
     return this.baseURL(protocol, host, parentId) + '/proxies/smallest'
   }
 
-  mediaType () { return this.document.source.mediaType || 'unknown' }
-  tinyProxy () { return this.document.proxies ? this.document.proxies.tinyProxy : null }
+  mediaType () { return (this.document.source && this.document.source.mediaType) || 'unknown' }
+  tinyProxy () { return (this.document.proxies && (this.document.proxies ? this.document.proxies.tinyProxy : null)) }
 
   width () {
     if (this.document.image) return this.document.image.width
@@ -61,11 +61,11 @@ export default class Asset {
   }
 
   startPage () {
-    if (this.document.source.clip && this.document.source.clip.page) return this.document.source.clip.page.start
+    if (this.document.source && this.document.source.clip && this.document.source.clip.page) return this.document.source.clip.page.start
   }
 
   stopPage () {
-    if (this.document.source.clip && this.document.source.clip.page) return this.document.source.clip.page.stop
+    if (this.document.source && this.document.source.clip && this.document.source.clip.page) return this.document.source.clip.page.stop
   }
 
   frameRate () {    // frames per second

@@ -2,41 +2,116 @@
 
 .Finder {
   @include flexCol;
+  @include fullWidth;
+  @include fullHeight;
+}
+
+.Finder-files {
+  @include flexCol;
+  @include flexOn;
+  overflow: auto;
+  border-top: 1px solid $zorroa-nearwhite;
+  border-bottom: 1px solid $zorroa-nearwhite;
 }
 
 .Finder-file {
   @include flexRow;
   @include flexAlignItemsCenter;
   min-height: 25px;
-  &.selected {
-    background-color: $zorroa-selected;
-  }
+  &:nth-child(odd) { background-color: $zorroa-nearwhite; }
+  &.selected { background-color: $zorroa-selected; }
 }
 
 .Finder-file-name {
   @include fullWidth;
+  @include nowrap;
+  @include clampText;
   height: 25px;
   padding-top: 4px;
   padding-bottom: 4px;
   color: $zorroa-greyish-brown;
-  border-bottom: 1px solid $zorroa-nearwhite;
-
-  &:hover {
-    background-color: $zorroa-hover;
+  .Finder-file:not(:last-child) & {
+    border-bottom: 1px solid $zorroa-nearwhite;
   }
-
+  &:hover { background-color: $zorroa-hover; }
 }
 
 .Finder-file-icon {
   @include flexRowCenter;
   padding: 4px;
-  width: 25px;
+  width: 30px;
   height: 25px;
+  div { transition: transform 0.1s linear; }
   &:hover { background-color: $zorroa-gray; color: white; }
 }
 
 .Finder-pad {
-  min-width: 14px;
+  min-width: 20px;
   height: 25px;
-  border-right: 1px solid $zorroa-lightgray;
+  //border-right: 1px solid $zorroa-lightgray;
+}
+
+.Finder-root {
+  @include flexRow;
+  margin: 6px;
+  min-height: 22px;
+}
+
+.Finder-root-folder {
+  @include flexRowCenter;
+  color: $zorroa-gray;
+  padding: 4px;
+  border-radius: 3px;
+  &:hover { color: white; background-color: $zorroa-lightgray; }
+}
+
+.Finder-root-dir {
+  @include nowrap;
+  font-size: 12px;
+  margin-right: 4px;
+  padding: 2px 0;
+}
+
+.Finder-root-separator {
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+.Finder-header {
+  @include flexCol;
+  min-height: 48px;
+}
+
+.Finder-selected {
+  color: $zorroa-lightgray;
+  position: relative;
+  padding-right: 20px;
+  margin-right: 10px;
+}
+
+.Finder-selected-cancel {
+  @include flexRowCenter;
+  font-size: 10px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin-top: auto;
+  margin-bottom: auto;
+  &:hover { color: $zorroa-sickly-green; }
+}
+
+.Finder-body {
+  @include flexRowCenter;
+}
+
+.Finder-filter {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include fullWidth;
+  color: $zorroa-gray;
+  position: relative;
+  padding: 5px 10px;
+  margin-top: 10px;
+  margin-bottom: 5px;
 }

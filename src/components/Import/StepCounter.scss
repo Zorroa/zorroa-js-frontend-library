@@ -1,0 +1,42 @@
+@import '../../styles/core-mixins';
+
+.StepCounter {
+  @include flexRowCenter;
+  position: relative;
+  margin: 5px;
+}
+
+.StepCounter-step {
+  @include flexRowCenter;
+  font-size: 20px;
+  width: 2em;
+  height: 2em;
+  padding: 10px;
+  border-radius: 1em;
+  background: white;
+  color: $zorroa-sickly-green;
+  border: 2px solid $zorroa-sickly-green;
+  z-index: 1;
+
+  &:not(:last-child) {
+    margin-right: 70px;
+  }
+
+  &.selected {
+    background-color: $zorroa-sickly-green;
+    color: white;
+  }
+}
+
+.StepCounter-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  height: 2px;
+  max-height: 5px;
+  background-color: $zorroa-sickly-green;
+  margin-top: auto;
+  margin-bottom: auto;
+}

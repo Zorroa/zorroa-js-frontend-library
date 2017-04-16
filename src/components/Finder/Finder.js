@@ -1,45 +1,53 @@
 import React, { Component, PropTypes } from 'react'
 import classnames from 'classnames'
 
+import { selectId } from '../../services/jsUtil'
+import Filter from '../Filter'
+
 export default class Finder extends Component {
   static propTypes = {
     items: PropTypes.instanceOf(Map).isRequired,   // {id: {id, name, childIds}}
-    rootId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    rootPath: PropTypes.string.isRequired,
+    rootId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+    rootIcon: PropTypes.node,
     openIcon: PropTypes.node,
     closeIcon: PropTypes.node,
     onOpen: PropTypes.func,
-    onSelect: PropTypes.func
+    onSelect: PropTypes.func,
+    onRoot: PropTypes.func
   }
 
   static defaultProps = {
-    rootId: 0,
-    openIcon: <div className="icon-square-plus"/>,
-    closeIcon: <div className="icon-square-minus"/>
+    rootIcon: <div className="icon-folder"/>,
+    openIcon: <div className="icon-triangle-down" style={{transform: 'rotate(-90deg)'}}/>,
+    closeIcon: <div className="icon-triangle-down"/>
   }
 
   state = {
     order: 'alpha-asc',
-    opened: new Set(),
-    selected: new Set()
+    opened: new Set([this.props.rootId]),
+    selected: new Set(),
+    filter: ''
   }
 
   componentWillReceiveProps (nextProps) {
-    if (!this.state.opened.has(nextProps.rootId)) {
-      const opened = new Set(this.state.opened)
-      opened.add(nextProps.rootId)
-      this.setState({opened})
-    }
+    const { rootId } = nextProps
+    if (!this.state.opened.has(rootId)) this.open(rootId)
   }
 
-  flatten (parent, depth, files) {
+  flatten (parent, depth, files, filter) {
     if (!parent) return
-    if (depth > 0) files.push(parent)
+    const matches = (file, filter) => (
+      !filter.length || file.name.toLowerCase().includes(filter) ||
+      file.path.toLowerCase().includes(filter)
+    )
+    if (depth > 0 && (parent.childIds || matches(parent, filter))) files.push(parent)
     const { items } = this.props
     const { order, opened } = this.state
     if (!parent.childIds || !opened.has(parent.id)) return
     const sorter = this.sort(order)
     const kids = [...parent.childIds].map(id => ({...items.get(id), depth})).sort(sorter)
-    kids.forEach(kid => { this.flatten(kid, depth + 1, files) })
+    kids.forEach(kid => { this.flatten(kid, depth + 1, files, filter) })
   }
 
   sort (order) {
@@ -61,14 +69,25 @@ export default class Finder extends Component {
   }
 
   select = (id, event) => {
-    const selected = new Set(this.state.selected)
-    if (selected.has(id)) {
-      selected.delete(id)
-    } else {
-      selected.add(id)
-    }
-    this.setState({selected})
-    if (this.props.onSelect) this.props.onSelect(id, selected, event)
+    const { items, rootId, onSelect } = this.props
+    const { filter, selected } = this.state
+    const files = []
+    this.flatten(items.get(rootId), 0, files, filter.toLowerCase())
+    const ids = selectId(id, event.shiftKey, event.metaKey, files, selected)
+    this.setState({selected: ids})
+    if (onSelect) onSelect(id, ids, items, event)
+  }
+
+  setRoot = (path) => {
+    if (this.props.onRoot) this.props.onRoot(path)
+  }
+
+  changeFilter = (event) => {
+    this.setState({filter: event.target.value})
+  }
+
+  clearFilter = (event) => {
+    this.setState({filter: ''})
   }
 
   renderPads (depth) {
@@ -79,24 +98,50 @@ export default class Finder extends Component {
   }
 
   render () {
-    const { items, rootId, openIcon, closeIcon } = this.props
-    const { opened, selected } = this.state
+    const { items, rootId, rootPath, rootIcon, openIcon, closeIcon } = this.props
+    const { opened, selected, filter } = this.state
     const files = []
-    this.flatten(items.get(rootId), 0, files)
+    this.flatten(items.get(rootId), 0, files, filter.toLowerCase())
+    const dirs = rootPath.slice(1).split('/').filter(dir => dir.length > 0)
     return (
       <div className="Finder">
-        { files.map(file => (
-          <div key={file.id}
-               className={classnames('Finder-file', {selected: selected.has(file.id)})}>
-            { this.renderPads(file.depth) }
-            <div className="Finder-file-icon"
-                 onClick={file.childIds && (e => this.open(file.id, e))}>
-              { file.childIds && (opened.has(file.id) ? closeIcon : openIcon) }
-            </div>
-            <div className="Finder-file-name"
-                 onClick={e => this.select(file.id, e)}>{file.name}</div>
+        <div className="Finder-header">
+          <div className="Finder-filter">
+            { rootIcon }
+            <Filter className="box" value={filter} onChange={this.changeFilter}
+                    onClear={this.clearFilter} placeholder="Filter files"/>
           </div>
-        ))}
+        </div>
+        <div className="Finder-files">
+          { files.map(file => (
+            <div key={file.id}
+                 className={classnames('Finder-file', {selected: selected.has(file.id)})}>
+              { this.renderPads(file.depth) }
+              <div className="Finder-file-icon"
+                   onClick={file.childIds && (e => this.open(file.id, e))}>
+                { file.childIds && (opened.has(file.id) ? closeIcon : openIcon) }
+              </div>
+              <div className="Finder-file-name"
+                   onDoubleClick={file.childIds && (e => this.setRoot(file.path))}
+                   onClick={e => this.select(file.id, e)}>{file.name}</div>
+            </div>
+          ))}
+        </div>
+        <div className="Finder-root">
+          <div key="/" className="flexRowCenter">
+            <div  onClick={e => this.setRoot('/')}
+                  className="Finder-root-folder icon-folder" />
+            <div className="Finder-root-dir">/</div>
+          </div>
+          { dirs.map((dir, i) => (
+            <div key={dir} className="flexRowCenter">
+              <div className="Finder-root-separator">&rsaquo;</div>
+              <div onClick={e => this.setRoot('/' + dirs.slice(0, i+1).join('/'))}
+                   className="Finder-root-folder icon-folder" />
+              <div className="Finder-root-dir">{dir}</div>
+            </div>
+          ))}
+        </div>
       </div>
     )
   }

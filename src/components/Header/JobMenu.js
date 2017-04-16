@@ -9,7 +9,7 @@ import { showModal } from '../../actions/appActions'
 import { getAssetFields } from '../../actions/assetsAction'
 import { getJobs, markJobDownloaded, cancelJobId, restartJobId } from '../../actions/jobActions'
 import DropdownMenu from '../../components/DropdownMenu'
-import CreateImport from './CreateImport'
+import Import from '../Import/Import'
 import JobTable from './JobTable'
 
 class JobMenu extends Component {
@@ -77,8 +77,8 @@ class JobMenu extends Component {
   }
 
   createImport = (event) => {
-    const width = '800px'
-    const body = <CreateImport/>
+    const width = '65vh'
+    const body = <Import lastStep={3}/>
     this.props.actions.showModal({body, width})
   }
 
