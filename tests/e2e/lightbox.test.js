@@ -43,7 +43,7 @@ describe('Workspace', function () {
 
     // Wait for the default server query to return, and start displaying assets
     .then(_ => selenium.waitForIdle(15000))
-    .then(_ => selenium.waitForCssElementVisible('.assets-footer', 15000))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.assets-footer'), 15000))
   })
 
   // ------------------------------------
@@ -53,23 +53,23 @@ describe('Workspace', function () {
   it('check lightbox', function () {
     return driver
     .then(_ => { DEBUG && console.log('------ check basic lightbox layout') })
-    .then(_ => selenium.waitForCssElementVisible('.Thumb', 15000))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Thumb'), 15000))
     .then(_ => driver.findElement(By.css('.Thumb'))
       .then(ele => driver.actions().doubleClick(ele).perform()))
-    .then(_ => selenium.waitForCssElementVisible('.lightbox'))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.lightbox')))
 
-    .then(_ => selenium.expectCssElementIsVisible('.Lightbar'))
-    .then(_ => selenium.expectCssElementIsVisible('.Lightbar-settings'))
-    .then(_ => selenium.expectCssElementIsVisible('.Lightbar-close'))
-    .then(_ => selenium.expectCssElementIsVisible('.Controlbar'))
+    .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Lightbar')))
+    .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Lightbar-settings')))
+    .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Lightbar-close')))
+    .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Controlbar')))
 
-    .then(_ => selenium.expectCssElementIsDisabled('.Controlbar-zoom-reset'))
-    .then(_ => selenium.clickCssElement('.Controlbar-zoom-in'))
-    .then(_ => selenium.waitForCssElementEnabled('.Controlbar-zoom-reset'))
-    .then(_ => selenium.clickCssElement('.Controlbar-zoom-reset'))
-    .then(_ => selenium.waitForCssElementDisabled('.Controlbar-zoom-reset'))
-    .then(_ => selenium.clickCssElement('.Controlbar-zoom-out'))
-    .then(_ => selenium.waitForCssElementEnabled('.Controlbar-zoom-reset'))
+    .then(_ => selenium.expectSelectorEnabledToBe(false, By.css('.Controlbar-zoom-reset')))
+    .then(_ => selenium.clickSelector(By.css('.Controlbar-zoom-in')))
+    .then(_ => selenium.waitForSelectorEnabledToBe(true, By.css('.Controlbar-zoom-reset')))
+    .then(_ => selenium.clickSelector(By.css('.Controlbar-zoom-reset')))
+    .then(_ => selenium.waitForSelectorEnabledToBe(false, By.css('.Controlbar-zoom-reset')))
+    .then(_ => selenium.clickSelector(By.css('.Controlbar-zoom-out')))
+    .then(_ => selenium.waitForSelectorEnabledToBe(true, By.css('.Controlbar-zoom-reset')))
   })
 
 })

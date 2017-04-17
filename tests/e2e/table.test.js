@@ -42,13 +42,13 @@ describe('Table', function () {
     .then(_ => selenium.login())
 
     .then(_ => { DEBUG && console.log('Make sure Workspace, header, Assets are visible') })
-    .then(_ => selenium.expectCssElementIsVisible('.header'))
-    .then(_ => selenium.expectCssElementIsVisible('.Workspace'))
-    .then(_ => selenium.expectCssElementIsVisible('.Assets'))
+    .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.header')))
+    .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Workspace')))
+    .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Assets')))
 
     .then(_ => { DEBUG && console.log('Wait for the default server query to return, and start displaying assets') })
     .then(_ => driver.wait(until.elementLocated(By.css('.assets-footer')), 15000))
-    .then(_ => selenium.expectCssElementIsVisible('.assets-footer'))
+    .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.assets-footer')))
   })
 
   // ------------------------------------
@@ -105,13 +105,13 @@ describe('Table', function () {
     .then(_ => driver.wait(until.elementLocated(By.css('.assets-footer')), 15000))
 
     .then(_ => { DEBUG && console.log('Table shouldnt be visible initially') })
-    .then(_ => selenium.expectCssElementIsNotVisible('.Table'))
+    .then(_ => selenium.expectSelectorVisibleToBe(false, By.css('.Table')))
 
     .then(_ => { DEBUG && console.log('Open the Table') })
     .then(_ => driver.findElement(By.css('.TableToggle')))
       .then(ele => { TableToggle = ele })
     .then(_ => TableToggle.click())
-    .then(_ => selenium.expectCssElementIsVisible('.Table'))
+    .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Table')))
 
     .then(_ => selenium.findCssElements(['.Table', '.header', '.assets-footer', '.assets-scroll', '.Assets-tableResize']))
       .then(eles => { elements = eles })
@@ -139,6 +139,6 @@ describe('Table', function () {
 
     .then(_ => { DEBUG && console.log('Close the Table') })
     .then(_ => TableToggle.click())
-    .then(_ => selenium.expectCssElementIsNotVisible('.Table'))
+    .then(_ => selenium.expectSelectorVisibleToBe(false, By.css('.Table')))
   })
 })
