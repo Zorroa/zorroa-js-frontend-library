@@ -23,7 +23,7 @@ const WidgetHeader = ({ isEnabled, isIconified, title, field, icon, backgroundCo
         { !isIconified && (<div className='WidgetHeader-close icon-cross2' onClick={onClose}/>) }
       </div>
     </div>
-    )
+  )
 }
 
 WidgetHeader.propTypes = {

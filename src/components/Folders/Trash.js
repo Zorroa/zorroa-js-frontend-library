@@ -172,7 +172,9 @@ class Trash extends Component {
                     <div className="Trash-item-count">
                       { this.renderPermission(trashedFolder.acl) }
                     </div>
-                  </div>) }) }
+                  </div>
+                )
+              }) }
             </div>
           </div>
         ) : <div/> }

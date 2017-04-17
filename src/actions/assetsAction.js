@@ -19,7 +19,7 @@ function escapeQuery (query) {
   // https://www.elastic.co/guide/en/elasticsearch/reference/2.1/query-dsl-query-string-query.html#_reserved_characters
   let safeQuery = new AssetSearch(query)
   if (safeQuery.query) {
-    safeQuery.query = safeQuery.query.replace(/(\+|\-|=|&&|\|\||>|<|!|\(|\)|\{|\}|\[|\]|\^|"|~|\*|\?|:|\\|\/)/g, '\\$&')
+    safeQuery.query = safeQuery.query.replace(/(\+|-|=|&&|\|\||>|<|!|\(|\)|\{|\}|\[|\]|\^|"|~|\*|\?|:|\\|\/)/g, '\\$&')
   }
   return safeQuery
 }

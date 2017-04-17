@@ -21,7 +21,7 @@ const CollapsibleHeader = ({ isOpen, isParent, isIconified, isSelected, header, 
         )
       }
     </div>
-    )
+  )
 }
 
 CollapsibleHeader.propTypes = {

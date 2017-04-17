@@ -19,7 +19,7 @@ export function unCamelCase (str) {
 }
 
 export function isValidEmail (email) {
-  return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)
+  return /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email)
 }
 
 export function formatDuration (seconds, fps) {

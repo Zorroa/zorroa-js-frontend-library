@@ -381,21 +381,22 @@ class Table extends Component {
           { visibleFields.map((fieldIndex) => {
             const field = fields[fieldIndex]
             return (
-            <div key={fieldIndex}
-                 className={this.headerClassnames(field)}
-                 style={{width: `${fieldWidth[field]}px`, left: `${fieldLeft[fieldIndex]}px`, top: '0px', position: 'absolute'}}>
-              <div className={`Table-cell`}>
-                { this.renderTitle(field, fields) }
+              <div key={fieldIndex}
+                   className={this.headerClassnames(field)}
+                   style={{width: `${fieldWidth[field]}px`, left: `${fieldLeft[fieldIndex]}px`, top: '0px', position: 'absolute'}}>
+                <div className={`Table-cell`}>
+                  { this.renderTitle(field, fields) }
+                </div>
+                <i onClick={this.sortByField.bind(this, field)} className={this.sortOrderClassnames(field)}/>
+                <div className='flexOn'/>
+                <div className='Table-header-resizer'
+                     onMouseDown={event => this.columnResizeStart(event, field)}
+                     onDoubleClick={event => this.columnAutoResize(event, field)}>
+                  <div className='Table-header-resizer-handle'/>
+                </div>
               </div>
-              <i onClick={this.sortByField.bind(this, field)} className={this.sortOrderClassnames(field)}/>
-              <div className='flexOn'/>
-              <div className='Table-header-resizer'
-                   onMouseDown={event => this.columnResizeStart(event, field)}
-                   onDoubleClick={event => this.columnAutoResize(event, field)}>
-                <div className='Table-header-resizer-handle'/>
-              </div>
-            </div>
-          ) }) }
+            )
+          }) }
         </div>
         <div className='Table-scroll-clip'
              style={{
@@ -431,8 +432,8 @@ class Table extends Component {
                             this.toggleArrayField(asset, field)
                           }}
                         />
-                      ) }
-                    )}
+                      )
+                    })}
                   </div>)
               })}
               <div id='Table-cell-test' className='Table-cell'/>
