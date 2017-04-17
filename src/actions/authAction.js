@@ -138,7 +138,7 @@ export function signinUser (username, password, protocol, host) {
   }
 }
 
-function authorize (dispatch, json) {
+function authorize (dispatch, json, source) {
   const user = new User(json)
   dispatch({ type: AUTH_USER, payload: user })
   localStorage.setItem(USER_ITEM, JSON.stringify(user))
@@ -185,7 +185,8 @@ function authorize (dispatch, json) {
       dispatch({type: LIGHTBAR_FIELDS, payload: metadata.lightbarFields})
     }
   }
-  browserHistory.push('/')
+  const url = window.location.origin + '/' + (source && source.length ? '?source=' + source : '')
+  browserHistory.push(url)   // Retain search from original URL
 }
 
 export function forgotPassword (email, protocol, host) {
@@ -223,7 +224,7 @@ export function updatePassword (user, password) {
   }
 }
 
-export function resetPassword (password, token, protocol, host) {
+export function resetPassword (password, token, protocol, host, source) {
   return dispatch => {
     createArchivist(dispatch, protocol, host)
     archivistPost(dispatch, '/api/v1/reset-password', {password}, {
@@ -233,7 +234,7 @@ export function resetPassword (password, token, protocol, host) {
       }
     })
       .then(response => {
-        authorize(dispatch, response.data)
+        authorize(dispatch, response.data, source)
       })
       .catch(error => dispatch(authError('Cannot reset password', error)))
   }
