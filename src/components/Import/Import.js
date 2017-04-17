@@ -3,6 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import { hideModal } from '../../actions/appActions'
+import { changePassword } from '../../actions/authAction'
 import { importAssets, uploadFiles, getPipelines, getProcessors } from '../../actions/jobActions'
 
 import Logo from '../Logo'
@@ -63,7 +64,12 @@ class Import extends Component {
   }
 
   setStep = (step) => {
-    if (step > this.props.lastStep) this.dismiss()
+    if (step == 4) {
+      this.dismiss()
+      this.props.actions.changePassword(true)
+    } else if (step > this.props.lastStep) {
+      this.dismiss()
+    }
     this.setState({step})
   }
 
@@ -158,7 +164,7 @@ class Import extends Component {
     return { name, pipelineId, processors, generators }
   }
 
-  dismiss = (event) => {
+  dismiss = () => {
     this.props.actions.hideModal()
   }
 
@@ -184,7 +190,10 @@ class Import extends Component {
     return (
       <div className="Import-header">
         <Logo/>
-        <StepCounter step={this.state.step} onStep={this.setStep}/>
+        <div className="Import-header-right">
+          <StepCounter step={this.state.step} onStep={this.setStep}/>
+          {this.props.lastStep <= 4 && <div onClick={this.dismiss} className="Import-cancel icon-cross2"/> }
+        </div>
       </div>
     )
   }
@@ -245,6 +254,7 @@ export default connect(state => ({
     getProcessors,
     importAssets,
     uploadFiles,
+    changePassword,
     hideModal
   }, dispatch)
 }))(Import)

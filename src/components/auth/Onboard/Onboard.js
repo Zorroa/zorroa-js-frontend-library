@@ -9,11 +9,17 @@ class Onboard extends Component {
     actions: PropTypes.object
   }
 
+  static get contextTypes () {
+    return {
+      router: PropTypes.object
+    }
+  }
+
   componentWillMount () {
     this.changePassword(this.randomPassword())
   }
 
-  randomPassword = () => ('kjadf72brc#(u!kla15')
+  randomPassword = () => (Math.random().toString(36).substring(7))
 
   changePassword = (password) => {
     const token = this.props.location && this.props.location.query && this.props.location.query.token
@@ -21,10 +27,11 @@ class Onboard extends Component {
     const host = window.location.hostname
     const source = this.props.location && this.props.location.query && this.props.location.query.source
     this.props.actions.resetPassword(password, token, protocol, host, source)
+    this.context.router.push('/')
   }
 
   render () {
-    return <div className="Onboard">Onboarding Zorroa</div>
+    return <div className="Onboard"/>
   }
 }
 
