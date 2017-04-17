@@ -129,14 +129,14 @@ export default class Finder extends Component {
         </div>
         <div className="Finder-root">
           <div key="/" className="flexRowCenter">
-            <div  onClick={e => this.setRoot('/')}
-                  className="Finder-root-folder icon-folder" />
+            <div onClick={e => this.setRoot('/')}
+                 className="Finder-root-folder icon-folder" />
             <div className="Finder-root-dir">/</div>
           </div>
           { dirs.map((dir, i) => (
             <div key={dir} className="flexRowCenter">
               <div className="Finder-root-separator">&rsaquo;</div>
-              <div onClick={e => this.setRoot('/' + dirs.slice(0, i+1).join('/'))}
+              <div onClick={e => this.setRoot('/' + dirs.slice(0, i + 1).join('/'))}
                    className="Finder-root-folder icon-folder" />
               <div className="Finder-root-dir">{dir}</div>
             </div>
