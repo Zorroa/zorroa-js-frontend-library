@@ -53,7 +53,7 @@ export function selectFolderIds (ids) {
 // TrashedFolder.folderId is used instead of Folder.id rather than instanceof.
 export function selectFolderId (id, shiftKey, metaKey, folders, selectedIds) {
   console.log('selectFolder')
-  let selectedFolderIds = selectedIds(id, shiftKey, metaKey, folders, selectedIds)
+  let selectedFolderIds = selectId(id, shiftKey, metaKey, folders, selectedIds)
   return selectFolderIds(selectedFolderIds)
 }
 
