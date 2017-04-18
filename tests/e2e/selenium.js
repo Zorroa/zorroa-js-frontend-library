@@ -126,7 +126,8 @@ export function startBrowserAndDriver (_suite) {
       build: process.env.TRAVIS_BUILD_NUMBER,
       username: process.env.SAUCE_USERNAME,
       accessKey: process.env.SAUCE_ACCESS_KEY,
-      browserName: browserName
+      browserName: browserName,
+      screenResolution: "1400x1050"
     }
 
     driver = new webdriver.Builder()
@@ -136,11 +137,11 @@ export function startBrowserAndDriver (_suite) {
   } else {
     // run tests locally if when not using travis+sauce
     driver = new webdriver.Builder()
-    .withCapabilities({browserName})
+    .withCapabilities({browserName, screenResolution: "1400x1050"})
     .build()
   }
 
-  driver.then(_ => driver.manage().window().setSize(1200,800))
+  driver.then(_ => driver.manage().window().setSize(1400,1050))
 
   return driver
 }
