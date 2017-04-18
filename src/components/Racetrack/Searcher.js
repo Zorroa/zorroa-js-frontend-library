@@ -12,6 +12,7 @@ import { searchAssets, getAssetFields, requiredFields } from '../../actions/asse
 import { countAssetsInFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
 import { MapWidgetInfo } from './WidgetInfo'
+import { jobsOfType } from '../../models/Job'
 
 // Searcher is a singleton. It combines AssetSearches from the Racetrack
 // and Folders and submits a new query to the Archivist server.
@@ -52,8 +53,8 @@ class Searcher extends Component {
   }
 
   updateImportFinished (nextProps) {
-    const oldJobs = this.props.jobs && Object.values(this.props.jobs).filter(job => (job.type === Job.Import))
-    const newJobs = nextProps.jobs && Object.values(nextProps.jobs).filter(job => (job.type === Job.Import))
+    const oldJobs = jobsOfType(this.props.jobs, Job.Import)
+    const newJobs = jobsOfType(nextProps.jobs, Job.Import)
     if (oldJobs && newJobs) {
       const oldFieldCount = this.props.fieldTypes && Object.keys(this.props.fieldTypes).length
       const newFieldCount = nextProps.fieldTypes && Object.keys(nextProps.fieldTypes).length
