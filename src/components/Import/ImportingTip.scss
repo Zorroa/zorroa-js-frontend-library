@@ -1,0 +1,70 @@
+@import '../../styles/core-mixins';
+
+.ImportingTip {
+  @include flexColCenter;
+}
+
+.ImportingTip-title {
+  margin-top: 40px;
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.ImportingTip-subtitle {
+  color: $zorroa-avocado-green;
+  font-size: 16px;
+  margin-bottom: 30px;
+  font-weight: 300;
+}
+
+.ImportingTip-tips {
+  @include flexColCenter;
+  padding-left: 100px;
+  padding-right: 100px;
+
+}
+
+.ImportingTip-tip {
+  @include flexRow;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  color: $zorroa-gray;
+  font-size: 16px;
+  line-height: 1.25em;
+}
+
+.ImportingTip-tip-icon {
+  font-size: 34px;
+  color: $zorroa-sickly-green;
+  margin-right: 20px;
+}
+
+.ImportingTip-tip-label {
+  margin-left: 15px;
+  @include flexOn;
+}
+
+.ImportingTip-tip-img {
+  width: 1.5em;
+  margin-left: 0.25em;
+  margin-right: 0.25em;
+  vertical-align: bottom;
+}
+
+.ImportingTip-dismiss {
+  @include flexRowCenter;
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+.ImportingTip-dismiss-button {
+  font-size: 12px;
+  padding: 10px 20px;
+  background-color: $zorroa-nearwhite;
+  color: $zorroa-gray;
+  border-radius: 3px;
+  text-transform: uppercase;
+
+  &:hover { background-color: $zorroa-lightgray; }
+}

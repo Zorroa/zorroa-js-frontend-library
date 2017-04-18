@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'zorroa-icons';
-  src:  url('fonts/zorroa-icons.eot?g499bm');
-  src:  url('fonts/zorroa-icons.eot?g499bm#iefix') format('embedded-opentype'),
-    url('fonts/zorroa-icons.woff2?g499bm') format('woff2'),
-    url('fonts/zorroa-icons.ttf?g499bm') format('truetype'),
-    url('fonts/zorroa-icons.woff?g499bm') format('woff'),
-    url('fonts/zorroa-icons.svg?g499bm#zorroa-icons') format('svg');
+  src:  url('fonts/zorroa-icons.eot?3k5r2g');
+  src:  url('fonts/zorroa-icons.eot?3k5r2g#iefix') format('embedded-opentype'),
+    url('fonts/zorroa-icons.woff2?3k5r2g') format('woff2'),
+    url('fonts/zorroa-icons.ttf?3k5r2g') format('truetype'),
+    url('fonts/zorroa-icons.woff?3k5r2g') format('woff'),
+    url('fonts/zorroa-icons.svg?3k5r2g#zorroa-icons') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -25,6 +25,12 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-server:before {
+  content: "\e96b";
+}
+.icon-database:before {
+  content: "\e96b";
+}
 .icon-search3:before {
   content: "\e965";
 }
@@ -54,6 +60,12 @@
 }
 .icon-plus2:before {
   content: "\e928";
+}
+.icon-circle-check:before {
+  content: "\e970";
+}
+.icon-box:before {
+  content: "\e971";
 }
 .icon-star-filled:before {
   content: "\e96a";
@@ -214,6 +226,12 @@
 .icon-stack-empty:before {
   content: "\ed3b";
 }
+.icon-dropbox:before {
+  content: "\e96c";
+}
+.icon-brand:before {
+  content: "\e96c";
+}
 .icon-film:before {
   content: "\e931";
 }
@@ -319,11 +337,17 @@
 .icon-binoculars:before {
   content: "\e906";
 }
+.icon-file-symlink-directory:before {
+  content: "\e96f";
+}
 .icon-triangle-down:before {
   content: "\e905";
 }
 .icon-search:before {
   content: "\e904";
+}
+.icon-laptop:before {
+  content: "\e96d";
 }
 .icon-sort:before {
   content: "\e94e";
@@ -339,6 +363,9 @@
 }
 .icon-sort-down:before {
   content: "\e90c";
+}
+.icon-google-drive:before {
+  content: "\e96e";
 }
 .icon-export:before {
   content: "\e936";

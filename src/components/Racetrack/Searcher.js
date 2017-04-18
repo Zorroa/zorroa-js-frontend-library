@@ -2,6 +2,7 @@ import { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
+import Job from '../../models/Job'
 import User from '../../models/User'
 import Widget from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
@@ -30,15 +31,46 @@ class Searcher extends Component {
     fieldTypes: PropTypes.object,
     metadataFields: PropTypes.arrayOf(PropTypes.string),
     lightbarFields: PropTypes.arrayOf(PropTypes.string),
+    jobs: PropTypes.object,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired
+  }
+
+  state = {
+    importFinished: false
   }
 
   componentWillMount () {
     this.pendingQueryCountIds = new Set()
     this.pendingFullCountIds = new Set()
     this.props.actions.getAssetFields()
+  }
+
+  componentWillReceiveProps (nextProps) {
+    this.updateImportFinished(nextProps)
+  }
+
+  updateImportFinished (nextProps) {
+    const oldJobs = this.props.jobs && Object.values(this.props.jobs).filter(job => (job.type === Job.Import))
+    const newJobs = nextProps.jobs && Object.values(nextProps.jobs).filter(job => (job.type === Job.Import))
+    if (oldJobs && newJobs) {
+      const oldFieldCount = this.props.fieldTypes && Object.keys(this.props.fieldTypes).length
+      const newFieldCount = nextProps.fieldTypes && Object.keys(nextProps.fieldTypes).length
+      let importFinished = oldJobs.length !== newJobs.length || oldFieldCount !== newFieldCount
+      oldJobs.forEach(oldJob => {
+        if (oldJob.state === Job.Active) {
+          const newJob = newJobs.find(job => job.id === oldJob.id)
+          if (newJob && newJob.state === Job.Finished) {
+            importFinished = true
+          }
+        }
+      })
+      this.setState({importFinished})
+      if (importFinished) {
+        this.props.actions.getAssetFields()
+      }
+    }
   }
 
   isCounted (folderId) {
@@ -173,9 +205,9 @@ class Searcher extends Component {
     const skip = new Set(['fields', 'from', 'size', 'scroll'])
     const missingField = this.inflightQuery ? this.inflightQuery.missingField(assetSearch.fields) : (!query || query.missingField(assetSearch.fields))
     const searchModified = this.inflightQuery ? !this.inflightQuery.equals(assetSearch, skip) : (!query || !assetSearch.equals(query, skip))
-    if (searchModified || missingField) {
+    if (searchModified || missingField || this.state.importFinished) {
       assetSearch.size = AssetSearch.autoPageSize
-      actions.searchAssets(assetSearch, query)
+      actions.searchAssets(assetSearch, query, this.state.importFinished)
       this.inflightQuery = assetSearch
       if (query) {
         // FIXME: Disable saving search to user settings to avoid conflicts
@@ -184,6 +216,9 @@ class Searcher extends Component {
       if (folders && folders.size > 1 && assetSearch && !assetSearch.empty()) {
         // New query, get all the filtered folder counts
         this.queueFolderCounts(new Set([...folders.keys()]), assetSearch)
+        if (this.state.importFinished) {
+          this.queueFolderCounts(new Set([...folders.keys()]))
+        }
       }
     } else if (modifiedFolderIds && modifiedFolderIds.size) {
       this.queueFolderCounts(modifiedFolderIds)
@@ -221,6 +256,7 @@ const mapStateToProps = state => ({
   fieldTypes: state.assets.types,
   metadataFields: state.app.metadataFields,
   lightbarFields: state.app.lightbarFields,
+  jobs: state.jobs.all,
   user: state.auth.user,
   userSettings: state.app.userSettings
 })

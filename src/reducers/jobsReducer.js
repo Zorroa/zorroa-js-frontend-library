@@ -2,7 +2,7 @@ import {
   EXPORT_ASSETS, IMPORT_ASSETS,
   GET_JOBS, GET_PIPELINES,
   MARK_JOB_DOWNLOADED, GET_PROCESSORS,
-  RESTART_JOB, CANCEL_JOB } from '../constants/actionTypes'
+  RESTART_JOB, CANCEL_JOB, UNAUTH_USER } from '../constants/actionTypes'
 import Job from '../models/Job'
 
 export const initialState = { all: {}, processors: [] }
@@ -18,6 +18,7 @@ export default function (state = initialState, action) {
 
     case IMPORT_ASSETS: {
       const job = action.payload
+      job.state = Job.Active      // Workaround 0.34 Archivist bug
       const all = { ...state.all, [job.id]: job }
       return { ...state, all }
     }
@@ -74,6 +75,10 @@ export default function (state = initialState, action) {
 
     case GET_PROCESSORS: {
       return { ...state, processors: action.payload }
+    }
+
+    case UNAUTH_USER: {
+      return initialState
     }
   }
 

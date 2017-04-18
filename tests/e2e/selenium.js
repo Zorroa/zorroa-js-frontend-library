@@ -332,6 +332,7 @@ export function login () {
   .then(_ => driver.findElement(By.css('input[name="password"]')).sendKeys('z0rr0@12'))
   .then(_ => driver.findElement(By.css('input[name="host"]')).sendKeys('dev.zorroa.com'))
   .then(_ => driver.findElement(By.css('input[name="ssl"]')).isSelected())
+  .then(_ => driver.findElement(By.css('input[name="eula"]')).click())
   .then(isSelected => !isSelected && driver.findElement(By.css('input[name="ssl"]')).click())
   .then(_ => driver.findElement(By.css('.auth-button-primary')).click())
   .then(_ => waitForUrl(`${BASE_URL}/`, 15000))

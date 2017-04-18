@@ -8,6 +8,7 @@ import RequireAuth from './components/auth/RequireAuth'
 import ResetPassword from './components/auth/ResetPassword'
 import ForgotPassword from './components/auth/ForgotPassword'
 import Workspace from './components/Workspace'
+import { DropboxAuth } from './components/Import/DropboxAuthenticator'
 
 export default (
   <Route path='/' component={App}>
@@ -16,5 +17,6 @@ export default (
     <Route path="signout" component={Signout} />
     <Route path="forgot" component={ForgotPassword} />
     <Route path="password" component={ResetPassword} />
+    <Route path="dbxauth" component={DropboxAuth} />
   </Route>
 )

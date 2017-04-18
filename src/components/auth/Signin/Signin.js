@@ -19,12 +19,16 @@ class Signin extends Component {
     username: '',
     password: '',
     host: '',
-    ssl: false
+    ssl: false,
+    acceptEULA: false
   }
 
   componentWillMount () {
     if (this.props.defaults) {
-      this.setState({...this.props.defaults})
+      const isLocalhost = this.props.defaults.host && this.props.defaults.host.includes('localhost')
+      const ssl = !isLocalhost        // Development settings
+      const acceptEULA = isLocalhost
+      this.setState({ ...this.props.defaults, ssl, acceptEULA })
     }
     this.clearError()
   }
@@ -69,6 +73,10 @@ class Signin extends Component {
     }
   }
 
+  toggleEULA = (event) => {
+    this.setState({ acceptEULA: !this.state.acceptEULA })
+  }
+
   renderAlert () {
     const { error } = this.props
     let changed = false
@@ -85,8 +93,8 @@ class Signin extends Component {
   }
 
   render () {
-    const { username, password, host, ssl } = this.state
-    const disabled = !username || !username.length || (!PROD && (!host || !host.length))
+    const { username, password, host, ssl, acceptEULA } = this.state
+    const disabled = !username || !username.length || (!PROD && (!host || !host.length)) || !acceptEULA
     return (
       <div className="auth">
         <div className="auth-box">
@@ -118,6 +126,10 @@ class Signin extends Component {
                 </div>
               </div>
             )}
+            <div className="auth-eula">
+              <input type="checkbox" className="auth-eula-input" name="eula" checked={acceptEULA} onChange={this.toggleEULA}/>
+              <div className="auth-eula-label">I accept the Zorroa <a href="http://zorroa.com/eula">terms of use</a></div>
+            </div>
             <div className={classnames('auth-button-primary', {disabled})} onClick={!disabled && this.signin}>Login</div>
           </div>
           <Link className="auth-forgot" to="/forgot">Forgot Password?</Link>

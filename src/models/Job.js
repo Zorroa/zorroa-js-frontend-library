@@ -63,7 +63,7 @@ export default class Job {
     if (!this.tasks) return -1
     const pct = this.tasks.percentCompleted()
     if (pct <= 0) return -1
-    return elapsed / pct
+    return 100 * elapsed / pct
   }
 
   timeRemainingString () {
@@ -78,6 +78,16 @@ export default class Job {
     const d = Math.floor(h / 24)
     return `${d} days, ${Math.floor(h - 24 * d)} hrs`
   }
+}
+
+export function jobsOfType (jobs, type) {
+  if (!jobs) return
+  return Object.values(jobs).filter(job => (job.type === type))
+}
+
+export function countOfJobsOfType (jobs, type) {
+  if (!jobs) return 0
+  return jobsOfType(jobs, type).length
 }
 
 export class JobFilter {

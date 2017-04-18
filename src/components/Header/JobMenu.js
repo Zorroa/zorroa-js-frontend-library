@@ -6,9 +6,10 @@ import classnames from 'classnames'
 import Job, { JobFilter } from '../../models/Job'
 import User from '../../models/User'
 import { showModal } from '../../actions/appActions'
+import { getAssetFields } from '../../actions/assetsAction'
 import { getJobs, markJobDownloaded, cancelJobId, restartJobId } from '../../actions/jobActions'
 import DropdownMenu from '../../components/DropdownMenu'
-import CreateImport from './CreateImport'
+import Import from '../Import/Import'
 import JobTable from './JobTable'
 
 class JobMenu extends Component {
@@ -47,7 +48,7 @@ class JobMenu extends Component {
       return (job.type === jobType && job.state === Job.Active)
     }) >= 0
     if (containsActiveJob) {
-      this.monitorJobsInterval = setInterval(this.refreshJobs, 10000)
+      this.monitorJobsInterval = setInterval(this.refreshJobs, 5000)
     }
   }
 
@@ -60,6 +61,7 @@ class JobMenu extends Component {
     // We only get the top N jobs, irrespective of the filter.
     // FIXME: fix the server to return the top N filtered jobs
     actions.getJobs(jobFilter, 0, 30)
+    actions.getAssetFields()
   }
 
   cancelJob (job) {
@@ -75,8 +77,8 @@ class JobMenu extends Component {
   }
 
   createImport = (event) => {
-    const width = '800px'
-    const body = <CreateImport/>
+    const width = '65vh'
+    const body = <Import lastStep={3}/>
     this.props.actions.showModal({body, width})
   }
 
@@ -89,8 +91,7 @@ class JobMenu extends Component {
   renderJobStatus (job) {
     switch (job.state) {
       case Job.Active: {
-        const estimate = job.timeRemainingString()
-        return <div className="JobMenu-timing">Time remaining: {estimate}</div>
+        return <div className="JobMenu-timing">{job.timeRemaining() < 0 ? '' : `Time remaining: ${job.timeRemainingString()}`}</div>
       }
       case Job.Cancelled:
         return (
@@ -126,7 +127,7 @@ class JobMenu extends Component {
 
   renderProgress (job) {
     if (job.state !== Job.Active) return
-    const progress = 100 * job.percentCompleted()
+    const progress = job.percentCompleted()
     return (
       <div className="JobMenu-progress">
         <progress max={100} value={progress}/>
@@ -167,7 +168,7 @@ class JobMenu extends Component {
       )
     }
     this.monitorJobs()
-    const maxJobs = 10
+    const maxJobs = 5
     const filteredJobs = allJobs.slice(0, maxJobs)
     return (
       <div className="JobMenu-jobs">
@@ -226,6 +227,7 @@ export default connect(state => ({
 }), dispatch => ({
   actions: bindActionCreators({
     getJobs,
+    getAssetFields,
     markJobDownloaded,
     cancelJobId,
     restartJobId,

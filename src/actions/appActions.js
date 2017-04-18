@@ -2,7 +2,7 @@ import {
   SHOW_MODAL, HIDE_MODAL, SORT_FOLDERS,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
   METADATA_FIELDS, LIGHTBAR_FIELDS,
-  SET_DRAGGING, SET_TABLE_FIELD_WIDTH, SHOW_IMPORT_SCRIPT_INFO,
+  SET_DRAGGING, SET_TABLE_FIELD_WIDTH,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
   SHOW_MULTIPAGE, SHOW_PAGES, VIDEO_VOLUME,
   HOVER_FIELD, CLEAR_HOVER_FIELD
@@ -81,13 +81,6 @@ export function setTableFieldWidth (newFieldWidths) {
   return ({
     type: SET_TABLE_FIELD_WIDTH,
     payload: newFieldWidths
-  })
-}
-
-export function showImportScriptInfo (show) {
-  return ({
-    type: SHOW_IMPORT_SCRIPT_INFO,
-    payload: show
   })
 }
 

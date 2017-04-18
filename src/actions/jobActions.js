@@ -32,10 +32,14 @@ export function exportAssets (name, search, fields, includeSource) {
   }
 }
 
-export function importAssets (name, pipelineId, generators) {
+export function importAssets (name, pipelineId, generators, pipeline) {
   return dispatch => {
-    console.log('Import: ' + name + ' with pipeline id ' + pipelineId)
-    archivistPost(dispatch, importEndpoint, {name, pipelineId, generators})
+    if (pipeline) {
+      console.log('Import: ' + name + ' with pipeline: ' + JSON.stringify(pipeline))
+    } else {
+      console.log('Import: ' + name + ' with pipeline id ' + pipelineId)
+    }
+    archivistPost(dispatch, importEndpoint, {name, pipelineId, generators, pipeline})
       .then(response => {
         dispatch({
           type: IMPORT_ASSETS,
@@ -43,7 +47,7 @@ export function importAssets (name, pipelineId, generators) {
         })
       })
       .catch(error => {
-        console.error('Error creating import ' + name + ' with pipeline id ' + pipelineId + ': ' + error)
+        console.error('Error creating import ' + name + ': ' + error)
       })
   }
 }
