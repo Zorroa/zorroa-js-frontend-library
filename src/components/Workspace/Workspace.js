@@ -89,6 +89,10 @@ class Workspace extends Component {
       const width = '300px'
       const body = <ChangePassword onChangePassword={this.updatePassword} onCancel={this.cancelPasswordUpdate}/>
       this.props.actions.showModal({body, width})
+    } else if (nextProps.app.modal && nextProps.app.modal.body.props.onChangePassword && !nextProps.changePassword) {
+      // The conditional above checks to see if the current modal is the ChangePassword component,
+      // and that we should hide it, which is really better handled with a promise somehow?
+      this.props.actions.hideModal()
     }
     const src = this.props.location && this.props.location.query && this.props.location.query.source
     const sources = { cloud: CLOUD_IMPORT, file_server: SERVER_IMPORT, my_computer: LOCAL_IMPORT }
