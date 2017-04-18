@@ -75,3 +75,11 @@
   &:hover { background-color: $zorroa-gray; }
   &.disabled { background-color: $zorroa-lightgray; }
 }
+
+.Import-header-right {
+  @include flexRowCenter;
+}
+
+.Import-cancel {
+  &:hover { color: $zorroa-sickly-green; }
+}

@@ -77,7 +77,7 @@ class JobMenu extends Component {
   }
 
   createImport = (event) => {
-    const width = '65vh'
+    const width = '65vw'
     const body = <Import lastStep={3}/>
     this.props.actions.showModal({body, width})
   }
