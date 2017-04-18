@@ -16,7 +16,7 @@ const ImportCloudproxy = (props) => (
       { oses.map(os => (
         <div className="ImportCloudproxy-download">
           <div className="ImportCloudproxy-script icon-script"/>
-          <a href={`http://dl.zorroa.com/cloudproxy-${os}.tgz`} download
+          <a href={`https://dl.zorroa.com/public/cloudproxy/zorroa-cloudproxy-${os}.tgz`} download
              className="Import-button"
              onClick={e => props.onSelect(os, e)}>
             Download {os} Script
