@@ -140,6 +140,8 @@ export function startBrowserAndDriver (_suite) {
     .build()
   }
 
+  driver.then(_ => driver.manage().window().setSize(1200,800))
+
   return driver
 }
 
