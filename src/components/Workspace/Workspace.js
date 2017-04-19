@@ -22,7 +22,7 @@ import Asset from '../../models/Asset'
 import Lightbox from '../Lightbox'
 import Feedback from '../Feedback'
 import Import from '../Import'
-import { LOCAL_IMPORT } from '../Import/ImportConstants'
+import { LOCAL_IMPORT, CLOUD_IMPORT, SERVER_IMPORT } from '../Import/ImportConstants'
 
 class Workspace extends Component {
   static displayName () {
@@ -90,11 +90,16 @@ class Workspace extends Component {
       const body = <ChangePassword onChangePassword={this.updatePassword} onCancel={this.cancelPasswordUpdate}/>
       this.props.actions.showModal({body, width})
     }
-    if (!nextProps.app.modal && !this.state.tipShown && nextProps.assets && !nextProps.assets.length &&
-      !countOfJobsOfType(nextProps.jobs, Job.Import)) {
+    const src = this.props.location && this.props.location.query && this.props.location.query.source
+    const sources = { cloud: CLOUD_IMPORT, file_server: SERVER_IMPORT, my_computer: LOCAL_IMPORT }
+    const source = sources[src]
+    if (!nextProps.app.modal && !this.state.tipShown &&   // not previously displayed
+      source ||                                           // source in URL
+      (nextProps.assets && !nextProps.assets.length &&    // no assets
+      !countOfJobsOfType(nextProps.jobs, Job.Import))) {  // no imports
       this.setState({tipShown: true})
       const width = '65vw'
-      const body = <Import/>
+      const body = <Import source={source} step={source ? 2 : 1}/>
       this.props.actions.showModal({body, width})
     }
   }

@@ -2,14 +2,11 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import ChangePassword from '../ChangePassword'
 import { resetPassword } from '../../../actions/authAction'
 
-class ResetPassword extends Component {
+class Onboard extends Component {
   static propTypes = {
-    actions: PropTypes.object,
-    error: PropTypes.string,
-    location: PropTypes.object
+    actions: PropTypes.object
   }
 
   static get contextTypes () {
@@ -18,32 +15,29 @@ class ResetPassword extends Component {
     }
   }
 
+  componentWillMount () {
+    this.changePassword(this.randomPassword())
+  }
+
+  randomPassword = () => (Math.random().toString(36).substring(7))
+
   changePassword = (password) => {
     const token = this.props.location && this.props.location.query && this.props.location.query.token
     const protocol = window.location.protocol
     const host = window.location.hostname
-    this.props.actions.resetPassword(password, token, protocol, host)
-  }
-
-  cancel = (event) => {
+    const source = this.props.location && this.props.location.query && this.props.location.query.source
+    this.props.actions.resetPassword(password, token, protocol, host, source)
     this.context.router.push('/')
   }
 
   render () {
-    return (
-      <ChangePassword
-        onChangePassword={this.changePassword}
-        onCancel={this.cancel}
-        fullscreen={true}
-        error={this.props.error}/>
-    )
+    return <div className="Onboard"/>
   }
 }
 
 export default connect(state => ({
-  error: state.auth.error
 }), dispatch => ({
   actions: bindActionCreators({
     resetPassword
   }, dispatch)
-}))(ResetPassword)
+}))(Onboard)

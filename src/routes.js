@@ -4,6 +4,7 @@ import { Route, IndexRoute } from 'react-router'
 import App from './components/App'
 import Signin from './components/auth/Signin'
 import Signout from './components/auth/Signout'
+import Onboard from './components/auth/Onboard'
 import RequireAuth from './components/auth/RequireAuth'
 import ResetPassword from './components/auth/ResetPassword'
 import ForgotPassword from './components/auth/ForgotPassword'
@@ -17,6 +18,7 @@ export default (
     <Route path="signout" component={Signout} />
     <Route path="forgot" component={ForgotPassword} />
     <Route path="password" component={ResetPassword} />
+    <Route path="onboard" component={Onboard} />
     <Route path="dbxauth" component={DropboxAuth} />
   </Route>
 )

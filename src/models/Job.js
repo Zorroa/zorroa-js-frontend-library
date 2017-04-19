@@ -82,7 +82,7 @@ export default class Job {
 
 export function jobsOfType (jobs, type) {
   if (!jobs) return
-  return Object.values(jobs).filter(job => (job.type === type))
+  return Object.keys(jobs).map(key => jobs[key]).filter(job => (job.type === type))
 }
 
 export function countOfJobsOfType (jobs, type) {
