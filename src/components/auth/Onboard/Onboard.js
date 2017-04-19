@@ -6,6 +6,7 @@ import { resetPassword } from '../../../actions/authAction'
 
 class Onboard extends Component {
   static propTypes = {
+    location: PropTypes.object,
     actions: PropTypes.object
   }
 
@@ -23,10 +24,9 @@ class Onboard extends Component {
 
   changePassword = (password) => {
     const token = this.props.location && this.props.location.query && this.props.location.query.token
-    const protocol = window.location.protocol
-    const host = window.location.hostname
+    const origin = window.location.origin
     const source = this.props.location && this.props.location.query && this.props.location.query.source
-    this.props.actions.resetPassword(password, token, protocol, host, source)
+    this.props.actions.resetPassword(password, token, origin, source)
     this.context.router.push('/')
   }
 

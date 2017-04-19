@@ -3,12 +3,12 @@ import { browserHistory } from 'react-router'
 import * as api from '../globals/api.js'
 
 import {
-  AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR, USER_SETTINGS,
-  AUTH_PERMISSIONS, AUTH_SYNC, METADATA_FIELDS,
+  AUTH_USER, UNAUTH_USER, AUTH_ORIGIN, AUTH_ERROR, USER_SETTINGS,
+  AUTH_PERMISSIONS, AUTH_SYNC, METADATA_FIELDS, AUTH_ONBOARDING,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT, SET_TABLE_FIELD_WIDTH,
   SHOW_MULTIPAGE, VIDEO_VOLUME, AUTH_CHANGE_PASSWORD, AUTH_DEFAULTS, LIGHTBAR_FIELDS
 } from '../constants/actionTypes'
-import { USER_ITEM, HOST_ITEM, PROTOCOL_ITEM } from '../constants/localStorageItems'
+import { USER_ITEM, ORIGIN_ITEM } from '../constants/localStorageItems'
 import User from '../models/User'
 import Permission from '../models/Permission'
 
@@ -19,24 +19,17 @@ var archivist
 // Create the global axios connection, on login or refresh.
 // Note this is not an action creator, so it should probably
 // be in another file, but we need access to archivist global.
-export function createArchivist (dispatch, protocol, host) {
-  // Set the default protocol for development.
-  // Change or provide a UI to set it for development testing.
-  if (!protocol) {
-    protocol = 'http:'
+export function createArchivist (dispatch, origin) {
+  // Override origin in production or update if not set
+  if (PROD || !origin || !origin.length) {
+    origin = window.location.origin
   }
-  if (!host || PROD) {
-    host = window.location.hostname
-    protocol = window.location.protocol
-  }
-  const baseURL = protocol + '//' + host + ':8066'
-  if (!archivist || archivist.baseURL !== baseURL) {
+  if (!archivist || archivist.origin !== origin) {
     // Use withCredentials to handle CORS certification.
-    archivist = axios.create({baseURL, withCredentials: true})
+    archivist = axios.create({baseURL: origin, withCredentials: true})
   }
-  dispatch({ type: AUTH_HOST, payload: {host, protocol} })
-  localStorage.setItem(HOST_ITEM, host)
-  localStorage.setItem(PROTOCOL_ITEM, protocol)
+  dispatch({ type: AUTH_ORIGIN, payload: origin })
+  localStorage.setItem(ORIGIN_ITEM, origin)
 }
 
 // // Return the axios connection for other action creators
@@ -92,10 +85,10 @@ export function archivistRequest (dispatch, ...args) {
   return finishRequest(dispatch, archivist.apply(this, args))
 }
 
-export function validateUser (user, protocol, host) {
+export function validateUser (user, origin) {
   return dispatch => {
     // Create a new archivist, if needed for a new host
-    createArchivist(dispatch, protocol, host)
+    createArchivist(dispatch, origin)
     if (user.id > 0) {
       archivistGet(dispatch, '/api/v1/users/' + user.id, {
         headers: { 'X-Requested-With': 'XMLHttpRequest' } // disable browser auth
@@ -114,18 +107,18 @@ export function validateUser (user, protocol, host) {
   }
 }
 
-export function signinDefaults (username, host, ssl) {
+export function signinDefaults (username, origin) {
   return ({
     type: AUTH_DEFAULTS,
-    payload: {username, host, ssl}
+    payload: {username, origin}
   })
 }
 
-export function signinUser (username, password, protocol, host) {
+export function signinUser (username, password, origin) {
   // Submit username+password to server
   return dispatch => {
     // Create a new archivist, if needed for a new host
-    createArchivist(dispatch, protocol, host)
+    createArchivist(dispatch, origin)
     archivistPost(dispatch, '/api/v1/login', {}, {
       withCredentials: true,
       auth: { username, password },
@@ -189,9 +182,9 @@ function authorize (dispatch, json, source) {
   browserHistory.push(url)   // Retain search from original URL
 }
 
-export function forgotPassword (email, protocol, host) {
+export function forgotPassword (email, origin) {
   return dispatch => {
-    createArchivist(dispatch, protocol, host)
+    createArchivist(dispatch, origin)
     archivistPost(dispatch, '/api/v1/send-password-reset-email', {email}, {
       headers: { 'X-Requested-With': 'XMLHttpRequest' } // disable browser auth
     })
@@ -223,9 +216,9 @@ export function updatePassword (user, password) {
   }
 }
 
-export function resetPassword (password, token, protocol, host, source) {
+export function resetPassword (password, token, origin, source, onboarding) {
   return dispatch => {
-    createArchivist(dispatch, protocol, host)
+    createArchivist(dispatch, origin)
     archivistPost(dispatch, '/api/v1/reset-password', {password}, {
       headers: {
         'X-Requested-With': 'XMLHttpRequest',   // disable browser auth
@@ -234,12 +227,13 @@ export function resetPassword (password, token, protocol, host, source) {
     })
       .then(response => {
         authorize(dispatch, response.data, source)
+        dispatch({ type: AUTH_ONBOARDING, payload: onboarding })
       })
       .catch(error => dispatch(authError('Cannot reset password', error)))
   }
 }
 
-export function signoutUser (user, host) {
+export function signoutUser (user, origin) {
   return dispatch => {
     if (archivist) {
       archivistPost(dispatch, '/api/v1/logout', {}, {
@@ -247,7 +241,7 @@ export function signoutUser (user, host) {
       })
       .then(response => {
         dispatch({ type: UNAUTH_USER, payload: response.data })
-        dispatch({ type: AUTH_DEFAULTS, payload: {host, username: user.username, ssl: true} })
+        dispatch({ type: AUTH_DEFAULTS, payload: {origin, username: user.username} })
         localStorage.setItem(USER_ITEM, JSON.stringify(new User({...user, id: -1})))
       })
       .catch(error => dispatch(authError('Cannot signout', error)))

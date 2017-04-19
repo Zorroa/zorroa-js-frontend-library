@@ -22,19 +22,18 @@ import { CLOUD_IMPORT, SERVER_IMPORT, LOCAL_IMPORT, DROPBOX_CLOUD, BOX_CLOUD, GD
 class Import extends Component {
   static propTypes = {
     step: PropTypes.number,
-    lastStep: PropTypes.number,
     source: PropTypes.string,
     cloud: PropTypes.string,
     files: PropTypes.object,
     pipelines: PropTypes.arrayOf(PropTypes.instanceOf(Pipeline)),
     processors: PropTypes.arrayOf(PropTypes.instanceOf(Processor)),
     user: PropTypes.instanceOf(User).isRequired,
+    onboarding: PropTypes.bool,
     actions: PropTypes.object
   }
 
   static defaultProps = {
     step: 1,
-    lastStep: 5,
     source: '',
     cloud: ''
   }
@@ -67,7 +66,7 @@ class Import extends Component {
     if (step >= this.props.lastStep) {
       this.dismiss()
     }
-    if (step <= this.props.lastStep) {
+    if (this.props.onboarding) {
       this.props.actions.changePassword(true)
     }
     this.setState({step})
@@ -192,7 +191,7 @@ class Import extends Component {
         <Logo/>
         <div className="Import-header-right">
           <StepCounter step={this.state.step} onStep={this.setStep}/>
-          {this.props.lastStep < 5 && <div onClick={this.dismiss} className="Import-cancel icon-cross2"/> }
+          { !this.props.onboarding && <div onClick={this.dismiss} className="Import-cancel icon-cross2"/> }
         </div>
       </div>
     )
@@ -247,7 +246,8 @@ class Import extends Component {
 export default connect(state => ({
   pipelines: state.jobs.pipelines,
   processors: state.jobs.processors,
-  user: state.auth.user
+  user: state.auth.user,
+  onboarding: state.auth.onboarding
 }), dispatch => ({
   actions: bindActionCreators({
     getPipelines,

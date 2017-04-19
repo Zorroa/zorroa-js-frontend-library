@@ -40,9 +40,9 @@ export default class Job {
     return (this.stats && this.stats.frameWarningCount) || (this.tasks && this.tasks.skipped)
   }
 
-  exportStream (protocol, host) {
+  exportStream (origin) {
     if (this.type === Job.Export && this.isFinished()) {
-      return `${protocol}//${host}:8066/api/v1/exports/${this.id}/_stream`
+      return `${origin}/api/v1/exports/${this.id}/_stream`
     }
   }
 

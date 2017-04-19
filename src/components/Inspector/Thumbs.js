@@ -13,8 +13,7 @@ class Thumbs extends Component {
     thumbSize: PropTypes.number.isRequired,
     selectedIds: PropTypes.instanceOf(Set),
     onMonopage: PropTypes.func.isRequired,
-    protocol: PropTypes.string,
-    host: PropTypes.string,
+    origin: PropTypes.string,
     actions: PropTypes.object.isRequired
   }
 
@@ -132,7 +131,7 @@ class Thumbs extends Component {
 
   render () {
     const { positions } = this.state
-    const { assets, protocol, host, thumbSize, selectedIds } = this.props
+    const { assets, origin, thumbSize, selectedIds } = this.props
     if (!positions || !assets || positions.length !== assets.length) {
       return <div className="Thumbs" ref={this.updateElement} />
     }
@@ -140,11 +139,11 @@ class Thumbs extends Component {
       <div className="Thumbs" ref={this.updateElement}>
         <div className="Thumbs-body">
           { assets.map((asset, i) => {
-            const { pageBadge } = monopageBadges(asset, protocol, host, -1, thumbSize < 100 ? 15 : 25)
+            const { pageBadge } = monopageBadges(asset, origin, -1, thumbSize < 100 ? 15 : 25)
             const dim = positions[i]
             const { width, height } = dim
             return <Thumb key={asset.id}
-                          pages={[page(asset, width, height, protocol, host)]}
+                          pages={[page(asset, width, height, origin)]}
                           dim={dim}
                           pageBadge={pageBadge}
                           isSelected={selectedIds && selectedIds.has(asset.id)}
@@ -159,8 +158,7 @@ class Thumbs extends Component {
 
 export default connect(state => ({
   selectedIds: state.assets.selectedPageIds,
-  protocol: state.auth.protocol,
-  host: state.auth.host,
+  origin: state.auth.origin,
   thumbSize: state.app.thumbSize
 }), dispatch => ({
   actions: bindActionCreators({selectPageAssetIds}, dispatch)

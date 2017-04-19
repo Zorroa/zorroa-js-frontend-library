@@ -163,7 +163,7 @@ class Workspace extends Component {
     const source = LOCAL_IMPORT
     const files = source === LOCAL_IMPORT && event && event.dataTransfer ? event.dataTransfer.files : null
     const width = '65vw'
-    const body = <Import files={files} source={source} step={2} lastStep={3}/>
+    const body = <Import files={files} source={source} step={2}/>
     this.props.actions.showModal({body, width})
     this.setState({isDroppable: false})
     event.preventDefault()

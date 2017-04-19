@@ -1,6 +1,6 @@
 import {
-  AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR, AUTH_PERMISSIONS,
-  AUTH_SYNC, AUTH_CHANGE_PASSWORD, AUTH_DEFAULTS } from '../constants/actionTypes'
+  AUTH_USER, UNAUTH_USER, AUTH_ORIGIN, AUTH_ERROR, AUTH_PERMISSIONS,
+  AUTH_SYNC, AUTH_CHANGE_PASSWORD, AUTH_DEFAULTS, AUTH_ONBOARDING } from '../constants/actionTypes'
 import User from '../models/User'
 
 const initialState = {
@@ -13,8 +13,8 @@ export default function (state = initialState, action) {
       return { ...state, error: '', authenticated: action.payload.id > 0, user: action.payload }
     case UNAUTH_USER:
       return { ...state, authenticated: false }
-    case AUTH_HOST:
-      return { ...state, host: action.payload.host, protocol: action.payload.protocol }
+    case AUTH_ORIGIN:
+      return { ...state, origin: action.payload }
     case AUTH_ERROR:
       return { ...state, error: action.payload }
     case AUTH_PERMISSIONS: {
@@ -26,9 +26,10 @@ export default function (state = initialState, action) {
       return { ...state, sync: action.payload }
     case AUTH_DEFAULTS:
       return { ...state, defaults: action.payload }
-    case AUTH_CHANGE_PASSWORD: {
+    case AUTH_CHANGE_PASSWORD:
       return { ...state, changePassword: action.payload }
-    }
+    case AUTH_ONBOARDING:
+      return { ...state, onboarding: action.payload }
   }
 
   return state
