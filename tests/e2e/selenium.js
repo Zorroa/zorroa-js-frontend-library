@@ -18,7 +18,7 @@ driver.wait(until.elementLocated(By.xpath(`//*[contains(text(), '_selenium_14902
 quit()
 */
 
-const DEBUG = true
+const DEBUG = false
 
 // selenium promise manager is deprecated; use this to start testing. also works in the shell
 // process.env.SELENIUM_PROMISE_MANAGER = 0
@@ -53,9 +53,26 @@ if (USE_SAUCE) {
   })
 }
 
+// webdriver docs
 // http://seleniumhq.github.io/selenium/docs/api/javascript/index.html
 // https://github.com/SeleniumHQ/selenium/wiki/WebDriverJs
+//
+// Sauce labs example
 // https://github.com/ndmanvar/JS-Mocha-WebdriverJS/blob/master/tests/sample-spec.js#L47-L50
+//
+// future docker selenium grid setup
+// http://testdetective.com/selenium-grid-with-docker/
+// http://www.tjmaher.com/2016/07/setting-up-selenium-grid-with-chrome.html
+// docker run -d -p 4444:4444 --name selenium-hub -P selenium/hub
+// docker run -d -P -e no_proxy=localhost -e HUB_ENV_no_proxy=localhost --link selenium-hub:hub selenium/node-chrome-debug
+// IIRC The no_proxy junk above is a mac-only issue
+// https://github.com/SeleniumHQ/docker-selenium/issues/227#issuecomment-224865735
+// https://github.com/SeleniumHQ/docker-selenium/issues/91#issuecomment-250502062
+//
+// Open question how to connect to docker host IP. For testing I exposed my curator publicly. Would prefer to avoid this.
+// https://github.com/moby/moby/issues/8427
+// https://github.com/moby/moby/issues/8395#issuecomment-212147825
+// https://github.com/moby/moby/issues/1143
 
 export const BASE_URL = 'http://localhost:8080'
 
@@ -138,6 +155,8 @@ export function startBrowserAndDriver (_suite) {
     // run tests locally if when not using travis+sauce
     driver = new webdriver.Builder()
     .withCapabilities({browserName, screenResolution: "1024x768"})
+    // .usingServer('http://localhost:4444/wd/hub')
+    // or use: SELENIUM_REMOTE_URL="http://localhost:4444/wd/hub" jest -i tags
     .build()
   }
 
@@ -148,7 +167,7 @@ export function startBrowserAndDriver (_suite) {
 
 // ----------------------------------------------------------------------
 export function stopBrowserAndDriver () {
-  return new Promise((resolve, reject) => {
+  return driver.then(_ => new Promise((resolve, reject) => {
     testStopDate = Date.now()
     testRunTimeMS = testStopDate - testStartDate
 
@@ -189,7 +208,7 @@ export function stopBrowserAndDriver () {
         }
       )
     })
-  })
+  }))
 }
 
 // ----------------------------------------------------------------------

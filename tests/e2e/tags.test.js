@@ -88,7 +88,7 @@ describe('Tags', function () {
       })
   }
 
-  it('user logs in', function () {
+  fit('user logs in', function () {
     return driver
     .then(_ => { DEBUG && console.log('--- user logs in') })
     .then(_ => selenium.login())
