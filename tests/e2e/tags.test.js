@@ -88,7 +88,7 @@ describe('Tags', function () {
       })
   }
 
-  fit('user logs in', function () {
+  it('user logs in', function () {
     return driver
     .then(_ => { DEBUG && console.log('--- user logs in') })
     .then(_ => selenium.login())
@@ -168,15 +168,16 @@ describe('Tags', function () {
     .then(_ => { DEBUG && console.log('--- check tag widget buttons') })
     .then(_ => openAllTags())
     .then(_ => openRacetrack())
+    .then(_ => selenium.waitForIdle(5000))
 
     .then(_ => { DEBUG && console.log('make sure colors tag bring up color widget') })
     .then(_ => selenium.getTagNamed('Colors'))
       .then(ele => ele.findElement(By.css('.Metadata-item-widget')))
       .then(ele => ele.click())
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Color')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Color')), 5000)
     // .then(_ => selenium.expectSelectorHasClassToBe(true, By.css('.Metadata-item-colors'), '.isSelected'))
     .then(_ => selenium.clickSelector(By.css('.Metadata-item-colors')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack-empty')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack-empty')), 5000)
 
     .then(_ => { DEBUG && console.log('open source tag folder') })
     .then(_ => selenium.getTagNamed('Source').then(ele => ele.click()))
