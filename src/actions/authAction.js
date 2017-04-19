@@ -217,8 +217,7 @@ export function updatePassword (user, password) {
       headers: {'X-Requested-With': 'XMLHttpRequest'} // disable browser auth
     })
       .then(response => {
-        dispatch({ type: UNAUTH_USER, payload: response.data })
-        browserHistory.push('/signin')
+        dispatch({ type: AUTH_CHANGE_PASSWORD, payload: false })
       })
       .catch(error => dispatch(authError('Cannot update ' + user.username + ' password', error)))
   }

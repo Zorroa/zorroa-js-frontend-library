@@ -34,7 +34,7 @@ class Import extends Component {
 
   static defaultProps = {
     step: 1,
-    lastStep: 4,
+    lastStep: 5,
     source: '',
     cloud: ''
   }
@@ -64,11 +64,11 @@ class Import extends Component {
   }
 
   setStep = (step) => {
-    if (step == 4) {
+    if (step >= this.props.lastStep) {
       this.dismiss()
+    }
+    if (step <= this.props.lastStep) {
       this.props.actions.changePassword(true)
-    } else if (step > this.props.lastStep) {
-      this.dismiss()
     }
     this.setState({step})
   }
@@ -192,7 +192,7 @@ class Import extends Component {
         <Logo/>
         <div className="Import-header-right">
           <StepCounter step={this.state.step} onStep={this.setStep}/>
-          {this.props.lastStep <= 4 && <div onClick={this.dismiss} className="Import-cancel icon-cross2"/> }
+          {this.props.lastStep < 5 && <div onClick={this.dismiss} className="Import-cancel icon-cross2"/> }
         </div>
       </div>
     )
