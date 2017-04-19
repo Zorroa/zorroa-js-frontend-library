@@ -41,7 +41,9 @@ class Workspace extends Component {
     user: PropTypes.instanceOf(User),
     isolatedId: PropTypes.string,
     changePassword: PropTypes.bool,
+    onboarding: PropTypes.bool,
     jobs: PropTypes.object,
+    location: PropTypes.object,
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset))
   }
 
@@ -87,7 +89,10 @@ class Workspace extends Component {
     }
     if (!nextProps.app.modal && (nextProps.changePassword || (nextProps.user && nextProps.user.changePassword))) {
       const width = '300px'
-      const body = <ChangePassword onChangePassword={this.updatePassword} onCancel={this.cancelPasswordUpdate}/>
+      const title = `${nextProps.onboarding ? 'SELECT' : 'CHANGE'} ${nextProps.user.username}'s PASSWORD`
+      const body = <ChangePassword onChangePassword={this.updatePassword}
+                                   onCancel={this.cancelPasswordUpdate}
+                                   title={title} />
       this.props.actions.showModal({body, width})
     } else if (nextProps.app.modal && nextProps.app.modal.body.props.onChangePassword && !nextProps.changePassword) {
       // The conditional above checks to see if the current modal is the ChangePassword component,
@@ -251,6 +256,7 @@ export default connect(state => ({
   user: state.auth.user,
   isolatedId: state.assets.isolatedId,
   changePassword: state.auth.changePassword,
+  onboarding: state.auth.onboarding,
   assets: state.assets.all,
   jobs: state.jobs.all
 }), dispatch => ({

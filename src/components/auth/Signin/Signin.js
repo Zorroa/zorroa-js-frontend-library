@@ -67,7 +67,8 @@ class Signin extends Component {
     const host = event.target.value
     const isLocalhost = host && host.includes('localhost')
     const ssl = this.state.ssl && isLocalhost ? false : this.state.ssl
-    this.setState({host, ssl})
+    const acceptEULA = !this.state.acceptEULA && isLocalhost ? true : this.state.acceptEULA
+    this.setState({host, ssl, acceptEULA})
     this.clearError()
   }
 

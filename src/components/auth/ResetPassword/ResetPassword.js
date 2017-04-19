@@ -33,7 +33,6 @@ class ResetPassword extends Component {
       <ChangePassword
         onChangePassword={this.changePassword}
         onCancel={this.cancel}
-        fullscreen={true}
         error={this.props.error}/>
     )
   }
