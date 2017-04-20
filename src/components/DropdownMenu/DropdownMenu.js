@@ -6,15 +6,20 @@ export default class DropdownMenu extends Component {
     children: PropTypes.node,
     label: PropTypes.node,
     style: PropTypes.object,
-    onChange: PropTypes.func
+    onChange: PropTypes.func,
+    show: PropTypes.bool
   }
 
   state = {
-    isVisible: false
+    isVisible: this.props.show
   }
 
   componentWillUnmount () {
     document.removeEventListener('click', this.hide)
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.show && !this.props.show) this.show()
   }
 
   setStateProm = (newState) => {
@@ -23,9 +28,13 @@ export default class DropdownMenu extends Component {
 
   show = (event) => {
     const { isVisible } = this.state
-    if (isVisible) return
+    if (isVisible || this.showing) return
+    this.showing = true
     this.setStateProm({ isVisible: true })
-    .then(() => document.addEventListener('click', this.hide))
+      .then(() => {
+        document.addEventListener('click', this.hide)
+        this.showing = false
+      })
     if (this.props.onChange) this.props.onChange(event, true)
   }
 

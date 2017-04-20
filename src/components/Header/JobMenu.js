@@ -17,8 +17,8 @@ class JobMenu extends Component {
     jobType: PropTypes.string.isRequired,
     jobs: PropTypes.object,
     user: PropTypes.instanceOf(User).isRequired,
-    protocol: PropTypes.string,
-    host: PropTypes.string,
+    origin: PropTypes.string,
+    onboarding: PropTypes.bool,
     actions: PropTypes.object.isRequired
   }
 
@@ -31,6 +31,11 @@ class JobMenu extends Component {
   componentWillUnmount () {
     clearInterval(this.monitorJobsInterval)
     this.monitorJobsInterval = null
+  }
+
+  componentWillReceiveProps (nextProps) {
+    // Show the import menu after we finish onboarding
+    this.show = this.props.onboarding && !nextProps.onboarding && nextProps.jobType === Job.Import
   }
 
   monitorJobs = () => {
@@ -78,7 +83,7 @@ class JobMenu extends Component {
 
   createImport = (event) => {
     const width = '65vw'
-    const body = <Import lastStep={3}/>
+    const body = <Import/>
     this.props.actions.showModal({body, width})
   }
 
@@ -104,7 +109,7 @@ class JobMenu extends Component {
         </div>
         )
       case Job.Finished: {
-        const {protocol, host} = this.props
+        const {origin} = this.props
         return (
           <div className="JobMenu-finished">
             { job.warningCount() ? <div className="JobMenu-warning">{job.warningCount()}</div> : null }
@@ -113,7 +118,7 @@ class JobMenu extends Component {
               <a key={job.id}
                  className={classnames('JobMenu-download', 'icon-download2', {notDownloaded: job.notDownloaded})}
                  onClick={this.markDownloaded.bind(this, job)}
-                 href={job.exportStream(protocol, host)} download={job.name}>
+                 href={job.exportStream(origin)} download={job.name}>
                 <div className="JobMenu-download-text">Download</div>
               </a>
             ) : null }
@@ -205,7 +210,7 @@ class JobMenu extends Component {
     return (
       <div className="header-menu header-menu-jobs">
         { this.renderJobBadge() }
-        <DropdownMenu label={`${jobType}s`} onChange={this.refreshJobs}>
+        <DropdownMenu label={`${jobType}s`} onChange={this.refreshJobs} show={this.show}>
           { jobType === Job.Import ? (
             <div onClick={this.createImport} className="JobMenu-jobs-create-import">
               <div className="icon-import"/>
@@ -222,8 +227,8 @@ class JobMenu extends Component {
 export default connect(state => ({
   user: state.auth.user,
   jobs: state.jobs && state.jobs.all,
-  protocol: state.auth && state.auth.protocol,
-  host: state.auth && state.auth.host
+  origin: state.auth.origin,
+  onboarding: state.auth.onboarding
 }), dispatch => ({
   actions: bindActionCreators({
     getJobs,

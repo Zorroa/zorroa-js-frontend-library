@@ -7,7 +7,7 @@ export default class ChangePassword extends Component {
   static propTypes = {
     onChangePassword: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
-    fullscreen: PropTypes.bool,
+    title: PropTypes.string,
     error: PropTypes.string
   }
 
@@ -37,23 +37,23 @@ export default class ChangePassword extends Component {
   }
 
   render () {
+    const { title } = this.props
     const { password, password2 } = this.state
     const mismatch = password.length && password !== password2
     const disabled = !password.length || mismatch
-    const fullscreen = this.props.fullscreen
     const error = this.props.error || (mismatch ? 'Passwords do not match' : '')
     return (
-      <div className={classnames('ChangePassword', {fullscreen})}>
-        { !fullscreen && (
+      <div className={classnames('ChangePassword', {fullscreen: !title})}>
+        { title && (
           <div className="ChangePassword-header">
             <div className="ChangePassword-settings icon-cog"/>
-            <div className="ChangePassword-title">Change Password</div>
+            <div className="ChangePassword-title">{title}</div>
             <div className="flexOn"/>
             <div className="ChangePassword-close icon-cross2" onClick={this.cancel}/>
           </div>
         )}
         <div className="ChangePassword-body">
-          { fullscreen && (
+          { !title && (
             <div className="auth-logo">
               <Logo/>
             </div>

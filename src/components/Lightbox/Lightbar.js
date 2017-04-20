@@ -26,8 +26,7 @@ class Lightbar extends Component {
     showPages: PropTypes.bool,
     pages: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     lightbarFields: PropTypes.arrayOf(PropTypes.string),
-    protocol: PropTypes.string,
-    host: PropTypes.string,
+    origin: PropTypes.string,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object
@@ -106,10 +105,10 @@ class Lightbar extends Component {
   }
 
   isolatedAssetURL () {
-    const { isolatedId, assets, host, protocol } = this.props
+    const { isolatedId, assets, origin } = this.props
     const asset = assets.find(asset => (asset.id === isolatedId))
     if (!asset) return
-    return asset.url(protocol, host)
+    return asset.url(origin)
   }
 
   copyIsolatedAssetLink = () => {
@@ -236,8 +235,7 @@ export default connect(state => ({
   pages: state.assets.pages,
   selectedPageIds: state.assets.selectedPageIds,
   lightbarFields: state.app.lightbarFields,
-  protocol: state.auth.protocol,
-  host: state.auth.host,
+  origin: state.auth.origin,
   user: state.auth.user,
   userSettings: state.app.userSettings
 }), dispatch => ({

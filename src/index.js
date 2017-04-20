@@ -12,7 +12,7 @@ import ReduxPromise from 'redux-promise'
 
 import routes from './routes'
 import reducers from './reducers'
-import { USER_ITEM, HOST_ITEM, PROTOCOL_ITEM } from './constants/localStorageItems'
+import { USER_ITEM, ORIGIN_ITEM } from './constants/localStorageItems'
 import { validateUser, signinDefaults } from './actions/authAction'
 import User from './models/User'
 
@@ -53,12 +53,11 @@ const applicationNode = (
 console.log('loading token')
 const userItem = JSON.parse(localStorage.getItem(USER_ITEM))
 const user = userItem ? new User(userItem) : null
-const host = localStorage.getItem(HOST_ITEM)
-const protocol = localStorage.getItem(PROTOCOL_ITEM)
-if (user && host) {
+const origin = localStorage.getItem(ORIGIN_ITEM)
+if (user && origin) {
   // Initialize form to avoid faking user & host in state.auth triggering Searcher
-  store.dispatch(signinDefaults(user.username, host, true))
-  store.dispatch(validateUser(user, protocol, host))
+  store.dispatch(signinDefaults(user.username, origin))
+  store.dispatch(validateUser(user, origin))
 }
 
 log('creating dom node')

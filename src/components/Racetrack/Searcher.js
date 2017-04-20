@@ -2,7 +2,7 @@ import { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import Job from '../../models/Job'
+import Job, { jobsOfType } from '../../models/Job'
 import User from '../../models/User'
 import Widget from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
@@ -12,7 +12,6 @@ import { searchAssets, getAssetFields, requiredFields } from '../../actions/asse
 import { countAssetsInFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
 import { MapWidgetInfo } from './WidgetInfo'
-import { jobsOfType } from '../../models/Job'
 
 // Searcher is a singleton. It combines AssetSearches from the Racetrack
 // and Folders and submits a new query to the Archivist server.

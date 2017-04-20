@@ -15,26 +15,26 @@ export default class Asset {
 
   source () { return this.document.source && this.document.source.filename }
 
-  baseURL (protocol, host, id) {
-    return `${protocol}//${host}:8066/api/v1/assets/${id}`
+  endpoint (origin, id) {
+    return `${origin}/api/v1/assets/${id}`
   }
 
-  url (protocol, host) {
-    return this.baseURL(protocol, host, this.id) + '/_stream'
+  url (origin) {
+    return this.endpoint(origin, this.id) + '/_stream'
   }
 
-  closestProxyURL (protocol, host, width, height) {
-    return `${this.baseURL(protocol, host, this.id)}/proxies/closest/${Math.round(width)}x${Math.round(height)}`
+  closestProxyURL (origin, width, height) {
+    return `${this.endpoint(origin, this.id)}/proxies/closest/${Math.round(width)}x${Math.round(height)}`
   }
 
-  largestProxyURL (protocol, host) {
-    return this.baseURL(protocol, host, this.id) + '/proxies/largest'
+  largestProxyURL (origin) {
+    return this.endpoint(origin, this.id) + '/proxies/largest'
   }
 
-  smallestParentProxyURL (protocol, host) {
+  smallestParentProxyURL (origin) {
     const parentId = this.parentId()
     if (!parentId) return null
-    return this.baseURL(protocol, host, parentId) + '/proxies/smallest'
+    return this.endpoint(origin, parentId) + '/proxies/smallest'
   }
 
   mediaType () { return (this.document.source && this.document.source.mediaType) || 'unknown' }
