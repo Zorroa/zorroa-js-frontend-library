@@ -64,12 +64,12 @@ class Import extends Component {
 
   setStep = (step) => {
     const { onboarding, actions } = this.props
-    const lastStep = onboarding ? 5 : 3
-    if (step >= lastStep) {
+    const lastStep = onboarding ? 4 : 3
+    if (step > lastStep) {
       this.dismiss()
-    }
-    if (onboarding) {
-      actions.changePassword(true)
+      if (onboarding) {
+        actions.changePassword(true)
+      }
     }
     this.setState({step})
   }
@@ -204,7 +204,7 @@ class Import extends Component {
       case 1: return <ImportSource onSelect={this.selectSource}/>
       case 2: return this.renderStep2()
       case 3: return this.renderStep3()
-      case 4: return <ImportingTip onDismiss={this.dismiss}/>
+      case 4: return <ImportingTip onDismiss={e => this.setStep(5)}/>
     }
   }
 

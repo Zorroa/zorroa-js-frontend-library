@@ -216,9 +216,10 @@ export function updatePassword (user, password) {
   }
 }
 
-export function resetPassword (password, token, origin, source, onboarding) {
+export function resetPassword (password, token, origin, source) {
   return dispatch => {
-    createArchivist(dispatch, origin)
+    const url = PROD ? origin : origin.replace('8080', '8066')
+    createArchivist(dispatch, url)
     archivistPost(dispatch, '/api/v1/reset-password', {password}, {
       headers: {
         'X-Requested-With': 'XMLHttpRequest',   // disable browser auth
@@ -227,6 +228,7 @@ export function resetPassword (password, token, origin, source, onboarding) {
     })
       .then(response => {
         authorize(dispatch, response.data, source)
+        const onboarding = source && source.length > 0
         dispatch({ type: AUTH_ONBOARDING, payload: onboarding })
       })
       .catch(error => dispatch(authError('Cannot reset password', error)))
