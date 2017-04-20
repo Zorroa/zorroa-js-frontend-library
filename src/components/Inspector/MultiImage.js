@@ -10,8 +10,7 @@ class MultiImage extends Component {
     parentId: PropTypes.string,
     pages: PropTypes.arrayOf(PropTypes.instanceOf(Asset)).isRequired,
     onMultipage: PropTypes.func.isRequired,
-    protocol: PropTypes.string,
-    host: PropTypes.string,
+    origin: PropTypes.string,
     actions: PropTypes.object
   }
 
@@ -43,11 +42,11 @@ class MultiImage extends Component {
   }
 
   render () {
-    const { pages, onMultipage, protocol, host } = this.props
+    const { pages, onMultipage, origin } = this.props
     const { pageIndex } = this.state
     const title = pages && pageIndex < pages.length && `Page ${pageIndex + 1} / ${pages.length}`
     const page = pages && pages[pageIndex]
-    const url = page.biggestProxy().url(protocol, host)
+    const url = page.biggestProxy().url(origin)
     return <Image title={title} url={url} onMultipage={onMultipage}
                   onNextPage={pages && pageIndex < pages.length - 1 ? this.nextPage : null}
                   onPrevPage={pages && pageIndex > 0 && pages.length ? this.prevPage : null}/>
@@ -55,7 +54,6 @@ class MultiImage extends Component {
 }
 
 export default connect(state => ({
-  protocol: state.auth.protocol,
-  host: state.auth.host,
+  origin: state.auth.origin,
   pages: state.assets.pages
 }))(MultiImage)

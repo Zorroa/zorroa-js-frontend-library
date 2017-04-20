@@ -1,7 +1,7 @@
 import authReducer from './authReducer'
 import User from '../models/User'
 import Permission from '../models/Permission'
-import { AUTH_USER, UNAUTH_USER, AUTH_HOST, AUTH_ERROR, AUTH_PERMISSIONS } from '../constants/actionTypes'
+import { AUTH_USER, UNAUTH_USER, AUTH_ORIGIN, AUTH_ERROR, AUTH_PERMISSIONS } from '../constants/actionTypes'
 
 describe('authReducer', () => {
   it('AUTH_USER sets authenticated', () => {
@@ -15,9 +15,9 @@ describe('authReducer', () => {
       .toEqual({ authenticated: false })
   })
 
-  it('AUTH_HOST sets host', () => {
-    const payload = { host: 'localhost', protocol: 'piglatin' }
-    expect(authReducer([], { type: AUTH_HOST, payload }))
+  it('AUTH_HOST sets origin', () => {
+    const payload = { origin: 'http://localhost:8066' }
+    expect(authReducer([], { type: AUTH_ORIGIN, payload: 'http://localhost:8066' }))
       .toEqual(payload)
   })
 

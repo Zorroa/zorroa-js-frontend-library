@@ -50,8 +50,7 @@ class Assets extends Component {
     sync: PropTypes.bool.isRequired,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
-    protocol: PropTypes.string,
-    host: PropTypes.string,
+    origin: PropTypes.string,
     actions: PropTypes.object
   }
 
@@ -481,7 +480,7 @@ class Assets extends Component {
   }
 
   renderAssets () {
-    const { assets, selectedIds, totalCount, layout, showMultipage, protocol, host, thumbSize, query } = this.props
+    const { assets, selectedIds, totalCount, layout, showMultipage, origin, thumbSize, query } = this.props
     const { positions, multipage, tableIsResizing } = this.state
     api.setTableIsResizing(tableIsResizing)
 
@@ -554,10 +553,10 @@ class Assets extends Component {
                   const parentId = asset.parentId()
                   const indexes = parentId && multipage[parentId]
                   const badgeHeight = thumbSize < 100 ? 15 : 25
-                  const badge = showMultipage ? multipageBadges(asset, protocol, host, indexes && indexes.length) : monopageBadges(asset)
+                  const badge = showMultipage ? multipageBadges(asset, origin, indexes && indexes.length) : monopageBadges(asset)
                   const pages = indexes && indexes.slice(0, 3).map(index => (
-                      page(assets[index], width, height, protocol, host, indexes))) ||
-                    [page(asset, width, height, protocol, host)]
+                      page(assets[index], width, height, origin, indexes))) ||
+                    [page(asset, width, height, origin)]
                   return (
                     <Thumb isSelected={selectedIds && selectedIds.has(asset.id)}
                            dim={dim}
@@ -666,8 +665,7 @@ export default connect(state => ({
   showMultipage: state.app.showMultipage,
   similarField: state.racetrack.similarField,
   similarValues: state.racetrack.similarValues,
-  protocol: state.auth.protocol,
-  host: state.auth.host
+  origin: state.auth.origin
 }), dispatch => ({
   actions: bindActionCreators({
     isolateAssetId,

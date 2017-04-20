@@ -13,8 +13,7 @@ import { showPages } from '../../actions/appActions'
 class Inspector extends Component {
   static propTypes = {
     asset: PropTypes.instanceOf(Asset),
-    protocol: PropTypes.string,
-    host: PropTypes.string,
+    origin: PropTypes.string,
     thumbSize: PropTypes.number,
     pages: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     actions: PropTypes.object
@@ -25,9 +24,9 @@ class Inspector extends Component {
   }
 
   render () {
-    const { asset, protocol, host, thumbSize, pages } = this.props
+    const { asset, origin, thumbSize, pages } = this.props
     const mediaType = asset.mediaType().toLowerCase()
-    const url = asset.url(protocol, host)
+    const url = asset.url(origin)
     const onMultipage = pages && pages.length && this.showMultipage
     const imageFormats = [ 'jpeg', 'jpg', 'png', 'gif' ]
     let warning = null    // FIXME: move to Lightbar?
@@ -52,7 +51,7 @@ class Inspector extends Component {
                        documentInitParameters={{url, withCredentials: true, rangeChunkSize}} />
     } else {
       const proxy = asset.biggestProxy()
-      inspector = <Image url={asset.largestProxyURL(protocol, host)} onMultipage={onMultipage} />
+      inspector = <Image url={asset.largestProxyURL(origin)} onMultipage={onMultipage} />
       warning = <div>{proxy.width} x {proxy.height} proxy</div>
     }
 
@@ -73,7 +72,7 @@ class Inspector extends Component {
 }
 
 export default connect(state => ({
-  protocol: state.auth.protocol,
+  origin: state.auth.origin,
   host: state.auth.host,
   thumbSize: state.app.thumbSize,
   pages: state.assets.pages

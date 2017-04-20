@@ -25,10 +25,18 @@ class Signin extends Component {
 
   componentWillMount () {
     if (this.props.defaults) {
-      const isLocalhost = this.props.defaults.host && this.props.defaults.host.includes('localhost')
+      const username = this.props.defaults.username
+      let url
+      try {
+        url = url && new URL(this.props.defaults.origin)
+      } catch (e) {
+        console.error('Invalid default URL: ' + this.props.defaults.origin) + ': ' + e
+      }
+      const host = url && url.host || ''
+      const isLocalhost = host && host.includes('localhost')
       const ssl = !isLocalhost        // Development settings
       const acceptEULA = isLocalhost
-      this.setState({ ...this.props.defaults, ssl, acceptEULA })
+      this.setState({ username, host, ssl, acceptEULA })
     }
     this.clearError()
   }
@@ -40,7 +48,8 @@ class Signin extends Component {
   signin = (event) => {
     const { username, password, ssl, host } = this.state
     const protocol = ssl ? 'https:' : 'http:'
-    this.props.actions.signinUser(username, password, protocol, host)
+    const origin = protocol && host && protocol + '//' + host
+    this.props.actions.signinUser(username, password, origin)
     this.forceUpdate()
   }
 
@@ -55,10 +64,11 @@ class Signin extends Component {
   }
 
   changeHost = (event) => {
-    const bareHost = event.target.value
-    // strip the protocol & port if this is copy/pasted
-    const host = bareHost.replace(/http.?:\/\//, '').replace(/:[0-9]{2,4}.*/, '')
-    this.setState({host})
+    const host = event.target.value
+    const isLocalhost = host && host.includes('localhost')
+    const ssl = this.state.ssl && isLocalhost ? false : this.state.ssl
+    const acceptEULA = !this.state.acceptEULA && isLocalhost ? true : this.state.acceptEULA
+    this.setState({host, ssl, acceptEULA})
     this.clearError()
   }
 

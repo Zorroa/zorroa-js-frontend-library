@@ -20,9 +20,8 @@ class ResetPassword extends Component {
 
   changePassword = (password) => {
     const token = this.props.location && this.props.location.query && this.props.location.query.token
-    const protocol = window.location.protocol
-    const host = window.location.hostname
-    this.props.actions.resetPassword(password, token, protocol, host)
+    const origin = window.location.origin
+    this.props.actions.resetPassword(password, token, origin)
   }
 
   cancel = (event) => {
@@ -34,7 +33,6 @@ class ResetPassword extends Component {
       <ChangePassword
         onChangePassword={this.changePassword}
         onCancel={this.cancel}
-        fullscreen={true}
         error={this.props.error}/>
     )
   }
