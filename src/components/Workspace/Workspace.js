@@ -102,11 +102,11 @@ class Workspace extends Component {
     const src = this.props.location && this.props.location.query && this.props.location.query.source
     const sources = { cloud: CLOUD_IMPORT, file_server: SERVER_IMPORT, my_computer: LOCAL_IMPORT }
     const source = sources[src]
-    if (!nextProps.app.modal && !this.state.tipShown &&   // not previously displayed
-      source ||                                           // source in URL
+    if (!nextProps.app.modal && !this.tipShown &&         // not previously displayed
+      (source ||                                          // source in URL
       (nextProps.assets && !nextProps.assets.length &&    // no assets
-      !countOfJobsOfType(nextProps.jobs, Job.Import))) {  // no imports
-      this.setState({tipShown: true})
+      !countOfJobsOfType(nextProps.jobs, Job.Import)))) { // no imports
+      this.tipShown = true
       const width = '65vw'
       const body = <Import source={source} step={source ? 2 : 1}/>
       this.props.actions.showModal({body, width})

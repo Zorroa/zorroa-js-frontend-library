@@ -27,7 +27,7 @@ export default function (state = initialState, action) {
     case AUTH_DEFAULTS:
       return { ...state, defaults: action.payload }
     case AUTH_CHANGE_PASSWORD:
-      return { ...state, changePassword: action.payload }
+      return { ...state, changePassword: action.payload, onboarding: false }
     case AUTH_ONBOARDING:
       return { ...state, onboarding: action.payload }
   }

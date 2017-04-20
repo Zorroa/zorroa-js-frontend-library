@@ -184,7 +184,8 @@ function authorize (dispatch, json, source) {
 
 export function forgotPassword (email, origin) {
   return dispatch => {
-    createArchivist(dispatch, origin)
+    const url = PROD ? origin : origin.replace('8080', '8066')
+    createArchivist(dispatch, url)
     archivistPost(dispatch, '/api/v1/send-password-reset-email', {email}, {
       headers: { 'X-Requested-With': 'XMLHttpRequest' } // disable browser auth
     })
