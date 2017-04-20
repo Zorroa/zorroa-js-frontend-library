@@ -226,7 +226,7 @@ class JobMenu extends Component {
 
 export default connect(state => ({
   user: state.auth.user,
-  jobs: state.jobs.all,
+  jobs: state.jobs && state.jobs.all,
   origin: state.auth.origin,
   onboarding: state.auth.onboarding
 }), dispatch => ({
