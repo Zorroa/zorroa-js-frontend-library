@@ -63,11 +63,13 @@ class Import extends Component {
   }
 
   setStep = (step) => {
-    if (step >= this.props.lastStep) {
+    const { onboarding, actions } = this.props
+    const lastStep = onboarding ? 5 : 3
+    if (step >= lastStep) {
       this.dismiss()
     }
-    if (this.props.onboarding) {
-      this.props.actions.changePassword(true)
+    if (onboarding) {
+      actions.changePassword(true)
     }
     this.setState({step})
   }

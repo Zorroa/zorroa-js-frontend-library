@@ -17,7 +17,7 @@ describe('authReducer', () => {
 
   it('AUTH_HOST sets origin', () => {
     const payload = { origin: 'http://localhost:8066' }
-    expect(authReducer([], { type: AUTH_ORIGIN, payload }))
+    expect(authReducer([], { type: AUTH_ORIGIN, payload: 'http://localhost:8066' }))
       .toEqual(payload)
   })
 
