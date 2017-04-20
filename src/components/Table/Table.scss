@@ -154,7 +154,6 @@ $tableResizeRightPadding: 20px;
 }
 
 .Table-cell {
-  @include noSelect;
   @include clampText;
   padding: 8px 5px;
 }
