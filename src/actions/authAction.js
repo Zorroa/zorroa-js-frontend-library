@@ -184,7 +184,7 @@ function authorize (dispatch, json, source) {
 
 export function forgotPassword (email, origin) {
   return dispatch => {
-    const url = PROD ? origin : origin.replace('8080', '8066')
+    const url = PROD ? origin : origin.replace('localhost:8080', 'localhost:8066')
     createArchivist(dispatch, url)
     archivistPost(dispatch, '/api/v1/send-password-reset-email', {email}, {
       headers: { 'X-Requested-With': 'XMLHttpRequest' } // disable browser auth
@@ -212,6 +212,7 @@ export function updatePassword (user, password) {
     })
       .then(response => {
         dispatch({ type: AUTH_CHANGE_PASSWORD, payload: false })
+        dispatch({ type: AUTH_ONBOARDING, payload: false })
       })
       .catch(error => dispatch(authError('Cannot update ' + user.username + ' password', error)))
   }
@@ -219,7 +220,7 @@ export function updatePassword (user, password) {
 
 export function resetPassword (password, token, origin, source) {
   return dispatch => {
-    const url = PROD ? origin : origin.replace('8080', '8066')
+    const url = PROD ? origin : origin.replace('localhost:8080', 'localhost:8066')
     createArchivist(dispatch, url)
     archivistPost(dispatch, '/api/v1/reset-password', {password}, {
       headers: {

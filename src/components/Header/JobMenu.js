@@ -18,6 +18,7 @@ class JobMenu extends Component {
     jobs: PropTypes.object,
     user: PropTypes.instanceOf(User).isRequired,
     origin: PropTypes.string,
+    onboarding: PropTypes.bool,
     actions: PropTypes.object.isRequired
   }
 
@@ -30,6 +31,11 @@ class JobMenu extends Component {
   componentWillUnmount () {
     clearInterval(this.monitorJobsInterval)
     this.monitorJobsInterval = null
+  }
+
+  componentWillReceiveProps (nextProps) {
+    // Show the import menu after we finish onboarding
+    this.show = this.props.onboarding && !nextProps.onboarding && nextProps.jobType === Job.Import
   }
 
   monitorJobs = () => {
@@ -204,7 +210,7 @@ class JobMenu extends Component {
     return (
       <div className="header-menu header-menu-jobs">
         { this.renderJobBadge() }
-        <DropdownMenu label={`${jobType}s`} onChange={this.refreshJobs}>
+        <DropdownMenu label={`${jobType}s`} onChange={this.refreshJobs} show={this.show}>
           { jobType === Job.Import ? (
             <div onClick={this.createImport} className="JobMenu-jobs-create-import">
               <div className="icon-import"/>
@@ -220,8 +226,9 @@ class JobMenu extends Component {
 
 export default connect(state => ({
   user: state.auth.user,
-  jobs: state.jobs && state.jobs.all,
-  origin: state.auth && state.auth.origin
+  jobs: state.jobs.all,
+  origin: state.auth.origin,
+  onboarding: state.auth.onboarding
 }), dispatch => ({
   actions: bindActionCreators({
     getJobs,
