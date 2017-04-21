@@ -356,6 +356,7 @@ class Folders extends Component {
             { this.renderFolderDeselector(folderList) }
             </div>
         </div>
+        {folderComponentList ? <Trash/> : null }
         <div ref='foldersScroll'
              className='Folders-scroll'
              onScroll={this.foldersScroll}
@@ -363,7 +364,6 @@ class Folders extends Component {
           <div className='Folders-body'
                style={{ height: `${foldersBodyHeight}px` }}>
             {folderComponentList}
-            {folderComponentList ? <Trash/> : null }
           </div>
         </div>
       </div>

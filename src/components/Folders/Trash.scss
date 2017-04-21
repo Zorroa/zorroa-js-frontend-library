@@ -3,15 +3,18 @@
 $TrashHeight : 25px;
 
 .Trash {
+  position: relative;
   @include flexCol;
   color: $zorroa-lightgray;
   &:not(.isOpen) .Trash-toggleArrow {
     transform: rotate(-90deg);
   }
+  border-bottom: 1px solid black;
 }
 
 .Trash-header {
   @extend .FolderItem;
+  position: relative;
 }
 
 .Trash-header-left {

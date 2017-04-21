@@ -38,7 +38,9 @@ describe('Folder dnd', function () {
   // ----------------------------------------------------------------------
 
   var emptyTrash = function () {
-    return selenium.getSelectorVisible(By.css('.Collections-collapsible .Trash'))
+    return driver
+
+    .then(_ => selenium.getSelectorVisible(By.css('.Collections-collapsible .Trash')))
     .then(trashVisible => {
       if (!trashVisible) return driver.then(_ => { DEBUG && console.log('no trash to empty 1') })
       return selenium.getSelectorVisible(By.css('.Trash-body'))
