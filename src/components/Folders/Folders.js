@@ -95,7 +95,27 @@ class Folders extends Component {
 
     const doOpen = !isOpen
     this.props.actions.toggleFolder(folder.id, doOpen)
-    if (doOpen) this.loadChildren(folder)
+    if (doOpen) {
+      this.loadChildren(folder)
+      this.scrollToFolder(folder.id)
+    }
+  }
+
+  scrollToFolder = (folderId) => {
+    const { folders } = this.props
+    const { foldersScrollTop, foldersScrollHeight } = this.state
+    const folderList = this.folderList(folders.all.get(Folder.ROOT_ID))
+    const folderPosition = folderList.findIndex(folder => folder.id === folderId)
+    if (folderPosition < 0) return
+
+    // scroll up by one folder if the opened folder is the last one
+    // I played with more agressive scrolling rules and it's very disorienting
+    // Maybe this should be removed
+    // Animated scrolling might help though
+    const folderHeight = folderPosition * FOLDER_HEIGHT_PX
+    if (folderHeight > foldersScrollTop + foldersScrollHeight - 1.5 * FOLDER_HEIGHT_PX) {
+      this.refs.foldersScroll.scrollTop = foldersScrollTop + FOLDER_HEIGHT_PX
+    }
   }
 
   // Apply standard desktop shift+meta multi-select on click and update state.
@@ -295,8 +315,20 @@ class Folders extends Component {
     const numOpenFolders = folderList.length
     const foldersBodyHeight = numOpenFolders * FOLDER_HEIGHT_PX
     const foldersScrollHeight = Math.min(foldersBodyHeight, MAX_FOLDER_SCROLL_HEIGHT_PX)
-
     const folderComponentList = this.renderFolderList(folderList, foldersScrollHeight)
+
+    requestAnimationFrame(_ => {
+      const foldersScrollTop = this.refs.foldersScroll.scrollTop
+      const foldersScrollHeight = this.refs.foldersScroll.clientHeight
+      if (foldersScrollTop !== this.state.foldersScrollTop ||
+        foldersScrollHeight !== this.state.foldersScrollHeight)
+      {
+        this.setState({
+          foldersScrollTop: this.refs.foldersScroll.scrollTop,
+          foldersScrollHeight: this.refs.foldersScroll.clientHeight
+        })
+      }
+    })
 
     return (
       <div className='Folders'>
