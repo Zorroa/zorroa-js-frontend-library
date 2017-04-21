@@ -8,7 +8,7 @@ $FolderItemHeight : 25px;
   @include flexAlignItemsCenter;
   @include fullWidth;
 
-  position: relative; // fbo .FolderItem-dropzone, who's position: absolute
+  position: absolute; // fbo .FolderItem-dropzone, who's position: absolute
   cursor: pointer;
   height: $FolderItemHeight;
 

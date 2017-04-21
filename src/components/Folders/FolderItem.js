@@ -72,6 +72,7 @@ class FolderItem extends Component {
     dragHover: PropTypes.bool,
     dragparams: PropTypes.object,
     dragInfo: PropTypes.object,
+    top: PropTypes.string,
 
     // state props
     selectedFolderIds: PropTypes.object,
@@ -413,14 +414,14 @@ class FolderItem extends Component {
   }
 
   render () {
-    const { folder, depth, isOpen, hasChildren, isSelected, onToggle, onSelect, dropparams, dragHover } = this.props
+    const { folder, depth, isOpen, hasChildren, isSelected, onToggle, onSelect, dropparams, dragHover, top } = this.props
     const icon = folder.isDyhi() ? 'icon-foldercog' : (folder.search ? 'icon-collections-smart' : 'icon-collections-simple')
     const draggable = !folder.isDyhi()
     const isDropTarget = this.isDropTarget()
     const dragparams = { ...this.props.dragparams, draggable }  // disable drag
     return (
       <div className={classnames('FolderItem', { isOpen, hasChildren, isSelected, isDropTarget, dragHover })}
-           style={{ paddingLeft: `${(depth - 1) * 10}px` }}>
+           style={{ paddingLeft: `${(depth - 1) * 10}px`, top }}>
         { this.renderContextMenu() }
         <div className={classnames('FolderItem-toggle', {hasChildren})}
              onClick={event => { onToggle(folder); return false }}>
