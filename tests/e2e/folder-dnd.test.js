@@ -105,6 +105,17 @@ describe('Folder dnd', function () {
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.assets-footer'), 15000))
   })
 
+  function pageDown(by) {
+    return driver.then(_ => {
+      return driver.findElement(by)
+      .then(ele => {
+        return ele.getSize()
+        .then(size => { return driver.actions().mouseMove(ele, {x:size.width - 5, y: size.height - 5}).click().sendKeys(Key.PAGE_DOWN, Key.PAGE_DOWN, Key.PAGE_DOWN).perform() })
+      })
+    })
+    .then(_ => driver.sleep(100))
+  }
+
   it('add & remove assets + dnd', function () {
     let allUsersFolder
     let myUserFolder
@@ -116,7 +127,15 @@ describe('Folder dnd', function () {
 
     return driver.then(_ => openCollectionsPanel())
 
+    .then(_ => { DEBUG && console.log('Open Film & scroll down') })
+    .then(_ => selenium.getFolderNamed('Film'))
+      .then(folderEle => folderEle.findElement(By.css('.FolderItem-toggle')))
+      .then(ele => ele.click())
+    .then(_ => selenium.waitForIdle())
+    .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
+
     .then(_ => { DEBUG && console.log('find & toggle the Users folder ' + Date.now()) })
+    .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
     .then(_ => selenium.getFolderNamed('Users').then(ele => { allUsersFolder = ele }))
     // Toggle open the users folder
     .then(_ => { DEBUG && console.log('toggle the Users folder') })
@@ -137,6 +156,7 @@ describe('Folder dnd', function () {
     .then(_ => selenium.waitForIdle())
 
     .then(_ => { DEBUG && console.log('deselect the Users folder') })
+    .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
     .then(_ => allUsersFolder.click())
     .then(_ => selenium.waitForIdle())
 
@@ -161,6 +181,7 @@ describe('Folder dnd', function () {
     .then(_ => selenium.waitForIdle())
 
     // wait til folder count says 1
+    .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
     .then(_ => driver.wait(_ => {
       return driver.then(_ => selenium.getFolderNamed(myUserName).then(e => { myUserFolder = e }))
       .then(_ => myUserFolder.findElement(By.css('.FolderItem-count')))
@@ -179,6 +200,7 @@ describe('Folder dnd', function () {
     .then(_ => selenium.waitForIdle())
 
     // wait til folder count says 0
+    .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
     .then(_ => driver.wait(_ => {
       return driver.then(_ => selenium.getFolderNamed(myUserName))
       .then(folderEle => folderEle.findElement(By.css('.FolderItem-count')).getText())
@@ -197,6 +219,7 @@ describe('Folder dnd', function () {
     .then(_ => selenium.clickSelector(By.css('.CreateFolder-save')))
     .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.modal .CreateFolder')))
     .then(_ => selenium.waitForIdle())
+    .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
 
     .then(_ => { DEBUG && console.log('add a sub-folder sub2 of selenium') })
     .then(_ => selenium.getFolderNamed(myUserName))
@@ -209,6 +232,7 @@ describe('Folder dnd', function () {
     .then(_ => selenium.clickSelector(By.css('.CreateFolder-save')))
     .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.modal .CreateFolder')))
     .then(_ => selenium.waitForIdle())
+    .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
 
     .then(_ => { DEBUG && console.log('add a sub-folder sub3 of sub1') })
     .then(_ => selenium.getFolderNamed('sub1'))
@@ -228,6 +252,7 @@ describe('Folder dnd', function () {
     .then(_ => selenium.clickSelector(By.css('.CreateFolder-save')))
     .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.modal .CreateFolder')))
     .then(_ => selenium.waitForIdle())
+    .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
 
     // // this doesn't work yet
     // .then(_ => { DEBUG && console.log('move sub3 to be under sub2') })
