@@ -321,8 +321,7 @@ class Folders extends Component {
       const foldersScrollTop = this.refs.foldersScroll.scrollTop
       const foldersScrollHeight = this.refs.foldersScroll.clientHeight
       if (foldersScrollTop !== this.state.foldersScrollTop ||
-        foldersScrollHeight !== this.state.foldersScrollHeight)
-      {
+        foldersScrollHeight !== this.state.foldersScrollHeight) {
         this.setState({
           foldersScrollTop: this.refs.foldersScroll.scrollTop,
           foldersScrollHeight: this.refs.foldersScroll.clientHeight
