@@ -13,6 +13,9 @@ import CreateFolder from './CreateFolder'
 const SORT_ALPHABETICAL = 'alpha'
 const SORT_TIME = 'time'
 
+const FOLDER_HEIGHT_PX = 25
+const MAX_FOLDER_SCROLL_HEIGHT_PX = 400
+
 // Display all folders, starting with the root.
 // Later this will be broken into Collections and Smart Folders.
 class Folders extends Component {
@@ -29,7 +32,22 @@ class Folders extends Component {
     sortFolders: PropTypes.string
   }
 
-  state = { filterString: '' }
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      filterString: '',
+      foldersScrollTop: 0,
+      foldersScrollHeight: 0
+    }
+  }
+
+  foldersScroll = (event) => {
+    this.setState({
+      foldersScrollTop: event.target.scrollTop,
+      foldersScrollHeight: event.target.clientHeight
+    })
+  }
 
   componentWillMount () {
     const rootFolder = this.props.folders.all.get(Folder.ROOT_ID)
@@ -77,7 +95,27 @@ class Folders extends Component {
 
     const doOpen = !isOpen
     this.props.actions.toggleFolder(folder.id, doOpen)
-    if (doOpen) this.loadChildren(folder)
+    if (doOpen) {
+      this.loadChildren(folder)
+      this.scrollToFolder(folder.id)
+    }
+  }
+
+  scrollToFolder = (folderId) => {
+    const { folders } = this.props
+    const { foldersScrollTop, foldersScrollHeight } = this.state
+    const folderList = this.folderList(folders.all.get(Folder.ROOT_ID))
+    const folderPosition = folderList.findIndex(folder => folder.id === folderId)
+    if (folderPosition < 0) return
+
+    // scroll up by one folder if the opened folder is the last one
+    // I played with more agressive scrolling rules and it's very disorienting
+    // Maybe this should be removed
+    // Animated scrolling might help though
+    const folderHeight = folderPosition * FOLDER_HEIGHT_PX
+    if (folderHeight > foldersScrollTop + foldersScrollHeight - 1.5 * FOLDER_HEIGHT_PX) {
+      this.refs.foldersScroll.scrollTop = foldersScrollTop + FOLDER_HEIGHT_PX
+    }
   }
 
   // Apply standard desktop shift+meta multi-select on click and update state.
@@ -218,21 +256,35 @@ class Folders extends Component {
     return this.depth(parent) + 1
   }
 
-  renderFolderList = (folderList) => (
-    folderList.map(folder => {
+  renderFolderList = (folderList, foldersScrollHeight) => {
+    const { foldersScrollTop } = this.state
+    let startIndex = Math.floor(foldersScrollTop / FOLDER_HEIGHT_PX)
+    // make sure startIndex is even, so the alternating color scheme doesn't spazz while scrolling
+    if (startIndex % 2 === 1 && startIndex > 0) startIndex--
+    const stopIndex = Math.min(
+      Math.ceil((foldersScrollTop + foldersScrollHeight) / FOLDER_HEIGHT_PX),
+      folderList.length - 1
+    )
+
+    let renderedFolders = []
+
+    for (let i = startIndex; i <= stopIndex; i++) {
+      const folder = folderList[i]
       const key = folder.id
       const { folders, onSelect } = this.props
       const depth = this.depth(folder)
       const isOpen = folders.openFolderIds.has(folder.id)
       const isSelected = !onSelect && folders.selectedFolderIds.has(folder.id)
       const hasChildren = folder.childCount > 0
-      return (
-        <FolderItem {...{key, depth, folder, isOpen, isSelected, hasChildren}}
-                    onToggle={this.toggleFolder.bind(this, folder)}
-                    onSelect={this.selectFolder.bind(this, folder)} />
+      renderedFolders.push(
+        <FolderItem {...{key, depth, folder, isOpen, isSelected, hasChildren, top: `${i * FOLDER_HEIGHT_PX}px`}}
+          onToggle={this.toggleFolder.bind(this, folder)}
+          onSelect={this.selectFolder.bind(this, folder)} />
       )
-    })
-  )
+    }
+
+    return renderedFolders
+  }
 
   renderSortButton (field) {
     const sort = this.sortOrder()
@@ -260,7 +312,23 @@ class Folders extends Component {
     const rootLoaded = folders.all.has(Folder.ROOT_ID)
     if (!rootLoaded) return null
     const folderList = this.folderList(folders.all.get(Folder.ROOT_ID))
-    const folderComponentList = this.renderFolderList(folderList)
+    const numOpenFolders = folderList.length
+    const foldersBodyHeight = numOpenFolders * FOLDER_HEIGHT_PX
+    const foldersScrollHeight = Math.min(foldersBodyHeight, MAX_FOLDER_SCROLL_HEIGHT_PX)
+    const folderComponentList = this.renderFolderList(folderList, foldersScrollHeight)
+
+    requestAnimationFrame(_ => {
+      const foldersScrollTop = this.refs.foldersScroll.scrollTop
+      const foldersScrollHeight = this.refs.foldersScroll.clientHeight
+      if (foldersScrollTop !== this.state.foldersScrollTop ||
+        foldersScrollHeight !== this.state.foldersScrollHeight) {
+        this.setState({
+          foldersScrollTop: this.refs.foldersScroll.scrollTop,
+          foldersScrollHeight: this.refs.foldersScroll.clientHeight
+        })
+      }
+    })
+
     return (
       <div className='Folders'>
         <div className="Folders-controls">
@@ -285,11 +353,17 @@ class Folders extends Component {
               { this.renderSortButton(SORT_TIME) }
             </div>
             { this.renderFolderDeselector(folderList) }
-          </div>
+            </div>
         </div>
-        <div>
-          {folderComponentList}
-          {folderComponentList ? <Trash/> : null }
+        {folderComponentList ? <Trash/> : null }
+        <div ref='foldersScroll'
+             className='Folders-scroll'
+             onScroll={this.foldersScroll}
+             style={{height: `${foldersScrollHeight}px`, maxHeight: `${foldersScrollHeight}px`}}>
+          <div className='Folders-body'
+               style={{ height: `${foldersBodyHeight}px` }}>
+            {folderComponentList}
+          </div>
         </div>
       </div>
     )

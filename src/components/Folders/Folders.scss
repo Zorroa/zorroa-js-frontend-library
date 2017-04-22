@@ -13,6 +13,18 @@
   background-color: white;
 }
 
+.Folders-scroll {
+  position: relative;
+  // max-height: 50vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.Folders-scroll-body {
+  position: relative;
+  width: 100%;
+}
+
 .Folders-filter-add {
   @include flexRow;
   @include flexJustifySpaceBetween;

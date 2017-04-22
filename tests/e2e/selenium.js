@@ -69,6 +69,9 @@ if (USE_SAUCE) {
 // https://github.com/SeleniumHQ/docker-selenium/issues/227#issuecomment-224865735
 // https://github.com/SeleniumHQ/docker-selenium/issues/91#issuecomment-250502062
 //
+// To run on local selenium grid:
+// SELENIUM_REMOTE_URL="http://localhost:4444/wd/hub" jest -i tags
+//
 // Open question how to connect to docker host IP. For testing I exposed my curator publicly. Would prefer to avoid this.
 // https://github.com/moby/moby/issues/8427
 // https://github.com/moby/moby/issues/8395#issuecomment-212147825
@@ -77,7 +80,7 @@ if (USE_SAUCE) {
 export const BASE_URL = 'http://localhost:8080'
 
 // let selenium tests run. jest's default is an unreasonable 5 seconds
-jasmine.DEFAULT_TIMEOUT_INTERVAL = (DEBUG && !USE_SAUCE) ? 30000 : 90000
+jasmine.DEFAULT_TIMEOUT_INTERVAL = (DEBUG && !USE_SAUCE) ? 30000 : 120000
 
 var allTestsPassed = true
 var failedTests = []
