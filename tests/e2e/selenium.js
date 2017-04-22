@@ -80,7 +80,7 @@ if (USE_SAUCE) {
 export const BASE_URL = 'http://localhost:8080'
 
 // let selenium tests run. jest's default is an unreasonable 5 seconds
-jasmine.DEFAULT_TIMEOUT_INTERVAL = (DEBUG && !USE_SAUCE) ? 30000 : 90000
+jasmine.DEFAULT_TIMEOUT_INTERVAL = (DEBUG && !USE_SAUCE) ? 30000 : 120000
 
 var allTestsPassed = true
 var failedTests = []
