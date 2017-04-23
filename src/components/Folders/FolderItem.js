@@ -12,6 +12,7 @@ import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import CreateExport from './CreateExport'
 import CreateFolder from './CreateFolder'
+import AssetPermissions from '../AssetPermissions'
 import {
   createFolder,
   selectFolderIds,
@@ -19,9 +20,10 @@ import {
   removeAssetIdsFromFolderId,
   deleteFolderIds,
   updateFolder } from '../../actions/folderAction'
-import { showModal } from '../../actions/appActions'
+import { showModal, hideModal } from '../../actions/appActions'
 import { exportAssets } from '../../actions/jobActions'
 import { restoreSearch } from '../../actions/racetrackAction'
+import { setAssetPermissions } from '../../actions/assetsAction'
 import { isolateSelectId } from '../../services/jsUtil'
 
 // Renders folder children as Collapsible elements.
@@ -83,6 +85,7 @@ class FolderItem extends Component {
     user: PropTypes.instanceOf(User),
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     metadataFields: PropTypes.arrayOf(PropTypes.string),
+    isAdministrator: PropTypes.bool,
     actions: PropTypes.object
   }
 
@@ -115,6 +118,24 @@ class FolderItem extends Component {
     }
     actions.selectFolderIds(folders)
     this.dismissContextMenu(event)
+  }
+
+  setAssetPermissions = (event) => {
+    event.preventDefault()
+    this.dismissContextMenu(event)
+    const width = '300px'
+    const body = <AssetPermissions title="Folder Asset Permissions"
+                                   onApply={this.setPermissions}
+                                   onCancel={this.props.actions.hideModal}/>
+    this.props.actions.showModal({body, width})
+  }
+
+  setPermissions = (acl) => {
+    this.props.actions.hideModal()
+    const { folder } = this.props
+    const filter = new AssetFilter({links: {folder: [folder.id]}})
+    const search = new AssetSearch({filter})
+    this.props.actions.setAssetPermissions(search, acl)
   }
 
   createChild = (event) => {
@@ -283,7 +304,7 @@ class FolderItem extends Component {
   }
 
   renderContextMenu () {
-    const { folder, selectedFolderIds, selectedAssetIds, user } = this.props
+    const { folder, selectedFolderIds, selectedAssetIds, user, isAdministrator } = this.props
     if (!this.state.isContextMenuVisible) {
       return
     }
@@ -333,6 +354,11 @@ class FolderItem extends Component {
                className="FolderItem-context-item FolderItem-context-restore-widgets"
                onContextMenu={this.dismissContextMenu}>
             <div className="icon-settings_backup_restore"/><div>Restore Widgets</div></div> }
+          { singleFolderSelected && isAdministrator &&
+          <div onClick={this.setAssetPermissions}
+               className="FolderItem-context-item FolderItem-context-asset-permissions"
+               onContextMenu={this.dismissContextMenu}>
+            <div className="icon-link2"/><div>Set Permissions...</div></div> }
           { singleFolderSelected &&
           <div onClick={this.exportFolder}
                className="FolderItem-context-item FolderItem-context-export"
@@ -456,7 +482,8 @@ export default connect(state => ({
   selectedAssetIds: state.assets.selectedIds,
   user: state.auth.user,
   dragInfo: state.app.dragInfo,
-  metadataFields: state.app.metadataFields
+  metadataFields: state.app.metadataFields,
+  isAdministrator: state.auth.isAdministrator
 }), dispatch => ({
   actions: bindActionCreators({
     createFolder,
@@ -465,8 +492,10 @@ export default connect(state => ({
     removeAssetIdsFromFolderId,
     exportAssets,
     showModal,
+    hideModal,
     deleteFolderIds,
     updateFolder,
-    restoreSearch
+    restoreSearch,
+    setAssetPermissions
   }, dispatch)
 }))(FolderItem)

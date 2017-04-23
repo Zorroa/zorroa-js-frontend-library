@@ -85,6 +85,10 @@ export function archivistRequest (dispatch, ...args) {
   return finishRequest(dispatch, archivist.apply(this, args))
 }
 
+export function archivistBaseURL () {
+  return archivist && archivist.defaults.baseURL
+}
+
 export function validateUser (user, origin) {
   return dispatch => {
     // Create a new archivist, if needed for a new host
@@ -178,7 +182,7 @@ function authorize (dispatch, json, source) {
       dispatch({type: LIGHTBAR_FIELDS, payload: metadata.lightbarFields})
     }
   }
-  const url = window.location.origin + '/' + (source && source.length ? '?source=' + source : '')
+  const url = source && source.length ? '?source=' + source : ''
   browserHistory.push(url)   // Retain search from original URL
 }
 
