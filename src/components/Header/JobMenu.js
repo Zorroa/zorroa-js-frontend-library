@@ -5,12 +5,15 @@ import classnames from 'classnames'
 
 import Job, { JobFilter } from '../../models/Job'
 import User from '../../models/User'
-import { showModal } from '../../actions/appActions'
-import { getAssetFields } from '../../actions/assetsAction'
+import { showModal, hideModal } from '../../actions/appActions'
+import { getAssetFields, setAssetPermissions } from '../../actions/assetsAction'
 import { getJobs, markJobDownloaded, cancelJobId, restartJobId } from '../../actions/jobActions'
 import DropdownMenu from '../../components/DropdownMenu'
 import Import from '../Import/Import'
 import JobTable from './JobTable'
+import AssetFilter from '../../models/AssetFilter'
+import AssetSearch from '../../models/AssetSearch'
+import AssetPermissions from '../AssetPermissions'
 
 class JobMenu extends Component {
   static propTypes = {
@@ -19,6 +22,7 @@ class JobMenu extends Component {
     user: PropTypes.instanceOf(User).isRequired,
     origin: PropTypes.string,
     onboarding: PropTypes.bool,
+    isAdministrator: PropTypes.bool,
     actions: PropTypes.object.isRequired
   }
 
@@ -81,6 +85,21 @@ class JobMenu extends Component {
     this.props.actions.markJobDownloaded(job.id)
   }
 
+  setImportPermissions = (job, event) => {
+    const width = '300px'
+    const body = <AssetPermissions title="Import Asset Permissions"
+                                   onApply={acl => this.setAssetPermissions(acl, job)}
+                                   onCancel={this.props.actions.hideModal}/>
+    this.props.actions.showModal({body, width})
+  }
+
+  setAssetPermissions = (acl, job) => {
+    this.props.actions.hideModal()
+    const filter = new AssetFilter({links: {import: [job.id]}})
+    const search = new AssetSearch({filter})
+    this.props.actions.setAssetPermissions(search, acl)
+  }
+
   createImport = (event) => {
     const width = '65vw'
     const body = <Import/>
@@ -114,14 +133,21 @@ class JobMenu extends Component {
           <div className="JobMenu-finished">
             { job.warningCount() ? <div className="JobMenu-warning">{job.warningCount()}</div> : null }
             { job.errorCount() ? <div className="JobMenu-error">{job.errorCount()}</div> : null }
-            { job.type === Job.Export ? (
+            { job.type === Job.Export && (
               <a key={job.id}
                  className={classnames('JobMenu-download', 'icon-download2', {notDownloaded: job.notDownloaded})}
                  onClick={this.markDownloaded.bind(this, job)}
                  href={job.exportStream(origin)} download={job.name}>
                 <div className="JobMenu-download-text">Download</div>
               </a>
-            ) : null }
+            )}
+            { job.type === Job.Import && this.props.isAdministrator && (
+              <div key={job.id}
+                   className={classnames('JobMenu-permissions', 'icon-link2')}
+                   onClick={e => this.setImportPermissions(job, e)}>
+                <div className="JobMenu-permissions-text">Access</div>
+              </div>
+            )}
           </div>
         )
       }
@@ -228,7 +254,8 @@ export default connect(state => ({
   user: state.auth.user,
   jobs: state.jobs && state.jobs.all,
   origin: state.auth.origin,
-  onboarding: state.auth.onboarding
+  onboarding: state.auth.onboarding,
+  isAdministrator: state.auth.isAdministrator
 }), dispatch => ({
   actions: bindActionCreators({
     getJobs,
@@ -236,6 +263,8 @@ export default connect(state => ({
     markJobDownloaded,
     cancelJobId,
     restartJobId,
-    showModal
+    setAssetPermissions,
+    showModal,
+    hideModal
   }, dispatch)
 }))(JobMenu)

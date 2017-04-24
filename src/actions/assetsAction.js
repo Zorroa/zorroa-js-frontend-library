@@ -2,7 +2,7 @@ import * as assert from 'assert'
 
 import {
   UNAUTH_USER, ASSET_SEARCH, ASSET_AGGS, ASSET_SEARCH_ERROR,
-  ASSET_SORT, ASSET_ORDER, ASSET_FIELDS,
+  ASSET_SORT, ASSET_ORDER, ASSET_FIELDS, ASSET_PERMISSIONS,
   ISOLATE_ASSET, SELECT_ASSETS,
   SELECT_PAGES,
   SUGGEST_COMPLETIONS, SEARCH_DOCUMENT
@@ -11,7 +11,7 @@ import Asset from '../models/Asset'
 import Page from '../models/Page'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
-import { archivistGet, archivistPost } from './authAction'
+import { archivistGet, archivistPut, archivistPost } from './authAction'
 
 function escapeQuery (query) {
   if (!query) return new AssetSearch()
@@ -245,6 +245,22 @@ export function getAssetFields () {
       })
       .catch(error => {
         console.error('Error getting asset fields: ' + error)
+      })
+  }
+}
+
+export function setAssetPermissions (search, acl) {
+  return dispatch => {
+    console.log('Set asset permissions ' + JSON.stringify(acl) + '\non: ' + JSON.stringify(search))
+    archivistPut(dispatch, '/api/v1/assets/_permissions', { search, acl })
+      .then(response => {
+        dispatch({
+          type: ASSET_PERMISSIONS,
+          payload: response.data
+        })
+      })
+      .catch(error => {
+        console.error('Error setting acl ' + JSON.stringify(acl) + '\non: ' + JSON.stringify(search) + ': ' + error)
       })
   }
 }

@@ -2,6 +2,7 @@ import {
   AUTH_USER, UNAUTH_USER, AUTH_ORIGIN, AUTH_ERROR, AUTH_PERMISSIONS,
   AUTH_SYNC, AUTH_CHANGE_PASSWORD, AUTH_DEFAULTS, AUTH_ONBOARDING } from '../constants/actionTypes'
 import User from '../models/User'
+import Permission from '../models/Permission'
 
 const initialState = {
   sync: true
@@ -20,7 +21,15 @@ export default function (state = initialState, action) {
     case AUTH_PERMISSIONS: {
       const user = new User(state.user)
       user.permissions = action.payload
-      return { ...state, user }
+      let isAdministrator = false
+      let isDeveloper = false
+      let isManager = false
+      user.permissions && user.permissions.forEach(permission => {
+        if (permission.equals(Permission.Administrator, Permission.GroupType)) isAdministrator = true
+        if (permission.equals(Permission.Developer, Permission.GroupType)) isDeveloper = true
+        if (permission.equals(Permission.Manager, Permission.GroupType)) isManager = true
+      })
+      return { ...state, user, isAdministrator, isManager, isDeveloper }
     }
     case AUTH_SYNC:
       return { ...state, sync: action.payload }

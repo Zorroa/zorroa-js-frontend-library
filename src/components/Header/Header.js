@@ -13,10 +13,13 @@ import Preferences from '../../components/Preferences'
 import Feedback from '../../components/Feedback'
 import Developer from '../../components/Developer'
 import { showModal } from '../../actions/appActions'
+import { archivistBaseURL } from '../../actions/authAction'
 
 class Header extends Component {
   static propTypes = {
     user: PropTypes.instanceOf(User).isRequired,
+    isDeveloper: PropTypes.bool,
+    isAdministrator: PropTypes.bool,
     actions: PropTypes.object.isRequired
   }
 
@@ -41,7 +44,8 @@ class Header extends Component {
   }
 
   render () {
-    const { user } = this.props
+    const { user, isDeveloper, isAdministrator } = this.props
+    const baseURL = archivistBaseURL()
     return (
       <nav className="header flexOff flexCenter fullWidth">
         <Link to="/" className='header-logo'><Logo/></Link>
@@ -67,9 +71,16 @@ class Header extends Component {
               <div className="header-menu-item header-menu-prefs" onClick={this.showPreferences}>
                 Preferences...
               </div>
-              <div className="header-menu-item header-menu-dev" onClick={this.showDeveloper}>
-                Developer...
-              </div>
+              { isDeveloper && (
+                <div className="header-menu-item header-menu-dev" onClick={this.showDeveloper}>
+                  Developer...
+                </div>
+              )}
+              { isAdministrator && baseURL && (
+                <a href={`${baseURL}/gui`} className="header-menu-item header-menu-admin">
+                  Administrator...
+                </a>
+              )}
               <Link className="header-menu-item header-menu-logout" to="/signout">Logout</Link>
             </DropdownMenu>
           </div>
@@ -83,7 +94,9 @@ class Header extends Component {
 }
 
 export default connect(state => ({
-  user: state.auth.user
+  user: state.auth.user,
+  isDeveloper: state.auth.isDeveloper,
+  isAdministrator: state.auth.isAdministrator
 }), dispatch => ({
   actions: bindActionCreators({ showModal }, dispatch)
 }))(Header)
