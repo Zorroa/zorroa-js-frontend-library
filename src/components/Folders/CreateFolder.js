@@ -65,7 +65,8 @@ class CreateFolder extends Component {
     } else if (user && user.permissions) {
       // Look through this user's permissions for the one with 'user' type
       const permissionId = user.permissions.find(permission => (permission.type === 'user')).id
-      acl = [ new AclEntry({ permissionId, access: this.permissionsForValue(3) }) ]
+      const access = AclEntry.ReadAccess | AclEntry.WriteAccess | AclEntry.ExportAccess
+      acl = [ new AclEntry({ permissionId, access }) ]
     }
     if (acl) {
       this.props.onCreate(name, acl)
