@@ -15,6 +15,7 @@ import Metadata from '../Metadata'
 import Collapsible from '../Collapsible'
 import { iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible, showModal, hideModal } from '../../actions/appActions'
 import { getUserPermissions, updatePassword, changePassword } from '../../actions/authAction'
+import { queueFilesUpload } from '../../actions/jobActions'
 import ChangePassword from '../auth/ChangePassword'
 import User from '../../models/User'
 import Job, { countOfJobsOfType } from '../../models/Job'
@@ -165,10 +166,33 @@ class Workspace extends Component {
   }
 
   createLocalImport = (event) => {
+    const traverseFileTree = (item) => {
+      console.log('Item: ' + item.name)
+      if (item.isFile) {
+        item.file(file => {
+          console.log('File: ', item.name)
+          this.props.actions.queueFilesUpload([file])
+        })
+      } else if (item.isDirectory) {
+        console.log('Directory: ' + item.name)
+        const dirReader = item.createReader()
+        dirReader.readEntries(entries => {
+          for (var i = 0; i < entries.length; ++i) {
+            traverseFileTree(entries[i])
+          }
+        })
+      }
+    }
+
     const source = LOCAL_IMPORT
-    const files = source === LOCAL_IMPORT && event && event.dataTransfer ? event.dataTransfer.files : null
+    const items = source === LOCAL_IMPORT && event && event.dataTransfer && event.dataTransfer.items ? event.dataTransfer.items : null
+    for (var i = 0; i < items.length; ++i) {
+      var item = items[i].webkitGetAsEntry()
+      if (item) traverseFileTree(item)
+    }
+
     const width = '65vw'
-    const body = <Import files={files} source={source} step={2}/>
+    const body = <Import source={source} step={2}/>
     this.props.actions.showModal({body, width})
     this.setState({isDroppable: false})
     event.preventDefault()
@@ -268,6 +292,7 @@ export default connect(state => ({
     updatePassword,
     changePassword,
     showModal,
-    hideModal
+    hideModal,
+    queueFilesUpload,
   }, dispatch)
 }))(Workspace)
