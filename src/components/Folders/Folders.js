@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
+var LRUCache = require('lru-cache')
 
 import Folder from '../../models/Folder'
 import { getFolderChildren, createFolder, selectFolderIds, selectFolderId, toggleFolder } from '../../actions/folderAction'
@@ -15,6 +16,8 @@ const SORT_TIME = 'time'
 
 const FOLDER_HEIGHT_PX = 25
 const MAX_FOLDER_SCROLL_HEIGHT_PX = 400
+
+const NUMTRUE = {numeric: true}
 
 // Display all folders, starting with the root.
 // Later this will be broken into Collections and Smart Folders.
@@ -40,6 +43,8 @@ class Folders extends Component {
       foldersScrollTop: 0,
       foldersScrollHeight: 0
     }
+
+    this.folderSortCache = new LRUCache({ max: 1000 })
   }
 
   foldersScroll = (event) => {
@@ -193,6 +198,35 @@ class Folders extends Component {
     return index < 0
   }
 
+  folderCompare = (a, b) => {
+    if (a.isDyhi() && !b.isDyhi()) return -1
+    if (b.isDyhi() && !a.isDyhi()) return 1
+    if (a.search && !b.search) return -1
+    if (b.search && !a.search) return 1
+
+    switch (this.sortOrder()) {
+      case 'alpha-desc':
+        return b.name.localeCompare(a.name, undefined, NUMTRUE)
+      case 'time-asc':
+        return a.timeModified < b.timeModified ? -1 : (a.timeModified > b.timeModified ? 1 : 0)
+      case 'time-desc':
+        return b.timeModified < a.timeModified ? -1 : (b.timeModified > a.timeModified ? 1 : 0)
+    }
+
+    return a.name.localeCompare(b.name, undefined, NUMTRUE)
+  }
+
+  // http://stackoverflow.com/a/7616484/1424242
+  hashCode = (str, optHash) => {
+    let hash = optHash || 0
+    if (str.length === 0) return hash
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) - hash) + str.charCodeAt(i)
+      hash = hash & hash // Convert to 32bit integer
+    }
+    return hash
+  }
+
   folderList (folder) {
     const { folders, filter } = this.props
     const { filterString } = this.state
@@ -205,35 +239,24 @@ class Folders extends Component {
     let grandkids = []
     if (childIds && isOpen) {
       let children = []
-      childIds.forEach(childId => children.push(folders.all.get(childId)))
+      let childrenNameHash = 0
+      childIds.forEach(childId => {
+        children.push(folders.all.get(childId))
+        childrenNameHash = this.hashCode(childId.toString(), childrenNameHash)
+      })
 
-      // Sort children by selected sort, initially partitioned by type: dyhi, smart, simple
-      const typeCompare = (a, b) => {
-        if (a.isDyhi() && !b.isDyhi()) return -1
-        if (b.isDyhi() && !a.isDyhi()) return 1
-        if (a.search && !b.search) return -1
-        if (b.search && !a.search) return 1
-        return 0
-      }
-      if (filter) {
-        children = children.filter(filter)
-      }
-      let subsort = (a, b) => a.name.localeCompare(b.name, undefined, {numeric: true})
-      switch (this.sortOrder()) {
-        case 'alpha-asc':
-          break
-        case 'alpha-desc':
-          subsort = (a, b) => b.name.localeCompare(a.name, undefined, {numeric: true})
-          break
-        case 'time-asc':
-          subsort = (a, b) => a.timeModified < b.timeModified ? -1 : (a.timeModified > b.timeModified ? 1 : 0)
-          break
-        case 'time-desc':
-          subsort = (a, b) => b.timeModified < a.timeModified ? -1 : (b.timeModified > a.timeModified ? 1 : 0)
-          break
+      const key = `${folder.id}|${this.sortOrder()}|${children.length}|${childrenNameHash}`
+      let childrenSortOrder = this.folderSortCache.get(key)
+      if (childrenSortOrder) {
+        children = childrenSortOrder.map(id => folders.all.get(id))
+      } else {
+        // Sort children by selected sort, initially partitioned by type: dyhi, smart, simple
+        if (filter) children = children.filter(filter)
+        children.sort(this.folderCompare)
+        childrenSortOrder = children.map(folder => folder.id)
+        this.folderSortCache.set(key, childrenSortOrder)
       }
 
-      children.sort((a, b) => typeCompare(a, b) || subsort(a, b))
       children.forEach(child => {
         grandkids = grandkids.concat(this.folderList(child))
       })
