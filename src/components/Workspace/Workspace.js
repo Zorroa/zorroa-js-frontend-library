@@ -16,10 +16,12 @@ import Collapsible from '../Collapsible'
 import { iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible, showModal, hideModal } from '../../actions/appActions'
 import { getUserPermissions, updatePassword, changePassword } from '../../actions/authAction'
 import { queueFilesUpload } from '../../actions/jobActions'
+import { updateCommand } from '../../actions/assetsAction'
 import ChangePassword from '../auth/ChangePassword'
 import User from '../../models/User'
 import Job, { countOfJobsOfType } from '../../models/Job'
 import Asset from '../../models/Asset'
+import CommandProgress from '../Workspace/CommandProgress'
 import Lightbox from '../Lightbox'
 import Feedback from '../Feedback'
 import Import from '../Import'
@@ -45,7 +47,8 @@ class Workspace extends Component {
     onboarding: PropTypes.bool,
     jobs: PropTypes.object,
     location: PropTypes.object,
-    assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset))
+    assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+    commands: PropTypes.instanceOf(Map)
   }
 
   state = {
@@ -54,6 +57,8 @@ class Workspace extends Component {
   }
 
   reloadInterval = null
+  commandInterval = null
+  activeCommandId = 0
 
   componentWillMount () {
     const { actions, user } = this.props
@@ -82,6 +87,7 @@ class Workspace extends Component {
 
   componentWillUnmount () {
     clearInterval(this.reloadInterval)
+    clearInterval(this.commandInterval)
   }
 
   componentWillReceiveProps (nextProps) {
@@ -112,6 +118,25 @@ class Workspace extends Component {
       const body = <Import source={source} step={source ? 2 : 1}/>
       this.props.actions.showModal({body, width})
     }
+    const command = [...nextProps.commands.values()].find(command => (command.state === Job.Waiting || command.state === Job.Active))
+    if (!this.commandInterval && command) {
+      // Add a timer to monitor long commands, including the initial Waiting state,
+      // but only display Active commands in render. If it completes in <5s nothing is shown
+      this.commandInterval = setInterval(this.checkCommandProgress, 5 * 1000)
+    } else if (this.commandInterval && !command) {
+      clearInterval(this.commandInterval)
+      this.commandInterval = null
+    }
+    if (!command && this.state.activeCommandId) {
+      this.activeCommandId = 0
+    } else if (command && command.id !== this.state.activeCommandId) {
+      this.activeCommandId = command.id
+    }
+  }
+
+  checkCommandProgress = () => {
+    if (!this.activeCommandId) return
+    this.props.actions.updateCommand(this.activeCommandId)
   }
 
   updatePassword = (password) => {
@@ -218,6 +243,12 @@ class Workspace extends Component {
       className: 'Metadata-collapsible'
     })
 
+    // Only show the command progress if Active, skipping super quick commands
+    const commands = [...this.props.commands.values()]
+    const command = commands.find(command => (command.state === Job.Active))
+    const commandSuccessPct = command ? 100 * command.successCount / command.totalCount : 0
+    const commandErrorPct = command ? 100 * command.errorCount / command.totalCount : 0
+
     const { isDroppable, showReloader } = this.state
     return (
       <div onDragEnter={this.dragEnter} className={classnames('App', 'flexCol', 'fullHeight', {isDragging: app.dragInfo})}>
@@ -235,6 +266,9 @@ class Workspace extends Component {
           </div>
         )}
         <Header/>
+
+        { command && <CommandProgress successPct={commandSuccessPct} errorPct={commandErrorPct}/>}
+
         <div className="Workspace flexOn flexRow fullWidth fullHeight">
 
           {/*  left panel - folders */}
@@ -282,7 +316,8 @@ export default connect(state => ({
   changePassword: state.auth.changePassword,
   onboarding: state.auth.onboarding,
   assets: state.assets.all,
-  jobs: state.jobs.all
+  jobs: state.jobs.all,
+  commands: state.assets.commands
 }), dispatch => ({
   actions: bindActionCreators({
     iconifyLeftSidebar,
@@ -294,5 +329,6 @@ export default connect(state => ({
     showModal,
     hideModal,
     queueFilesUpload,
+    updateCommand
   }, dispatch)
 }))(Workspace)

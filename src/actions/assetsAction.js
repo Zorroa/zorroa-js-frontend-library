@@ -2,13 +2,15 @@ import * as assert from 'assert'
 
 import {
   UNAUTH_USER, ASSET_SEARCH, ASSET_AGGS, ASSET_SEARCH_ERROR,
-  ASSET_SORT, ASSET_ORDER, ASSET_FIELDS, ASSET_PERMISSIONS,
+  ASSET_SORT, ASSET_ORDER, ASSET_FIELDS,
+  ASSET_PERMISSIONS, UPDATE_COMMAND,
   ISOLATE_ASSET, SELECT_ASSETS,
   SELECT_PAGES,
   SUGGEST_COMPLETIONS, SEARCH_DOCUMENT
 } from '../constants/actionTypes'
 import Asset from '../models/Asset'
 import Page from '../models/Page'
+import Command from '../models/Command'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
 import { archivistGet, archivistPut, archivistPost } from './authAction'
@@ -256,11 +258,26 @@ export function setAssetPermissions (search, acl) {
       .then(response => {
         dispatch({
           type: ASSET_PERMISSIONS,
-          payload: response.data
+          payload: new Command(response.data)
         })
       })
       .catch(error => {
         console.error('Error setting acl ' + JSON.stringify(acl) + '\non: ' + JSON.stringify(search) + ': ' + error)
+      })
+  }
+}
+
+export function updateCommand (id) {
+  return dispatch => {
+    archivistGet(dispatch, '/api/v1/commands/' + id)
+      .then(response => {
+        dispatch({
+          type: UPDATE_COMMAND,
+          payload: new Command(response.data)
+        })
+      })
+      .catch(error => {
+        console.error('Error updating command ' + id + ': ' + error)
       })
   }
 }

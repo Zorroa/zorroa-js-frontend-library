@@ -7,6 +7,7 @@ export default class Job {
   static Batch = 'Batch'
 
   // States
+  static Waiting = 'Waiting'
   static Active = 'Active'
   static Cancelled = 'Cancelled'
   static Finished = 'Finished'
