@@ -16,7 +16,7 @@ import Collapsible from '../Collapsible'
 import { iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible, showModal, hideModal } from '../../actions/appActions'
 import { getUserPermissions, updatePassword, changePassword } from '../../actions/authAction'
 import { queueFilesUpload } from '../../actions/jobActions'
-import { updateCommand } from '../../actions/assetsAction'
+import { updateCommand, getAllCommands } from '../../actions/assetsAction'
 import ChangePassword from '../auth/ChangePassword'
 import User from '../../models/User'
 import Job, { countOfJobsOfType } from '../../models/Job'
@@ -63,6 +63,7 @@ class Workspace extends Component {
   componentWillMount () {
     const { actions, user } = this.props
     actions.getUserPermissions(user)
+    actions.getAllCommands()
     Feedback.loadEmailJs()
   }
 
@@ -329,6 +330,7 @@ export default connect(state => ({
     showModal,
     hideModal,
     queueFilesUpload,
+    getAllCommands,
     updateCommand
   }, dispatch)
 }))(Workspace)

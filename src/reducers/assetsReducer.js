@@ -1,7 +1,7 @@
 import {
   ASSET_SEARCH, ASSET_AGGS, ASSET_SEARCH_ERROR,
   ASSET_SORT, ASSET_ORDER, ASSET_FIELDS, SIMILAR_VALUES,
-  ASSET_PERMISSIONS, UPDATE_COMMAND,
+  ASSET_PERMISSIONS, UPDATE_COMMAND, GET_COMMANDS,
   ISOLATE_ASSET, SELECT_ASSETS, SELECT_PAGES,
   ADD_ASSETS_TO_FOLDER, REMOVE_ASSETS_FROM_FOLDER,
   SUGGEST_COMPLETIONS, SEARCH_DOCUMENT, UNAUTH_USER
@@ -179,6 +179,10 @@ export default function (state = initialState, action) {
       return { ...state, commands }
     }
 
+    case GET_COMMANDS: {
+      const commands = action.payload
+      return { ...state, commands }
+    }
     case UNAUTH_USER:
       return initialState
   }

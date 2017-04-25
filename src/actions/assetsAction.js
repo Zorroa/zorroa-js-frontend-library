@@ -3,7 +3,7 @@ import * as assert from 'assert'
 import {
   UNAUTH_USER, ASSET_SEARCH, ASSET_AGGS, ASSET_SEARCH_ERROR,
   ASSET_SORT, ASSET_ORDER, ASSET_FIELDS,
-  ASSET_PERMISSIONS, UPDATE_COMMAND,
+  ASSET_PERMISSIONS, UPDATE_COMMAND, GET_COMMANDS,
   ISOLATE_ASSET, SELECT_ASSETS,
   SELECT_PAGES,
   SUGGEST_COMPLETIONS, SEARCH_DOCUMENT
@@ -278,6 +278,26 @@ export function updateCommand (id) {
       })
       .catch(error => {
         console.error('Error updating command ' + id + ': ' + error)
+      })
+  }
+}
+
+export function getAllCommands () {
+  return dispatch => {
+    archivistGet(dispatch, '/api/v1/commands')
+      .then(response => {
+        const commands = new Map()
+        response.data.forEach(json => {
+          const command = new Command(json)
+          commands.set(command.id, command)
+        })
+        dispatch({
+          type: GET_COMMANDS,
+          payload: commands
+        })
+      })
+      .catch(error => {
+        console.error('Error getting commands: ' + error)
       })
   }
 }
