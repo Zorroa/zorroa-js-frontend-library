@@ -1,47 +1,30 @@
 import React, { Component, PropTypes } from 'react'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 import { humanFileSize } from '../../services/jsUtil'
+import { queueFilesUpload, dequeueUploadFiles } from '../../actions/jobActions'
 
-export default class LocalChooser extends Component {
+class LocalChooser extends Component {
   static propTypes = {
     onImport: PropTypes.func,
     onBack: PropTypes.func.isRequired,
     onDone: PropTypes.func,
-    files: PropTypes.instanceOf(FileList)
+    uploadFiles: PropTypes.arrayOf(PropTypes.instanceOf(File)),
+    actions: PropTypes.object
   }
 
   state = {
-    isDroppable: false,     // true when file over drop target
-    uploadFiles: []         // pending File array
-  }
-
-  componentWillMount () {
-    const { files } = this.props
-    if (files) this.addFiles(files)
-  }
-
-  addFiles (files, event) {
-    const uploadFiles = [...this.state.uploadFiles]
-    for (let i = 0; i < files.length; ++i) {
-      const file = files[i]
-      if (uploadFiles.findIndex(f => (f.name === file.name)) < 0) {
-        console.log('   Added File: ' + file.name)
-        uploadFiles.push(file)
-      } else {
-        console.log('   Skipped duplicate file: ' + file.name)
-      }
-    }
-    this.setState({uploadFiles})
-    return false
+    isDroppable: false      // true when file over drop target
   }
 
   changeFile = (event) => {
-    this.addFiles(event.target.files)
+    this.props.actions.queueFilesUpload(event.target.files)
   }
 
   dropFile = (event) => {
-    this.addFiles(event.dataTransfer.files)
+    this.props.actions.queueFilesUpload(event.dataTransfer.files)
     this.setState({isDroppable: false})
     event.preventDefault()
   }
@@ -62,14 +45,14 @@ export default class LocalChooser extends Component {
 
   removeUploadFile (file, event) {
     console.log('Cancel upload ' + file.name)
-    const uploadFiles = this.state.uploadFiles.filter(f => (f.name !== file.name))
-    this.setState({uploadFiles})
+    this.props.actions.dequeueUploadFiles([file])
   }
 
   // We only know the total progress in bytes, not which file.
   // Compute per-file progress assuming in-order uploads.
   progressForFileIndex (i) {
-    const { progressEvent, uploadFiles } = this.state
+    const { uploadFiles } = this.props
+    const { progressEvent } = this.state
     if (!progressEvent) return -1
     let bytes = 0
     for (let j = 0; j <= i && j < uploadFiles.length; ++j) {
@@ -98,7 +81,8 @@ export default class LocalChooser extends Component {
   }
 
   renderFileList () {
-    const { isDroppable, uploadFiles } = this.state
+    const { uploadFiles } = this.props
+    const { isDroppable } = this.state
     const isDraggable = !this.props.onImport
     return (
       <div className="LocalChooser-activity-region">
@@ -118,7 +102,7 @@ export default class LocalChooser extends Component {
                 <td className="LocalChooser-upload-status">
                   <div className={`icon-file-empty${this.progressForFileIndex(i) === 1 ? '' : '2'}`}/>
                 </td>
-                <td className="LocalChooser-upload-name">{file.name}</td>
+                <td className="LocalChooser-upload-name">{file.webkitRelativePath}{file.name}</td>
                 <td
                   className="LocalChooser-upload-size">{humanFileSize(file.size)}</td>
                 <td className="LocalChooser-upload-type">{file.type}</td>
@@ -177,8 +161,8 @@ export default class LocalChooser extends Component {
   }
 
   render () {
-    const { onImport, onDone, onBack } = this.props
-    const { uploadFiles, progressEvent } = this.state
+    const { onImport, onDone, onBack, uploadFiles } = this.props
+    const { progressEvent } = this.state
     const uploadsCompleted = progressEvent && progressEvent.loaded >= progressEvent.total
     const disabled = (progressEvent && !uploadsCompleted) || !uploadFiles.length
     const step = onImport ? 2 : 3
@@ -206,3 +190,12 @@ export default class LocalChooser extends Component {
     )
   }
 }
+
+export default connect(state => ({
+  uploadFiles: state.jobs.uploadFiles
+}), dispatch => ({
+  actions: bindActionCreators({
+    queueFilesUpload,
+    dequeueUploadFiles
+  }, dispatch)
+}))(LocalChooser)

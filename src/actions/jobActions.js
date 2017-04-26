@@ -6,6 +6,7 @@ import AssetSearch from '../models/AssetSearch'
 import {
   EXPORT_ASSETS, IMPORT_ASSETS,
   GET_PIPELINES, GET_JOBS,
+  QUEUE_FILE_UPLOAD, DEQUEUE_UPLOADED_FILE,
   MARK_JOB_DOWNLOADED, GET_PROCESSORS,
   CANCEL_JOB, RESTART_JOB } from '../constants/actionTypes'
 import { archivistGet, archivistPost, archivistRequest } from './authAction'
@@ -175,4 +176,18 @@ export function getProcessors () {
         })
       })
   }
+}
+
+export function queueFilesUpload (files) {
+  return ({
+    type: QUEUE_FILE_UPLOAD,
+    payload: files
+  })
+}
+
+export function dequeueUploadFiles (files) {
+  return ({
+    type: DEQUEUE_UPLOADED_FILE,
+    payload: files
+  })
 }

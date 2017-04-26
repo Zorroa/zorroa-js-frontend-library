@@ -146,8 +146,8 @@ class AclEditor extends Component {
         </div>
         <div className="AclEditor-permission-items">
           { permissions.map(permission => (
-            <div key={permission.id} className="AclEditor-permission flexRow flexAlignItemsCenter">
-              <input type="checkbox" id={permission.id} checked={selectedPermissionIds && selectedPermissionIds.has(permission.id)} onChange={this.togglePermission.bind(this, permission)}/>
+            <div key={permission.id} className="AclEditor-permission">
+              <input type="checkbox" name={`${permission.type}__${permission.name}`} id={permission.id} checked={selectedPermissionIds && selectedPermissionIds.has(permission.id)} onChange={this.togglePermission.bind(this, permission)}/>
               <label htmlFor={permission.id} className={classnames('AclEditor-permission-icon', icon)}/>
               <label htmlFor={permission.id} className="AclEditor-permission-name">{permission.name}</label>
             </div>

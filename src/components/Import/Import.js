@@ -24,7 +24,6 @@ class Import extends Component {
     step: PropTypes.number,
     source: PropTypes.string,
     cloud: PropTypes.string,
-    files: PropTypes.object,
     pipelines: PropTypes.arrayOf(PropTypes.instanceOf(Pipeline)),
     processors: PropTypes.arrayOf(PropTypes.instanceOf(Processor)),
     user: PropTypes.instanceOf(User).isRequired,
@@ -173,7 +172,7 @@ class Import extends Component {
     switch (this.state.source) {
       case CLOUD_IMPORT: return <ImportCloud launch={this.state.cloud} onSelect={this.selectCloud} onBack={e => this.setStep(1)}/>
       case SERVER_IMPORT: return <ImportCloudproxy onSelect={this.selectCloudproxy} onBack={e => this.setStep(1)}/>
-      case LOCAL_IMPORT: return <LocalChooser files={this.props.files} onImport={this.createImport} onBack={e => this.setStep(1)}/>
+      case LOCAL_IMPORT: return <LocalChooser onImport={this.createImport} onBack={e => this.setStep(1)}/>
     }
   }
 

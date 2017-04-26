@@ -234,7 +234,7 @@ class JobMenu extends Component {
   render () {
     const { jobType } = this.props
     return (
-      <div className="header-menu header-menu-jobs">
+      <div className={classnames('header-menu', 'header-menu-jobs', `header-menu-${jobType}`)}>
         { this.renderJobBadge() }
         <DropdownMenu label={`${jobType}s`} onChange={this.refreshJobs} show={this.show}>
           { jobType === Job.Import ? (

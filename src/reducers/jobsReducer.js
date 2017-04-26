@@ -1,11 +1,16 @@
 import {
   EXPORT_ASSETS, IMPORT_ASSETS,
   GET_JOBS, GET_PIPELINES,
+  QUEUE_FILE_UPLOAD, DEQUEUE_UPLOADED_FILE,
   MARK_JOB_DOWNLOADED, GET_PROCESSORS,
   RESTART_JOB, CANCEL_JOB, UNAUTH_USER } from '../constants/actionTypes'
 import Job from '../models/Job'
 
-export const initialState = { all: {}, processors: [] }
+export const initialState = {
+  all: {},
+  processors: [],
+  uploadFiles: []
+}
 
 export default function (state = initialState, action) {
   switch (action.type) {
@@ -75,6 +80,38 @@ export default function (state = initialState, action) {
 
     case GET_PROCESSORS: {
       return { ...state, processors: action.payload }
+    }
+
+    case QUEUE_FILE_UPLOAD: {
+      const files = action.payload
+      const uploadFiles = [...state.uploadFiles]
+      for (let i = 0; i < files.length; ++i) {
+        const file = files[i]
+        console.log('Queue: ' + file.name)
+        if (file.name.startsWith('.')) continue
+        const path = file.webkitRelativePath + file.name
+        const index = uploadFiles.findIndex(f => (f.webkitRelativePath + f.name === path))
+        console.log('Queued: ' + index + ': ' + path)
+        if (index >= 0) {
+          uploadFiles[index] = file
+        } else {
+          uploadFiles.push(file)
+        }
+      }
+      return { ...state, uploadFiles }
+    }
+
+    case DEQUEUE_UPLOADED_FILE: {
+      const files = action.payload
+      const uploadFiles = [...state.uploadFiles]
+      for (let i = 0; i < files.length; ++i) {
+        const file = files[i]
+        const index = uploadFiles.findIndex(f => (f.webkitRelativePath + f.name === file.webkitRelativePath + file.name))
+        if (index >= 0) {
+          uploadFiles.splice(index, 1)
+        }
+      }
+      return { ...state, uploadFiles }
     }
 
     case UNAUTH_USER: {
