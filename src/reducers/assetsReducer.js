@@ -1,6 +1,7 @@
 import {
   ASSET_SEARCH, ASSET_AGGS, ASSET_SEARCH_ERROR,
   ASSET_SORT, ASSET_ORDER, ASSET_FIELDS, SIMILAR_VALUES,
+  ASSET_PERMISSIONS, UPDATE_COMMAND, GET_COMMANDS,
   ISOLATE_ASSET, SELECT_ASSETS, SELECT_PAGES,
   ADD_ASSETS_TO_FOLDER, REMOVE_ASSETS_FROM_FOLDER,
   SUGGEST_COMPLETIONS, SEARCH_DOCUMENT, UNAUTH_USER
@@ -15,7 +16,8 @@ const initialState = {
   // The value itself has no meaning, these are used to respond to query
   // or selection changes. (See Assets & Table for examples)
   assetsCounter: 0,
-  selectionCounter: 0
+  selectionCounter: 0,
+  commands: new Map()
 }
 
 function inject (src, idx, arr) {
@@ -169,6 +171,18 @@ export default function (state = initialState, action) {
       return { ...state, all, query }
     }
 
+    case UPDATE_COMMAND:        // Same reduction action for update
+    case ASSET_PERMISSIONS: {
+      const command = action.payload
+      const commands = new Map(state.commands)
+      commands.set(command.id, command)
+      return { ...state, commands }
+    }
+
+    case GET_COMMANDS: {
+      const commands = action.payload
+      return { ...state, commands }
+    }
     case UNAUTH_USER:
       return initialState
   }

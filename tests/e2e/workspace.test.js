@@ -170,6 +170,25 @@ describe('Workspace', function () {
     .then(_ => selenium.clickSelector(By.css('.Developer-done')))
   })
 
+  it('command progress', () => {
+    return driver
+      .then(_ => { DEBUG && console.log('admin menu preferences') })
+      .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.header-menu-Import')))
+      .then(_ => selenium.clickSelector(By.css('.header-menu-Import')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.JobMenu-permissions')))
+      .then(_ => selenium.clickSelector(By.css('.JobMenu-permissions')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.AssetPermissions')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.AclEditor')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.AclEditor-permissions')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.AclEditor-permission-items')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('input[name="user__admin"]')))
+      .then(_ => driver.findElement(By.css('input[name="user__admin"]')).click())
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.AssetPermissions-apply')))
+      .then(_ => selenium.clickSelector(By.css('.AssetPermissions-apply')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.CommandProgress-progress-bar')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.CommandProgress-progress-bar')))
+  })
+
   it('log out', () => {
     let url
 
