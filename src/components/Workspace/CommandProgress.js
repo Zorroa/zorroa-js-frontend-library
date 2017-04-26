@@ -9,7 +9,7 @@ const CommandProgress = (props) => (
     <div className="CommandProgress-subtitle">
       Setting asset permissions
     </div>
-    <div className="CommandProgress-progress-bar">
+    <div className={classnames('CommandProgress-progress-bar', {indeterminate: props.successPct === 0 && props.errorPct === 0})}>
       <div className={classnames('CommandProgress-progress', {hasErrors: props.errorPct > 0})}
            style={{width: `${props.successPct}%`}}/>
       <div className="CommandProgress-errors" style={{width: `${props.errorPct}%`}}/>

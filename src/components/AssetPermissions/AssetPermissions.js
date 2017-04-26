@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react'
+import classnames from 'classnames'
 
 import AclEditor from '../AclEditor'
 
@@ -28,6 +29,7 @@ export default class AssetPermissions extends Component {
 
   render () {
     const { title } = this.props
+    const disabled = !this.state.acl
     return (
       <div className="AssetPermissions">
         <div className="AssetPermissions-header">
@@ -38,7 +40,8 @@ export default class AssetPermissions extends Component {
           <AclEditor onChange={this.changeAcl}/>
         </div>
         <div className="AssetPermissions-controls">
-          <div className="AssetPermissions-apply" onClick={this.setPermissions}>Save</div>
+          <div className={classnames('AssetPermissions-apply', {disabled})}
+               onClick={!disabled && this.setPermissions}>Save</div>
           <div className="AssetPermissions-cancel" onClick={this.cancel}>Cancel</div>
         </div>
       </div>

@@ -246,9 +246,9 @@ class Workspace extends Component {
 
     // Only show the command progress if Active, skipping super quick commands
     const commands = [...this.props.commands.values()]
-    const command = commands.find(command => (command.state === Job.Active))
-    const commandSuccessPct = command ? 100 * command.successCount / command.totalCount : 0
-    const commandErrorPct = command ? 100 * command.errorCount / command.totalCount : 0
+    const command = commands.find(command => (command.state === Job.Active)) || commands.find(command => (command.state === Job.Waiting))
+    const commandSuccessPct = command && command.totalCount ? 100 * command.successCount / command.totalCount : 0
+    const commandErrorPct = command && command.totalCount ? 100 * command.errorCount / command.totalCount : 0
 
     const { isDroppable, showReloader } = this.state
     return (
