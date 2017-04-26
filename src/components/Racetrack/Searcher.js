@@ -108,7 +108,7 @@ class Searcher extends Component {
     if (this.folderCountTimer) clearTimeout(this.folderCountTimer)
     this.folderCountTimer = null
     if (this.pendingQueryCountIds.size || this.pendingFullCountIds.size) {
-      this.folderCountTimer = setTimeout(this.runFolderCount, 100)
+      this.folderCountTimer = setTimeout(this.runFolderCount, 0)
     }
   }
 
