@@ -72,7 +72,7 @@
   text-decoration: none;
   @include nowrap;
 
-  &:hover { background-color: $zorroa-gray; }
+  &:hover:not(.disabled) { background-color: $zorroa-gray; }
   &.disabled { background-color: $zorroa-lightgray; }
 }
 
