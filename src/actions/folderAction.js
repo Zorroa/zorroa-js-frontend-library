@@ -1,7 +1,7 @@
 import {
   GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, UPDATE_FOLDER,
   DELETE_FOLDER, TOGGLE_FOLDER, ADD_ASSETS_TO_FOLDER,
-  REMOVE_ASSETS_FROM_FOLDER, FOLDER_COUNTS
+  REMOVE_ASSETS_FROM_FOLDER, FOLDER_COUNTS, FOLDERS_VISIBLE
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import { archivistGet, archivistPut, archivistPost, archivistRequest } from './authAction'
@@ -176,5 +176,16 @@ export function countAssetsInFolderIds (ids, search) {
       .catch(error => {
         console.error('Error counting query assets in folders ' + JSON.stringify(ids) + ': ' + error)
       })
+  }
+}
+
+// Setting folders visible means request folder counts
+// For use outside of Searcher (in Folders); This will result in countAssetsInFolderIds
+// being called with & without the current query, via Searcher
+export function setVisibileFolderIds (ids) {
+  if (!(ids instanceof Set)) ids = new Set(ids)
+  return {
+    type: FOLDERS_VISIBLE,
+    payload: ids
   }
 }

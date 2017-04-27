@@ -3,7 +3,7 @@ import {
   DELETE_FOLDER, ADD_ASSETS_TO_FOLDER, REMOVE_ASSETS_FROM_FOLDER,
   TOGGLE_FOLDER, UNAUTH_USER, FOLDER_COUNTS,
   TRASHED_FOLDERS, EMPTY_FOLDER_TRASH, COUNT_TRASHED_FOLDERS,
-  RESTORE_TRASHED_FOLDERS, DELETE_TRASHED_FOLDERS
+  RESTORE_TRASHED_FOLDERS, DELETE_TRASHED_FOLDERS, FOLDERS_VISIBLE
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import * as assert from 'assert'
@@ -72,7 +72,7 @@ export default function (state = initialState, action) {
           all.set(newParent.id, newParent)
         }
 
-        return { ...state, all, modifiedIds }
+        return { ...state, all } // skip modifiedIds; Folders component will request as needed
       }
       break
 
@@ -233,6 +233,11 @@ export default function (state = initialState, action) {
 
     case UNAUTH_USER:
       return initialState
+
+    case FOLDERS_VISIBLE:
+      // Setting folders visible means request folder counts
+      const modifiedIds = new Set([...state.modifiedIds, ...action.payload])
+      return { ...state, modifiedIds }
   }
 
   return state
