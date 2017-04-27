@@ -6,7 +6,7 @@ import LRUCache from 'lru-cache'
 
 import Folder from '../../models/Folder'
 import { getFolderChildren, createFolder, selectFolderIds, selectFolderId,
-  toggleFolder, setVisibileFolderIds } from '../../actions/folderAction'
+  toggleFolder, queueFolderCounts } from '../../actions/folderAction'
 import { showModal, sortFolders } from '../../actions/appActions'
 import Trash from './Trash'
 import FolderItem from './FolderItem'
@@ -33,6 +33,7 @@ class Folders extends Component {
 
     // connect props
     actions: PropTypes.object.isRequired,
+    assetsCounter: PropTypes.number.isRequired,
 
     // state props
     folders: PropTypes.object.isRequired,
@@ -51,8 +52,10 @@ class Folders extends Component {
     this.folderSortCache = new LRUCache({ max: 1000 })
 
     this.foldersVisible = new Set()
-    this.folderCountRequested = new Set()
+    this.folderCountRequested = new Map()
     this.requestFolderCountsTimer
+
+    this.assetsCounter = 0
   }
 
   queueFolderCounts = () => {
@@ -62,9 +65,11 @@ class Folders extends Component {
 
   requestFolderCounts = () => {
     var requestSet = new Set(this.foldersVisible)
-    for (let id of requestSet) if (this.folderCountRequested.has(id)) requestSet.delete(id)
-    this.props.actions.setVisibileFolderIds(requestSet)
-    for (let id of requestSet) this.folderCountRequested.add(id)
+    for (let id of requestSet) {
+      if (this.folderCountRequested.get(id) === this.assetsCounter) requestSet.delete(id)
+    }
+    this.props.actions.queueFolderCounts(requestSet)
+    for (let id of requestSet) this.folderCountRequested.set(id, this.assetsCounter)
   }
 
   foldersScroll = (event) => {
@@ -124,6 +129,9 @@ class Folders extends Component {
       this.loadChildren(folder)
       this.scrollToFolder(folder.id)
     }
+
+    // evict all folders from counted list; will start refreshing everyone
+    this.folderCountRequested = new Map()
   }
 
   scrollToFolder = (folderId) => {
@@ -365,6 +373,13 @@ class Folders extends Component {
     const { filterString } = this.state
     const rootLoaded = folders.all.has(Folder.ROOT_ID)
     if (!rootLoaded) return null
+
+    if (this.props.assetsCounter !== this.assetsCounter) {
+      this.assetsCounter = this.props.assetsCounter
+      // evict all folders from counted list; will start refreshing everyone
+      this.folderCountRequested = new Map()
+    }
+
     const folderList = this.folderList(folders.all.get(Folder.ROOT_ID))
     const numOpenFolders = folderList.length
     const foldersBodyHeight = numOpenFolders * FOLDER_HEIGHT_PX
@@ -426,7 +441,8 @@ class Folders extends Component {
 
 export default connect(state => ({
   folders: state.folders,
-  sortFolders: state.app.sortFolders
+  sortFolders: state.app.sortFolders,
+  assetsCounter: state.assets.assetsCounter
 }), dispatch => ({
   actions: bindActionCreators({
     getFolderChildren,
@@ -436,6 +452,6 @@ export default connect(state => ({
     toggleFolder,
     showModal,
     sortFolders,
-    setVisibileFolderIds
+    queueFolderCounts
   }, dispatch)
 }))(Folders)

@@ -3,7 +3,8 @@ import {
   DELETE_FOLDER, ADD_ASSETS_TO_FOLDER, REMOVE_ASSETS_FROM_FOLDER,
   TOGGLE_FOLDER, UNAUTH_USER, FOLDER_COUNTS,
   TRASHED_FOLDERS, EMPTY_FOLDER_TRASH, COUNT_TRASHED_FOLDERS,
-  RESTORE_TRASHED_FOLDERS, DELETE_TRASHED_FOLDERS, FOLDERS_VISIBLE
+  RESTORE_TRASHED_FOLDERS, DELETE_TRASHED_FOLDERS,
+  QUEUE_FOLDER_COUNTS, CLEAR_FOLDER_COUNT_QUEUE
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import * as assert from 'assert'
@@ -48,12 +49,9 @@ export default function (state = initialState, action) {
         let all = new Map(state.all) // copy previous state
 
         // Add children to app state, preserve existing grandchildren
-        const modifiedIds = new Set(state.modifiedIds)
         children.forEach(child => {
           let newChild = new Folder(child)
           const prevChild = all.get(child.id)
-          _addAncestorIds(prevChild, modifiedIds, state.all)
-          _addAncestorIds(newChild, modifiedIds, state.all)
           if (prevChild && prevChild.childIds && !child.childIds) {
             newChild.childIds = new Set(prevChild.childIds)
           } else if (child.childIds) {
@@ -72,7 +70,7 @@ export default function (state = initialState, action) {
           all.set(newParent.id, newParent)
         }
 
-        return { ...state, all } // skip modifiedIds; Folders component will request as needed
+        return { ...state, all }
       }
       break
 
@@ -167,19 +165,30 @@ export default function (state = initialState, action) {
       }
       break
 
+    case QUEUE_FOLDER_COUNTS: {
+      // Setting folders visible means request folder counts
+      const modifiedIds = new Set([...state.modifiedIds, ...action.payload])
+      return { ...state, modifiedIds }
+    }
+
+    case CLEAR_FOLDER_COUNT_QUEUE: {
+      // Setting folders visible means request folder counts
+      const modifiedIds = new Set([...state.modifiedIds])
+      for (let id of action.payload) modifiedIds.delete(id)
+      return { ...state, modifiedIds }
+    }
+
     case FOLDER_COUNTS: {
       const { search, ids, counts } = action.payload
       if (counts && counts.length && counts.length === ids.length) {
         const newCounts = new Map(search ? state.filteredCounts : state.counts)
-        const modifiedIds = new Set([...state.modifiedIds])
         for (let i = 0; i < ids.length; ++i) {
           newCounts.set(ids[i], counts[i])
-          if (!search) modifiedIds.delete(ids[i])
         }
         if (search) {
           return { ...state, filteredCounts: newCounts }
         }
-        return { ...state, counts: newCounts, modifiedIds }
+        return { ...state, counts: newCounts }
       } else if (search && search.empty() && ids && ids.length) {
         // Fast path: copy the counts into the filter counts
         const newCounts = new Map(state.filteredCounts)
@@ -233,11 +242,6 @@ export default function (state = initialState, action) {
 
     case UNAUTH_USER:
       return initialState
-
-    case FOLDERS_VISIBLE:
-      // Setting folders visible means request folder counts
-      const modifiedIds = new Set([...state.modifiedIds, ...action.payload])
-      return { ...state, modifiedIds }
   }
 
   return state
