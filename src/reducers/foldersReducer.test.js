@@ -36,7 +36,6 @@ describe('foldersReducer', () => {
     afterState.all.set(child1.id, child1)
     afterState.all.set(child2.id, child2)
     afterState.all.get(0).childIds = new Set([child1.id, child2.id])
-    afterState.modifiedIds = new Set([child1.id, child2.id])
 
     expect(foldersReducer(beforeState,
       {
