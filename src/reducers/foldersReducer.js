@@ -4,7 +4,7 @@ import {
   TOGGLE_FOLDER, UNAUTH_USER, FOLDER_COUNTS,
   TRASHED_FOLDERS, EMPTY_FOLDER_TRASH, COUNT_TRASHED_FOLDERS,
   RESTORE_TRASHED_FOLDERS, DELETE_TRASHED_FOLDERS,
-  QUEUE_FOLDER_COUNTS, CLEAR_FOLDER_COUNT_QUEUE
+  QUEUE_FOLDER_COUNTS, CLEAR_FOLDER_COUNT_QUEUE, ASSET_SEARCH
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import * as assert from 'assert'
@@ -199,6 +199,10 @@ export default function (state = initialState, action) {
       }
       break
     }
+
+    case ASSET_SEARCH:
+      // filteredCounts become stale when query changes (oh and skip rendering them too)
+      return { ...state, filteredCounts: new Map() }
 
     case ADD_ASSETS_TO_FOLDER: {
       const folder = state.all && state.all.get(action.payload.folderId)
