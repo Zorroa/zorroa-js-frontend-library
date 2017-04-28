@@ -2,20 +2,24 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
-import LRUCache  from 'lru-cache'
+import LRUCache from 'lru-cache'
 
 import Folder from '../../models/Folder'
-import { getFolderChildren, createFolder, selectFolderIds, selectFolderId, toggleFolder } from '../../actions/folderAction'
+import { getFolderChildren, createFolder, selectFolderIds, selectFolderId,
+  toggleFolder, queueFolderCounts } from '../../actions/folderAction'
 import { showModal, sortFolders } from '../../actions/appActions'
 import Trash from './Trash'
 import FolderItem from './FolderItem'
 import CreateFolder from './CreateFolder'
+import { equalSets } from '../../services/jsUtil'
 
 const SORT_ALPHABETICAL = 'alpha'
 const SORT_TIME = 'time'
 
 const FOLDER_HEIGHT_PX = 25
 const MAX_FOLDER_SCROLL_HEIGHT_PX = 400
+
+const FOLDER_COUNT_SCROLL_IDLE_THRESH_MS = 250 // ms to wait after scrolling stops before requesting folder counts
 
 const NUMTRUE = {numeric: true}
 
@@ -29,6 +33,7 @@ class Folders extends Component {
 
     // connect props
     actions: PropTypes.object.isRequired,
+    assetsCounter: PropTypes.number.isRequired,
 
     // state props
     folders: PropTypes.object.isRequired,
@@ -45,6 +50,26 @@ class Folders extends Component {
     }
 
     this.folderSortCache = new LRUCache({ max: 1000 })
+
+    this.foldersVisible = new Set()
+    this.folderCountRequested = new Map()
+    this.requestFolderCountsTimer
+
+    this.assetsCounter = 0
+  }
+
+  queueFolderCounts = () => {
+    clearTimeout(this.requestFolderCountsTimer)
+    this.requestFolderCountsTimer = setTimeout(this.requestFolderCounts, FOLDER_COUNT_SCROLL_IDLE_THRESH_MS)
+  }
+
+  requestFolderCounts = () => {
+    var requestSet = new Set(this.foldersVisible)
+    for (let id of requestSet) {
+      if (this.folderCountRequested.get(id) === this.assetsCounter) requestSet.delete(id)
+    }
+    this.props.actions.queueFolderCounts(requestSet)
+    for (let id of requestSet) this.folderCountRequested.set(id, this.assetsCounter)
   }
 
   foldersScroll = (event) => {
@@ -104,6 +129,9 @@ class Folders extends Component {
       this.loadChildren(folder)
       this.scrollToFolder(folder.id)
     }
+
+    // evict all folders from counted list; will start refreshing everyone
+    this.folderCountRequested = new Map()
   }
 
   scrollToFolder = (folderId) => {
@@ -242,18 +270,23 @@ class Folders extends Component {
       let childrenNameHash = 0
       childIds.forEach(childId => {
         children.push(folders.all.get(childId))
+        // compute a hash of all child ids, to use in the key of our sort order cache
+        // If the list of children changes, the key will change, which will force a re-sort & new cache entry
         childrenNameHash = this.hashCode(childId.toString(), childrenNameHash)
       })
 
+      // We are caching the folder sort because alphabetic sort is SLOW, and this runs every frame (e.g., while scrolling)
       const key = `${folder.id}|${this.sortOrder()}|${children.length}|${childrenNameHash}`
       let childrenSortOrder = this.folderSortCache.get(key)
       if (childrenSortOrder) {
+        // If we already sorted before and nothing's changed, retrieve the sort order
         children = childrenSortOrder.map(id => folders.all.get(id))
       } else {
         // Sort children by selected sort, initially partitioned by type: dyhi, smart, simple
         if (filter) children = children.filter(filter)
         children.sort(this.folderCompare)
         childrenSortOrder = children.map(folder => folder.id)
+        // Once we sort, store the sort order in our sort order cache
         this.folderSortCache.set(key, childrenSortOrder)
       }
 
@@ -290,6 +323,8 @@ class Folders extends Component {
     )
 
     let renderedFolders = []
+    let prevFoldersVisible = new Set([...this.foldersVisible])
+    this.foldersVisible.clear()
 
     for (let i = startIndex; i <= stopIndex; i++) {
       const folder = folderList[i]
@@ -299,6 +334,9 @@ class Folders extends Component {
       const isOpen = folders.openFolderIds.has(folder.id)
       const isSelected = !onSelect && folders.selectedFolderIds.has(folder.id)
       const hasChildren = folder.childCount > 0
+
+      this.foldersVisible.add(folder.id)
+
       renderedFolders.push(
         <FolderItem {...{key, depth, folder, isOpen, isSelected, hasChildren, top: `${i * FOLDER_HEIGHT_PX}px`}}
           onToggle={this.toggleFolder.bind(this, folder)}
@@ -306,6 +344,7 @@ class Folders extends Component {
       )
     }
 
+    if (!equalSets(prevFoldersVisible, this.foldersVisible)) this.queueFolderCounts()
     return renderedFolders
   }
 
@@ -334,6 +373,14 @@ class Folders extends Component {
     const { filterString } = this.state
     const rootLoaded = folders.all.has(Folder.ROOT_ID)
     if (!rootLoaded) return null
+
+    if (this.props.assetsCounter !== this.assetsCounter) {
+      this.assetsCounter = this.props.assetsCounter
+      // evict all folders from counted list; will start refreshing everyone
+      this.folderCountRequested = new Map()
+      this.queueFolderCounts()
+    }
+
     const folderList = this.folderList(folders.all.get(Folder.ROOT_ID))
     const numOpenFolders = folderList.length
     const foldersBodyHeight = numOpenFolders * FOLDER_HEIGHT_PX
@@ -395,7 +442,8 @@ class Folders extends Component {
 
 export default connect(state => ({
   folders: state.folders,
-  sortFolders: state.app.sortFolders
+  sortFolders: state.app.sortFolders,
+  assetsCounter: state.assets.assetsCounter
 }), dispatch => ({
   actions: bindActionCreators({
     getFolderChildren,
@@ -404,6 +452,7 @@ export default connect(state => ({
     selectFolderId,
     toggleFolder,
     showModal,
-    sortFolders
+    sortFolders,
+    queueFolderCounts
   }, dispatch)
 }))(Folders)

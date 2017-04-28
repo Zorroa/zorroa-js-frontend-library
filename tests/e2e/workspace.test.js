@@ -186,6 +186,7 @@ describe('Workspace', function () {
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.AssetPermissions-apply')))
       .then(_ => selenium.clickSelector(By.css('.AssetPermissions-apply')))
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.CommandProgress-progress-bar')))
+      .then(_ => driver.sleep(5000)) // progress bar is supposed to be visible for 5 seconds
       .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.CommandProgress-progress-bar')))
   })
 

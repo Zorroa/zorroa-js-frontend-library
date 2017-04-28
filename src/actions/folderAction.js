@@ -1,7 +1,7 @@
 import {
   GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, UPDATE_FOLDER,
   DELETE_FOLDER, TOGGLE_FOLDER, ADD_ASSETS_TO_FOLDER,
-  REMOVE_ASSETS_FROM_FOLDER, FOLDER_COUNTS
+  REMOVE_ASSETS_FROM_FOLDER, FOLDER_COUNTS, QUEUE_FOLDER_COUNTS, CLEAR_FOLDER_COUNT_QUEUE
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import { archivistGet, archivistPut, archivistPost, archivistRequest } from './authAction'
@@ -152,6 +152,25 @@ export function removeAssetIdsFromFolderId (assetIds, folderId) {
       .catch(error => {
         console.error('Error removing assets ' + JSON.stringify(assetIds) + ' from folder ' + folderId + ': ' + error)
       })
+  }
+}
+
+// Setting folders visible means request folder counts
+// For use outside of Searcher (in Folders); This will result in countAssetsInFolderIds
+// being called with & without the current query, via Searcher
+export function queueFolderCounts (ids) {
+  if (!(ids instanceof Set)) ids = new Set(ids)
+  return {
+    type: QUEUE_FOLDER_COUNTS,
+    payload: ids
+  }
+}
+
+export function clearFolderCountQueue (ids) {
+  if (!(ids instanceof Set)) ids = new Set(ids)
+  return {
+    type: CLEAR_FOLDER_COUNT_QUEUE,
+    payload: ids
   }
 }
 

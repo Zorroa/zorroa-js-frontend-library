@@ -9,7 +9,7 @@ import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import TrashedFolder from '../../models/TrashedFolder'
 import { searchAssets, getAssetFields, requiredFields } from '../../actions/assetsAction'
-import { countAssetsInFolderIds } from '../../actions/folderAction'
+import { countAssetsInFolderIds, clearFolderCountQueue } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
 import { MapWidgetInfo } from './WidgetInfo'
 
@@ -19,7 +19,6 @@ class Searcher extends Component {
   static propTypes = {
     query: PropTypes.instanceOf(AssetSearch),
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
-    folders: PropTypes.instanceOf(Map),
     selectedFolderIds: PropTypes.object,
     modifiedFolderIds: PropTypes.instanceOf(Set),
     folderCounts: PropTypes.instanceOf(Map),
@@ -135,7 +134,7 @@ class Searcher extends Component {
   // Note that post-filter is less efficient than a standard filter.
   render () {
     const {
-      widgets, actions, folders, selectedFolderIds, query,
+      widgets, actions, selectedFolderIds, query,
       modifiedFolderIds, trashedFolders, order,
       similarField, similarValues,
       metadataFields, lightbarFields, fieldTypes } = this.props
@@ -213,18 +212,14 @@ class Searcher extends Component {
         // FIXME: Disable saving search to user settings to avoid conflicts
         // actions.saveUserSettings(user, { ...userSettings, search: assetSearch })
       }
-      if (folders && folders.size > 1 && assetSearch && !assetSearch.empty()) {
-        // New query, get all the filtered folder counts
-        this.queueFolderCounts(new Set([...folders.keys()]), assetSearch)
-        if (this.state.importFinished) {
-          this.queueFolderCounts(new Set([...folders.keys()]))
-        }
-      }
-    } else if (modifiedFolderIds && modifiedFolderIds.size) {
+    }
+
+    if (modifiedFolderIds && modifiedFolderIds.size) {
       this.queueFolderCounts(modifiedFolderIds)
       if (assetSearch && !assetSearch.empty()) {
         this.queueFolderCounts(modifiedFolderIds, assetSearch)
       }
+      requestAnimationFrame(_ => this.props.actions.clearFolderCountQueue(modifiedFolderIds))
     }
 
     if (this.inflightQuery && query && this.inflightQuery.equals(query)) this.inflightQuery = null
@@ -237,6 +232,7 @@ const mapDispatchToProps = dispatch => ({
     searchAssets,
     getAssetFields,
     countAssetsInFolderIds,
+    clearFolderCountQueue,
     saveUserSettings
   }, dispatch)
 })
@@ -245,7 +241,6 @@ const mapStateToProps = state => ({
   query: state.assets.query,
   order: state.assets.order,
   widgets: state.racetrack.widgets,
-  folders: state.folders.all,
   folderCounts: state.folders.counts,
   filteredFolderCounts: state.folders.filteredCounts,
   selectedFolderIds: state.folders.selectedFolderIds,
