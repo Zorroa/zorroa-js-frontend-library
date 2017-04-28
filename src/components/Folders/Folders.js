@@ -378,6 +378,7 @@ class Folders extends Component {
       this.assetsCounter = this.props.assetsCounter
       // evict all folders from counted list; will start refreshing everyone
       this.folderCountRequested = new Map()
+      this.queueFolderCounts()
     }
 
     const folderList = this.folderList(folders.all.get(Folder.ROOT_ID))
