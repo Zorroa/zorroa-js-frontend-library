@@ -377,7 +377,7 @@ class LocalChooser extends Component {
   }
 
   render () {
-    const { onImport, onBack } = this.props
+    const { onImport } = this.props
     const { progressEvent, directoryCount } = this.state
     const fileCount = this.props.fileEntries.size - directoryCount
     const uploadsCompleted = progressEvent && progressEvent.loaded >= progressEvent.total
