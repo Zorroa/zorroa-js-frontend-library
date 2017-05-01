@@ -16,5 +16,6 @@ import './QuickAddWidget.scss'
 import './DateRange.scss'
 import './Widget.scss'
 import './SimilarHash.scss'
-
+import './slick.scss'
+import './slick-theme.scss'
 export default Racetrack

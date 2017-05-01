@@ -10,7 +10,7 @@ import Thumb, { page, monopageBadges, multipageBadges } from '../Thumb'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
 import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, searchAssetsRequestProm } from '../../actions/assetsAction'
-import { resetRacetrackWidgets, similarValues } from '../../actions/racetrackAction'
+import { resetRacetrackWidgets, similar } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
 import { setThumbSize, setThumbLayout, showTable, setTableHeight, showMultipage } from '../../actions/appActions'
@@ -271,7 +271,7 @@ class Assets extends Component {
   updateSelectedHashes = (similarField, selectedIds) => {
     if (similarField && similarField.length && selectedIds && selectedIds.size) {
       const { cachedSelectedIds } = this.state
-      if (cachedSelectedIds && equalSets(selectedIds, cachedSelectedIds)) return
+      if (cachedSelectedIds && equalSets(selectedIds, new Set(cachedSelectedIds))) return
       const dummyDispatch = () => {}
       const mkProm = (query) => {
         return searchAssetsRequestProm(dummyDispatch, query)
@@ -283,12 +283,13 @@ class Assets extends Component {
       makePromiseQueue([query], mkProm, 1 /* limit to one */)
         .then(responses => {
           const assets = responses[0].data.list.map(json => (new Asset(json)))
-          const cachedSelectedHashes = assets.map(asset => (asset.rawValue(similarField)))
-          return this.setState({cachedSelectedHashes})
+          const cachedSelectedHashes = assets.map(asset => asset.rawValue(similarField))
+          const cachedSelectedIds = assets.map(asset => asset.id)
+          return this.setState({cachedSelectedHashes, cachedSelectedIds})
         })
 
       // Update state now to avoid re-sending
-      this.setState({cachedSelectedIds: new Set(selectedIds)})
+      this.setState({cachedSelectedIds: [...selectedIds]})
     } else {
       // Clear the cache
       const cachedSelectedIds = null
@@ -417,8 +418,9 @@ class Assets extends Component {
   }
 
   sortSimilar = () => {
-    const { cachedSelectedHashes } = this.state
-    this.props.actions.similarValues(cachedSelectedHashes)
+    const { cachedSelectedHashes, cachedSelectedIds } = this.state
+    const similar = { values: cachedSelectedHashes, ids: cachedSelectedIds }
+    this.props.actions.similar(similar)
     console.log('Sort by similar: ' + JSON.stringify(cachedSelectedHashes))
   }
 
@@ -663,8 +665,8 @@ export default connect(state => ({
   showTable: state.app.showTable,
   tableHeight: state.app.tableHeight,
   showMultipage: state.app.showMultipage,
-  similarField: state.racetrack.similarField,
-  similarValues: state.racetrack.similarValues,
+  similarField: state.racetrack.similar.field,
+  similarValues: state.racetrack.similar.values,
   origin: state.auth.origin
 }), dispatch => ({
   actions: bindActionCreators({
@@ -674,7 +676,7 @@ export default connect(state => ({
     searchAssets,
     searchAssetsRequestProm,
     resetRacetrackWidgets,
-    similarValues,
+    similar,
     selectFolderIds,
     setThumbSize,
     setThumbLayout,

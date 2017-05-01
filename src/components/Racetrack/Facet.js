@@ -369,7 +369,7 @@ class Facet extends Component {
     if (!buckets || !buckets.length) {
       return (
         <div className="Facet-empty">
-          <div className="Facet-empty-icon icon-brokenegg"/>
+          <div className="Facet-empty-icon icon-emptybox"/>
           <div className="Facet-empty-info">
             No results
           </div>

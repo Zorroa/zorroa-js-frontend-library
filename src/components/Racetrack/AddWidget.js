@@ -14,7 +14,7 @@ class AddWidget extends Component {
   static propTypes = {
     fieldTypes: PropTypes.object,
     widgets: PropTypes.arrayOf(PropTypes.object),
-    permissions: PropTypes.arrayOf(Permission),
+    permissions: PropTypes.arrayOf(PropTypes.instanceOf(Permission)),
     actions: PropTypes.object
   }
 

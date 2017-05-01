@@ -100,7 +100,12 @@ ImageThumb.propTypes = {
 class Thumb extends Component {
   static propTypes = {
     // Rendering properties
-    dim: PropTypes.object.isRequired,
+    dim: PropTypes.shape({
+      width: PropTypes.number.isRequired,
+      height: PropTypes.number.isRequired,
+      x: PropTypes.number,
+      y: PropTypes.number
+    }).isRequired,
     pages: PropTypes.arrayOf(PropTypes.shape({
       url: React.PropTypes.string,
       backgroundColor: React.PropTypes.string

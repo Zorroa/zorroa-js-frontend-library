@@ -49,3 +49,8 @@
   @include clampText;
 }
 
+.SimilarHash-thumb {
+  min-width: 0;
+  //min-height: 0;
+  min-height: 100px !important;
+}
