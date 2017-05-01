@@ -18,7 +18,7 @@ driver.wait(until.elementLocated(By.xpath(`//*[contains(text(), '_selenium_14902
 quit()
 */
 
-const DEBUG = false
+const DEBUG = true
 
 // selenium promise manager is deprecated; use this to start testing. also works in the shell
 // process.env.SELENIUM_PROMISE_MANAGER = 0
@@ -170,7 +170,9 @@ export function startBrowserAndDriver (_suite) {
 
 // ----------------------------------------------------------------------
 export function stopBrowserAndDriver () {
-  return driver.then(_ => new Promise((resolve, reject) => {
+  return driver
+  .then(_ => driver.sleep(100)) // for my own peace of mind; this helps prevent console.log output from appearing after the test results
+  .then(_ => new Promise((resolve, reject) => {
     testStopDate = Date.now()
     testRunTimeMS = testStopDate - testStartDate
 
@@ -178,8 +180,10 @@ export function stopBrowserAndDriver () {
 
     if (!USE_SAUCE) {
       driver.quit()
-      driver = null
-      return resolve()
+      .then(_ => {
+        resolve()
+        driver = null
+      })
     }
 
     driver.getSession()
@@ -205,13 +209,43 @@ export function stopBrowserAndDriver () {
           }
         },
         function _updateJobDoneFn () {
-          driver.quit()
-          driver = null
-          resolve()
+          return driver.quit()
+          .then(_ => {
+            resolve()
+            driver = null
+          })
         }
       )
     })
   }))
+}
+
+// ----------------------------------------------------------------------
+export function expectNoJSErrors () {
+  return driver
+  .then(_ => { DEBUG && console.log(`checking for JS errors`) })
+  .then(_ => driver.executeScript('return window.zorroa.getLastError()'))
+  .then(lastErr => {
+    expect(lastErr).toBe(null)
+    if (lastErr) return driver.executeScript('return window.zorroa.clearErrors()')
+  })
+}
+
+// ----------------------------------------------------------------------
+export function testJSErrors () {
+  return driver
+  .then(_ => { DEBUG && console.log(`testing JS error handling`) })
+  .then(_ => expectNoJSErrors())
+  .then(_ => driver.executeScript('return window.zorroa.testError()'))
+  // NOTE: testError is 1 frame async, so wait before continuing.
+  // Use driver.wait instead of driver.sleep if this ever fails.
+  .then(_ => driver.sleep(100))
+  .then(_ => driver.executeScript('return window.zorroa.getNumErrors()'))
+    .then(nerrs => { expect(nerrs).toBe(1) })
+  .then(_ => driver.executeScript('return window.zorroa.getLastErrorMessage()'))
+    .then(msg => console.log('last error message:', msg))
+  .then(_ => driver.executeScript('return window.zorroa.clearErrors()'))
+  .then(_ => expectNoJSErrors())
 }
 
 // ----------------------------------------------------------------------
@@ -365,6 +399,7 @@ export function login () {
   .then(_ => driver.getCurrentUrl())
   .then(url => { expect(url).toBe(`${BASE_URL}/`) })
   .then(_ => { console.log('logged in') })
+  .then(_ => expectNoJSErrors())
 
   // // If there's a saved search from last session, then clear it
   // // [Started but temporarily disabled until we figure out

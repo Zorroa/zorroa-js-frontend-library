@@ -9,6 +9,40 @@ window.zorroa = {}
 
 // ----------------------------------------------------------------------
 
+window.zorroa.jsErrors = []
+
+// install a global error handler that logs all errors,
+// so selenium tests can tell if we've had any errors.
+// NOTE: this may not capture startup errors that occur before
+// this code has run.
+
+window.addEventListener('error', (err) => {
+  return window.zorroa.jsErrors.push(err)
+})
+
+export function getNumErrors () { return window.zorroa.jsErrors.length }
+export function getLastError () {
+  return window.zorroa.jsErrors[window.zorroa.jsErrors.length - 1]
+}
+export function getLastErrorMessage () {
+  const err = getLastError()
+  return err && err.message
+}
+export function getError (n) { return window.zorroa.jsErrors[n] }
+export function clearErrors () { window.zorroa.jsErrors = [] }
+
+// Webdriver catches syncronous errors, make this async to better simulate a real error
+export function testError () { requestAnimationFrame(_ => { window.nonexistant.property = 0 }) }
+
+window.zorroa.getNumErrors = getNumErrors
+window.zorroa.getLastError = getLastError
+window.zorroa.getLastErrorMessage = getLastErrorMessage
+window.zorroa.getError = getError
+window.zorroa.clearErrors = clearErrors
+window.zorroa.testError = testError
+
+// ----------------------------------------------------------------------
+
 var requestSentCounter = 0
 var requestReceivedCounter = 0
 

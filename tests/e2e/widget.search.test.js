@@ -26,8 +26,9 @@ describe('search widget', function () {
   // beforeEach(function () {
   // })
 
-  // afterEach(function () {
-  // })
+  afterEach(function () {
+    return selenium.expectNoJSErrors()
+  })
 
   // Pay attention to where there are hidden promises
   // All driver actions turn into promises

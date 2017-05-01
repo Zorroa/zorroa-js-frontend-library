@@ -26,8 +26,9 @@ describe('Home Page', function () {
   // beforeEach(function () {
   // })
 
-  // afterEach(function () {
-  // })
+  afterEach(function () {
+    return selenium.expectNoJSErrors()
+  })
 
   // Pay attention to where there are hidden promises
   // All driver actions turn into promises
@@ -66,5 +67,8 @@ describe('Home Page', function () {
   it('user should be able to log in', function () {
     DEBUG && console.log('------ forgot password should redirect to /forgot')
     return selenium.login()
+    .then(_ => selenium.logout())
+    .then(_ => selenium.testJSErrors())
   })
+
 })
