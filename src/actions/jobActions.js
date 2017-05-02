@@ -6,7 +6,7 @@ import AssetSearch from '../models/AssetSearch'
 import {
   EXPORT_ASSETS, IMPORT_ASSETS,
   GET_PIPELINES, GET_JOBS,
-  QUEUE_FILE_UPLOAD, DEQUEUE_UPLOADED_FILE,
+  QUEUE_UPLOAD_FILE_ENTRIES, DEQUEUE_UPLOADED_FILE_ENTRIES,
   MARK_JOB_DOWNLOADED, GET_PROCESSORS,
   CANCEL_JOB, RESTART_JOB } from '../constants/actionTypes'
 import { archivistGet, archivistPost, archivistRequest } from './authAction'
@@ -40,6 +40,7 @@ export function importAssets (name, pipelineId, generators, pipeline) {
     } else {
       console.log('Import: ' + name + ' with pipeline id ' + pipelineId)
     }
+    pipelineId = pipelineId <= 0 ? undefined : pipelineId
     archivistPost(dispatch, importEndpoint, {name, pipelineId, generators, pipeline})
       .then(response => {
         dispatch({
@@ -178,16 +179,16 @@ export function getProcessors () {
   }
 }
 
-export function queueFilesUpload (files) {
+export function queueFileEntrysUpload (fileEntries) {
   return ({
-    type: QUEUE_FILE_UPLOAD,
-    payload: files
+    type: QUEUE_UPLOAD_FILE_ENTRIES,
+    payload: fileEntries
   })
 }
 
-export function dequeueUploadFiles (files) {
+export function dequeueUploadFileEntrys (fileEntries) {
   return ({
-    type: DEQUEUE_UPLOADED_FILE,
-    payload: files
+    type: DEQUEUE_UPLOADED_FILE_ENTRIES,
+    payload: fileEntries
   })
 }
