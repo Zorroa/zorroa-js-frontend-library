@@ -28,3 +28,20 @@
   margin-top: 20px;
   margin-bottom: 40px;
 }
+
+.ImportCloudproxy-upload-overflow {
+  @include flexColCenter;
+  font-size: 14px;
+  color: $zorroa-greyish-brown;
+  margin-top: 20px;
+  margin-bottom: 40px;
+}
+
+.ImportCloudproxy-upload-overflow-highlight {
+  @include flexColCenter;
+  font-size: 18px;
+  font-weight: 600;
+  color: $zorroa-greyish-brown;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}

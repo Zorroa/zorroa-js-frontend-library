@@ -172,7 +172,7 @@ describe('Workspace', function () {
 
   it('command progress', () => {
     return driver
-      .then(_ => { DEBUG && console.log('admin menu preferences') })
+      .then(_ => { DEBUG && console.log('command progress') })
       .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.header-menu-Import')))
       .then(_ => selenium.clickSelector(By.css('.header-menu-Import')))
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.JobMenu-permissions')))
@@ -185,6 +185,7 @@ describe('Workspace', function () {
       .then(_ => driver.findElement(By.css('input[name="user__admin"]')).click())
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.AssetPermissions-apply')))
       .then(_ => selenium.clickSelector(By.css('.AssetPermissions-apply')))
+      .then(_ => { DEBUG && console.log('command progress - started command') })
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.CommandProgress-progress-bar')))
       .then(_ => driver.sleep(5000)) // progress bar is supposed to be visible for 5 seconds
       .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.CommandProgress-progress-bar')))

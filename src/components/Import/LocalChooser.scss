@@ -69,13 +69,15 @@ $dropcolor: rgba(115, 182, 28, 0.1);
 }
 
 .LocalChooser-upload-size {
-  @include flexRow;
-  @include flexJustifyEnd;
+  width: 1px;
+  @include nowrap;
+  text-align: right;
 }
 
 .LocalChooser-upload-progress {
   @include flexRow;
   @include flexAlignItemsCenter;
+  @include flexJustifyEnd;
   width: 60px;
 
   progress {
@@ -208,13 +210,20 @@ $dropcolor: rgba(115, 182, 28, 0.1);
 }
 
 .LocalChooser-upload-status {
+  width: 1px;
+  @include nowrap;
 }
 
 .LocalChooser-upload-cancel {
+  width: 1px;
+  @include nowrap;
 }
 
 .LocalChooser-upload-name {
+  @include nowrap;
 }
 
 .LocalChooser-upload-type {
+  width: 1px;
+  @include nowrap;
 }

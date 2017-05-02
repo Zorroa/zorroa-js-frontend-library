@@ -15,7 +15,7 @@ import Metadata from '../Metadata'
 import Collapsible from '../Collapsible'
 import { iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible, showModal, hideModal } from '../../actions/appActions'
 import { getUserPermissions, updatePassword, changePassword } from '../../actions/authAction'
-import { queueFilesUpload } from '../../actions/jobActions'
+import { queueFileEntrysUpload } from '../../actions/jobActions'
 import { updateCommand, getAllCommands } from '../../actions/assetsAction'
 import ChangePassword from '../auth/ChangePassword'
 import User from '../../models/User'
@@ -192,30 +192,13 @@ class Workspace extends Component {
   }
 
   createLocalImport = (event) => {
-    const traverseFileTree = (item) => {
-      console.log('Item: ' + item.name)
-      if (item.isFile) {
-        item.file(file => {
-          console.log('File: ', item.name)
-          this.props.actions.queueFilesUpload([file])
-        })
-      } else if (item.isDirectory) {
-        console.log('Directory: ' + item.name)
-        const dirReader = item.createReader()
-        dirReader.readEntries(entries => {
-          for (var i = 0; i < entries.length; ++i) {
-            traverseFileTree(entries[i])
-          }
-        })
-      }
-    }
-
     const source = LOCAL_IMPORT
     const items = source === LOCAL_IMPORT && event && event.dataTransfer && event.dataTransfer.items ? event.dataTransfer.items : null
-    for (var i = 0; i < items.length; ++i) {
-      var item = items[i].webkitGetAsEntry()
-      if (item) traverseFileTree(item)
+    const entries = []
+    for (let i = 0; i < items.length; ++i) {
+      entries.push(items[i].webkitGetAsEntry())
     }
+    this.props.actions.queueFileEntrysUpload(entries)
 
     const width = '65vw'
     const body = <Import source={source} step={2}/>
@@ -329,7 +312,7 @@ export default connect(state => ({
     changePassword,
     showModal,
     hideModal,
-    queueFilesUpload,
+    queueFileEntrysUpload,
     getAllCommands,
     updateCommand
   }, dispatch)

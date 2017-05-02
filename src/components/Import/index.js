@@ -8,5 +8,6 @@ import './LocalChooser.scss'
 import './StepCounter.scss'
 import './DropboxChooser.scss'
 import './ImportingTip.scss'
+import './CloudproxyInstructions.scss'
 export default Import
 export { CLOUD_IMPORT, SERVER_IMPORT, LOCAL_IMPORT }

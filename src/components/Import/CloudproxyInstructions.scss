@@ -1,0 +1,83 @@
+@import '../../styles/core-mixins';
+
+.CloudproxyInstructions {
+  @include flexColCenter;
+}
+
+.CloudproxyInstructions-local {
+  @include flexCol;
+  padding: 40px;
+  min-width: 80%;
+}
+
+.CloudproxyInstructions-server {
+  @include flexCol;
+  padding: 40px;
+  min-width: 80%;
+}
+
+.CloudproxyInstructions-item {
+  @include flexRow;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  a {
+    color: $zorroa-water-blue;
+    text-decoration: none;
+    font-weight: 500;
+    &:hover { text-decoration: underline; }
+  }
+}
+
+.CloudproxyInstructions-item-title {
+  color: $zorroa-sickly-green;
+  font-size: 18px;
+  margin-right: 10px;
+}
+
+.CloudproxyInstructions-item-body {
+  color: $zorroa-gray;
+  font-size: 16px;
+  font-weight: 400;
+  margin-right: 0.25em;
+
+  &.code {
+    font-family: "Lucida Console", monospace;
+  }
+}
+
+.CloudproxyInstructions-server-name {
+  @include flexRow;
+  margin: 25px;
+}
+
+.CloudproxyInstructions-server-name-label {
+  font-family: "Roboto Condensed";
+  color: $zorroa-lightgray;
+  font-size: 16px;
+  text-transform: uppercase;
+}
+
+.CloudproxyInstructions-server-input {
+  text-decoration: none;
+  border: none;
+  border-bottom: 1px solid $zorroa-lightgray;
+  width: 70%;
+  margin-left: 10px;
+  font-size: 16px;
+}
+
+.CloudproxyInstructions-done {
+  margin: 40px;
+  font-size: 12px;
+  padding: 10px 20px;
+  background-color: $zorroa-lightgray;
+  color: white;
+  border-radius: 3px;
+  text-transform: uppercase;
+  pointer-events: auto;
+  text-decoration: none;
+  @include nowrap;
+
+  &:hover:not(.disabled) { background-color: $zorroa-gray; }
+  &.disabled { background-color: $zorroa-lightgray; }
+}
