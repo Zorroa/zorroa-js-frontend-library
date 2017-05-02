@@ -70,6 +70,7 @@
   text-transform: uppercase;
   pointer-events: auto;
   text-decoration: none;
+  cursor: pointer;
   @include nowrap;
 
   &:hover:not(.disabled) { background-color: $zorroa-gray; }

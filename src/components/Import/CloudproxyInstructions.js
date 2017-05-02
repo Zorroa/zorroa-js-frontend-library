@@ -34,7 +34,7 @@ export default class CloudproxyInstructions extends Component {
         </div>
         <div className="CloudproxyInstructions-item">
           <div className="CloudproxyInstructions-item-title">4.</div>
-          <a href="http://localhost:8090" className="CloudproxyInstructions-item-body">
+          <a href="http://localhost:8090" target="_blank" className="CloudproxyInstructions-item-body">
             Navigate to Cloudproxy
           </a>
           <div className="CloudproxyInstructions-item-body">
@@ -74,7 +74,7 @@ export default class CloudproxyInstructions extends Component {
         </div>
         <div className="CloudproxyInstructions-item">
           <div className="CloudproxyInstructions-item-title">4.</div>
-          <a href={`http://${server}:8090`} className="CloudproxyInstructions-item-body">
+          <a href={`http://${server}:8090`} target="_blank" className="CloudproxyInstructions-item-body">
             Navigate to Cloudproxy
           </a>
           <div className="CloudproxyInstructions-item-body">

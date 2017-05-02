@@ -181,6 +181,7 @@ class LocalChooser extends Component {
       const uploadedSize = this.state.uploadedSize + progressEvent.loaded
       this.setState({uploadedSize})
       if (uploadedSize >= this.state.totalSize) {
+        this.clear()
         setTimeout(() => { this.props.onDone() }, 1500)
       }
       console.log('Finished upload batch')
@@ -291,9 +292,13 @@ class LocalChooser extends Component {
     return <progress max={1} value={value}/>
   }
 
-  back = (event) => {
+  clear = () => {
     this.props.actions.dequeueUploadFileEntrys(this.props.fileEntries)
     this.setState(initialState)
+  }
+
+  back = (event) => {
+    this.clear()
     this.props.onBack()
   }
 
