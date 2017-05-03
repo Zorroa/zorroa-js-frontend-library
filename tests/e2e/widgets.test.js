@@ -51,6 +51,61 @@ describe('search widget', function () {
   // Tests below ASSUME we are logged in!
   // ------------------------------------
 
+  it('check search widget', function () {
+    return driver
+    .then(_ => { DEBUG && console.log('------ check search widget') })
+
+    .then(_ => selenium.clickSelector(By.css('.Sidebar-open-close-button.isRightEdge')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack-empty'), 5000))
+    .then(_ => selenium.clickSelector(By.css('.Racetrack-add-widget')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.modal .AddWidget'), 5000))
+    .then(_ => selenium.clickSelector(By.css('.widget-SIMPLE_SEARCH')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.modal .DisplayOptions'), 5000))
+    .then(_ => selenium.expectSelectorHasClassToBe(true, By.css('.DisplayOptions-update'), 'disabled'))
+    .then(_ => selenium.clickSelector(By.css('.DisplayOptions-namespace-Disney')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.DisplayOptions-namespace-Disney-animators'), 5000))
+    .then(_ => selenium.clickSelector(By.css('.DisplayOptions-namespace-Disney-animators input')))
+    .then(_ => selenium.waitForSelectorHasClassToBe(false, By.css('.DisplayOptions-update'), 'disabled', 5000))
+    .then(_ => selenium.waitForSelectorEnabledToBe(true, By.css('.DisplayOptions-update')))
+    .then(_ => selenium.clickSelector(By.css('.DisplayOptions-update')))
+    .then(selenium.waitForIdle)
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack-filters .SimpleSearch'), 5000))
+
+    .then(_ => { DEBUG && console.log('Expect 39 images by Ferguson exact') })
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.SimpleSearch-fuzzy')))
+    .then(_ => selenium.clickSelector(By.css('.SimpleSearch input')))
+    .then(_ => driver.findElement(By.css('.SimpleSearch input')))
+      .then(ele => ele.sendKeys('Ferguson', Key.ENTER))
+    .then(selenium.waitForIdle)
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.asset-counter-count')))
+    .then(_ => driver.findElement(By.css('.asset-counter-count')))
+      .then(ele => ele.getText())
+      .then(text => expect(text).toBe('39'))
+
+    .then(_ => { DEBUG && console.log('Expect 39 images by Farguson fuzzy') })
+    .then(_ => selenium.clickSelector(By.css('.SimpleSearch input')))
+    .then(_ => driver.findElement(By.css('.SimpleSearch input'))).then(ele => ele.clear())
+    .then(_ => driver.findElement(By.css('.SimpleSearch input')))
+      .then(ele => ele.sendKeys('Farguson', Key.ENTER))
+    .then(selenium.waitForIdle)
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.asset-counter-count')))
+    .then(_ => driver.findElement(By.css('.asset-counter-count')))
+      .then(ele => ele.getText())
+      .then(text => expect(text).toBe('39'))
+
+    .then(_ => selenium.clickSelector(By.css('.SimpleSearch .Toggle')))
+    .then(selenium.waitForIdle)
+
+    .then(_ => { DEBUG && console.log('Expect 0 images by Buhler fuzzy') })
+    .then(_ => selenium.clickSelector(By.css('.SimpleSearch input')))
+    .then(_ => driver.findElement(By.css('.SimpleSearch input'))).then(ele => ele.clear())
+    .then(_ => driver.findElement(By.css('.SimpleSearch input')))
+      .then(ele => ele.sendKeys('Buhler', Key.ENTER))
+    .then(selenium.waitForIdle)
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.assets-footer')))
+  })
+
+
   it('check facet widget', function () {
     let text1, text2
 
@@ -94,10 +149,8 @@ describe('search widget', function () {
     .then(_ => driver.findElement(By.css('.asset-counter-total')))
       .then(ele => ele.getText())
       .then(text => text2 = text)
-    .then(_ => {
-      expect(Number(text2)).toBeGreaterThan(Number(text1))
-    })
-
+    .then(_ => { expect(Number(text2)).toBeGreaterThan(Number(text1)) })
   })
+
 
 })
