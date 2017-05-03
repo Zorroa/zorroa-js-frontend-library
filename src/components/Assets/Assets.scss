@@ -173,3 +173,49 @@
     &:hover { background-color: darken($zorroa-sickly-green, 15%); }
   }
 }
+
+// TODO: factor this into a generic message dialog
+.Assets-history {
+  @include flexColCenter;
+
+  .Assets-history-header {
+    @include flexRow;
+    @include flexAlignItemsCenter;
+    @include fullWidth;
+
+    overflow: hidden;
+
+    color: white;
+    background-color: black;
+    font-size: 14px;
+    font-weight: 500;
+    min-height: 40px;
+    max-height: 40px;
+  }
+
+  .Assets-history-title {
+    @include flexShrinkOnly;
+    @include clampText;
+    text-transform: uppercase;
+    text-overflow: ellipsis;
+    margin: 0 20px;
+  }
+
+  .Assets-history-close {
+    @include zorroa-square-btn-lighten(40px);
+    font-size: 20px;
+    border: none;
+    outline: none;
+    color: white;
+    background-color: black;
+  }
+
+  .Assets-history-msg {
+    margin: 30px;
+  }
+
+  .Assets-history-dismiss {
+    @include zorroa-btn(6em, 40px, $zorroa-lightgray, $zorroa-sickly-green);
+    margin: 30px;
+  }
+}

@@ -10,10 +10,10 @@ import Thumb, { page, monopageBadges, multipageBadges } from '../Thumb'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
 import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, searchAssetsRequestProm } from '../../actions/assetsAction'
-import { resetRacetrackWidgets, similarValues } from '../../actions/racetrackAction'
+import { resetRacetrackWidgets, similarValues, restoreSearch } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
-import { setThumbSize, setThumbLayout, showTable, setTableHeight, showMultipage } from '../../actions/appActions'
+import { setThumbSize, setThumbLayout, showTable, setTableHeight, showMultipage, showModal, hideModal } from '../../actions/appActions'
 import Pager from './Pager'
 import Footer from './Footer'
 import Table from '../Table'
@@ -83,6 +83,8 @@ class Assets extends Component {
     this.assetsCounter = 0
     this.resizer = null
     this.loaded = 0
+
+    this.history = {}
   }
 
   // Adjust the selection set for the specified asset using
@@ -253,6 +255,64 @@ class Assets extends Component {
     this.updateAssetsScrollSizeInterval = setInterval(this.updateAssetsScrollSize, 150)
     this.resizer = new Resizer()
     this.updateSelectedHashes(this.props.similarField, this.props.selectedIds)
+
+    // Support using the navigation buttons to restore previous search state
+    this.saveHistory('first')
+    window.onpopstate = (event) => {
+      const historyKey = location.hash.slice(1)
+      // Warn user if they're about to erase their history
+      if (historyKey === 'first') {
+        // TODO: factor this into a generic message dialog
+        return new Promise((resolve) => {
+          let dismissFn = (event) => {
+            this.props.actions.hideModal()
+            resolve()
+          }
+          const body = (
+            <div className="Assets-history">
+              <div className="Assets-history-header">
+                <div className="Assets-history-title">History Warning</div>
+                <div className="flexOn"/>
+                <div className="Assets-history-close icon-cross2" onClick={dismissFn}/>
+              </div>
+              <div className="Assets-history-msg">Going back any further will lose your history.</div>
+              <button className="Assets-history-dismiss" onClick={dismissFn}>Okay</button>
+            </div>
+          )
+          this.props.actions.showModal({ body, width:'400px' })
+        })
+        .then(_ => {
+          // TODO: erase history if they go back?
+        })
+        return
+      }
+      const historyVal = this.history[historyKey]
+      if (!historyVal) return
+      const query = historyVal.query
+      console.log({historyKey, query, event})
+      this.props.actions.restoreSearch(query)
+    }
+  }
+
+  saveHistory = (optHistoryKey) => {
+    const path = location.pathname + location.search
+    optHistoryKey = optHistoryKey || Date.now().toString()
+    const query = this.props.query
+    this.history[optHistoryKey] = { query }
+    // Only save new history when we're not browsing old history
+    // TODO: make sure a brand new search does create a new history entry, that current doesn't work
+    // TODO: when browsing back, and making a new search, pop & lose all the forward states?
+    if (!location.hash) {
+      requestAnimationFrame(_ => {
+        // Trying to keep the URL clean by hiding our key in the previous entry,
+        // and having the current entry w/o a hash
+        // TODO: this is pushing the current search into the previous position --
+        // we need to push the previous search into the previous position
+        // Right now the first time back is used, nothing happens.
+        history.replaceState({}, 'title', `${path}#${optHistoryKey}`)
+        history.pushState({}, 'title', `${path}`)
+      })
+    }
   }
 
   componentWillUnmount = () => {
@@ -600,6 +660,8 @@ class Assets extends Component {
         this.loaded = 0
         this.scrollToSelection()
       }
+
+      this.saveHistory()
     }
     this.assetsCounter = assetsCounter
 
@@ -675,12 +737,15 @@ export default connect(state => ({
     searchAssetsRequestProm,
     resetRacetrackWidgets,
     similarValues,
+    restoreSearch,
     selectFolderIds,
     setThumbSize,
     setThumbLayout,
     showTable,
     setTableHeight,
     showMultipage,
+    showModal,
+    hideModal,
     saveUserSettings
   }, dispatch)
 }))(Assets)
