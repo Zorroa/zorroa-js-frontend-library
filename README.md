@@ -53,7 +53,11 @@ There are two different modes this project can be run in: __dev mode__ and __sta
 Dev mode is for the typical daily workflow and has live reloading enabled. It does not actually build into a directory, it runs the project though a dev server that uses the files in your working tree.
 
 ```
-npm run dev # will run with hot reloading on a special server
+npm run dev # will run with hot reloading on a special server over HTTP
+```
+
+```
+npm run dev -- --https # dev server over HTTPS
 ```
 
 ### Static mode
