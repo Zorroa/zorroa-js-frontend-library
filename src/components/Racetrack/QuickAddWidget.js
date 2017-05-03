@@ -144,7 +144,7 @@ class QuickAddWidget extends Component {
             { widgetInfos.map(widgetInfo => (
               <div onMouseDown={e => this.addWidget(widgetInfo, e)}
                    style={{backgroundColor: widgetInfo.color}}
-                   className={classnames('QuickAddWidget-item',
+                   className={classnames('QuickAddWidget-item', `QuickAddWidget-item-${widgetInfo.type}`,
                      {selected: selectedWidgetInfo && widgetInfo.type === selectedWidgetInfo.type})}
                    key={widgetInfo.type}>
                 <span className={`QuickAddWidget-item-icon ${widgetInfo.icon}`}></span>
