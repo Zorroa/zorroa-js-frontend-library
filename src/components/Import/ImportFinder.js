@@ -83,7 +83,7 @@ export default class ImportFinder extends Component {
         </div>
         <div className="ImportFinder-body">
           <div className="ImportFinder-finder">
-            <DropboxChooser accessToken={accessToken} onSelect={this.selectFile}/>
+            <DropboxChooser accessToken={accessToken} onSelect={this.selectFile} onBack={onBack}/>
           </div>
           <div className="ImportFinder-shifters">
             <div className={classnames('ImportFinder-shifter',

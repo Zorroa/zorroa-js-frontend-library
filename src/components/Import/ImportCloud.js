@@ -12,7 +12,13 @@ const clouds = [ DROPBOX_CLOUD, GDRIVE_CLOUD, BOX_CLOUD ]
 
 const ImportCloud = (props) => {
   const auths = [
-    new DropboxAuthenticator('6fifppvd9maxou9', accessToken => props.onSelect(DROPBOX_CLOUD, accessToken)),
+    new DropboxAuthenticator('6fifppvd9maxou9', accessToken => {
+      if (accessToken && accessToken.length) {
+        props.onSelect(DROPBOX_CLOUD, accessToken)
+      } else {
+        DropboxAuthenticator.deauthorize()
+      }
+    }),
     null,
     null
   ]
