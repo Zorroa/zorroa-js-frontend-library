@@ -55,6 +55,8 @@
   @include flexRow;
   margin: 6px;
   min-height: 22px;
+  overflow-y: auto;
+  &::-webkit-scrollbar { height: 5px; }
 }
 
 .Finder-root-folder {
