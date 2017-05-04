@@ -62,19 +62,7 @@
 }
 
 .Import-button {
-  font-size: 12px;
-  padding: 10px 20px;
-  background-color: $zorroa-sickly-green;
-  color: $zorroa-nearwhite;
-  border-radius: 3px;
-  text-transform: uppercase;
-  pointer-events: auto;
-  text-decoration: none;
-  cursor: pointer;
-  @include nowrap;
-
-  &:hover:not(.disabled) { background-color: $zorroa-gray; }
-  &.disabled { background-color: $zorroa-lightgray; }
+  @include zorroa-ok-btn;
 }
 
 .Import-header-right {

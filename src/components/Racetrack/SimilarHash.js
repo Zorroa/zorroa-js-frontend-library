@@ -2,13 +2,11 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
-import Slider from 'react-slick'
 
 import { SimilarHashWidgetInfo } from './WidgetInfo'
 import { removeRacetrackWidgetIds, similar } from '../../actions/racetrackAction'
 import Widget from './Widget'
 import Asset from '../../models/Asset'
-import Thumb from '../Thumb'
 
 const SCHEMA = 'Similarity'
 
@@ -34,7 +32,8 @@ class SimilarHash extends Component {
 
   state = {
     hashTypes: null,
-    hashName: ''
+    hashName: '',
+    similarity: 0.5
   }
 
   componentWillMount () {
@@ -119,35 +118,23 @@ class SimilarHash extends Component {
     console.log('Set slide ' + num)
   }
 
+  changeSimilarity = (event) => {
+    this.setState({similarity: event.target.value})
+  }
+
   renderThumb (id) {
     const dim = { width: 160, height: 120 }
     const asset = new Asset({id, document: {}})
     const url = asset.closestProxyURL(this.props.origin, dim.width, dim.height)
-    const backgroundColor = '#888'
-    const page = { url, backgroundColor }
     return (
-      <div className="SimilarHash-thumb" key={id}>
-        <Thumb dim={dim} pages={[page]} onClick={e => this.selectAssetId(id)} onDoubleClick={e => {}}/>
-      </div>
+      <div className="SimilarHash-thumb" key={id} style={{backgroundImage: `url(${url})`}}/>
     )
   }
 
   render () {
-    const { isIconified, similar } = this.props
-    const { hashName } = this.state
-    var settings = {
-      // accessibility: true,
-      // arrows: false,
-      // centerMode: true,
-      // draggable: true,
-      // focusOnSelect: true,
-      infinite: true,
-      speed: 500,
-      slidesToShow: Math.min(3, similar.ids.length),
-      slidesToScroll: 1,
-      // vertical: false,
-      // afterChange: this.changeSlide
-    };
+    const { isIconified, similar, selectedAssetIds } = this.props
+    const { hashName, similarity } = this.state
+    const disabled = !selectedAssetIds || !selectedAssetIds.size
     return (
       <Widget className="SimilarHash"
               title={SimilarHashWidgetInfo.title}
@@ -158,9 +145,35 @@ class SimilarHash extends Component {
               icon={SimilarHashWidgetInfo.icon}
               onClose={this.removeFilter.bind(this)}>
         <div className="SimilarHash-body">
-          <Slider {...settings}>
+          <div className="SimilarHash-carousel">
             { similar.ids.map(id => this.renderThumb(id)) }
-          </Slider>
+            { !similar.ids.length && (
+              <div className="SimilarHash-carousel-empty">
+                <div className="SimilarHash-carousel-empty-icon icon-emptybox"/>
+                <div className="SimilarHash-carousel-empty-label">
+                  No Similar Items
+                </div>
+              </div>
+            ) }
+          </div>
+          <div className="SimilarHash-slider">
+            <div className="SimilarHash-slider-icon icon-blocked"/>
+            <input className="SimilarHash-slider-input" type="range"
+                   min="-1" max="1" step="0.01" list="similarity_ticks"
+                   value={similarity} onChange={this.changeSimilarity}/>
+            <datalist id="similarity_ticks">
+              <option>-1</option>
+              <option>-0.5</option>
+              <option>0</option>
+              <option>0.5</option>
+              <option>-1</option>
+            </datalist>
+            <div className="SimilarHash-slider-icon icon-similarity"/>
+          </div>
+          <div className="SimilarHash-slider-center-triangle"/>
+          <div className={classnames('SimilarHash-snap-selected', {disabled})}>
+            Find Similar
+          </div>
         </div>
       </Widget>
     )
