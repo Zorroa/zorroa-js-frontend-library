@@ -14,6 +14,7 @@ import ImportSource from './ImportSource'
 import LocalChooser from './LocalChooser'
 import ImportFinder from './ImportFinder'
 import ImportingTip from './ImportingTip'
+import TutorialVideos from './TutorialVideos'
 import CloudproxyInstructions from './CloudproxyInstructions'
 import User from '../../models/User'
 import Pipeline from '../../models/Pipeline'
@@ -65,7 +66,7 @@ class Import extends Component {
 
   setStep = (step) => {
     const { onboarding, actions } = this.props
-    const lastStep = onboarding ? 4 : 3
+    const lastStep = onboarding ? 5 : 3
     if (step > lastStep) {
       this.dismiss()
       if (onboarding) {
@@ -210,6 +211,7 @@ class Import extends Component {
       case 2: return this.renderStep2()
       case 3: return this.renderStep3()
       case 4: return <ImportingTip onDismiss={e => this.setStep(5)}/>
+      case 5: return <TutorialVideos onDismiss={e => this.setStep(6)}/>
     }
   }
 

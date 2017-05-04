@@ -181,8 +181,7 @@ class LocalChooser extends Component {
       const uploadedSize = this.state.uploadedSize + progressEvent.loaded
       this.setState({uploadedSize})
       if (uploadedSize >= this.state.totalSize) {
-        this.clear()
-        setTimeout(() => { this.props.onDone() }, 1500)
+        setTimeout(() => { this.clear(); this.props.onDone() }, 1500)
       }
       console.log('Finished upload batch')
       resolve()      // Move on to the next batch of uploads
@@ -201,7 +200,7 @@ class LocalChooser extends Component {
       fileCount += info.fileCount
     })
     const maxSize = 128 * 1024 * 1024
-    const maxCount = 500
+    const maxCount = 100
     if (this.props.onCloudproxy && (totalSize > maxSize || fileCount > maxCount)) {
       this.props.onCloudproxy()
     } else if (this.props.onImport) {

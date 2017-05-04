@@ -25,6 +25,7 @@ export default class CloudproxyInstructions extends Component {
           <div className="CloudproxyInstructions-item-body code">
             tar xvzf ~/Downloads/zorroa-cloudproxy-osx.tgz
           </div>
+          <sup>*</sup>
         </div>
         <div className="CloudproxyInstructions-item">
           <div className="CloudproxyInstructions-item-title">3.</div>
@@ -39,6 +40,11 @@ export default class CloudproxyInstructions extends Component {
           </a>
           <div className="CloudproxyInstructions-item-body">
             and select folders & files.
+          </div>
+        </div>
+        <div className="CloudproxyInstructions-item">
+          <div className="CloudproxyInstructions-item-note">
+            <sup>*</sup> ...or wherever your browser downloads files if not ~/Download
           </div>
         </div>
       </div>
