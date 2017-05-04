@@ -38,7 +38,7 @@ const ImportCloud = (props) => {
             <img className="ImportCloud-logo" src={logos[i]}/>
             <div onClick={e => auths[i].authorize()} className="Import-button">
               Authenticate
-              { props.launch === c && auths[i].authorize() }
+              { props.launch === c && requestAnimationFrame(auths[i].authorize) }
             </div>
           </div>
         ))}
