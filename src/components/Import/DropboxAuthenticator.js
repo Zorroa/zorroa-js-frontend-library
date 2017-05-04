@@ -4,9 +4,15 @@ import Dropbox from 'dropbox'
 import domUtils from '../../services/domUtils'
 
 export const DropboxAuth = () => {
-  const response = domUtils.parseQueryString(window.location.toString())
-  const accessToken = response[DropboxAuthenticator.redirectURL()]
-  localStorage.setItem('DropboxAccessToken', accessToken)
+  const fragment = domUtils.parseQueryString(window.location.hash)
+  const accessToken = fragment.access_token
+  if (accessToken && accessToken.length) {
+    console.log('Dropbox authorized')
+    localStorage.setItem('DropboxAccessToken', accessToken)
+  } else {
+    console.log('Invalid access token, deauthorizing Dropbox')
+    DropboxAuthenticator.deauthorize()
+  }
   window.close()
   return <div>Dropbox Authorized</div>
 }
@@ -17,7 +23,9 @@ export class DropboxAuthenticator {
     this.onAuth = onAuth
   }
 
-  static redirectURL = () => (`${window.location.origin}/dbxauth#access_token`)
+  static redirectURL = () => ('https://onboard.zorroa.com:3000/dbxauth')
+  static accessToken = () => (localStorage.getItem('DropboxAccessToken'))
+  static deauthorize = () => { localStorage.removeItem('DropboxAccessToken') }
 
   authorized = (ev) => {
     if (ev.key === 'DropboxAccessToken') {
@@ -29,14 +37,8 @@ export class DropboxAuthenticator {
     }
   }
 
-  deauthorize = () => {
-    localStorage.removeItem('DropboxURL')
-    localStorage.removeItem('DropboxAccessToken')
-    this.onAuth()
-  }
-
   authorize = () => {
-    const accessToken = localStorage.getItem('DropboxAccessToken')
+    const accessToken = DropboxAuthenticator.accessToken()
     if (accessToken && accessToken.length) {
       const dbx = new Dropbox({ clientId: this.appKey, accessToken })
       if (dbx && dbx.getClientId()) {
@@ -52,9 +54,11 @@ export class DropboxAuthenticator {
     // const authUrl = 'http://localhost:8066/#access_token=gnXMnC4kaSAAAAAAAAABcjGEFV6hNSMs-L3xJ3D6qGF9SFNW2LJ2YcdSUTwNX4h8&token_type=bearer&uid=542065014&account_id=dbid%3AAAALlZIpNztmWVNtxx53n-gH4N0bhq_YnJQ'
     // Set the login anchors href using dbx.getAuthenticationUrl()
     const dbx = new Dropbox({ clientId: this.appKey })
-    const state = Math.random().toString(36).substring(7)
-    const authUrl = dbx.getAuthenticationUrl(DropboxAuthenticator.redirectURL(), state)
-    console.log('Auth URL: ' + authUrl)
+    const url = 'https://www.dropbox.com/oauth2/authorize' +
+      '?response_type=code&client_id=' + dbx.getClientId() +
+      '&redirect_uri=' + DropboxAuthenticator.redirectURL() +
+      '&state=w3@r3n0td@m!' + window.location.origin
+    console.log('Auth URL: ' + url)
     console.log('Popup Dropbox authenticator')
     const w = 480
     const h = 640
@@ -63,6 +67,12 @@ export class DropboxAuthenticator {
     const left = wLeft + (window.innerWidth / 2) - (w / 2)
     const top = wTop + (window.innerHeight / 2) - (h / 2)
     const strWindowFeatures = `left=${left},top=${top},width=${w},height=${h},dialog=yes,resizable=no,status=no,dependent=yes,toolbar=no,location=no,directories=no,menubar=no,copyhistory=no`
-    window.open(authUrl, 'Zorroa Dropbox', strWindowFeatures)
+    const win = window.open(url, 'Zorroa Dropbox', strWindowFeatures)
+    const pollTimer = window.setInterval(_ => {
+      if (win.closed !== false) { // !== is required for compatibility with Opera
+        window.clearInterval(pollTimer)
+        this.authenticating = false
+      }
+    }, 500)
   }
 }

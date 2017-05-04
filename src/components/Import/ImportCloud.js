@@ -12,7 +12,13 @@ const clouds = [ DROPBOX_CLOUD, GDRIVE_CLOUD, BOX_CLOUD ]
 
 const ImportCloud = (props) => {
   const auths = [
-    new DropboxAuthenticator('6fifppvd9maxou9', accessToken => props.onSelect(DROPBOX_CLOUD, accessToken)),
+    new DropboxAuthenticator('6fifppvd9maxou9', accessToken => {
+      if (accessToken && accessToken.length) {
+        props.onSelect(DROPBOX_CLOUD, accessToken)
+      } else {
+        DropboxAuthenticator.deauthorize()
+      }
+    }),
     null,
     null
   ]
@@ -32,7 +38,7 @@ const ImportCloud = (props) => {
             <img className="ImportCloud-logo" src={logos[i]}/>
             <div onClick={e => auths[i].authorize()} className="Import-button">
               Authenticate
-              { props.launch === c && auths[i].authorize() }
+              { props.launch === c && requestAnimationFrame(auths[i].authorize) }
             </div>
           </div>
         ))}

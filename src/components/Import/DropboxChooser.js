@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import Dropbox from 'dropbox'
 
+import { DropboxAuthenticator } from './DropboxAuthenticator'
 import Finder from '../Finder'
 import spin from './spin.svg'
 
@@ -10,6 +11,7 @@ const ROOT_PATH = '/'
 export default class DropboxChooser extends Component {
   static propTypes = {
     onSelect: PropTypes.func.isRequired,
+    onBack: PropTypes.func.isRequired,
     accessToken: PropTypes.string.isRequired
   }
 
@@ -35,6 +37,12 @@ export default class DropboxChooser extends Component {
       .then((response) => {
         console.log(response)
         this.setState({userAccount: response})
+      })
+      .catch(error => {
+        console.log('Error getting Dropbox account: ' + error)
+        DropboxAuthenticator.deauthorize()
+        this.props.onBack()
+        return
       })
 
     this.setState({loading: true})

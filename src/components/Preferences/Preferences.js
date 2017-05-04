@@ -7,6 +7,7 @@ import { hideModal } from '../../actions/appActions'
 import { saveUserSettings, changePassword } from '../../actions/authAction'
 import { archivistInfo, archivistHealth, archivistMetrics } from '../../actions/archivistAction'
 import User from '../../models/User'
+import { DropboxAuthenticator } from '../Import/DropboxAuthenticator'
 
 const theme = {
   scheme: 'bright',
@@ -60,6 +61,11 @@ class Preferences extends Component {
     this.dismiss()
   }
 
+  logoutDropbox = (event) => {
+    DropboxAuthenticator.deauthorize()
+    this.dismiss()
+  }
+
   render () {
     const { user, info, health, metrics } = this.props
     return (
@@ -80,6 +86,7 @@ class Preferences extends Component {
           <div className="Preferences-curator flexCol">
             <button className="Preferences-reset" onClick={this.reset}>Reset Default Settings</button>
             <button className="Preferences-reset" onClick={this.changePassword}>Change Password</button>
+            { DropboxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutDropbox}>Logout Dropbox</button> }
           </div>
           <div className="Preferences-status">
             <div className='Preferences-build'>
