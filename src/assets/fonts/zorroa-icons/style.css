@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'zorroa-icons';
-  src:  url('fonts/zorroa-icons.eot?3k5r2g');
-  src:  url('fonts/zorroa-icons.eot?3k5r2g#iefix') format('embedded-opentype'),
-    url('fonts/zorroa-icons.woff2?3k5r2g') format('woff2'),
-    url('fonts/zorroa-icons.ttf?3k5r2g') format('truetype'),
-    url('fonts/zorroa-icons.woff?3k5r2g') format('woff'),
-    url('fonts/zorroa-icons.svg?3k5r2g#zorroa-icons') format('svg');
+  src:  url('fonts/zorroa-icons.eot?susp0q');
+  src:  url('fonts/zorroa-icons.eot?susp0q#iefix') format('embedded-opentype'),
+    url('fonts/zorroa-icons.woff2?susp0q') format('woff2'),
+    url('fonts/zorroa-icons.ttf?susp0q') format('truetype'),
+    url('fonts/zorroa-icons.woff?susp0q') format('woff'),
+    url('fonts/zorroa-icons.svg?susp0q#zorroa-icons') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -60,6 +60,12 @@
 }
 .icon-plus2:before {
   content: "\e928";
+}
+.icon-leaf:before {
+  content: "\e973";
+}
+.icon-similarity:before {
+  content: "\e972";
 }
 .icon-circle-check:before {
   content: "\e970";
@@ -225,6 +231,9 @@
 }
 .icon-stack-empty:before {
   content: "\ed3b";
+}
+.icon-blocked:before {
+  content: "\ed67";
 }
 .icon-dropbox:before {
   content: "\e96c";
@@ -525,6 +534,9 @@
 }
 .icon-layers:before {
   content: "\e977";
+}
+.icon-subtract:before {
+  content: "\e983";
 }
 .icon-plus-square:before {
   content: "\e98e";

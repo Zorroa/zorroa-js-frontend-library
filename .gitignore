@@ -1,6 +1,7 @@
 *.log
 *.debug
 .idea
+.DS_Store
 
 bin
 node_modules
