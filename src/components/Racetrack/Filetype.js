@@ -220,7 +220,7 @@ class Filetype extends Component {
     const exts = groupExts[group]
     const count = this.groupAggCount(group)
     return (
-      <div className={classnames('Filetype-group', {disabled: count <= 0})} key={group}>
+      <div className={classnames('Filetype-group', `Filetype-group-${group}`, {disabled: count <= 0})} key={group}>
         <Check state={this.selectionState(exts)}
                onClick={e => this.selectTypes(exts)}
                color='#ef4487'/>
