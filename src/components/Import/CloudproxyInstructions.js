@@ -24,13 +24,13 @@ export default class CloudproxyInstructions extends Component {
           <div className="CloudproxyInstructions-item-title">2.</div>
           <div className="CloudproxyInstructions-item-body code">
             tar xvzf ~/Downloads/zorroa-cloudproxy-osx.tgz
+            <sup>*</sup>
           </div>
-          <sup>*</sup>
         </div>
         <div className="CloudproxyInstructions-item">
           <div className="CloudproxyInstructions-item-title">3.</div>
           <div className="CloudproxyInstructions-item-body code">
-            zorroa-cloudproxy/bin/cloudproxy -d
+            zorroa-cloudproxy-osx/bin/cloudproxy -d
           </div>
         </div>
         <div className="CloudproxyInstructions-item">

@@ -4,6 +4,7 @@
   @include flexRowCenter;
   position: relative;
   margin: 5px;
+  margin-right: 40px;
 }
 
 .StepCounter-step {
@@ -17,6 +18,7 @@
   color: $zorroa-sickly-green;
   border: 2px solid $zorroa-sickly-green;
   z-index: 1;
+  cursor: default;
 
   &:not(:last-child) {
     margin-right: 70px;
