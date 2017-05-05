@@ -68,11 +68,13 @@ export class DropboxAuthenticator {
     const top = wTop + (window.innerHeight / 2) - (h / 2)
     const strWindowFeatures = `left=${left},top=${top},width=${w},height=${h},dialog=yes,resizable=no,status=no,dependent=yes,toolbar=no,location=no,directories=no,menubar=no,copyhistory=no`
     const win = window.open(url, 'Zorroa Dropbox', strWindowFeatures)
-    const pollTimer = window.setInterval(_ => {
-      if (win.closed !== false) { // !== is required for compatibility with Opera
-        window.clearInterval(pollTimer)
-        this.authenticating = false
-      }
-    }, 500)
+    if (win) {
+      const pollTimer = window.setInterval(_ => {
+        if (win.closed !== false) { // !== is required for compatibility with Opera
+          window.clearInterval(pollTimer)
+          this.authenticating = false
+        }
+      }, 500)
+    }
   }
 }
