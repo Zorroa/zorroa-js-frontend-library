@@ -42,7 +42,7 @@ const ImportCloudproxy = (props) => (
     { props.uploadOverflow ? (
     <div className="ImportCloudproxy-upload-overflow">
       <div className="ImportCloudproxy-upload-overflow-highlight">
-        That's a lot of stuff! Don't worry, we can handle it.
+        That's a lot of stuff! A perfect job for our server upload script.
       </div>
       We'll show you how to run the script next...
     </div>
