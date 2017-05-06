@@ -289,7 +289,9 @@ class Assets extends Component {
       const historyVal = this.history[historyKey]
       if (!historyVal) return
       const query = historyVal.query
-      console.log({historyKey, query, event})
+
+      // close lightbox, restore search
+      this.props.actions.isolateAssetId()
       this.props.actions.restoreSearch(query)
     }
   }
