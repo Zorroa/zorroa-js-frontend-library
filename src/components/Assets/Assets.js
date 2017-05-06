@@ -85,6 +85,7 @@ class Assets extends Component {
     this.loaded = 0
 
     this.history = {}
+    this.historyNav = null
   }
 
   // Adjust the selection set for the specified asset using
@@ -257,64 +258,87 @@ class Assets extends Component {
     this.updateSelectedHashes(this.props.similarField, this.props.selectedIds)
 
     // Support using the navigation buttons to restore previous search state
+    // This 'first' history entry is a sentinel we use to warn the user about going back too far & losing their history
     this.saveHistory('first')
-    window.onpopstate = (event) => {
-      const historyKey = location.hash.slice(1)
-      // Warn user if they're about to erase their history
-      if (historyKey === 'first') {
-        // TODO: factor this into a generic message dialog
-        return new Promise((resolve) => {
-          let dismissFn = (event) => {
-            this.props.actions.hideModal()
-            resolve()
-          }
-          const body = (
-            <div className="Assets-history">
-              <div className="Assets-history-header">
-                <div className="Assets-history-title">History Warning</div>
-                <div className="flexOn"/>
-                <div className="Assets-history-close icon-cross2" onClick={dismissFn}/>
-              </div>
-              <div className="Assets-history-msg">Going back any further will lose your history.</div>
-              <button className="Assets-history-dismiss" onClick={dismissFn}>Okay</button>
-            </div>
-          )
-          this.props.actions.showModal({ body, width:'400px' })
-        })
-        .then(_ => {
-          // TODO: erase history if they go back?
-        })
-        return
-      }
-      const historyVal = this.history[historyKey]
-      if (!historyVal) return
-      const query = historyVal.query
-
-      // close lightbox, restore search
-      this.props.actions.isolateAssetId()
-      this.props.actions.restoreSearch(query)
-    }
+    // called in response to both Back and Forward navigation, after navigation occurs
+    window.onpopstate = this.restoreHistory
   }
 
-  saveHistory = (optHistoryKey) => {
-    const path = location.pathname + location.search
-    optHistoryKey = optHistoryKey || Date.now().toString()
-    const query = this.props.query
-    this.history[optHistoryKey] = { query }
-    // Only save new history when we're not browsing old history
-    // TODO: make sure a brand new search does create a new history entry, that current doesn't work
-    // TODO: when browsing back, and making a new search, pop & lose all the forward states?
-    if (!location.hash) {
-      requestAnimationFrame(_ => {
-        // Trying to keep the URL clean by hiding our key in the previous entry,
-        // and having the current entry w/o a hash
-        // TODO: this is pushing the current search into the previous position --
-        // we need to push the previous search into the previous position
-        // Right now the first time back is used, nothing happens.
-        history.replaceState({}, 'title', `${path}#${optHistoryKey}`)
-        history.pushState({}, 'title', `${path}`)
+  restoreHistory = (event) => {
+    // location has the new URL, after having hit Back or Forward
+    const historyKey = location.hash.slice(1)
+    // Warn user if they're about to erase their history
+    if (historyKey === 'first') {
+      // TODO: factor this into a generic message dialog
+      return new Promise((resolve) => {
+        let dismissFn = (event) => {
+          this.props.actions.hideModal()
+          resolve()
+        }
+        const body = (
+          <div className="Assets-history">
+            <div className="Assets-history-header">
+              <div className="Assets-history-title">History Warning</div>
+              <div className="flexOn"/>
+              <div className="Assets-history-close icon-cross2" onClick={dismissFn}/>
+            </div>
+            <div className="Assets-history-msg">Going back any further will lose your history.</div>
+            <button className="Assets-history-dismiss" onClick={dismissFn}>Okay</button>
+          </div>
+        )
+        this.props.actions.showModal({ body, width: '400px' })
+      })
+      .then(_ => {
+        // TODO: erase history if they go back?
       })
     }
+    const historyVal = this.history[historyKey]
+    if (!historyVal) return
+
+    this.startHistoryNav()
+
+    // close lightbox, restore search
+    const query = historyVal.query
+    this.props.actions.isolateAssetId()
+    this.props.actions.restoreSearch(query)
+  }
+
+  // We need to detect when the search changes because of navigation (fwd/back buttons)
+  // or whether the user modified the query without navigating.
+  // Mark us as navigating on the popstate event, and then wait for the query to change.
+  // If the query doesn't change after some time, time out and assume user is not navigating
+  // To reduce the likelihood of timing out, restart the timer during render() if it's running.
+
+  startHistoryNav = () => {
+    clearTimeout(this.historyNav)
+    this.historyNav = setTimeout(this.stopHistoryNav, 250)
+  }
+
+  stopHistoryNav = () => {
+    clearTimeout(this.historyNav)
+    this.historyNav = null
+  }
+
+  saveHistory = (optFirstTimeHistoryKey) => {
+    if (this.historyNav && !optFirstTimeHistoryKey) return
+    this.stopHistoryNav()
+
+    const path = location.pathname + location.search
+    const historyKey = optFirstTimeHistoryKey || Date.now().toString()
+    const query = this.props.query
+    this.history[historyKey] = { query }
+
+    // Trying to keep the URL clean by hiding our key in the previous entry,
+    // and having the current entry w/o a hash
+
+    requestAnimationFrame(_ => {
+      if (location.hash) {
+        history.pushState({}, 'title', `${path}#${historyKey}`)
+      } else {
+        history.replaceState({}, 'title', `${path}#${historyKey}`)
+      }
+      history.pushState({}, 'title', `${path}`)
+    })
   }
 
   componentWillUnmount = () => {
@@ -666,6 +690,7 @@ class Assets extends Component {
       this.saveHistory()
     }
     this.assetsCounter = assetsCounter
+    if (this.historyNav) this.startHistoryNav()
 
     // If the selection change triggered this update, scroll to the new selection
     if (this.props.selectionCounter !== this.selectionCounter) {
