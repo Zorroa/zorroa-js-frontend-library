@@ -10,6 +10,7 @@ import ResetPassword from './components/auth/ResetPassword'
 import ForgotPassword from './components/auth/ForgotPassword'
 import Workspace from './components/Workspace'
 import { DropboxAuth } from './components/Import/DropboxAuthenticator'
+import { BoxAuth } from './components/Import/BoxAuthenticator'
 
 export default (
   <Route path='/' component={App}>
@@ -20,5 +21,6 @@ export default (
     <Route path="password" component={ResetPassword} />
     <Route path="onboard" component={Onboard} />
     <Route path="dbxauth" component={DropboxAuth} />
+    <Route path="boxauth" component={BoxAuth} />
   </Route>
 )

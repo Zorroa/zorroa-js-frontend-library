@@ -8,6 +8,7 @@ import { saveUserSettings, changePassword } from '../../actions/authAction'
 import { archivistInfo, archivistHealth, archivistMetrics } from '../../actions/archivistAction'
 import User from '../../models/User'
 import { DropboxAuthenticator } from '../Import/DropboxAuthenticator'
+import { BoxAuthenticator } from '../Import/BoxAuthenticator'
 
 const theme = {
   scheme: 'bright',
@@ -66,6 +67,11 @@ class Preferences extends Component {
     this.dismiss()
   }
 
+  logoutBox = (event) => {
+    BoxAuthenticator.deauthorize()
+    this.dismiss()
+  }
+
   render () {
     const { user, info, health, metrics } = this.props
     return (
@@ -87,6 +93,7 @@ class Preferences extends Component {
             <button className="Preferences-reset" onClick={this.reset}>Reset Default Settings</button>
             <button className="Preferences-reset" onClick={this.changePassword}>Change Password</button>
             { DropboxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutDropbox}>Logout Dropbox</button> }
+            { BoxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutDropbox}>Logout Box</button> }
           </div>
           <div className="Preferences-status">
             <div className='Preferences-build'>

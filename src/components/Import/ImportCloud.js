@@ -4,6 +4,7 @@ import DropboxLogo from './DropboxLogo.svg'
 import GDriveLogo from './GDriveLogo.svg'
 import BoxLogo from './BoxLogo.svg'
 import { DropboxAuthenticator } from './DropboxAuthenticator'
+import { BoxAuthenticator } from './BoxAuthenticator'
 
 import { DROPBOX_CLOUD, BOX_CLOUD, GDRIVE_CLOUD } from './ImportConstants'
 
@@ -20,7 +21,13 @@ const ImportCloud = (props) => {
       }
     }),
     null,
-    null
+    new BoxAuthenticator('nvjb3koff9j86go05crt24o0br60gk2r', accessToken => {
+      if (accessToken && accessToken.length) {
+        props.onSelect(BOX_CLOUD, accessToken)
+      } else {
+        BoxAuthenticator.deauthorize()
+      }
+    })
   ]
   clouds.forEach((c, i) => { if (props.launch === c) requestAnimationFrame(auths[i].authorize) })
   return (

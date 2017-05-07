@@ -90,7 +90,6 @@ class Import extends Component {
   }
 
   selectCloudproxy = (os) => {
-    console.log('Download cloudproxy ' + os)
     this.setState({ step: 3 })
   }
 
@@ -112,8 +111,8 @@ class Import extends Component {
       case CLOUD_IMPORT:
         switch (cloud) {
           case DROPBOX_CLOUD: return this.configureDropboxImport(files, progress)
+          case BOX_CLOUD: return this.configureBoxImport(files, progress)
           case GDRIVE_CLOUD:
-          case BOX_CLOUD:
         }
         break
       case LOCAL_IMPORT: return this.configureUploadFileImport(files, progress)
@@ -164,6 +163,22 @@ class Import extends Component {
     const generator = this.props.processors.find(p => (p.name === generatorName))
     const generators = [...dropboxFiles].map(file => generator.ref({path: file.path, accessKey}))
     const name = this.importName('Dropbox')
+    return { name, pipelineId, processors, generators }
+  }
+
+  configureBoxImport = (files, progress) => {
+    if (!files || !files.length) return {}
+    const { pipelineId } = this.state
+    const accessKey = this.state.accessToken
+    const pipeline = this.props.pipelines.find(pipeline => (pipeline.id === pipelineId))
+    const downloadClass = 'com.zorroa.core.processor.BoxDownloader'
+    const download = this.props.processors.find(p => (p.name === downloadClass))
+    const downloadRef = download && download.ref({ accessKey })
+    const processors = [ downloadRef, ...pipeline.processors ]
+    const generatorName = 'com.zorroa.core.generator.BoxGenerator'
+    const generator = this.props.processors.find(p => (p.name === generatorName))
+    const generators = [...files].map(file => generator.ref({id: file.id, accessKey}))
+    const name = this.importName('Box')
     return { name, pipelineId, processors, generators }
   }
 

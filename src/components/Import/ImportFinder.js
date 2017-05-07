@@ -3,6 +3,8 @@ import classnames from 'classnames'
 
 import Filter from '../Filter'
 import DropboxChooser from './DropboxChooser'
+import BoxChooser from './BoxChooser'
+import { DROPBOX_CLOUD, BOX_CLOUD, GDRIVE_CLOUD } from './ImportConstants'
 
 export default class ImportFinder extends Component {
   static propTypes = {
@@ -56,8 +58,16 @@ export default class ImportFinder extends Component {
     this.setState({addedFilter: ''})
   }
 
+  renderChooser () {
+    const { mode, accessToken, onBack } = this.props
+    switch (mode) {
+      case DROPBOX_CLOUD: return <DropboxChooser accessToken={accessToken} onSelect={this.selectFile} onBack={onBack}/>
+      case BOX_CLOUD: return <BoxChooser onSelect={this.selectFile} onBack={onBack} accessToken={accessToken} clientID="nvjb3koff9j86go05crt24o0br60gk2r" clientSecret="sPX3HUXU98pRMj1QDCVjW3xeTw8ccmPy"/>
+    }
+  }
+
   render () {
-    const { accessToken, onImport, onBack } = this.props
+    const { onImport, onBack } = this.props
     const { files, selectedFiles, addedFiles, selectedAddedFiles, addedFilter } = this.state
     const disabled = !addedFiles.size
     const fileCount = [...addedFiles].filter(id => !files.get(id).childIds).length
@@ -68,8 +78,7 @@ export default class ImportFinder extends Component {
     if (folderCount) title += ` ${folderCount} Folder${folderCount > 1 ? 's' : ''}`
     const lcfilter = addedFilter.toLowerCase()
     const added = [...addedFiles].map(id => files.get(id)).filter(file => (
-      file.name.toLowerCase().includes(lcfilter) ||
-      file.path.toLowerCase().includes(lcfilter)
+      file.name.toLowerCase().includes(lcfilter)
     )).sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true, sensitivity: 'base'}))
     return (
       <div className="ImportFinder">
@@ -83,7 +92,7 @@ export default class ImportFinder extends Component {
         </div>
         <div className="ImportFinder-body">
           <div className="ImportFinder-finder">
-            <DropboxChooser accessToken={accessToken} onSelect={this.selectFile} onBack={onBack}/>
+            { this.renderChooser() }
           </div>
           <div className="ImportFinder-shifters">
             <div className={classnames('ImportFinder-shifter',
@@ -106,7 +115,7 @@ export default class ImportFinder extends Component {
                        {selected: selectedAddedFiles.has(file.id)})}
                      onClick={e => this.selectAddedFile(file.id, e)}>
                   <div className={'ImportFinder-added-icon icon-' + (file.childIds ? 'folder' : 'file-empty2')}/>
-                  {file.path}
+                  {file.name}
                 </div>
               ))}
               { !addedFiles.size && (

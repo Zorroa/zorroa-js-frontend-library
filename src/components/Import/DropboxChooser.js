@@ -17,14 +17,13 @@ export default class DropboxChooser extends Component {
 
   state = {
     files: new Map(),
-    rootPath: ROOT_PATH,
     rootId: ROOT_ID,
     cursor: '',
     loading: false
   }
 
   componentWillMount () {
-    this.loadFiles(this.state.rootPath, this.state.rootId)
+    this.loadFiles(ROOT_PATH, this.state.rootId)
   }
 
   loadFiles = (path, parentId) => {
@@ -48,7 +47,6 @@ export default class DropboxChooser extends Component {
     this.setState({loading: true})
     dbx.filesListFolder({path})
       .then((response) => {
-        console.log(response)
         const files = new Map(this.state.files)
         const childIds = new Set()
         response.entries.forEach(f => {
@@ -57,6 +55,7 @@ export default class DropboxChooser extends Component {
             childIds: f['.tag'] === 'folder' ? new Set() : undefined,
             name: f.name,
             path: f.path_lower,
+            parentId,
             metadata: f
           }
           files.set(f.id, item)
@@ -82,22 +81,18 @@ export default class DropboxChooser extends Component {
     }
   }
 
-  setRoot = (rootPath) => {
-    const root = [...this.state.files.values()].find(file => (file.path === rootPath))
-    if (root) {
-      const rootId = root.id
-      this.setState({rootPath, rootId})
-      this.loadDirectory(rootId)
-    }
+  setRoot = (id) => {
+    this.setState({rootId: id})
+    this.loadDirectory(id)
   }
 
   render () {
-    const { files, loading, rootPath, rootId, userAccount } = this.state
+    const { files, loading, rootId, userAccount } = this.state
     const title = (userAccount && userAccount.name ? userAccount.name.display_name + '\'s' : 'Unknown') + ' Dropbox'
     const icon = loading ? <img className="DropboxChooser-icon" src={spin} alt="Loading Dropbox"/> : <div className="DropboxChooser-icon icon-folder-subfolders" title={title}/>
     return (
       <div className="DropboxChooser">
-        <Finder items={files} rootPath={rootPath} rootId={rootId} loading={loading}
+        <Finder items={files} rootId={rootId} loading={loading}
                 onSelect={this.props.onSelect}
                 rootIcon={icon}
                 onRoot={this.setRoot}

@@ -6,8 +6,7 @@ import Filter from '../Filter'
 
 export default class Finder extends Component {
   static propTypes = {
-    items: PropTypes.instanceOf(Map).isRequired,   // {id: {id, name, childIds}}
-    rootPath: PropTypes.string.isRequired,
+    items: PropTypes.instanceOf(Map).isRequired,   // {id: {id, name, childIds, parentId}}
     rootId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
     rootIcon: PropTypes.node,
     openIcon: PropTypes.node,
@@ -37,10 +36,7 @@ export default class Finder extends Component {
 
   flatten (parent, depth, files, filter) {
     if (!parent) return
-    const matches = (file, filter) => (
-      !filter.length || file.name.toLowerCase().includes(filter) ||
-      file.path.toLowerCase().includes(filter)
-    )
+    const matches = (file, filter) => (!filter.length || file.name.toLowerCase().includes(filter))
     if (depth > 0 && (parent.childIds || matches(parent, filter))) files.push(parent)
     const { items } = this.props
     const { order, opened } = this.state
@@ -78,8 +74,8 @@ export default class Finder extends Component {
     if (onSelect) onSelect(id, ids, items, event)
   }
 
-  setRoot = (path) => {
-    if (this.props.onRoot) this.props.onRoot(path)
+  setRoot = (id) => {
+    if (this.props.onRoot) this.props.onRoot(id)
   }
 
   changeFilter = (event) => {
@@ -90,6 +86,21 @@ export default class Finder extends Component {
     this.setState({filter: ''})
   }
 
+  ancestors = (id) => {
+    const ancestors = []
+    this._ancestors(id, ancestors)
+    return ancestors
+  }
+
+  _ancestors = (id, stack) => {
+    if (!id) return
+    const item = this.props.items.get(id)
+    if (item) {
+      stack.unshift(item)
+      this._ancestors(item.parentId, stack)
+    }
+  }
+
   renderPads (depth) {
     if (depth <= 0) return null
     let pads = []
@@ -98,11 +109,11 @@ export default class Finder extends Component {
   }
 
   render () {
-    const { items, rootId, rootPath, rootIcon, openIcon, closeIcon } = this.props
+    const { items, rootId, rootIcon, openIcon, closeIcon } = this.props
     const { opened, selected, filter } = this.state
     const files = []
     this.flatten(items.get(rootId), 0, files, filter.toLowerCase())
-    const dirs = rootPath.slice(1).split('/').filter(dir => dir.length > 0)
+    const dirs = this.ancestors(rootId)
     return (
       <div className="Finder">
         <div className="Finder-header">
@@ -122,23 +133,23 @@ export default class Finder extends Component {
                 { file.childIds && (opened.has(file.id) ? closeIcon : openIcon) }
               </div>
               <div className="Finder-file-name"
-                   onDoubleClick={file.childIds && (e => this.setRoot(file.path))}
+                   onDoubleClick={file.childIds && (e => this.setRoot(file.id))}
                    onClick={e => this.select(file.id, e)}>{file.name}</div>
             </div>
           ))}
         </div>
         <div className="Finder-root">
           <div key="/" className="flexRowCenter">
-            <div onClick={e => this.setRoot('/')}
+            <div onClick={e => this.setRoot(0)}
                  className="Finder-root-folder icon-folder" />
             <div className="Finder-root-dir">/</div>
           </div>
           { dirs.map((dir, i) => (
-            <div key={dir} className="flexRowCenter">
+            <div key={dir.id} className="flexRowCenter">
               <div className="Finder-root-separator">&rsaquo;</div>
-              <div onClick={e => this.setRoot('/' + dirs.slice(0, i + 1).join('/'))}
+              <div onClick={e => this.setRoot(dir.id)}
                    className="Finder-root-folder icon-folder" />
-              <div className="Finder-root-dir">{dir}</div>
+              <div className="Finder-root-dir">{dir.name}</div>
             </div>
           ))}
         </div>
