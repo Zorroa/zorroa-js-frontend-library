@@ -119,7 +119,7 @@ class Import extends Component {
           case DROPBOX_CLOUD: return this.configureDropboxImport(files, progress)
           case BOX_CLOUD: return this.configureBoxImport(files, progress)
           case CLOUDPROXY_CLOUD: return this.configureCloudproxyImport(files, progress)
-          case GDRIVE_CLOUD:
+          case GDRIVE_CLOUD: return this.configureGDriveImport(files, progress)
         }
         break
       case LOCAL_IMPORT: return this.configureUploadFileImport(files, progress)
@@ -188,6 +188,10 @@ class Import extends Component {
     const generators = [...files].map(file => generator.ref({id: file.id, accessKey}))
     const name = this.importName('Box')
     return { name, pipelineId, processors, generators }
+  }
+
+  configureGDriveImport = (files, progress) => {
+    console.log('GDrive support coming soon')
   }
 
   configureCloudproxyImport = (files, progress) => {

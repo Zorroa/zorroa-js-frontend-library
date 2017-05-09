@@ -11,6 +11,7 @@ import ForgotPassword from './components/auth/ForgotPassword'
 import Workspace from './components/Workspace'
 import { DropboxAuth } from './components/Import/DropboxAuthenticator'
 import { BoxAuth } from './components/Import/BoxAuthenticator'
+import { GDriveAuth } from './components/Import/GDriveAuthenticator'
 
 export default (
   <Route path='/' component={App}>
@@ -22,5 +23,6 @@ export default (
     <Route path="onboard" component={Onboard} />
     <Route path="dbxauth" component={DropboxAuth} />
     <Route path="boxauth" component={BoxAuth} />
+    <Route path="gdriveauth" component={GDriveAuth} />
   </Route>
 )

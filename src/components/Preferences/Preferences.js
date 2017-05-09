@@ -9,6 +9,7 @@ import { archivistInfo, archivistHealth, archivistMetrics } from '../../actions/
 import User from '../../models/User'
 import { DropboxAuthenticator } from '../Import/DropboxAuthenticator'
 import { BoxAuthenticator } from '../Import/BoxAuthenticator'
+import { GDriveAuthenticator } from '../Import/GDriveAuthenticator'
 
 const theme = {
   scheme: 'bright',
@@ -72,6 +73,11 @@ class Preferences extends Component {
     this.dismiss()
   }
 
+  logoutGDrive = (event) => {
+    GDriveAuthenticator.deauthorize()
+    this.dismiss()
+  }
+
   render () {
     const { user, info, health, metrics } = this.props
     return (
@@ -94,6 +100,7 @@ class Preferences extends Component {
             <button className="Preferences-reset" onClick={this.changePassword}>Change Password</button>
             { DropboxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutDropbox}>Logout Dropbox</button> }
             { BoxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutBox}>Logout Box</button> }
+            { GDriveAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutGDrive}>Logout Google Drive</button> }
           </div>
           <div className="Preferences-status">
             <div className='Preferences-build'>

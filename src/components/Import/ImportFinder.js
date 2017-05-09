@@ -4,8 +4,9 @@ import classnames from 'classnames'
 import Filter from '../Filter'
 import DropboxChooser from './DropboxChooser'
 import BoxChooser from './BoxChooser'
+import GDriveChooser from './GDriveChooser'
 import CloudproxyChooser from './CloudproxyChooser'
-import { DROPBOX_CLOUD, BOX_CLOUD, CLOUDPROXY_CLOUD } from './ImportConstants'
+import { DROPBOX_CLOUD, BOX_CLOUD, GDRIVE_CLOUD, CLOUDPROXY_CLOUD } from './ImportConstants'
 
 export default class ImportFinder extends Component {
   static propTypes = {
@@ -65,6 +66,7 @@ export default class ImportFinder extends Component {
       case DROPBOX_CLOUD: return <DropboxChooser accessToken={accessToken} onSelect={this.selectFile} onBack={onBack}/>
       case BOX_CLOUD: return <BoxChooser onSelect={this.selectFile} onBack={onBack} accessToken={accessToken} clientID="nvjb3koff9j86go05crt24o0br60gk2r" clientSecret="sPX3HUXU98pRMj1QDCVjW3xeTw8ccmPy"/>
       case CLOUDPROXY_CLOUD: return <CloudproxyChooser onSelect={this.selectFile} onBack={onBack}/>
+      case GDRIVE_CLOUD: return <GDriveChooser onSelect={this.selectFile} onBack={onBack} accessToken=""/>
     }
   }
 
