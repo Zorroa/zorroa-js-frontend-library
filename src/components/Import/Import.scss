@@ -76,6 +76,7 @@
 
   &:hover:not(.disabled) { background-color: $zorroa-gray; }
   &.disabled { background-color: $zorroa-lightgray; }
+  &.running:not(.disabled) { background-color: $zorroa-faded-red; }
 }
 
 .Import-header-right {

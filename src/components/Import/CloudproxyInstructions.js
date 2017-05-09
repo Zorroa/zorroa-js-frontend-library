@@ -3,67 +3,37 @@ import React, { PropTypes, Component } from 'react'
 export default class CloudproxyInstructions extends Component {
   static propTypes = {
     local: PropTypes.bool.isRequired,
+    os: PropTypes.string.isRequired,
     onBack: PropTypes.func.isRequired,
     onDone: PropTypes.func.isRequired
   }
 
   state = {
-    server: 'localhost'
+    server: 'localhost',
+    downloads: '~/Downloads',
+    stats: null
   }
 
-  renderLocal () {
-    return (
-      <div className="CloudproxyInstructions-local">
-        <div className="CloudproxyInstructions-item">
-          <div className="CloudproxyInstructions-item-title">1.</div>
-          <div className="CloudproxyInstructions-item-body">
-            Start the Terminal application
-          </div>
-        </div>
-        <div className="CloudproxyInstructions-item">
-          <div className="CloudproxyInstructions-item-title">2.</div>
-          <div className="CloudproxyInstructions-item-body code">
-            tar xvzf ~/Downloads/zorroa-cloudproxy-osx.tgz
-            <sup>*</sup>
-          </div>
-        </div>
-        <div className="CloudproxyInstructions-item">
-          <div className="CloudproxyInstructions-item-title">3.</div>
-          <div className="CloudproxyInstructions-item-body code">
-            zorroa-cloudproxy-osx/bin/cloudproxy -d
-          </div>
-        </div>
-        <div className="CloudproxyInstructions-item">
-          <div className="CloudproxyInstructions-item-title">4.</div>
-          <a href="http://localhost:8090" target="_blank" className="CloudproxyInstructions-item-body">
-            Navigate to Cloudproxy
-          </a>
-          <div className="CloudproxyInstructions-item-body">
-            and select folders & files.
-          </div>
-        </div>
-        <div className="CloudproxyInstructions-item">
-          <div className="CloudproxyInstructions-item-note">
-            <sup>*</sup> ...or wherever your browser downloads files if not ~/Download
-          </div>
-        </div>
-      </div>
-    )
+  changeCloudproxyServer = (event) => {
+    const server = event.target.value
+    this.cloudproxy.initialize(server)
+    this.setState({server})
   }
 
   renderServer () {
+    const { os } = this.props
     const { server } = this.state
     return (
       <div className="CloudproxyInstructions-server">
         <div className="CloudproxyInstructions-server-name">
           <div className="CloudproxyInstructions-server-name-label">Server name:</div>
           <input className="CloudproxyInstructions-server-input"
-                 type="text" value={server} onChange={e => this.setState({server: e.target.value})}/>
+                 type="text" value={server} onChange={this.changeCloudproxyServer}/>
         </div>
         <div className="CloudproxyInstructions-item">
           <div className="CloudproxyInstructions-item-title">1.</div>
           <div className="CloudproxyInstructions-item-body code">
-            scp zorroa-cloudproxy-linux.tgz {server}:/var/tmp
+            { `scp zorroa-cloudproxy-${os}.tgz {server}:/var/tmp` }
           </div>
         </div>
         <div className="CloudproxyInstructions-item">
@@ -78,21 +48,12 @@ export default class CloudproxyInstructions extends Component {
             /var/tmp/zorroa-cloudproxy/bin/cloudproxy -d
           </div>
         </div>
-        <div className="CloudproxyInstructions-item">
-          <div className="CloudproxyInstructions-item-title">4.</div>
-          <a href={`http://${server}:8090`} target="_blank" className="CloudproxyInstructions-item-body">
-            Navigate to Cloudproxy
-          </a>
-          <div className="CloudproxyInstructions-item-body">
-            and select folders & files.
-          </div>
-        </div>
       </div>
     )
   }
 
   render () {
-    const { local, onBack, onDone } = this.props
+    const { onBack, onDone } = this.props
     return (
       <div className="CloudproxyInstructions">
         <div className="Import-back" onClick={onBack}>
@@ -103,9 +64,9 @@ export default class CloudproxyInstructions extends Component {
           <div className="Import-step">Step 3:</div>
           Start the Cloudproxy script and select files.
         </div>
-        { local ? this.renderLocal() : this.renderServer() }
+        { this.renderServer() }
         <div className="CloudproxyInstructions-done" onClick={onDone}>
-          Done
+          Open Cloudproxy
         </div>
       </div>
     )
