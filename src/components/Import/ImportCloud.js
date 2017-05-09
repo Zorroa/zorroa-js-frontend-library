@@ -22,6 +22,7 @@ const ImportCloud = (props) => {
     null,
     null
   ]
+  clouds.forEach((c, i) => { if (props.launch === c) requestAnimationFrame(auths[i].authorize) })
   return (
     <div className="ImportCloud">
       <div className="Import-back" onClick={props.onBack}>
@@ -38,7 +39,6 @@ const ImportCloud = (props) => {
             <img className="ImportCloud-logo" src={logos[i]}/>
             <div onClick={e => auths[i].authorize()} className="Import-button">
               Authenticate
-              { props.launch === c && requestAnimationFrame(auths[i].authorize) }
             </div>
           </div>
         ))}
