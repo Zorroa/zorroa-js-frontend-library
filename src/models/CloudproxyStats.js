@@ -1,5 +1,5 @@
 export class CloudproxyProgress {
-  constructor ({ total, completed, progress}) {
+  constructor ({ total, completed, progress }) {
     this.total = total
     this.completed = completed
     this.progress = progress
