@@ -4,11 +4,12 @@ import classnames from 'classnames'
 import Filter from '../Filter'
 import DropboxChooser from './DropboxChooser'
 import BoxChooser from './BoxChooser'
-import { DROPBOX_CLOUD, BOX_CLOUD } from './ImportConstants'
+import CloudproxyChooser from './CloudproxyChooser'
+import { DROPBOX_CLOUD, BOX_CLOUD, CLOUDPROXY_CLOUD } from './ImportConstants'
 
 export default class ImportFinder extends Component {
   static propTypes = {
-    accessToken: PropTypes.string.isRequired,
+    accessToken: PropTypes.string,
     mode: PropTypes.string.isRequired,
     onImport: PropTypes.func.isRequired,
     onBack: PropTypes.func.isRequired
@@ -63,6 +64,7 @@ export default class ImportFinder extends Component {
     switch (mode) {
       case DROPBOX_CLOUD: return <DropboxChooser accessToken={accessToken} onSelect={this.selectFile} onBack={onBack}/>
       case BOX_CLOUD: return <BoxChooser onSelect={this.selectFile} onBack={onBack} accessToken={accessToken} clientID="nvjb3koff9j86go05crt24o0br60gk2r" clientSecret="sPX3HUXU98pRMj1QDCVjW3xeTw8ccmPy"/>
+      case CLOUDPROXY_CLOUD: return <CloudproxyChooser onSelect={this.selectFile} onBack={onBack}/>
     }
   }
 
