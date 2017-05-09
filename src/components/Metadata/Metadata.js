@@ -234,12 +234,12 @@ class Metadata extends Component {
   }
 
   renderField (field, namespace, name, depth, hasChildren, isOpen, isSelected, isFavorite, widgetIcon) {
-    const id = `${field}-${namespace}`
+    // const id = `${field}-${namespace}`
     const isLeaf = this.isLeaf(field, namespace)
-    const path = field.replace('.', '-')
+    const itemClass = namespace.replace('.', '-')
     return (
-      <div className={classnames('Metadata-item', 'Metadata-item-' + path, {isSelected, isLeaf, isOpen})}
-           key={id}
+      <div className={classnames('Metadata-item', 'Metadata-item-' + itemClass, {isSelected, isLeaf, isOpen})}
+           key={namespace}
            onClick={e => hasChildren ? this.toggleCollapsible(namespace, e) : this.toggleWidget(field, e)}
            onMouseOver={e => this.hover(namespace)} onMouseOut={e => this.clearHover(namespace)} >
         { this.renderPads(depth) }
