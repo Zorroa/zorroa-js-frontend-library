@@ -203,6 +203,7 @@
 
   .Assets-history-close {
     @include zorroa-square-btn-lighten(40px);
+    border-radius: 0 3px 0 0;
     font-size: 20px;
     border: none;
     outline: none;
@@ -215,7 +216,10 @@
   }
 
   .Assets-history-dismiss {
-    @include zorroa-btn(6em, 40px, $zorroa-lightgray, $zorroa-sickly-green);
-    margin: 30px;
+    @include zorroa-btn(6em, 40px, $zorroa-sickly-green, darken($zorroa-sickly-green, 15%));
+    margin: 12px;
+    text-transform: uppercase;
+    font-size: 16px;
+    color: #fff;
   }
 }

@@ -311,7 +311,7 @@ class Assets extends Component {
 
   startHistoryNav = () => {
     clearTimeout(this.historyNav)
-    this.historyNav = setTimeout(this.stopHistoryNav, 250)
+    this.historyNav = setTimeout(this.stopHistoryNav, 500)
   }
 
   stopHistoryNav = () => {
