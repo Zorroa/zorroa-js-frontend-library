@@ -14,7 +14,7 @@ const clouds = [ DROPBOX_CLOUD, GDRIVE_CLOUD, BOX_CLOUD ]
 const ImportCloud = (props) => {
   const auths = [
     new DropboxAuthenticator('6fifppvd9maxou9', accessToken => {
-      if (accessToken && accessToken.length) {
+      if (accessToken && accessToken.length && accessToken !== 'undefined') {
         props.onSelect(DROPBOX_CLOUD, accessToken)
       } else {
         DropboxAuthenticator.deauthorize()
@@ -22,7 +22,7 @@ const ImportCloud = (props) => {
     }),
     null,
     new BoxAuthenticator('nvjb3koff9j86go05crt24o0br60gk2r', accessToken => {
-      if (accessToken && accessToken.length) {
+      if (accessToken && accessToken.length && accessToken !== 'undefined') {
         props.onSelect(BOX_CLOUD, accessToken)
       } else {
         BoxAuthenticator.deauthorize()

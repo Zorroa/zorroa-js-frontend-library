@@ -93,7 +93,7 @@ class Preferences extends Component {
             <button className="Preferences-reset" onClick={this.reset}>Reset Default Settings</button>
             <button className="Preferences-reset" onClick={this.changePassword}>Change Password</button>
             { DropboxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutDropbox}>Logout Dropbox</button> }
-            { BoxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutDropbox}>Logout Box</button> }
+            { BoxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutBox}>Logout Box</button> }
           </div>
           <div className="Preferences-status">
             <div className='Preferences-build'>
