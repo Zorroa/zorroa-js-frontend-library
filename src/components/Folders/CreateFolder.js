@@ -3,7 +3,6 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
-import { createFolder } from '../../actions/folderAction'
 import { hideModal } from '../../actions/appActions'
 import User from '../../models/User'
 import AclEntry from '../../models/Acl'
@@ -134,5 +133,5 @@ class CreateFolder extends Component {
 export default connect(state => ({
   user: state.auth && state.auth.user
 }), dispatch => ({
-  actions: bindActionCreators({ createFolder, hideModal }, dispatch)
+  actions: bindActionCreators({ hideModal }, dispatch)
 }))(CreateFolder)
