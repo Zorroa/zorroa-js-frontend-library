@@ -44,12 +44,8 @@ export class BoxAuthenticator {
         headers: {'Authorization': 'Bearer ' + accessToken}
       })
       box.get('users/me')
-        .then(response => {
-          this.onAuth(accessToken)
-        })
-        .catch(error => {
-          this.authenticate()
-        })
+        .then(response => { this.onAuth(accessToken) })
+        .catch(_ => { this.authenticate() })
     } else {
       this.authenticate()
     }

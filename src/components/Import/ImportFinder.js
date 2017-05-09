@@ -4,7 +4,7 @@ import classnames from 'classnames'
 import Filter from '../Filter'
 import DropboxChooser from './DropboxChooser'
 import BoxChooser from './BoxChooser'
-import { DROPBOX_CLOUD, BOX_CLOUD, GDRIVE_CLOUD } from './ImportConstants'
+import { DROPBOX_CLOUD, BOX_CLOUD } from './ImportConstants'
 
 export default class ImportFinder extends Component {
   static propTypes = {
