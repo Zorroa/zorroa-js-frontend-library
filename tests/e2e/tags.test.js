@@ -120,23 +120,23 @@ describe('Tags', function () {
         return Promise.all(proms)
       })
       .then(eleTexts => {
-        let expectedTexts = ['Image Hash', 'Colors', 'Document', 'Image', 'Keywords', 'Proxies', 'Source', 'Video']
+        let expectedTexts = ['Colors', 'Image', 'Keywords', 'Proxies', 'Source', 'Video']
         // console.log({expectedTexts, eleTexts})
         let hasExpectedTexts = expectedTexts.map(text => eleTexts.includes(text))
         // console.log({hasExpectedTexts})
         expect(hasExpectedTexts.every(x=>x)).toBe(true)
       })
 
-    .then(_ => { DEBUG && console.log('Document tag has Creator child?') })
-    .then(_ => selenium.getTagNamed('Document').then(tag => documentTag = tag))
+    .then(_ => { DEBUG && console.log('Image tag has Aspect child?') })
+    .then(_ => selenium.getTagNamed('Image').then(tag => documentTag = tag))
     .then(_ => documentTag.getAttribute('class'))
     .then(classes => {
       driver.then(_ => { DEBUG && console.log({classes}) })
       if (!(new RegExp(`\\bisLeaf\\b`).test(classes))) return documentTag.click()
     })
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Metadata-item-document-creator.isLeaf')))
-    .then(_ => selenium.getTagNamed('Document').then(ele => ele.click()))
-    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('Metadata-item-document-creator.isOpen'), 5000))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Metadata-item-image-aspect.isLeaf')))
+    .then(_ => selenium.getTagNamed('Image').then(ele => ele.click()))
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('Metadata-item-image-aspect.isOpen'), 5000))
   })
 
   it('search for some hidden tags', function () {
@@ -144,12 +144,12 @@ describe('Tags', function () {
     .then(_ => { DEBUG && console.log('--- search for some hidden tags') })
     .then(_ => openAllTags())
     .then(_ => selenium.clickSelector(By.css('.Metadata-filter input')))
-    .then(_ => driver.findElement(By.css('.Metadata-filter input')).sendKeys('creator'))
+    .then(_ => driver.findElement(By.css('.Metadata-filter input')).sendKeys('aspect'))
 
-    .then(_ => { DEBUG && console.log('look for the two "creator" tags') })
+    .then(_ => { DEBUG && console.log('look for the two "aspect" tags') })
     .then(_ => driver.findElements(By.css('.Metadata-item')))
       .then(elements => {
-        // on dev, the only creator tags are document.creator and image.iptc.creator
+        // on dev, the only aspect tags are document.aspect and image.iptc.aspect
         // with those, there are between 2 and 5 Metadata-item element visible,
         // depending on which parents are open
         expect(elements.length).toBeGreaterThan(1)
@@ -186,11 +186,9 @@ describe('Tags', function () {
     .then(_ => selenium.getTagNamed('Source').then(ele => ele.click()))
 
     .then(_ => { DEBUG && console.log('make sure source.basename tag brings up facet widget') })
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Metadata-item-source-basename')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Metadata-item-source.isOpen')))
     .then(_ => selenium.expectSelectorHasClassToBe(true, By.css('.Metadata-item-source-basename'), 'isLeaf'))
-    // there are 2 assetType tags (since assetType is first) - the top most one is the tag folder
-    .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Metadata-item-source-assetType.isOpen')))
-    .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Metadata-item-source-assetType.isLeaf')))
+    .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Metadata-item-source-basename.isLeaf')))
     .then(_ => { DEBUG && console.log('make sure tag shows up as "selected"') })
     .then(_ => selenium.clickSelector(By.css('.Metadata-item-source-basename .Metadata-item-widget')))
     .then(_ => selenium.waitForSelectorHasClassToBe(true, By.css('.Metadata-item-source-basename'), 'isSelected'))
@@ -201,7 +199,7 @@ describe('Tags', function () {
     //   .then(ele => ele.getLocation())
     //   .then(loc => driver.actions().mouseMove(loc).perform())
     .then(_ => selenium.waitForSelectorHasClassToBe(true, By.css('.Racetrack-widget'), 'hoverField', 10000))
-    .then(_ => driver.findElement(By.css('.Metadata-item-source-assetType.isLeaf')))
+    .then(_ => driver.findElement(By.css('.Metadata-item-source.isOpen')))
       .then(ele => ele.getLocation())
       .then(loc => driver.actions().mouseMove(loc).perform())
     .then(_ => selenium.waitForSelectorHasClassToBe(false, By.css('.Racetrack-widget'), 'hoverField', 10000))
@@ -210,8 +208,8 @@ describe('Tags', function () {
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack-empty')))
 
     .then(_ => { DEBUG && console.log('favorite the source tag') })
-    .then(_ => selenium.clickSelector(By.css('.Metadata-item-source-assetType.isOpen .Metadata-item-favorite:not(.isSelected)')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Metadata-item-source-assetType.isOpen .Metadata-item-favorite.isSelected'), 5000))
+    .then(_ => selenium.clickSelector(By.css('.Metadata-item-source.isOpen .Metadata-item-favorite:not(.isSelected)')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Metadata-item-source.isOpen .Metadata-item-favorite.isSelected'), 5000))
 
     .then(_ => { DEBUG && console.log('show only favorites') })
     .then(_ => selenium.expectSelectorHasClassToBe(false, By.css('.Metadata-favorites'), 'isSelected'))
@@ -246,9 +244,9 @@ describe('Tags', function () {
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack-empty')))
 
     .then(_ => { DEBUG && console.log('unfavorite the source tag') })
-    .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Metadata-item-source-assetType.isOpen .Metadata-item-favorite.isSelected')))
-    .then(_ => selenium.clickSelector(By.css('.Metadata-item-source-assetType.isOpen .Metadata-item-favorite.isSelected')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Metadata-item-source-assetType.isOpen .Metadata-item-favorite.isSelected')))
+    .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Metadata-item-source.isOpen .Metadata-item-favorite.isSelected')))
+    .then(_ => selenium.clickSelector(By.css('.Metadata-item-source.isOpen .Metadata-item-favorite.isSelected')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Metadata-item-source.isOpen .Metadata-item-favorite.isSelected')))
   })
 
 })
