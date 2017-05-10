@@ -128,6 +128,20 @@ describe('Folder dnd', function () {
 
     return driver.then(_ => openCollectionsPanel())
 
+    // The Film folder is a DyHi created manualy on the first dev instance
+    // To create, go to the admin gui, create a folder named Film, and give it these attrs:
+    // Attr: Disney.films
+    // Attr: Disney.characterName
+    // Attr: Disney.documentType
+    // Don’t forget to hit SAVE!
+    //
+    // General approach: 1. make new folder, 2. double click on folder, 3. hit lighting bolt, 4. set dyhi fields, 5. hit save.
+    // Must have capitalization of fields correct.
+    // To get field names, either select an asset in Curator and use User > Developer to poke around the expandable asset (look under document), or, in the admin ui, you can go to the asset page and look at the full JSON.
+    // There are rest endpoints for creating dyhis
+    // Used in admin gui and by the curl commands in /zorroa-data/onboard/new-customer.sh
+    // Magic enum values are the hardest part.
+
     .then(_ => { DEBUG && console.log('Open Film & scroll down') })
     .then(_ => selenium.getFolderNamed('Film'))
       .then(folderEle => folderEle.findElement(By.css('.FolderItem-toggle')))
