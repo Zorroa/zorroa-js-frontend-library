@@ -5,7 +5,9 @@ import {
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
   SHOW_MULTIPAGE, SHOW_PAGES, VIDEO_VOLUME,
-  HOVER_FIELD, CLEAR_HOVER_FIELD, SET_FUZZY
+  HOVER_FIELD, CLEAR_HOVER_FIELD, SET_FUZZY,
+  SHOW_DIALOG_ALERT, HIDE_DIALOG_ALERT,
+  SHOW_DIALOG_CONFIRM, HIDE_DIALOG_CONFIRM
 } from '../constants/actionTypes'
 
 export const MIN_THUMBSIZE = 48
@@ -23,6 +25,34 @@ export function showModal (props) {
 export function hideModal () {
   return {
     type: HIDE_MODAL,
+    payload: null
+  }
+}
+
+export function showDialogAlert (title, message, confirmAction) {
+  return {
+    type: SHOW_DIALOG_ALERT,
+    payload: { title, message, confirmAction }
+  }
+}
+
+export function hideDialogAlert () {
+  return {
+    type: HIDE_DIALOG_ALERT,
+    payload: null
+  }
+}
+
+export function showDialogConfirm (title, message, confirmAction, cancelAction) {
+  return {
+    type: SHOW_DIALOG_CONFIRM,
+    payload: { title, message, confirmAction, cancelAction }
+  }
+}
+
+export function hideDialogConfirm () {
+  return {
+    type: HIDE_DIALOG_CONFIRM,
     payload: null
   }
 }

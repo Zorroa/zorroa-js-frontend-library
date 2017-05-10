@@ -6,7 +6,9 @@ import {
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
   SHOW_MULTIPAGE, SHOW_PAGES, VIDEO_VOLUME,
   HOVER_FIELD, CLEAR_HOVER_FIELD,
-  USER_SETTINGS, UNAUTH_USER, SET_FUZZY
+  USER_SETTINGS, UNAUTH_USER, SET_FUZZY,
+  SHOW_DIALOG_ALERT, HIDE_DIALOG_ALERT,
+  SHOW_DIALOG_CONFIRM, HIDE_DIALOG_CONFIRM
 } from '../constants/actionTypes'
 import { DEFAULT_THUMBSIZE } from '../actions/appActions'
 
@@ -59,6 +61,14 @@ export default function app (state = initialState, action) {
       return { ...state, modal: action.payload }
     case HIDE_MODAL:
       return { ...state, modal: null }
+    case SHOW_DIALOG_ALERT:
+      return { ...state, dialogAlert: action.payload }
+    case HIDE_DIALOG_ALERT:
+      return { ...state, dialogAlert: null }
+    case SHOW_DIALOG_CONFIRM:
+      return { ...state, dialogConfirm: action.payload }
+    case HIDE_DIALOG_CONFIRM:
+      return { ...state, dialogConfirm: null }
     case ICONIFY_LEFT_SIDEBAR:
       return { ...state, leftSidebarIsIconified: action.payload }
     case ICONIFY_RIGHT_SIDEBAR:

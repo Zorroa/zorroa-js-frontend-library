@@ -1,0 +1,21 @@
+@import '../../styles/core-mixins.scss';
+
+.DialogAlert {
+}
+
+.DialogAlert-header {
+}
+
+.DialogAlert-body {
+  padding: 40px;
+}
+
+.DialogAlert-footer {
+  @include flexRowCenter;
+  padding: 10px;
+}
+
+.DialogAlert-dismiss {
+  color: white;
+  @include zorroa-btn(6em, 40px, $zorroa-sickly-green, darken($zorroa-sickly-green, 15%));
+}
