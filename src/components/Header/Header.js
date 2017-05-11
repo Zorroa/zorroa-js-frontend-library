@@ -58,9 +58,9 @@ class Header extends Component {
           <JobMenu jobType={Job.Export}/>
           <div className="header-menu">
             <DropdownMenu label="Help">
-              <a href="http://zorroa.com/docs/help" target="_blank" className="header-menu-item" >Help</a>
-              <a href="http://zorroa.com/docs/tutorials" target="_blank" className="header-menu-item" >Tutorials</a>
-              <a href="http://zorroa.com/docs/release-notes" target="_blank" className="header-menu-item" >Release Notes</a>
+              <a href="https://zorroa.com/help-center/" target="_blank" className="header-menu-item" >Tutorials</a>
+              <a href="https://zorroa.com/help-center/faqs" target="_blank" className="header-menu-item" >FAQ</a>
+              <a href="https://zorroa.com/help-center/release-notes/" target="_blank" className="header-menu-item" >Release Notes</a>
               <div className="header-menu-item header-menu-feedback" onClick={this.showFeedback}>
                 Send Feedback
               </div>
