@@ -114,17 +114,37 @@ describe('Collections', function () {
     .then(_ => emptyTrash())
   })
 
+  function pageDown(by) {
+    return driver.then(_ => {
+      return driver.findElement(by)
+        .then(ele => {
+          return ele.getSize()
+            .then(size => { return driver.actions().mouseMove(ele, {x:size.width - 5, y: size.height - 5}).click().sendKeys(Key.PAGE_DOWN, Key.PAGE_DOWN, Key.PAGE_DOWN).perform() })
+        })
+    })
+      .then(_ => driver.sleep(100))
+  }
+
   // Disable until we open all parents to a newly created search folder
   // now created underneath the user's personal folder rather than root
-  xit('create a new search, then delete it (assumes trash is empty)', function () {
+  it('create a new search, then delete it (assumes trash is empty)', function () {
     let timeStr = Date.now().toString()
     let searchStr = '_selenium_' + timeStr
     let searchBar
 
     let folder
     let folderXpath = `//*[contains(text(), '${searchStr}')]` // http://stackoverflow.com/a/30648604/1424242
+    let allUsersFolder
 
     return driver.then(_ => openCollectionsPanel())
+
+    .then(_ => { DEBUG && console.log('find & toggle the Users folder ' + Date.now()) })
+    .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
+    .then(_ => selenium.getFolderNamed('Users').then(ele => { allUsersFolder = ele }))
+    // Toggle open the users folder
+    .then(_ => { DEBUG && console.log('toggle the Users folder') })
+    .then(_ => allUsersFolder.findElement(By.css('.FolderItem-toggle')).click())
+    .then(_ => selenium.waitForIdle())
 
     .then(_ => { DEBUG && console.log('Search for something we know exists') })
     .then(_ => driver.findElement(By.css('.Suggestions-search')).then(ele => { searchBar = ele }))
