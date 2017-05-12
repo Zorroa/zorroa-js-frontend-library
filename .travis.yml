@@ -10,6 +10,9 @@ notifications:
 addons:
   sauce_connect: true
 
+sudo: required
+dist: precise
+
 env:
   global:
     # # parent Sauce Labs account credentials

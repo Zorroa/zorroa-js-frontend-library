@@ -53,6 +53,9 @@ if (USE_SAUCE) {
   })
 }
 
+// var port =
+// const USE_GRID =
+
 // webdriver docs
 // http://seleniumhq.github.io/selenium/docs/api/javascript/index.html
 // https://github.com/SeleniumHQ/selenium/wiki/WebDriverJs
@@ -141,6 +144,7 @@ export function startBrowserAndDriver (_suite) {
 
   if (USE_SAUCE) {
     // run tests using travis+sauce
+    console.log('travis job #', process.env.TRAVIS_JOB_NUMBER)
     const caps = {
       'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
       build: process.env.TRAVIS_BUILD_NUMBER,
