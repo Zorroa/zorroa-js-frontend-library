@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react'
 
-import { CLOUD_IMPORT, SERVER_IMPORT, LOCAL_IMPORT, DROPBOX_CLOUD, BOX_CLOUD, GDRIVE_CLOUD } from './ImportConstants'
+import { CLOUD_IMPORT, SERVER_IMPORT, CLOUDPROXY_IMPORT, DROPBOX_CLOUD, BOX_CLOUD, GDRIVE_CLOUD } from './ImportConstants'
 
 import CloudBackground from './CloudBackground.svg'
 import ServerBackground from './ServerBackground.svg'
@@ -11,7 +11,7 @@ import BoxLogo from './BoxLogo.svg'
 
 const services = [ DROPBOX_CLOUD, GDRIVE_CLOUD, BOX_CLOUD ]
 const serviceIcons = [ DropboxLogo, GDriveLogo, BoxLogo ]
-const sources = [ CLOUD_IMPORT, SERVER_IMPORT, LOCAL_IMPORT ]
+const sources = [ CLOUD_IMPORT, SERVER_IMPORT, CLOUDPROXY_IMPORT ]
 const sourceIcons = [ CloudBackground, ServerBackground, LocalBackground ]
 const sourceTags = [ 'On a cloud service', 'On a file server', 'On my computer' ]
 

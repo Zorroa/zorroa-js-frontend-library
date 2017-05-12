@@ -3,22 +3,25 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import { hideModal } from '../../actions/appActions'
-import { changePassword } from '../../actions/authAction'
+import { changePassword, getHMACKey } from '../../actions/authAction'
 import { importAssets, uploadFiles, getPipelines, getProcessors } from '../../actions/jobActions'
 
 import Logo from '../Logo'
 import StepCounter from './StepCounter'
 import ImportCloud from './ImportCloud'
 import ImportCloudproxy from './ImportCloudproxy'
+import LocalCloudproxy from './LocalCloudproxy'
 import ImportSource from './ImportSource'
 import LocalChooser from './LocalChooser'
 import ImportFinder from './ImportFinder'
 import ImportingTip from './ImportingTip'
+import TutorialVideos from './TutorialVideos'
 import CloudproxyInstructions from './CloudproxyInstructions'
 import User from '../../models/User'
 import Pipeline from '../../models/Pipeline'
 import Processor from '../../models/Processor'
-import { CLOUD_IMPORT, SERVER_IMPORT, LOCAL_IMPORT, DROPBOX_CLOUD, BOX_CLOUD, GDRIVE_CLOUD } from './ImportConstants'
+import Cloudproxy from '../../services/Cloudproxy'
+import { CLOUD_IMPORT, SERVER_IMPORT, LOCAL_IMPORT, CLOUDPROXY_IMPORT, DROPBOX_CLOUD, BOX_CLOUD, GDRIVE_CLOUD, CLOUDPROXY_CLOUD } from './ImportConstants'
 
 class Import extends Component {
   static propTypes = {
@@ -28,6 +31,8 @@ class Import extends Component {
     pipelines: PropTypes.arrayOf(PropTypes.instanceOf(Pipeline)),
     processors: PropTypes.arrayOf(PropTypes.instanceOf(Processor)),
     user: PropTypes.instanceOf(User).isRequired,
+    hmacKey: PropTypes.string,
+    origin: PropTypes.string,
     onboarding: PropTypes.bool,
     actions: PropTypes.object
   }
@@ -42,6 +47,7 @@ class Import extends Component {
     step: this.props.step,
     source: this.props.source,
     cloud: this.props.cloud,
+    os: '',
     accessToken: '',
     pipelineId: -1,
     uploadOverflow: false
@@ -51,6 +57,7 @@ class Import extends Component {
     const { actions } = this.props
     actions.getPipelines()
     actions.getProcessors()
+    actions.getHMACKey()
   }
 
   componentWillReceiveProps (nextProps) {
@@ -65,7 +72,7 @@ class Import extends Component {
 
   setStep = (step) => {
     const { onboarding, actions } = this.props
-    const lastStep = onboarding ? 4 : 3
+    const lastStep = onboarding ? 5 : 3
     if (step > lastStep) {
       this.dismiss()
       if (onboarding) {
@@ -89,8 +96,7 @@ class Import extends Component {
   }
 
   selectCloudproxy = (os) => {
-    console.log('Download cloudproxy ' + os)
-    this.setState({ step: 3 })
+    this.setState({ step: 3, os })
   }
 
   selectLocalFiles = () => {
@@ -111,13 +117,15 @@ class Import extends Component {
       case CLOUD_IMPORT:
         switch (cloud) {
           case DROPBOX_CLOUD: return this.configureDropboxImport(files, progress)
-          case GDRIVE_CLOUD:
-          case BOX_CLOUD:
+          case BOX_CLOUD: return this.configureBoxImport(files, progress)
+          case CLOUDPROXY_CLOUD: return this.configureCloudproxyImport(files, progress)
+          case GDRIVE_CLOUD: return this.configureGDriveImport(files, progress)
         }
         break
       case LOCAL_IMPORT: return this.configureUploadFileImport(files, progress)
       case SERVER_IMPORT:
         break
+      case CLOUDPROXY_IMPORT: return this.configureCloudproxyImport(files, progress)
     }
     return {}
   }
@@ -166,6 +174,34 @@ class Import extends Component {
     return { name, pipelineId, processors, generators }
   }
 
+  configureBoxImport = (files, progress) => {
+    if (!files || !files.length) return {}
+    const { pipelineId } = this.state
+    const accessKey = this.state.accessToken
+    const pipeline = this.props.pipelines.find(pipeline => (pipeline.id === pipelineId))
+    const downloadClass = 'com.zorroa.core.processor.BoxDownloader'
+    const download = this.props.processors.find(p => (p.name === downloadClass))
+    const downloadRef = download && download.ref({ accessKey })
+    const processors = [ downloadRef, ...pipeline.processors ]
+    const generatorName = 'com.zorroa.core.generator.BoxGenerator'
+    const generator = this.props.processors.find(p => (p.name === generatorName))
+    const generators = [...files].map(file => generator.ref({id: file.id, accessKey}))
+    const name = this.importName('Box')
+    return { name, pipelineId, processors, generators }
+  }
+
+  configureGDriveImport = (files, progress) => {
+    console.log('GDrive support coming soon')
+  }
+
+  configureCloudproxyImport = (files, progress) => {
+    const { user, hmacKey, origin } = this.props
+    const paths = files.map(file => file.path)
+    const cloudproxy = new Cloudproxy('localhost')
+    cloudproxy.import(origin, hmacKey, user.username, paths)
+    return {}
+  }
+
   dismiss = () => {
     this.props.actions.hideModal()
   }
@@ -174,19 +210,31 @@ class Import extends Component {
     this.setState({ step: 2, source: SERVER_IMPORT, uploadOverflow: true })
   }
 
+  cloudproxyInstalled = () => {
+    if (this.state.uploadOverflow) {
+      this.setState({step: 2, source: LOCAL_IMPORT})
+    } else if (this.source === CLOUDPROXY_IMPORT) {
+      this.setState({step: 3, source: CLOUD_IMPORT, cloud: CLOUDPROXY_CLOUD})
+    } else {
+      this.dismiss()
+    }
+  }
+
   renderStep2 () {
     switch (this.state.source) {
       case CLOUD_IMPORT: return <ImportCloud launch={this.state.cloud} onSelect={this.selectCloud} onBack={e => this.setStep(1)}/>
-      case SERVER_IMPORT: return <ImportCloudproxy onSelect={this.selectCloudproxy} onBack={e => this.setStep(1)} uploadOverflow={this.state.uploadOverflow}/>
+      case SERVER_IMPORT: return <ImportCloudproxy onSelect={this.selectCloudproxy} onBack={e => this.setStep(1)} local={this.state.uploadOverflow}/>
       case LOCAL_IMPORT: return <LocalChooser onImport={this.configureUploadFileImport} onBack={e => this.setStep(1)} onCloudproxy={this.localToCloudproxy}/>
+      case CLOUDPROXY_IMPORT: return <LocalCloudproxy step={2} onBack={e => this.setStep(1)} onDone={e => { this.setState({cloud: CLOUDPROXY_CLOUD}); this.setStep(3) }}/>
     }
   }
 
   renderStep3 () {
-    const { source, cloud, accessToken, uploadOverflow } = this.state
+    const { source, cloud, accessToken, uploadOverflow, os } = this.state
     switch (source) {
+      case CLOUDPROXY_IMPORT: return <ImportFinder mode={CLOUDPROXY_CLOUD} onImport={this.createImport} onBack={e => { this.setStep(1) }}/>
       case CLOUD_IMPORT: return <ImportFinder mode={cloud} accessToken={accessToken} onImport={this.createImport} onBack={e => { this.setState({cloud: ''}); this.setStep(2) }}/>
-      case SERVER_IMPORT: return <CloudproxyInstructions local={uploadOverflow} onDone={this.dismiss} onBack={e => this.setStep(2)}/>
+      case SERVER_IMPORT: return <CloudproxyInstructions local={uploadOverflow} os={os} onDone={this.cloudproxyInstalled} onBack={e => this.setStep(2)}/>
       case LOCAL_IMPORT: return <LocalChooser onDone={e => this.setStep(4)} onBack={e => this.setStep(2)}/>
     }
   }
@@ -210,6 +258,7 @@ class Import extends Component {
       case 2: return this.renderStep2()
       case 3: return this.renderStep3()
       case 4: return <ImportingTip onDismiss={e => this.setStep(5)}/>
+      case 5: return <TutorialVideos onDismiss={e => this.setStep(6)}/>
     }
   }
 
@@ -254,6 +303,8 @@ export default connect(state => ({
   pipelines: state.jobs.pipelines,
   processors: state.jobs.processors,
   user: state.auth.user,
+  hmacKey: state.auth.hmacKey,
+  origin: state.auth.origin,
   onboarding: state.auth.onboarding
 }), dispatch => ({
   actions: bindActionCreators({
@@ -262,6 +313,7 @@ export default connect(state => ({
     importAssets,
     uploadFiles,
     changePassword,
+    getHMACKey,
     hideModal
   }, dispatch)
 }))(Import)

@@ -85,15 +85,22 @@ export default function (state = initialState, action) {
         let openFolderIds = new Set(state.openFolderIds)
         all.set(folder.id, folder)
         const parent = state.all.get(folder.parentId) // copy folder's parent
-        let newParent = new Folder(parent)
-        if (!parent.childIds) {
-          newParent.childIds = new Set()
-        } else {
-          newParent.childIds = new Set(parent.childIds) // copy; about to modify
+        if (parent) {
+          let newParent = new Folder(parent)
+          if (!parent.childIds) {
+            newParent.childIds = new Set()
+          } else {
+            newParent.childIds = new Set(parent.childIds) // copy; about to modify
+          }
+          newParent.childIds.add(folder.id)
+          all.set(newParent.id, newParent)
+          const openAncestors = (id) => {
+            openFolderIds.add(id)
+            const folder = all.get(id)
+            if (folder && folder.parentId) openAncestors(folder.parentId)
+          }
+          openAncestors(newParent.id)
         }
-        newParent.childIds.add(folder.id)
-        all.set(newParent.id, newParent)
-        openFolderIds.add(newParent.id) // make sure we can see the new folder immediately
         const modifiedIds = new Set(state.modifiedIds)
         _addAncestorIds(folder, modifiedIds, state.all)
         return {...state, all, openFolderIds, modifiedIds}

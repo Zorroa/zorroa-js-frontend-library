@@ -14,7 +14,8 @@ const initialState = {
   totalSize: 0,
   entryInfos: new Map(),
   cancelUpload: false,
-  onImport: null          // retained copy during upload processing
+  onImport: null,         // retained copy during upload processing
+  stats: null
 }
 
 class LocalChooser extends Component {
@@ -22,7 +23,6 @@ class LocalChooser extends Component {
     onImport: PropTypes.func,
     onBack: PropTypes.func.isRequired,
     onDone: PropTypes.func,
-    onCloudproxy: PropTypes.func,
     fileEntries: PropTypes.instanceOf(Map),
     actions: PropTypes.object
   }
@@ -181,30 +181,32 @@ class LocalChooser extends Component {
       const uploadedSize = this.state.uploadedSize + progressEvent.loaded
       this.setState({uploadedSize})
       if (uploadedSize >= this.state.totalSize) {
-        this.clear()
-        setTimeout(() => { this.props.onDone() }, 1500)
+        setTimeout(() => { this.clear(); this.props.onDone() }, 1500)
       }
       console.log('Finished upload batch')
       resolve()      // Move on to the next batch of uploads
     }
   }
 
+  totalSize = () => {
+    let totalSize = 0
+    this.state.selectedFiles.forEach(file => { totalSize += file.size })
+    this.state.entryInfos.forEach(info => { totalSize += info.size })
+    return totalSize
+  }
+
+  totalFileCount = () => {
+    let fileCount = this.state.selectedFiles.size
+    this.state.entryInfos.forEach(info => { fileCount += info.fileCount })
+    return fileCount
+  }
+
   upload = (event) => {
-    if (this.state.progressEvent) {
+    if (this.state.progressEvent && !this.state.cancelUpload) {
       this.setState({cancelUpload: true})
     }
-    let totalSize = 0
-    let fileCount = this.state.selectedFiles.size
-    this.state.selectedFiles.forEach(file => { totalSize += file.size })
-    this.state.entryInfos.forEach(info => {
-      totalSize += info.size
-      fileCount += info.fileCount
-    })
-    const maxSize = 128 * 1024 * 1024
-    const maxCount = 500
-    if (this.props.onCloudproxy && (totalSize > maxSize || fileCount > maxCount)) {
-      this.props.onCloudproxy()
-    } else if (this.props.onImport) {
+    if (this.props.onImport) {
+      const totalSize = this.totalSize()
       this.setState({totalSize})
       this.generateFileBatches(event)
     } else {
@@ -388,6 +390,7 @@ class LocalChooser extends Component {
     const uploadsCompleted = progressEvent && progressEvent.loaded >= progressEvent.total
     const disabled = (progressEvent && !uploadsCompleted) || (!fileCount && !directoryCount)
     const step = onImport ? 2 : 3
+    const running = !onImport
     let title = onImport ? 'Upload' : 'Stop'
     if (onImport && fileCount) title += ` ${fileCount} File${fileCount > 1 ? 's' : ''}`
     if (onImport && fileCount && directoryCount) title += ' and'
@@ -406,7 +409,7 @@ class LocalChooser extends Component {
           { fileCount || directoryCount ? this.renderFileList() : this.renderDropzone() }
         </div>
         <div className="LocalChooser-start">
-          <div className={classnames('Import-button', {disabled})} onClick={!disabled && this.upload}>
+          <div className={classnames('Import-button', {disabled, running})} onClick={this.upload}>
             {title}
           </div>
         </div>

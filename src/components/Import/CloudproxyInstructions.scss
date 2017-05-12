@@ -24,6 +24,7 @@
     color: $zorroa-water-blue;
     text-decoration: none;
     font-weight: 500;
+    cursor: pointer;
     &:hover { text-decoration: underline; }
   }
 }
@@ -43,6 +44,13 @@
   &.code {
     font-family: "Lucida Console", monospace;
   }
+}
+
+.CloudproxyInstructions-item-note {
+  margin-top: 30px;
+  font-size: 12px;
+  font-weight: 300;
+  color: $zorroa-lightgray;
 }
 
 .CloudproxyInstructions-server-name {
@@ -76,6 +84,7 @@
   text-transform: uppercase;
   pointer-events: auto;
   text-decoration: none;
+  cursor: pointer;
   @include nowrap;
 
   &:hover:not(.disabled) { background-color: $zorroa-gray; }

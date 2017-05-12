@@ -9,6 +9,7 @@ import QuickAddWidget from './QuickAddWidget'
 import CreateFolder from '../Folders/CreateFolder'
 import Widget from '../../models/Widget'
 import * as WidgetInfo from './WidgetInfo'
+import User from '../../models/User'
 import Folder from '../../models/Folder'
 import AssetSearch from '../../models/AssetSearch'
 import { resetRacetrackWidgets } from '../../actions/racetrackAction'
@@ -21,7 +22,8 @@ class Racetrack extends Component {
     query: PropTypes.instanceOf(AssetSearch),
     actions: PropTypes.object.isRequired,
     isIconified: PropTypes.bool.isRequired,
-    hoverFields: PropTypes.instanceOf(Set)
+    hoverFields: PropTypes.instanceOf(Set),
+    user: PropTypes.instanceOf(User).isRequired
   }
 
   state = {
@@ -36,8 +38,8 @@ class Racetrack extends Component {
   }
 
   saveSearch = (name, acl) => {
-    const { query } = this.props
-    const parentId = Folder.ROOT_ID     // FIXME: Private folders under <user>
+    const { query, user } = this.props
+    const parentId = user ? user.homeFolderId : Folder.ROOT_ID
     const search = new AssetSearch(query)
     search.aggs = undefined             // Remove widget aggs
     const folder = new Folder({ name, acl, parentId, search })
@@ -153,7 +155,8 @@ const mapDispatchToProps = dispatch => ({
 const mapStateToProps = state => ({
   widgets: state.racetrack.widgets,
   query: state.assets.query,
-  hoverFields: state.app.hoverFields
+  hoverFields: state.app.hoverFields,
+  user: state.auth.user
 })
 
 export default connect(

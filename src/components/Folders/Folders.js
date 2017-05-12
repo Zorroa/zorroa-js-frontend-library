@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 import LRUCache from 'lru-cache'
 
+import User from '../../models/User'
 import Folder from '../../models/Folder'
 import { getFolderChildren, createFolder, selectFolderIds, selectFolderId,
   toggleFolder, queueFolderCounts } from '../../actions/folderAction'
@@ -37,7 +38,8 @@ class Folders extends Component {
 
     // state props
     folders: PropTypes.object.isRequired,
-    sortFolders: PropTypes.string
+    sortFolders: PropTypes.string,
+    user: PropTypes.instanceOf(User)
   }
 
   constructor (props) {
@@ -210,9 +212,10 @@ class Folders extends Component {
   }
 
   selectedParentId () {
-    const selectedFolderIds = this.props.folders.selectedFolderIds
-    if (!selectedFolderIds || selectedFolderIds.size < 1) return Folder.ROOT_ID
-    return selectedFolderIds.values().next().value
+    const { folders, user } = this.props
+    const selectedFolderIds = folders.selectedFolderIds
+    if (selectedFolderIds && selectedFolderIds.size === 1) return selectedFolderIds.values().next().value
+    return user ? user.homeFolderId : Folder.ROOT_ID
   }
 
   isAddFolderEnabled () {
@@ -443,7 +446,8 @@ class Folders extends Component {
 export default connect(state => ({
   folders: state.folders,
   sortFolders: state.app.sortFolders,
-  assetsCounter: state.assets.assetsCounter
+  assetsCounter: state.assets.assetsCounter,
+  user: state.auth.user
 }), dispatch => ({
   actions: bindActionCreators({
     getFolderChildren,

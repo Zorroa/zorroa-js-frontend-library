@@ -1,5 +1,5 @@
 import {
-  AUTH_USER, UNAUTH_USER, AUTH_ORIGIN, AUTH_ERROR, AUTH_PERMISSIONS,
+  AUTH_USER, UNAUTH_USER, AUTH_ORIGIN, AUTH_ERROR, AUTH_PERMISSIONS, AUTH_HMAC,
   AUTH_SYNC, AUTH_CHANGE_PASSWORD, AUTH_DEFAULTS, AUTH_ONBOARDING } from '../constants/actionTypes'
 import User from '../models/User'
 import Permission from '../models/Permission'
@@ -39,6 +39,8 @@ export default function (state = initialState, action) {
       return { ...state, changePassword: action.payload }
     case AUTH_ONBOARDING:
       return { ...state, onboarding: action.payload }
+    case AUTH_HMAC:
+      return { ...state, hmacKey: action.payload }
   }
 
   return state

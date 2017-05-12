@@ -32,6 +32,7 @@
   background-color: $zorroa-sickly-green;
   color: white;
   font-size: 16px;
+  cursor: pointer;
 
   &.flip { transform: scaleX(-1); }
   &:hover { background-color: $zorroa-gray; }

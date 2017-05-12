@@ -1,10 +1,12 @@
 import React, { PropTypes } from 'react'
+import classnames from 'classnames'
 
 import DropboxLogo from './DropboxLogo.svg'
 import GDriveLogo from './GDriveLogo.svg'
 import BoxLogo from './BoxLogo.svg'
 import { DropboxAuthenticator } from './DropboxAuthenticator'
-
+import { BoxAuthenticator } from './BoxAuthenticator'
+import { GDriveAuthenticator } from './GDriveAuthenticator'
 import { DROPBOX_CLOUD, BOX_CLOUD, GDRIVE_CLOUD } from './ImportConstants'
 
 const logos = [ DropboxLogo, GDriveLogo, BoxLogo ]
@@ -12,10 +14,29 @@ const clouds = [ DROPBOX_CLOUD, GDRIVE_CLOUD, BOX_CLOUD ]
 
 const ImportCloud = (props) => {
   const auths = [
-    new DropboxAuthenticator('6fifppvd9maxou9', accessToken => props.onSelect(DROPBOX_CLOUD, accessToken)),
-    null,
-    null
+    new DropboxAuthenticator('6fifppvd9maxou9', accessToken => {
+      if (accessToken && accessToken.length && accessToken !== 'undefined') {
+        props.onSelect(DROPBOX_CLOUD, accessToken)
+      } else {
+        DropboxAuthenticator.deauthorize()
+      }
+    }),
+    new GDriveAuthenticator('', accessToken => {
+      if (accessToken && accessToken.length && accessToken !== 'undefined') {
+        props.onSelect(GDRIVE_CLOUD, accessToken)
+      } else {
+        GDriveAuthenticator.deauthorize()
+      }
+    }),
+    new BoxAuthenticator('nvjb3koff9j86go05crt24o0br60gk2r', accessToken => {
+      if (accessToken && accessToken.length && accessToken !== 'undefined') {
+        props.onSelect(BOX_CLOUD, accessToken)
+      } else {
+        BoxAuthenticator.deauthorize()
+      }
+    })
   ]
+  clouds.forEach((c, i) => { if (props.launch === c) requestAnimationFrame(auths[i].authorize) })
   return (
     <div className="ImportCloud">
       <div className="Import-back" onClick={props.onBack}>
@@ -30,9 +51,8 @@ const ImportCloud = (props) => {
         { clouds.map((c, i) => (
           <div className="ImportCloud-service" key={i}>
             <img className="ImportCloud-logo" src={logos[i]}/>
-            <div onClick={e => auths[i].authorize()} className="Import-button">
+            <div onClick={e => auths[i].authorize()} className={classnames('Import-button', {disabled: c === GDRIVE_CLOUD})}>
               Authenticate
-              { props.launch === c && auths[i].authorize() }
             </div>
           </div>
         ))}
