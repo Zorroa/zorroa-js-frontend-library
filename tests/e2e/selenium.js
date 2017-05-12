@@ -74,16 +74,27 @@ if (USE_SAUCE) {
 //
 // To run on local selenium grid:
 // SELENIUM_REMOTE_URL="http://localhost:4444/wd/hub" jest -i tags
+// SELENIUM_REMOTE_URL="http://10.8.0.1:4444/wd/hub" jest -i tags
+// DONT FORGET to use a public URL for your curator server (BASE_URL); localhost is not accessible inside docker
+// [dahart] ssh tjt + ssh -L 8000::8080 localhost -nNT + BASE_URL = http://blot.asuscomm.com:8000/
+//
+// https://github.com/SeleniumHQ/docker-selenium
+// When you are prompted for the password it is secret.
 //
 // Open question how to connect to docker host IP. For testing I exposed my curator publicly. Would prefer to avoid this.
 // https://github.com/moby/moby/issues/8427
 // https://github.com/moby/moby/issues/8395#issuecomment-212147825
 // https://github.com/moby/moby/issues/1143
 
-export const BASE_URL = 'http://localhost:8080'
+// https://groups.google.com/forum/#!topic/selenium-users/ilfLKSUAqQQ
+// check memory and CPU usage by node/s and HUB with docker stats $(docker ps -aq)
+
+
+
+export const BASE_URL = 'http://10.8.0.1:8080' // local selenium grid? see DONT FORGET above
 
 // let selenium tests run. jest's default is an unreasonable 5 seconds
-jasmine.DEFAULT_TIMEOUT_INTERVAL = (DEBUG && !USE_SAUCE) ? 30000 : 180000
+jasmine.DEFAULT_TIMEOUT_INTERVAL = (DEBUG && !USE_SAUCE) ? 120000 : 180000
 
 var allTestsPassed = true
 var failedTests = []
@@ -114,7 +125,7 @@ var suite = null
 export var driver = null
 
 const browserDriverConfig = {
-  chrome: { driver: 'selenium-webdriver/chrome', pathModule: 'chromedriver' },
+  chrome: { driver: 'selenium-webdriver/chrome', pathModule: 'chromedriver', maxSession: 4 },
   firefox: { driver: 'selenium-webdriver/firefox', pathModule: 'geckodriver' }
 }
 
@@ -392,7 +403,7 @@ export function logout () {
 export function login () {
   return logout()
   .then(_ => { DEBUG && console.log('loggin in') })
-  .then(_ => driver.get(`${BASE_URL}/signin`))
+  .then(_ => driver.get(`${BASE_URL}`))
   .then(_ => driver.executeScript('window.zorroa.setSeleniumTesting(true)'))
   .then(_ => driver.findElement(By.css('input[name="username"]')).sendKeys('selenium'))
   .then(_ => driver.findElement(By.css('input[name="password"]')).sendKeys('z0rr0@12'))
