@@ -59,7 +59,22 @@
   margin-left: 2px;
   margin-right: 2px;
   border: 6px solid transparent;
+  position: relative;
   &.selected { border: 6px solid $zorroa-darkish-purple; }
+}
+
+.SimilarHash-thumb-cancel {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  color: $zorroa-lightgray;
+  padding: 4px;
+
+  &:hover {
+    color: $zorroa-faded-red;
+    background-color: rgba(255, 255, 255, 0.75);
+    border-radius: 3px;
+  }
 }
 
 .SimilarHash-carousel {
@@ -67,9 +82,9 @@
   margin-top: 10px;
   margin-bottom: 10px;
   overflow: auto;
-  width: 100%;
+  max-width: 100%;
   padding-bottom: 4px;
-  @include flexRowCenter;
+  @include flexRow;
   &::-webkit-scrollbar { height: 5px; }
 }
 

@@ -9,7 +9,7 @@ import * as assert from 'assert'
 import Thumb, { page, monopageBadges, multipageBadges } from '../Thumb'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
-import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, searchAssetsRequestProm } from '../../actions/assetsAction'
+import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, assetsForIds } from '../../actions/assetsAction'
 import { resetRacetrackWidgets, similar, restoreSearch } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
@@ -20,11 +20,10 @@ import Table from '../Table'
 import Editbar from './Editbar'
 import * as ComputeLayout from './ComputeLayout.js'
 import AssetSearch from '../../models/AssetSearch'
-import AssetFilter from '../../models/AssetFilter'
 import Resizer from '../../services/Resizer'
 import TrashedFolder from '../../models/TrashedFolder'
 import { weights } from '../Racetrack/SimilarHash'
-import { addSiblings, equalSets, unCamelCase, makePromiseQueue } from '../../services/jsUtil'
+import { addSiblings, equalSets, unCamelCase } from '../../services/jsUtil'
 import * as api from '../../globals/api.js'
 
 const assetsScrollPadding = 8
@@ -359,20 +358,14 @@ class Assets extends Component {
     if (similarField && similarField.length && selectedIds && selectedIds.size) {
       const { cachedSelectedIds } = this.state
       if (cachedSelectedIds && equalSets(selectedIds, new Set(cachedSelectedIds))) return
-      const dummyDispatch = () => {}
-      const mkProm = (query) => {
-        return searchAssetsRequestProm(dummyDispatch, query)
-          .catch(error => error) // this catch ensures one error doesn't spoil the batch
-      }
-      const filter = new AssetFilter({terms: {'_id': [...selectedIds]}})
-      const fields = [similarField]
-      const query = new AssetSearch({filter, fields, size: selectedIds.size})
-      makePromiseQueue([query], mkProm, 1 /* limit to one */)
-        .then(responses => {
-          const assets = responses[0].data.list.map(json => (new Asset(json)))
+      assetsForIds(selectedIds, [similarField])
+        .then(assets => {
           const cachedSelectedHashes = assets.map(asset => asset.rawValue(similarField))
           const cachedSelectedIds = assets.map(asset => asset.id)
           return this.setState({cachedSelectedHashes, cachedSelectedIds})
+        })
+        .catch(error => {
+          console.log('Cannot get similarity hashes: ' + error)
         })
 
       // Update state now to avoid re-sending
@@ -768,7 +761,6 @@ export default connect(state => ({
     selectAssetIds,
     sortAssets,
     searchAssets,
-    searchAssetsRequestProm,
     resetRacetrackWidgets,
     similar,
     restoreSearch,

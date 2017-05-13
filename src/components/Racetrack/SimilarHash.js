@@ -6,12 +6,11 @@ import LRUCache from 'lru-cache'
 
 import { SimilarHashWidgetInfo } from './WidgetInfo'
 import { removeRacetrackWidgetIds, similar } from '../../actions/racetrackAction'
-import { sortAssets } from '../../actions/assetsAction'
+import { sortAssets, assetsForIds } from '../../actions/assetsAction'
 import { equalSets } from '../../services/jsUtil'
 import Widget from './Widget'
 import Asset from '../../models/Asset'
 
-const SCHEMA = 'Similarity'
 const DEFAULT_WEIGHT = 1
 
 const similarityCache = new LRUCache({ max: 1000 })
@@ -30,7 +29,6 @@ class SimilarHash extends Component {
       assetIds: PropTypes.arrayOf(PropTypes.string).isRequired
     }).isRequired,
     selectedAssetIds: PropTypes.instanceOf(Set),
-    assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     widgets: PropTypes.arrayOf(PropTypes.object),
     origin: PropTypes.string,
     actions: PropTypes.object.isRequired,
@@ -41,10 +39,10 @@ class SimilarHash extends Component {
   }
 
   state = {
-    hashTypes: null,
-    hashName: '',
     similarity: DEFAULT_WEIGHT,
-    selectedAssetId: ''
+    selectedAssetId: '',
+    cachedSelectedIds: null,
+    cachedSelectedHashes: null
   }
 
   adjustTimout = null
@@ -57,31 +55,39 @@ class SimilarHash extends Component {
     return new Promise(resolve => this.setState(newState, resolve))
   }
 
-  // recompute state.hashNames based on give props
-  // return promise that resolves after setState is complete
-  updateHashTypes = (props) => {
-    const { fields } = props
-    if (!fields) return Promise.resolve()
+  updateSelectedHashes = (similarField, selectedIds) => {
+    if (similarField && similarField.length && selectedIds && selectedIds.size) {
+      const { cachedSelectedIds } = this.state
+      if (cachedSelectedIds && equalSets(selectedIds, new Set(cachedSelectedIds))) return
+      assetsForIds(selectedIds, [similarField])
+        .then(assets => {
+          const cachedSelectedHashes = assets.map(asset => asset.rawValue(similarField))
+          const cachedSelectedIds = assets.map(asset => asset.id)
+          return this.setState({cachedSelectedHashes, cachedSelectedIds})
+        })
+        .catch(error => {
+          console.log('Cannot get similarity hashes: ' + error)
+        })
 
-    let hashTypes = {}
-    for (let s in fields.string) {
-      const fieldParts = fields.string[s].split('.')
-      if (fieldParts.length >= 3 && fieldParts[0] === SCHEMA) {
-        hashTypes[fieldParts[1]] = fieldParts[2]
-      }
+      // Update state now to avoid re-sending
+      this.setState({cachedSelectedIds: [...selectedIds]})
+    } else {
+      // Clear the cache
+      const cachedSelectedIds = null
+      const cachedSelectedHashes = null
+      this.setState({cachedSelectedIds, cachedSelectedHashes})
     }
-    return this.setStatePromise({ hashTypes })
   }
 
   componentWillReceiveProps = (nextProps) => {
     // initialize hashTypes first time through -- or maybe (TODO) later as well
-    if (!this.state.hashTypes) this.updateHashTypes(nextProps)
-    const assetIds = nextProps.similar && nextProps.similar.assetIds
+    const field = nextProps.similar.field
+    const ids = new Set([...nextProps.similar.assetIds, ...nextProps.selectedAssetIds])
+    const assetIds = [...ids]
+    this.updateSelectedHashes(field, ids)
     assetIds && assetIds.forEach(id => {
       if (!similarityCache.has(id)) similarityCache.set(id, DEFAULT_WEIGHT)
     })
-    const hashName = nextProps.similar.field && nextProps.similar.field.split('.')[1]
-    this.setState({ hashName })
   }
 
   removeFilter = () => {
@@ -89,24 +95,8 @@ class SimilarHash extends Component {
     this.props.actions.removeRacetrackWidgetIds([this.props.id])
   }
 
-  hashField = (name) => (name ? `${SCHEMA}.${name}.${this.state.hashTypes[name]}` : null)
-
-  values = (assetIds, field) => {
-    const { assets } = this.props
-    const values = []
-    assetIds.forEach(id => {
-      const asset = assets.find(a => a.id === id)
-      if (asset) {
-        const hash = asset.value(field)
-        if (hash) values.push(hash)
-      }
-    })
-    return values
-  }
-
   selectedValues = () => {
-    const { hashName } = this.state
-    return this.values(this.props.selectedAssetIds, this.hashField(hashName))
+    return this.state.cachedSelectedHashes
   }
 
   static canSortSimilar = (selectedAssetIds, field, values, curHashes) => {
@@ -133,12 +123,25 @@ class SimilarHash extends Component {
     this.setState({selectedAssetId: id, similarity: parseFloat(similarityCache.get(id))})
   }
 
-  snapSelected = () => {
-    const values = this.selectedValues()
-    const assetIds = [...this.props.selectedAssetIds]
+  addSelected = () => {
+    const assetIds = this.state.cachedSelectedIds
+    const values = this.state.cachedSelectedHashes
     const similar = { values, assetIds, weights: weights(assetIds) }
     this.props.actions.similar(similar)
-    console.log('Sort by similar: ' + JSON.stringify(similar))
+    console.log('Add similar: ' + JSON.stringify(similar))
+  }
+
+  removeAssetId = (id) => {
+    const assetIds = [...this.props.similar.assetIds]
+    const index = assetIds.findIndex(i => i === id)
+    if (index >= 0) {
+      assetIds.splice(index, 1)
+      const values = [...this.props.similar.values]
+      values.splice(index, 1)
+      const similar = { values, assetIds, weights: weights(assetIds) }
+      this.props.actions.similar(similar)
+      console.log('Remove similar: ' + JSON.stringify())
+    }
   }
 
   renderThumb (id) {
@@ -149,22 +152,24 @@ class SimilarHash extends Component {
     return (
       <div className={classnames('SimilarHash-thumb', {selected: id === selectedAssetId})} key={id}
            style={{backgroundImage: `url(${url})`}}
-           onClick={_ => this.selectAsset(id)}/>
+           onClick={_ => this.selectAsset(id)}>
+        <div className="SimilarHash-thumb-cancel icon-cancel-circle" onClick={_ => this.removeAssetId(id)}/>
+      </div>
     )
   }
 
   render () {
     const { isIconified, similar, selectedAssetIds } = this.props
-    const { hashName, similarity, selectedAssetId } = this.state
+    const { similarity, selectedAssetId } = this.state
     const adjustable = similar && similar.assetIds && similar.assetIds.findIndex(id => (id === selectedAssetId)) >= 0
     const disabled = !selectedAssetIds || !selectedAssetIds.size ||
-        !hashName || !hashName.length ||
+        !similar.field || !similar.field.length ||
         !SimilarHash.canSortSimilar(selectedAssetIds, similar.field,
           this.selectedValues(), similar.values)
     return (
       <Widget className="SimilarHash"
               title={SimilarHashWidgetInfo.title}
-              field={hashName}
+              field={similar.field}
               backgroundColor={SimilarHashWidgetInfo.color}
               isIconified={isIconified}
               isEnabled={true}
@@ -198,7 +203,7 @@ class SimilarHash extends Component {
             <div className="SimilarHash-slider-icon icon-similarity"/>
           </div>
           <div className="SimilarHash-slider-center-triangle"/>
-          <div onClick={!disabled && this.snapSelected}
+          <div onClick={!disabled && this.addSelected}
                className={classnames('SimilarHash-snap-selected', {disabled})}>
             Find Similar
           </div>
@@ -213,7 +218,6 @@ export default connect(
     fields: state.assets && state.assets.fields,
     similar: state.racetrack.similar,
     selectedAssetIds: state.assets.selectedIds,
-    assets: state.assets.all,
     widgets: state.racetrack && state.racetrack.widgets,
     origin: state.auth.origin
   }), dispatch => ({

@@ -34,7 +34,7 @@ export function requiredFields (fields, fieldTypes) {
     'video.width', 'video.height', 'video.pages', 'video.frameRate', 'video.frames',
   ]
   const prefix = [
-    'links', 'clip', 'source.clip', 'pages', 'proxies', 'Similarity'
+    'links', 'clip', 'source.clip', 'pages', 'proxies',
   ]
 
   const req = new Set()
@@ -93,6 +93,22 @@ export function searchAssetsRequestProm (dispatch, query) {
   })
 }
 
+export function assetsForIds(assetIds, fields) {
+  return new Promise(resolve => {
+    const ids = [...assetIds]
+    if (!ids || !ids.length) {
+      throw new Error('Invalid fields for asset ids')
+    }
+    const filter = new AssetFilter({terms: {'_id': [...ids]}})
+    const query = new AssetSearch({filter, fields, size: ids.length})
+    const dummyDispatch = () => {}
+    searchAssetsRequestProm(dummyDispatch, query)
+      .then(response => {
+        resolve(response.data.list.map(json => (new Asset(json))))
+      })
+      .catch(error => { throw error })
+  })
+}
 export function searchAssets (query, lastQuery, force) {
   return dispatch => {
     const promises = []
