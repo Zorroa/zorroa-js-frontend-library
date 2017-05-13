@@ -23,6 +23,7 @@ import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import Resizer from '../../services/Resizer'
 import TrashedFolder from '../../models/TrashedFolder'
+import { weights } from '../Racetrack/SimilarHash'
 import { addSiblings, equalSets, unCamelCase, makePromiseQueue } from '../../services/jsUtil'
 import * as api from '../../globals/api.js'
 
@@ -505,7 +506,11 @@ class Assets extends Component {
 
   sortSimilar = () => {
     const { cachedSelectedHashes, cachedSelectedIds } = this.state
-    const similar = { values: cachedSelectedHashes, ids: cachedSelectedIds }
+    const similar = {
+      values: cachedSelectedHashes,
+      assetIds: cachedSelectedIds,
+      weights: weights(cachedSelectedIds)
+    }
     this.props.actions.similar(similar)
     console.log('Sort by similar: ' + JSON.stringify(cachedSelectedHashes))
   }
@@ -515,10 +520,10 @@ class Assets extends Component {
     const { cachedSelectedHashes } = this.state
 
     const similarActive = similarField && similarField.length > 0 && similarValues && similarValues.length > 0
-    let similarValuesSelected = similarValues && cachedSelectedHashes && equalSets(new Set([...similarValues]), new Set([...cachedSelectedHashes]))
+    const similarValuesSelected = similarValues && cachedSelectedHashes && equalSets(new Set([...similarValues]), new Set([...cachedSelectedHashes]))
 
     // Only enable similar button if selected assets have the right hash
-    let canSortSimilar = selectedIds && selectedIds.size > 0 && similarField && similarField.length > 0 && !similarValuesSelected && cachedSelectedHashes && cachedSelectedHashes.length > 0
+    const canSortSimilar = selectedIds && selectedIds.size > 0 && similarField && similarField.length > 0 && !similarValuesSelected && cachedSelectedHashes && cachedSelectedHashes.length > 0
     const sortSimilar = canSortSimilar ? this.sortSimilar : null
 
     const columnName = order && order.length && order[0].field !== 'source.filename' ? unCamelCase(Asset.lastNamespace(order[0].field)) : 'Table Column'
@@ -532,7 +537,7 @@ class Assets extends Component {
         { syncer }
         <div className="SortingSelector">
           <div className="SortingSelector-title">Sort By</div>
-          <div onClick={this.sortAssets}
+          <div onClick={_ => this.sortAssets()}
                className={classnames('SortingSelector-sort',
                  {'SortingSelector-selected': !similarActive &&
                  (!order || !order.length)})}>
@@ -550,7 +555,7 @@ class Assets extends Component {
           </div>
           }
           { !similarField || !similarField.length &&
-          <div onClick={e => { this.sortAssets('source.filename', true) }}
+          <div onClick={_ => { this.sortAssets('source.filename', true) }}
                className={classnames('SortingSelector-sort',
                  {'SortingSelector-enabled': order && order.length >= 1 &&
                  order[0].field === 'source.filename'})}>

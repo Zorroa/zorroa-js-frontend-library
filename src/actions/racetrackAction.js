@@ -135,7 +135,7 @@ export function restoreSearch (search) {
     promises.push(similar({
       field: search.filter.hamming.field,
       values: search.filter.hamming.hashes,
-      ids: search.filter.hamming.ids
+      assetIds: search.filter.hamming.assetIds
     }))
   }
 

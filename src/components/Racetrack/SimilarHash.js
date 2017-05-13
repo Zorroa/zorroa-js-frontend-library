@@ -2,13 +2,23 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
+import LRUCache from 'lru-cache'
 
 import { SimilarHashWidgetInfo } from './WidgetInfo'
 import { removeRacetrackWidgetIds, similar } from '../../actions/racetrackAction'
+import { sortAssets } from '../../actions/assetsAction'
+import { equalSets } from '../../services/jsUtil'
 import Widget from './Widget'
 import Asset from '../../models/Asset'
 
 const SCHEMA = 'Similarity'
+const DEFAULT_WEIGHT = 1
+
+const similarityCache = new LRUCache({ max: 1000 })
+
+export function weights (assetIds) {
+  return assetIds.map(id => similarityCache.has(id) ? parseFloat(similarityCache.get(id)) : DEFAULT_WEIGHT)
+}
 
 class SimilarHash extends Component {
   static propTypes = {
@@ -17,7 +27,7 @@ class SimilarHash extends Component {
     similar: PropTypes.shape({
       field: PropTypes.string,
       values: PropTypes.arrayOf(PropTypes.string).isRequired,
-      ids: PropTypes.arrayOf(PropTypes.string).isRequired
+      assetIds: PropTypes.arrayOf(PropTypes.string).isRequired
     }).isRequired,
     selectedAssetIds: PropTypes.instanceOf(Set),
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
@@ -33,8 +43,11 @@ class SimilarHash extends Component {
   state = {
     hashTypes: null,
     hashName: '',
-    similarity: 0.5
+    similarity: DEFAULT_WEIGHT,
+    selectedAssetId: ''
   }
+
+  adjustTimout = null
 
   componentWillMount () {
     this.componentWillReceiveProps(this.props)
@@ -51,7 +64,7 @@ class SimilarHash extends Component {
     if (!fields) return Promise.resolve()
 
     let hashTypes = {}
-    for (var s in fields.string) {
+    for (let s in fields.string) {
       const fieldParts = fields.string[s].split('.')
       if (fieldParts.length >= 3 && fieldParts[0] === SCHEMA) {
         hashTypes[fieldParts[1]] = fieldParts[2]
@@ -63,78 +76,91 @@ class SimilarHash extends Component {
   componentWillReceiveProps = (nextProps) => {
     // initialize hashTypes first time through -- or maybe (TODO) later as well
     if (!this.state.hashTypes) this.updateHashTypes(nextProps)
+    const assetIds = nextProps.similar && nextProps.similar.assetIds
+    assetIds && assetIds.forEach(id => {
+      if (!similarityCache.has(id)) similarityCache.set(id, DEFAULT_WEIGHT)
+    })
     const hashName = nextProps.similar.field && nextProps.similar.field.split('.')[1]
     this.setState({ hashName })
   }
 
   removeFilter = () => {
+    this.props.actions.sortAssets()
     this.props.actions.removeRacetrackWidgetIds([this.props.id])
   }
 
-  selectHash (hashName) {
-    const field = hashName ? `${SCHEMA}.${hashName}.${this.state.hashTypes[hashName]}` : null
-    const { assets, selectedAssetIds } = this.props
+  hashField = (name) => (name ? `${SCHEMA}.${name}.${this.state.hashTypes[name]}` : null)
+
+  values = (assetIds, field) => {
+    const { assets } = this.props
     const values = []
-    selectedAssetIds.forEach(id => {
+    assetIds.forEach(id => {
       const asset = assets.find(a => a.id === id)
       if (asset) {
         const hash = asset.value(field)
         if (hash) values.push(hash)
       }
     })
-    const similar = { field, values, ids: selectedAssetIds }
-    this.props.actions.similar(similar)
+    return values
   }
 
-  renderHashes () {
-    const { assets, selectedAssetIds } = this.props
-    const { hashTypes } = this.state
-    if (!hashTypes) return null
-    const hashNames = Object.keys(hashTypes).sort((a, b) => a.localeCompare(b))
-    return (
-      <table>
-        <tbody className="SimilarHash-table">
-        { hashNames.map(hashName => {
-          let disabled = !selectedAssetIds || selectedAssetIds.size === 0
-          selectedAssetIds && selectedAssetIds.forEach(id => {
-            const asset = assets.find(a => (a.id === id))
-            const similarField = hashName ? `${SCHEMA}.${hashName}.${this.state.hashTypes[hashName]}` : null
-            if (!asset || !asset.rawValue(similarField)) disabled = true
-          })
-          return (
-            <tr className={classnames('SimilarHash-value-table-row',
-              { selected: hashName === this.state.hashName, disabled })}
-                key={hashName} onClick={e => this.selectHash(hashName, e)}>
-              <td className="SimilarHash-value-cell">{hashName}</td>
-            </tr>
-          )
-        })}
-        </tbody>
-      </table>
-    )
+  selectedValues = () => {
+    const { hashName } = this.state
+    return this.values(this.props.selectedAssetIds, this.hashField(hashName))
   }
 
-  changeSlide = (num) => {
-    console.log('Set slide ' + num)
+  static canSortSimilar = (selectedAssetIds, field, values, curHashes) => {
+    // Only enable similar button if selected assets have a different hash
+    const similarValuesSelected = values && curHashes && equalSets(new Set([...values]), new Set([...curHashes]))
+    return selectedAssetIds && selectedAssetIds.size > 0 && field && field.length > 0 && !similarValuesSelected && curHashes && curHashes.length > 0
   }
 
   changeSimilarity = (event) => {
-    this.setState({similarity: event.target.value})
+    const similarity = event.target.value
+    this.setState({similarity})
+    similarityCache.set(this.state.selectedAssetId, similarity)
+    if (this.adjustTimout) clearTimeout(this.adjustTimout)
+    this.adjustTimout = setTimeout(this.adjustSimilarity, 500)
+  }
+
+  adjustSimilarity = () => {
+    const similar = { ...this.props.similar, weights: weights(this.props.similar.assetIds) }
+    this.props.actions.similar(similar)
+    console.log('Adjust similar: ' + JSON.stringify(similar))
+  }
+
+  selectAsset = (id) => {
+    this.setState({selectedAssetId: id, similarity: parseFloat(similarityCache.get(id))})
+  }
+
+  snapSelected = () => {
+    const values = this.selectedValues()
+    const assetIds = [...this.props.selectedAssetIds]
+    const similar = { values, assetIds, weights: weights(assetIds) }
+    this.props.actions.similar(similar)
+    console.log('Sort by similar: ' + JSON.stringify(similar))
   }
 
   renderThumb (id) {
+    const { selectedAssetId } = this.state
     const dim = { width: 160, height: 120 }
     const asset = new Asset({id, document: {}})
     const url = asset.closestProxyURL(this.props.origin, dim.width, dim.height)
     return (
-      <div className="SimilarHash-thumb" key={id} style={{backgroundImage: `url(${url})`}}/>
+      <div className={classnames('SimilarHash-thumb', {selected: id === selectedAssetId})} key={id}
+           style={{backgroundImage: `url(${url})`}}
+           onClick={_ => this.selectAsset(id)}/>
     )
   }
 
   render () {
     const { isIconified, similar, selectedAssetIds } = this.props
-    const { hashName, similarity } = this.state
-    const disabled = !selectedAssetIds || !selectedAssetIds.size
+    const { hashName, similarity, selectedAssetId } = this.state
+    const adjustable = similar && similar.assetIds && similar.assetIds.findIndex(id => (id === selectedAssetId)) >= 0
+    const disabled = !selectedAssetIds || !selectedAssetIds.size ||
+        !hashName || !hashName.length ||
+        !SimilarHash.canSortSimilar(selectedAssetIds, similar.field,
+          this.selectedValues(), similar.values)
     return (
       <Widget className="SimilarHash"
               title={SimilarHashWidgetInfo.title}
@@ -146,8 +172,8 @@ class SimilarHash extends Component {
               onClose={this.removeFilter.bind(this)}>
         <div className="SimilarHash-body">
           <div className="SimilarHash-carousel">
-            { similar.ids.map(id => this.renderThumb(id)) }
-            { !similar.ids.length && (
+            { similar.assetIds.map(id => this.renderThumb(id)) }
+            { !similar.assetIds.length && (
               <div className="SimilarHash-carousel-empty">
                 <div className="SimilarHash-carousel-empty-icon icon-emptybox"/>
                 <div className="SimilarHash-carousel-empty-label">
@@ -159,19 +185,21 @@ class SimilarHash extends Component {
           <div className="SimilarHash-slider">
             <div className="SimilarHash-slider-icon icon-blocked"/>
             <input className="SimilarHash-slider-input" type="range"
-                   min="-1" max="1" step="0.01" list="similarity_ticks"
+                   disabled={!adjustable}
+                   min="-1.5" max="1.5" step="0.01" list="similarity_ticks"
                    value={similarity} onChange={this.changeSimilarity}/>
             <datalist id="similarity_ticks">
               <option>-1</option>
               <option>-0.5</option>
               <option>0</option>
               <option>0.5</option>
-              <option>-1</option>
+              <option>1</option>
             </datalist>
             <div className="SimilarHash-slider-icon icon-similarity"/>
           </div>
           <div className="SimilarHash-slider-center-triangle"/>
-          <div className={classnames('SimilarHash-snap-selected', {disabled})}>
+          <div onClick={!disabled && this.snapSelected}
+               className={classnames('SimilarHash-snap-selected', {disabled})}>
             Find Similar
           </div>
         </div>
@@ -191,6 +219,7 @@ export default connect(
   }), dispatch => ({
     actions: bindActionCreators({
       removeRacetrackWidgetIds,
+      sortAssets,
       similar
     }, dispatch)
   })

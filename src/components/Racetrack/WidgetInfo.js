@@ -106,7 +106,7 @@ export const DateRangeWidgetInfo = {
 
 export const SimilarHashWidgetInfo = {
   type: 'SIMILARHASH',
-  icon: 'icon-pictures',
+  icon: 'icon-similarity',
   title: 'Similar',
   description: 'Search for images based on similarity',
   element: <SimilarHash/>,
