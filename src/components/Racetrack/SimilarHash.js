@@ -41,8 +41,8 @@ class SimilarHash extends Component {
   state = {
     similarity: DEFAULT_WEIGHT,
     selectedAssetId: '',
-    cachedSelectedIds: null,
-    cachedSelectedHashes: null
+    cachedSelectedIds: [],
+    cachedSelectedHashes: []
   }
 
   adjustTimout = null
@@ -59,7 +59,9 @@ class SimilarHash extends Component {
     if (similarField && similarField.length && selectedIds && selectedIds.size) {
       const { cachedSelectedIds } = this.state
       if (cachedSelectedIds && equalSets(selectedIds, new Set(cachedSelectedIds))) return
-      assetsForIds(selectedIds, [similarField])
+      const ids = new Set([...this.props.similar.assetIds, ...selectedIds])
+      const assetIds = [...ids]
+      assetsForIds(assetIds, [similarField])
         .then(assets => {
           const cachedSelectedHashes = assets.map(asset => asset.rawValue(similarField))
           const cachedSelectedIds = assets.map(asset => asset.id)
@@ -73,8 +75,8 @@ class SimilarHash extends Component {
       this.setState({cachedSelectedIds: [...selectedIds]})
     } else {
       // Clear the cache
-      const cachedSelectedIds = null
-      const cachedSelectedHashes = null
+      const cachedSelectedIds = []
+      const cachedSelectedHashes = []
       this.setState({cachedSelectedIds, cachedSelectedHashes})
     }
   }
@@ -82,12 +84,21 @@ class SimilarHash extends Component {
   componentWillReceiveProps = (nextProps) => {
     // initialize hashTypes first time through -- or maybe (TODO) later as well
     const field = nextProps.similar.field
-    const ids = new Set([...nextProps.similar.assetIds, ...nextProps.selectedAssetIds])
-    const assetIds = [...ids]
-    this.updateSelectedHashes(field, ids)
+    this.updateSelectedHashes(field, nextProps.selectedAssetIds)
+    const assetIds = nextProps.similar.assetIds
     assetIds && assetIds.forEach(id => {
       if (!similarityCache.has(id)) similarityCache.set(id, DEFAULT_WEIGHT)
     })
+
+    // Select one of the assets, if none match
+    let selectedAssetId = this.state.selectedAssetId
+    if (!assetIds.length) {
+      selectedAssetId = ''
+    } else if (!selectedAssetId || !selectedAssetId.length ||
+      assetIds.findIndex(id => (id === selectedAssetId)) < 0) {
+      selectedAssetId = assetIds[0]
+    }
+    if (selectedAssetId !== this.state.selectedAssetId) this.setState({selectedAssetId})
   }
 
   removeFilter = () => {

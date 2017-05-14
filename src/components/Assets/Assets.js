@@ -45,8 +45,11 @@ class Assets extends Component {
     showMultipage: PropTypes.bool.isRequired,
     folders: PropTypes.instanceOf(Map),
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
-    similarField: PropTypes.string,
-    similarValues: PropTypes.arrayOf(PropTypes.string),
+    similar: PropTypes.shape({
+      field: PropTypes.string,
+      values: PropTypes.arrayOf(PropTypes.string).isRequired,
+      assetIds: PropTypes.arrayOf(PropTypes.string).isRequired
+    }).isRequired,
     sync: PropTypes.bool.isRequired,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
@@ -70,8 +73,8 @@ class Assets extends Component {
       positions: [],
       multipage: {},
       collapsed: 0,
-      cachedSelectedIds: null,
-      cachedSelectedHashes: null
+      cachedSelectedIds: [],
+      cachedSelectedHashes: []
     }
 
     this.newTableHeight = 0
@@ -255,7 +258,7 @@ class Assets extends Component {
     }
     this.updateAssetsScrollSizeInterval = setInterval(this.updateAssetsScrollSize, 150)
     this.resizer = new Resizer()
-    this.updateSelectedHashes(this.props.similarField, this.props.selectedIds)
+    this.updateSelectedHashes(this.props.similar.field, this.props.selectedIds)
 
     // Support using the navigation buttons to restore previous search state
     // This 'first' history entry is a sentinel we use to warn the user about going back too far & losing their history
@@ -351,14 +354,16 @@ class Assets extends Component {
   }
 
   componentWillReceiveProps = (nextProps) => {
-    this.updateSelectedHashes(nextProps.similarField, nextProps.selectedIds)
+    this.updateSelectedHashes(nextProps.similar.field, nextProps.selectedIds)
   }
 
   updateSelectedHashes = (similarField, selectedIds) => {
     if (similarField && similarField.length && selectedIds && selectedIds.size) {
       const { cachedSelectedIds } = this.state
       if (cachedSelectedIds && equalSets(selectedIds, new Set(cachedSelectedIds))) return
-      assetsForIds(selectedIds, [similarField])
+      const ids = new Set([...this.props.similar.assetIds, ...selectedIds])
+      const assetIds = [...ids]
+      assetsForIds(assetIds, [similarField])
         .then(assets => {
           const cachedSelectedHashes = assets.map(asset => asset.rawValue(similarField))
           const cachedSelectedIds = assets.map(asset => asset.id)
@@ -372,8 +377,8 @@ class Assets extends Component {
       this.setState({cachedSelectedIds: [...selectedIds]})
     } else {
       // Clear the cache
-      const cachedSelectedIds = null
-      const cachedSelectedHashes = null
+      const cachedSelectedIds = []
+      const cachedSelectedHashes = []
       this.setState({cachedSelectedIds, cachedSelectedHashes})
     }
   }
@@ -509,14 +514,14 @@ class Assets extends Component {
   }
 
   renderEditbar () {
-    const { order, selectedIds, similarField, similarValues, query, sync } = this.props
+    const { order, selectedIds, similar, query, sync } = this.props
     const { cachedSelectedHashes } = this.state
 
-    const similarActive = similarField && similarField.length > 0 && similarValues && similarValues.length > 0
-    const similarValuesSelected = similarValues && cachedSelectedHashes && equalSets(new Set([...similarValues]), new Set([...cachedSelectedHashes]))
+    const similarActive = similar.field && similar.field.length > 0 && similar.values && similar.values.length > 0
+    const similarValuesSelected = similar.values && cachedSelectedHashes && equalSets(new Set([...similar.values]), new Set([...cachedSelectedHashes]))
 
     // Only enable similar button if selected assets have the right hash
-    const canSortSimilar = selectedIds && selectedIds.size > 0 && similarField && similarField.length > 0 && !similarValuesSelected && cachedSelectedHashes && cachedSelectedHashes.length > 0
+    const canSortSimilar = selectedIds && selectedIds.size > 0 && similar.field && similar.field.length > 0 && !similarValuesSelected && cachedSelectedHashes && cachedSelectedHashes.length > 0
     const sortSimilar = canSortSimilar ? this.sortSimilar : null
 
     const columnName = order && order.length && order[0].field !== 'source.filename' ? unCamelCase(Asset.lastNamespace(order[0].field)) : 'Table Column'
@@ -536,7 +541,7 @@ class Assets extends Component {
                  (!order || !order.length)})}>
             { !query || query.empty() ? 'Latest' : 'Rank' }
           </div>
-          { similarField && similarField.length > 0 &&
+          { similar.field && similar.field.length > 0 &&
           <div onClick={sortSimilar} className="SortingSelector-similar">
             { sortSimilar && similarActive && !similarValuesSelected && selectedIds && selectedIds.size > 0 &&
             <div onClick={sortSimilar}
@@ -547,7 +552,7 @@ class Assets extends Component {
             </div>
           </div>
           }
-          { !similarField || !similarField.length &&
+          { !similar.field || !similar.field.length &&
           <div onClick={_ => { this.sortAssets('source.filename', true) }}
                className={classnames('SortingSelector-sort',
                  {'SortingSelector-enabled': order && order.length >= 1 &&
@@ -752,8 +757,7 @@ export default connect(state => ({
   showTable: state.app.showTable,
   tableHeight: state.app.tableHeight,
   showMultipage: state.app.showMultipage,
-  similarField: state.racetrack.similar.field,
-  similarValues: state.racetrack.similar.values,
+  similar: state.racetrack.similar,
   origin: state.auth.origin
 }), dispatch => ({
   actions: bindActionCreators({
