@@ -51,8 +51,6 @@
 }
 
 .SimilarHash-thumb {
-  min-width: 160px;
-  min-height: 120px;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -65,8 +63,8 @@
 
 .SimilarHash-thumb-cancel {
   position: absolute;
-  right: 4px;
-  top: 4px;
+  right: -8px;
+  top: -8px;
   color: $zorroa-lightgray;
   padding: 4px;
 

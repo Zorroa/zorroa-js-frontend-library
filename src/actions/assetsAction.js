@@ -6,7 +6,8 @@ import {
   ASSET_PERMISSIONS, UPDATE_COMMAND, GET_COMMANDS,
   ISOLATE_ASSET, SELECT_ASSETS,
   SELECT_PAGES,
-  SUGGEST_COMPLETIONS, SEARCH_DOCUMENT
+  SUGGEST_COMPLETIONS, SEARCH_DOCUMENT,
+  SIMILAR_ASSETS
 } from '../constants/actionTypes'
 import Asset from '../models/Asset'
 import Page from '../models/Page'
@@ -109,6 +110,20 @@ export function assetsForIds (assetIds, fields) {
       .catch(error => { throw error })
   })
 }
+
+export function similarAssets (assetIds, fields) {
+  return dispatch => {
+    assetsForIds(assetIds, fields)
+      .then(assets => dispatch({
+        type: SIMILAR_ASSETS,
+        payload: assets
+      }))
+      .catch(error => {
+        console.error('Error searching for similar assets: ' + error)
+      })
+  }
+}
+
 export function searchAssets (query, lastQuery, force) {
   return dispatch => {
     const promises = []

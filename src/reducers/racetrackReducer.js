@@ -57,7 +57,7 @@ export default function (state = initialState, action) {
       if (index >= 0) {
         widgets.splice(index, 1)
       }
-      return { ...state, similar: { ...state.similar, values: [], ids: [], widgets } }
+      return { ...state, widgets, similar: { ...state.similar, values: [], ids: [] } }
     }
     case ASSET_FIELDS: {
       // Scan available asset fields for the preferred or a valid field
@@ -91,7 +91,6 @@ export default function (state = initialState, action) {
       }
       return { ...state, similar: { ...state.similar, field } }
     }
-
     case UNAUTH_USER:
       return initialState
   }
