@@ -8,7 +8,6 @@ import Range from './Range'
 import Filetype from './Filetype'
 import DateRange from './DateRange'
 import SimilarHash from './SimilarHash'
-import Permission from '../../models/Permission'
 import { createFacetWidget, createMapWidget, createColorWidget,
   createDateRangeWidget, createRangeWidget, createSimilarityWidget,
   createFiletypeWidget, createExistsWidget, createSearchWidget } from '../../models/Widget'
@@ -112,5 +111,5 @@ export const SimilarHashWidgetInfo = {
   element: <SimilarHash/>,
   create: createSimilarityWidget,
   fieldTypes: [],
-  color: '#a11e77', // $zorroa-darkish-purple
+  color: '#a11e77' // $zorroa-darkish-purple
 }

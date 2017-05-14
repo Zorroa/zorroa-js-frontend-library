@@ -186,7 +186,7 @@ class Searcher extends Component {
       // Normalize the minScore based on the total weights
       let avgWeight = 0
       if (similar.weights && similar.weights.length) {
-        similar.weights.forEach(w => avgWeight += w)
+        similar.weights.forEach(w => { avgWeight += w })
         avgWeight /= similar.weights.length
       } else {
         avgWeight = 1
