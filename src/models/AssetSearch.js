@@ -5,6 +5,8 @@ export default class AssetSearch {
   static autoPageSize = 100
 
   constructor (json) {
+    this.fuzzy = false
+
     if (json) {
       // Make an extra copy to handle deep clones
       json = JSON.parse(JSON.stringify(json))
@@ -17,7 +19,7 @@ export default class AssetSearch {
       this.order = json.order     // {string field, bool ascending}
       this.size = json.size       // int:              Number of assets to return
       this.from = json.from       // int:              First asset index to return
-      this.fuzzy = json.fuzzy     // bool:             Enable fuzzy search
+      this.fuzzy = !!json.fuzzy     // bool:             Enable fuzzy search
       this.aggs = json.aggs       // {string, {string, object}}
     }
   }
@@ -47,7 +49,7 @@ export default class AssetSearch {
         this.postFilter = new AssetFilter(assetSearch.postFilter)
       }
     }
-    this.fuzzy = this.fuzzy || assetSearch.fuzzy
+    this.fuzzy = !!(this.fuzzy || assetSearch.fuzzy)
     if (assetSearch.queryFields) {
       if (!this.queryFields) {
         this.queryFields = { ...assetSearch.queryFields }
