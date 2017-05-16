@@ -53,7 +53,7 @@ class Racetrack extends Component {
   submitEmptySearch = (event) => {
     event.preventDefault()
     const type = WidgetInfo.SimpleSearchWidgetInfo.type
-    const sliver = new AssetSearch({ query: this.state.emptySearch })
+    const sliver = new AssetSearch({ query: this.state.emptySearch, fuzzy: false })
     this.props.actions.resetRacetrackWidgets([new Widget({ type, sliver })])
   }
 
