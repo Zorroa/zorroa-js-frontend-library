@@ -40,6 +40,7 @@
 
 .SimilarHash-body {
   padding: 10px;
+  @include flexColCenter;
 }
 
 .SimilarHash-value-cell {
@@ -49,3 +50,100 @@
   @include clampText;
 }
 
+.SimilarHash-thumb {
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin-left: 2px;
+  margin-right: 2px;
+  border: 6px solid transparent;
+  position: relative;
+  &.selected { border: 6px solid $zorroa-darkish-purple; }
+}
+
+.SimilarHash-thumb-cancel {
+  position: absolute;
+  right: -8px;
+  top: -8px;
+  color: $zorroa-lightgray;
+  padding: 4px;
+
+  &:hover {
+    color: $zorroa-faded-red;
+    background-color: rgba(255, 255, 255, 0.75);
+    border-radius: 3px;
+  }
+}
+
+.SimilarHash-carousel {
+  min-height: 120px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  overflow: auto;
+  max-width: 100%;
+  padding-bottom: 4px;
+  @include flexRow;
+  &::-webkit-scrollbar { height: 5px; }
+}
+
+.SimilarHash-carousel-empty {
+  @include flexColCenter;
+}
+
+.SimilarHash-carousel-empty-icon {
+  font-size: 60px;
+  color: $zorroa-lightgray;
+}
+
+.SimilarHash-carousel-empty-label {
+  margin-top: 10px;
+  color: $zorroa-lightgray;
+}
+
+.SimilarHash-slider {
+  width: 100%;
+  @include flexRowCenter;
+
+  input[type=range]::-webkit-slider-runnable-track {
+    height: 3px;
+    background: $zorroa-lightgray;
+  }
+
+  input[type=range]:focus::-webkit-slider-runnable-track {
+    height: 3px;
+    background: $zorroa-lightgray;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    margin-top: -6px;
+  }
+  input[type=range] {
+    padding: 0;
+    margin: 0;
+  }
+}
+
+.SimilarHash-slider-icon {
+  color: $zorroa-darkgray;
+  font-size: 20px;
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+.SimilarHash-slider-input {
+  padding: 0;
+}
+
+.SimilarHash-slider-center-triangle {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid $zorroa-nearwhite;
+}
+
+.SimilarHash-snap-selected {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  @include zorroa-ok-btn;
+}

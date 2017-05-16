@@ -123,6 +123,21 @@ $zorroa-Sidebar-width : 340px;
   }
 }
 
+@mixin zorroa-ok-btn {
+  padding: 10px 20px;
+  background-color: $zorroa-sickly-green;
+  color: $zorroa-nearwhite;
+  border-radius: 3px;
+  text-transform: uppercase;
+  pointer-events: auto;
+  text-decoration: none;
+  cursor: pointer;
+  @include nowrap;
+
+  &:hover:not(.disabled) { background-color: $zorroa-gray; }
+  &.disabled { background-color: $zorroa-lightgray; }
+}
+
 /* Text classes */
 
 @mixin nowrap { white-space: nowrap; }

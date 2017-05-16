@@ -1,5 +1,5 @@
 import { MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS,
-  SIMILAR_FIELD, SIMILAR_VALUES } from '../constants/actionTypes'
+  SIMILAR_VALUES } from '../constants/actionTypes'
 import Widget from '../models/Widget'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
@@ -36,17 +36,10 @@ export function resetRacetrackWidgets (widgets) {
   })
 }
 
-export function similarField (field) {
-  return ({
-    type: SIMILAR_FIELD,
-    payload: field
-  })
-}
-
-export function similarValues (values) {
+export function similar (similar) {
   return ({
     type: SIMILAR_VALUES,
-    payload: values
+    payload: similar
   })
 }
 
@@ -134,15 +127,18 @@ export function restoreSearch (search) {
     widgets.push(color)
   }
 
-  // Return promises to update the racetrack for the new search
-  const promises = [resetRacetrackWidgets(widgets)]
+  // Return actions to update the racetrack for the new search
+  const actions = [resetRacetrackWidgets(widgets)]
 
   // Create a SimilarHash widget if there's a hash query
   if (search.filter && search.filter.hamming) {
-    promises.push(similarField(search.filter.hamming.field))
-    promises.push(similarValues(search.filter.hamming.hashes))
+    actions.push(similar({
+      field: search.filter.hamming.field,
+      values: search.filter.hamming.hashes,
+      assetIds: search.filter.hamming.assetIds
+    }))
   }
 
   // Reset the racetrack to the new widget
-  return promises
+  return actions
 }
