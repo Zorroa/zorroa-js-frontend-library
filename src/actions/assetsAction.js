@@ -107,7 +107,9 @@ export function assetsForIds (assetIds, fields) {
       .then(response => {
         resolve(response.data.list.map(json => (new Asset(json))))
       })
-      .catch(error => { throw error })
+      .catch(error => {
+        console.error('Error finding assets for ids: ' + error)
+      })
   })
 }
 

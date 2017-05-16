@@ -84,9 +84,10 @@ class SimilarHash extends Component {
   }
 
   static canSortSimilar = (selectedAssetIds, field, values, curHashes) => {
+    if (!curHashes.length && selectedAssetIds.size) return true
     // Only enable similar button if selected assets have a different hash
     const similarValuesSelected = values && curHashes && equalSets(new Set([...values]), new Set([...curHashes]))
-    return selectedAssetIds && selectedAssetIds.size > 0 && field && field.length > 0 && !similarValuesSelected && curHashes && curHashes.length > 0
+    return selectedAssetIds && selectedAssetIds.size && field && field.length && !similarValuesSelected && curHashes && curHashes.length > 0
   }
 
   changeSimilarity = (event) => {
@@ -131,12 +132,11 @@ class SimilarHash extends Component {
   renderThumb (id) {
     const { similarAssets } = this.props
     const { selectedAssetId } = this.state
-    const dim = { width: 160, height: 120 }
     const asset = similarAssets.find(asset => asset.id === id)
     const height = 120
     const width = asset.aspect() * height
-    const url = asset.closestProxyURL(this.props.origin, dim.width, dim.height)
-    const style = { backgroundImage: `url(${url})`, width, height }
+    const url = asset.closestProxyURL(this.props.origin, width, height)
+    const style = { backgroundImage: `url(${url})`, minWidth: width, minHeight: height }
     return (
       <div className={classnames('SimilarHash-thumb', {selected: id === selectedAssetId})} key={id}
            style={style}
@@ -176,7 +176,7 @@ class SimilarHash extends Component {
             ) }
           </div>
           <div className="SimilarHash-slider">
-            <div className="SimilarHash-slider-icon icon-blocked"/>
+            <div className="SimilarHash-slider-icon icon-dissimilar"/>
             <input className="SimilarHash-slider-input" type="range"
                    disabled={!adjustable}
                    min="-1.5" max="1.5" step="0.01" list="similarity_ticks"
