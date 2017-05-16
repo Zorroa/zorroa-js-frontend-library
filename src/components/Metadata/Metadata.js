@@ -157,11 +157,6 @@ class Metadata extends Component {
     this.props.actions.clearHoverField(field)
   }
 
-  showFavorites = (show) => {
-    this.setStatePromise({showFavorites: show})
-      .then(() => this.updateFilteredFields(this.props))
-  }
-
   isLeaf (field, namespace) {
     return field === namespace || field === `${namespace}.raw`
   }

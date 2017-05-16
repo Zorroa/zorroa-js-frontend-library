@@ -12,6 +12,7 @@ import Assets from '../Assets'
 import Folders from '../Folders'
 import Racetrack from '../Racetrack'
 import Metadata from '../Metadata'
+import Metadata2 from '../Metadata2'
 import Collapsible from '../Collapsible'
 import { iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible, showModal, hideModal } from '../../actions/appActions'
 import { getUserPermissions, updatePassword, changePassword } from '../../actions/authAction'
@@ -159,7 +160,7 @@ class Workspace extends Component {
     actions.iconifyRightSidebar(!app.rightSidebarIsIconified)
   }
 
-  static collapsibleNames = new Set(['browsing', 'collection', 'simple', 'smart', 'metadata'])
+  static collapsibleNames = new Set(['browsing', 'collection', 'simple', 'smart', 'metadata', 'metadata2'])
   toggleCollapsible = (name) => {
     const { actions, app } = this.props
     // If the Sidebar is iconified, ignore the click, the sidebar will open itself instead
@@ -219,12 +220,20 @@ class Workspace extends Component {
       className: 'Collections-collapsible'
     })
     const MetadataParams = () => ({
-      header: (<span>Tags</span>),
+      header: (<span>Explore</span>),
       isOpen: app.collapsibleOpen.metadata,
       isIconified: app.leftSidebarIsIconified,
       onOpen: this.toggleCollapsible.bind(this, 'metadata'),
       closeIcon: 'icon-binoculars',
       className: 'Metadata-collapsible'
+    })
+    const Metadata2Params = () => ({
+      header: (<span>Metadata</span>),
+      isOpen: app.collapsibleOpen.metadata2,
+      isIconified: app.leftSidebarIsIconified,
+      onOpen: this.toggleCollapsible.bind(this, 'metadata2'),
+      closeIcon: 'icon-register',
+      className: 'Metadata2-collapsible'
     })
 
     // Only show the command progress if Active, skipping super quick commands
@@ -263,6 +272,9 @@ class Workspace extends Component {
             </Collapsible>
             <Collapsible {...MetadataParams()}>
               <Metadata isIconified={app.leftSidebarIsIconified}/>
+            </Collapsible>
+            <Collapsible {...Metadata2Params()}>
+              <Metadata2 isIconified={app.leftSidebarIsIconified}/>
             </Collapsible>
           </Sidebar>
 

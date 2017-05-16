@@ -23,6 +23,7 @@ const initialState = {
     smart: false,
     simple: false,
     metadata: false,
+    metadata2: false,
     source: false,
     proxies: false,
     'proxies.proxies': false
