@@ -63,9 +63,8 @@
       padding-right: 10px;
       color: $zorroa-greyish-brown;
       cursor: pointer;
-      &:hover { background-color: $zorroa-hover; }
+      &:not(.selected):hover { background-color: $zorroa-hover; }
       &.selected { background-color: $zorroa-selected; }
-      &.selected:hover { background-color: $zorroa-selected; }
     }
 
     .Facet-value-table-key {
@@ -215,7 +214,7 @@
       cursor: pointer;
       color: $zorroa-lightgray;
 
-      &:hover {
+      &:not(.selected):hover {
         background-color: $zorroa-nearwhite;
       }
 

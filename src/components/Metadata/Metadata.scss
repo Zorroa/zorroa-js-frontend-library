@@ -86,7 +86,7 @@
     @include flexRow;
   }
 
-  &:hover { background-color: $zorroa-hover; }
+  &:hover:not(.isSelected) { background-color: $zorroa-hover; }
   &.isSelected { background-color: $zorroa-selected; }
 }
 
@@ -126,13 +126,13 @@
   background-color: transparent;
   cursor: pointer;
 
-  &.isSelected {
-    color: $zorroa-lightgray;
-  }
-
-  &:hover {
+  &:hover:not(.isSelected) {
     background-color: $zorroa-nearwhite;
     color: $zorroa-golden-yellow;
+  }
+
+  &.isSelected {
+    color: $zorroa-lightgray;
   }
 }
 
@@ -148,7 +148,7 @@ $FolderItemHeight : 25px;
   cursor: pointer;
 
   .FolderItem.isSelected & { background-color: $zorroa-selected; }
-  .FolderItem.isSelected &.hasChildren:hover { color: white; background-color: $zorroa-darkgray; }
+  .FolderItem.isSelected &.hasChildren:not(.isSelected):hover { color: white; background-color: $zorroa-darkgray; }
   .FolderItem.isDropTarget.dragHover & { color: white; background-color: $zorroa-sickly-green; }
   .FolderItem.isSelected.isDropTarget.dragHover & { color: white; background-color: darken($zorroa-sickly-green, 15%); }
 }
@@ -172,7 +172,7 @@ $FolderItemHeight : 25px;
 
   &.isSelected { color: $zorroa-golden-yellow; }
 
-  &:hover {
+  &:hover:not(.isSelected) {
     background-color: transparent;
     border: 1px solid $zorroa-nearwhite;
   }
