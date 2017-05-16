@@ -122,7 +122,7 @@
   font-weight: 700;
   margin-left: 5px;
   margin-right: 3px;
-  color: transparent;
+  color: $zorroa-lightgray;
   background-color: transparent;
   cursor: pointer;
 
@@ -132,7 +132,7 @@
   }
 
   &.isSelected {
-    color: $zorroa-lightgray;
+    color: $zorroa-golden-yellow;
   }
 }
 
@@ -184,4 +184,26 @@ $FolderItemHeight : 25px;
   color: $zorroa-lightgray;
   width: 25px;
   height: 25px;
+}
+
+.Metadata-sort {
+  @include flexRowCenter;
+  @include flexOff;
+  height: 24px;
+  width: 16px;
+  padding-right: 2px; // This compensates for the slight offset of icon-sort*
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 3px;
+  color: $zorroa-darkgray;
+
+  &.icon-sort {
+    color: $zorroa-lightgray;
+    background-color: transparent;
+  }
+
+  &:hover {
+    background-color: $zorroa-sickly-green;
+    color: white;
+  }
 }

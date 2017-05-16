@@ -7,7 +7,7 @@ import User from '../../models/User'
 import { iconifyRightSidebar, updateMetadataFields,
   toggleCollapsible, hoverField, clearHoverField } from '../../actions/appActions'
 import { saveUserSettings } from '../../actions/authAction'
-import { getAssetFields } from '../../actions/assetsAction'
+import { getAssetFields, sortAssets, unorderAssets } from '../../actions/assetsAction'
 import { unCamelCase } from '../../services/jsUtil'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
 import { fieldUsedInWidget, widgetTypeForField } from '../../models/Widget'
@@ -21,6 +21,7 @@ class Metadata extends Component {
     collapsibleOpen: PropTypes.object,
     fieldTypes: PropTypes.object,
     aggs: PropTypes.object,
+    order: PropTypes.arrayOf(PropTypes.object),
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object
@@ -34,6 +35,7 @@ class Metadata extends Component {
     collapsibleOpen: {},
     aggs: {},
     aggFields: [],
+    order: null,
     metadataFields: this.props.metadataFields,
     searchedFields: null
   }
@@ -167,7 +169,7 @@ class Metadata extends Component {
   // Update the filteredFields component list, caching heavily based on all
   // the factors that affect the components: fields, open collapsibles, and aggs.
   updateFilteredFields (props) {
-    const {fieldTypes, collapsibleOpen, aggs, metadataFields, widgets} = props
+    const {fieldTypes, collapsibleOpen, aggs, metadataFields, widgets, order} = props
     const modifiedFavorites = JSON.stringify(metadataFields) !== JSON.stringify(this.state.metadataFields)
     let modifiedWidgets = false
     this.state.searchedFields && this.state.searchedFields.forEach(field => {
@@ -180,6 +182,7 @@ class Metadata extends Component {
     const filteredFields = fields.filter(field => (field.toLowerCase().includes(lcFilterString))).sort((a, b) => a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'}))
     if (JSON.stringify(filteredFields) !== JSON.stringify(this.state.filteredFields) ||
         JSON.stringify(collapsibleOpen) !== JSON.stringify(this.state.collapsibleOpen) ||
+        JSON.stringify(order) !== JSON.stringify(this.state.order) ||
         JSON.stringify(aggs) !== JSON.stringify(this.state.aggs) || modifiedFavorites || modifiedWidgets) {
       // Unroll the fields iteratively into an item element array
       const filteredComponents = []
@@ -201,7 +204,7 @@ class Metadata extends Component {
             const widgetType = !hasChildren && widgetTypeForField(field, fieldTypes[field])
             const widgetIcon = this.widgetTypeIcon(widgetType)
             filteredComponents.push(this.renderField(field, namespace, parents[i],
-              i, hasChildren, isOpen, isSearched, isFavorite, widgetIcon))
+              i, hasChildren, isOpen, isSearched, isFavorite, widgetIcon, order))
             ancestors.splice(i)
             ancestors.push({field, namespace})
             aggFields.push(namespace)
@@ -222,8 +225,31 @@ class Metadata extends Component {
         this.setState({filteredComponents})
       }
 
-      this.setState({filteredFields, collapsibleOpen, aggs, aggFields, metadataFields, searchedFields})
+      this.setState({filteredFields, collapsibleOpen, aggs, aggFields, metadataFields, searchedFields, order})
     }
+  }
+
+  sortByField = (field) => {
+    console.log('Sort by ' + field)
+    const { order } = this.props
+    let ascending = true
+    if (order) {
+      const index = order && order.findIndex(order => (order.field === field))
+      if (index >= 0) {
+        ascending = order[index].ascending ? false : undefined
+      }
+    }
+    if (ascending === undefined) {
+      this.props.actions.unorderAssets()
+    } else {
+      this.props.actions.sortAssets(field, ascending)
+    }
+  }
+
+  sortOrderClassnames = (field, order) => {
+    const index = order && order.findIndex(order => (order.field === field))
+    const icon = !order || index !== 0 ? 'icon-sort' : (order[index].ascending ? 'icon-sort-asc' : 'icon-sort-desc')
+    return `Metadata-sort ${icon}`
   }
 
   renderPads (depth) {
@@ -233,7 +259,7 @@ class Metadata extends Component {
     return pads
   }
 
-  renderField (field, namespace, name, depth, hasChildren, isOpen, isSelected, isFavorite, widgetIcon) {
+  renderField (field, namespace, name, depth, hasChildren, isOpen, isSelected, isFavorite, widgetIcon, order) {
     // const id = `${field}-${namespace}`
     const isLeaf = this.isLeaf(field, namespace)
     const itemClass = namespace.replace('.', '-')
@@ -255,6 +281,7 @@ class Metadata extends Component {
         <div className="Metadata-middle"/>
         <div className="Metadata-right">
           <div className={classnames('Metadata-item-widget', widgetIcon)} />
+          { isLeaf && <i onClick={_ => this.sortByField(field)} className={this.sortOrderClassnames(field, order)}/> }
           <div onClick={e => this.favorite(field, namespace, e)}
                className={classnames('Metadata-item-favorite', 'icon-star-filled', {isSelected: isFavorite})}/>
         </div>
@@ -292,6 +319,7 @@ export default connect(state => ({
   collapsibleOpen: state.app.collapsibleOpen,
   fieldTypes: state.assets.types,
   aggs: state.assets.aggs,
+  order: state.assets.order,
   user: state.auth.user,
   userSettings: state.app.userSettings
 }), dispatch => ({
@@ -303,6 +331,8 @@ export default connect(state => ({
     toggleCollapsible,
     modifyRacetrackWidget,
     removeRacetrackWidgetIds,
+    sortAssets,
+    unorderAssets,
     hoverField,
     clearHoverField
   }, dispatch)
