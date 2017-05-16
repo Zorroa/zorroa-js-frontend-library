@@ -4,7 +4,7 @@
   position: relative;
   display: inline-block;
   width: 30px;
-  height: 4px;
+  height: 6px;
 
   input:checked + .Toggle-slider {
     background-color: $zorroa-sickly-green;
@@ -15,9 +15,9 @@
   }
 
   input:checked + .Toggle-slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
-    transform: translateX(26px);
+    -webkit-transform: translateX(18px);
+    -ms-transform: translateX(18px);
+    transform: translateX(18px);
   }
 
   /* Rounded sliders */
@@ -54,10 +54,10 @@ $animation-duration: 0.25s;
 .Toggle-slider:before {
   position: absolute;
   content: "";
-  height: 10px;
-  width: 10px;
+  height: 12px;
+  width: 12px;
   left: 0;
-  bottom: -2.5px;
+  bottom: -3px;
   background-color: $zorroa-sickly-green;
   box-shadow: 0px 0px 0px 1px white;
   -webkit-transition: $animation-duration;
