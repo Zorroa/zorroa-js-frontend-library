@@ -88,11 +88,11 @@ export default function (state = initialState, action) {
         const maxOrder = 3
         order = order.slice(0, maxOrder)
       }
-      return { ...state, order }
+      return { ...state, order, similar: [] }
     }
 
     case ASSET_ORDER:
-      return { ...state, order: action.payload }
+      return { ...state, order: action.payload, similar: [] }
 
     case SIMILAR_VALUES:
       const hashes = action.payload

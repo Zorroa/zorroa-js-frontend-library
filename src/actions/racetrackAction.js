@@ -127,12 +127,12 @@ export function restoreSearch (search) {
     widgets.push(color)
   }
 
-  // Return promises to update the racetrack for the new search
-  const promises = [resetRacetrackWidgets(widgets)]
+  // Return actions to update the racetrack for the new search
+  const actions = [resetRacetrackWidgets(widgets)]
 
   // Create a SimilarHash widget if there's a hash query
   if (search.filter && search.filter.hamming) {
-    promises.push(similar({
+    actions.push(similar({
       field: search.filter.hamming.field,
       values: search.filter.hamming.hashes,
       assetIds: search.filter.hamming.assetIds
@@ -140,5 +140,5 @@ export function restoreSearch (search) {
   }
 
   // Reset the racetrack to the new widget
-  return promises
+  return actions
 }

@@ -517,7 +517,7 @@ class Assets extends Component {
         { syncer }
         <div className="SortingSelector">
           <div className="SortingSelector-title">Sort By</div>
-          <div onClick={_ => this.sortAssets()}
+          <div onClick={this.sortAssets}
                className={classnames('SortingSelector-sort',
                  {'SortingSelector-selected': !similarActive &&
                  (!order || !order.length)})}>

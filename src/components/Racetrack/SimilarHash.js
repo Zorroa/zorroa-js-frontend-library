@@ -50,10 +50,6 @@ class SimilarHash extends Component {
     this.componentWillReceiveProps(this.props)
   }
 
-  setStatePromise = (newState) => {
-    return new Promise(resolve => this.setState(newState, resolve))
-  }
-
   componentWillReceiveProps = (nextProps) => {
     // initialize hashTypes first time through -- or maybe (TODO) later as well
     const assetIds = nextProps.similar.assetIds
