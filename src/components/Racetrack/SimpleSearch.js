@@ -121,7 +121,7 @@ const queryString = props => (
 )
 
 const isFuzzy = props => (
-  !!(props && props.query && props.query.fuzzy)
+  props && props.query && (typeof props.query.fuzzy === 'undefined' || props.query.fuzzy)
 )
 
 const queryField = props => (
