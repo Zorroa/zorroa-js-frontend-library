@@ -86,8 +86,8 @@
     @include flexRow;
   }
 
-  &.isSelected { background-color: $zorroa-selected; }
   &:hover { background-color: $zorroa-hover; }
+  &.isSelected { background-color: $zorroa-selected; }
 }
 
 .Metadata-item-pad {

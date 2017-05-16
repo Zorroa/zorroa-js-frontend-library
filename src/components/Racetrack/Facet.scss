@@ -65,7 +65,7 @@
       cursor: pointer;
       &:hover { background-color: $zorroa-hover; }
       &.selected { background-color: $zorroa-selected; }
-      &.selected:hover { background-color: $zorroa-hover; }
+      &.selected:hover { background-color: $zorroa-selected; }
     }
 
     .Facet-value-table-key {
