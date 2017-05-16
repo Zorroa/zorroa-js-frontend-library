@@ -529,7 +529,7 @@ class Assets extends Component {
             <div onClick={sortSimilar}
                  className="SortingSelector-icon icon-settings_backup_restore">&thinsp;</div> }
             <div className={classnames('SortingSelector-sort',
-              { 'SortingSelector-selected': similarActive })}>
+              { 'SortingSelector-selected': similarActive, 'SortingSelector-disabled': !canSortSimilar })}>
               Similar
             </div>
           </div>
