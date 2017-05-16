@@ -6,7 +6,7 @@ import {
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
   SHOW_MULTIPAGE, SHOW_PAGES, VIDEO_VOLUME,
   HOVER_FIELD, CLEAR_HOVER_FIELD,
-  USER_SETTINGS, UNAUTH_USER
+  USER_SETTINGS, UNAUTH_USER, SET_FUZZY
 } from '../constants/actionTypes'
 import { DEFAULT_THUMBSIZE } from '../actions/appActions'
 
@@ -46,7 +46,8 @@ const initialState = {
     tableHeight: 300,
     thumbSize: DEFAULT_THUMBSIZE,
     thumbLayout: 'masonry',
-    videoVolume: 0.8
+    videoVolume: 0.8,
+    fuzzy: false
   }
 }
 
@@ -113,6 +114,8 @@ export default function app (state = initialState, action) {
       hoverFields.delete(action.payload)
       return { ...state, hoverFields }
     }
+    case SET_FUZZY:
+      return { ...state, fuzzy: action.payload }
     case USER_SETTINGS:
       return { ...state, userSettings: action.payload.metadata }
     case UNAUTH_USER:

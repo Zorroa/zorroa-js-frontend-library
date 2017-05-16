@@ -20,13 +20,14 @@ class SimpleSearch extends Component {
     query: PropTypes.instanceOf(AssetSearch).isRequired,
     actions: PropTypes.object.isRequired,
     id: PropTypes.number.isRequired,
-    isIconified: PropTypes.bool.isRequired
+    isIconified: PropTypes.bool.isRequired,
+    userSettings: PropTypes.object.isRequired
   }
 
   state = {
     isEnabled: true,
     queryString: queryString(this.props),
-    fuzzy: isFuzzy(this.props),
+    fuzzy: this.props.userSettings.fuzzy,
     field: queryField(this.props)
   }
 
@@ -75,7 +76,7 @@ class SimpleSearch extends Component {
   }
 
   toggleFuzzy = (event) => {
-    const fuzzy = !event.target.checked
+    const fuzzy = event.target.checked
     this.setState({ fuzzy })
     this.modifySliver(this.state.queryString, fuzzy, this.state.field)
   }
@@ -107,8 +108,10 @@ class SimpleSearch extends Component {
                    onKeyPress={this.queryStringKeyPressed} onChange={this.updateQueryString} />
           </div>
           <div className="SimpleSearch-fuzzy">
-            <Toggle checked={!fuzzy} onChange={this.toggleFuzzy} />
-            <div className="SimpleSearch-fuzzy-label">Exact matches</div>
+            Text matching:&nbsp;&nbsp;
+            Exact
+            <Toggle checked={fuzzy} onChange={this.toggleFuzzy} />
+            Fuzzy
           </div>
         </div>
       </Widget>
@@ -121,7 +124,7 @@ const queryString = props => (
 )
 
 const isFuzzy = props => (
-  props && props.query && (typeof props.query.fuzzy === 'undefined' || props.query.fuzzy)
+  props && props.query && props.query.fuzzy
 )
 
 const queryField = props => (
@@ -133,7 +136,8 @@ const mapDispatchToProps = dispatch => ({
 })
 
 const mapStateToProps = state => ({
-  query: state.assets.query
+  query: state.assets.query,
+  userSettings: state.app.userSettings
 })
 
 export default connect(
