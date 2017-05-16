@@ -77,6 +77,13 @@ describe('search widget', function () {
     .then(selenium.waitForIdle)
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack-filters .SimpleSearch'), 5000))
 
+    .then(_ => { DEBUG && console.log('Set text search to exact match') })
+    .then(_ => selenium.doesSelectorHaveClass (By.css('.SimpleSearch-fuzzy .Toggle'), 'checked'))
+      .then(checkboxChecked => {
+        if (checkboxChecked) return selenium.clickSelector(By.css('.SimpleSearch-fuzzy .Toggle'))
+      })
+    .then(_ => selenium.waitForSelectorHasClassToBe (false, By.css('.SimpleSearch-fuzzy .Toggle'), 'checked', 5000))
+
     .then(_ => { DEBUG && console.log('Expect 39 images by Ferguson exact') })
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.SimpleSearch-fuzzy')))
     .then(_ => selenium.clickSelector(By.css('.SimpleSearch input')))
@@ -88,7 +95,13 @@ describe('search widget', function () {
       .then(ele => ele.getText())
       .then(text => expect(text).toBe('39'))
 
+    .then(_ => { DEBUG && console.log('Set text search to fuzzy match') })
+    // set matching to fuzzy
+    .then(_ => selenium.clickSelector(By.css('.SimpleSearch-fuzzy .Toggle')))
+    .then(_ => selenium.waitForSelectorHasClassToBe (true, By.css('.SimpleSearch-fuzzy .Toggle'), 'checked', 5000))
+
     .then(_ => { DEBUG && console.log('Expect 39 images by Farguson fuzzy') })
+    // focus the query input
     .then(_ => selenium.clickSelector(By.css('.SimpleSearch input')))
     .then(_ => driver.findElement(By.css('.SimpleSearch input'))).then(ele => ele.clear())
     .then(_ => driver.findElement(By.css('.SimpleSearch input')))
@@ -99,10 +112,9 @@ describe('search widget', function () {
       .then(ele => ele.getText())
       .then(text => expect(text).toBe('39'))
 
-    .then(_ => selenium.clickSelector(By.css('.SimpleSearch .Toggle')))
-    .then(selenium.waitForIdle)
-
     .then(_ => { DEBUG && console.log('Expect 0 images by Buhler fuzzy') })
+    // still fuzzy, right?
+    .then(_ => selenium.expectSelectorHasClassToBe (true, By.css('.SimpleSearch-fuzzy .Toggle'), 'checked'))
     .then(_ => selenium.clickSelector(By.css('.SimpleSearch input')))
     .then(_ => driver.findElement(By.css('.SimpleSearch input'))).then(ele => ele.clear())
     .then(_ => driver.findElement(By.css('.SimpleSearch input')))

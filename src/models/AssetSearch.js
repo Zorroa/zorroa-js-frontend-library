@@ -5,7 +5,7 @@ export default class AssetSearch {
   static autoPageSize = 100
 
   constructor (json) {
-    if (json.query && !('fuzzy' in json)) {
+    if (json && 'query' in json && !('fuzzy' in json)) {
       throw new Error('fuzzy is required when searching with a query')
     }
 
