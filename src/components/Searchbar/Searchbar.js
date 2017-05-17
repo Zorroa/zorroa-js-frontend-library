@@ -63,6 +63,7 @@ class Searchbar extends Component {
       widgets[index] = widget
     }
     this.props.actions.resetRacetrackWidgets(widgets)
+    clearTimeout(this.instaSearchTimer)
     this.instaSearchTimer = null
     // hide suggestions whenever a search is performed
     this.showSuggestions = false

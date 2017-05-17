@@ -81,6 +81,7 @@ class SimpleSearch extends Component {
     widget.id = this.props.id
     widget.isEnabled = this.state.isEnabled
     this.props.actions.modifyRacetrackWidget(widget)
+    clearTimeout(this.instaSearchTimer)
     this.instaSearchTimer = null
   }
 
