@@ -120,10 +120,10 @@ describe('Workspace', function () {
     .then(_ => driver.findElement(By.css('.Suggestions-search')).then(e => { searchbarSearch = e }))
     .then(_ => searchbarSearch.sendKeys('dumbo'))
 
-    .then(_ => { DEBUG && console.log('Make sure the suggestions panel appears & has a valid suggestion') })
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css(suggestionsSelector), 5000))
-    .then(_ => driver.findElements(By.css('.Suggestions-suggestion')))
-      .then(elements => { expect(elements.length).toBeGreaterThan(0) })
+    // .then(_ => { DEBUG && console.log('Make sure the suggestions panel appears & has a valid suggestion') })
+    // .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css(suggestionsSelector), 5000))
+    // .then(_ => driver.findElements(By.css('.Suggestions-suggestion')))
+    //   .then(elements => { expect(elements.length).toBeGreaterThan(0) })
 
     .then(_ => { DEBUG && console.log('Make sure a search works and returns assets') })
     .then(_ => selenium.waitForAssetsCounterChange(_ => searchbarSearch.sendKeys(Key.ENTER), 15000))
