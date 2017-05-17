@@ -506,7 +506,7 @@ class Assets extends Component {
     const canSortSimilar = selectedIds && selectedIds.size > 0 && similar.field && similar.field.length > 0 && !similarValuesSelected && similarHashes && similarHashes.length > 0
     const sortSimilar = canSortSimilar ? this.sortSimilar : null
 
-    const columnName = order && order.length && order[0].field !== 'source.filename' ? unCamelCase(Asset.lastNamespace(order[0].field)) : 'Table Column'
+    const columnName = order && order.length && order[0].field !== 'source.filename' ? unCamelCase(Asset.lastNamespace(order[0].field)) : 'Field'
 
     const loader = require('./loader-rolling.svg')
     const syncer = sync ? <div className="Assets-loading sync"/> : <img className="Assets-loading" src={loader}/>

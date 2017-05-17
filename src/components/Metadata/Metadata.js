@@ -221,6 +221,7 @@ class Metadata extends Component {
       })
       const modifiedAggFields = JSON.stringify(aggFields) !== JSON.stringify(this.state.aggFields)
       if (modifiedAggFields || modifiedFavorites || modifiedWidgets ||
+        JSON.stringify(order) !== JSON.stringify(this.state.order) ||
         JSON.stringify(aggs) !== JSON.stringify(this.state.aggs)) {
         this.setState({filteredComponents})
       }
@@ -229,7 +230,7 @@ class Metadata extends Component {
     }
   }
 
-  sortByField = (field) => {
+  sortByField = (field, event) => {
     console.log('Sort by ' + field)
     const { order } = this.props
     let ascending = true
@@ -244,6 +245,7 @@ class Metadata extends Component {
     } else {
       this.props.actions.sortAssets(field, ascending)
     }
+    event.stopPropagation()
   }
 
   sortOrderClassnames = (field, order) => {
@@ -260,12 +262,15 @@ class Metadata extends Component {
   }
 
   renderField (field, namespace, name, depth, hasChildren, isOpen, isSelected, isFavorite, widgetIcon, order) {
-    // const id = `${field}-${namespace}`
+    const { fieldTypes } = this.props
+    const fieldType = fieldTypes[field]
+    const sortableTypes = [ 'string', 'long', 'double', 'integer', 'date' ]
     const isLeaf = this.isLeaf(field, namespace)
+    const isSortable = isLeaf && sortableTypes.findIndex(type => (type === fieldType)) >= 0
     const itemClass = namespace.replace('.', '-')
     return (
       <div className={classnames('Metadata-item', 'Metadata-item-' + itemClass, {isSelected, isLeaf, isOpen})}
-           key={namespace}
+           key={namespace} title={field}
            onClick={e => hasChildren ? this.toggleCollapsible(namespace, e) : this.toggleWidget(field, e)}
            onMouseOver={e => this.hover(namespace)} onMouseOut={e => this.clearHover(namespace)} >
         { this.renderPads(depth) }
@@ -281,7 +286,7 @@ class Metadata extends Component {
         <div className="Metadata-middle"/>
         <div className="Metadata-right">
           <div className={classnames('Metadata-item-widget', widgetIcon)} />
-          { isLeaf && <i onClick={_ => this.sortByField(field)} className={this.sortOrderClassnames(field, order)}/> }
+          { isSortable && <i onClick={e => this.sortByField(field, e)} className={this.sortOrderClassnames(field, order)}/> }
           <div onClick={e => this.favorite(field, namespace, e)}
                className={classnames('Metadata-item-favorite', 'icon-star-filled', {isSelected: isFavorite})}/>
         </div>
