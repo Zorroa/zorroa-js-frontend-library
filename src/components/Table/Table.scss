@@ -165,6 +165,7 @@ $tableResizeRightPadding: 20px;
 
 .Table-title {
   @include flexRowCenter;
+  margin-left: 4px;
 }
 
 .Table-title-head {
