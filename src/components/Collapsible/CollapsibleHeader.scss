@@ -22,13 +22,13 @@
     border-bottom-right-radius: 0;
   }
 
+  &:not(.isSelected):hover {
+    background-color: $zorroa-whitegray;
+  }
+
   &.isSelected {
     color: white;
     background-color: $zorroa-water-blue;
-  }
-
-  &:hover {
-    background-color: $zorroa-whitegray;
   }
 }
 

@@ -119,19 +119,19 @@
     margin-right: 10px;
     color: $zorroa-gray;
 
-    &:hover {
+    &:not(.SortingSelector-disabled):hover {
       cursor: pointer;
       color: $zorroa-darkgray;
       text-decoration: underline;
     }
 
     &.SortingSelector-selected {
-      cursor: pointer;
+      cursor: default;
       color: $zorroa-sickly-green;
       text-decoration: underline;
     }
 
-    &.SortingSelector-disabled {
+    &.SortingSelector-disabled:not(.SortingSelector-selected) {
       cursor: not-allowed;
       color: $zorroa-lightgray;
       text-decoration: none;

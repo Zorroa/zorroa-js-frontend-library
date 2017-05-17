@@ -86,8 +86,8 @@
     @include flexRow;
   }
 
+  &:hover:not(.isSelected) { background-color: $zorroa-hover; }
   &.isSelected { background-color: $zorroa-selected; }
-  &:hover { background-color: $zorroa-hover; }
 }
 
 .Metadata-item-pad {
@@ -122,16 +122,16 @@
   font-weight: 700;
   margin-left: 5px;
   margin-right: 3px;
-  color: transparent;
+  color: $zorroa-lightgray;
   background-color: transparent;
   cursor: pointer;
 
-  &.isSelected {
-    color: $zorroa-lightgray;
+  &:hover:not(.isSelected) {
+    background-color: $zorroa-nearwhite;
+    color: $zorroa-golden-yellow;
   }
 
-  &:hover {
-    background-color: $zorroa-nearwhite;
+  &.isSelected {
     color: $zorroa-golden-yellow;
   }
 }
@@ -148,7 +148,7 @@ $FolderItemHeight : 25px;
   cursor: pointer;
 
   .FolderItem.isSelected & { background-color: $zorroa-selected; }
-  .FolderItem.isSelected &.hasChildren:hover { color: white; background-color: $zorroa-darkgray; }
+  .FolderItem.isSelected &.hasChildren:not(.isSelected):hover { color: white; background-color: $zorroa-darkgray; }
   .FolderItem.isDropTarget.dragHover & { color: white; background-color: $zorroa-sickly-green; }
   .FolderItem.isSelected.isDropTarget.dragHover & { color: white; background-color: darken($zorroa-sickly-green, 15%); }
 }
@@ -172,7 +172,7 @@ $FolderItemHeight : 25px;
 
   &.isSelected { color: $zorroa-golden-yellow; }
 
-  &:hover {
+  &:hover:not(.isSelected) {
     background-color: transparent;
     border: 1px solid $zorroa-nearwhite;
   }
@@ -184,4 +184,26 @@ $FolderItemHeight : 25px;
   color: $zorroa-lightgray;
   width: 25px;
   height: 25px;
+}
+
+.Metadata-sort {
+  @include flexRowCenter;
+  @include flexOff;
+  height: 24px;
+  width: 16px;
+  padding-right: 2px; // This compensates for the slight offset of icon-sort*
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 3px;
+  color: $zorroa-darkgray;
+
+  &.icon-sort {
+    color: $zorroa-lightgray;
+    background-color: transparent;
+  }
+
+  &:hover {
+    background-color: $zorroa-sickly-green;
+    color: white;
+  }
 }

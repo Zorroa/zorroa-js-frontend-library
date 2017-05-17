@@ -64,8 +64,8 @@
   color: $zorroa-greyish-brown;
   min-height: 25px;
   &:nth-child(odd) { background-color: $zorroa-nearwhite; }
+  &:not(.selected):hover { background-color: $zorroa-hover; }
   &.selected { background-color: $zorroa-selected; }
-  &:hover { background-color: $zorroa-hover; }
 }
 
 .ImportFinder-added-icon {

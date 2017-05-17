@@ -9,8 +9,8 @@ import * as assert from 'assert'
 import Thumb, { page, monopageBadges, multipageBadges } from '../Thumb'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
-import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, searchAssetsRequestProm } from '../../actions/assetsAction'
-import { resetRacetrackWidgets, similarValues, restoreSearch } from '../../actions/racetrackAction'
+import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, similarAssets } from '../../actions/assetsAction'
+import { resetRacetrackWidgets, similar, restoreSearch } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
 import { setThumbSize, setThumbLayout, showTable, setTableHeight, showMultipage, showModal, hideModal } from '../../actions/appActions'
@@ -20,10 +20,10 @@ import Table from '../Table'
 import Editbar from './Editbar'
 import * as ComputeLayout from './ComputeLayout.js'
 import AssetSearch from '../../models/AssetSearch'
-import AssetFilter from '../../models/AssetFilter'
 import Resizer from '../../services/Resizer'
 import TrashedFolder from '../../models/TrashedFolder'
-import { addSiblings, equalSets, unCamelCase, makePromiseQueue } from '../../services/jsUtil'
+import { weights } from '../Racetrack/SimilarHash'
+import { addSiblings, equalSets, unCamelCase } from '../../services/jsUtil'
 import * as api from '../../globals/api.js'
 
 const assetsScrollPadding = 8
@@ -45,8 +45,12 @@ class Assets extends Component {
     showMultipage: PropTypes.bool.isRequired,
     folders: PropTypes.instanceOf(Map),
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
-    similarField: PropTypes.string,
-    similarValues: PropTypes.arrayOf(PropTypes.string),
+    similar: PropTypes.shape({
+      field: PropTypes.string,
+      values: PropTypes.arrayOf(PropTypes.string).isRequired,
+      assetIds: PropTypes.arrayOf(PropTypes.string).isRequired
+    }).isRequired,
+    similarAssets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     sync: PropTypes.bool.isRequired,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
@@ -69,9 +73,7 @@ class Assets extends Component {
       tableIsResizing: false,
       positions: [],
       multipage: {},
-      collapsed: 0,
-      cachedSelectedIds: null,
-      cachedSelectedHashes: null
+      collapsed: 0
     }
 
     this.newTableHeight = 0
@@ -255,7 +257,7 @@ class Assets extends Component {
     }
     this.updateAssetsScrollSizeInterval = setInterval(this.updateAssetsScrollSize, 150)
     this.resizer = new Resizer()
-    this.updateSelectedHashes(this.props.similarField, this.props.selectedIds)
+    this.updateSelectedHashes(this.props.similar.field, this.props.selectedIds)
 
     // Support using the navigation buttons to restore previous search state
     // This 'first' history entry is a sentinel we use to warn the user about going back too far & losing their history
@@ -351,35 +353,17 @@ class Assets extends Component {
   }
 
   componentWillReceiveProps = (nextProps) => {
-    this.updateSelectedHashes(nextProps.similarField, nextProps.selectedIds)
+    this.updateSelectedHashes(nextProps.similar.field, nextProps.selectedIds)
   }
 
   updateSelectedHashes = (similarField, selectedIds) => {
     if (similarField && similarField.length && selectedIds && selectedIds.size) {
-      const { cachedSelectedIds } = this.state
-      if (cachedSelectedIds && equalSets(selectedIds, cachedSelectedIds)) return
-      const dummyDispatch = () => {}
-      const mkProm = (query) => {
-        return searchAssetsRequestProm(dummyDispatch, query)
-          .catch(error => error) // this catch ensures one error doesn't spoil the batch
-      }
-      const filter = new AssetFilter({terms: {'_id': [...selectedIds]}})
-      const fields = [similarField]
-      const query = new AssetSearch({filter, fields, size: selectedIds.size})
-      makePromiseQueue([query], mkProm, 1 /* limit to one */)
-        .then(responses => {
-          const assets = responses[0].data.list.map(json => (new Asset(json)))
-          const cachedSelectedHashes = assets.map(asset => (asset.rawValue(similarField)))
-          return this.setState({cachedSelectedHashes})
-        })
-
-      // Update state now to avoid re-sending
-      this.setState({cachedSelectedIds: new Set(selectedIds)})
-    } else {
-      // Clear the cache
-      const cachedSelectedIds = null
-      const cachedSelectedHashes = null
-      this.setState({cachedSelectedIds, cachedSelectedHashes})
+      const ids = new Set([...this.props.similar.assetIds, ...selectedIds])
+      if (this.similarIds && equalSets(ids, this.similarIds)) return
+      this.similarIds = ids
+      const assetIds = [...ids]
+      const fields = [similarField, 'image.width', 'image.height', 'video.width', 'video.height', 'proxies*']
+      this.props.actions.similarAssets(assetIds, fields)
     }
   }
 
@@ -503,23 +487,26 @@ class Assets extends Component {
   }
 
   sortSimilar = () => {
-    const { cachedSelectedHashes } = this.state
-    this.props.actions.similarValues(cachedSelectedHashes)
-    console.log('Sort by similar: ' + JSON.stringify(cachedSelectedHashes))
+    const { similarAssets } = this.props
+    const values = similarAssets.map(asset => asset.rawValue(this.props.similar.field))
+    const assetIds = similarAssets.map(asset => asset.id)
+    const similar = { values, assetIds, weights: weights(assetIds) }
+    this.props.actions.similar(similar)
+    console.log('Sort by similar: ' + JSON.stringify(similar))
   }
 
   renderEditbar () {
-    const { order, selectedIds, similarField, similarValues, query, sync } = this.props
-    const { cachedSelectedHashes } = this.state
+    const { order, selectedIds, similar, similarAssets, query, sync } = this.props
 
-    const similarActive = similarField && similarField.length > 0 && similarValues && similarValues.length > 0
-    let similarValuesSelected = similarValues && cachedSelectedHashes && equalSets(new Set([...similarValues]), new Set([...cachedSelectedHashes]))
+    const similarHashes = similarAssets.map(asset => asset.rawValue(this.props.similar.field))
+    const similarActive = similar.field && similar.field.length > 0 && similar.values && similar.values.length > 0
+    const similarValuesSelected = similar.values && similarHashes && equalSets(new Set([...similar.values]), new Set([...similarHashes]))
 
     // Only enable similar button if selected assets have the right hash
-    let canSortSimilar = selectedIds && selectedIds.size > 0 && similarField && similarField.length > 0 && !similarValuesSelected && cachedSelectedHashes && cachedSelectedHashes.length > 0
+    const canSortSimilar = selectedIds && selectedIds.size > 0 && similar.field && similar.field.length > 0 && !similarValuesSelected && similarHashes && similarHashes.length > 0
     const sortSimilar = canSortSimilar ? this.sortSimilar : null
 
-    const columnName = order && order.length && order[0].field !== 'source.filename' ? unCamelCase(Asset.lastNamespace(order[0].field)) : 'Table Column'
+    const columnName = order && order.length && order[0].field !== 'source.filename' ? unCamelCase(Asset.lastNamespace(order[0].field)) : 'Field'
 
     const loader = require('./loader-rolling.svg')
     const syncer = sync ? <div className="Assets-loading sync"/> : <img className="Assets-loading" src={loader}/>
@@ -536,19 +523,19 @@ class Assets extends Component {
                  (!order || !order.length)})}>
             { !query || query.empty() ? 'Latest' : 'Rank' }
           </div>
-          { similarField && similarField.length > 0 &&
+          { similar.field && similar.field.length > 0 &&
           <div onClick={sortSimilar} className="SortingSelector-similar">
             { sortSimilar && similarActive && !similarValuesSelected && selectedIds && selectedIds.size > 0 &&
             <div onClick={sortSimilar}
                  className="SortingSelector-icon icon-settings_backup_restore">&thinsp;</div> }
             <div className={classnames('SortingSelector-sort',
-              { 'SortingSelector-selected': similarActive })}>
+              { 'SortingSelector-selected': similarActive, 'SortingSelector-disabled': !canSortSimilar })}>
               Similar
             </div>
           </div>
           }
-          { !similarField || !similarField.length &&
-          <div onClick={e => { this.sortAssets('source.filename', true) }}
+          { !similar.field || !similar.field.length &&
+          <div onClick={_ => { this.sortAssets('source.filename', true) }}
                className={classnames('SortingSelector-sort',
                  {'SortingSelector-enabled': order && order.length >= 1 &&
                  order[0].field === 'source.filename'})}>
@@ -752,8 +739,8 @@ export default connect(state => ({
   showTable: state.app.showTable,
   tableHeight: state.app.tableHeight,
   showMultipage: state.app.showMultipage,
-  similarField: state.racetrack.similarField,
-  similarValues: state.racetrack.similarValues,
+  similar: state.racetrack.similar,
+  similarAssets: state.assets.similar,
   origin: state.auth.origin
 }), dispatch => ({
   actions: bindActionCreators({
@@ -761,9 +748,9 @@ export default connect(state => ({
     selectAssetIds,
     sortAssets,
     searchAssets,
-    searchAssetsRequestProm,
+    similarAssets,
     resetRacetrackWidgets,
-    similarValues,
+    similar,
     restoreSearch,
     selectFolderIds,
     setThumbSize,

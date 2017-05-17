@@ -6,7 +6,8 @@ import {
   ASSET_PERMISSIONS, UPDATE_COMMAND, GET_COMMANDS,
   ISOLATE_ASSET, SELECT_ASSETS,
   SELECT_PAGES,
-  SUGGEST_COMPLETIONS, SEARCH_DOCUMENT
+  SUGGEST_COMPLETIONS, SEARCH_DOCUMENT,
+  SIMILAR_ASSETS
 } from '../constants/actionTypes'
 import Asset from '../models/Asset'
 import Page from '../models/Page'
@@ -91,6 +92,38 @@ export function searchAssetsRequestProm (dispatch, query) {
     }
     return Promise.reject(error) // re-throw the error, so downstream can catch
   })
+}
+
+export function assetsForIds (assetIds, fields) {
+  return new Promise(resolve => {
+    const ids = [...assetIds]
+    if (!ids || !ids.length) {
+      throw new Error('Invalid fields for asset ids')
+    }
+    const filter = new AssetFilter({terms: {'_id': [...ids]}})
+    const query = new AssetSearch({filter, fields, size: ids.length})
+    const dummyDispatch = () => {}
+    searchAssetsRequestProm(dummyDispatch, query)
+      .then(response => {
+        resolve(response.data.list.map(json => (new Asset(json))))
+      })
+      .catch(error => {
+        console.error('Error finding assets for ids: ' + error)
+      })
+  })
+}
+
+export function similarAssets (assetIds, fields) {
+  return dispatch => {
+    assetsForIds(assetIds, fields)
+      .then(assets => dispatch({
+        type: SIMILAR_ASSETS,
+        payload: assets
+      }))
+      .catch(error => {
+        console.error('Error searching for similar assets: ' + error)
+      })
+  }
 }
 
 export function searchAssets (query, lastQuery, force) {

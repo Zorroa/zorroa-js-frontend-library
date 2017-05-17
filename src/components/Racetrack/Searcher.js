@@ -25,8 +25,11 @@ class Searcher extends Component {
     filteredFolderCounts: PropTypes.instanceOf(Map),
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
     order: PropTypes.arrayOf(PropTypes.object),
-    similarField: PropTypes.string,
-    similarValues: PropTypes.arrayOf(PropTypes.string),
+    similar: PropTypes.shape({
+      field: PropTypes.string,
+      values: PropTypes.arrayOf(PropTypes.string),
+      assetIds: PropTypes.arrayOf(PropTypes.string)
+    }),
     fieldTypes: PropTypes.object,
     metadataFields: PropTypes.arrayOf(PropTypes.string),
     lightbarFields: PropTypes.arrayOf(PropTypes.string),
@@ -139,7 +142,7 @@ class Searcher extends Component {
     const {
       widgets, actions, selectedFolderIds, query,
       modifiedFolderIds, trashedFolders, order,
-      similarField, similarValues,
+      similar,
       metadataFields, lightbarFields, fieldTypes } = this.props
     if (!fieldTypes) return null
     let assetSearch = new AssetSearch({order})
@@ -181,14 +184,23 @@ class Searcher extends Component {
     }
 
     // Force similar ordering
-    if (similarField && similarValues && similarValues.length) {
-      const minScore = 0
+    if (similar.field && similar.values && similar.values.length) {
       assetSearch.order = undefined
+      // Normalize the minScore based on the total weights
+      let avgWeight = 0
+      if (similar.weights && similar.weights.length) {
+        similar.weights.forEach(w => { avgWeight += w })
+        avgWeight /= similar.weights.length
+      } else {
+        avgWeight = 1
+      }
       const filter = new AssetFilter({
         hamming: {
-          field: similarField,
-          hashes: similarValues,
-          minScore
+          field: similar.field,
+          hashes: similar.values,
+          assetIds: similar.assetIds,
+          weights: similar.weights,
+          minScore: avgWeight * 75
         }
       })
       assetSearch.merge(new AssetSearch({filter}))
@@ -249,8 +261,7 @@ const mapStateToProps = state => ({
   selectedFolderIds: state.folders.selectedFolderIds,
   modifiedFolderIds: state.folders.modifiedIds,
   trashedFolders: state.folders.trashedFolders,
-  similarField: state.racetrack.similarField,
-  similarValues: state.racetrack.similarValues,
+  similar: state.racetrack.similar,
   fieldTypes: state.assets.types,
   metadataFields: state.app.metadataFields,
   lightbarFields: state.app.lightbarFields,

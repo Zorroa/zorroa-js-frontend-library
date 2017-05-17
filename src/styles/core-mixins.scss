@@ -45,7 +45,7 @@ $zorroa-nearwhite  : #ededed;
 $zorroa-transparent: transparent;
 
 $zorroa-selected       : #D1E3F6;
-$zorroa-hover          : #C7E3A4;
+$zorroa-hover          : rgba(0,0,0,0.1);
 $zorroa-dropzone       : rgba(115, 182, 28, 0.75);
 
 /* shared metrics */
@@ -121,6 +121,21 @@ $zorroa-Sidebar-width : 340px;
   &:hover {
     background-color: $bgHover;
   }
+}
+
+@mixin zorroa-ok-btn {
+  padding: 10px 20px;
+  background-color: $zorroa-sickly-green;
+  color: $zorroa-nearwhite;
+  border-radius: 3px;
+  text-transform: uppercase;
+  pointer-events: auto;
+  text-decoration: none;
+  cursor: pointer;
+  @include nowrap;
+
+  &:hover:not(.disabled) { background-color: $zorroa-gray; }
+  &.disabled { background-color: $zorroa-lightgray; }
 }
 
 /* Text classes */

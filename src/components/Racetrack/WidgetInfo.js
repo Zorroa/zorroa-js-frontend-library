@@ -8,7 +8,6 @@ import Range from './Range'
 import Filetype from './Filetype'
 import DateRange from './DateRange'
 import SimilarHash from './SimilarHash'
-import Permission from '../../models/Permission'
 import { createFacetWidget, createMapWidget, createColorWidget,
   createDateRangeWidget, createRangeWidget, createSimilarityWidget,
   createFiletypeWidget, createExistsWidget, createSearchWidget } from '../../models/Widget'
@@ -106,12 +105,11 @@ export const DateRangeWidgetInfo = {
 
 export const SimilarHashWidgetInfo = {
   type: 'SIMILARHASH',
-  icon: 'icon-pictures',
+  icon: 'icon-similarity',
   title: 'Similar',
-  description: 'Match images with similar hash values',
+  description: 'Search for images based on similarity',
   element: <SimilarHash/>,
   create: createSimilarityWidget,
   fieldTypes: [],
-  color: '#fc6c2c', // $zorroa-orangish
-  permissions: [new Permission({type: Permission.GroupType, name: Permission.Developer})]
+  color: '#a11e77' // $zorroa-darkish-purple
 }
