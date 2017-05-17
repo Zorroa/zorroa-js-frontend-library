@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
-import Asset from '../../models/Asset'
+import Asset, { minimalUniqueFieldTitle } from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
 import User from '../../models/User'
 import { unCamelCase } from '../../services/jsUtil'
@@ -58,7 +58,6 @@ class Table extends Component {
 
     this.columnResizeFieldName = null
     this.assetsCounter = 0
-    this.rowBottomPx = []
     this.assetRow = null
     this.selectionCounter = 0
     this.skipNextSelectionScroll = false
@@ -148,34 +147,10 @@ class Table extends Component {
     this.setState({assetFieldOpen})
   }
 
-  isAssetFieldOpen = (asset, field) => {
-    return this.state.assetFieldOpen[asset.id] && this.state.assetFieldOpen[asset.id][field]
-  }
-
-  isAssetOpen = (asset) => {
-    return !!this.state.assetFieldOpen[asset.id]
-  }
+  rowBottomPx = (row) => (Math.max(0, row + 1) * rowHeightPx)
 
   recomputeRowHeights = () => {
-    let { assets, fields } = this.props
-    if (!fields || !fields.length) fields = defaultMetadataFields
-    let rowHeightInLines = []
-    for (let i = 0; i < assets.length; i++) {
-      if (this.isAssetOpen(assets[i])) {
-        rowHeightInLines[i] = Math.max.apply(Math, fields.map(field => {
-          if (!this.isAssetFieldOpen(assets[i], field)) return 1
-          return assets[i].rawValue(field).length + 1 // one extra for the toggle button
-        }))
-      } else {
-        rowHeightInLines[i] = 1
-      }
-    }
-
-    this.rowBottomPx.length = assets.length
-    if (assets.length) this.rowBottomPx[0] = rowHeightInLines[0] * rowHeightPx
-    for (let i = 1; i < assets.length; i++) {
-      this.rowBottomPx[i] = this.rowBottomPx[i - 1] + rowHeightInLines[i] * rowHeightPx
-    }
+    let { assets } = this.props
 
     // map asset ids to row number, so later we can easily track which rows
     // selected asset ids are sitting in.
@@ -212,8 +187,8 @@ class Table extends Component {
     const firstRow = selectedRows[0]
     const lastRow = selectedRows[selectedRows.length - 1]
 
-    const topPx = (firstRow > 0) ? this.rowBottomPx[firstRow - 1] : 0
-    const bottomPx = this.rowBottomPx[lastRow]
+    const topPx = this.rowBottomPx(firstRow - 1)
+    const bottomPx = this.rowBottomPx(lastRow)
 
     const selectionHeight = bottomPx - topPx
 
@@ -226,7 +201,7 @@ class Table extends Component {
       scrollPx = topPx
     }
 
-    scrollPx = Math.max(0, Math.min(this.rowBottomPx[this.rowBottomPx.length - 1], scrollPx))
+    scrollPx = Math.max(0, Math.min(this.rowBottomPx(assets.length - 1), scrollPx))
 
     requestAnimationFrame(() => {
       if (this.refs.tableScroll) {
@@ -254,6 +229,7 @@ class Table extends Component {
   }
 
   createTagFacet = (term, field, event) => {
+    const fieldType = this.props.fieldTypes[field]
     field = field && field.endsWith('.raw') ? field : field + '.raw'
     const index = this.props.widgets.findIndex(widget => fieldUsedInWidget(field, widget))
     let terms = [term]
@@ -263,7 +239,7 @@ class Table extends Component {
         terms = [...widget.sliver.filter.terms[field], term]
       }
     }
-    const widget = createFacetWidget(field, terms, this.props.fieldTypes)
+    const widget = createFacetWidget(field, fieldType, terms)
     if (index >= 0) widget.id = this.props.widgets[index].id
     this.props.actions.modifyRacetrackWidget(widget)
     this.props.actions.iconifyRightSidebar(false)
@@ -271,25 +247,7 @@ class Table extends Component {
   }
 
   renderTitle (field, fields) {
-    const types = ['point', 'bit', 'byte', 'raw']
-    const names = field.split('.')
-    if (!names || names.length < 2) return field
-    let title = ''
-    let head, tail
-    for (let i = names.length - 1; i >= 0; --i) {
-      if (i === names.length - 1 && types.findIndex(t => t === names[i]) >= 0) continue
-      if (!head) {
-        head = names[i]
-      } else if (!tail) {
-        tail = ` \u2039 ${names[i]}`
-      } else {
-        tail = tail.concat(` \u2039 ${names[i]}`)
-      }
-      title = title.concat(names[i])
-      const matchesAnotherField = fields.findIndex(f => f !== field && f.endsWith(title)) >= 0
-      if (!matchesAnotherField) break
-      if (i > 0) title = title.concat('.')
-    }
+    const { head, tail } = minimalUniqueFieldTitle(field, fields)
     return (
       <div className="Table-title">
         <div className="Table-title-head">{unCamelCase(head)}</div>
@@ -405,12 +363,12 @@ class Table extends Component {
                maxHeight: `${height - tableHeaderHeight}px`
              }}>
           <div ref='tableScroll' className='Table-scroll' onScroll={this.tableScroll}>
-            <div className='Table-body' style={{height: `${this.rowBottomPx[this.rowBottomPx.length - 1]}px`}}>
+            <div className='Table-body' style={{height: `${this.rowBottomPx(assets.length - 1)}px`}}>
               { assets.map((asset, index) => {
                 // Render only the visible Table rows
-                if (index >= this.rowBottomPx.length) return null
-                const rowTopPx = (index) ? this.rowBottomPx[index - 1] : 0
-                const rowBottomPx = this.rowBottomPx[index]
+                if (index >= assets.length) return null
+                const rowTopPx = this.rowBottomPx(index - 1)
+                const rowBottomPx = this.rowBottomPx(index)
                 if (rowBottomPx < tableScrollTop) return null
                 if (rowTopPx > tableScrollBottom) return null
                 const isSelected = selectedAssetIds && selectedAssetIds.has(asset.id)
@@ -425,13 +383,7 @@ class Table extends Component {
                       const width = fieldWidth[field]
                       return (
                         <TableField {...{ asset, field, key: field, width, left: `${fieldLeft[fieldIndex]}px`, top: `0px` }}
-                          onTag={this.createTagFacet}
-                          isOpen={this.isAssetFieldOpen(asset, field)}
-                          onOpen={event => {
-                            event.stopPropagation() // prevent row select when openening a field
-                            this.toggleArrayField(asset, field)
-                          }}
-                        />
+                          onTag={this.createTagFacet} />
                       )
                     })}
                   </div>)

@@ -155,7 +155,6 @@ $tableResizeRightPadding: 20px;
 
 .Table-cell {
   @include clampText;
-  padding: 8px 5px;
 }
 
 // This is for measure text, for auto column width resizing
@@ -166,6 +165,7 @@ $tableResizeRightPadding: 20px;
 
 .Table-title {
   @include flexRowCenter;
+  margin-left: 4px;
 }
 
 .Table-title-head {

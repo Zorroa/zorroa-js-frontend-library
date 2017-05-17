@@ -6,15 +6,12 @@
 
 .TableField-array {
   @include nowrap;
-  overflow: hidden;
+  @include flexRow;
+  @include flexAlignItemsCenter;
   &.isOpen {
-    @include flexCol;
-    @include flexAlignItemsStart;
-    @include flexJustifyStart;
+    @include flexWrap;
   }
   &:not(.isOpen) {
-    @include flexRow;
-    @include flexAlignItemsCenter;
   }
 }
 
@@ -48,7 +45,9 @@
 .TableField-tag {
   @include flexRowCenter;
   padding: 3px 5px;
-  margin: 4px;
+  margin-top: -2px;   // Undo half of Table-cell pad
+  margin-bottom: 4px;
+  margin-right: 4px;
   border-radius: 3px;
   color: $zorroa-greyish-brown;
   background-color: rgba(0,0,0,0.1);

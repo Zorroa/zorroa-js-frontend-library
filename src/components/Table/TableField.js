@@ -81,7 +81,7 @@ export default class TableField extends Component {
     const { asset, field, width, left, top } = this.props
     const val = asset.rawValue(field)
     let renderValFn = this.renderGeneral
-    let padding = '8px 4px'
+    let padding = '4px 4px'
 
     if (field === 'source.type') {
       renderValFn = this.renderFileType
