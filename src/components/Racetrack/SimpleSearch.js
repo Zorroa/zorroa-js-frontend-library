@@ -110,7 +110,7 @@ class SimpleSearch extends Component {
           <div className="SimpleSearch-fuzzy">
             Text matching:&nbsp;&nbsp;
             Exact
-            <Toggle checked={fuzzy} onChange={this.toggleFuzzy} />
+            <Toggle checked={!!fuzzy} onChange={this.toggleFuzzy} />
             Fuzzy
           </div>
         </div>

@@ -109,7 +109,7 @@ class Preferences extends Component {
               <div className="Preferences-user-fuzzy">
                 Text matching:&nbsp;&nbsp;
                 Exact
-                <Toggle checked={fuzzy} onChange={this.toggleFuzzy} />
+                <Toggle checked={!!fuzzy} onChange={this.toggleFuzzy} />
                 Fuzzy
               </div>
             </div>
