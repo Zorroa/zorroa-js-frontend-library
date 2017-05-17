@@ -9,6 +9,8 @@ import Widget from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
 import Suggestions from '../Suggestions'
 
+const INSTA_SEARCH_TIME = 1000
+
 class Searchbar extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
@@ -17,6 +19,9 @@ class Searchbar extends Component {
     suggestions: PropTypes.arrayOf(PropTypes.object),
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget))
   }
+
+  instaSearchTimer = null
+  showSuggestions = true
 
   state = {
     queryString: this.props.query && this.props.query.query
@@ -32,7 +37,16 @@ class Searchbar extends Component {
 
   // Submit a new suggestion string to get a new list of suggestions
   suggest = (suggestion) => {
+    // hide suggestions whenever the search input is cleared
+    if (!suggestion) this.showSuggestions = false
+
     this.props.actions.suggestQueryStrings(suggestion)
+    clearTimeout(this.instaSearchTimer)
+    this.instaSearchTimer = setTimeout(_ => {
+      this.search(suggestion)
+    }, INSTA_SEARCH_TIME)
+    // show suggestions whenever the user types into the input
+    this.showSuggestions = true
   }
 
   // Submit a new query string, replacing the first SimpleSearch widget
@@ -49,6 +63,9 @@ class Searchbar extends Component {
       widgets[index] = widget
     }
     this.props.actions.resetRacetrackWidgets(widgets)
+    this.instaSearchTimer = null
+    // hide suggestions whenever a search is performed
+    this.showSuggestions = false
   }
 
   forceSearch = () => {
@@ -60,7 +77,7 @@ class Searchbar extends Component {
   render () {
     const { query, suggestions } = this.props
     const { queryString } = this.state
-    const value = query && query.query && query.query !== queryString ? query.query
+    const value = this.showSuggestions && query && query.query && query.query !== queryString ? query.query
       : (query && query.query === undefined && queryString ? '' : undefined)
     return (
       <div className="Searchbar">
