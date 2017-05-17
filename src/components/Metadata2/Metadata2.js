@@ -51,6 +51,7 @@ class Metadata2 extends Component {
   componentWillReceiveProps (nextProps) {
     if (!nextProps.selectedAssetIds || !nextProps.selectedAssetIds.size) {
       if (this.state.selectedAssets.length) this.setState({selectedAssets: []})
+      this.cachedAssetIds = new Set()
     } else if (!equalSets(this.cachedAssetIds, nextProps.selectedAssetIds)) {
       this.cachedAssetIds = new Set([...nextProps.selectedAssetIds])
       assetsForIds(nextProps.selectedAssetIds)
@@ -243,7 +244,7 @@ class Metadata2 extends Component {
     const { selectedAssets } = this.state
     if (!selectedAssets || !selectedAssets.length) {
       const empty = (
-        <div className="Metadata2-no-assets">
+        <div key="no-assets" className="Metadata2-no-assets">
           <div className="Metadata2-no-assets-icon icon-emptybox"/>
           No Assets Selected
         </div>
