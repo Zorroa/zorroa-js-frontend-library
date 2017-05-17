@@ -98,29 +98,6 @@ class Metadata2 extends Component {
     return isFavorite
   }
 
-  favorite = (field, namespace, event) => {
-    const { metadataFields, fieldTypes, user, userSettings } = this.props
-    const hasChildren = field.length !== namespace.length
-    const isFavorite = this.isFavorite(fieldTypes, hasChildren, namespace, metadataFields)
-    const all = Object.keys(this.props.fieldTypes)
-    let fields
-    if (isFavorite) {
-      fields = metadataFields.filter(f => !f.startsWith(namespace))
-    } else {
-      const children = all.filter(f => (f.startsWith(namespace) && f.charAt(namespace.length) === '.'))
-      const union = new Set([...metadataFields, ...children, field])
-      fields = [...union]
-    }
-    this.props.actions.updateMetadataFields(fields)
-    const settings = {
-      ...userSettings,
-      metadataFields: fields,
-      tableFields: []   // Remove deprecated setting
-    }
-    this.props.actions.saveUserSettings(user, settings)
-    event.stopPropagation()
-  }
-
   toggleFavorites = () => {
     this.setState({showFavorites: !this.state.showFavorites})
   }
