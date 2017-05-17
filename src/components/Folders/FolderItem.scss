@@ -25,7 +25,7 @@ $FolderItemHeight : 25px;
     &.isSelected { background-color: $zorroa-selected; }
   }
 
-  &:hover { background-color: $zorroa-hover; }
+  &:hover:not(.isSelected) { background-color: $zorroa-hover; }
 
   &.isSelected { background-color: $zorroa-selected; }
   &.isDropTarget.dragHover { color: white; background-color: $zorroa-sickly-green; }
@@ -42,9 +42,9 @@ $FolderItemHeight : 25px;
 
   cursor: pointer;
 
-  &.hasChildren:hover { color: white; background-color: $zorroa-darkgray; }
+  &.hasChildren:not(.isSelected):hover { color: white; background-color: $zorroa-darkgray; }
   .FolderItem.isSelected & { background-color: $zorroa-selected; }
-  .FolderItem.isSelected &.hasChildren:hover { color: white; background-color: $zorroa-darkgray; }
+  .FolderItem.isSelected &.hasChildren:not(.isSelected):hover { color: white; background-color: $zorroa-darkgray; }
   .FolderItem.isDropTarget.dragHover & { color: white; background-color: $zorroa-sickly-green; }
   .FolderItem.isSelected.isDropTarget.dragHover & { color: white; background-color: darken($zorroa-sickly-green, 15%); }
 }

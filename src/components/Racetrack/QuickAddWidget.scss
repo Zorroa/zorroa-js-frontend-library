@@ -33,11 +33,11 @@
       text-transform: uppercase;
       color: white;
 
-      &.selected {
+      &:not(.selected):hover {
         border: 3px solid $zorroa-gray;
       }
 
-      &:hover {
+      &.selected {
         border: 3px solid $zorroa-gray;
       }
     }
