@@ -147,7 +147,7 @@ class Table extends Component {
     this.setState({assetFieldOpen})
   }
 
-  rowBottomPx = (row) => (Math.max(0, row) * rowHeightPx)
+  rowBottomPx = (row) => (Math.max(0, row + 1) * rowHeightPx)
 
   recomputeRowHeights = () => {
     let { assets } = this.props
