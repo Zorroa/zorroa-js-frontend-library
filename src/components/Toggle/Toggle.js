@@ -1,7 +1,8 @@
 import React, { PropTypes } from 'react'
+import classnames from 'classnames'
 
 const Toggle = ({checked, onChange}) => (
-  <label className="Toggle">
+  <label className={classnames('Toggle', {checked})}>
     <input type="checkbox" checked={checked} onChange={onChange}
            className="Toggle-checkbox"/>
     <div className="Toggle-slider round"/>

@@ -517,10 +517,10 @@ export function getSelectorSelected (by) {
 // ----------------------------------------------------------------------
 // assert (expect) that a selector is selected
 // if not, the selector is displayed in the error message
-export function expectElementSelectedToBe (goal, by) {
+export function expectSelectorSelectedToBe (goal, by) {
   return driver
   .then(_ => { DEBUG && console.log(`checking for ${by.toString()} to be selected=${goal}`) })
-  .then(_ => driver.findElement(by(selector)))
+  .then(_ => driver.findElement(by))
   .then(
     ele => ele.isSelected(), // element found
     _ => false // element not found
@@ -537,8 +537,8 @@ export function expectElementSelectedToBe (goal, by) {
 export function waitForSelectorSelectedToBe (goal, by, optTimeout) {
   return driver
   .then(_ => { DEBUG && console.log(`waiting for ${by.toString()} to be selected=${goal}`) })
-  .then(_ => driver.wait(_ => getSelectorSelected(by).then(is => is === goal), optTimeout, `timeout waiting for ${selector} to be selected=${goal}`))
-  .then(_ => expectElementSelectedToBe(goal, by))
+  .then(_ => driver.wait(_ => getSelectorSelected(by).then(is => is === goal), optTimeout, `timeout waiting for ${by.toString()} to be selected=${goal}`))
+  .then(_ => expectSelectorSelectedToBe(goal, by))
 }
 
 // ----------------------------------------------------------------------

@@ -17,7 +17,8 @@ class Searchbar extends Component {
     query: PropTypes.instanceOf(AssetSearch),
     totalCount: PropTypes.number,
     suggestions: PropTypes.arrayOf(PropTypes.object),
-    widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget))
+    widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
+    userSettings: PropTypes.object.isRequired
   }
 
   instaSearchTimer = null
@@ -52,7 +53,8 @@ class Searchbar extends Component {
   // Submit a new query string, replacing the first SimpleSearch widget
   // if one already exists, or adding a new one if none in racetrack.
   search = (query) => {
-    const sliver = new AssetSearch({ query })
+    const { fuzzy } = this.props.userSettings
+    const sliver = new AssetSearch({ query, fuzzy })
     const widget = new Widget({ type: SimpleSearchWidgetInfo.type, sliver })
     const index = this.props.widgets && this.props.widgets.findIndex(widget => (
       widget.type === SimpleSearchWidgetInfo.type))
@@ -86,7 +88,7 @@ class Searchbar extends Component {
           <Suggestions suggestions={suggestions}
                        value={value}
                        onChange={this.suggest}
-                       onSelect={this.search} />
+                       onSelect={this.search.bind(this)} />
           <button onClick={this.forceSearch} className="search-button icon-search" />
         </div>
       </div>
@@ -102,7 +104,8 @@ const mapStateToProps = state => ({
   query: state.assets && state.assets.query,
   totalCount: state.assets && state.assets.totalCount,
   suggestions: state.assets && state.assets.suggestions,
-  widgets: state.racetrack && state.racetrack.widgets
+  widgets: state.racetrack && state.racetrack.widgets,
+  userSettings: state.app.userSettings
 })
 
 export default connect(

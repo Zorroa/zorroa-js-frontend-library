@@ -5,6 +5,10 @@ export default class AssetSearch {
   static autoPageSize = 100
 
   constructor (json) {
+    if (json && 'query' in json && !('fuzzy' in json)) {
+      throw new Error('fuzzy is required when searching with a query')
+    }
+
     if (json) {
       // Make an extra copy to handle deep clones
       json = JSON.parse(JSON.stringify(json))
@@ -47,7 +51,7 @@ export default class AssetSearch {
         this.postFilter = new AssetFilter(assetSearch.postFilter)
       }
     }
-    this.fuzzy = this.fuzzy || assetSearch.fuzzy
+    this.fuzzy = !!(this.fuzzy || assetSearch.fuzzy)
     if (assetSearch.queryFields) {
       if (!this.queryFields) {
         this.queryFields = { ...assetSearch.queryFields }

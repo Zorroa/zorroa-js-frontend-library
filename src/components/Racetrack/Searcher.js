@@ -97,7 +97,10 @@ class Searcher extends Component {
     if (this.pendingQuery && query && !this.pendingQuery.equals(query)) {
       this.pendingQueryCountIds = new Set()
     }
-    if (query) this.pendingQuery = new AssetSearch(query)
+    if (query) {
+      const { fuzzy } = this.props.userSettings
+      this.pendingQuery = new AssetSearch({ query, fuzzy })
+    }
     if (query) {
       this.pendingQueryCountIds = new Set([...this.pendingQueryCountIds, ...ids])
     } else {

@@ -5,7 +5,7 @@ import {
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
   SHOW_MULTIPAGE, SHOW_PAGES, VIDEO_VOLUME,
-  HOVER_FIELD, CLEAR_HOVER_FIELD
+  HOVER_FIELD, CLEAR_HOVER_FIELD, SET_FUZZY
 } from '../constants/actionTypes'
 
 export const MIN_THUMBSIZE = 48
@@ -151,5 +151,12 @@ export function clearHoverField (field) {
   return ({
     type: CLEAR_HOVER_FIELD,
     payload: field
+  })
+}
+
+export function setFuzzy (fuzzy) {
+  return ({
+    type: SET_FUZZY,
+    payload: fuzzy
   })
 }
