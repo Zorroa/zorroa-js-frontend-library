@@ -314,11 +314,12 @@ export function minimalUniqueFieldTitle (field, fields) {
     } else if (!tail) {
       tail = ` \u2039 ${names[i]}`
     } else {
+      if (!tail) tail = ''
       tail = tail.concat(` \u2039 ${names[i]}`)
     }
     title = title.concat(names[i])
     const matchesAnotherField = fields.findIndex(f => f !== field && f.endsWith(title)) >= 0
-    if (!matchesAnotherField) break
+    if (!matchesAnotherField) return { head, tail }
     if (i > 0) title = title.concat('.')
   }
   return { head, tail }
