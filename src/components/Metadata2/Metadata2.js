@@ -7,10 +7,11 @@ import User from '../../models/User'
 import Filter from '../Filter'
 import TableField from '../Table/TableField'
 import Resizer from '../../services/Resizer'
+import { minimalUniqueFieldTitle } from '../../models/Asset'
 import { unCamelCase, equalSets } from '../../services/jsUtil'
 import { getAssetFields, assetsForIds } from '../../actions/assetsAction'
 import { saveUserSettings } from '../../actions/authAction'
-import { fieldUsedInWidget, widgetTypeForField } from '../../models/Widget'
+import { fieldUsedInWidget, widgetTypeForField, createFacetWidget } from '../../models/Widget'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
 import { iconifyRightSidebar, updateMetadataFields,
   toggleCollapsible, hoverField, clearHoverField } from '../../actions/appActions'
@@ -168,6 +169,24 @@ class Metadata2 extends Component {
     event.stopPropagation()
   }
 
+  createTagFacet = (term, field, event) => {
+    const fieldType = this.props.fieldTypes[field]
+    field = field && field.endsWith('.raw') ? field : field + '.raw'
+    const index = this.props.widgets.findIndex(widget => fieldUsedInWidget(field, widget))
+    let terms = [term]
+    if (index >= 0 && event.shiftKey) {       // Add to terms for shift
+      const widget = this.props.widgets[index]
+      if (widget.sliver && widget.sliver.filter && widget.sliver.filter.terms) {
+        terms = [...widget.sliver.filter.terms[field], term]
+      }
+    }
+    const widget = createFacetWidget(field, fieldType, terms)
+    if (index >= 0) widget.id = this.props.widgets[index].id
+    this.props.actions.modifyRacetrackWidget(widget)
+    this.props.actions.iconifyRightSidebar(false)
+    event.stopPropagation()
+  }
+
   hover = (field) => {
     this.props.actions.hoverField(field)
   }
@@ -180,21 +199,14 @@ class Metadata2 extends Component {
     return field === namespace || field === `${namespace}.raw`
   }
 
-  renderPads (depth) {
-    if (depth <= 0) return null
-    let pads = []
-    for (let i = 0; i < depth; ++i) pads.push(<div key={i} className="Metadata2-item-pad"/>)
-    return pads
-  }
-
-  renderNamespace (namespace, name, isOpen) {
+  renderNamespace (namespace, isOpen) {
     const itemClass = namespace.replace('.', '-')
     return (
       <div key={itemClass}
            onClick={e => this.toggleCollapsible(namespace, e)}
            className={classnames('Metadata2-namespace', 'Metadata2-namespace-' + itemClass, {isOpen})}>
         <div className="Metadata2-namespace-title">
-          {unCamelCase(name)}
+          {unCamelCase(namespace)}
         </div>
         <div className={classnames('Metadata2-namespace-toggle', 'icon-chevron-down', {isOpen})}/>
       </div>
@@ -209,16 +221,14 @@ class Metadata2 extends Component {
     } else if (asset) {
       return (
         <div className="Metadata2-value">
-          <TableField asset={asset} field={field}/>
-          <div onClick={e => this.favorite(field, namespace, e)}
-               className={classnames('Metadata2-item-favorite', 'icon-star-filled', {isSelected: isFavorite})}/>
+          <TableField asset={asset} field={field} isOpen={true} onTag={this.createTagFacet}/>
         </div>
       )
     }
     return <div className="Metadata2-value-null">null</div>
   }
 
-  renderLeaf (field, namespace, name, isSelected, isFavorite, widgetIcon) {
+  renderLeaf (field, namespace, fields, isSelected, isFavorite, widgetIcon) {
     const { selectedAssets, titleWidth, showNull } = this.state
     const itemClass = field.replace('.', '-')
     let asset
@@ -235,57 +245,60 @@ class Metadata2 extends Component {
     }
     if (asset === undefined) return
     if (!showNull && asset && !asset.rawValue(field)) return
+    const { head, tail } = minimalUniqueFieldTitle(field, fields)
     return (
       <div key={itemClass} className={classnames('Metadata2-leaf', {isSelected})}
+           title={field}
            onMouseOver={e => this.hover(namespace)} onMouseOut={e => this.clearHover(namespace)}
            onClick={e => this.toggleWidget(field, e)}>
-        <div className="Metadata2-leaf-title" style={{width: titleWidth}}>
-          <div className="Metadata2-leaf-title-label">
-            {unCamelCase(name)}
+        <div className="Metadata2-leaf-title" style={{minWidth: titleWidth, maxWidth: titleWidth}}>
+          <div className="Metadata2-leaf-title-head">
+            {unCamelCase(head)}
           </div>
+          { tail && <div className="Metadata2-leaf-title-tail">&nbsp;{tail}</div> }
         </div>
         { this.renderValue(field, namespace, asset, isFavorite) }
       </div>
     )
   }
 
-  renderField (field, namespace, name, depth, hasChildren, isOpen, isSelected, isFavorite, widgetIcon) {
-    const isLeaf = this.isLeaf(field, namespace)
-    if (!isLeaf) return this.renderNamespace(namespace, name, isOpen)
-    return this.renderLeaf(field, namespace, name, isSelected, isFavorite, widgetIcon)
-  }
-
   renderFields () {
+    const { selectedAssets } = this.state
+    if (!selectedAssets || !selectedAssets.length) {
+      const empty = (
+        <div className="Metadata2-no-assets">
+          <div className="Metadata2-no-assets-icon icon-emptybox"/>
+          No Assets Selected
+        </div>
+      )
+      return [empty]
+    }
     const { fieldTypes, metadataFields, collapsibleOpen, widgets } = this.props
     const fields = this.state.showFavorites ? metadataFields : Object.keys(fieldTypes)
     const lcFilterString = this.state.filterString.toLowerCase()
     const filteredFields = fields.filter(field => (field.toLowerCase().includes(lcFilterString))).sort((a, b) => a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'}))
+    const namespaces = []
     const components = []
-    let ancestors = []
-    const addFields = (ancestors, field) => {
+    const addField = (field) => {
       const parents = field.split('.')
-      for (let i = 0; i < parents.length; ++i) {
-        const namespace = parents.slice(0, i + 1).join('.')
-        const index = ancestors.findIndex(ancestor => (ancestor.namespace === namespace))
-        const isOpen = collapsibleOpen[namespace]
-        if (index < 0) {
-          const hasChildren = i < parents.length - 1
-          const isFavorite = this.isFavorite(fieldTypes, hasChildren, namespace, metadataFields)
-          const isLeaf = this.isLeaf(field, namespace)
-          const isSearched = isLeaf && widgets.findIndex(widget => fieldUsedInWidget(field, widget)) >= 0
-          const widgetType = !hasChildren && widgetTypeForField(field, fieldTypes[field])
-          const widgetIcon = this.widgetTypeIcon(widgetType)
-          components.push(this.renderField(field, namespace, parents[i],
-            i, hasChildren, isOpen, isSearched, isFavorite, widgetIcon))
-          ancestors.splice(i)
-          ancestors.push({field, namespace})
-        } else if (collapsibleOpen[ancestors[index].namespace]) {
-          continue
-        }
-        if (!isOpen) break
+      const namespace = parents[0]
+      const isOpen = collapsibleOpen[namespace]
+      const isLeaf = this.isLeaf(field, namespace)
+      const index = namespaces.findIndex(n => (n === namespace))
+      if (!isLeaf && index < 0) {
+        components.push(this.renderNamespace(namespace, isOpen))
+        namespaces.push(namespace)  // Only render each namespace once
+      }
+      if (isLeaf || isOpen) {
+        const hasChildren = false
+        const isFavorite = this.isFavorite(fieldTypes, hasChildren, namespace, metadataFields)
+        const isSearched = widgets.findIndex(widget => fieldUsedInWidget(field, widget)) >= 0
+        const widgetType = widgetTypeForField(field, fieldTypes[field])
+        const widgetIcon = this.widgetTypeIcon(widgetType)
+        components.push(this.renderLeaf(field, namespace, fields, isSearched, isFavorite, widgetIcon))
       }
     }
-    filteredFields.forEach(field => addFields(ancestors, field))
+    filteredFields.forEach(field => addField(field))
     return components
   }
 
