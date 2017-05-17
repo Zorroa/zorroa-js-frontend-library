@@ -16,17 +16,6 @@ import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
 import { archivistGet, archivistPut, archivistPost } from './authAction'
 
-function escapeQuery (query) {
-  if (!query) return new AssetSearch()
-  // Escape special characters
-  // https://www.elastic.co/guide/en/elasticsearch/reference/2.1/query-dsl-query-string-query.html#_reserved_characters
-  let safeQuery = new AssetSearch(query)
-  if (safeQuery.query) {
-    safeQuery.query = safeQuery.query.replace(/(\+|-|=|&&|\|\||>|<|!|\(|\)|\{|\}|\[|\]|\^|"|~|\*|\?|:|\\|\/)/g, '\\$&')
-  }
-  return safeQuery
-}
-
 export function requiredFields (fields, fieldTypes) {
   const required = [
     'id',
@@ -74,12 +63,11 @@ export function searchAssetsRequestProm (dispatch, query) {
   assert.ok(query instanceof AssetSearch)
   assert.ok(query.size)
   assert.ok(typeof query.from === 'undefined' || query.from >= 0)
-  const safeQuery = escapeQuery(query)
-  console.log('Search: ' + JSON.stringify(safeQuery))
+  console.log('Search: ' + JSON.stringify(query))
 
-  return archivistPost(dispatch, '/api/v3/assets/_search', safeQuery)
+  return archivistPost(dispatch, '/api/v3/assets/_search', query)
   .then(response => {
-    console.log('Query ' + JSON.stringify(safeQuery))
+    console.log('Query ' + JSON.stringify(query))
     console.log(response)
     return response
   })
@@ -191,19 +179,18 @@ export function searchAssets (query, lastQuery, force) {
 export function searchDocument (query, parentId) {
   assert.ok(!query || query instanceof AssetSearch)
   return dispatch => {
-    const safeQuery = escapeQuery(query)
     const filter = new AssetFilter({terms: {'source.clip.parent.raw': [parentId]}})
-    if (safeQuery.filter) {
-      safeQuery.filter.merge(filter)
+    if (query.filter) {
+      query.filter.merge(filter)
     } else {
-      safeQuery.filter = filter
+      query.filter = filter
     }
-    safeQuery.size = 10000
-    safeQuery.from = 0
-    console.log('Search Document: ' + JSON.stringify(safeQuery))
-    archivistPost(dispatch, '/api/v3/assets/_search', safeQuery)
+    query.size = 10000
+    query.from = 0
+    console.log('Search Document: ' + JSON.stringify(query))
+    archivistPost(dispatch, '/api/v3/assets/_search', query)
       .then(response => {
-        console.log('Query Document' + JSON.stringify(safeQuery))
+        console.log('Query Document' + JSON.stringify(query))
         console.log(response)
         const assets = response.data.list.map(asset => (new Asset(asset)))
         dispatch({
