@@ -11,6 +11,8 @@ import { unCamelCase } from '../../services/jsUtil'
 import Widget from './Widget'
 import Toggle from '../Toggle'
 
+const INSTA_SEARCH_TIME = 1000
+
 // Manage the query string for the current AssetSearch.
 // Monitors the global query and updates slivers when the search is changed.
 // The input state is stored in the component local state.queryString
@@ -22,6 +24,8 @@ class SimpleSearch extends Component {
     id: PropTypes.number.isRequired,
     isIconified: PropTypes.bool.isRequired
   }
+
+  instaSearchTimer = null
 
   state = {
     isEnabled: true,
@@ -52,7 +56,12 @@ class SimpleSearch extends Component {
 
   // Manage the <input> without a form, using onChange to update local state
   updateQueryString = (event) => {
-    this.setState({ queryString: event.target.value })
+    const queryString = event.target.value
+    clearTimeout(this.instaSearchTimer)
+    this.instaSearchTimer = setTimeout(_ => {
+      this.modifySliver(queryString, this.state.fuzzy, this.state.field)
+    }, INSTA_SEARCH_TIME)
+    this.setState({ queryString })
   }
 
   // ...and onKeyPress to monitor for the Enter key to submit the new query
@@ -72,6 +81,8 @@ class SimpleSearch extends Component {
     widget.id = this.props.id
     widget.isEnabled = this.state.isEnabled
     this.props.actions.modifyRacetrackWidget(widget)
+    clearTimeout(this.instaSearchTimer)
+    this.instaSearchTimer = null
   }
 
   toggleFuzzy = (event) => {
