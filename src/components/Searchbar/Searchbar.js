@@ -9,7 +9,7 @@ import Widget from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
 import Suggestions from '../Suggestions'
 
-const INSTA_SEARCH_TIME = 1000
+const INSTA_SEARCH_TIME = 1500
 
 class Searchbar extends Component {
   static propTypes = {
