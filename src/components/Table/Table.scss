@@ -154,7 +154,7 @@ $tableResizeRightPadding: 20px;
 }
 
 .Table-cell {
-  @include clampText;
+  &:not(.isOpen) { @include clampText; }
 }
 
 // This is for measure text, for auto column width resizing

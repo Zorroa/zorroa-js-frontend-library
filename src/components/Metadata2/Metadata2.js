@@ -34,7 +34,7 @@ class Metadata2 extends Component {
     filterString: '',
     showNull: false,
     showFavorites: false,
-    titleWidth: 60
+    titleWidth: 100
   }
 
   cachedAssetIds = new Set()
@@ -262,19 +262,18 @@ class Metadata2 extends Component {
       const namespace = parents[0]
       const isOpen = collapsibleOpen[namespace]
       const isLeaf = this.isLeaf(field, namespace)
+      const hasChildren = false
+      const isFavorite = this.isFavorite(fieldTypes, hasChildren, namespace, metadataFields)
+      const isSearched = widgets.findIndex(widget => fieldUsedInWidget(field, widget)) >= 0
+      const widgetType = widgetTypeForField(field, fieldTypes[field])
+      const widgetIcon = this.widgetTypeIcon(widgetType)
+      const leaf = this.renderLeaf(field, namespace, fields, isSearched, isFavorite, widgetIcon)
       const index = namespaces.findIndex(n => (n === namespace))
-      if (!isLeaf && index < 0) {
+      if (leaf && !isLeaf && index < 0) {
         components.push(this.renderNamespace(namespace, isOpen))
         namespaces.push(namespace)  // Only render each namespace once
       }
-      if (isLeaf || isOpen) {
-        const hasChildren = false
-        const isFavorite = this.isFavorite(fieldTypes, hasChildren, namespace, metadataFields)
-        const isSearched = widgets.findIndex(widget => fieldUsedInWidget(field, widget)) >= 0
-        const widgetType = widgetTypeForField(field, fieldTypes[field])
-        const widgetIcon = this.widgetTypeIcon(widgetType)
-        components.push(this.renderLeaf(field, namespace, fields, isSearched, isFavorite, widgetIcon))
-      }
+      if (leaf && (isLeaf || isOpen)) components.push(leaf) // Wait until we know it is not null
     }
     filteredFields.forEach(field => addField(field))
     return components
@@ -290,7 +289,7 @@ class Metadata2 extends Component {
                   onClear={_ => this.setState({filterString: ''})}
                   onChange={e => this.setState({filterString: e.target.value})}/>
           <div onClick={this.toggleNull}
-               className={classnames('Metadata2-favorites', 'icon-blocked',
+               className={classnames('Metadata2-nulls', 'icon-blocked',
                  {isSelected: !showNull})}/>
           <div onClick={this.toggleFavorites}
                className={classnames('Metadata2-favorites',

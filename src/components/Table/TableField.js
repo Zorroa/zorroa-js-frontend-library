@@ -78,7 +78,7 @@ export default class TableField extends Component {
   }
 
   render = () => {
-    const { asset, field, width, left, top } = this.props
+    const { asset, field, width, left, top, isOpen } = this.props
     const val = asset.rawValue(field)
     let renderValFn = this.renderGeneral
     let padding = '4px 4px'
@@ -112,6 +112,6 @@ export default class TableField extends Component {
       style.position = 'absolute'
     }
 
-    return (<div className='Table-cell' style={style}>{renderValFn(val, asset)}</div>)
+    return (<div className={classnames('Table-cell', {isOpen})} style={style}>{renderValFn(val, asset)}</div>)
   }
 }

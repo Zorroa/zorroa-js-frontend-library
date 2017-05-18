@@ -130,7 +130,8 @@ class SimilarHash extends Component {
     const { selectedAssetId } = this.state
     const asset = similarAssets.find(asset => asset.id === id)
     const height = 120
-    const width = asset.aspect() * height
+    const aspect = asset.aspect() || asset.proxyAspect() || 1
+    const width = aspect * height
     const url = asset.closestProxyURL(this.props.origin, width, height)
     const style = { backgroundImage: `url(${url})`, minWidth: width, minHeight: height }
     return (
@@ -153,7 +154,6 @@ class SimilarHash extends Component {
     return (
       <Widget className="SimilarHash"
               title={SimilarHashWidgetInfo.title}
-              field={similar.field}
               backgroundColor={SimilarHashWidgetInfo.color}
               isIconified={isIconified}
               isEnabled={true}

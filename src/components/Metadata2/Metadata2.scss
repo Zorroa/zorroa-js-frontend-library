@@ -19,120 +19,6 @@
   }
 }
 
-.Metadata2-left {
-  @include flexRow;
-  @include flexAlignItemsCenter;
-  margin-left: 4px;
-  border-bottom: 1px solid $zorroa-nearwhite;
-}
-
-.Metadata2-middle {
-  @include flexOn;
-  height: 25px;
-  border-bottom: 1px solid $zorroa-nearwhite;
-}
-
-.Metadata2-right {
-  @include flexRow;
-  @include flexAlignItemsCenter;
-  border-bottom: 1px solid $zorroa-nearwhite;
-}
-
-.Metadata2-item {
-  margin-left: 8px;
-  margin-right: 8px;
-  margin-bottom: -1px;  // Forces borders together
-  font-size: 14px;
-  cursor: pointer;
-
-  @include flexRow;
-  @include flexAlignItemsCenter;
-
-  .Metadata2-item-label {
-    @include flexRow;
-    color: $zorroa-greyish-brown;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    &.hasChildren { font-weight: 500; }
-  }
-
-  .Metadata2-item-right {
-    @include flexRow;
-  }
-
-  &:hover { background-color: $zorroa-hover; }
-  &.isSelected { background-color: $zorroa-selected; }
-}
-
-.Metadata2-item-pad {
-  width: 14px;
-  height: 25px;
-  border-right: 1px solid $zorroa-lightgray;
-}
-
-.Metadata2-cancel-filter {
-  @include flexRowCenter;
-  font-size: 10px;
-  color: $zorroa-lightgray;
-  position: absolute;
-  right: 30px;
-  margin-top: auto;
-  margin-bottom: auto;
-  top: 0;
-  bottom: 0;
-  height: 16px;
-  cursor: pointer;
-
-  &:hover { color: $zorroa-gray; }
-}
-
-.Metadata2-item-favorite {
-  @include flexOff;
-  @include flexRowCenter;
-  width: 20px;
-  height: 20px;
-  border-radius: 2px;
-  font-size: 14px;
-  font-weight: 700;
-  margin-left: 5px;
-  margin-right: 3px;
-  color: $zorroa-nearwhite;
-  background-color: transparent;
-  cursor: pointer;
-
-  &.isSelected {
-    color: $zorroa-golden-yellow;
-  }
-
-  &:hover {
-    background-color: $zorroa-nearwhite;
-    color: $zorroa-golden-yellow;
-  }
-}
-
-$FolderItemHeight : 25px;
-
-.Metadata2-item-toggle {
-  @include flexOff;
-  @include flexRowCenter;
-
-  width: $FolderItemHeight;
-  height: $FolderItemHeight;
-
-  cursor: pointer;
-
-  .FolderItem.isSelected & { background-color: $zorroa-selected; }
-  .FolderItem.isSelected &.hasChildren:hover { color: white; background-color: $zorroa-darkgray; }
-  .FolderItem.isDropTarget.dragHover & { color: white; background-color: $zorroa-sickly-green; }
-  .FolderItem.isSelected.isDropTarget.dragHover & { color: white; background-color: darken($zorroa-sickly-green, 15%); }
-}
-
-.Metadata2-toggle-open {
-  margin-left: -7px;
-  color: $zorroa-gray;
-}
-
 .Metadata2-favorites {
   @include flexRowCenter;
   margin-left: 4px;
@@ -151,6 +37,11 @@ $FolderItemHeight : 25px;
     background-color: transparent;
     border: 1px solid $zorroa-nearwhite;
   }
+}
+
+.Metadata2-nulls {
+  @extend .Metadata2-favorites;
+  &.isSelected { color: $zorroa-darkish-purple; }
 }
 
 .Metadata2-item-widget {
@@ -172,7 +63,6 @@ $FolderItemHeight : 25px;
 .Metadata2-namespace {
   @include flexRow;
   @include flexJustifySpaceBetween;
-  //font-family: "Roboto Condensed";
   margin-top: 4px;
   margin-left: 4px;
   margin-right: 4px;
@@ -182,6 +72,8 @@ $FolderItemHeight : 25px;
   font-size: 12px;
   font-weight: 500;
   color: $zorroa-darkgray;
+
+  &:not(.isSelected):hover { background-color: $zorroa-hover; }
 }
 
 .Metadata2-namespace-toggle {
@@ -201,6 +93,8 @@ $FolderItemHeight : 25px;
   align-items: stretch;
   padding-left: 4px;
   padding-right: 4px;
+
+  &:not(.isSelected):hover { background-color: $zorroa-hover; }
   &.isSelected { background-color: $zorroa-selected; }
 }
 

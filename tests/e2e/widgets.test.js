@@ -272,9 +272,8 @@ describe('search widget', function () {
 
     .then(_ => driver.findElement(By.css('.Filetype-group-Image .Filetype-group-count'))
       .getText().then(text => countImage = Number(text)))
-    // temporarily commented due to no vector assets in the Disney data set
-    // .then(_ => driver.findElement(By.css('.Filetype-group-Vector .Filetype-group-count'))
-    //   .getText().then(text => countVector = Number(text)))
+    .then(_ => driver.findElement(By.css('.Filetype-group-Vector .Filetype-group-count'))
+      .getText().then(text => countVector = Number(text)))
     .then(_ => driver.findElement(By.css('.Filetype-group-Video .Filetype-group-count'))
       .getText().then(text => countVideo = Number(text)))
 
@@ -292,10 +291,9 @@ describe('search widget', function () {
     .then(_ => selenium.clickSelector(By.css('.Filetype-group-Image .Check')))
     .then(_ => selenium.clickSelector(By.css('.Filetype-group-Vector .Check')))
     .then(selenium.waitForIdle)
-    // temporarily commented due to no vector assets in the Disney data set
-    // .then(_ => driver.findElement(By.css('.asset-counter-total'))
-    //   .getText().then(text => countTotal = Number(text)))
-    // .then(_ => { expect(countTotal).toBe(countVector) })
+    .then(_ => driver.findElement(By.css('.asset-counter-total'))
+      .getText().then(text => countTotal = Number(text)))
+    .then(_ => { expect(countTotal).toBe(countVector) })
 
     .then(_ => selenium.clickSelector(By.css('.Filetype-group-Vector .Check')))
     .then(_ => selenium.clickSelector(By.css('.Filetype-group-Video .Check')))
