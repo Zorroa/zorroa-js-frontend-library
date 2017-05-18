@@ -289,7 +289,7 @@ class Metadata2 extends Component {
                   onClear={_ => this.setState({filterString: ''})}
                   onChange={e => this.setState({filterString: e.target.value})}/>
           <div onClick={this.toggleNull}
-               className={classnames('Metadata2-favorites', 'icon-blocked',
+               className={classnames('Metadata2-nulls', 'icon-blocked',
                  {isSelected: !showNull})}/>
           <div onClick={this.toggleFavorites}
                className={classnames('Metadata2-favorites',

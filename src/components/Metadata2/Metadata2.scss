@@ -39,6 +39,11 @@
   }
 }
 
+.Metadata2-nulls {
+  @extend .Metadata2-favorites;
+  &.isSelected { color: $zorroa-darkish-purple; }
+}
+
 .Metadata2-item-widget {
   @include flexRowCenter;
   font-size: 12px;
