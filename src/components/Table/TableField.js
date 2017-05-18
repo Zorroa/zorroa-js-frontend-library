@@ -65,7 +65,9 @@ export default class TableField extends Component {
 
   renderGeneral = (val) => {
     const { field } = this.props
-    if (field.toLowerCase().endsWith('size') && typeof val === 'number') {
+    if (typeof val === 'boolean') {
+      return val ? 'true' : 'false'
+    } else if (field.toLowerCase().endsWith('size') && typeof val === 'number') {
       return humanFileSize(val)
     } else if (field.toLowerCase().includes('date') && typeof val === 'string') {
       const date = Date.parse(val)

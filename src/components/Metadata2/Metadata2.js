@@ -194,7 +194,7 @@ class Metadata2 extends Component {
   renderValue (field, namespace, asset, isFavorite) {
     if (asset === null) {
       return <div className="Metadata2-value-various">Various</div>
-    } else if (!asset.rawValue(field)) {
+    } else if (asset.rawValue(field) === undefined) {
       return <div className="Metadata2-value-null">null</div>
     } else if (asset) {
       return (
@@ -222,7 +222,7 @@ class Metadata2 extends Component {
       }
     }
     if (asset === undefined) return
-    if (!showNull && asset && !asset.rawValue(field)) return
+    if (!showNull && asset && asset.rawValue(field) === undefined) return
     const { head, tail } = minimalUniqueFieldTitle(field, fields)
     return (
       <div key={itemClass} className={classnames('Metadata2-leaf', {isSelected})}
