@@ -51,6 +51,11 @@ export default class Asset {
 
   aspect () { return this.width() / Math.max(1, this.height()) }
 
+  proxyAspect () {
+    const proxy = this.biggestProxy()
+    if (proxy) return proxy.width / Math.max(1, proxy.height)
+  }
+
   backgroundColor () { return this.tinyProxy() ? this.tinyProxy()[5] : getRandomColor() }
 
   pageCount () {

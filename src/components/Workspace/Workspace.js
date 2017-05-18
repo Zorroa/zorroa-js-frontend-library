@@ -60,6 +60,8 @@ class Workspace extends Component {
   reloadInterval = null
   commandInterval = null
   activeCommandId = 0
+  repoContainsAssets = false
+  tipShown = false
 
   componentWillMount () {
     const { actions, user } = this.props
@@ -112,6 +114,7 @@ class Workspace extends Component {
     const sources = { cloud: CLOUD_IMPORT, file_server: SERVER_IMPORT, my_computer: LOCAL_IMPORT }
     const source = sources[src]
     if (!nextProps.app.modal && !this.tipShown &&         // not previously displayed
+        !this.repoContainsAssets &&
       (source ||                                          // source in URL
       (nextProps.assets && !nextProps.assets.length &&    // no assets
       !countOfJobsOfType(nextProps.jobs, Job.Import)))) { // no imports
@@ -120,6 +123,7 @@ class Workspace extends Component {
       const body = <Import source={source} step={source ? 2 : 1}/>
       this.props.actions.showModal({body, width})
     }
+    if (nextProps.assets && nextProps.assets.length) this.repoContainsAssets = true
     const command = [...nextProps.commands.values()].find(command => (command.state === Job.Waiting || command.state === Job.Active))
     if (!this.commandInterval && command) {
       // Add a timer to monitor long commands, including the initial Waiting state,
