@@ -6,7 +6,8 @@ export default class AssetSearch {
 
   constructor (json) {
     if (json && 'query' in json && !('fuzzy' in json)) {
-      throw new Error('fuzzy is required when searching with a query')
+      json.fuzzy = true
+      // throw new Error('fuzzy is required when searching with a query')
     }
 
     if (json) {
