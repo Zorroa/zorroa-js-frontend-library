@@ -35,7 +35,8 @@
 
 .ResizeableWindow-handle {
   position: absolute;
-  &:hover { background-color: $zorroa-lightgray; }
+  border-radius: 3px;
+  &:hover { background-color: rgba(128, 128, 128, 0.75); }
 }
 
 $handle-dim: 5px;

@@ -139,7 +139,8 @@ class Metadata2 extends Component {
   }
 
   toggleWidget = (field, event) => {
-    const { widgets } = this.props
+    const { widgets, dark } = this.props
+    if (dark) return
     const index = widgets.findIndex(widget => fieldUsedInWidget(field, widget))
     if (index >= 0) {
       this.props.actions.removeRacetrackWidgetIds([widgets[index].id])
@@ -154,6 +155,7 @@ class Metadata2 extends Component {
   }
 
   createTagFacet = (term, field, event) => {
+    if (this.props.dark) return
     const fieldType = this.props.fieldTypes[field]
     field = field && field.endsWith('.raw') ? field : field + '.raw'
     const index = this.props.widgets.findIndex(widget => fieldUsedInWidget(field, widget))
@@ -172,10 +174,12 @@ class Metadata2 extends Component {
   }
 
   hover = (field) => {
+    if (this.props.dark) return
     this.props.actions.hoverField(field)
   }
 
   clearHover = (field) => {
+    if (this.props.dark) return
     this.props.actions.clearHoverField(field)
   }
 
@@ -257,7 +261,7 @@ class Metadata2 extends Component {
       )
       return [empty]
     }
-    const { fieldTypes, metadataFields, collapsibleOpen, widgets } = this.props
+    const { fieldTypes, metadataFields, collapsibleOpen, widgets, dark } = this.props
     const fields = this.state.showFavorites ? metadataFields : Object.keys(fieldTypes)
     const lcFilterString = this.state.filterString.toLowerCase()
     const filteredFields = fields.filter(field => (field.toLowerCase().includes(lcFilterString))).sort((a, b) => a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'}))
@@ -270,7 +274,7 @@ class Metadata2 extends Component {
       const isLeaf = this.isLeaf(field, namespace)
       const hasChildren = false
       const isFavorite = this.isFavorite(fieldTypes, hasChildren, namespace, metadataFields)
-      const isSearched = widgets.findIndex(widget => fieldUsedInWidget(field, widget)) >= 0
+      const isSearched = !dark && widgets.findIndex(widget => fieldUsedInWidget(field, widget)) >= 0
       const widgetType = widgetTypeForField(field, fieldTypes[field])
       const widgetIcon = this.widgetTypeIcon(widgetType)
       const leaf = this.renderLeaf(field, namespace, fields, isSearched, isFavorite, widgetIcon)
