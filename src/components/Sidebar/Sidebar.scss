@@ -3,7 +3,6 @@
 // Sidebars use flex-basis to toggle between open and close
 .Sidebar {
   @include flexCol;
-  @include fullHeight;
   @include flexOff;
 
   position: relative;   // For resize-thumb absolute

@@ -3,10 +3,6 @@
 .QuickAddWidget {
   position: relative;   // For floating list
 
-  QuickAddWidget-input {
-
-  }
-
   .QuickAddWidget-list {
     position: absolute;
     top: 110%;
@@ -69,6 +65,7 @@
 
 .QuickAddWidget-input {
   height: 40px;
+  width: 14em;
   padding-left: 32px;
   padding-right: 8px;
   padding-top: 8px;

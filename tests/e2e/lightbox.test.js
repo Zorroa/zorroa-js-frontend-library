@@ -53,17 +53,32 @@ describe('Workspace', function () {
 
   it('check lightbox', function () {
     return driver
-    .then(_ => { DEBUG && console.log('------ check basic lightbox layout') })
+    .then(_ => { DEBUG && console.log('------ check lightbox') })
+
+    .then(_ => { DEBUG && console.log('use filetype widget to make sure we open the lightbox with an image') })
+    .then(_ => selenium.clickSelector(By.css('.Sidebar-open-close-button.isRightEdge.isIconified')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.QuickAddWidget-input')))
+    .then(_ => selenium.clickSelector(By.css('.QuickAddWidget-input')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.QuickAddWidget-item-FILETYPE')))
+    .then(_ => selenium.clickSelector(By.css('.QuickAddWidget-item-FILETYPE')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Filetype')))
+    .then(_ => selenium.waitForIdle())
+    .then(_ => selenium.clickSelector(By.css('.Filetype-group-Image .Check')))
+    .then(_ => selenium.waitForIdle())
+
+    .then(_ => { DEBUG && console.log('open the lightbox') })
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Thumb'), 15000))
     .then(_ => driver.findElement(By.css('.Thumb'))
       .then(ele => driver.actions().doubleClick(ele).perform()))
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.lightbox')))
 
+    .then(_ => { DEBUG && console.log('check basic lightbox layout') })
     .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Lightbar')))
     .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Lightbar-settings')))
     .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Lightbar-close')))
     .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Controlbar')))
 
+    .then(_ => { DEBUG && console.log('make sure zooming works') })
     .then(_ => selenium.expectSelectorEnabledToBe(false, By.css('.Controlbar-zoom-reset')))
     .then(_ => selenium.clickSelector(By.css('.Controlbar-zoom-in')))
     .then(_ => selenium.waitForSelectorEnabledToBe(true, By.css('.Controlbar-zoom-reset')))
