@@ -115,7 +115,7 @@
     margin-right: 8px;
 
     .Racetrack-footer-group {
-      display: flex;
+      @include flexRowCenter;
     }
 
     .Racetrack-footer-save {
