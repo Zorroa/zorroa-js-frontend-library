@@ -44,7 +44,10 @@
   cursor: pointer;
   border: none;
 
-  .Metadata2.dark & { background-color: $zorroa-darkgray; }
+  .Metadata2.dark & {
+    color: $zorroa-gray;
+    background-color: $zorroa-darkgray;
+  }
 
   &.isSelected { color: $zorroa-golden-yellow; }
 
@@ -56,7 +59,12 @@
 
 .Metadata2-nulls {
   @extend .Metadata2-favorites;
-  &.isSelected { color: $zorroa-darkish-purple; }
+  margin-left: 8px;
+  margin-right: 4px;
+  &.isSelected {
+    color: darkred;
+    .Metadata2.dark & { color: darkred; }
+  }
 }
 
 .Metadata2-item-widget {
@@ -138,7 +146,7 @@
   color: $zorroa-gray;
   font-weight: 400;
 
-  .Metadata2.dark & { color: $zorroa-darkgray; }
+  .Metadata2.dark & { color: $zorroa-gray; }
 }
 
 .Metadata2-leaf-title-tail {
@@ -150,7 +158,7 @@
   color: $zorroa-lightgray;
   font-weight: 400;
 
-  .Metadata2.dark & { color: $zorroa-darkgray; }
+  .Metadata2.dark & { color: $zorroa-gray; }
 }
 
 .Metadata2-value {

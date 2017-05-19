@@ -9,17 +9,21 @@ import Inspector from '../Inspector'
 import Metadata2 from '../Metadata2'
 import ResizableWindow from '../ResizableWindow'
 import { isolateAssetId } from '../../actions/assetsAction'
+import { lightboxMetadata } from '../../actions/appActions'
 
 class Lightbox extends Component {
   static propTypes = {
     pages: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     isolatedId: PropTypes.string.isRequired,
+    lightboxMetadata: PropTypes.shape({
+      show: PropTypes.bool.isRequired,
+      left: PropTypes.number.isRequired,
+      top: PropTypes.number.isRequired,
+      width: PropTypes.number.isRequired,
+      height: PropTypes.number.isRequired
+    }),
     actions: PropTypes.object
-  }
-
-  state = {
-    showMetadata: false
   }
 
   @keydown('esc')
@@ -45,14 +49,23 @@ class Lightbox extends Component {
     }
   }
 
+  showMetadata = (event) => {
+    const { lightboxMetadata } = this.props
+    this.props.actions.lightboxMetadata({ ...lightboxMetadata, show: true })
+  }
+
   closeMetadata = (event) => {
-    this.setState({ showMetadata: false })
+    const { lightboxMetadata } = this.props
+    this.props.actions.lightboxMetadata({ ...lightboxMetadata, show: false })
     event.stopPropagation()
   }
 
+  moveMetadata = ({left, top, width, height}) => {
+    this.props.actions.lightboxMetadata({ left, top, width, height, show: true })
+  }
+
   render () {
-    const { assets, pages, isolatedId } = this.props
-    const { showMetadata } = this.state
+    const { assets, pages, isolatedId, lightboxMetadata } = this.props
     let asset = null
     let hasNext = false
     let hasPrev = false
@@ -72,15 +85,16 @@ class Lightbox extends Component {
     }
     return (
       <div className="lightbox flexCol fullWidth fullHeight">
-        <Lightbar showMetadata={showMetadata}
-                  onMetadata={_ => this.setState({showMetadata: !showMetadata})}/>
+        <Lightbar showMetadata={lightboxMetadata.show}
+                  onMetadata={this.showMetadata}/>
         <div className="lightbox-body flexOn fullWidth fullHeight">
           <Inspector asset={asset}
                      onNext={hasNext && (_ => this.isolateIndexOffset(1))}
                      onPrev={hasPrev && (_ => this.isolateIndexOffset(-1))} />
         </div>
-        { this.state.showMetadata && (
-          <ResizableWindow onClose={this.closeMetadata}
+        { lightboxMetadata.show && (
+          <ResizableWindow onClose={this.closeMetadata} onMove={this.moveMetadata}
+                           {...lightboxMetadata}
                            title={<div className="Lightbox-metadata-title"><div className="icon-register"/><div>Metadata</div></div>}>
             <Metadata2 assetIds={new Set([isolatedId])} dark={true} height="100%"/>
           </ResizableWindow>
@@ -94,7 +108,8 @@ class Lightbox extends Component {
 export default connect(state => ({
   assets: state.assets.all,
   pages: state.assets.pages,
-  isolatedId: state.assets.isolatedId
+  isolatedId: state.assets.isolatedId,
+  lightboxMetadata: state.app.lightboxMetadata
 }), dispatch => ({
-  actions: bindActionCreators({ isolateAssetId }, dispatch)
+  actions: bindActionCreators({ isolateAssetId, lightboxMetadata }, dispatch)
 }))(Lightbox)

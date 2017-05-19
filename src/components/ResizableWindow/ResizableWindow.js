@@ -8,26 +8,27 @@ const minHeight = 120
 export default class ResizableWindow extends Component {
   static propTypes = {
     onClose: PropTypes.func.isRequired,
+    onMove: PropTypes.func,
     title: PropTypes.node,
     left: PropTypes.number,
     top: PropTypes.number,
     width: PropTypes.number,
     height: PropTypes.number,
-    children: PropTypes.node,
+    children: PropTypes.node
   }
 
   static defaultProps = {
     left: 20,
     top: 80,
     width: 300,
-    height: 500,
+    height: 500
   }
 
   state = {
     left: this.props.left,
     top: this.props.top,
     width: this.props.width,
-    height: this.props.height,
+    height: this.props.height
   }
 
   componentWillMount () {
@@ -75,14 +76,17 @@ export default class ResizableWindow extends Component {
     this.setState({width, height})
   }
 
-  release = () => {}
+  release = () => {
+    const { onMove } = this.props
+    if (onMove) onMove({ ...this.state })
+  }
 
   render () {
     const { title, children, onClose } = this.props
     const { top, left, width, height } = this.state
     return (
       <div className="ResizableWindow" style={this.state}>
-        <div onMouseDown={_ => this.resizer.capture(this.moveHeader, null, left, top)}
+        <div onMouseDown={_ => this.resizer.capture(this.moveHeader, this.release, left, top)}
              className="ResizableWindow-header">
           <div className="ResizableWindow-title">
             {title}

@@ -295,7 +295,7 @@ class Metadata2 extends Component {
     return (
       <div className={classnames('Metadata2', {dark})} style={{height: height, maxHeight: height}}>
         <div className="Metadata2-header">
-          <Filter className="box" value={filterString}
+          <Filter className="box" value={filterString} dark={dark}
                   placeholder="Filter Metadata Fields"
                   onClear={_ => this.setState({filterString: ''})}
                   onChange={e => this.setState({filterString: e.target.value})}/>
