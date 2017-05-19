@@ -34,8 +34,7 @@ export default class Suggestions extends Component {
     }
   }
 
-  updateValue = (event) => {
-    const value = event.target.value
+  updateValue = (value) => {
     this.setState({ value })
     this.props.onChange(value)
   }
@@ -45,6 +44,7 @@ export default class Suggestions extends Component {
     if (this.state.value !== value) {
       this.setState({value})
       this.props.onSelect(value)
+      this.updateValue('')
     }
   }
 
@@ -149,7 +149,7 @@ export default class Suggestions extends Component {
         <input className='Suggestions-search'
                value={value || ''}
                onKeyDown={this.onKeyDown}
-               onChange={this.updateValue}
+               onChange={event => this.updateValue(event.target.value)}
                placeholder={placeholder} type="text" />
         <button onClick={this.clearValue}
                 disabled={!value || !value.length}
