@@ -28,6 +28,10 @@ class Searchbar extends Component {
     queryString: this.props.query && this.props.query.query
   }
 
+  setStatePromise = (newState) => {
+    return new Promise(resolve => this.setState(newState, resolve))
+  }
+
   componentDidUpdate () {
     const { query } = this.props
     const { queryString } = this.state
@@ -37,15 +41,24 @@ class Searchbar extends Component {
   }
 
   // Submit a new suggestion string to get a new list of suggestions
-  suggest = (suggestion) => {
+  // lastAction is 'type' or 'select' - whatever the user did to cause us to get here
+  // (when 'type': start the search timer; when 'select': no timer)
+  suggest = (suggestion, lastAction) => {
     // hide suggestions whenever the search input is cleared
     if (!suggestion) this.showSuggestions = false
 
-    this.props.actions.suggestQueryStrings(suggestion)
     clearTimeout(this.instaSearchTimer)
+    if (lastAction === 'type') {
+      this.props.actions.suggestQueryStrings(suggestion)
+    }
+
     this.instaSearchTimer = setTimeout(_ => {
-      this.search(suggestion)
+      Promise.resolve()
+      // set the query string just in case we're insta-searching for a suggestion
+      .then(_ => { if (lastAction === 'select') return this.setStatePromise({ queryString: suggestion }) })
+      .then(_ => this.search(suggestion))
     }, INSTA_SEARCH_TIME)
+
     // show suggestions whenever the user types into the input
     this.showSuggestions = true
   }
@@ -80,12 +93,14 @@ class Searchbar extends Component {
   render () {
     const { query, suggestions } = this.props
     const { queryString } = this.state
-    const value = this.showSuggestions && query && query.query && query.query !== queryString ? query.query
-      : (query && query.query === undefined && queryString ? '' : undefined)
+    const value = query && query.query && query.query !== queryString ? query.query
+        : (query && query.query === undefined && queryString ? '' : undefined)
+
     return (
       <div className="Searchbar">
         <div className="Searchbar-body flexCenter">
           <Suggestions suggestions={suggestions}
+                       showSuggestions={this.showSuggestions}
                        value={value}
                        onChange={this.suggest}
                        onSelect={this.search.bind(this)} />
