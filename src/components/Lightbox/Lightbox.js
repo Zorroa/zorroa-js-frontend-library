@@ -49,9 +49,9 @@ class Lightbox extends Component {
     }
   }
 
-  showMetadata = (event) => {
+  toggleMetadata = (event) => {
     const { lightboxMetadata } = this.props
-    this.props.actions.lightboxMetadata({ ...lightboxMetadata, show: true })
+    this.props.actions.lightboxMetadata({ ...lightboxMetadata, show: !lightboxMetadata.show })
   }
 
   closeMetadata = (event) => {
@@ -86,7 +86,7 @@ class Lightbox extends Component {
     return (
       <div className="lightbox flexCol fullWidth fullHeight">
         <Lightbar showMetadata={lightboxMetadata.show}
-                  onMetadata={this.showMetadata}/>
+                  onMetadata={this.toggleMetadata}/>
         <div className="lightbox-body flexOn fullWidth fullHeight">
           <Inspector asset={asset}
                      onNext={hasNext && (_ => this.isolateIndexOffset(1))}
