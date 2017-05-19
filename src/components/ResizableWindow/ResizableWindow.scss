@@ -1,0 +1,82 @@
+@import '../../styles/core-mixins.scss';
+
+.ResizableWindow {
+  @include flexCol;
+  border-radius: 3px;
+  overflow: hidden;
+  position: absolute; // Expects absolute top, left, width, height set externally
+}
+
+.ResizableWindow-header {
+  @include flexRow;
+  @include flexJustifySpaceBetween;
+  @include flexAlignItemsCenter;
+  background-color: black;
+  min-height: 38px;
+}
+
+.ResizableWindow-title {
+  color: white;
+  font-size: 16px;
+  text-transform: uppercase;
+}
+
+.ResizableWindow-close {
+  @include zorroa-square-btn-lighten(24px);
+  color: white;
+  margin: 8px;
+}
+
+.ResizableWindow-body {
+  background-color: rgba(0,0,0,0.65);
+  height: 100%;
+  max-height: 100%;
+}
+
+.ResizeableWindow-handle {
+  position: absolute;
+  &:hover { background-color: $zorroa-lightgray; }
+}
+
+$handle-dim: 5px;
+$handle-neg-off: -1 * $handle-dim / 2;
+
+.ResizableWindow-left-handle {
+  cursor: ew-resize;
+  left: $handle-neg-off;
+  width: $handle-dim;
+  top: 0;
+  height: 100%;
+}
+
+.ResizableWindow-right-handle {
+  cursor: ew-resize;
+  right: $handle-neg-off;
+  width: $handle-dim;
+  top: 0;
+  height: 100%;
+}
+
+.ResizableWindow-bottom-handle {
+  cursor: ns-resize;
+  left: 0;
+  bottom: $handle-neg-off;
+  height: $handle-dim;
+  width: 100%;
+}
+
+.ResizableWindow-lower-left-handle {
+  cursor: nesw-resize;
+  left: 2 * $handle-neg-off;
+  width: 4 * $handle-dim;
+  bottom: 2 * $handle-neg-off;
+  height: 4 * $handle-dim;
+}
+
+.ResizableWindow-lower-right-handle {
+  cursor: nwse-resize;
+  right: 2 * $handle-neg-off;
+  width: 4 * $handle-dim;
+  bottom: 2 * $handle-neg-off;
+  height: 4 * $handle-dim;
+}

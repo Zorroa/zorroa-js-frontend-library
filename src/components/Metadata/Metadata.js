@@ -16,14 +16,14 @@ import * as WidgetInfo from '../Racetrack/WidgetInfo'
 class Metadata extends Component {
   static propTypes = {
     // state props
-    metadataFields: PropTypes.arrayOf(PropTypes.string).isRequired,
+    metadataFields: PropTypes.arrayOf(PropTypes.string),
     widgets: PropTypes.arrayOf(PropTypes.object),
     collapsibleOpen: PropTypes.object,
     fieldTypes: PropTypes.object,
     aggs: PropTypes.object,
     order: PropTypes.arrayOf(PropTypes.object),
     user: PropTypes.instanceOf(User),
-    userSettings: PropTypes.object.isRequired,
+    userSettings: PropTypes.object,
     actions: PropTypes.object
   }
 

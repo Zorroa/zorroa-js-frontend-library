@@ -6,18 +6,20 @@ import keydown from 'react-keydown'
 import Asset from '../../models/Asset'
 import Lightbar from './Lightbar'
 import Inspector from '../Inspector'
+import Metadata2 from '../Metadata2'
+import ResizableWindow from '../ResizableWindow'
 import { isolateAssetId } from '../../actions/assetsAction'
 
 class Lightbox extends Component {
-  static get displayName () {
-    return 'Lightbox'
-  }
-
   static propTypes = {
     pages: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     isolatedId: PropTypes.string.isRequired,
     actions: PropTypes.object
+  }
+
+  state = {
+    showMetadata: false
   }
 
   @keydown('esc')
@@ -43,8 +45,14 @@ class Lightbox extends Component {
     }
   }
 
+  closeMetadata = (event) => {
+    this.setState({ showMetadata: false })
+    event.stopPropagation()
+  }
+
   render () {
     const { assets, pages, isolatedId } = this.props
+    const { showMetadata } = this.state
     let asset = null
     let hasNext = false
     let hasPrev = false
@@ -64,12 +72,20 @@ class Lightbox extends Component {
     }
     return (
       <div className="lightbox flexCol fullWidth fullHeight">
-        <Lightbar/>
+        <Lightbar showMetadata={showMetadata}
+                  onMetadata={_ => this.setState({showMetadata: !showMetadata})}/>
         <div className="lightbox-body flexOn fullWidth fullHeight">
           <Inspector asset={asset}
                      onNext={hasNext && (_ => this.isolateIndexOffset(1))}
                      onPrev={hasPrev && (_ => this.isolateIndexOffset(-1))} />
         </div>
+        { this.state.showMetadata && (
+          <ResizableWindow onClose={this.closeMetadata}
+                           title={<div className="Lightbox-metadata-title"><div className="icon-register"/><div>Metadata</div></div>}>
+            <Metadata2 assetIds={new Set([isolatedId])} dark={true} height="100%"/>
+          </ResizableWindow>
+          )
+        }
       </div>
     )
   }

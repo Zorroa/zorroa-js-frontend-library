@@ -20,6 +20,8 @@ class Lightbar extends Component {
   static displayName = 'Lightbar'
 
   static propTypes = {
+    showMetadata: PropTypes.bool.isRequired,
+    onMetadata: PropTypes.func.isRequired,
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     isolatedId: PropTypes.string,
     selectedPageIds: PropTypes.instanceOf(Set),
@@ -173,7 +175,7 @@ class Lightbar extends Component {
   }
 
   render () {
-    const { lightbarFields, assets, isolatedId, showPages, selectedPageIds, user, pages } = this.props
+    const { lightbarFields, assets, isolatedId, showPages, selectedPageIds, user, pages, showMetadata, onMetadata } = this.props
     const { columnWidth, actionWidth, lightbarHeight, copyingLink, showFolders, addingToCollection } = this.state
     const isDraggingColumn = this.resizer.active && this.resizer.onMove === this.resizeColumn
     const isDraggingAction = this.resizer.active && this.resizer.onMove === this.resizeAction
@@ -183,7 +185,8 @@ class Lightbar extends Component {
     const isAddToCollectionDisabled = showPages && !nselected
     return (
       <div className="Lightbar" style={{height: lightbarHeight}}>
-        <button onClick={this.showDisplayOptions} className="Lightbar-settings icon-cog" />
+        <div onClick={this.showDisplayOptions} className="Lightbar-settings icon-cog" />
+        <div onClick={onMetadata} className={classnames('Lightbar-settings', 'icon-chevron-down', {isOpen: showMetadata})} />
         <div className="Lightbar-metadata">
           { titleFields && titleFields.map(tf => this.renderField({...tf, asset})) }
           <div className="Lightbar-column-resizers">

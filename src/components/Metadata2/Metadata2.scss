@@ -4,6 +4,9 @@
 
   background-color: white;
 
+  &.dark { background-color: transparent; }
+
+  @include flexCol;
   .Metadata2-header {
     @include flexRow;
     @include flexJustifySpaceBetween;
@@ -11,12 +14,22 @@
     padding-top: 4px;
     padding-left: 8px;
     padding-bottom: 8px;
+    min-height: 44px;
+    border-bottom: 1px solid $zorroa-nearwhite;
+
+    .Metadata2.dark & { border-bottom: 1px solid $zorroa-darkgray; }
   }
 
   .Metadata2-body {
     margin-bottom: 10px;
     position: relative;
+    max-height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
+}
+
+.Metadata2-scroll {
 }
 
 .Metadata2-favorites {
@@ -30,6 +43,8 @@
   height: 26px;
   cursor: pointer;
   border: none;
+
+  .Metadata2.dark & { background-color: $zorroa-darkgray; }
 
   &.isSelected { color: $zorroa-golden-yellow; }
 
@@ -50,6 +65,8 @@
   color: $zorroa-lightgray;
   width: 25px;
   height: 25px;
+
+  .Metadata2.dark & { color: $zorroa-darkgray; }
 }
 
 .Metadata2-resizer {
@@ -72,6 +89,11 @@
   font-size: 12px;
   font-weight: 500;
   color: $zorroa-darkgray;
+
+  .Metadata2.dark & {
+    border-top: 1px solid $zorroa-darkgray;
+    color: $zorroa-lightgray;
+  }
 
   &:not(.isSelected):hover { background-color: $zorroa-hover; }
 }
@@ -113,6 +135,8 @@
   font-size: 12px;
   color: $zorroa-gray;
   font-weight: 400;
+
+  .Metadata2.dark & { color: $zorroa-darkgray; }
 }
 
 .Metadata2-leaf-title-tail {
@@ -123,10 +147,13 @@
   font-size: 12px;
   color: $zorroa-lightgray;
   font-weight: 400;
+
+  .Metadata2.dark & { color: $zorroa-darkgray; }
 }
 
 .Metadata2-value {
   border-left: 1px solid $zorroa-nearwhite;
+  .Metadata2.dark & { border-left: 1px solid $zorroa-darkgray; }
   @include flexOn;
   @include flexRow;
   @include flexJustifySpaceBetween;
@@ -139,6 +166,10 @@
   font-style: italic;
   padding: 4px;
   font-size: 12px;
+  .Metadata2.dark & {
+    color: $zorroa-gray;
+    border-left: 1px solid $zorroa-darkgray;
+  }
 }
 
 .Metadata2-value-null {
@@ -147,6 +178,10 @@
   color: $zorroa-lightgray;
   font-style: italic;
   font-size: 12px;
+  .Metadata2.dark & {
+    color: $zorroa-gray;
+    border-left: 1px solid $zorroa-darkgray;
+  }
 }
 
 .Metadata2-no-assets {
@@ -154,10 +189,12 @@
   color: $zorroa-lightgray;
   margin-top: 10px;
   padding-bottom: 20px;
+  .Metadata2.dark & { color: $zorroa-darkgray; }
 }
 
 .Metadata2-no-assets-icon {
   margin-bottom: 10px;
   font-size: 40px;
   color: $zorroa-lightgray;
+  .Metadata2.dark & { color: $zorroa-gray; }
 }

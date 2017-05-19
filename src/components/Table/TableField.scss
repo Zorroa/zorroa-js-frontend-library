@@ -39,6 +39,11 @@
   &:hover .TableField-toggle-icon {
     color: $zorroa-light-green;
     background-color: $zorroa-darkgray;
+
+
+    .Table-cell.dark & {
+      background-color: $zorroa-lightgray;
+    }
   }
 }
 
@@ -52,9 +57,20 @@
   color: $zorroa-greyish-brown;
   background-color: rgba(0,0,0,0.1);
   cursor: pointer;
+
+  .Table-cell.dark & {
+    color: $zorroa-lightgray;
+    background-color: rgba(255,255,255,0.1);
+  }
+
   &:hover {
     color: #fff;
     background-color: $zorroa-sickly-green;
+
+    .Table-cell.dark & {
+      color: $zorroa-darkgray;
+      background-color: rgba(255,255,255,0.1);
+    }
   }
 }
 

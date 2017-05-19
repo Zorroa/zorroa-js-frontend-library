@@ -19,13 +19,15 @@ import * as WidgetInfo from '../Racetrack/WidgetInfo'
 
 class Metadata2 extends Component {
   static propTypes = {
-    selectedAssetIds: PropTypes.instanceOf(Set),
-    metadataFields: PropTypes.arrayOf(PropTypes.string).isRequired,
+    dark: PropTypes.bool,
+    height: PropTypes.string.isRequired,
+    assetIds: PropTypes.instanceOf(Set),
+    metadataFields: PropTypes.arrayOf(PropTypes.string),
     widgets: PropTypes.arrayOf(PropTypes.object),
     collapsibleOpen: PropTypes.object,
     fieldTypes: PropTypes.object,
     user: PropTypes.instanceOf(User),
-    userSettings: PropTypes.object.isRequired,
+    userSettings: PropTypes.object,
     actions: PropTypes.object
   }
 
@@ -49,12 +51,12 @@ class Metadata2 extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    if (!nextProps.selectedAssetIds || !nextProps.selectedAssetIds.size) {
+    if (!nextProps.assetIds || !nextProps.assetIds.size) {
       if (this.state.selectedAssets.length) this.setState({selectedAssets: []})
       this.cachedAssetIds = new Set()
-    } else if (!equalSets(this.cachedAssetIds, nextProps.selectedAssetIds)) {
-      this.cachedAssetIds = new Set([...nextProps.selectedAssetIds])
-      assetsForIds(nextProps.selectedAssetIds)
+    } else if (!equalSets(this.cachedAssetIds, nextProps.assetIds)) {
+      this.cachedAssetIds = new Set([...nextProps.assetIds])
+      assetsForIds(nextProps.assetIds)
         .then(selectedAssets => this.setState({selectedAssets}))
         .catch(error => {
           console.log('Error getting selected assets: ' + error)
@@ -185,7 +187,7 @@ class Metadata2 extends Component {
     const itemClass = namespace.replace('.', '-')
     return (
       <div key={itemClass}
-           onClick={e => this.toggleCollapsible(namespace, e)}
+           onClick={e => this.toggleCollapsible(`meta2-${namespace}`, e)}
            className={classnames('Metadata2-namespace', 'Metadata2-namespace-' + itemClass, {isOpen})}>
         <div className="Metadata2-namespace-title">
           {unCamelCase(namespace)}
@@ -203,7 +205,7 @@ class Metadata2 extends Component {
     } else if (asset) {
       return (
         <div className="Metadata2-value">
-          <TableField asset={asset} field={field} isOpen={true} onTag={this.createTagFacet}/>
+          <TableField asset={asset} field={field} isOpen={true} dark={this.props.dark} onTag={this.createTagFacet}/>
         </div>
       )
     }
@@ -264,7 +266,7 @@ class Metadata2 extends Component {
     const addField = (field) => {
       const parents = field.split('.')
       const namespace = parents[0]
-      const isOpen = collapsibleOpen[namespace]
+      const isOpen = collapsibleOpen[`meta2-${namespace}`]
       const isLeaf = this.isLeaf(field, namespace)
       const hasChildren = false
       const isFavorite = this.isFavorite(fieldTypes, hasChildren, namespace, metadataFields)
@@ -284,9 +286,10 @@ class Metadata2 extends Component {
   }
 
   render () {
+    const { dark, height } = this.props
     const { filterString, showFavorites, titleWidth, showNull } = this.state
     return (
-      <div className="Metadata2">
+      <div className={classnames('Metadata2', {dark})} style={{height: height, maxHeight: height}}>
         <div className="Metadata2-header">
           <Filter className="box" value={filterString}
                   placeholder="Filter Metadata Fields"
@@ -301,9 +304,11 @@ class Metadata2 extends Component {
                  {isSelected: showFavorites})}/>
         </div>
         <div className="Metadata2-body">
-          { this.renderFields() }
-          <div className={classnames('Metadata2-resizer', {active: this.resizer.active})}
-               style={{left: 2 + titleWidth}} onMouseDown={this.resizeStart}/>
+          <div className="Metadata2-scroll">
+            { this.renderFields() }
+            <div className={classnames('Metadata2-resizer', {active: this.resizer.active})}
+                 style={{left: 2 + titleWidth}} onMouseDown={this.resizeStart}/>
+          </div>
         </div>
       </div>
     )
@@ -312,7 +317,6 @@ class Metadata2 extends Component {
 
 export default connect(state => ({
   assets: state.assets.all,
-  selectedAssetIds: state.assets.selectedIds,
   metadataFields: state.app.metadataFields,
   widgets: state.racetrack.widgets,
   collapsibleOpen: state.app.collapsibleOpen,

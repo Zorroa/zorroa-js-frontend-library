@@ -19,6 +19,8 @@
   color: white;
   background-color: black;
   border: none;
+
+  &.isOpen { transform: rotate(180deg); }
 }
 
 .Lightbar-metadata {
