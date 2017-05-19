@@ -10,6 +10,8 @@
     "post-install": "rm -rf bin; npm run build",
     "start": "./node_modules/.bin/serve ./bin -p 8080",
     "dev": "./node_modules/.bin/webpack-dev-server --config ./build/webpack.dev.js --progress --inline --hot --colors --no-info --history-api-fallback",
+    "dev-https": "./node_modules/.bin/webpack-dev-server --config ./build/webpack.dev.js --progress --inline --hot --colors --no-info --history-api-fallback --https --cert ./cert.pem --key ./key.pem # this is for safari testing",
+    "dev-https-cert": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj '/CN=localhost'",
     "build-dev": "./node_modules/.bin/webpack --config ./build/webpack.dev.js --progress --colors",
     "build-only": "./node_modules/.bin/webpack --config ./build/webpack.prod.js --progress --colors",
     "build-prodlocal": "./node_modules/.bin/webpack --config ./build/webpack.prodlocal.js --progress --colors",
