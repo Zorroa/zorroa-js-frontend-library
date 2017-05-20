@@ -149,17 +149,19 @@ class Searcher extends Component {
     if (widgets && widgets.length) {
       let postFilter = new AssetFilter()
       for (let widget of widgets) {
-        if (!widget || !widget.sliver || !widget.isEnabled) {
+        if (!widget || !widget.sliver) {
           continue
         }
         let sliver = widget.sliver
         if (sliver.aggs) {
-          postFilter.merge(widget.sliver.filter)
+          if (widget.isEnabled) postFilter.merge(widget.sliver.filter)
           const allOthers = widget.type === MapWidgetInfo.type ? new AssetFilter() : this.allOtherFilters(widget).convertToBool()
           let aggs = {[widget.id]: {filter: allOthers, aggs: sliver.aggs}}
           sliver = new AssetSearch({aggs})
         }
-        assetSearch.merge(sliver)
+        // Search for aggs even if widget is disabled to update contents, e.g. facets
+        const search = widget.isEnabled ? sliver : new AssetSearch({aggs: sliver.aggs})
+        assetSearch.merge(search)
       }
       assetSearch.postFilter = postFilter
     }

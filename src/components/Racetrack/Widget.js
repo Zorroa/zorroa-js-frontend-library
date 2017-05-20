@@ -12,26 +12,23 @@ export default class Widget extends Component {
     backgroundColor: PropTypes.string.isRequired,
     isEnabled: PropTypes.bool.isRequired,
     isIconified: PropTypes.bool.isRequired,
-    isOpen: PropTypes.bool,
+    onOpen: PropTypes.func,
     onClose: PropTypes.func.isRequired,
     className: PropTypes.string,
     enableToggleFn: PropTypes.func
   }
 
-  constructor (props) {
-    super(props)
-    this.state = { isOpen: true }
+  state = {
+    isOpen: true
   }
 
   toggleCollapse = () => {
-    const { isOpen } = this.state
-    const { children, isIconified } = this.props
+    const { isIconified, onOpen } = this.props
     // If the Sidebar is iconified, ignore the click, the sidebar will open itself instead
     if (isIconified) return
-    if (children) {
-      this.setState({ ...this.state, isOpen: !isOpen })
-    }
-    return false
+    const isOpen = onOpen ? onOpen(this.state.isOpen) : !this.state.isOpen
+    this.setState({ isOpen })
+    return false  // Useless?
   }
 
   render () {
