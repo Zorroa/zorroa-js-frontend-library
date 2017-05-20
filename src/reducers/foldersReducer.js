@@ -112,31 +112,34 @@ export default function (state = initialState, action) {
       const folder = action.payload
       const oldFolder = state.all.get(folder.id)
       const parent = state.all.get(folder.parentId) // get folder's parent to open it
-      if (folder.id) {
+      if (folder) {
         let all = new Map(state.all) // copy folder map
-        if (oldFolder && oldFolder.childIds) {
-          if (oldFolder.parentId !== folder.parentId) {
-            // Remove from old parent child list
-            const oldParent = state.all.get(oldFolder.parentId)
-            const newOldParent = new Folder(oldParent)
-            const newOldParentChildIds = new Set(oldParent.childIds)
-            newOldParentChildIds.delete(folder.id)
-            newOldParent.childIds = newOldParentChildIds
-            all.set(oldParent.id, newOldParent)
-            // Add to new parent child list
-            const newParent = new Folder(parent)
-            const newParentChildIds = parent.childIds ? new Set(parent.childIds) : new Set()
-            newParentChildIds.add(folder.id)
-            newParent.childIds = newParentChildIds
-            all.set(parent.id, newParent)
-          } else {
-            assert.ok(parent.childIds.has(folder.id))
-          }
-          folder.childIds = new Set(oldFolder.childIds)
+        if (oldFolder.parentId !== folder.parentId) {
+          // WARNING: Client side objects manually mirroring server-side changes.
+          //          When we move a folder, we should request updated parent folders
+          //          but instead we mirror the change to childCount locally.
+          //          childCount & childIds are used by Folders to display the tree.
+
+          // Remove from old parent child list
+          const oldParent = state.all.get(oldFolder.parentId)
+          const newOldParent = new Folder(oldParent)
+          newOldParent.childCount--
+          const newOldParentChildIds = new Set(oldParent.childIds)
+          newOldParentChildIds.delete(folder.id)
+          if (newOldParentChildIds.size) newOldParent.childIds = newOldParentChildIds
+          all.set(oldParent.id, newOldParent)
+
+          // Add to new parent child list
+          const newParent = new Folder(parent)
+          const newParentChildIds = parent.childIds ? new Set(parent.childIds) : new Set()
+          newParentChildIds.add(folder.id)
+          newParent.childIds = newParentChildIds
+          newParent.childCount++
+          all.set(parent.id, newParent)
         } else {
-          folder.childIds = new Set()
           assert.ok(parent.childIds.has(folder.id))
         }
+        if (oldFolder.childIds) folder.childIds = new Set(oldFolder.childIds)
         let openFolderIds = new Set(state.openFolderIds)
         all.set(folder.id, folder)
         openFolderIds.add(parent.id) // make sure we can see the updated folder immediately

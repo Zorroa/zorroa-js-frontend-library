@@ -221,25 +221,27 @@ class Folders extends Component {
     return user ? user.homeFolderId : Folder.ROOT_ID
   }
 
-  isAddFolderEnabled () {
+  cannotAddFolderReason () {
     const { folders, user, selectedAssetIds } = this.props
     // True if one folder is selected, it isn't in the trash, and we have write permission
     const selectedFolderIds = folders.selectedFolderIds
     if (selectedFolderIds && selectedFolderIds.size > 0) {
-      if (selectedFolderIds.size > 1) return false  // Don't know which to use as parent
+      if (selectedFolderIds.size > 1) return 'Select a single parent folder'
       const id = selectedFolderIds.values().next().value
       if (folders.trashedFolders) {
         const index = folders.trashedFolders.findIndex(trashedFolder => (trashedFolder.folderId === id))
-        if (index >= 0) return false
+        if (index >= 0) return 'Select a folder outside of trash'
       }
       const folder = folders.all.get(id)
-      if (!folder) return false
-      return folder.hasAccess(user, AclEntry.WriteAccess)
+      if (!folder) return 'Selected folder does not exist'
+      if (folder.isDyhi()) return 'Cannot add child to automatic smart folder'
+      if (folder.isSmartCollection()) return 'Cannot add child to smart folder'
+      if (!folder.hasAccess(user, AclEntry.WriteAccess)) return 'No write permission to parent folder'
+    } else {
+      // If no parent folder is selected, we'll create in the user's folder.
+      // Enable add folder if we have any selected assets
+      if (!selectedAssetIds || !selectedAssetIds.size) return 'Select assets or parent folder to create a new folder'
     }
-
-    // If no parent folder is selected, we'll create in the user's folder.
-    // Enable add folder if we have any selected assets
-    return selectedAssetIds && selectedAssetIds.size
   }
 
   folderCompare = (a, b) => {
@@ -415,6 +417,7 @@ class Folders extends Component {
       }
     })
 
+    const cannotAddError = this.cannotAddFolderReason()
     return (
       <div className='Folders'>
         <div className="Folders-controls">
@@ -427,9 +430,9 @@ class Folders extends Component {
               <div className="icon-search"/>
 
             </div>
-            <div className={classnames('Folders-controls-add',
-              {disabled: !this.isAddFolderEnabled()})}
-                 onClick={this.isAddFolderEnabled() ? this.addFolder : null}>
+            <div className={classnames('Folders-controls-add', {disabled: cannotAddError})}
+                 title={cannotAddError || 'Create a new folder'}
+                 onClick={!cannotAddError && this.addFolder}>
               <span className='icon-collections-add'/>
             </div>
           </div>
