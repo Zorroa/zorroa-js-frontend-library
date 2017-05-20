@@ -6,6 +6,7 @@ import LRUCache from 'lru-cache'
 
 import User from '../../models/User'
 import Folder from '../../models/Folder'
+import AclEntry from '../../models/Acl'
 import { getFolderChildren, createFolder, selectFolderIds, selectFolderId,
   toggleFolder, queueFolderCounts } from '../../actions/folderAction'
 import { showModal, sortFolders } from '../../actions/appActions'
@@ -39,6 +40,7 @@ class Folders extends Component {
     // state props
     folders: PropTypes.object.isRequired,
     sortFolders: PropTypes.string,
+    selectedAssetIds: PropTypes.instanceOf(Set),
     user: PropTypes.instanceOf(User)
   }
 
@@ -201,14 +203,15 @@ class Folders extends Component {
   addFolder = () => {
     const width = '300px'
     const body = <CreateFolder title='Create Collection' acl={[]}
+                               includeAssets={true}
                                onCreate={this.createFolder}/>
     this.props.actions.showModal({body, width})
   }
 
-  createFolder = (name, acl, search) => {
+  createFolder = (name, acl, assetIds) => {
     const parentId = this.selectedParentId()
-    const folder = new Folder({ name, parentId, acl, search })
-    this.props.actions.createFolder(folder)
+    const folder = new Folder({ name, parentId, acl })
+    this.props.actions.createFolder(folder, assetIds)
   }
 
   selectedParentId () {
@@ -219,14 +222,24 @@ class Folders extends Component {
   }
 
   isAddFolderEnabled () {
-    const { folders } = this.props
-    // True if one folder is selected and it isn't in the trash
+    const { folders, user, selectedAssetIds } = this.props
+    // True if one folder is selected, it isn't in the trash, and we have write permission
     const selectedFolderIds = folders.selectedFolderIds
-    if (!selectedFolderIds || selectedFolderIds.size !== 1) return false
-    if (!folders.trashedFolders) return true
-    const id = selectedFolderIds.values().next().value
-    const index = folders.trashedFolders.findIndex(trashedFolder => (trashedFolder.folderId === id))
-    return index < 0
+    if (selectedFolderIds && selectedFolderIds.size > 0) {
+      if (selectedFolderIds.size > 1) return false  // Don't know which to use as parent
+      const id = selectedFolderIds.values().next().value
+      if (folders.trashedFolders) {
+        const index = folders.trashedFolders.findIndex(trashedFolder => (trashedFolder.folderId === id))
+        if (index >= 0) return false
+      }
+      const folder = folders.all.get(id)
+      if (!folder) return false
+      return folder.hasAccess(user, AclEntry.WriteAccess)
+    }
+
+    // If no parent folder is selected, we'll create in the user's folder.
+    // Enable add folder if we have any selected assets
+    return selectedAssetIds && selectedAssetIds.size
   }
 
   folderCompare = (a, b) => {
@@ -447,7 +460,8 @@ export default connect(state => ({
   folders: state.folders,
   sortFolders: state.app.sortFolders,
   assetsCounter: state.assets.assetsCounter,
-  user: state.auth.user
+  user: state.auth.user,
+  selectedAssetIds: state.assets.selectedIds
 }), dispatch => ({
   actions: bindActionCreators({
     getFolderChildren,

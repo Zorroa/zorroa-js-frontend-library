@@ -7,6 +7,7 @@ import { hideModal } from '../../actions/appActions'
 import User from '../../models/User'
 import AclEntry from '../../models/Acl'
 import AclEditor from '../AclEditor'
+import Toggle from '../Toggle'
 
 class CreateFolder extends Component {
   static propTypes = {
@@ -18,16 +19,19 @@ class CreateFolder extends Component {
     onCreate: PropTypes.func.isRequired,  // passed Folder
     onDelete: PropTypes.func,             // optional delete button
     onLink: PropTypes.func,               // optional link button
+    includeAssets: PropTypes.bool,        // optionally include selected assets
 
     // App State
     user: PropTypes.instanceOf(User),
+    selectedAssetIds: PropTypes.instanceOf(Set),
     actions: PropTypes.object.isRequired
   }
 
   state = {
     name: this.props.name || '',
     isShared: false,
-    acl: null
+    acl: null,
+    includeSelectedAssets: this.props.includeAssets
   }
 
   changeName = (event) => {
@@ -56,8 +60,8 @@ class CreateFolder extends Component {
   }
 
   saveFolder = (event) => {
-    const { user } = this.props
-    const { name, isShared } = this.state
+    const { user, selectedAssetIds } = this.props
+    const { name, isShared, includeSelectedAssets } = this.state
     let acl = null
     if (isShared && acl) {
       acl = this.state.acl
@@ -68,7 +72,8 @@ class CreateFolder extends Component {
       acl = [ new AclEntry({ permissionId, access }) ]
     }
     if (acl) {
-      this.props.onCreate(name, acl)
+      const assetIds = includeSelectedAssets && selectedAssetIds
+      this.props.onCreate(name, acl, assetIds)
       this.props.actions.hideModal()
     } else {
       console.error('Cannot determine permissions to create folder ' + name)
@@ -79,13 +84,18 @@ class CreateFolder extends Component {
     this.setState({ isShared: event.target.checked })
   }
 
+  toggleShareSelected = (event) => {
+    this.setState({includeSelectedAssets: event.target.checked})
+  }
+
   changeAcl = (acl) => {
     this.setState({acl})
   }
 
   render () {
-    const { title, onLink, onDelete, user, date } = this.props
-    const { isShared, name } = this.state
+    const { title, onLink, onDelete, user, date, selectedAssetIds, includeAssets } = this.props
+    const { isShared, name, includeSelectedAssets } = this.state
+    const disableIncludeSelected = !selectedAssetIds || !selectedAssetIds.size
     return (
       <div className="CreateFolder flexRow flexAlignItemsCenter">
         <div className="CreateFolder-form">
@@ -99,10 +109,17 @@ class CreateFolder extends Component {
           <div className="CreateFolder-body">
             <div className="CreateFolder-input-title">Title</div>
             <input className="CreateFolder-input-title-input" autoFocus={true} type="text" placeholder="Name" onKeyDown={this.checkForSubmit} value={name} onChange={this.changeName} />
+            { includeAssets && (
+              <div className={classnames('CreateFolder-include-selected-assets', {disabled: disableIncludeSelected})}>
+                <input type="checkbox" checked={includeSelectedAssets} disabled={disableIncludeSelected}
+                       onChange={this.toggleShareSelected} />
+                <div onClick={this.toggleShareSelected}>Include Selected Assets</div>
+              </div>
+            )}
             <div className="CreateFolder-public-private flexRow flexAlignItemsCenter">
-              <div>Collection is&nbsp;</div>
+              <div>Collection is</div>
               <div className={classnames('CreateFolder-public-private', {disabled: isShared})}>Private</div>
-              <input checked={isShared} onChange={this.togglePublic} type="checkbox"/>
+              <Toggle checked={isShared} onChange={this.togglePublic}/>
               <div className={classnames('CreateFolder-public-private', {disabled: !isShared})}>Public</div>
             </div>
             { isShared && <AclEditor onChange={this.changeAcl} title="Folder Asset Permissions"/> }
@@ -131,7 +148,8 @@ class CreateFolder extends Component {
 }
 
 export default connect(state => ({
-  user: state.auth && state.auth.user
+  user: state.auth && state.auth.user,
+  selectedAssetIds: state.assets.selectedIds
 }), dispatch => ({
   actions: bindActionCreators({ hideModal }, dispatch)
 }))(CreateFolder)

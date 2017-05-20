@@ -142,15 +142,15 @@ class FolderItem extends Component {
     this.dismissContextMenu(event)
     const width = '300px'
     const body = <CreateFolder title='Create Collection'
-                               acl={[]}
+                               acl={[]} includeAssets={true}
                                onCreate={this.createChildFolder}/>
     this.props.actions.showModal({body, width})
   }
 
-  createChildFolder = (name, acl, search) => {
+  createChildFolder = (name, acl, assetIds) => {
     const parentId = this.props.folder.id
-    const folder = new Folder({ name, parentId, acl, search })
-    this.props.actions.createFolder(folder)
+    const folder = new Folder({ name, parentId, acl })
+    this.props.actions.createFolder(folder, assetIds)
   }
 
   moveTo = (event) => {
@@ -191,6 +191,7 @@ class FolderItem extends Component {
                                acl={acl}
                                date={date}
                                name={name}
+                               includeAssets={false}
                                onCreate={this.editFolder}
                                onDelete={this.deleteFolder}
                                onLink={this.getLink}/>
