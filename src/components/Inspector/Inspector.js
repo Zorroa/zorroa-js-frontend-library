@@ -13,6 +13,8 @@ import { showPages } from '../../actions/appActions'
 class Inspector extends Component {
   static propTypes = {
     asset: PropTypes.instanceOf(Asset),
+    onNext: PropTypes.func,
+    onPrev: PropTypes.func,
     origin: PropTypes.string,
     thumbSize: PropTypes.number,
     pages: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
@@ -24,7 +26,7 @@ class Inspector extends Component {
   }
 
   render () {
-    const { asset, origin, thumbSize, pages } = this.props
+    const { asset, origin, thumbSize, pages, onNext, onPrev } = this.props
     const mediaType = asset.mediaType().toLowerCase()
     const url = asset.url(origin)
     const onMultipage = pages && pages.length && this.showMultipage
@@ -35,7 +37,8 @@ class Inspector extends Component {
 
     if (mediaType.startsWith('image') &&
       imageFormats.findIndex(format => (mediaType.endsWith(format))) >= 0) {
-      inspector = <Image url={url} onMultipage={onMultipage} />
+      inspector = <Image url={url} onMultipage={onMultipage}
+                         onNextPage={onNext} onPrevPage={onPrev} />
     } else if (mediaType.startsWith('image') && pages && pages.length) {
       inspector = <MultiImage id={asset.id} parentId={asset.parentId()}
                               onMultipage={onMultipage} />

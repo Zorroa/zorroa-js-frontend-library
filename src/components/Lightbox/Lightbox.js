@@ -46,15 +46,29 @@ class Lightbox extends Component {
   render () {
     const { assets, pages, isolatedId } = this.props
     let asset = null
+    let hasNext = false
+    let hasPrev = false
     if (isolatedId) {
-      if (pages) asset = pages.find(asset => (asset.id === isolatedId))
-      if (!asset && assets) asset = assets.find(asset => (asset.id === isolatedId))
+      if (pages) {
+        const index = pages.findIndex(asset => (asset.id === isolatedId))
+        asset = pages[index]
+        hasPrev = index > 0
+        hasNext = index < pages.length - 1
+      }
+      if (!asset && assets) {
+        const index = assets.findIndex(asset => (asset.id === isolatedId))
+        asset = assets[index]
+        hasPrev = index > 0
+        hasNext = index < assets.length - 1
+      }
     }
     return (
       <div className="lightbox flexCol fullWidth fullHeight">
         <Lightbar/>
         <div className="lightbox-body flexOn fullWidth fullHeight">
-          <Inspector asset={asset} />
+          <Inspector asset={asset}
+                     onNext={hasNext && (_ => this.isolateIndexOffset(1))}
+                     onPrev={hasPrev && (_ => this.isolateIndexOffset(-1))} />
         </div>
       </div>
     )
