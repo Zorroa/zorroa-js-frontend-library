@@ -359,10 +359,12 @@ class Facet extends Component {
   }
 
   renderBucketKey = (key) => {
-    if (!key) return '(none)'
     if (key === OTHER_BUCKET) return key
     const field = this.state.field && this.state.field.replace(/\.raw$/, '')
-    if (this.props.fieldTypes && this.props.fieldTypes[field] === 'date') return new Date(key).toLocaleString()
+    const fieldType = this.props.fieldTypes && this.props.fieldTypes[field]
+    if (fieldType === 'boolean') return key ? 'true' : 'false'
+    if (!key) return '(none)'
+    if (fieldType === 'date') return new Date(key).toLocaleString()
     return key
   }
 
