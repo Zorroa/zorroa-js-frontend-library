@@ -143,6 +143,12 @@ export default function (state = initialState, action) {
         let openFolderIds = new Set(state.openFolderIds)
         all.set(folder.id, folder)
         openFolderIds.add(parent.id) // make sure we can see the updated folder immediately
+        if (parent && parent.parentId) {
+          for (let grandparent = state.all.get(parent.parentId); grandparent;
+               grandparent = state.all.get(grandparent.parentId)) {
+            openFolderIds.add(grandparent.id)
+          }
+        }
         const modifiedIds = new Set(state.modifiedIds)
         _addAncestorIds(oldFolder, modifiedIds, state.all)
         _addAncestorIds(folder, modifiedIds, state.all)

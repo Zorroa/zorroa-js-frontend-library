@@ -339,7 +339,7 @@ class FolderItem extends Component {
     if (!selectedAssets) {
       addableAssetTitle = 'No assets selected'
     } else if (!selectedAssetsNotInFolder) {
-      addableAssetTitle = 'Selected assets are not in selected folder'
+      addableAssetTitle = 'Selected assets are already in selected folder'
     } else if (!this.simpleFolderIds().length) {
       addableAssetTitle = 'No simple folders selected'
     }

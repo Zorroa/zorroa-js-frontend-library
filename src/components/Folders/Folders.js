@@ -40,7 +40,6 @@ class Folders extends Component {
     // state props
     folders: PropTypes.object.isRequired,
     sortFolders: PropTypes.string,
-    selectedAssetIds: PropTypes.instanceOf(Set),
     user: PropTypes.instanceOf(User)
   }
 
@@ -84,9 +83,26 @@ class Folders extends Component {
   }
 
   componentWillMount () {
-    const rootFolder = this.props.folders.all.get(Folder.ROOT_ID)
+    const all = this.props.folders.all
+    const rootFolder = all.get(Folder.ROOT_ID)
     if (!rootFolder.childIds || !rootFolder.childIds.size) {
       this.loadChildren(rootFolder)
+    }
+    this.componentWillReceiveProps(this.props)
+  }
+
+  componentWillReceiveProps (nextProps) {
+    // Force load the User folder's children so that we can open the
+    // full ancestor path when creating new folders in the user's folder.
+    const all = this.props.folders.all
+    const rootFolder = all.get(Folder.ROOT_ID)
+    if (rootFolder && rootFolder.childIds) {
+      const rootChildIds = [...rootFolder.childIds]
+      const index = rootChildIds.findIndex(id => all.get(id).name === 'Users')
+      if (index >= 0) {
+        const userFolder = all.get(rootChildIds[index])
+        if (!userFolder.childIds) this.loadChildren(userFolder)
+      }
     }
   }
 
@@ -222,7 +238,7 @@ class Folders extends Component {
   }
 
   cannotAddFolderReason () {
-    const { folders, user, selectedAssetIds } = this.props
+    const { folders, user } = this.props
     // True if one folder is selected, it isn't in the trash, and we have write permission
     const selectedFolderIds = folders.selectedFolderIds
     if (selectedFolderIds && selectedFolderIds.size > 0) {
@@ -237,10 +253,6 @@ class Folders extends Component {
       if (folder.isDyhi()) return 'Cannot add child to automatic smart folder'
       if (folder.isSmartCollection()) return 'Cannot add child to smart folder'
       if (!folder.hasAccess(user, AclEntry.WriteAccess)) return 'No write permission to parent folder'
-    } else {
-      // If no parent folder is selected, we'll create in the user's folder.
-      // Enable add folder if we have any selected assets
-      if (!selectedAssetIds || !selectedAssetIds.size) return 'Select assets or parent folder to create a new folder'
     }
   }
 
@@ -463,8 +475,7 @@ export default connect(state => ({
   folders: state.folders,
   sortFolders: state.app.sortFolders,
   assetsCounter: state.assets.assetsCounter,
-  user: state.auth.user,
-  selectedAssetIds: state.assets.selectedIds
+  user: state.auth.user
 }), dispatch => ({
   actions: bindActionCreators({
     getFolderChildren,
