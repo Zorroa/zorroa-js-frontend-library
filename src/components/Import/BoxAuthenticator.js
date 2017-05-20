@@ -2,13 +2,14 @@ import React from 'react'
 import axios from 'axios'
 
 import domUtils from '../../services/domUtils'
+import { BOX_ACCESS_TOKEN_ITEM } from '../../constants/localStorageItems'
 
 export const BoxAuth = () => {
   const fragment = domUtils.parseQueryString(window.location.hash)
   const accessToken = fragment.access_token
   if (accessToken && accessToken.length) {
     console.log('Box authorized')
-    localStorage.setItem('BoxAccessToken', accessToken)
+    localStorage.setItem(BOX_ACCESS_TOKEN_ITEM, accessToken)
   } else {
     console.log('Invalid access token, deauthorizing Box')
     BoxAuthenticator.deauthorize()
@@ -24,11 +25,11 @@ export class BoxAuthenticator {
   }
 
   static redirectURL = () => ('https://onboard.zorroa.com:3000/boxauth')
-  static accessToken = () => (localStorage.getItem('BoxAccessToken'))
-  static deauthorize = () => { localStorage.removeItem('BoxAccessToken') }
+  static accessToken = () => (localStorage.getItem(BOX_ACCESS_TOKEN_ITEM))
+  static deauthorize = () => { localStorage.removeItem(BOX_ACCESS_TOKEN_ITEM) }
 
   authorized = (ev) => {
-    if (ev.key === 'BoxAccessToken') {
+    if (ev.key === BOX_ACCESS_TOKEN_ITEM) {
       this.accessToken = ev.newValue
       this.authenticating = false
       this.onAuth(this.accessToken)

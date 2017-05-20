@@ -2,13 +2,14 @@ import React from 'react'
 import axios from 'axios'
 
 import domUtils from '../../services/domUtils'
+import { GDRIVE_ACCESS_TOKEN_ITEM } from '../../constants/localStorageItems'
 
 export const GDriveAuth = () => {
   const fragment = domUtils.parseQueryString(window.location.hash)
   const accessToken = fragment.access_token
   if (accessToken && accessToken.length) {
     console.log('GDrive authorized')
-    localStorage.setItem('GDriveAccessToken', accessToken)
+    localStorage.setItem(GDRIVE_ACCESS_TOKEN_ITEM, accessToken)
   } else {
     console.log('Invalid access token, deauthorizing GDrive')
     GDriveAuthenticator.deauthorize()
@@ -24,11 +25,11 @@ export class GDriveAuthenticator {
   }
 
   static redirectURL = () => ('https://onboard.zorroa.com:3000/gdriveauth')
-  static accessToken = () => (localStorage.getItem('GDriveAccessToken'))
-  static deauthorize = () => { localStorage.removeItem('GDriveAccessToken') }
+  static accessToken = () => (localStorage.getItem(GDRIVE_ACCESS_TOKEN_ITEM))
+  static deauthorize = () => { localStorage.removeItem(GDRIVE_ACCESS_TOKEN_ITEM) }
 
   authorized = (ev) => {
-    if (ev.key === 'GDriveAccessToken') {
+    if (ev.key === GDRIVE_ACCESS_TOKEN_ITEM) {
       this.accessToken = ev.newValue
       this.authenticating = false
       this.onAuth(this.accessToken)

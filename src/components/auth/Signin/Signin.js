@@ -6,6 +6,11 @@ import classnames from 'classnames'
 
 import Logo from '../../Logo'
 import { signinUser, authError } from '../../../actions/authAction'
+import { EULA_VERSION_ITEM } from '../../../constants/localStorageItems'
+
+// Update whenever legal agreement is changed.
+// CORS prevents using the current version on zorroa.com. Drats.
+const currentEULAVersion = '1.0'
 
 class Signin extends Component {
   static propTypes = {
@@ -39,6 +44,17 @@ class Signin extends Component {
       this.setState({ username, host, ssl, acceptEULA })
     }
     this.clearError()
+    this.checkLocalEULA()
+  }
+
+  checkLocalEULA () {
+    const { acceptEULA } = this.state
+    if (!acceptEULA) {
+      const localVersion = localStorage.getItem(EULA_VERSION_ITEM)
+      if (localVersion && localVersion === currentEULAVersion) {
+        this.setState({acceptEULA: true})
+      }
+    }
   }
 
   clearError = () => {
@@ -84,7 +100,13 @@ class Signin extends Component {
   }
 
   toggleEULA = (event) => {
-    this.setState({ acceptEULA: !this.state.acceptEULA })
+    const acceptEULA = event.target.checked
+    this.setState({ acceptEULA })
+    if (acceptEULA) {
+      localStorage.setItem(EULA_VERSION_ITEM, currentEULAVersion)
+    } else {
+      localStorage.removeItem(EULA_VERSION_ITEM)
+    }
   }
 
   renderAlert () {

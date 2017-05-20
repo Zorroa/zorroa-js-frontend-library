@@ -2,13 +2,14 @@ import React from 'react'
 import Dropbox from 'dropbox'
 
 import domUtils from '../../services/domUtils'
+import { DROPBOX_ACCESS_TOKEN_ITEM } from '../../constants/localStorageItems'
 
 export const DropboxAuth = () => {
   const fragment = domUtils.parseQueryString(window.location.hash)
   const accessToken = fragment.access_token
   if (accessToken && accessToken.length) {
     console.log('Dropbox authorized')
-    localStorage.setItem('DropboxAccessToken', accessToken)
+    localStorage.setItem(DROPBOX_ACCESS_TOKEN_ITEM, accessToken)
   } else {
     console.log('Invalid access token, deauthorizing Dropbox')
     DropboxAuthenticator.deauthorize()
@@ -24,11 +25,11 @@ export class DropboxAuthenticator {
   }
 
   static redirectURL = () => ('https://onboard.zorroa.com:3000/dbxauth')
-  static accessToken = () => (localStorage.getItem('DropboxAccessToken'))
-  static deauthorize = () => { localStorage.removeItem('DropboxAccessToken') }
+  static accessToken = () => (localStorage.getItem(DROPBOX_ACCESS_TOKEN_ITEM))
+  static deauthorize = () => { localStorage.removeItem(DROPBOX_ACCESS_TOKEN_ITEM) }
 
   authorized = (ev) => {
-    if (ev.key === 'DropboxAccessToken') {
+    if (ev.key === DROPBOX_ACCESS_TOKEN_ITEM) {
       this.accessToken = ev.newValue
       this.authenticating = false
       this.onAuth(this.accessToken)
