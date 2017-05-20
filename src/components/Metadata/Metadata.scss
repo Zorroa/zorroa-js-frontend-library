@@ -3,11 +3,16 @@
 .Metadata {
 
   background-color: white;
+  max-height: 40vh;
+  @include flexCol;
 
   .Metadata-header {
     @include flexRow;
     @include flexJustifySpaceBetween;
     @include flexAlignItemsCenter;
+
+    min-height: 44px;
+    border-bottom: 1px solid $zorroa-nearwhite;
 
     .Metadata-filter {
       @include flexOn;
@@ -40,7 +45,11 @@
   }
 
   .Metadata-body {
+    @include flexOn;
     margin-bottom: 10px;
+    position: relative;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 }
 

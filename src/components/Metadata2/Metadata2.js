@@ -33,7 +33,7 @@ class Metadata2 extends Component {
     selectedAssets: [],
     filterString: '',
     showNull: false,
-    showFavorites: false,
+    showFavorites: this.props.userSettings.showFavorites,
     titleWidth: 100
   }
 
@@ -100,7 +100,11 @@ class Metadata2 extends Component {
   }
 
   toggleFavorites = () => {
-    this.setState({showFavorites: !this.state.showFavorites})
+    const { user, userSettings } = this.props
+    const showFavorites = !this.state.showFavorites
+    this.setState({showFavorites})
+    const settings = { ...userSettings, showFavorites }
+    this.props.actions.saveUserSettings(user, settings)
   }
 
   toggleNull = () => {

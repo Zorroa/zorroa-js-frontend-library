@@ -30,7 +30,7 @@ class Metadata extends Component {
   state = {
     filterString: '',
     filteredFields: [],
-    showFavorites: true,
+    showFavorites: this.props.userSettings.showFavorites,
     filteredComponents: [],
     collapsibleOpen: {},
     aggs: {},
@@ -105,7 +105,11 @@ class Metadata extends Component {
   }
 
   toggleFavorites = () => {
-    this.setStatePromise({showFavorites: !this.state.showFavorites})
+    const { user, userSettings } = this.props
+    const showFavorites = !this.state.showFavorites
+    const settings = { ...userSettings, showFavorites }
+    this.props.actions.saveUserSettings(user, settings)
+    this.setStatePromise({showFavorites})
       .then(() => this.updateFilteredFields(this.props))
   }
 
@@ -306,7 +310,9 @@ class Metadata extends Component {
                  {isSelected: showFavorites})}/>
         </div>
         <div className="Metadata-body">
-          {filteredComponents}
+          <div className="Metadata-scroll">
+            {filteredComponents}
+          </div>
         </div>
       </div>
     )
