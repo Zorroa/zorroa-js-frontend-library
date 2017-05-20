@@ -7,7 +7,7 @@ import Searcher from './Searcher'
 import AddWidget from './AddWidget'
 import QuickAddWidget from './QuickAddWidget'
 import CreateFolder from '../Folders/CreateFolder'
-import Widget from '../../models/Widget'
+import Widget, { createSearchWidget } from '../../models/Widget'
 import * as WidgetInfo from './WidgetInfo'
 import User from '../../models/User'
 import Folder from '../../models/Folder'
@@ -52,9 +52,8 @@ class Racetrack extends Component {
 
   submitEmptySearch = (event) => {
     event.preventDefault()
-    const type = WidgetInfo.SimpleSearchWidgetInfo.type
-    const sliver = new AssetSearch({ query: this.state.emptySearch, fuzzy: false })
-    this.props.actions.resetRacetrackWidgets([new Widget({ type, sliver })])
+    const widget = createSearchWidget('', null, this.state.emptySearch, false)
+    this.props.actions.resetRacetrackWidgets([widget])
   }
 
   changeEmptySearch = (event) => {
