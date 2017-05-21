@@ -24,13 +24,6 @@ $tableResizeRightPadding: 20px;
 
   padding-right: $tableResizeRightPadding;
 
-  .Table-cell {
-    text-align: left;
-    font-size: 12px;
-    font-family: Roboto Condensed;
-
-    &.dark { color: $zorroa-lightgray; }
-  }
 }
 
 .Table-header-cell {
@@ -156,6 +149,11 @@ $tableResizeRightPadding: 20px;
 }
 
 .Table-cell {
+  text-align: left;
+  font-size: 12px;
+  font-family: Roboto Condensed;
+  cursor: default;
+
   &.dark { color: $zorroa-lightgray; }
   &:not(.isOpen) { @include clampText; }
 }
@@ -163,7 +161,11 @@ $tableResizeRightPadding: 20px;
 // This is for measure text, for auto column width resizing
 #Table-cell-test {
   position: absolute;
-  top: -50px;
+  top: -500px;
+
+  // Even with the &:not(.isOpen), measurment needs these values reset
+  white-space: normal;
+  min-width: inherit;
 }
 
 .Table-title {

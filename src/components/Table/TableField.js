@@ -107,6 +107,8 @@ export default class TableField extends Component {
     // Without width is for the .Table-cell-test, auto width for measuring cells
     if (width) {
       style.width = `${width}px`
+      style.maxWidth = style.width
+      style.minWidth = style.width
     }
     if (left && top) {
       style.left = left

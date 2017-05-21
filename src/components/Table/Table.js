@@ -109,7 +109,7 @@ class Table extends Component {
 
     // measure the largest cell in this column
     assets.forEach(asset => {
-      test.innerHTML = ReactDOMServer.renderToString(<TableField {...{ asset, field, isOpen: true }}/>)
+      test.innerHTML = ReactDOMServer.renderToString(<TableField {...{ asset, field, isOpen: false }}/>)
       maxWidth = Math.max(maxWidth, test.clientWidth)
     })
     // include the header!
@@ -388,7 +388,6 @@ class Table extends Component {
                     })}
                   </div>)
               })}
-              <div id='Table-cell-test' className='Table-cell'/>
             </div>
           </div>
         </div>
