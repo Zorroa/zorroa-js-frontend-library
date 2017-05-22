@@ -18,7 +18,7 @@
     "build": "npm test && npm run build-only",
     "deploy": "sh ./build/build-prod.sh",
     "pretest": "npm run test:lint",
-    "test": "./node_modules/.bin/jest --debug --forceExit --logHeapUsage --verbose",
+    "test": "./node_modules/.bin/jest -w 6 --debug --forceExit --logHeapUsage --verbose",
     "test:watch": "./node_modules/.bin/jest --verbose --watch",
     "test:e2e": "./node_modules/.bin/jest e2e",
     "test:lint": "./node_modules/.bin/eslint src --color; exit 0",
