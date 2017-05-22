@@ -64,10 +64,11 @@ describe('Table', function () {
     var elements
 
     const dragVertFn = (fromEleName, toEleName, yoffset) => {
-      var n = Math.abs(yoffset / 50)
-      var dy = yoffset / n
+      const stepSize = 25
+      const numSteps = Math.abs(yoffset / stepSize)
+      const dy = yoffset / numSteps
 
-      driver.then(_ => { DEBUG && console.log({n, dy, yoffset}) })
+      driver.then(_ => { DEBUG && console.log({numSteps, dy, yoffset}) })
       var prom = driver
       .then(_ => driver.actions().mouseDown(elements[fromEleName]).perform())
       .then(_ => selenium.showLog())
@@ -81,7 +82,7 @@ describe('Table', function () {
       .then(_ => selenium.waitForJsFnVal('window.zorroa.getTableIsResizing', true, 10000))
       .then(_ => selenium.showLog())
 
-      for (let i = 0; i < n; i++) {
+      for (let i = 0; i < numSteps; i++) {
         // prom = prom.then(_ => DEBUG && console.log({x: 0, y: dy}))
         prom = prom.then(_ => driver.actions().mouseMove({x: 0, y: dy}).perform())
         // prom = prom.then(_ => selenium.showLog())
@@ -122,7 +123,9 @@ describe('Table', function () {
       .then(height => { assetsScrollHeight = height })
 
     .then(_ => { DEBUG && console.log('Expand the Table as far as it will go') })
-    .then(_ => dragVertFn('.Assets-tableResize', '.header', -2000))
+    .then(_ => dragVertFn('.Assets-tableResize', '.header', -100))
+    .then(_ => driver.sleep(5000)) // the first drag is triggering a border & title-bar size change. wait here for it to finish.
+    .then(_ => dragVertFn('.Assets-tableResize', '.header', -300))
 
     .then(_ => { DEBUG && console.log('Check that the table size changed, and that the assets scroll is at the expected minimum') })
     .then(_ => elements['.assets-scroll'].getCssValue('height'))
@@ -132,7 +135,7 @@ describe('Table', function () {
       })
 
     .then(_ => { DEBUG && console.log('Shrink the Table as far as it will go') })
-    .then(_ => dragVertFn('.Assets-tableResize', '.assets-footer', 2000))
+    .then(_ => dragVertFn('.Assets-tableResize', '.assets-footer', 800))
 
     .then(_ => { DEBUG && console.log('Check that the Table height is at the expected minimum') })
     .then(_ => elements['.Table'].getCssValue('height'))
