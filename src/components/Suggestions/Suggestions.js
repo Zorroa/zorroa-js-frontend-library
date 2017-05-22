@@ -42,7 +42,7 @@ export default class Suggestions extends Component {
 
   updateValue = (value) => {
     if (value === this.state.value) return
-    this.setStatePromise({ value, lastAction: 'type' })
+    this.setStatePromise({ value, selectedIndex: -1, lastAction: 'type' })
     .then(_ => this.props.onChange(this.state.value, this.state.lastAction))
   }
 
@@ -121,8 +121,8 @@ export default class Suggestions extends Component {
   selectedSuggestionString () {
     const { value, selectedIndex } = this.state
     const { suggestions } = this.props
-    if (selectedIndex < 0 || !suggestions) return ''
-    const suggestion = suggestions[selectedIndex]
+    if (!suggestions || !suggestions.length) return ''
+    const suggestion = (selectedIndex >= 0) ? suggestions[selectedIndex] : suggestions[0]
     const suffix = suggestion && suggestion.text ? suggestion.text.slice(value.length) : ''
     return value + suffix
   }
