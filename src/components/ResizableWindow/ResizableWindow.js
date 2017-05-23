@@ -2,8 +2,8 @@ import React, { Component, PropTypes } from 'react'
 
 import Resizer from '../../services/Resizer'
 
-const minWidth = 140
-const minHeight = 120
+const minWidth = 160
+const minHeight = 160
 
 export default class ResizableWindow extends Component {
   static propTypes = {

@@ -13,6 +13,7 @@
   @include flexAlignItemsCenter;
   background-color: black;
   min-height: 38px;
+  cursor: move;
 }
 
 .ResizableWindow-title {
@@ -39,7 +40,7 @@
   &:hover { background-color: rgba(128, 128, 128, 0.75); }
 }
 
-$handle-dim: 5px;
+$handle-dim: 7px;
 $handle-neg-off: -1 * $handle-dim / 2;
 
 .ResizableWindow-left-handle {

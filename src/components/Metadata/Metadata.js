@@ -304,7 +304,7 @@ class Metadata extends Component {
             { filterString && filterString.length && <div onClick={this.cancelFilter} className="Metadata-cancel-filter icon-cancel-circle"/> }
             <div className="icon-search"/>
           </div>
-          <div onClick={this.toggleFavorites}
+          <div onClick={this.toggleFavorites} title="Filter to show only favorite fields"
                className={classnames('Metadata-favorites',
                  `icon-star-${showFavorites ? 'filled' : 'empty'}`,
                  {isSelected: showFavorites})}/>

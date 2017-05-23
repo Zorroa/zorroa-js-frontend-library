@@ -299,10 +299,10 @@ class Metadata2 extends Component {
                   placeholder="Filter Metadata Fields"
                   onClear={_ => this.setState({filterString: ''})}
                   onChange={e => this.setState({filterString: e.target.value})}/>
-          <div onClick={this.toggleNull}
+          <div onClick={this.toggleNull} title="Filter to remove null-valued fields"
                className={classnames('Metadata2-nulls', 'icon-blocked',
                  {isSelected: !showNull})}/>
-          <div onClick={this.toggleFavorites}
+          <div onClick={this.toggleFavorites} title="Filter to show only favorite fields"
                className={classnames('Metadata2-favorites',
                  `icon-star-${showFavorites ? 'filled' : 'empty'}`,
                  {isSelected: showFavorites})}/>
