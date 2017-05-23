@@ -182,8 +182,8 @@ class Lightbar extends Component {
     // Fill the columns
     fields.forEach(field => {
       let fieldWidth = columnWidth - titleWidth
-      const params = { width: fieldWidth, asset, field: field.field }
-      test.innerHTML = ReactDOMServer.renderToString(<TableField {...params} isOpen={true} />)
+      const params = { width: fieldWidth, asset, field: field.field, isOpen: true }
+      test.innerHTML = ReactDOMServer.renderToString(addField(params))
       const rect = test.getBoundingClientRect()
       const height = rect.height
       if (columnHeight + height <= maxColumnHeight) {
