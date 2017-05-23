@@ -58,15 +58,20 @@ export function selectFolderId (id, shiftKey, metaKey, folders, selectedIds) {
   return selectFolderIds(selectedFolderIds)
 }
 
-export function createFolder (folder) {
+export function createFolder (folder, assetIds) {
   return dispatch => {
     console.log('Create folder: ' + JSON.stringify(folder))
     archivistPost(dispatch, `${rootEndpoint}`, folder)
       .then(response => {
+        const folder = new Folder(response.data)
         dispatch({
           type: CREATE_FOLDER,
-          payload: new Folder(response.data)
+          payload: folder
         })
+        if (assetIds) {
+          // Chain actions to add assets to newly created folder
+          addAssetIdsToFolderIdProm(dispatch, assetIds, folder.id)
+        }
       })
       .catch(error => {
         console.error('Error creating folder ' + folder.name + ': ' + error)
@@ -115,20 +120,22 @@ export function deleteFolderIds (ids) {
 }
 
 export function addAssetIdsToFolderId (assetIds, folderId) {
-  return dispatch => {
-    if (assetIds instanceof Set) assetIds = [...assetIds]
-    console.log('Add assets ' + JSON.stringify(assetIds) + ' to folder ' + folderId)
-    archivistPost(dispatch, `${rootEndpoint}/${folderId}/assets`, assetIds)
-      .then(response => {
-        dispatch({
-          type: ADD_ASSETS_TO_FOLDER,
-          payload: {assetIds, folderId, data: response.data}
-        })
+  return dispatch => addAssetIdsToFolderIdProm(dispatch, assetIds, folderId)
+}
+
+export function addAssetIdsToFolderIdProm (dispatch, assetIds, folderId) {
+  if (assetIds instanceof Set) assetIds = [...assetIds]
+  console.log('Add assets ' + JSON.stringify(assetIds) + ' to folder ' + folderId)
+  return archivistPost(dispatch, `${rootEndpoint}/${folderId}/assets`, assetIds)
+    .then(response => {
+      dispatch({
+        type: ADD_ASSETS_TO_FOLDER,
+        payload: {assetIds, folderId, data: response.data}
       })
-      .catch(error => {
-        console.error('Error adding assets ' + JSON.stringify(assetIds) + ' to folder ' + folderId + ': ' + error)
-      })
-  }
+    })
+    .catch(error => {
+      console.error('Error adding assets ' + JSON.stringify(assetIds) + ' to folder ' + folderId + ': ' + error)
+    })
 }
 
 export function removeAssetIdsFromFolderId (assetIds, folderId) {

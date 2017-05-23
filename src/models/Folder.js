@@ -61,8 +61,9 @@ export default class Folder {
 
   isDroppableType (dragFolder) {
     if (!dragFolder) return false
-    if (dragFolder.isDyhi() || this.isDyhi()) return false
-    if (dragFolder.isSmartCollection() !== this.isSmartCollection()) return false
+    if (dragFolder.dyhiId && !dragFolder.dyhiRoot) return false  // Dyhi child
+    if (this.isDyhi()) return false             // Can't drop onto a dyhi of any type
+    if (this.isSmartCollection()) return false  // Can't drop onto smart (forced simplification)
     return true
   }
 

@@ -215,7 +215,7 @@ class Lightbar extends Component {
             { showFolders && (
               <div className="Lightbar-folders" onClick={e => { e.stopPropagation() }}>
                 <Folders filterName="simple" onSelect={this.addToCollection}
-                         filter={f => (!f.isDyhi() && !f.search && (f.childCount || f.canAddAssetIds(selectedPageIds, assets, user)))} />
+                         filter={f => (!f.isDyhi() && !f.search && (f.childCount || f.canAddAssetIds(showPages ? selectedPageIds : new Set([isolatedId]), assets, user)))} />
               </div>
             )}
             { addingToCollection && <div className="Lightbar-performed-action">{addingToCollection}</div> }

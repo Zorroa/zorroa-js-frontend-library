@@ -6,6 +6,7 @@ import LRUCache from 'lru-cache'
 
 import User from '../../models/User'
 import Folder from '../../models/Folder'
+import AclEntry from '../../models/Acl'
 import { getFolderChildren, createFolder, selectFolderIds, selectFolderId,
   toggleFolder, queueFolderCounts } from '../../actions/folderAction'
 import { showModal, sortFolders } from '../../actions/appActions'
@@ -82,9 +83,26 @@ class Folders extends Component {
   }
 
   componentWillMount () {
-    const rootFolder = this.props.folders.all.get(Folder.ROOT_ID)
+    const all = this.props.folders.all
+    const rootFolder = all.get(Folder.ROOT_ID)
     if (!rootFolder.childIds || !rootFolder.childIds.size) {
       this.loadChildren(rootFolder)
+    }
+    this.componentWillReceiveProps(this.props)
+  }
+
+  componentWillReceiveProps (nextProps) {
+    // Force load the User folder's children so that we can open the
+    // full ancestor path when creating new folders in the user's folder.
+    const all = this.props.folders.all
+    const rootFolder = all.get(Folder.ROOT_ID)
+    if (rootFolder && rootFolder.childIds) {
+      const rootChildIds = [...rootFolder.childIds]
+      const index = rootChildIds.findIndex(id => all.get(id).name === 'Users')
+      if (index >= 0) {
+        const userFolder = all.get(rootChildIds[index])
+        if (!userFolder.childIds) this.loadChildren(userFolder)
+      }
     }
   }
 
@@ -201,14 +219,15 @@ class Folders extends Component {
   addFolder = () => {
     const width = '300px'
     const body = <CreateFolder title='Create Collection' acl={[]}
+                               includeAssets={true}
                                onCreate={this.createFolder}/>
     this.props.actions.showModal({body, width})
   }
 
-  createFolder = (name, acl, search) => {
+  createFolder = (name, acl, assetIds) => {
     const parentId = this.selectedParentId()
-    const folder = new Folder({ name, parentId, acl, search })
-    this.props.actions.createFolder(folder)
+    const folder = new Folder({ name, parentId, acl })
+    this.props.actions.createFolder(folder, assetIds)
   }
 
   selectedParentId () {
@@ -218,15 +237,23 @@ class Folders extends Component {
     return user ? user.homeFolderId : Folder.ROOT_ID
   }
 
-  isAddFolderEnabled () {
-    const { folders } = this.props
-    // True if one folder is selected and it isn't in the trash
+  cannotAddFolderReason () {
+    const { folders, user } = this.props
+    // True if one folder is selected, it isn't in the trash, and we have write permission
     const selectedFolderIds = folders.selectedFolderIds
-    if (!selectedFolderIds || selectedFolderIds.size !== 1) return false
-    if (!folders.trashedFolders) return true
-    const id = selectedFolderIds.values().next().value
-    const index = folders.trashedFolders.findIndex(trashedFolder => (trashedFolder.folderId === id))
-    return index < 0
+    if (selectedFolderIds && selectedFolderIds.size > 0) {
+      if (selectedFolderIds.size > 1) return 'Select a single parent folder'
+      const id = selectedFolderIds.values().next().value
+      if (folders.trashedFolders) {
+        const index = folders.trashedFolders.findIndex(trashedFolder => (trashedFolder.folderId === id))
+        if (index >= 0) return 'Select a folder outside of trash'
+      }
+      const folder = folders.all.get(id)
+      if (!folder) return 'Selected folder does not exist'
+      if (folder.isDyhi()) return 'Cannot add child to automatic smart folder'
+      if (folder.isSmartCollection()) return 'Cannot add child to smart folder'
+      if (!folder.hasAccess(user, AclEntry.WriteAccess)) return 'No write permission to parent folder'
+    }
   }
 
   folderCompare = (a, b) => {
@@ -402,6 +429,7 @@ class Folders extends Component {
       }
     })
 
+    const cannotAddError = this.cannotAddFolderReason()
     return (
       <div className='Folders'>
         <div className="Folders-controls">
@@ -414,9 +442,9 @@ class Folders extends Component {
               <div className="icon-search"/>
 
             </div>
-            <div className={classnames('Folders-controls-add',
-              {disabled: !this.isAddFolderEnabled()})}
-                 onClick={this.isAddFolderEnabled() ? this.addFolder : null}>
+            <div className={classnames('Folders-controls-add', {disabled: cannotAddError})}
+                 title={cannotAddError || 'Create a new folder'}
+                 onClick={!cannotAddError && this.addFolder}>
               <span className='icon-collections-add'/>
             </div>
           </div>
