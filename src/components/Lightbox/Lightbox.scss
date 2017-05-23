@@ -22,3 +22,18 @@
   align-items: center;
   overflow: hidden;
 }
+
+.Lightbox-metadata-title {
+  @include flexRowCenter;
+  align-self: center;
+  font-size: 12px;
+  color: $zorroa-gray;
+  margin: 8px;
+
+  div[class^="icon-"]:before {
+    margin-right: 8px;
+    margin-left: 4px;
+    font-size: 16px;
+    color: $zorroa-gray;
+  }
+}

@@ -49,6 +49,7 @@ class Workspace extends Component {
     jobs: PropTypes.object,
     location: PropTypes.object,
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+    selectedAssetIds: PropTypes.instanceOf(Set),
     commands: PropTypes.instanceOf(Map)
   }
 
@@ -213,7 +214,7 @@ class Workspace extends Component {
   }
 
   render () {
-    const { app, isolatedId } = this.props
+    const { app, isolatedId, selectedAssetIds } = this.props
 
     const CollectionParams = () => ({
       header: (<span>Collections</span>),
@@ -275,10 +276,10 @@ class Workspace extends Component {
               <Folders/>
             </Collapsible>
             <Collapsible {...MetadataParams()}>
-              <Metadata isIconified={app.leftSidebarIsIconified}/>
+              <Metadata/>
             </Collapsible>
             <Collapsible {...Metadata2Params()}>
-              <Metadata2 isIconified={app.leftSidebarIsIconified}/>
+              <Metadata2 assetIds={selectedAssetIds} height="60vh" />
             </Collapsible>
           </Sidebar>
 
@@ -316,6 +317,7 @@ export default connect(state => ({
   changePassword: state.auth.changePassword,
   onboarding: state.auth.onboarding,
   assets: state.assets.all,
+  selectedAssetIds: state.assets.selectedIds,
   jobs: state.jobs.all,
   commands: state.assets.commands
 }), dispatch => ({

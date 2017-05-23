@@ -1,7 +1,7 @@
 import {
   SHOW_MODAL, HIDE_MODAL, SORT_FOLDERS,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
-  METADATA_FIELDS, LIGHTBAR_FIELDS, ASSET_FIELDS,
+  METADATA_FIELDS, LIGHTBAR_FIELDS, LIGHTBOX_METADATA, ASSET_FIELDS,
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
   SHOW_MULTIPAGE, SHOW_PAGES, VIDEO_VOLUME,
@@ -30,6 +30,7 @@ const initialState = {
   },
   metadataFields: [ ...defaultMetadataFields ],
   lightbarFields: [ ...defaultLightbarFields ],
+  lightboxMetadata: { show: false, left: 20, top: 80, width: 300, height: 500 },
   tableFieldWidth: Object.assign({},
     ...defaultMetadataFields.map(field => ({ [field]: defaultTableFieldWidth }))),
   thumbSize: DEFAULT_THUMBSIZE,
@@ -85,6 +86,8 @@ export default function app (state = initialState, action) {
       return { ...state, metadataFields: action.payload, tableFieldWidth }
     case LIGHTBAR_FIELDS:
       return { ...state, lightbarFields: action.payload }
+    case LIGHTBOX_METADATA:
+      return { ...state, lightboxMetadata: action.payload }
     case SET_DRAGGING:
       return { ...state, dragInfo: action.payload }
     case SET_TABLE_FIELD_WIDTH:

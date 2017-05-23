@@ -28,6 +28,8 @@ $tableResizeRightPadding: 20px;
     text-align: left;
     font-size: 12px;
     font-family: Roboto Condensed;
+
+    &.dark { color: $zorroa-lightgray; }
   }
 }
 
@@ -154,6 +156,7 @@ $tableResizeRightPadding: 20px;
 }
 
 .Table-cell {
+  &.dark { color: $zorroa-lightgray; }
   &:not(.isOpen) { @include clampText; }
 }
 
