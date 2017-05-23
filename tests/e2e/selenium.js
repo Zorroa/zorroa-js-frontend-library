@@ -53,6 +53,9 @@ if (USE_SAUCE) {
   })
 }
 
+// var port =
+// const USE_GRID =
+
 // webdriver docs
 // http://seleniumhq.github.io/selenium/docs/api/javascript/index.html
 // https://github.com/SeleniumHQ/selenium/wiki/WebDriverJs
@@ -141,6 +144,7 @@ export function startBrowserAndDriver (_suite) {
 
   if (USE_SAUCE) {
     // run tests using travis+sauce
+    console.log('travis job #', process.env.TRAVIS_JOB_NUMBER)
     const caps = {
       'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
       build: process.env.TRAVIS_BUILD_NUMBER,
@@ -163,7 +167,9 @@ export function startBrowserAndDriver (_suite) {
     .build()
   }
 
-  driver.then(_ => driver.manage().window().setSize(1024,768))
+  driver
+  .then(_ => { console.log(`Test "${suite.description}" starting at ${new Date}`) })
+  .then(_ => driver.manage().window().setSize(1024,768))
 
   return driver
 }
@@ -171,6 +177,7 @@ export function startBrowserAndDriver (_suite) {
 // ----------------------------------------------------------------------
 export function stopBrowserAndDriver () {
   return driver
+  .then(_ => { console.log(`Test ${suite.description} stopping at ${new Date}`) })
   .then(_ => driver.sleep(100)) // for my own peace of mind; this helps prevent console.log output from appearing after the test results
   .then(_ => new Promise((resolve, reject) => {
     testStopDate = Date.now()
