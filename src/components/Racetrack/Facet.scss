@@ -14,6 +14,7 @@
   }
 
   .Facet-body {
+    @include flexCol;
     padding: 10px;
   }
 
@@ -26,8 +27,8 @@
     font-size: 13px;
     color: $zorroa-lightgray;
     height: 14px;
-    margin-top: 14px;
-    margin-bottom: 14px;
+    margin-top: 10px;
+    margin-bottom: 4px;
   }
 
   .Facet-clear-selection-cancel {
@@ -46,12 +47,12 @@
 
   .Facet-value-table {
     @include flexOn;
+    @include flexCol;
+    @include flexAlignItemsCenter;
     width: 100%;
     max-width: 100%;
     max-height: 300px;
-    border-bottom: 1px solid #aaa;
-    border-spacing: 0;
-    padding: 2px 0 2px 2px;
+    border-bottom: 1px solid $zorroa-nearwhite;
     overflow: hidden;
     overflow-y: auto;
 
@@ -145,7 +146,7 @@
 
   .Facet-table-header {
     @include flexRow;
-    @include flexAlignItemsCenter;
+    @include flexAlignItemsEnd;
     @include flexJustifySpaceBetween;
     margin-bottom: 6px;
     margin-left: 10px;
@@ -195,10 +196,10 @@
     color: $zorroa-gray;
   }
 
-  .Facet-footer {
-    border-top: 1px solid $zorroa-nearwhite;
-    padding-top: 4px;
-    padding-bottom: 4px;
+  .Facet-chart-selector {
+    @include flexRow;
+    @include flexJustifyCenter;
+    margin-bottom: 8px;
 
     .Facet-icon {
       @include flexRowCenter;
@@ -208,7 +209,8 @@
       outline: none;
       font-size: 22px;
       border-radius: 3px;
-      margin: 4px;
+      margin-left: 4px;
+      margin-right: 4px;
       counter-reset: $zorroa-greyish-brown;
       background: transparent;
       cursor: pointer;
@@ -245,4 +247,11 @@
   font-size: 16px;
   text-transform: uppercase;
   color: $zorroa-lightgray;
+}
+
+.Facet-value-table-row-extra {
+  font-size: 12px;
+  color: $zorroa-gray;
+  margin-top: 4px;
+  margin-bottom: 4px
 }

@@ -8,6 +8,7 @@
   font-weight: 100;
   overflow: hidden;
   filter: grayscale(100%) opacity(50%);
+  cursor: pointer;
 
   color: $zorroa-gray;
   background-color: $zorroa-darkwhite;
@@ -41,6 +42,7 @@
 .WidgetHeader-toggle {
   max-width: 100%;
   min-width: 0;
+  cursor: pointer;
 }
 
 .WidgetHeader-icon {
@@ -106,9 +108,11 @@
   @include flexOff;
   font-weight: 100;
   margin-right: 4px;
+  cursor: pointer;
 }
 
 .WidgetHeader-header-field {
   @include flexOn;
   font-weight: 400;
+  cursor: pointer;
 }

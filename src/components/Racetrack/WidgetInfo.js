@@ -33,7 +33,7 @@ export const FacetWidgetInfo = {
   description: 'Match keywords and specific values for specific fields',
   element: <Facet/>,
   create: createFacetWidget,
-  fieldTypes: [ 'string', 'long', 'double', 'integer', 'date' ],
+  fieldTypes: [ 'string', 'long', 'double', 'integer', 'date', 'boolean' ],
   color: '#a11d77' // zorroa-darkish-purple
 }
 

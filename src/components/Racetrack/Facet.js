@@ -30,7 +30,9 @@ class Facet extends Component {
   }
 
   state = {
+    isOpen: true,
     isEnabled: true,
+    isMinimized: false,
     otherIsSelected: false,
     field: '',
     order: { '_count': 'desc' },
@@ -43,7 +45,6 @@ class Facet extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    if (!this.state.isEnabled) return
     const { id, widgets } = nextProps
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
@@ -74,13 +75,15 @@ class Facet extends Component {
               break
             }
           }
-          this.setState({terms, otherIsSelected})
+          if (widget.isEnabled) this.setState({terms, otherIsSelected})
         }
-      } else {
+      } else if (widget.isEnabled) {
         this.setState({terms: [], otherIsSelected: false})
       }
-      const order = widget.sliver.aggs.facet.terms.order
-      if (order) this.setState({order})
+      if (widget.isEnabled) {
+        const order = widget.sliver.aggs.facet.terms.order
+        if (order) this.setState({order})
+      }
     } else {
       this.removeFilter()
     }
@@ -110,7 +113,7 @@ class Facet extends Component {
     }
   }
 
-  selectTerm (term, event) {
+  selectTerm = (term, event) => {
     let terms = []
     if (term === OTHER_BUCKET) {
       const buckets = this.aggBuckets(this.state.terms)
@@ -165,6 +168,9 @@ class Facet extends Component {
         terms = [term]
       }
     }
+    if (this.state.isMinimized && !terms.length) {
+      this.setState({ isMinimized: false, isOpen: false })
+    }
     this.modifySliver(this.state.field, terms, this.state.order)
   }
 
@@ -172,7 +178,7 @@ class Facet extends Component {
     this.selectTerm(name, event)
   }
 
-  deselectAllTerms = (event) => {
+  deselectAllTerms = () => {
     this.modifySliver(this.state.field, [], this.state.order)
   }
 
@@ -319,8 +325,8 @@ class Facet extends Component {
   }
 
   renderClearSelection () {
-    if (!this.baseBuckets().length) return
-    const { terms } = this.state
+    const { terms, isMinimized } = this.state
+    if (isMinimized || !this.baseBuckets().length) return
     if (!terms || terms.length === 0) return <div className="Facet-clear-selection"/>
     return (
       <div className="Facet-clear-selection">
@@ -353,15 +359,17 @@ class Facet extends Component {
   }
 
   renderBucketKey = (key) => {
-    if (!key) return '(none)'
     if (key === OTHER_BUCKET) return key
     const field = this.state.field && this.state.field.replace(/\.raw$/, '')
-    if (this.props.fieldTypes && this.props.fieldTypes[field] === 'date') return new Date(key).toLocaleString()
+    const fieldType = this.props.fieldTypes && this.props.fieldTypes[field]
+    if (fieldType === 'boolean') return key ? 'true' : 'false'
+    if (!key) return '(none)'
+    if (fieldType === 'date') return new Date(key).toLocaleString()
     return key
   }
 
   renderChart () {
-    const { field, terms, chartType } = this.state
+    const { field, terms, chartType, isMinimized } = this.state
     let maxCount = 0
     let minCount = Number.MAX_SAFE_INTEGER
     // Extract the buckets for this widget from the global query using id
@@ -387,15 +395,53 @@ class Facet extends Component {
     if (mergedTerms.length < terms.length) mergedTerms.push(OTHER_BUCKET)
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042',
       '#ce2d3f', '#fc6c2c', ' #a11e77', '#b7df4d', '#1875d1' ]
+    const selectedBuckets = buckets.filter(b => mergedTerms.indexOf(b.key) >= 0)
     switch (chartType) {
       case BAR_CHART:
+        if (isMinimized) {
+          return (
+            <div className="Facet-table">
+              <div className="Facet-value-table">
+                <table>
+                  <thead>
+                  <tr>
+                    <td style={{width: '80%'}}/>
+                    <td style={{width: '20%'}}/>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  { selectedBuckets.slice(0, 3).map(bucket => (
+                    <tr className={classnames('Facet-value-table-row', {selected: true})}
+                        title={`Click to de-select ${bucket.key}`}
+                        key={bucket.key} onClick={e => this.selectTerm(bucket.key, {...e, metaKey: true})}>
+                      <td className="Facet-value-cell">
+                        <div className="Facet-value-table-key">
+                          <div className="Facet-value-pct-bar" style={{width: `${100 * bucket.doc_count / maxCount}%`}} />
+                          <div className="Facet-value-key">{this.renderBucketKey(bucket.key)}</div>
+                        </div>
+                      </td>
+                      <td className="Facet-value-count">{bucket.doc_count}</td>
+                    </tr>
+                  )) }
+                  </tbody>
+                </table>
+                { selectedBuckets.length > 3 && (
+                  <div className="Facet-value-table-row-extra">
+                    and { selectedBuckets.length - 3} more...
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        }
         return (
           <div className="Facet-table">
             <div className="Facet-table-header">
               { this.renderHeaderCell('keyword') }
+              { this.renderChartTypes() }
               { this.renderHeaderCell('count') }
             </div>
-            <div className="Facet-value-table">
+            <div className="Facet-value-table" style={{minHeight: '300px'}}>
               <table>
                 <thead>
                   <tr>
@@ -407,6 +453,7 @@ class Facet extends Component {
                 { buckets && buckets.map(bucket => (
                   <tr className={classnames('Facet-value-table-row',
                     { selected: mergedTerms.indexOf(bucket.key) >= 0 })}
+                      title={`Click to filter for ${bucket.key}`}
                       key={bucket.key} onClick={this.selectTerm.bind(this, bucket.key)}>
                     <td className="Facet-value-cell">
                       <div className="Facet-value-table-key">
@@ -428,6 +475,7 @@ class Facet extends Component {
         const activeIndex = mergedTerms.map((term, index) => (buckets.findIndex(bucket => (bucket.key === term))))
         return (
           <div className="Facet-pie-chart">
+            { this.renderChartTypes() }
             <ResponsiveContainer>
               <PieChart width={300} height={300}>
                 <Pie innerRadius={30} outerRadius={60} paddingAngle={0}
@@ -452,24 +500,35 @@ class Facet extends Component {
     const { chartType } = this.state
     const selected = chartType === type
     return (
-      <button className={classnames('Facet-icon', type, {selected})}
+      <div className={classnames('Facet-icon', type, {selected})}
               key={type} onClick={this.selectGraph.bind(this, type)} />
     )
   }
 
   renderChartTypes () {
+    const { isMinimized } = this.state
     const buckets = this.baseBuckets()
-    if (!buckets || !buckets.length) return
+    if (isMinimized || !buckets || !buckets.length) return
     return (
-      <div className="Facet-footer flexRow flexJustifyCenter">
+      <div className="Facet-chart-selector">
         { chartTypes.map(type => this.renderChartIcon(type)) }
       </div>
     )
   }
 
+  minimize = (wasOpen) => {
+    const { chartType, terms } = this.state
+    wasOpen = this.state.isOpen   // Override Widget open state to handle all removed when minimized
+    const shouldMinimize = chartType === BAR_CHART && terms && terms.length > 0
+    const isMinimized = shouldMinimize && wasOpen && !this.state.isMinimized
+    const isOpen = shouldMinimize ? true : !wasOpen  // Always leave open if we have selected bar terms
+    this.setState({isMinimized, isOpen})
+    return isOpen
+  }
+
   render () {
     const { isIconified } = this.props
-    const { isEnabled, field } = this.state
+    const { isEnabled, field, isOpen } = this.state
     const title = Asset.lastNamespace(unCamelCase(field))
     return (
       <Widget className="Facet"
@@ -480,12 +539,14 @@ class Facet extends Component {
               enableToggleFn={this.toggleEnabled}
               isIconified={isIconified}
               icon={FacetWidgetInfo.icon}
+              onOpen={this.minimize}
               onClose={this.removeFilter.bind(this)}>
-        <div className="Facet-body flexCol">
-          { this.renderChart() }
-          { this.renderClearSelection() }
-          { this.renderChartTypes() }
-        </div>
+        { isOpen && (
+          <div className="Facet-body">
+            { this.renderChart() }
+            { this.renderClearSelection() }
+          </div>
+        )}
       </Widget>
     )
   }
