@@ -89,8 +89,10 @@ export default function (state = initialState, action) {
           let newParent = new Folder(parent)
           if (!parent.childIds) {
             newParent.childIds = new Set()
+            newParent.childCount = 1
           } else {
             newParent.childIds = new Set(parent.childIds) // copy; about to modify
+            newParent.childCount = parent.childIds.size + 1
           }
           newParent.childIds.add(folder.id)
           all.set(newParent.id, newParent)

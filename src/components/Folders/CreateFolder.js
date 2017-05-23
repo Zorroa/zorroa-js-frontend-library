@@ -23,6 +23,7 @@ class CreateFolder extends Component {
 
     // App State
     user: PropTypes.instanceOf(User),
+    isolatedId: PropTypes.string,
     selectedAssetIds: PropTypes.instanceOf(Set),
     actions: PropTypes.object.isRequired
   }
@@ -60,7 +61,7 @@ class CreateFolder extends Component {
   }
 
   saveFolder = (event) => {
-    const { user, selectedAssetIds } = this.props
+    const { user, isolatedId, selectedAssetIds } = this.props
     const { name, isShared, includeSelectedAssets } = this.state
     let acl = null
     if (isShared && acl) {
@@ -72,7 +73,7 @@ class CreateFolder extends Component {
       acl = [ new AclEntry({ permissionId, access }) ]
     }
     if (acl) {
-      const assetIds = includeSelectedAssets && selectedAssetIds
+      const assetIds = includeSelectedAssets && (isolatedId ? new Set(isolatedId) : selectedAssetIds)
       this.props.onCreate(name, acl, assetIds)
       this.props.actions.hideModal()
     } else {
@@ -149,6 +150,7 @@ class CreateFolder extends Component {
 
 export default connect(state => ({
   user: state.auth && state.auth.user,
+  isolatedId: state.assets.isolatedId,
   selectedAssetIds: state.assets.selectedIds
 }), dispatch => ({
   actions: bindActionCreators({ hideModal }, dispatch)
