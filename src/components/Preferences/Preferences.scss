@@ -83,19 +83,6 @@
   padding: 10px 20px;
 }
 
-.Preferences-user-body {
-  margin-bottom: 10px;
-  padding: 10px 20px;
-}
-
-.Preferences-user-fuzzy {
-  @include flexRow;
-  @include flexAlignItemsCenter;
-  padding-left: 12px;
-  padding-right: 12px;
-  margin-bottom: 10px;
-}
-
 .Preferences-user-fuzzy .Toggle {
   margin: 10px;
 }

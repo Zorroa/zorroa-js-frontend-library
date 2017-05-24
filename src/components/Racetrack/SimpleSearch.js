@@ -9,7 +9,6 @@ import { SimpleSearchWidgetInfo } from './WidgetInfo'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
 import { unCamelCase } from '../../services/jsUtil'
 import Widget from './Widget'
-import Toggle from '../Toggle'
 
 const INSTA_SEARCH_TIME = 1000
 
@@ -86,21 +85,8 @@ class SimpleSearch extends Component {
     this.instaSearchTimer = null
   }
 
-  toggleFuzzy = (event) => {
-    const fuzzy = event.target.checked
-    this.setState({ fuzzy })
-    this.modifySliver(this.state.queryString, fuzzy, this.state.field)
-  }
-
-  clearField = (event) => {
-    const field = ''
-    this.setState({ field })
-    this.modifySliver(this.state.queryString, this.state.fuzzy, field)
-    event && event.stopPropagation()
-  }
-
   render () {
-    const { fuzzy, field, isEnabled } = this.state
+    const { field, isEnabled } = this.state
     const { isIconified } = this.props
     const title = Asset.lastNamespace(unCamelCase(field))
     return (
@@ -117,12 +103,6 @@ class SimpleSearch extends Component {
           <div className="flexRow">
             <input type="text" placeholder="Search..." value={this.state.queryString}
                    onKeyPress={this.queryStringKeyPressed} onChange={this.updateQueryString} />
-          </div>
-          <div className="SimpleSearch-fuzzy">
-            Text matching:&nbsp;&nbsp;
-            Exact
-            <Toggle checked={!!fuzzy} onChange={this.toggleFuzzy} />
-            Fuzzy
           </div>
         </div>
       </Widget>

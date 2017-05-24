@@ -36,14 +36,6 @@
     @include flexJustifySpaceBetween;
   }
 
-  .SimpleSearch-fuzzy {
-    @include flexRow;
-    @include flexAlignItemsCenter;
-    padding-left: 12px;
-    padding-right: 12px;
-    margin-bottom: 10px;
-  }
-
   .SimpleSearch-fuzzy .Toggle {
     margin: 10px;
   }
