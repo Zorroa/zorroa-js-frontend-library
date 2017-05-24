@@ -90,7 +90,9 @@ class Lightbar extends Component {
 
   resizeTitle (index, width) {
     const titleWidths = [...this.state.titleWidths]
-    titleWidths[index] = width
+    const min = 40
+    const max = this.state.columnWidths[index] - min
+    titleWidths[index] = Math.min(max, Math.max(min, width))
     this.setState({ titleWidths })
   }
 
