@@ -38,24 +38,6 @@ global.expect = global.expect || (x => {
 
 // ----------------------------------------------------------------------
 
-var SauceLabs = require('saucelabs')
-
-var username = process.env.SAUCE_USERNAME
-var accessKey = process.env.SAUCE_ACCESS_KEY
-
-var saucelabs
-
-const USE_SAUCE = (username !== undefined)
-if (USE_SAUCE) {
-  saucelabs = new SauceLabs({
-    username: username,
-    password: accessKey
-  })
-}
-
-// var port =
-// const USE_GRID =
-
 // webdriver docs
 // http://seleniumhq.github.io/selenium/docs/api/javascript/index.html
 // https://github.com/SeleniumHQ/selenium/wiki/WebDriverJs
@@ -89,9 +71,27 @@ if (USE_SAUCE) {
 // https://groups.google.com/forum/#!topic/selenium-users/ilfLKSUAqQQ
 // check memory and CPU usage by node/s and HUB with docker stats $(docker ps -aq)
 
+var SauceLabs = require('saucelabs')
 
+var username = process.env.SAUCE_USERNAME
+var accessKey = process.env.SAUCE_ACCESS_KEY
 
-export const BASE_URL = 'http://10.8.0.1:8080' // local selenium grid? see DONT FORGET above
+var saucelabs
+
+const USE_SAUCE = (username !== undefined)
+
+if (USE_SAUCE) {
+  saucelabs = new SauceLabs({
+    username: username,
+    password: accessKey
+  })
+}
+
+// defined in runNpmTest.sh -- the port we'll use for nodes to access our local web server
+var ZORROA_GRID_PORT = process.env.ZORROA_GRID_PORT
+const USE_GRID = (ZORROA_GRID_PORT !== undefined)
+
+export const BASE_URL = USE_GRID ? `http://10.8.0.1:${ZORROA_GRID_PORT}` : 'http://localhost:8080'
 
 // let selenium tests run. jest's default is an unreasonable 5 seconds
 jasmine.DEFAULT_TIMEOUT_INTERVAL = (DEBUG && !USE_SAUCE) ? 120000 : 180000
@@ -153,8 +153,22 @@ export function startBrowserAndDriver (_suite) {
   suite = _suite
   expect(suite && !!suite.description).toBe(true)
 
-  if (USE_SAUCE) {
+  if (USE_GRID) {
+    // run tests using our own selenium grid
+    const GRID_HUB = `http://localhost:4444/wd/hub` // on Travis builds, localhost:4444 is port-forwarded to shub:4444
+    const caps = {
+      build: process.env.TRAVIS_BUILD_NUMBER,
+      browserName: browserName,
+      screenResolution: "1024x768"
+    }
+
+    driver = new webdriver.Builder()
+    .withCapabilities(caps)
+    .usingServer(GRID_HUB)
+    .build()
+  } else if (USE_SAUCE) {
     // run tests using travis+sauce
+    const SAUCE_HUB = `https://${username}:${accessKey}@ondemand.saucelabs.com/wd/hub`
     console.log('travis job #', process.env.TRAVIS_JOB_NUMBER)
     const caps = {
       'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
@@ -167,7 +181,7 @@ export function startBrowserAndDriver (_suite) {
 
     driver = new webdriver.Builder()
     .withCapabilities(caps)
-    .usingServer(`https://${username}:${accessKey}@ondemand.saucelabs.com/wd/hub`)
+    .usingServer(SAUCE_HUB)
     .build()
   } else {
     // run tests locally if when not using travis+sauce
