@@ -26,67 +26,17 @@
 .Lightbar-metadata {
   @include flexOn;
   padding-top: 15px;
+  padding-bottom: 5px;
   @include flexCol;
   @include flexWrap;
   align-content: flex-start;
   max-height: 100%;
-  overflow-y: auto;
+  overflow-y: hidden;
   position: relative;
 
   &::-webkit-scrollbar {
     height: 5px;
   }
-}
-
-.Lightbar-attr {
-  @include flexRow;
-  @include flexAlignItemsCenter;
-
-  .TableField-tag {
-    color: white;
-    background-color: $zorroa-darkgray;
-    margin: 2px;
-    font-size: 12px;
-  }
-
-  .TableField-array {
-    @include nowrap;
-    @include flexRow;
-    @include flexWrap;
-    @include flexAlignItemsCenter;
-    @include flexJustifyStart;
-    &.isOpen {
-    }
-    &:not(.isOpen) {
-    }
-  }
-
-}
-
-.Lightbar-attr-field {
-  font-size: 12px;
-  font-weight: 100;
-  color: $zorroa-lightgray;
-  text-align: right;
-}
-
-.Lightbar-attr-separator {
-  height: 32px;
-  border-right: 1px solid $zorroa-darkgray;
-  margin-left: 4px;
-  cursor: ew-resize;
-}
-
-.Lightbar-attr-bar {
-  @include flexOn;
-  margin-left: 8px;
-  margin-right: 20px;
-  height: 1px;
-  border-bottom: 1px solid $zorroa-darkgray;
-}
-
-.Lightbar-attr-title {
-  font-size: 11px;
 }
 
 .Lightbar-btn-icon {
@@ -99,6 +49,7 @@
   @include flexWrap;
   @include flexJustifyEnd;
   @include flexAlignItemsStart;
+  align-content: flex-start;
   margin-top: 10px;
   position: relative;
 }
@@ -145,15 +96,24 @@
   bottom: -4px;
 }
 
-// Column resizers inside their own div so they
-// do not affect the scrolling size of the parent
-.Lightbar-column-resizers {
-  position: absolute;
+.Lightbar-column {
+  position: relative;
+  @include flexCol;
+  @include flexOn;
   overflow: hidden;
-  left: 0;
-  bottom: 2px;
-  right: 0;
-  top: 2px;
+}
+
+.Lightbar-title-resizer {
+  cursor: col-resize;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  border-radius: 2px;
+  margin-left: -2px;
+
+  &:hover { background-color: $zorroa-darkgray; }
+  &.isDragging { background-color: $zorroa-darkgray; }
 }
 
 .Lightbar-column-resizer {
@@ -161,8 +121,10 @@
   position: absolute;
   top: 0;
   bottom: 0;
+  right: -2px;
   width: 5px;
   border-radius: 2px;
+  border-left: 1px dotted $zorroa-darkgray;
 
   &:hover { background-color: $zorroa-darkgray; }
   &.isDragging { background-color: $zorroa-darkgray; }
@@ -210,4 +172,39 @@
   z-index: 1000;
   background-color: black;
   color: $zorroa-nearwhite;
+}
+
+.Lightbar-field {
+  @include flexRow;
+  @include flexAlignItemsStart;
+}
+
+.Lightbar-field-title {
+  @include flexRow;
+  //@include flexAlignItemsCenter;
+  @include flexJustifyEnd;
+  align-self: stretch;
+  padding: 4px;
+  border-right: 1px solid $zorroa-darkgray;
+}
+
+.Lightbar-field-title-head {
+  @include noSelect;
+  @include clampText;
+  @include nowrap;
+  color: $zorroa-lightgray;
+  font-size: 12px;
+  font-weight: 100;
+  text-align: right;
+}
+
+.Lightbar-field-title-tail {
+  @include noSelect;
+  @include clampText;
+  @include nowrap;
+  color: $zorroa-gray;
+  font-size: 12px;
+  font-weight: 100;
+  text-align: right;
+  margin-right: 4px;
 }

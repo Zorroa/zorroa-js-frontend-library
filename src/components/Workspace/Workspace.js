@@ -305,6 +305,7 @@ class Workspace extends Component {
           Drop Assets to Import
         </div>
         { isolatedId && <Lightbox/> }
+        <div id='Table-cell-test' className='Table-cell'/>
       </div>
     )
   }

@@ -306,26 +306,27 @@ function getRandomColor () {
   return color
 }
 
-export function minimalUniqueFieldTitle (field, fields) {
+export function minimalUniqueFieldTitle (field, fields, minIndex) {
   const types = ['point', 'bit', 'byte', 'raw']
   const names = field.split('.')
   if (!names || names.length < 2) return { head: field }
-  let title = ''
-  let head, tail
-  for (let i = names.length - 1; i > 0; --i) {
+  let title, head, tails
+  for (let i = names.length - 1; i >= minIndex; --i) {
     if (i === names.length - 1 && types.findIndex(t => t === names[i]) >= 0) continue
     if (!head) {
       head = names[i]
-    } else if (!tail) {
-      tail = ` \u2039 ${names[i]}`
+    } else if (!tails) {
+      tails = [names[i]]
     } else {
-      if (!tail) tail = ''
-      tail = tail.concat(` \u2039 ${names[i]}`)
+      tails.push(names[i])
     }
-    title = title.concat(names[i])
+    if (!title) {
+      title = names[i]
+    } else {
+      title = names[i] + '.' + title
+    }
     const matchesAnotherField = fields.findIndex(f => f !== field && f.endsWith(title)) >= 0
-    if (!matchesAnotherField) return { head, tail }
-    if (i > 0) title = title.concat('.')
+    if (!matchesAnotherField) return { head, tails }
   }
-  return { head, tail }
+  return { head, tails }
 }
