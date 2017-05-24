@@ -233,7 +233,8 @@ class Metadata2 extends Component {
     }
     if (asset === undefined) return
     if (!showNull && asset && asset.rawValue(field) === undefined) return
-    const { head, tail } = minimalUniqueFieldTitle(field, fields)
+    const { head, tails } = minimalUniqueFieldTitle(field, fields, 1)
+    const tail = tails && '\u2039 ' + tails.join(' \u2039 ')
     return (
       <div key={itemClass} className={classnames('Metadata2-leaf', {isSelected})}
            title={field}
@@ -243,7 +244,7 @@ class Metadata2 extends Component {
           <div className="Metadata2-leaf-title-head">
             {unCamelCase(head)}
           </div>
-          { tail && <div className="Metadata2-leaf-title-tail">&nbsp;{tail}</div> }
+          { tail && <div className="Metadata2-leaf-title-tail">{tail}</div> }
         </div>
         { this.renderValue(field, namespace, asset, isFavorite) }
       </div>

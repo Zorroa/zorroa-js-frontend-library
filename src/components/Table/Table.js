@@ -247,11 +247,12 @@ class Table extends Component {
   }
 
   renderTitle (field, fields) {
-    const { head, tail } = minimalUniqueFieldTitle(field, fields)
+    const { head, tails } = minimalUniqueFieldTitle(field, fields, 0)
+    const tail = tails && '\u2039 ' + tails.join(' \u2039 ')
     return (
       <div className="Table-title">
         <div className="Table-title-head">{unCamelCase(head)}</div>
-        { tail && <div className="Table-title-tail">&nbsp;{tail}</div> }
+        { tail && <div className="Table-title-tail">{tail}</div> }
       </div>
     )
   }

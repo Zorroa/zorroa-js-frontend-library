@@ -167,11 +167,12 @@ class Lightbar extends Component {
 
     const fieldNames = fields.map(field => field.field)
     const addField = (params) => {
-      const { tail, head } = minimalUniqueFieldTitle(params.field, fieldNames)
+      const { tails, head } = minimalUniqueFieldTitle(params.field, fieldNames, 0)
+      const tail = tails && tails.join(' \u203A ') + ' \u203A '
       return (
         <div className="Lightbar-field" key={params.field}>
           <div className="Lightbar-field-title" style={{minWidth: titleWidth, maxWidth: titleWidth}}>
-            { tail && <div className="Lightbar-field-title-tail">&nbsp;{tail}</div> }
+            { tail && <div className="Lightbar-field-title-tail">{tail}</div> }
             { head && <div className="Lightbar-field-title-head">{unCamelCase(head)}</div> }
           </div>
           <TableField {...params}/>
@@ -182,7 +183,7 @@ class Lightbar extends Component {
     // Fill the columns
     fields.forEach(field => {
       let fieldWidth = columnWidth - titleWidth
-      const params = { width: fieldWidth, asset, field: field.field, isOpen: true }
+      const params = { width: fieldWidth, asset, field: field.field, isOpen: true, dark: true }
       test.innerHTML = ReactDOMServer.renderToString(addField(params))
       const rect = test.getBoundingClientRect()
       const height = rect.height

@@ -189,6 +189,9 @@
 }
 
 .Lightbar-field-title-head {
+  @include noSelect;
+  @include clampText;
+  @include nowrap;
   color: $zorroa-lightgray;
   font-size: 12px;
   font-weight: 100;
@@ -196,8 +199,12 @@
 }
 
 .Lightbar-field-title-tail {
+  @include noSelect;
+  @include clampText;
+  @include nowrap;
   color: $zorroa-gray;
   font-size: 12px;
   font-weight: 100;
   text-align: right;
+  margin-right: 4px;
 }
