@@ -8,7 +8,7 @@ notifications:
   slack: zorroa:U0489fQGuSPls5EZZfSUoGsL
 
 addons:
-  sauce_connect: true
+  sauce_connect: false
 
 sudo: required
 dist: precise
