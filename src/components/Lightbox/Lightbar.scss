@@ -124,7 +124,7 @@
   right: -2px;
   width: 5px;
   border-radius: 2px;
-  border-right: 1px dotted $zorroa-darkgray;
+  border-left: 1px dotted $zorroa-darkgray;
 
   &:hover { background-color: $zorroa-darkgray; }
   &.isDragging { background-color: $zorroa-darkgray; }
@@ -185,7 +185,7 @@
   @include flexJustifyEnd;
   align-self: stretch;
   padding: 4px;
-  border-right: 1px solid $zorroa-gray;
+  border-right: 1px solid $zorroa-darkgray;
 }
 
 .Lightbar-field-title-head {
