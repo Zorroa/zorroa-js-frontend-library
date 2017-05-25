@@ -5,8 +5,8 @@
 #
 # Usage: stopNodeOnHost.sh <ip>
 
-# DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-# cd $DIR
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd $DIR
 
 # one way to list all nodes is query the selenium grid console (best for stopping)
 nodes=$(curl -s localhost:4444/grid/console | perl -ne 'if (m|http://([^\s]+):5555|) { print "$1\n" }' | sort | uniq)

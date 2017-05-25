@@ -19,8 +19,7 @@ export ZORROA_GRID_PORT=$(node -e 'console.log(Math.round(Math.random()*1000+800
 ssh -i id_rsa_zorroa_selenium_hub -nNT -o StrictHostKeyChecking=no -L 4444:localhost:4444 -R $ZORROA_GRID_PORT:localhost:8080 computeruser@shub.zorroa.com & sshPid=$!
 
 # Run all tests
-# -w 4 is 4 workers; this is currently the number of selenium nodes we have
-# TODO use -w 8 when we have > 8 nodes (it's the number of selenium tests we have)
+# -w 8 is 8 workers; this is currently the number of selenium tests we have
 $projroot/node_modules/.bin/jest -w 4 --debug --forceExit --logHeapUsage --verbose
 testResultExitCode=$?
 

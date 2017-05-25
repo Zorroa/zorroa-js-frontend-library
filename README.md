@@ -172,9 +172,19 @@ Tips for making testing quicker & easier:
       .then(ele => { ... }) // ele will be an element
     ```
 
-### Running Selenium tests manually:
+### Running Zorroa Grid tests manually:
+```
+npm test e2e
+```
 
-- `npm test` and `jest` accept a pattern argument to filter which tests to run.
+- `npm test` accepts a pattern argument to filter which tests to run.
+
+### Running Selenium tests locally:
+```
+node_modules/.bin/jest e2e
+```
+
+- `jest` accepts a pattern argument to filter which tests to run.
 - Use `npm test e2e` to run only tests/e2e/* (Selenium) tests
 - Use `./node_modules/.bin/jest table` if you want to run just the table test, without the lint or code coverage passes. Useful for iterating more quickly.
 
@@ -197,6 +207,69 @@ RUNS  tests/e2e/workspace.test.js
 - Monitor test results in the [Sauce Labs tests dashboard](https://saucelabs.com/beta/dashboard/tests)
 -- Clicking on the test, then navigating to the "Watch" tab will display the test's browser screen real-time.
 
+### Adding a node to the Zorroa Grid
+
+Here's how to spinn up a new mac mini node machine & add it to our grid
+
+```
+Install teamViewer
+```
+
+```
+Install tunnelBlick
+  Add selenium vpn keys & connect to the vpn (vpn keys are in tests/selenium/zorroa-openvpn-client.tar.gz)
+  Don't route all traffic
+  Do connect to vpn on startup
+```
+
+```
+Install java
+  Install Java SE Development Kit 8 (NOT the regular jre)
+  http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+```
+
+```
+Set mac to auto-login to user account zorroa (to faciliate restarts via teamviewer)
+```
+
+```
+Turn on remote login (ssh access) and copy ssh keys to the machine:
+  HOST=10.8.0.3 # REPLACE IP with the correct host IP - use ifconfig on the new machine
+  cd tests/selenium # (Curator repo)
+  chmod 600 id_rsa_zorroa_*
+  chmod 644 id_rsa_zorroa_*.pub
+  ssh-copy-id -i id_rsa_zorroa_selenium_node zorroa@$HOST
+  # does the node need to have any private keys? maybe not # scp id_rsa_zorroa_selenium_node* zorroa@$HOST:~/.ssh/
+  ssh zorroa@$HOST -i id_rsa_zorroa_selenium_node # make sure it works - this should not ask for a password
+  ./startNodeOnHost.sh $HOST
+```
+
+mac mini user account password: z0rr0@12
+
+teamViewer remote control non-rotating password
+EatGrapes!
+
+teamViewer login:
+selenium@zorroa.com / selZorTeam248$
+
+### Restarting the Zorroa Grid hub
+
+There is an ansible playbook to deploy shub.zorroa.com
+To restart shub, use the AWS console
+
+### Restarting the Zorroa Grid nodes
+
+This will start or restart nodes on all available IP addresses connected to the Selenium VPN, excluding the hub and your own machine.
+
+```
+tests/selenium/startAllNodes.sh
+```
+
+To stop all nodes:
+
+```
+tests/selenium/startAllNodes.sh
+```
 
 ## Deploying the project
 
