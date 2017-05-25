@@ -220,6 +220,11 @@ Install tunnelBlick
   Add selenium vpn keys & connect to the vpn (vpn keys are in tests/selenium/zorroa-openvpn-client.tar.gz)
   Don't route all traffic
   Do connect to vpn on startup
+  Keep connected
+  Don't disconnect when sleeping
+  Do reconnect when waking
+  Don't disconnect when user switches out
+  Do reconnect when user switches in
 ```
 
 ```
@@ -230,6 +235,8 @@ Install java
 
 ```
 Set mac to auto-login to user account zorroa (to faciliate restarts via teamviewer)
+set power save settings to not sleep
+(TODO: this is probably not needed) System Preferences | Security & Privacy | Turn off require password
 ```
 
 ```

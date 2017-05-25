@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# start selenium node on all our remote machines (all machines on vpn)
+# List all VPN IPs
 #
-# Usage: startAllNodes.sh
+# Usage: listVpnNodes.sh
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
@@ -12,13 +12,9 @@ cd $DIR
 # another way is check all the IPs on the selenium vpn. (best for starting)
 # remove the hub address & remove the local machine
 myAddr=$(ifconfig | egrep -o '10.8.0.[[:digit:]]+' | sort | uniq)
-echo I am on $myAddr
 if [[ "$myAddr" == "" ]]; then
   echo 'not connected to vpn?'
   exit
 fi
-echo looking for nodes...
-nodes=$($DIR/listVpnNodes.sh)
-echo nodes: $nodes
-
-parallel -k "echo starting node {1}; ./startNodeOnHost.sh {1}" ::: $nodes
+nodes=$(nmap --min-parallelism 100 -sn 10.8.0.1/24 | egrep -o '\b10\.8\.0\.[[:digit:]]+' | sort | uniq | egrep -v '\b10\.8\.0\.1\b' | grep -v "\b$myAddr\b")
+echo $nodes
