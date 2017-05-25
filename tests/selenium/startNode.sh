@@ -31,6 +31,8 @@ logfile=selenium-node-$(date "+%Y_%m_%d_%Hh_%Mm_%Ss").log
 PATH=$PATH:. java -jar $SERVER -role node -hub $HUB &> $logfile &
 disown -r
 
+sleep 1 # wait a sec for log file to exist TODO: actually wait for the file
+
 echo logging to $logfile
 echo starting Selenium node...
 tail -f $logfile | grep -qe 'The node is registered to the hub and ready to use'

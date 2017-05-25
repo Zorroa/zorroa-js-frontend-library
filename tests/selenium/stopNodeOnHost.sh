@@ -17,6 +17,6 @@ fi
 # make sure ssh key perms are correct
 chmod 600 id_rsa_zorroa_selenium_{hub,node}
 
-ssh -i id_rsa_zorroa_selenium_node -o StrictHostKeyChecking=no zorroa@$HOST "cd ~; mkdir -p Desktop/selenium"
-scp -i id_rsa_zorroa_selenium_node -o StrictHostKeyChecking=no stopNode.sh "zorroa@$HOST:~/Desktop/selenium/"
-ssh -i id_rsa_zorroa_selenium_node -o StrictHostKeyChecking=no zorroa@$HOST "cd ~/Desktop/selenium; ./stopNode.sh"
+ssh -i id_rsa_zorroa_selenium_node -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no zorroa@$HOST "cd ~; mkdir -p Desktop/selenium"
+scp -i id_rsa_zorroa_selenium_node -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no stopNode.sh "zorroa@$HOST:~/Desktop/selenium/"
+ssh -i id_rsa_zorroa_selenium_node -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no zorroa@$HOST "cd ~/Desktop/selenium; ./stopNode.sh"

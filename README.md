@@ -213,6 +213,7 @@ Here's how to spinn up a new mac mini node machine & add it to our grid
 
 ```
 Install teamViewer
+  Turn off Actions | lock on session end
 ```
 
 ```

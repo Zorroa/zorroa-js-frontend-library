@@ -7,10 +7,6 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
 
-# one way to list all nodes is query the selenium grid console (best for stopping)
-# nodes=$(curl -s localhost:4444/grid/console | perl -ne 'if (m|http://([^\s]+):5555|) { print "$1\n" }' | sort | uniq)
-# another way is check all the IPs on the selenium vpn. (best for starting)
-# remove the hub address & remove the local machine
 myAddr=$(ifconfig | egrep -o '10.8.0.[[:digit:]]+' | sort | uniq)
 if [[ "$myAddr" == "" ]]; then
   echo 'not connected to vpn?'
