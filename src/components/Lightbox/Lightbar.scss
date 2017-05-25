@@ -52,6 +52,7 @@
   align-content: flex-start;
   margin-top: 10px;
   position: relative;
+  border-left: 1px solid $zorroa-darkgray;
 }
 
 .Lightbar-action {
@@ -125,19 +126,6 @@
   width: 5px;
   border-radius: 2px;
   border-left: 1px dotted $zorroa-darkgray;
-
-  &:hover { background-color: $zorroa-darkgray; }
-  &.isDragging { background-color: $zorroa-darkgray; }
-}
-
-.Lightbar-action-resizer {
-  cursor: col-resize;
-  position: absolute;
-  top: 2px;
-  bottom: 2px;
-  left: 0;
-  width: 5px;
-  border-radius: 2px;
 
   &:hover { background-color: $zorroa-darkgray; }
   &.isDragging { background-color: $zorroa-darkgray; }

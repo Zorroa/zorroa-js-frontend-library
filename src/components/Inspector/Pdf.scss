@@ -1,10 +1,10 @@
 @import '../../styles/core-mixins.scss';
 
 .Pdf {
-  @include fullHeight;
   @include flexCol;
   @include flexAlignItemsCenter;
   @include flexJustifyCenter;
+  @include flexOn;
 
   position: relative;
   img.loading {

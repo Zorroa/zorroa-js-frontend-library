@@ -84,13 +84,13 @@ class Lightbox extends Component {
       }
     }
     return (
-      <div className="lightbox flexCol fullWidth fullHeight">
+      <div className="lightbox">
         <Lightbar showMetadata={lightboxMetadata.show}
                   onMetadata={this.toggleMetadata}/>
         <div className="lightbox-body flexOn fullWidth fullHeight">
           <Inspector asset={asset}
-                     onNext={hasNext && (_ => this.isolateIndexOffset(1))}
-                     onPrev={hasPrev && (_ => this.isolateIndexOffset(-1))} />
+                     onNext={hasNext ? (_ => this.isolateIndexOffset(1)) : null}
+                     onPrev={hasPrev ? (_ => this.isolateIndexOffset(-1)) : null} />
         </div>
         { lightboxMetadata.show && (
           <ResizableWindow onClose={this.closeMetadata} onMove={this.moveMetadata}

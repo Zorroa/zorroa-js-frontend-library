@@ -228,7 +228,7 @@ class Lightbar extends Component {
         <div className="Lightbar-metadata">
           { this.renderFields(titleFields, asset) }
         </div>
-        <div className="Lightbar-actions" style={{width: actionWidth}}>
+        <div className="Lightbar-actions" style={{width: actionWidth, minWidth: actionWidth}}>
           <a href={this.isolatedAssetURL()} className='Lightbar-action' download={this.isolatedAssetURL()}>
             <span className='Lightbar-action-text'>Download</span>
             <i className='Lightbar-btn-icon icon-download2'/>
