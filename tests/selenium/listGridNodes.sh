@@ -7,7 +7,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
 
-ssh -i id_rsa_zorroa_selenium_hub -nNT -o StrictHostKeyChecking=no -L 4444:localhost:4444 computeruser@shub.zorroa.com &
+ssh -q -i id_rsa_zorroa_selenium_hub -nNT -o BatchMode=yes -o StrictHostKeyChecking=no -L 4444:localhost:4444 computeruser@shub.zorroa.com &
 sshPid=$!
 
 # wait for the ssh connection to spin up

@@ -13,6 +13,7 @@ if [[ "$myAddr" == "" ]]; then
   echo 'not connected to vpn?'
   exit
 fi
+
 echo looking for nodes...
 nodes=$($DIR/listVpnNodes.sh)
 echo nodes: $nodes

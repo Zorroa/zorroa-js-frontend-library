@@ -250,6 +250,7 @@ Turn on remote login (ssh access) and copy ssh keys to the machine:
   # does the node need to have any private keys? maybe not # scp id_rsa_zorroa_selenium_node* zorroa@$HOST:~/.ssh/
   ssh zorroa@$HOST -i id_rsa_zorroa_selenium_node # make sure it works - this should not ask for a password
   ./startNodeOnHost.sh $HOST
+  ./sshNodeHost.sh $HOST 'touch ~/.zorroa-grid' # enable this node; startAllNodes.sh looks for this file
 ```
 
 mac mini user account password: z0rr0@12
