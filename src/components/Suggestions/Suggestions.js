@@ -121,9 +121,10 @@ export default class Suggestions extends Component {
   }
 
   renderSuggestions () {
-    const { suggestions } = this.props
+    let { suggestions } = this.props
     const { selectedIndex } = this.state
     if (!suggestions || !suggestions.length) return null
+    suggestions = suggestions.slice(0, 4)
     return (
       <div className="Suggestions-suggestions">
         { suggestions.map((suggestion, index) => (
@@ -134,6 +135,7 @@ export default class Suggestions extends Component {
             <div>{suggestion.score}</div>
           </div>
         ))}
+        <div className="Suggestions-instructions">Press Enter to search</div>
       </div>
     )
   }
