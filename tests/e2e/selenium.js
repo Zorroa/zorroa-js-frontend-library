@@ -125,7 +125,7 @@ var suite = null
 export var driver = null
 
 const browserDriverConfig = {
-  chrome: { driver: 'selenium-webdriver/chrome', pathModule: 'chromedriver', maxSession: 2 },
+  chrome: { driver: 'selenium-webdriver/chrome', pathModule: 'chromedriver' /*, maxSession: 2 */ },
   firefox: { driver: 'selenium-webdriver/firefox', pathModule: 'geckodriver' }
 }
 

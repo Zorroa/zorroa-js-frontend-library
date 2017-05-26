@@ -23,7 +23,7 @@ while ! nc -w 1 localhost 4444 </dev/null; do sleep 1; done
 # Run all tests
 # jest -w 8 would start 8 workers (# tests running simultaneously)
 # -b flag bails on the suite after the first failure
-$projroot/node_modules/.bin/jest -w 6 -b --debug --forceExit --logHeapUsage --verbose
+$projroot/node_modules/.bin/jest -w 8 -b --debug --forceExit --logHeapUsage --verbose
 testResultExitCode=$?
 
 echo is ssh still up?
