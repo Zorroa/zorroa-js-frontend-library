@@ -159,7 +159,8 @@ export function startBrowserAndDriver (_suite) {
     const caps = {
       build: process.env.TRAVIS_BUILD_NUMBER,
       browserName: browserName,
-      screenResolution: "1024x768"
+      screenResolution: "1024x768",
+      platform: 'MAC'
     }
 
     driver = new webdriver.Builder()

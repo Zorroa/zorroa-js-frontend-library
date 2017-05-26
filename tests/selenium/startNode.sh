@@ -34,6 +34,7 @@ MAX_INSTS=$(( $MEM_GB / 2 ))
 # OPTS string from http://www.software-testing-tutorials-automation.com/2016/04/usage-of-maxsession-in-grid-2-to-set.html
 # OPTS="-browser browserName=firefox,maxInstances=2 -browser browserName=chrome,maxInstances=2"
 OPTS="-browser browserName=chrome,maxInstances=$MAX_INSTS -maxSession $MAX_INSTS"
+# all local folder to PATH, so selenium can see chromedriver
 PATH=$PATH:. java -jar $SERVER -role node -hub $HUB $OPTS &> $logfile &
 disown -r
 

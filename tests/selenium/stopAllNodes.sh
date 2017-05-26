@@ -12,8 +12,8 @@ myAddr=$(ifconfig | egrep -o '10.8.0.[[:digit:]]+' | sort | uniq)
 echo I am on $myAddr
 if [[ "$myAddr" == "" ]]; then
   echo 'not connected to vpn?'
-  exit
+  exit 1
 fi
 
-nodes=$($DIR/listVpnNodes.sh)
+nodes=$($DIR/listGridNodes.sh)
 parallel -k "echo stopping node {1}; ./stopNodeOnHost.sh {1}" ::: $nodes

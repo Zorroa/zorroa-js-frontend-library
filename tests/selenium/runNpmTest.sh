@@ -8,7 +8,7 @@ projroot=$DIR/../..
 cd $DIR
 
 # make sure ssh key perms are correct
-chmod 600 id_rsa_zorroa_selenium_{hub,node}
+chmod 600 id_rsa_zorroa_selenium_hub
 
 # setup localhost:4444 to see our selenium hub via ssh tunnel
 # expose our web server on a random port (so multiple tests can run on the grid simultaneously)
@@ -19,8 +19,15 @@ sshPid=$!
 # wait for the ssh connection to spin up
 while ! nc -w 1 localhost 4444 </dev/null; do sleep 1; done
 
+# make sure a server is running
+if ! nc -z shub.zorroa.com $ZORROA_GRID_PORT; then
+  echo "I see no curator running on shub:$ZORROA_GRID_PORT; make sure to start your server"
+  kill $sshPid
+  exit 1
+fi
+
 # Run all tests
-# jest -w 8 would start 8 workers (# tests running simultaneously)
+# jest -w 8 would start 8 workers (# tests running simultaneously) TODO: above 4 seems unstable. why?
 # -b flag bails on the suite after the first failure
 $projroot/node_modules/.bin/jest -w 4 -b --debug --forceExit --logHeapUsage --verbose "$@"
 testResultExitCode=$?

@@ -7,10 +7,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
 
-NEED_SSH="false"
-if ! nc -w 0 localhost 4444; then
- NEED_SSH="true"
-fi
+if ! nc -w 0 localhost 4444; then NEED_SSH="true"; else NEED_SSH="false"; fi
 
 if [[ $NEED_SSH == "true" ]]; then
  ssh -i id_rsa_zorroa_selenium_hub -nNT -o StrictHostKeyChecking=no -L 4444:localhost:4444 computeruser@shub.zorroa.com &

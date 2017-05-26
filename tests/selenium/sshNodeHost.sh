@@ -9,13 +9,10 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
 
 HOST=$1
-if [[ "$HOST" == "" ]]; then
-  echo "Usage: $0 <ip>"
-  exit
-fi
+if [[ "$HOST" == "" ]]; then echo "Usage: $0 <ip>"; exit 1; fi
 shift
 
 # make sure ssh key perms are correct
-chmod 600 id_rsa_zorroa_selenium_{hub,node}
+chmod 600 id_rsa_zorroa_selenium_node
 
 ssh -q -i id_rsa_zorroa_selenium_node -o ConnectTimeout=5 -o BatchMode=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no zorroa@$HOST "$@"
