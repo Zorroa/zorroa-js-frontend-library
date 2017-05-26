@@ -85,3 +85,13 @@
   &:not(.selected):hover { color: $zorroa-sickly-green; }
   &.selected { background-color: rgba(192, 192, 192, 0.5); }
 }
+
+.Suggestions-instructions {
+  font-size: 12px;
+  font-style: italic;
+  color: $zorroa-lightgray;
+  padding: 5px 5px 0 5px;
+  text-align: center;
+  width: 100%;
+  // border-top: 1px solid $zorroa-lightgray;
+}

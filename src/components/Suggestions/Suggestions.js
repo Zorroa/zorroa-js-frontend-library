@@ -1,9 +1,11 @@
 import React, { Component, PropTypes } from 'react'
 import classnames from 'classnames'
+import AssetSearch from '../../models/AssetSearch'
 
 export default class Suggestions extends Component {
   static propTypes = {
     value: PropTypes.string,
+    query: PropTypes.instanceOf(AssetSearch),
     suggestions: PropTypes.arrayOf(PropTypes.object),
     showSuggestions: PropTypes.bool,
     placeholder: PropTypes.string,
@@ -128,9 +130,16 @@ export default class Suggestions extends Component {
   }
 
   renderSuggestions () {
-    const { suggestions } = this.props
+    const { value } = this.state
+    if (!value) return null
+
+    const { query } = this.props
+    if (query && query.query === value) return null
+
+    let { suggestions } = this.props
     const { selectedIndex } = this.state
-    if (!suggestions || !suggestions.length) return null
+    if (!suggestions || !suggestions.length) suggestions = []
+    suggestions = suggestions.slice(0, 4)
     return (
       <div className="Suggestions-suggestions">
         { suggestions.map((suggestion, index) => (
@@ -141,6 +150,7 @@ export default class Suggestions extends Component {
             <div>{suggestion.score}</div>
           </div>
         ))}
+        <div className="Suggestions-instructions">Press Enter to search</div>
       </div>
     )
   }

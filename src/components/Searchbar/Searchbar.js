@@ -49,7 +49,7 @@ class Searchbar extends Component {
 
     clearTimeout(this.instaSearchTimer)
     if (lastAction === 'type') {
-      this.props.actions.suggestQueryStrings(suggestion)
+    this.props.actions.suggestQueryStrings(suggestion)
     }
 
     this.instaSearchTimer = setTimeout(_ => {
@@ -94,13 +94,14 @@ class Searchbar extends Component {
     const { query, suggestions } = this.props
     const { queryString } = this.state
     const value = query && query.query && query.query !== queryString ? query.query
-        : (query && query.query === undefined && queryString ? '' : undefined)
+      : (query && query.query === undefined && queryString ? '' : undefined)
 
     return (
       <div className="Searchbar">
         <div className="Searchbar-body flexCenter">
           <Suggestions suggestions={suggestions}
                        showSuggestions={this.showSuggestions}
+                       query={query}
                        value={value}
                        onChange={this.suggest}
                        onSelect={this.search.bind(this)} />
