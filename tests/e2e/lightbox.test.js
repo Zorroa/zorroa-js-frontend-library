@@ -6,7 +6,7 @@ const { By, until, Key } = selenium.webdriver
 
 const DEBUG = true
 
-describe('Workspace', function () {
+describe('Lightbox', function () {
   // For all jest functions that are passed a function parameter
   // (it, beforeEach, afterEach, beforeAll, afterAll):
   // if the passed function takes a callback, jest will wait for the callback to be called

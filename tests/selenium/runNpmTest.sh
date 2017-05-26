@@ -5,7 +5,6 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 projroot=$DIR/../..
-
 cd $DIR
 
 # make sure ssh key perms are correct
@@ -23,17 +22,8 @@ while ! nc -w 1 localhost 4444 </dev/null; do sleep 1; done
 # Run all tests
 # jest -w 8 would start 8 workers (# tests running simultaneously)
 # -b flag bails on the suite after the first failure
-$projroot/node_modules/.bin/jest -w 8 -b --debug --forceExit --logHeapUsage --verbose
+$projroot/node_modules/.bin/jest -w 4 -b --debug --forceExit --logHeapUsage --verbose "$@"
 testResultExitCode=$?
-
-echo is ssh still up?
-ps aux | grep ssh
-
-echo is hub still up?
-curl localhost:4444/grid/console | head -5
-
-echo is web server still up?
-curl localhost:8080/signin | head -5
 
 # close our port forwards
 kill $sshPid

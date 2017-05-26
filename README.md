@@ -279,6 +279,19 @@ To stop all nodes:
 tests/selenium/startAllNodes.sh
 ```
 
+### Grid notes
+
+List all nodes on the vpn: listVpnNodes.sh
+List all nodes registered with the hub: listGridNodes.sh
+Open the hub in your favorite browser: openHub.sh
+ssh into a node machine: sshNodeHost.sh <vpn ip>
+
+Troubleshooting
+
+One of the minis was saying 'connection refused' during tests. Tunnelblick's connection had gone bad.
+
+Teamviewer doesn't let you past the password: switch back to the teamviewer app while the login screen is still hung, and double-click the machine to login again. That should clear it up.
+
 ## Deploying the project
 
 ```

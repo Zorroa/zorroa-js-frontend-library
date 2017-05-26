@@ -33,7 +33,7 @@ MEM_GB=$(sysctl hw.memsize | awk '{print int($2/1023**3)}')
 MAX_INSTS=$(( $MEM_GB / 2 ))
 # OPTS string from http://www.software-testing-tutorials-automation.com/2016/04/usage-of-maxsession-in-grid-2-to-set.html
 # OPTS="-browser browserName=firefox,maxInstances=2 -browser browserName=chrome,maxInstances=2"
-OPTS="-browser browserName=chrome,maxInstances=$MAX_INSTS"
+OPTS="-browser browserName=chrome,maxInstances=$MAX_INSTS -maxSession $MAX_INSTS"
 PATH=$PATH:. java -jar $SERVER -role node -hub $HUB $OPTS &> $logfile &
 disown -r
 
