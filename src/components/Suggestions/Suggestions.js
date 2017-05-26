@@ -1,9 +1,11 @@
 import React, { Component, PropTypes } from 'react'
 import classnames from 'classnames'
+import AssetSearch from '../../models/AssetSearch'
 
 export default class Suggestions extends Component {
   static propTypes = {
     value: PropTypes.string,
+    query: PropTypes.instanceOf(AssetSearch),
     suggestions: PropTypes.arrayOf(PropTypes.object),
     placeholder: PropTypes.string,
     style: PropTypes.object,
@@ -121,9 +123,15 @@ export default class Suggestions extends Component {
   }
 
   renderSuggestions () {
+    const { value } = this.state
+    if (!value) return null
+
+    const { query } = this.props
+    if (query && query.query === value) return null
+
     let { suggestions } = this.props
     const { selectedIndex } = this.state
-    if (!suggestions || !suggestions.length) return null
+    if (!suggestions || !suggestions.length) suggestions = []
     suggestions = suggestions.slice(0, 4)
     return (
       <div className="Suggestions-suggestions">

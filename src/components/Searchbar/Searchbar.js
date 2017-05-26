@@ -86,6 +86,7 @@ class Searchbar extends Component {
       <div className="Searchbar">
         <div className="Searchbar-body flexCenter">
           <Suggestions suggestions={suggestions}
+                       query={query}
                        value={value}
                        onChange={this.suggest}
                        onSelect={this.search.bind(this)} />
