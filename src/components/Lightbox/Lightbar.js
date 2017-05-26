@@ -251,7 +251,7 @@ class Lightbar extends Component {
             { addingToCollection && <div className="Lightbar-performed-action">{addingToCollection}</div> }
           </div>
         </div>
-        <button className="Lightbar-close icon-cross2" onClick={this.closeLightbox.bind(this)} />
+        <div className="Lightbar-close icon-cross2" onClick={this.closeLightbox.bind(this)} />
         <div onMouseDown={event => this.resizer.capture(this.resizeLightbar, this.release, 0, lightbarHeight)}
              className="Lightbar-resizer" />
       </div>

@@ -81,6 +81,7 @@
 
 .Lightbar-close {
   @include zorroa-square-btn-lighten(60px);
+  @include flexCenter;
   font-size: 20px;
   border: none;
   outline: none;
