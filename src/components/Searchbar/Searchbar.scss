@@ -1,7 +1,7 @@
 @import '../../styles/core-mixins.scss';
 
 .Searchbar {
-  // Remove box highling when focused
+  // Remove box highlighting when focused
   .searchbar:focus {
     outline: none;
   }

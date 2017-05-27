@@ -125,7 +125,8 @@ export default class Suggestions extends Component {
     const { suggestions } = this.props
     if (!suggestions || !suggestions.length) return ''
     const suggestion = (selectedIndex >= 0) ? suggestions[selectedIndex] : suggestions[0]
-    const suffix = suggestion && suggestion.text ? suggestion.text.slice(value.length) : ''
+    const cleanValue = value.replace(/[\"\~]/g, '')
+    const suffix = suggestion && suggestion.text ? suggestion.text.slice(cleanValue.length) : ''
     return value + suffix
   }
 
@@ -161,7 +162,7 @@ export default class Suggestions extends Component {
     return (
     <div className="Suggestions" style={style}>
       <div className="Suggestions-overlapping-inputs">
-        <input disabled={true} value={this.selectedSuggestionString()}
+        <input value={this.selectedSuggestionString()}
                type="text" className="Suggestions-typeahead"/>
         <input className='Suggestions-search'
                value={value || ''}
