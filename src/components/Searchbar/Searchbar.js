@@ -118,7 +118,7 @@ const mapDispatchToProps = dispatch => ({
 
 const mapStateToProps = state => ({
   query: state.assets && state.assets.query,
-  error: state.assets.error,
+  error: state.assets && state.assets.error,
   totalCount: state.assets && state.assets.totalCount,
   suggestions: state.assets && state.assets.suggestions,
   widgets: state.racetrack && state.racetrack.widgets,
