@@ -31,7 +31,7 @@ export default class Widget {
 export function aggField (field, fieldType) {
   field = field && field.replace(/\.raw/, '')
   if (!field || !field.length || !fieldType || !fieldType.length) return
-  const numericFieldTypes = new Set(['double', 'integer', 'long', 'date'])
+  const numericFieldTypes = new Set(['double', 'integer', 'long', 'date', 'boolean'])
   const isNumeric = numericFieldTypes.has(fieldType)
   return (isNumeric) ? field : field + '.raw'
 }
@@ -50,6 +50,7 @@ export function widgetTypeForField (field, type) {
   switch (type) {
     case 'date': return DateRangeWidgetInfo.type
     case 'point': return MapWidgetInfo.type
+    case 'boolean':
     case 'string': return FacetWidgetInfo.type
     case 'integer':
     case 'double':

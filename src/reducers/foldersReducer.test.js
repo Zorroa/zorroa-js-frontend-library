@@ -56,6 +56,7 @@ describe('foldersReducer', () => {
     let afterState = createInitialState()
     afterState.all.set(foo.id, foo)
     afterState.all.get(0).childIds = new Set([1])
+    afterState.all.get(0).childCount = 1
     afterState.modifiedIds = new Set([1])
     expect(foldersReducer(initialState, { type: CREATE_FOLDER, payload: foo }))
       .toEqual(afterState)
@@ -67,10 +68,12 @@ describe('foldersReducer', () => {
     let afterState = createInitialState()
     afterState.all.set(foo.id, foo)
     afterState.all.get(0).childIds = new Set([1])
+    afterState.all.get(0).childCount = 1
     const nextState = foldersReducer(initialState, { type: CREATE_FOLDER, payload: foo })
     let finalState = createInitialState()
     finalState.all.set(foo.id, bar)
     finalState.all.get(0).childIds = new Set([1])
+    finalState.all.get(0).childCount = 1
     finalState.modifiedIds = new Set([1])
     expect(foldersReducer(nextState, { type: UPDATE_FOLDER, payload: bar }))
       .toEqual(finalState)

@@ -59,16 +59,11 @@
 
       .CreateFolder-public-private {
         color: $zorroa-gray;
-
-        &.disabled {
-          color: $zorroa-lightgray;
-        }
-
-        input {
-          width: auto;
-          height: auto;
-          padding: 0;
-          margin: 0 8px;
+        margin-left: 18px;
+        &.disabled { color: $zorroa-lightgray; }
+        div {
+          margin-left: 4px;
+          margin-right: 4px;
         }
       }
     }
@@ -139,4 +134,13 @@
       }
     }
   }
+}
+
+.CreateFolder-include-selected-assets {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  margin-bottom: 10px;
+  color: $zorroa-gray;
+  &.disabled { color: $zorroa-lightgray; }
+  div { margin-left: 4px; }
 }

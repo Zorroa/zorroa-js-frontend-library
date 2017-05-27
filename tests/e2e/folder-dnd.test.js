@@ -160,6 +160,10 @@ describe('Folder dnd', function () {
     .then(_ => { DEBUG && console.log('select the Users folder') })
     .then(_ => allUsersFolder.click())
     .then(_ => selenium.waitForIdle())
+    .then(_ => { DEBUG && console.log('deselect the Users folder') })
+    .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
+    .then(_ => allUsersFolder.click())
+    .then(_ => selenium.waitForIdle())
 
     .then(_ => { DEBUG && console.log('Add a "selenium" user folder') })
     // using the add folder button this time
@@ -168,11 +172,6 @@ describe('Folder dnd', function () {
     .then(_ => driver.findElement(By.css('.CreateFolder-input-title-input')).then(ele => ele.sendKeys(myUserName)))
     .then(_ => selenium.clickSelector(By.css('.CreateFolder-save')))
     .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.modal .CreateFolder')))
-    .then(_ => selenium.waitForIdle())
-
-    .then(_ => { DEBUG && console.log('deselect the Users folder') })
-    .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
-    .then(_ => allUsersFolder.click())
     .then(_ => selenium.waitForIdle())
 
     .then(_ => { DEBUG && console.log('find the new "selenium" user folder') })
@@ -190,6 +189,11 @@ describe('Folder dnd', function () {
     .then(_ => selenium.clickSelector(By.css('.Thumb')))
     .then(_ => selenium.waitForIdle())
     .then(_ => driver.actions().click(myUserFolder, 2).perform()) // right-click
+    .then(_ => { DEBUG && console.log('remove the asset from the folder in case it was already there') })
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.FolderItem-context-remove-assets'), 5000))
+    .then(_ => selenium.clickSelector(By.css('.FolderItem-context-remove-assets')))
+    .then(_ => selenium.waitForIdle())
+    .then(_ => { DEBUG && console.log('add the asset') })
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.FolderItem-context-add-assets'), 5000))
     .then(_ => selenium.clickSelector(By.css('.FolderItem-context-add-assets')))
     .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.FolderItem-context-add-assets'), 5000))

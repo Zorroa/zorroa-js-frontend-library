@@ -3,9 +3,10 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 import copy from 'copy-to-clipboard'
+import ReactDOMServer from 'react-dom/server'
 
 import User from '../../models/User'
-import Asset from '../../models/Asset'
+import Asset, { minimalUniqueFieldTitle } from '../../models/Asset'
 import Folders from '../Folders'
 import DisplayOptions from '../DisplayOptions'
 import TableField from '../Table/TableField'
@@ -15,11 +16,14 @@ import { flatDisplayPropertiesForFields } from '../../models/DisplayProperties'
 import { isolateAssetId } from '../../actions/assetsAction'
 import { addAssetIdsToFolderId } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
+import { unCamelCase } from '../../services/jsUtil'
 
 class Lightbar extends Component {
   static displayName = 'Lightbar'
 
   static propTypes = {
+    showMetadata: PropTypes.bool.isRequired,
+    onMetadata: PropTypes.func.isRequired,
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     isolatedId: PropTypes.string,
     selectedPageIds: PropTypes.instanceOf(Set),
@@ -33,7 +37,8 @@ class Lightbar extends Component {
   }
 
   state = {
-    columnWidth: 300,       // Fixed widths, to be draggable
+    columnWidths: [240],       // Fixed widths, to be draggable
+    titleWidths: [70],
     actionWidth: 425,
     lightbarHeight: 60,
     copyingLink: false,
@@ -43,26 +48,10 @@ class Lightbar extends Component {
 
   componentWillMount () {
     this.resizer = new Resizer()
-    this.componentWillReceiveProps(this.props)
   }
 
   componentWillUnmount () {
     this.resizer.release()  // safe, removes listener on async redraw
-  }
-
-  componentWillReceiveProps (props) {
-    const actionColWidth = 185
-    const actionRowWidth = 425
-    const actionRowHeight = 130
-    if (props.lightbarFields.length > 3) {
-      if (this.state.actionWidth > actionColWidth) {
-        this.setState({ actionWidth: actionColWidth, lightbarHeight: actionRowHeight })
-      }
-    } else {
-      if (this.state.actionWidth < actionRowWidth) {
-        this.setState({ actionWidth: actionRowWidth })
-      }
-    }
   }
 
   closeLightbox () {
@@ -81,7 +70,6 @@ class Lightbar extends Component {
 
   updateDisplayOptions = (event, state) => {
     const lightbarFields = state.checkedNamespaces
-    console.log('Update lightbar display options to:\n' + JSON.stringify(lightbarFields))
     this.props.actions.updateLightbarFields(lightbarFields)
     const { user, userSettings } = this.props
     const settings = { ...userSettings, lightbarFields }
@@ -89,15 +77,23 @@ class Lightbar extends Component {
   }
 
   resizeLightbar = (resizeX, resizeY) => {
-    this.setState({ lightbarHeight: Math.max(60, resizeY) })
+    const lightbarHeight = Math.max(60, resizeY)
+    const actionWidth = lightbarHeight < 125 ? 425 : 185
+    this.setState({ lightbarHeight, actionWidth })
   }
 
-  resizeColumn = (resizeX, resizeY) => {
-    this.setState({ columnWidth: Math.max(60, resizeX) })
+  resizeColumn (index, width) {
+    const columnWidths = [...this.state.columnWidths]
+    columnWidths[index] = Math.max(60, width)
+    this.setState({ columnWidths })
   }
 
-  resizeAction = (resizeX, resizeY) => {
-    this.setState({ actionWidth: Math.max(60, resizeX) })
+  resizeTitle (index, width) {
+    const titleWidths = [...this.state.titleWidths]
+    const min = 40
+    const max = this.state.columnWidths[index] - min
+    titleWidths[index] = Math.min(max, Math.max(min, width))
+    this.setState({ titleWidths })
   }
 
   release = (event) => {
@@ -115,7 +111,6 @@ class Lightbar extends Component {
     const text = this.isolatedAssetURL()
     if (!text) return
     copy(text)
-    console.log('Copied to clipboard: ' + text)
     this.setState({ copyingLink: true })
     if (this.copyTimeout) clearTimeout(this.copyTimout)
     this.copyTimout = setTimeout(() => {
@@ -142,58 +137,96 @@ class Lightbar extends Component {
     }, 3000)
   }
 
-  renderField ({title, field, displayProperties, asset}) {
-    const { columnWidth } = this.state
+  renderFields (titleFields, asset) {
+    const fields = titleFields.filter(field => {
+      const children = field.displayProperties.children
+      return !children || !children.length
+    })
+    const titleWidths = [...this.state.titleWidths]
+    let titleWidth = titleWidths[0]
+    const columnWidths = [...this.state.columnWidths]
+    let columnWidth = columnWidths[0]
+    const maxColumnHeight = this.state.lightbarHeight - 20
+    const columns = []
+    let columnKids = []
+    let columnHeight = 0
+    var test = document.getElementById('Table-cell-test')
+    if (!test) return
+    const isDraggingColumn = this.resizer.active
+    const addColumn = (index) => {
+      const column = (
+        <div className="Lightbar-column" style={{width: columnWidth}} key={columns.length}>
+          {columnKids}
+          <div className={classnames('Lightbar-title-resizer', {isDragging: isDraggingColumn})} key="title-resizer"
+               style={{left: `${titleWidth}px`}}
+               onMouseDown={event => this.resizer.capture(this.resizeTitle.bind(this, index), this.release, titleWidths[index])} />
+          <div className={classnames('Lightbar-column-resizer', {isDragging: isDraggingColumn})} key="col-resizer"
+               onMouseDown={event => this.resizer.capture(this.resizeColumn.bind(this, index), this.release, columnWidths[index])} />
+        </div>
+      )
+      columns.push(column)
+    }
 
-    // Section title, contains object starting with title field
-    if (displayProperties.children && displayProperties.children.length) {
-      if (!field.includes('.')) return null   // Skip top-level section titles
+    const fieldNames = fields.map(field => field.field)
+    const addField = (params) => {
+      const { tails, head } = minimalUniqueFieldTitle(params.field, fieldNames, 0)
+      const tail = tails && tails.join(' \u203A ') + ' \u203A '
       return (
-        <div key={`${title}-${field}`} className="Lightbar-attr" style={{width: columnWidth}}>
-          <div className="Lightbar-attr-title">
-            { title }
+        <div className="Lightbar-field" key={params.field}>
+          <div className="Lightbar-field-title" style={{minWidth: titleWidth, maxWidth: titleWidth}}>
+            { tail && <div className="Lightbar-field-title-tail">{tail}</div> }
+            { head && <div className="Lightbar-field-title-head">{unCamelCase(head)}</div> }
           </div>
-          <div className="Lightbar-attr-bar"/>
+          <TableField {...params}/>
         </div>
       )
     }
 
-    // Field value
-    const titleWidth = columnWidth / 3
-    const fieldWidth = 2 * titleWidth
-    return (
-      <div key={field} className="Lightbar-attr" style={{width: columnWidth}}>
-        <div className="Lightbar-attr-field" style={{width: titleWidth}}>
-          {title}
-        </div>
-        <div className="Lightbar-attr-separator"/>
-        <TableField asset={asset} field={field} width={fieldWidth}/>
-      </div>
-    )
+    // Fill the columns
+    fields.forEach(field => {
+      let fieldWidth = columnWidth - titleWidth
+      const params = { width: fieldWidth, asset, field: field.field, isOpen: true, dark: true }
+      test.innerHTML = ReactDOMServer.renderToString(addField(params))
+      const rect = test.getBoundingClientRect()
+      const height = rect.height
+      if (columnHeight + height <= maxColumnHeight) {
+        const isOpen = height <= maxColumnHeight
+        columnKids.push(addField({...params, isOpen}))
+        columnHeight += height
+      } else {
+        addColumn(columns.length)
+        if (columnWidths.length <= columns.length) {
+          columnWidths.push(columnWidths[columnWidths.length - 1])
+          titleWidths.push(titleWidths[titleWidths.length - 1])
+        }
+        columnWidth = columnWidths[columns.length]
+        titleWidth = titleWidths[columns.length]
+        fieldWidth = columnWidth - titleWidth
+        columnHeight = height
+        params.width = fieldWidth
+        const isOpen = height <= maxColumnHeight
+        columnKids = [addField({...params, isOpen})]
+      }
+    })
+
+    if (columnKids.length) addColumn()    // Last column
+    if (this.state.columnWidths.length !== columnWidths.length) this.setState({columnWidths, titleWidths})
+    return columns
   }
 
   render () {
-    const { lightbarFields, assets, isolatedId, showPages, selectedPageIds, user, pages } = this.props
-    const { columnWidth, actionWidth, lightbarHeight, copyingLink, showFolders, addingToCollection } = this.state
-    const isDraggingColumn = this.resizer.active && this.resizer.onMove === this.resizeColumn
-    const isDraggingAction = this.resizer.active && this.resizer.onMove === this.resizeAction
+    const { lightbarFields, assets, isolatedId, showPages, selectedPageIds, user, pages, showMetadata, onMetadata } = this.props
+    const { actionWidth, lightbarHeight, copyingLink, showFolders, addingToCollection } = this.state
     const asset = assets.find(asset => (asset.id === isolatedId)) || pages.find(asset => (asset.id === isolatedId))
     const titleFields = asset && lightbarFields && flatDisplayPropertiesForFields(lightbarFields, asset)
     const nselected = selectedPageIds && selectedPageIds.size
     const isAddToCollectionDisabled = showPages && !nselected
     return (
       <div className="Lightbar" style={{height: lightbarHeight}}>
-        <button onClick={this.showDisplayOptions} className="Lightbar-settings icon-cog" />
+        <div onClick={this.showDisplayOptions} className="Lightbar-settings icon-cog" />
+        <div onClick={onMetadata} className={classnames('Lightbar-settings', 'icon-chevron-down', {isOpen: showMetadata})} />
         <div className="Lightbar-metadata">
-          { titleFields && titleFields.map(tf => this.renderField({...tf, asset})) }
-          <div className="Lightbar-column-resizers">
-            { /* TRICKY: N columns, with accumulated scaling */
-              [1, 2, 3, 4, 5, 6, 7].map(k => (
-              <div key={k} className={classnames('Lightbar-column-resizer', {isDragging: isDraggingColumn})}
-                   style={{left: k * columnWidth - 2.5}}
-                   onMouseDown={event => this.resizer.capture(this.resizeColumn, this.release, columnWidth, 0, 1.0 / k)} />
-            ))}
-          </div>
+          { this.renderFields(titleFields, asset) }
         </div>
         <div className="Lightbar-actions" style={{width: actionWidth}}>
           <a href={this.isolatedAssetURL()} className='Lightbar-action' download={this.isolatedAssetURL()}>
@@ -212,13 +245,11 @@ class Lightbar extends Component {
             { showFolders && (
               <div className="Lightbar-folders" onClick={e => { e.stopPropagation() }}>
                 <Folders filterName="simple" onSelect={this.addToCollection}
-                         filter={f => (!f.isDyhi() && !f.search && (f.childCount || f.canAddAssetIds(selectedPageIds, assets, user)))} />
+                         filter={f => (!f.isDyhi() && !f.search && (f.childCount || f.canAddAssetIds(showPages ? selectedPageIds : new Set([isolatedId]), assets, user)))} />
               </div>
             )}
             { addingToCollection && <div className="Lightbar-performed-action">{addingToCollection}</div> }
           </div>
-          <div onMouseDown={event => this.resizer.capture(this.resizeAction, this.release, actionWidth, 0, -1 /* left */)}
-               className={classnames('Lightbar-action-resizer', {isDragging: isDraggingAction})} />
         </div>
         <button className="Lightbar-close icon-cross2" onClick={this.closeLightbox.bind(this)} />
         <div onMouseDown={event => this.resizer.capture(this.resizeLightbar, this.release, 0, lightbarHeight)}

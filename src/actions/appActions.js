@@ -1,7 +1,7 @@
 import {
   SHOW_MODAL, HIDE_MODAL, SORT_FOLDERS,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
-  METADATA_FIELDS, LIGHTBAR_FIELDS,
+  METADATA_FIELDS, LIGHTBAR_FIELDS, LIGHTBOX_METADATA,
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
   SHOW_MULTIPAGE, SHOW_PAGES, VIDEO_VOLUME,
@@ -59,6 +59,13 @@ export function updateLightbarFields (fields) {
   return ({
     type: LIGHTBAR_FIELDS,
     payload: fields
+  })
+}
+
+export function lightboxMetadata ({show, left, top, width, height}) {
+  return ({
+    type: LIGHTBOX_METADATA,
+    payload: { show, left, top, width, height }
   })
 }
 

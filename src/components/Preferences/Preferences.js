@@ -11,8 +11,6 @@ import { DropboxAuthenticator } from '../Import/DropboxAuthenticator'
 import { BoxAuthenticator } from '../Import/BoxAuthenticator'
 import { GDriveAuthenticator } from '../Import/GDriveAuthenticator'
 
-import Toggle from '../Toggle'
-
 const theme = {
   scheme: 'bright',
   author: 'chris kempson (http://chriskempson.com)',
@@ -81,14 +79,8 @@ class Preferences extends Component {
     this.dismiss()
   }
 
-  toggleFuzzy = (event) => {
-    const fuzzy = event.target.checked
-    this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, fuzzy })
-  }
-
   render () {
     const { user, info, health, metrics } = this.props
-    const { fuzzy } = this.props.userSettings
     return (
       <div className="Preferences">
         <div className="Preferences-header">
@@ -104,14 +96,6 @@ class Preferences extends Component {
               <span>{user.username}</span>
               <span>{user.firstName} {user.lastName}</span>
               <span>{user.email}</span>
-            </div>
-            <div className="Preferences-user-body">
-              <div className="Preferences-user-fuzzy">
-                Text matching:&nbsp;&nbsp;
-                Exact
-                <Toggle checked={!!fuzzy} onChange={this.toggleFuzzy} />
-                Fuzzy
-              </div>
             </div>
           </div>
           <div className="Preferences-curator flexCol">

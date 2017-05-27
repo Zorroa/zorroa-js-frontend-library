@@ -142,15 +142,15 @@ class FolderItem extends Component {
     this.dismissContextMenu(event)
     const width = '300px'
     const body = <CreateFolder title='Create Collection'
-                               acl={[]}
+                               acl={[]} includeAssets={true}
                                onCreate={this.createChildFolder}/>
     this.props.actions.showModal({body, width})
   }
 
-  createChildFolder = (name, acl, search) => {
+  createChildFolder = (name, acl, assetIds) => {
     const parentId = this.props.folder.id
-    const folder = new Folder({ name, parentId, acl, search })
-    this.props.actions.createFolder(folder)
+    const folder = new Folder({ name, parentId, acl })
+    this.props.actions.createFolder(folder, assetIds)
   }
 
   moveTo = (event) => {
@@ -183,17 +183,21 @@ class FolderItem extends Component {
   }
 
   edit = (event) => {
+    const { folder, user } = this.props
     this.dismissContextMenu(event)
     const width = '300px'
     const { acl, timeCreated, timeModified, name } = this.props.folder
     const date = timeModified > timeCreated ? `Modified ${new Date(timeModified).toLocaleString('en-US')}` : `Created ${new Date(timeCreated).toLocaleString('en-US')}`
+    const writePermission = folder.hasAccess(user, AclEntry.WriteAccess)
+    const readPermission = folder.hasAccess(user, AclEntry.ReadAccess)
     const body = <CreateFolder title='Edit Collection'
                                acl={acl}
                                date={date}
                                name={name}
+                               includeAssets={false}
                                onCreate={this.editFolder}
-                               onDelete={this.deleteFolder}
-                               onLink={this.getLink}/>
+                               onDelete={writePermission && this.deleteFolder}
+                               onLink={readPermission && this.getLink}/>
     this.props.actions.showModal({body, width})
   }
 
@@ -319,7 +323,33 @@ class FolderItem extends Component {
     const selectedAssetsNotInFolder = selectedAssets && this.selectedAssetNotInSelectedFolder()
     const addableAssets = selectedAssetsNotInFolder && this.simpleFolderIds().length > 0
     const removableAssets = selectedAssets && this.selectedFolderContainsSelectedAssets()
-    const canAddChild = singleFolderSelected && !folder.isDyhi() && !folder.search && folder.hasAccess(user, AclEntry.WriteAccess)
+    const writePermission = folder.hasAccess(user, AclEntry.WriteAccess)
+    const canAddChild = singleFolderSelected && !folder.isDyhi() && !folder.search && writePermission
+    let canAddChildTitle = ''
+    if (!singleFolderSelected) {
+      canAddChildTitle = 'Select a single folder as parent'
+    } else if (folder.isDyhi()) {
+      canAddChildTitle = 'Cannot add children to an automatic smart folder'
+    } else if (folder.search) {
+      canAddChildTitle = 'Cannot add children to a smart folder'
+    } else if (!writePermission) {
+      canAddChildTitle = 'No write permission on parent folder'
+    }
+    let addableAssetTitle = 'Add selected assets to selected folders'
+    if (!selectedAssets) {
+      addableAssetTitle = 'No assets selected'
+    } else if (!selectedAssetsNotInFolder) {
+      addableAssetTitle = 'Selected assets are already in selected folder'
+    } else if (!this.simpleFolderIds().length) {
+      addableAssetTitle = 'No simple folders selected'
+    }
+    let removableAssetTitle = 'Remove selected assets from selected folders'
+    if (!selectedAssets) {
+      removableAssetTitle = 'No assets selected'
+    } else if (!this.selectedFolderContainsSelectedAssets()) {
+      removableAssetTitle = 'Selected assets are not in selected folder'
+    }
+    let removeFolderTitle = writePermission ? 'Move folder to trash' : 'No write permission'
 
     // FIXME: Get Link, Move to, and Favorite are disabled until implemented
     return (
@@ -370,7 +400,8 @@ class FolderItem extends Component {
             <div onClick={canAddChild && this.createChild}
                  className="FolderItem-context-item FolderItem-context-create-subfolder"
                  onContextMenu={this.dismissContextMenu}>
-              <div className={classnames('icon-folder-add', {disabled: !canAddChild})} />
+              <div title={canAddChildTitle}
+                   className={classnames('icon-folder-add', {disabled: !canAddChild})} />
               <div>Create Sub-folder</div>
             </div> }
           <div onClick={this.moveTo}
@@ -386,11 +417,13 @@ class FolderItem extends Component {
             <div>Favorite</div>
           </div>
           <div onClick={addableAssets && this.addAssetsToFolders}
+               title={addableAssetTitle}
                className={classnames('FolderItem-context-item FolderItem-context-add-assets', {disabled: !addableAssets})}>
             <div className="icon-plus2"/>
             <div>Add Assets</div>
           </div>
           <div onClick={removableAssets && this.removeAssetsFromFolders}
+               title={removableAssetTitle}
                className={classnames('FolderItem-context-item FolderItem-context-remove-assets', {disabled: !removableAssets})}>
             <div className="icon-removeasset"/>
             <div>Remove Assets</div>
@@ -402,8 +435,9 @@ class FolderItem extends Component {
             <div className="icon-pencil"/>
             <div>Edit...</div>
           </div> }
-          <div onClick={this.removeFolder}
-               className="FolderItem-context-item FolderItem-context-remove-folder"
+          <div onClick={writePermission && this.removeFolder}
+               title={removeFolderTitle}
+               className={classnames('FolderItem-context-item FolderItem-context-remove-folder', {disabled: !writePermission})}
                onContextMenu={this.dismissContextMenu}>
             <div className="icon-trash2"/>
             <div>Remove folder</div>

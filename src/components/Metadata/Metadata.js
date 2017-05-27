@@ -16,14 +16,14 @@ import * as WidgetInfo from '../Racetrack/WidgetInfo'
 class Metadata extends Component {
   static propTypes = {
     // state props
-    metadataFields: PropTypes.arrayOf(PropTypes.string).isRequired,
+    metadataFields: PropTypes.arrayOf(PropTypes.string),
     widgets: PropTypes.arrayOf(PropTypes.object),
     collapsibleOpen: PropTypes.object,
     fieldTypes: PropTypes.object,
     aggs: PropTypes.object,
     order: PropTypes.arrayOf(PropTypes.object),
     user: PropTypes.instanceOf(User),
-    userSettings: PropTypes.object.isRequired,
+    userSettings: PropTypes.object,
     actions: PropTypes.object
   }
 
@@ -304,7 +304,7 @@ class Metadata extends Component {
             { filterString && filterString.length && <div onClick={this.cancelFilter} className="Metadata-cancel-filter icon-cancel-circle"/> }
             <div className="icon-search"/>
           </div>
-          <div onClick={this.toggleFavorites}
+          <div onClick={this.toggleFavorites} title="Filter to show only favorite fields"
                className={classnames('Metadata-favorites',
                  `icon-star-${showFavorites ? 'filled' : 'empty'}`,
                  {isSelected: showFavorites})}/>

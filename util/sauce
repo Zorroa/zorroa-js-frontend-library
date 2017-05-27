@@ -55,5 +55,5 @@ while [ ! -f $readyfile ]; do sleep 1; done
 # test REPL; execute each test (pattern)
 while read -p 'Enter test to run (blank to exit):' test && [ ! -z "$test" ]; do
   echo "running tests that match '$test'"
-  $ZORROA/node_modules/.bin/jest -i "$test"
+  $ZORROA/node_modules/.bin/jest "$test"
 done

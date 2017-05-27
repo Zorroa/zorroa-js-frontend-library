@@ -42,6 +42,8 @@ $FolderItemHeight : 25px;
 
   cursor: pointer;
 
+  color: $zorroa-gray;
+
   &.hasChildren:not(.isSelected):hover { color: white; background-color: $zorroa-darkgray; }
   .FolderItem.isSelected & { background-color: $zorroa-selected; }
   .FolderItem.isSelected &.hasChildren:not(.isSelected):hover { color: white; background-color: $zorroa-darkgray; }

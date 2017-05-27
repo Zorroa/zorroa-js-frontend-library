@@ -6,7 +6,7 @@ import { humanFileSize } from '../../services/jsUtil'
 
 export default class TableField extends Component {
   static propTypes = {
-    // props
+    dark: PropTypes.bool,
     asset: PropTypes.instanceOf(Asset).isRequired,
     field: PropTypes.string.isRequired,
     isOpen: PropTypes.bool,
@@ -80,7 +80,7 @@ export default class TableField extends Component {
   }
 
   render = () => {
-    const { asset, field, width, left, top, isOpen } = this.props
+    const { asset, field, width, left, top, isOpen, dark } = this.props
     const val = asset.rawValue(field)
     let renderValFn = this.renderGeneral
     let padding = '4px 4px'
@@ -107,6 +107,8 @@ export default class TableField extends Component {
     // Without width is for the .Table-cell-test, auto width for measuring cells
     if (width) {
       style.width = `${width}px`
+      style.maxWidth = style.width
+      style.minWidth = style.width
     }
     if (left && top) {
       style.left = left
@@ -114,6 +116,6 @@ export default class TableField extends Component {
       style.position = 'absolute'
     }
 
-    return (<div className={classnames('Table-cell', {isOpen})} style={style}>{renderValFn(val, asset)}</div>)
+    return (<div className={classnames('Table-cell', {isOpen, dark})} style={style}>{renderValFn(val, asset)}</div>)
   }
 }
