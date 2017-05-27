@@ -22,3 +22,10 @@
     &:hover { color: $zorroa-gray; }
   }
 }
+
+.Searchbar-error {
+  position: absolute;
+  font-size: 12px;
+  font-style: italic;
+  color: $zorroa-orangish;
+}

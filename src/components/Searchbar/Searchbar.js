@@ -15,6 +15,7 @@ class Searchbar extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
     query: PropTypes.instanceOf(AssetSearch),
+    error: PropTypes.string,
     totalCount: PropTypes.number,
     suggestions: PropTypes.arrayOf(PropTypes.object),
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
@@ -91,7 +92,7 @@ class Searchbar extends Component {
   }
 
   render () {
-    const { query, suggestions } = this.props
+    const { query, suggestions, error } = this.props
     const { queryString } = this.state
     const value = query && query.query && query.query !== queryString ? query.query
       : (query && query.query === undefined && queryString ? '' : undefined)
@@ -107,6 +108,7 @@ class Searchbar extends Component {
                        onSelect={this.search.bind(this)} />
           <button onClick={this.forceSearch} className="search-button icon-search" />
         </div>
+        { error && <div className="Searchbar-error">Search syntax error</div> }
       </div>
     )
   }
@@ -118,6 +120,7 @@ const mapDispatchToProps = dispatch => ({
 
 const mapStateToProps = state => ({
   query: state.assets && state.assets.query,
+  error: state.assets.error,
   totalCount: state.assets && state.assets.totalCount,
   suggestions: state.assets && state.assets.suggestions,
   widgets: state.racetrack && state.racetrack.widgets,

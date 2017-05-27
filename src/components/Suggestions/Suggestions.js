@@ -50,7 +50,7 @@ export default class Suggestions extends Component {
 
   clearValue = () => {
     const value = ''
-    if (this.state.value !== value) {
+    if (this.state.value !== value || this.state.error) {
       this.setState({value})
       this.props.onSelect(value)
       this.updateValue('')
