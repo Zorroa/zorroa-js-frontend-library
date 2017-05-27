@@ -22,7 +22,7 @@ class Searchbar extends Component {
     userSettings: PropTypes.object.isRequired
   }
 
-  instaSearchTimer = null
+  // instaSearchTimer = null
   showSuggestions = true
 
   state = {
@@ -48,17 +48,15 @@ class Searchbar extends Component {
     // hide suggestions whenever the search input is cleared
     if (!suggestion) this.showSuggestions = false
 
-    clearTimeout(this.instaSearchTimer)
-    if (lastAction === 'type') {
-    this.props.actions.suggestQueryStrings(suggestion)
-    }
+    // clearTimeout(this.instaSearchTimer)
+    if (lastAction === 'type') this.props.actions.suggestQueryStrings(suggestion)
 
-    this.instaSearchTimer = setTimeout(_ => {
-      Promise.resolve()
-      // set the query string just in case we're insta-searching for a suggestion
-      .then(_ => { if (lastAction === 'select') return this.setStatePromise({ queryString: suggestion }) })
-      .then(_ => this.search(suggestion))
-    }, INSTA_SEARCH_TIME)
+    // this.instaSearchTimer = setTimeout(_ => {
+    //   Promise.resolve()
+    //   // set the query string just in case we're insta-searching for a suggestion
+    //   .then(_ => { if (lastAction === 'select') return this.setStatePromise({ queryString: suggestion }) })
+    //   .then(_ => this.search(suggestion))
+    // }, INSTA_SEARCH_TIME)
 
     // show suggestions whenever the user types into the input
     this.showSuggestions = true
@@ -79,8 +77,8 @@ class Searchbar extends Component {
       widgets[index] = widget
     }
     this.props.actions.resetRacetrackWidgets(widgets)
-    clearTimeout(this.instaSearchTimer)
-    this.instaSearchTimer = null
+    // clearTimeout(this.instaSearchTimer)
+    // this.instaSearchTimer = null
     // hide suggestions whenever a search is performed
     this.showSuggestions = false
   }
