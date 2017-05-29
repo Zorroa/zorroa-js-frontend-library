@@ -1,6 +1,9 @@
 @import '../../styles/core-mixins.scss';
 
 .lightbox {
+  @include flexCol;
+  @include fullWidth;
+
   background-color: $zorroa-greyish-brown; // $grayish-brown
   display: flex;
   flex-direction: column;
@@ -16,6 +19,7 @@
 }
 
 .lightbox-body {
+  @include flexCol;
   flex: 1;
   display: flex;
   justify-content: center;

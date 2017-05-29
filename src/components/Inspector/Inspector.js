@@ -62,8 +62,8 @@ class Inspector extends Component {
     const order = [{ field: `source.clip.${field}.start`, ascending: true }]
 
     return (
-      <div className="Inspector fullWidth fullHeight flexCenter">
-        <div className='Inspector-content flexOn'>
+      <div className="Inspector">
+        <div className='Inspector-content'>
           <Multipage parentId={asset.parentId()} order={order}>
             { inspector }
             { warning ? <div className="Inspector-warning">{warning}</div> : null }
