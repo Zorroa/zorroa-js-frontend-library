@@ -105,7 +105,7 @@ class SimpleSearch extends Component {
                    onKeyPress={this.queryStringKeyPressed} onChange={this.updateQueryString} />
           </div>
           <div className="SimpleSearch-help">
-            <a href="https://zorroa.com/help-center/search" target="_blank"><i className="icon-question"/> search tips</a>
+            <a href="https://zorroa.com/help-center/#search-help" target="_blank"><i className="icon-question"/> search tips</a>
           </div>
         </div>
       </Widget>
