@@ -8,7 +8,8 @@ import {
   HOVER_FIELD, CLEAR_HOVER_FIELD,
   USER_SETTINGS, UNAUTH_USER, SET_FUZZY,
   SHOW_DIALOG_ALERT, HIDE_DIALOG_ALERT,
-  SHOW_DIALOG_CONFIRM, HIDE_DIALOG_CONFIRM
+  SHOW_DIALOG_CONFIRM, HIDE_DIALOG_CONFIRM,
+  SHOW_DIALOG_PROMPT, HIDE_DIALOG_PROMPT
 } from '../constants/actionTypes'
 import { DEFAULT_THUMBSIZE } from '../actions/appActions'
 
@@ -69,6 +70,10 @@ export default function app (state = initialState, action) {
       return { ...state, dialogConfirm: action.payload }
     case HIDE_DIALOG_CONFIRM:
       return { ...state, dialogConfirm: null }
+    case SHOW_DIALOG_PROMPT:
+      return { ...state, dialogPrompt: action.payload }
+    case HIDE_DIALOG_PROMPT:
+      return { ...state, dialogPrompt: null }
     case ICONIFY_LEFT_SIDEBAR:
       return { ...state, leftSidebarIsIconified: action.payload }
     case ICONIFY_RIGHT_SIDEBAR:

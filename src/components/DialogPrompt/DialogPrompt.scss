@@ -1,0 +1,32 @@
+@import '../../styles/core-mixins.scss';
+
+.DialogPrompt {
+}
+
+.DialogPrompt-header {
+}
+
+.DialogPrompt-body {
+  @include flexCol;
+  padding: 40px;
+}
+
+.DialogPrompt-input {
+  margin: 10px 0px;
+}
+
+.DialogPrompt-footer {
+  @include flexRowCenter;
+  @include fullWidth;
+  @include flexJustifySpaceAround;
+  padding: 10px;
+}
+
+.DialogPrompt-confirm {
+  color: white;
+  @include zorroa-btn(6em, 40px, $zorroa-sickly-green, darken($zorroa-sickly-green, 15%));
+}
+.DialogPrompt-cancel {
+  color: $zorroa-darkgray;
+  @include zorroa-btn(6em, 40px, $zorroa-lightgray, darken($zorroa-lightgray, 15%));
+}

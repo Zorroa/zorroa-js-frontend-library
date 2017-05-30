@@ -7,7 +7,8 @@ import {
   SHOW_MULTIPAGE, SHOW_PAGES, VIDEO_VOLUME,
   HOVER_FIELD, CLEAR_HOVER_FIELD, SET_FUZZY,
   SHOW_DIALOG_ALERT, HIDE_DIALOG_ALERT,
-  SHOW_DIALOG_CONFIRM, HIDE_DIALOG_CONFIRM
+  SHOW_DIALOG_CONFIRM, HIDE_DIALOG_CONFIRM,
+  SHOW_DIALOG_PROMPT, HIDE_DIALOG_PROMPT
 } from '../constants/actionTypes'
 
 export const MIN_THUMBSIZE = 48
@@ -53,6 +54,20 @@ export function showDialogConfirm (title, message, confirmAction, cancelAction) 
 export function hideDialogConfirm () {
   return {
     type: HIDE_DIALOG_CONFIRM,
+    payload: null
+  }
+}
+
+export function showDialogPrompt (title, message, confirmAction, cancelAction) {
+  return {
+    type: SHOW_DIALOG_PROMPT,
+    payload: { title, message, confirmAction, cancelAction }
+  }
+}
+
+export function hideDialogPrompt () {
+  return {
+    type: HIDE_DIALOG_PROMPT,
     payload: null
   }
 }

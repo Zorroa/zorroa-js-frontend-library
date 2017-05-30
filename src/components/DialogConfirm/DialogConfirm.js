@@ -33,7 +33,7 @@ const DialogConfirm = (props) => {
 
 DialogConfirm.propTypes = {
   title: PropTypes.string,
-  message: PropTypes.node,
+  message: PropTypes.string,
   confirmAction: PropTypes.func,
   cancelAction: PropTypes.func
 }
