@@ -125,18 +125,12 @@ export default class Suggestions extends Component {
     const { suggestions } = this.props
     if (!suggestions || !suggestions.length) return ''
     const suggestion = (selectedIndex >= 0) ? suggestions[selectedIndex] : suggestions[0]
-    const cleanValue = value.replace(/[\"\~]/g, '')
+    const cleanValue = value.replace(/["~]/g, '')
     const suffix = suggestion && suggestion.text ? suggestion.text.slice(cleanValue.length) : ''
     return value + suffix
   }
 
   renderSuggestions () {
-    const { value } = this.state
-    if (!value) return null
-
-    const { query } = this.props
-    if (query && query.query === value) return null
-
     let { suggestions } = this.props
     const { selectedIndex } = this.state
     if (!suggestions || !suggestions.length) suggestions = []
@@ -157,22 +151,30 @@ export default class Suggestions extends Component {
   }
 
   render () {
-    const { placeholder, style } = this.props
+    const { placeholder, style, query } = this.props
     const { value } = this.state
+
+    /* dont show suggestions if input matches current results */
+    const showSuggestions = this.props.showSuggestions && value && (!query || query.query !== value)
+
     return (
     <div className="Suggestions" style={style}>
       <div className="Suggestions-overlapping-inputs">
-        <input value={this.selectedSuggestionString()}
-               type="text" className="Suggestions-typeahead"/>
+        { showSuggestions &&
+          <input value={this.selectedSuggestionString()}
+                 type="text"
+                 className="Suggestions-typeahead"
+                 readOnly/> }
         <input className='Suggestions-search'
                value={value || ''}
-               onKeyDown={this.onKeyDown}
+               onKeyDown={showSuggestions && this.onKeyDown}
                onChange={event => this.updateValue(event.target.value)}
-               placeholder={placeholder} type="text" />
+               placeholder={placeholder}
+               type="text" />
         <button onClick={this.clearValue}
                 disabled={!value || !value.length}
                 className="Suggestions-clear icon-cancel-circle" />
-        { this.props.showSuggestions && this.renderSuggestions() }
+        { showSuggestions && this.renderSuggestions() }
       </div>
     </div>
     )
