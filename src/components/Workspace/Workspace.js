@@ -250,7 +250,7 @@ class Workspace extends Component {
 
   // This is example code for alert & confirm dialogs. Remove anytime.
   renderModalTest = () => {
-    const test = true
+    const test = false
     if (test) {
       return (
         <div className='flexRowCenter'>
