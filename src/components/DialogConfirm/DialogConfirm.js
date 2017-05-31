@@ -4,9 +4,7 @@ import Dialog from '../Dialog'
 
 const DialogConfirm = (props) => {
   const { title, message, confirmAction, cancelAction } = props
-
   const header = <span className='DialogConfirm-header'>{title}</span>
-
   const body = <div className='DialogConfirm-body'>{message}</div>
 
   const footer = (
@@ -24,7 +22,7 @@ const DialogConfirm = (props) => {
 
   return (
     <Dialog className='DialogConfirm'
-        closeFn={cancelAction}
+        closeFn={_ => cancelAction && cancelAction()}
         header={header}
         body={body}
         footer={footer}/>

@@ -17,13 +17,8 @@ import Racetrack from '../Racetrack'
 import Metadata from '../Metadata'
 import Metadata2 from '../Metadata2'
 import Collapsible from '../Collapsible'
-import {
-  iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible,
-  showModal, hideModal,
-  showDialogAlert, hideDialogAlert,
-  showDialogConfirm, hideDialogConfirm,
-  showDialogPrompt, hideDialogPrompt
-} from '../../actions/appActions'
+import { iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible, showModal, hideModal,
+  dialogAlertPromise, dialogConfirmPromise, dialogPromptPromise } from '../../actions/appActions'
 import { getUserPermissions, updatePassword, changePassword } from '../../actions/authAction'
 import { queueFileEntrysUpload } from '../../actions/jobActions'
 import { updateCommand, getAllCommands } from '../../actions/assetsAction'
@@ -224,43 +219,33 @@ class Workspace extends Component {
 
   // This is an example of how to use DialogAlert. Remove anytime
   alert = (message) => {
-    const { showDialogAlert, hideDialogAlert } = this.props.actions
-    // const message = 'this is a message lsjd flks jdlfkj sdljf lskdj flkjs dlfj lskdj flkjsd flkj sdlkjf lskdj flkjsd lkfj sldjf lskjd lksjd flkjsd this is a message lsjd flks jdlfkj sdljf lskdj flkjs dlfj lskdj flkjsd flkj sdlkjf lskdj flkjsd lkfj sldjf lskjd lksjd flkjsd this is a message lsjd flks jdlfkj sdljf lskdj flkjs dlfj lskdj flkjsd flkj sdlkjf lskdj flkjsd lkfj sldjf lskjd lksjd flkjsd this is a message lsjd flks jdlfkj sdljf lskdj flkjs dlfj lskdj flkjsd flkj sdlkjf lskdj flkjsd lkfj sldjf lskjd lksjd flkjsd '
+    const { dialogAlertPromise } = this.props.actions
     message = message || 'Hey, you should know something'
-    return new Promise(resolve => showDialogAlert('alert dialog', message, resolve))
-    .then(_ => console.log('DISMISSED!'))
-    .then(hideDialogAlert)
+    // message = message + ' lsjd flks jdlfkj sdljf lskdj flkjs dlfj lskdj flkjsd flkj sdlkjf lskdj flkjsd lkfj sldjf lskjd lksjd flkjsd this is a message lsjd flks jdlfkj sdljf lskdj flkjs dlfj lskdj flkjsd flkj sdlkjf lskdj flkjsd lkfj sldjf lskjd lksjd flkjsd this is a message lsjd flks jdlfkj sdljf lskdj flkjs dlfj lskdj flkjsd flkj sdlkjf lskdj flkjsd lkfj sldjf lskjd lksjd flkjsd this is a message lsjd flks jdlfkj sdljf lskdj flkjs dlfj lskdj flkjsd flkj sdlkjf lskdj flkjsd lkfj sldjf lskjd lksjd flkjsd '
+    return dialogAlertPromise('alert dialog', message)
   }
 
   // This is an example of how to use DialogConfirm. Remove anytime
   confirm = (message) => {
-    const { showDialogConfirm, hideDialogConfirm } = this.props.actions
-    // const message = 'this is a message lsjd flks jdlfkj sdljf lskdj flkjs dlfj lskdj flkjsd flkj sdlkjf lskdj flkjsd lkfj sldjf lskjd lksjd flkjsd this is a message lsjd flks jdlfkj sdljf lskdj flkjs dlfj lskdj flkjsd flkj sdlkjf lskdj flkjsd lkfj sldjf lskjd lksjd flkjsd this is a message lsjd flks jdlfkj sdljf lskdj flkjs dlfj lskdj flkjsd flkj sdlkjf lskdj flkjsd lkfj sldjf lskjd lksjd flkjsd this is a message lsjd flks jdlfkj sdljf lskdj flkjs dlfj lskdj flkjsd flkj sdlkjf lskdj flkjsd lkfj sldjf lskjd lksjd flkjsd '
+    const { dialogConfirmPromise } = this.props.actions
     message = message || 'Confirm that you want to do something really dangerous.'
-    return new Promise((resolve, reject) => showDialogConfirm('confirm dialog', message, resolve, reject))
-    .then(function _accept () { hideDialogConfirm(); console.log('ACCEPT'); return Promise.resolve() },
-          function _cancel () { hideDialogConfirm(); console.log('CANCEL'); return Promise.reject() })
+    return dialogConfirmPromise('confirm dialog', message)
     // NB: this is supposed to throw an unhandled rejection when you hit cancel
   }
 
   // This is an example of how to use DialogPrompt. Remove anytime
   // Also demonstrates chaining actions after dialogs & chaining multiple dialogs
   prompt = () => {
-    const { showDialogPrompt, hideDialogPrompt } = this.props.actions
-    // const message = 'this is a message lsjd flks jdlfkj sdljf lskdj flkjs dlfj lskdj flkjsd flkj sdlkjf lskdj flkjsd lkfj sldjf lskjd lksjd flkjsd this is a message lsjd flks jdlfkj sdljf lskdj flkjs dlfj lskdj flkjsd flkj sdlkjf lskdj flkjsd lkfj sldjf lskjd lksjd flkjsd this is a message lsjd flks jdlfkj sdljf lskdj flkjs dlfj lskdj flkjsd flkj sdlkjf lskdj flkjsd lkfj sldjf lskjd lksjd flkjsd this is a message lsjd flks jdlfkj sdljf lskdj flkjs dlfj lskdj flkjsd flkj sdlkjf lskdj flkjsd lkfj sldjf lskjd lksjd flkjsd '
+    const { dialogPromptPromise } = this.props.actions
     const message = 'Enter your value, pretty please:'
-    return new Promise((resolve, reject) => showDialogPrompt('prompt dialog', message, resolve, reject))
-    .then(function _accept (value) { hideDialogPrompt(); return value },
-          function _cancel () { hideDialogPrompt(); return Promise.reject() })
+    return dialogPromptPromise('prompt dialog', message)
     .then(value => {
       return this.confirm(`Do you want to do something with "${value}"?`)
       .then(_ => 'accepted', _ => 'rejected')
       .then(action => this.alert(`I have ${action} ${value}`))
       .then(_ => value)
     })
-    .catch(_ => {
-      return this.alert('okay I bailed out')
-    })
+    .catch(_ => this.alert('I bailed out'))
   }
 
   // This is example code for alert & confirm dialogs. Remove anytime.
@@ -282,7 +267,7 @@ class Workspace extends Component {
   renderModal = () => {
     // TODO: look into portals; they might simplify modals & make wrapping them in promises easier
     // https://stackoverflow.com/a/39828187/1424242
-    // Or Popper https://github.com/souporserious/react-popper
+    // Or Popper https://github.com/souporserious/react-popper (esp. for tooltips & tutorials!)
     const { app } = this.props
     if (app.dialogAlert) return <Modal width='' body={<DialogAlert {...app.dialogAlert}/>}/>
     if (app.dialogConfirm) return <Modal width='' body={<DialogConfirm {...app.dialogConfirm}/>}/>
@@ -410,12 +395,9 @@ export default connect(state => ({
     changePassword,
     showModal,
     hideModal,
-    showDialogAlert,
-    hideDialogAlert,
-    showDialogConfirm,
-    hideDialogConfirm,
-    showDialogPrompt,
-    hideDialogPrompt,
+    dialogAlertPromise,
+    dialogConfirmPromise,
+    dialogPromptPromise,
     queueFileEntrysUpload,
     getAllCommands,
     updateCommand

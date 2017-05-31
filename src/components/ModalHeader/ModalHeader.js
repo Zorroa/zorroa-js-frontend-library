@@ -8,8 +8,8 @@ const ModalHeader = (props) => {
       <div className='ModalHeader-title'>
         { children }
       </div>
-      <div className='ModalHeader-close'>
-        <div className='icon-cross2' onClick={_ => closeFn && closeFn()}/>
+      <div className='ModalHeader-close' onClick={_ => closeFn && closeFn()}>
+        <div className='icon-cross2'/>
       </div>
     </div>
   )

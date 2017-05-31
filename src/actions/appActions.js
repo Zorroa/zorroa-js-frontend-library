@@ -30,45 +30,87 @@ export function hideModal () {
   }
 }
 
-export function showDialogAlert (title, message, confirmAction) {
-  return {
-    type: SHOW_DIALOG_ALERT,
-    payload: { title, message, confirmAction }
+// Show a DialogAlert -- similar to the native alert() call,
+// but async with Zorroa styling and wrapped in a convenient promise.
+// Returns a promise that resolves when the user confirms or closes the dialog.
+// The promise always resolves and never rejects.
+// The dialog is hidden automatically.
+export function dialogAlertPromise (title, message) {
+  return dispatch => {
+    return new Promise(resolve => {
+      dispatch({
+        type: SHOW_DIALOG_ALERT,
+        payload: { title, message, confirmAction: resolve }
+      })
+    })
+    .then(_ => {
+      console.log('DISMISSED!')
+      dispatch({
+        type: HIDE_DIALOG_ALERT,
+        payload: null
+      })
+    })
   }
 }
 
-export function hideDialogAlert () {
-  return {
-    type: HIDE_DIALOG_ALERT,
-    payload: null
-  }
-}
-
-export function showDialogConfirm (title, message, confirmAction, cancelAction) {
-  return {
-    type: SHOW_DIALOG_CONFIRM,
-    payload: { title, message, confirmAction, cancelAction }
-  }
-}
-
-export function hideDialogConfirm () {
-  return {
+// Show a DialogConfirm -- similar to the native confirm() call,
+// but async with Zorroa styling and wrapped in a convenient promise.
+// This returns a promise that resolves when the user confirms.
+// If the user closes or cancels the prompt, the promise will reject.
+// The dialog is hidden automatically.
+export function dialogConfirmPromise (title, message) {
+  const hideConfirmAction = {
     type: HIDE_DIALOG_CONFIRM,
     payload: null
   }
-}
 
-export function showDialogPrompt (title, message, confirmAction, cancelAction) {
-  return {
-    type: SHOW_DIALOG_PROMPT,
-    payload: { title, message, confirmAction, cancelAction }
+  return dispatch => {
+    return new Promise((resolve, reject) => {
+      dispatch({
+        type: SHOW_DIALOG_CONFIRM,
+        payload: { title, message, confirmAction: resolve, cancelAction: reject }
+      })
+    })
+    .then(
+      function _confirmConfirm () {
+        dispatch(hideConfirmAction)
+      },
+      function _confirmCancel () {
+        dispatch(hideConfirmAction)
+        return Promise.reject()
+      }
+    )
   }
 }
 
-export function hideDialogPrompt () {
-  return {
+// Show a DialogPrompt -- similar to the native prompt() call,
+// but async with Zorroa styling and wrapped in a convenient promise.
+// This returns a promise that resolves with the prompted value.
+// If the user closes or cancels the prompt, the promise will reject.
+// The dialog is closed automatically.
+export function dialogPromptPromise (title, message) {
+  const hidePromptAction = {
     type: HIDE_DIALOG_PROMPT,
     payload: null
+  }
+
+  return dispatch => {
+    return new Promise((resolve, reject) => {
+      dispatch({
+        type: SHOW_DIALOG_PROMPT,
+        payload: { title, message, confirmAction: resolve, cancelAction: reject }
+      })
+    })
+    .then(
+      function _promptConfirm (value) {
+        dispatch(hidePromptAction)
+        return value
+      },
+      function _promptCancel () {
+        dispatch(hidePromptAction)
+        return Promise.reject()
+      }
+    )
   }
 }
 
