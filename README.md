@@ -282,12 +282,24 @@ tests/selenium/startAllNodes.sh
 
 ### Grid notes
 
+To switch Travis builds to use Sauce instead of the Zorroa grid, look for Sauce instructions in runNpmTest.sh & .travis.yml.
+
 List all nodes on the vpn: listVpnNodes.sh
 List all nodes registered with the hub: listGridNodes.sh
 Open the hub in your favorite browser: openHub.sh
 ssh into a node machine: sshNodeHost.sh <vpn ip>
 
+Selenium & Grid resources:
+
+http://elementalselenium.com/tips/70-grid-extras
+http://elementalselenium.com/tips
+https://github.com/groupon/Selenium-Grid-Extras
+
+
 Troubleshooting
+
+"Driver info: driver.version: unknown" exception
+This one is dogging me. It seems related to how many tests I try to run in parallel, turning down the number of workers has seemed to help, but it's not always reproducible. I suspect somewhere in this pipeline is some kind of max connection limit -- I'm not sure if it's ssh, or the vpn, or jest, or webpack dev server, or selenium.
 
 One of the minis was saying 'connection refused' during tests. Tunnelblick's connection had gone bad.
 

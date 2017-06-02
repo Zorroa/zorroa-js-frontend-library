@@ -9,9 +9,6 @@ cd $DIR
 
 if ! nc -w 0 localhost 4444; then NEED_SSH="true"; else NEED_SSH="false"; fi
 
-
-
-
 if [[ $NEED_SSH == "true" ]]; then
  ssh -4 -q -i id_rsa_zorroa_selenium_hub -nNT -o UserKnownHostsFile=/dev/null -o BatchMode=yes -o StrictHostKeyChecking=no -L 4444:localhost:4444 computeruser@shub.zorroa.com > /dev/null 2>&1 &
  sshPid=$!
