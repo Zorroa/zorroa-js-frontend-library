@@ -18,4 +18,4 @@ echo looking for nodes...
 nodes=$(./listVpnNodes.sh)
 echo starting nodes: $nodes
 
-parallel -k "echo starting node {1}; ./startNodeOnHost.sh {1}" ::: $nodes
+parallel "echo starting node {1}; ./startNodeOnHost.sh {1}" ::: $nodes

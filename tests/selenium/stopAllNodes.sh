@@ -17,6 +17,11 @@ fi
 
 echo looking for nodes...
 nodes=$(./listGridNodes.sh)
+if [ "$nodes" == "" ]; then
+  echo 'no nodes are running'
+  exit
+fi
+
 echo stopping nodes: $nodes
 
-parallel -k "echo stopping node {1}; ./stopNodeOnHost.sh {1}" ::: $nodes
+parallel "echo stopping node {1}; ./stopNodeOnHost.sh {1}" ::: $nodes

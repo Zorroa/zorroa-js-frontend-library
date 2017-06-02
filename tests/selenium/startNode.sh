@@ -25,15 +25,20 @@ if [[ ! -e $CHROMEDRIVER ]]; then
   unzip chromedriver_mac64.zip
 fi
 
-# launch & disown selenium node
+# kill old server, if running
 killall java
+
+# delete all but last 2 log files
+ls selenium-node-*.log | sort -r | sed '1d;2d' | xargs rm
+
+# launch & disown selenium node
 logfile=selenium-node-$(date "+%Y_%m_%d_%Hh_%Mm_%Ss").log
 # find out how much mem on this system. This is mac specific
 MEM_GB=$(sysctl hw.memsize | awk '{print int($2/1023**3)}')
 MAX_INSTS=$(( $MEM_GB / 2 ))
 # OPTS string from http://www.software-testing-tutorials-automation.com/2016/04/usage-of-maxsession-in-grid-2-to-set.html
 # OPTS="-browser browserName=firefox,maxInstances=2 -browser browserName=chrome,maxInstances=2"
-OPTS="-browser browserName=chrome,maxInstances=$MAX_INSTS -maxSession $MAX_INSTS"
+OPTS="-browser browserName=chrome,maxInstances=$MAX_INSTS -maxSession $MAX_INSTS -debug true"
 # all local folder to PATH, so selenium can see chromedriver
 PATH=$PATH:. java -jar $SERVER -role node -hub $HUB $OPTS &> $logfile &
 disown -r
@@ -42,5 +47,4 @@ sleep 1 # wait a sec for log file to exist TODO: actually wait for the file
 
 echo logging to $logfile
 echo starting Selenium node...
-tail -f $logfile | grep -qe 'The node is registered to the hub and ready to use'
-echo 'The node is registered to the hub and ready to use'
+tail -f $logfile | tee /dev/stderr | grep -qe 'The node is registered to the hub and ready to use'

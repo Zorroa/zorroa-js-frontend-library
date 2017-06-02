@@ -9,12 +9,16 @@ cd $DIR
 
 if ! nc -w 0 localhost 4444; then NEED_SSH="true"; else NEED_SSH="false"; fi
 
+
+
+
 if [[ $NEED_SSH == "true" ]]; then
- ssh -q -i id_rsa_zorroa_selenium_hub -nNT -o BatchMode=yes -o StrictHostKeyChecking=no -L 4444:localhost:4444 computeruser@shub.zorroa.com &
+ ssh -4 -q -i id_rsa_zorroa_selenium_hub -nNT -o UserKnownHostsFile=/dev/null -o BatchMode=yes -o StrictHostKeyChecking=no -L 4444:localhost:4444 computeruser@shub.zorroa.com > /dev/null 2>&1 &
  sshPid=$!
 fi
 
 # wait for the ssh connection to spin up
+>&2 echo "waiting for ssh connection"
 while ! nc -w 0 localhost 4444 </dev/null; do sleep 0.25; done
 
 # query the selenium grid console to see which nodes are registered
