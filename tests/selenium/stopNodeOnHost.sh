@@ -15,6 +15,6 @@ shift
 # make sure ssh key perms are correct
 chmod 600 id_rsa_zorroa_selenium_node
 
-./sshNodeHost.ssh $HOST "cd ~; mkdir -p Desktop/selenium"
-cat stopNode.sh | ./sshNodeHost.sh $HOST 'cat - > ~/Desktop/selenium/stopNode.sh'
+./sshNodeHost.sh $HOST "cd ~; mkdir -p Desktop/selenium"
+cat ./stopNode.sh | ./sshNodeHost.sh $HOST 'cat - > ~/Desktop/selenium/stopNode.sh'
 ./sshNodeHost.sh $HOST "cd ~/Desktop/selenium; ./stopNode.sh"

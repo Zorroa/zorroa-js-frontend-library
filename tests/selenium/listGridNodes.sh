@@ -23,6 +23,6 @@ nodes=$(curl -s -m 10 localhost:4444/grid/console | perl -ne 'if (m|http://([^\s
 echo $nodes
 
 if [[ $NEED_SSH == "true" ]]; then
- echo ssh tunnel to the hub is running, if you want to kill it later, do this:
- echo kill $sshPid
+ >&2 echo ssh tunnel to the hub is running, if you want to kill it later, do this:
+ >&2 echo kill $sshPid
 fi

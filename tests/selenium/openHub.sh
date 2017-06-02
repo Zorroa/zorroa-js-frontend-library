@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# List all
+# Open the Selenium Hub console page
 #
 # Usage: openHub.sh
 
@@ -17,10 +17,10 @@ fi
 # wait for the ssh connection to spin up
 while ! nc -w 0 localhost 4444 </dev/null; do sleep 0.25; done
 
-# launch
+# launch. NB open is mac specific - might be okay since this script is for running manually
 open 'http://localhost:4444/grid/console'
 
 if [[ "$NEED_SSH" == "true" ]]; then
- echo ssh tunnel to the hub is running, if you want to kill it later, do this:
- echo kill $sshPid
+ >&2 echo ssh tunnel to the hub is running, if you want to kill it later, do this:
+ >&2 echo kill $sshPid
 fi

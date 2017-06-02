@@ -9,7 +9,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
 
 HOST=$1
-if [[ "$HOST" == "" ]]; then echo "Usage: $0 <ip>"; exit 1; fi
+if [[ "$HOST" == "" ]]; then >&2 echo "Usage: $0 <ip>"; exit 1; fi
 shift
 
 # make sure ssh key perms are correct

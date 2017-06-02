@@ -293,6 +293,10 @@ One of the minis was saying 'connection refused' during tests. Tunnelblick's con
 
 Teamviewer doesn't let you past the password: switch back to the teamviewer app while the login screen is still hung, and double-click the machine to login again. That should clear it up.
 
+When running npm test locally, if your local web server is up and running and the test still complains it's not running: killall ssh & try again.
+
+Sometimes it seems like connecting my local machine to the vpn causes the node machines to reconnect using a different IP address. Run openHub & if the hub console shows one or more machines failing to connect, then stop & restart all nodes. Another way to check is to run listVpnNodes & listGridNodes and make sure they match; if they don't then restart the nodes.
+
 ## Deploying the project
 
 ```

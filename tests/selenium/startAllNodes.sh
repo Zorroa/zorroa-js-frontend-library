@@ -7,15 +7,15 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
 
-myAddr=$(ifconfig | egrep -o '10.8.0.[[:digit:]]+' | sort | uniq)
+myAddr=$(ifconfig | egrep -o '\b10\.8\.0\.[[:digit:]]+\b' | sort | uniq)
 echo I am on $myAddr
 if [[ "$myAddr" == "" ]]; then
-  echo 'not connected to vpn?'
-  exit
+  >&2 echo 'not connected to vpn?'
+  exit 1
 fi
 
 echo looking for nodes...
-nodes=$($DIR/listVpnNodes.sh)
-echo nodes: $nodes
+nodes=$(./listVpnNodes.sh)
+echo starting nodes: $nodes
 
 parallel -k "echo starting node {1}; ./startNodeOnHost.sh {1}" ::: $nodes
