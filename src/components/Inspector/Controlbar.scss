@@ -11,7 +11,8 @@
   box-shadow: 0 2px 4px 4px rgba(0,0,0,0.25);
   color: white;
   background-color: black;
-  padding: 10px;
+  padding: 10px 0;
+
   width: auto;
 
   @include flexRow;

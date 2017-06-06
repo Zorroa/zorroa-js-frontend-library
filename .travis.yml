@@ -7,25 +7,21 @@ bundler_args: --retry 2
 notifications:
   slack: zorroa:U0489fQGuSPls5EZZfSUoGsL
 
-addons:
-  sauce_connect: true
-
 sudo: required
 dist: precise
 
-env:
-  global:
-    # # parent Sauce Labs account credentials
-    # - SAUCE_USERNAME: "danwexler"
-    # - SAUCE_ACCESS_KEY: "64400a01-0dc8-41b8-b2ed-d58f3911efe5"
 
-    - SAUCE_USERNAME: "zorroasauce"
-    - SAUCE_ACCESS_KEY: "f6c35e63-e19a-4575-be77-b49748e98bd6"
+# Uncomment these sections to default to using Sauce Labs for Travis tests
+# Don't forget to adjust runNpmTest.sh too
 
-    # sub-account Sauce Labs credentials
-    # Currently, the Sauce web site gives me UI warnings when using Wex's creds
-    # - SAUCE_USERNAME: "davidAtZorroa"
-    # - SAUCE_ACCESS_KEY: "b1932cf1-4c5e-408b-9617-122c06263c18"
+# addons:
+#   sauce_connect: true
+
+# env:
+#   global:
+#     - SAUCE_USERNAME: "zorroasauce"
+#     - SAUCE_ACCESS_KEY: "f6c35e63-e19a-4575-be77-b49748e98bd6"
+
 
 before_script:
   - npm run dev &

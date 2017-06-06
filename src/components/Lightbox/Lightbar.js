@@ -228,7 +228,7 @@ class Lightbar extends Component {
         <div className="Lightbar-metadata">
           { this.renderFields(titleFields, asset) }
         </div>
-        <div className="Lightbar-actions" style={{width: actionWidth}}>
+        <div className="Lightbar-actions" style={{width: actionWidth, minWidth: actionWidth}}>
           <a href={this.isolatedAssetURL()} className='Lightbar-action' download={this.isolatedAssetURL()}>
             <span className='Lightbar-action-text'>Download</span>
             <i className='Lightbar-btn-icon icon-download2'/>
@@ -251,7 +251,7 @@ class Lightbar extends Component {
             { addingToCollection && <div className="Lightbar-performed-action">{addingToCollection}</div> }
           </div>
         </div>
-        <button className="Lightbar-close icon-cross2" onClick={this.closeLightbox.bind(this)} />
+        <div className="Lightbar-close icon-cross2" onClick={this.closeLightbox.bind(this)} />
         <div onMouseDown={event => this.resizer.capture(this.resizeLightbar, this.release, 0, lightbarHeight)}
              className="Lightbar-resizer" />
       </div>
