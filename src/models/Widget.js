@@ -134,12 +134,12 @@ export function createRangeWidget (field, fieldType, min, max) {
 export function createSimilarityWidget (hashName, fieldType, hashVal, minScore, hashTypes) {
   const type = SimilarHashWidgetInfo.type
   let sliver = new AssetSearch(/*{aggs}*/) // NB aggs break the search!
+  if (hashTypes && hashTypes[hashName]) hashName = `Similarity.${hashName}.${hashTypes[hashName]}`
   if (hashName && hashVal) {
-    assert.ok(hashTypes[hashName])
     sliver.filter = new AssetFilter({
       hamming: {
-        field: `Similarity.${hashName}.${hashTypes[hashName]}.raw`,
-        hashes: [ hashVal ],
+        field: `${hashName}.raw`,
+        hashes: hashVal ? [ hashVal ] : undefined,
         minScore
       }
     })

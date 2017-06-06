@@ -111,5 +111,6 @@ export const SimilarHashWidgetInfo = {
   element: <SimilarHash/>,
   create: createSimilarityWidget,
   fieldTypes: [],
+  fieldRegex: /^Similarity\..+/,
   color: '#a11e77' // $zorroa-darkish-purple
 }

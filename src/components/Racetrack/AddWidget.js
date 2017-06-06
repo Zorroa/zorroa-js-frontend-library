@@ -24,7 +24,7 @@ class AddWidget extends Component {
   }
 
   addWidget = (widgetInfo, event) => {
-    if (widgetInfo.fieldTypes && !widgetInfo.fieldTypes.length) {
+    if (widgetInfo.fieldTypes && !widgetInfo.fieldTypes.length && !widgetInfo.fieldRegex) {
       this.updateDisplayOptions(event, {}, widgetInfo)
       this.dismiss(event)
       return
@@ -33,6 +33,7 @@ class AddWidget extends Component {
     const body = <DisplayOptions title='Search Field'
                                  singleSelection={true}
                                  fieldTypes={widgetInfo.fieldTypes}
+                                 fieldRegex={widgetInfo.fieldRegex}
                                  selectedFields={[]}
                                  onUpdate={(event, state) => this.updateDisplayOptions(event, state, widgetInfo)}/>
     this.props.actions.showModal({body, width})

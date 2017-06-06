@@ -15,6 +15,7 @@ class DisplayOptions extends Component {
     singleSelection: PropTypes.bool,                  // true forces radio mode
     title: PropTypes.string.isRequired,               // E.g. 'Metadata Display Options'
     fieldTypes: PropTypes.arrayOf(PropTypes.string),  // Optional list of types, e.g. ['point']
+    fieldRegex: PropTypes.object,                     // Optional regex for matched fields
     fields: PropTypes.object,                         // state.assets.fields
     actions: PropTypes.object
   }
@@ -122,14 +123,13 @@ class DisplayOptions extends Component {
   // We could optimize this by storing the result statically,
   // if we knew how to flush the cache during an import.
   allFields () {
-    const { fields, fieldTypes } = this.props
+    const { fields, fieldTypes, fieldRegex } = this.props
     const allFields = []
     for (let key in fields) {
-      if (fieldTypes && fieldTypes.indexOf(key) < 0) {
-        continue
-      }
+      if (fieldTypes && fieldTypes.length && fieldTypes.indexOf(key) < 0) continue
       const typeFields = fields[key]
       for (let field of typeFields) {
+        if (fieldRegex && !field.match(fieldRegex)) continue
         allFields.push(field)
       }
     }
