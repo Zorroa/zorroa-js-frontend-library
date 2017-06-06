@@ -148,12 +148,15 @@ class SimilarHash extends Component {
     const { similarity, selectedAssetId } = this.state
     const adjustable = similar && similar.assetIds && similar.assetIds.findIndex(id => (id === selectedAssetId)) >= 0
     const disabled = !selectedAssetIds || !selectedAssetIds.size ||
+        (similar.values && similar.values.length >= 10) ||
         !similar.field || !similar.field.length ||
         !SimilarHash.canSortSimilar(selectedAssetIds, similar.field,
           this.selectedValues(), similar.values)
+    const field = similar.field.replace(/^Similarity\./, '').replace(/\.raw$/, '')
     return (
       <Widget className="SimilarHash"
               title={SimilarHashWidgetInfo.title}
+              field={field}
               backgroundColor={SimilarHashWidgetInfo.color}
               isIconified={isIconified}
               isEnabled={true}

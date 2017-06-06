@@ -1,8 +1,9 @@
 export function unCamelCase (str) {
   if (!str) return
   let buf
-  // Convert upper and lower underscore to camel case
-  if (str.indexOf('_') >= 0 && (str === str.toUpperCase() || str === str.toLowerCase())) {
+  // Convert upper and lower underscore to camel case,
+  // skipping fields with leading underscore, e.g. _byte
+  if (str.indexOf('_') > 0 && (str === str.toUpperCase() || str === str.toLowerCase())) {
     // convert all-upper-under to camelcase
     buf = str.toLowerCase().replace(/[-_]([a-z,A-Z])/g, function (g) { return g[1].toUpperCase() })
   } else {
