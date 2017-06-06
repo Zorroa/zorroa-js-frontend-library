@@ -37,11 +37,10 @@ export function resetRacetrackWidgets (widgets) {
 }
 
 export function similar (similar) {
-  assert.ok(similar.values.length)
-  assert.ok(similar.assetIds.length === similar.values.length)
-  assert.ok(similar.weights.length === similar.values.length)
   const maxValues = 10
   if (similar.values.length > maxValues) {
+    assert.ok(similar.assetIds.length === similar.values.length)
+    assert.ok(similar.weights.length === similar.values.length)
     similar.values = similar.values.slice(0, maxValues)
     similar.assetIds = similar.assetIds.slice(0, maxValues)
     similar.weights = similar.weights.slice(0, maxValues)

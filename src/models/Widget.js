@@ -135,7 +135,7 @@ export function createSimilarityWidget (hashName, fieldType, hashVal, minScore, 
   const type = SimilarHashWidgetInfo.type
   let sliver = new AssetSearch(/*{aggs}*/) // NB aggs break the search!
   if (hashTypes && hashTypes[hashName]) hashName = `Similarity.${hashName}.${hashTypes[hashName]}`
-  if (hashName && hashVal) {
+  if (hashName) {
     sliver.filter = new AssetFilter({
       hamming: {
         field: `${hashName}.raw`,
