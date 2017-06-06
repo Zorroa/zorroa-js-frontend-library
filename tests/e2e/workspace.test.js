@@ -126,14 +126,22 @@ describe('Workspace', function () {
     //   .then(elements => { expect(elements.length).toBeGreaterThan(0) })
 
     .then(_ => { DEBUG && console.log('Make sure a search works and returns assets') })
-    .then(_ => selenium.waitForAssetsCounterChange(_ => searchbarSearch.sendKeys(Key.ENTER), 15000))
+    .then(_ => searchbarSearch.sendKeys(Key.ENTER), 15000)
+    .then(_ => selenium.waitForIdle())
     .then(_ => driver.findElement(By.css('.Assets-layout')))
       .then(e => e.findElements(By.css('.Thumb')))
       .then(es => { expect(es.length).toBeGreaterThan(0) })
 
     .then(_ => { DEBUG && console.log('Make sure a bad search returns 0 assets') })
-    .then(_ => searchbarSearch.clear())
-    .then(_ => selenium.waitForAssetsCounterChange(_ => searchbarSearch.sendKeys(Date.now().toString(), Key.ENTER), 15000))
+    .then(_ => selenium.clickSelector(By.css('.Suggestions-clear')))
+    .then(_ => selenium.waitForIdle())
+    // Why do none of these work??
+    // .then(_ => searchbarSearch.clear())
+    // .then(_ => searchbarSearch.sendKeys(Key.DELETE, Key.DELETE, Key.DELETE, Key.DELETE, Key.DELETE))
+    // .then(_ => searchbarSearch.sendKeys(Key.chord(Key.CONTROL, 'a'), Key.DELETE, Date.now().toString(), Key.ENTER))
+    // .then(_ => selenium.waitForIdle())
+    .then(_ => searchbarSearch.sendKeys(Date.now().toString(), Key.ENTER))
+    .then(_ => selenium.waitForIdle())
     .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.assets-layout-empty')))
 
     .then(_ => selenium.clickSelector(By.css('.Suggestions-clear')))

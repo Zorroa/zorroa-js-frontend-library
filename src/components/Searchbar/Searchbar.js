@@ -9,23 +9,25 @@ import Widget from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
 import Suggestions from '../Suggestions'
 
-const INSTA_SEARCH_TIME = 1500
-
 class Searchbar extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
     query: PropTypes.instanceOf(AssetSearch),
+    error: PropTypes.string,
     totalCount: PropTypes.number,
     suggestions: PropTypes.arrayOf(PropTypes.object),
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
     userSettings: PropTypes.object.isRequired
   }
 
-  instaSearchTimer = null
   showSuggestions = true
 
   state = {
     queryString: this.props.query && this.props.query.query
+  }
+
+  setStatePromise = (newState) => {
+    return new Promise(resolve => this.setState(newState, resolve))
   }
 
   componentDidUpdate () {
@@ -37,15 +39,14 @@ class Searchbar extends Component {
   }
 
   // Submit a new suggestion string to get a new list of suggestions
-  suggest = (suggestion) => {
+  // lastAction is 'type' or 'select' - whatever the user did to cause us to get here
+  // (when 'type': start the search timer; when 'select': no timer)
+  suggest = (suggestion, lastAction) => {
     // hide suggestions whenever the search input is cleared
     if (!suggestion) this.showSuggestions = false
 
-    this.props.actions.suggestQueryStrings(suggestion)
-    clearTimeout(this.instaSearchTimer)
-    this.instaSearchTimer = setTimeout(_ => {
-      this.search(suggestion)
-    }, INSTA_SEARCH_TIME)
+    if (lastAction === 'type') this.props.actions.suggestQueryStrings(suggestion)
+
     // show suggestions whenever the user types into the input
     this.showSuggestions = true
   }
@@ -65,8 +66,6 @@ class Searchbar extends Component {
       widgets[index] = widget
     }
     this.props.actions.resetRacetrackWidgets(widgets)
-    clearTimeout(this.instaSearchTimer)
-    this.instaSearchTimer = null
     // hide suggestions whenever a search is performed
     this.showSuggestions = false
   }
@@ -78,19 +77,23 @@ class Searchbar extends Component {
   }
 
   render () {
-    const { query, suggestions } = this.props
+    const { query, suggestions, error } = this.props
     const { queryString } = this.state
-    const value = this.showSuggestions && query && query.query && query.query !== queryString ? query.query
+    const value = query && query.query && query.query !== queryString ? query.query
       : (query && query.query === undefined && queryString ? '' : undefined)
+
     return (
       <div className="Searchbar">
         <div className="Searchbar-body flexCenter">
           <Suggestions suggestions={suggestions}
+                       showSuggestions={this.showSuggestions}
+                       query={query}
                        value={value}
                        onChange={this.suggest}
                        onSelect={this.search.bind(this)} />
           <button onClick={this.forceSearch} className="search-button icon-search" />
         </div>
+        { error && <div className="Searchbar-error">Search syntax error</div> }
       </div>
     )
   }
@@ -102,6 +105,7 @@ const mapDispatchToProps = dispatch => ({
 
 const mapStateToProps = state => ({
   query: state.assets && state.assets.query,
+  error: state.assets && state.assets.error,
   totalCount: state.assets && state.assets.totalCount,
   suggestions: state.assets && state.assets.suggestions,
   widgets: state.racetrack && state.racetrack.widgets,

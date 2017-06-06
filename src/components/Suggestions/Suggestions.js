@@ -1,10 +1,13 @@
 import React, { Component, PropTypes } from 'react'
 import classnames from 'classnames'
+import AssetSearch from '../../models/AssetSearch'
 
 export default class Suggestions extends Component {
   static propTypes = {
     value: PropTypes.string,
+    query: PropTypes.instanceOf(AssetSearch),
     suggestions: PropTypes.arrayOf(PropTypes.object),
+    showSuggestions: PropTypes.bool,
     placeholder: PropTypes.string,
     style: PropTypes.object,
     onChange: PropTypes.func.isRequired,
@@ -18,7 +21,12 @@ export default class Suggestions extends Component {
 
   state = {
     value: this.props.value,
-    selectedIndex: -1
+    selectedIndex: -1,
+    lastAction: 'none'
+  }
+
+  setStatePromise = (newState) => {
+    return new Promise(resolve => this.setState(newState, resolve))
   }
 
   componentWillReceiveProps (nextProps) {
@@ -27,81 +35,82 @@ export default class Suggestions extends Component {
     if (suggestions) {
       let { selectedIndex } = this.state
       if (selectedIndex < 0 || selectedIndex >= suggestions.length) {
-        this.setState({selectedIndex: 0})
+        this.setState({selectedIndex: -1})
       }
     } else {
       this.setState({selectedIndex: -1})
     }
   }
 
-  updateValue = (event) => {
-    const value = event.target.value
-    this.setState({ value })
-    this.props.onChange(value)
+  updateValue = (value) => {
+    if (value === this.state.value) return
+    this.setStatePromise({ value, selectedIndex: -1, lastAction: 'type' })
+    .then(_ => this.props.onChange(this.state.value, this.state.lastAction))
   }
 
   clearValue = () => {
     const value = ''
-    if (this.state.value !== value) {
+    if (this.state.value !== value || this.state.error) {
       this.setState({value})
       this.props.onSelect(value)
+      this.updateValue('')
     }
   }
 
   // Parse each keypress for special commands
   onKeyDown = (event) => {
     switch (event.key) {
-      case 'Enter': return this.selectCurrentValue()
-      case 'Tab': return this.selectCurrentSuggestion()
-      case 'ArrowUp': return this.previousSuggestion()
-      case 'ArrowDown': return this.nextSuggestion()
-      default:
+      case 'Enter': return this.selectCurrentSuggestionOrValue()
+      case 'Tab': {
+        const { suggestions } = this.props
+        // prevent tab from focusing on another element
+        event.preventDefault()
+        if (!suggestions) return
+        if (this.state.selectedIndex >= this.props.suggestions.length - 1) {
+          return this.goToSuggestion(0)
+        } else {
+          return this.goToSuggestion(this.state.selectedIndex + 1)
+        }
+      }
+      case 'ArrowUp':
+        // prevent the cursor from relocating to the front of the input
+        event.preventDefault()
+        return this.goToSuggestion(this.state.selectedIndex - 1)
+      case 'ArrowDown': return this.goToSuggestion(this.state.selectedIndex + 1)
+      default: return this.setState({ lastAction: 'type' })
     }
   }
 
-  selectCurrentValue = () => {
-    this.props.onSelect(this.state.value)
+  selectCurrentSuggestionOrValue = () => {
+    if (this.state.lastAction === 'select') {
+      this.chooseSuggestion(this.getCurrentSuggestion())
+    } else {
+      this.props.onSelect(this.state.value)
+    }
   }
 
-  selectCurrentSuggestion = () => {
+  getCurrentSuggestion = () => {
     const { suggestions } = this.props
     if (!suggestions) return
     const { selectedIndex } = this.state
-    const index = selectedIndex < 0 ? 0 : selectedIndex
-    if (index < suggestions.length) {
-      this.chooseSuggestion(suggestions[index])
-    } else {
-      this.selectCurrentValue()
-    }
+    if (selectedIndex < 0 || selectedIndex >= suggestions.length) return
+    return suggestions[selectedIndex]
   }
 
-  nextSuggestion = () => {
+  goToSuggestion = (newIndex) => {
     const { suggestions } = this.props
-    const { selectedIndex } = this.state
     if (!suggestions) {
-      if (selectedIndex !== -1) {
-        this.setState({ selectedIndex: -1 })
-        return
-      }
+      if (this.state.selectedIndex !== -1) this.setState({ selectedIndex: -1 })
+      return
     }
-    const index = Math.min(selectedIndex + 1, suggestions.length - 1)
-    if (index !== selectedIndex) {
-      this.setState({ selectedIndex: index })
-    }
-  }
-
-  previousSuggestion = () => {
-    const { suggestions } = this.props
-    const { selectedIndex } = this.state
-    if (!suggestions) {
-      if (selectedIndex !== -1) {
-        this.setState({ selectedIndex: -1 })
-        return
-      }
-    }
-    const index = Math.max(0, selectedIndex - 1)
-    if (index !== selectedIndex) {
-      this.setState({ selectedIndex: index })
+    const index = Math.max(0, Math.min(newIndex, suggestions.length - 1))
+    if (index !== this.state.selectedIndex) {
+      this.setStatePromise({ selectedIndex: index, lastAction: 'select' })
+      .then(_ => {
+        const suggestion = this.getCurrentSuggestion()
+        const text = suggestion ? suggestion.text : this.state.value
+        this.props.onChange(text, this.state.lastAction)
+      })
     }
   }
 
@@ -114,16 +123,18 @@ export default class Suggestions extends Component {
   selectedSuggestionString () {
     const { value, selectedIndex } = this.state
     const { suggestions } = this.props
-    if (selectedIndex < 0 || !suggestions) return ''
-    const suggestion = suggestions[selectedIndex]
-    const suffix = suggestion && suggestion.text ? suggestion.text.slice(value.length) : ''
+    if (!suggestions || !suggestions.length) return ''
+    const suggestion = (selectedIndex >= 0) ? suggestions[selectedIndex] : suggestions[0]
+    const cleanValue = value.replace(/["~]/g, '')
+    const suffix = suggestion && suggestion.text ? suggestion.text.slice(cleanValue.length) : ''
     return value + suffix
   }
 
   renderSuggestions () {
-    const { suggestions } = this.props
+    let { suggestions } = this.props
     const { selectedIndex } = this.state
-    if (!suggestions || !suggestions.length) return null
+    if (!suggestions || !suggestions.length) suggestions = []
+    suggestions = suggestions.slice(0, 4)
     return (
       <div className="Suggestions-suggestions">
         { suggestions.map((suggestion, index) => (
@@ -134,27 +145,36 @@ export default class Suggestions extends Component {
             <div>{suggestion.score}</div>
           </div>
         ))}
+        <div className="Suggestions-instructions">Press Enter to search</div>
       </div>
     )
   }
 
   render () {
-    const { placeholder, style } = this.props
+    const { placeholder, style, query } = this.props
     const { value } = this.state
+
+    /* dont show suggestions if input matches current results */
+    const showSuggestions = this.props.showSuggestions && value && (!query || query.query !== value)
+
     return (
     <div className="Suggestions" style={style}>
       <div className="Suggestions-overlapping-inputs">
-        <input disabled={true} value={this.selectedSuggestionString()}
-               type="text" className="Suggestions-typeahead"/>
+        { showSuggestions &&
+          <input value={this.selectedSuggestionString()}
+                 type="text"
+                 className="Suggestions-typeahead"
+                 readOnly/> }
         <input className='Suggestions-search'
                value={value || ''}
-               onKeyDown={this.onKeyDown}
-               onChange={this.updateValue}
-               placeholder={placeholder} type="text" />
+               onKeyDown={showSuggestions && this.onKeyDown}
+               onChange={event => this.updateValue(event.target.value)}
+               placeholder={placeholder}
+               type="text" />
         <button onClick={this.clearValue}
                 disabled={!value || !value.length}
                 className="Suggestions-clear icon-cancel-circle" />
-        { this.renderSuggestions() }
+        { showSuggestions && this.renderSuggestions() }
       </div>
     </div>
     )
