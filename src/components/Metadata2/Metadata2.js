@@ -312,7 +312,7 @@ class Metadata2 extends Component {
           <div className="Metadata2-scroll">
             { this.renderFields() }
             <div className={classnames('Metadata2-resizer', {active: this.resizer.active})}
-                 style={{left: 2 + titleWidth}} onMouseDown={this.resizeStart}/>
+                 style={{left: 6 + titleWidth}} onMouseDown={this.resizeStart}/>
           </div>
         </div>
       </div>
