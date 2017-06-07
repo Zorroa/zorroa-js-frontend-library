@@ -62,7 +62,7 @@ export default function (state = initialState, action) {
       const totalCount = page && page.totalCount ? page.totalCount : 0
       const assetsCounter = state.assetsCounter + 1
       api.setAssetsCounter(assetsCounter)
-      return { ...state, all, query, totalCount, suggestions: null, assetsCounter }
+      return { ...state, all, query, totalCount, suggestions: null, assetsCounter, error: null }
     }
 
     case ASSET_AGGS: {

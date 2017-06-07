@@ -20,6 +20,7 @@ describe('assetsReducer', () => {
       all: assets,
       totalCount: 1,
       suggestions: null,
+      error: null,
       assetsCounter: 1
     }
     expect(assetsReducer({assetsCounter: 0}, { type: ASSET_SEARCH, payload }))
@@ -43,6 +44,7 @@ describe('assetsReducer', () => {
       all: concatAssets,
       totalCount: 2,
       suggestions: null,
+      error: null,
       assetsCounter: 2
     }
     expect(assetsReducer(state1, { type: ASSET_SEARCH, payload: payload2 }))

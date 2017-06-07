@@ -172,9 +172,19 @@ Tips for making testing quicker & easier:
       .then(ele => { ... }) // ele will be an element
     ```
 
-### Running Selenium tests manually:
+### Running Zorroa Grid tests manually:
+```
+npm test e2e
+```
 
-- `npm test` and `jest` accept a pattern argument to filter which tests to run.
+- `npm test` accepts a pattern argument to filter which tests to run.
+
+### Running Selenium tests locally:
+```
+node_modules/.bin/jest e2e
+```
+
+- `jest` accepts a pattern argument to filter which tests to run.
 - Use `npm test e2e` to run only tests/e2e/* (Selenium) tests
 - Use `./node_modules/.bin/jest table` if you want to run just the table test, without the lint or code coverage passes. Useful for iterating more quickly.
 
@@ -197,6 +207,107 @@ RUNS  tests/e2e/workspace.test.js
 - Monitor test results in the [Sauce Labs tests dashboard](https://saucelabs.com/beta/dashboard/tests)
 -- Clicking on the test, then navigating to the "Watch" tab will display the test's browser screen real-time.
 
+### Adding a node to the Zorroa Grid
+
+Here's how to spinn up a new mac mini node machine & add it to our grid
+
+```
+Install teamViewer
+  Turn off Actions | lock on session end
+```
+
+```
+Install tunnelBlick
+  Add selenium vpn keys & connect to the vpn (vpn keys are in tests/selenium/zorroa-openvpn-client.tar.gz)
+  Don't route all traffic
+  Do connect to vpn on startup
+  Keep connected
+  Don't disconnect when sleeping
+  Do reconnect when waking
+  Don't disconnect when user switches out
+  Do reconnect when user switches in
+```
+
+```
+Install java
+  Install Java SE Development Kit 8 (NOT the regular jre)
+  http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+```
+
+```
+Set mac to auto-login to user account zorroa (to faciliate restarts via teamviewer)
+set power save settings to not sleep
+(TODO: this is probably not needed) System Preferences | Security & Privacy | Turn off require password
+```
+
+```
+Turn on remote login (ssh access) and copy ssh keys to the machine:
+  HOST=10.8.0.3 # REPLACE IP with the correct host IP - use ifconfig on the new machine
+  cd tests/selenium # (Curator repo)
+  chmod 600 id_rsa_zorroa_*
+  chmod 644 id_rsa_zorroa_*.pub
+  ssh-copy-id -i id_rsa_zorroa_selenium_node zorroa@$HOST
+  # does the node need to have any private keys? maybe not # scp id_rsa_zorroa_selenium_node* zorroa@$HOST:~/.ssh/
+  ssh zorroa@$HOST -i id_rsa_zorroa_selenium_node # make sure it works - this should not ask for a password
+  ./startNodeOnHost.sh $HOST
+  ./sshNodeHost.sh $HOST 'touch ~/.zorroa-grid' # enable this node; startAllNodes.sh looks for this file
+```
+
+mac mini user account password: z0rr0@12
+
+teamViewer remote control non-rotating password
+EatGrapes!
+
+teamViewer login:
+selenium@zorroa.com / selZorTeam248$
+
+### Restarting the Zorroa Grid hub
+
+There is an ansible playbook to deploy shub.zorroa.com
+To restart shub, use the AWS console
+
+### Restarting the Zorroa Grid nodes
+
+This will start or restart nodes on all available IP addresses connected to the Selenium VPN, excluding the hub and your own machine.
+
+```
+tests/selenium/startAllNodes.sh
+```
+
+To stop all nodes:
+
+```
+tests/selenium/startAllNodes.sh
+```
+
+### Grid notes
+
+To switch Travis builds to use Sauce instead of the Zorroa grid, look for Sauce instructions in runNpmTest.sh & .travis.yml.
+
+List all nodes on the vpn: listVpnNodes.sh
+List all nodes registered with the hub: listGridNodes.sh
+Open the hub in your favorite browser: openHub.sh
+ssh into a node machine: sshNodeHost.sh <vpn ip>
+
+Selenium & Grid resources:
+
+http://elementalselenium.com/tips/70-grid-extras
+http://elementalselenium.com/tips
+https://github.com/groupon/Selenium-Grid-Extras
+
+
+Troubleshooting
+
+"Driver info: driver.version: unknown" exception
+This one is dogging me. It seems related to how many tests I try to run in parallel, turning down the number of workers has seemed to help, but it's not always reproducible. I suspect somewhere in this pipeline is some kind of max connection limit -- I'm not sure if it's ssh, or the vpn, or jest, or webpack dev server, or selenium.
+
+One of the minis was saying 'connection refused' during tests. Tunnelblick's connection had gone bad.
+
+Teamviewer doesn't let you past the password: switch back to the teamviewer app while the login screen is still hung, and double-click the machine to login again. That should clear it up.
+
+When running npm test locally, if your local web server is up and running and the test still complains it's not running: killall ssh & try again.
+
+Sometimes it seems like connecting my local machine to the vpn causes the node machines to reconnect using a different IP address. Run openHub & if the hub console shows one or more machines failing to connect, then stop & restart all nodes. Another way to check is to run listVpnNodes & listGridNodes and make sure they match; if they don't then restart the nodes.
 
 ## Deploying the project
 

@@ -38,24 +38,6 @@ global.expect = global.expect || (x => {
 
 // ----------------------------------------------------------------------
 
-var SauceLabs = require('saucelabs')
-
-var username = process.env.SAUCE_USERNAME
-var accessKey = process.env.SAUCE_ACCESS_KEY
-
-var saucelabs
-
-const USE_SAUCE = (username !== undefined)
-if (USE_SAUCE) {
-  saucelabs = new SauceLabs({
-    username: username,
-    password: accessKey
-  })
-}
-
-// var port =
-// const USE_GRID =
-
 // webdriver docs
 // http://seleniumhq.github.io/selenium/docs/api/javascript/index.html
 // https://github.com/SeleniumHQ/selenium/wiki/WebDriverJs
@@ -74,16 +56,45 @@ if (USE_SAUCE) {
 //
 // To run on local selenium grid:
 // SELENIUM_REMOTE_URL="http://localhost:4444/wd/hub" jest -i tags
+// SELENIUM_REMOTE_URL="http://10.8.0.1:4444/wd/hub" jest -i tags
+// DONT FORGET to use a public URL for your curator server (BASE_URL); localhost is not accessible inside docker
+// [dahart] ssh tjt + ssh -L 8000::8080 localhost -nNT + BASE_URL = http://blot.asuscomm.com:8000/
+//
+// https://github.com/SeleniumHQ/docker-selenium
+// When you are prompted for the password it is secret.
 //
 // Open question how to connect to docker host IP. For testing I exposed my curator publicly. Would prefer to avoid this.
 // https://github.com/moby/moby/issues/8427
 // https://github.com/moby/moby/issues/8395#issuecomment-212147825
 // https://github.com/moby/moby/issues/1143
 
-export const BASE_URL = 'http://localhost:8080'
+// https://groups.google.com/forum/#!topic/selenium-users/ilfLKSUAqQQ
+// check memory and CPU usage by node/s and HUB with docker stats $(docker ps -aq)
+
+var SauceLabs = require('saucelabs')
+
+var username = process.env.SAUCE_USERNAME
+var accessKey = process.env.SAUCE_ACCESS_KEY
+
+var saucelabs
+
+const USE_SAUCE = (username !== undefined)
+
+if (USE_SAUCE) {
+  saucelabs = new SauceLabs({
+    username: username,
+    password: accessKey
+  })
+}
+
+// defined in runNpmTest.sh -- the port we'll use for nodes to access our local web server
+var ZORROA_GRID_PORT = process.env.ZORROA_GRID_PORT
+const USE_GRID = (ZORROA_GRID_PORT !== undefined)
+
+export const BASE_URL = USE_GRID ? `http://10.8.0.1:${ZORROA_GRID_PORT}` : 'http://localhost:8080'
 
 // let selenium tests run. jest's default is an unreasonable 5 seconds
-jasmine.DEFAULT_TIMEOUT_INTERVAL = (DEBUG && !USE_SAUCE) ? 30000 : 180000
+jasmine.DEFAULT_TIMEOUT_INTERVAL = (DEBUG && !USE_SAUCE) ? 120000 : 180000
 
 var allTestsPassed = true
 var failedTests = []
@@ -114,7 +125,7 @@ var suite = null
 export var driver = null
 
 const browserDriverConfig = {
-  chrome: { driver: 'selenium-webdriver/chrome', pathModule: 'chromedriver' },
+  chrome: { driver: 'selenium-webdriver/chrome', pathModule: 'chromedriver' /*, maxSession: 2 */ },
   firefox: { driver: 'selenium-webdriver/firefox', pathModule: 'geckodriver' }
 }
 
@@ -142,8 +153,23 @@ export function startBrowserAndDriver (_suite) {
   suite = _suite
   expect(suite && !!suite.description).toBe(true)
 
-  if (USE_SAUCE) {
+  if (USE_GRID) {
+    // run tests using our own selenium grid
+    const GRID_HUB = `http://localhost:4444/wd/hub` // on Travis builds, localhost:4444 is port-forwarded to shub:4444
+    const caps = {
+      build: process.env.TRAVIS_BUILD_NUMBER,
+      browserName: browserName,
+      screenResolution: "1024x768",
+      platform: 'MAC'
+    }
+
+    driver = new webdriver.Builder()
+    .withCapabilities(caps)
+    .usingServer(GRID_HUB)
+    .build()
+  } else if (USE_SAUCE) {
     // run tests using travis+sauce
+    const SAUCE_HUB = `https://${username}:${accessKey}@ondemand.saucelabs.com/wd/hub`
     console.log('travis job #', process.env.TRAVIS_JOB_NUMBER)
     const caps = {
       'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
@@ -156,7 +182,7 @@ export function startBrowserAndDriver (_suite) {
 
     driver = new webdriver.Builder()
     .withCapabilities(caps)
-    .usingServer(`https://${username}:${accessKey}@ondemand.saucelabs.com/wd/hub`)
+    .usingServer(SAUCE_HUB)
     .build()
   } else {
     // run tests locally if when not using travis+sauce
@@ -392,7 +418,7 @@ export function logout () {
 export function login () {
   return logout()
   .then(_ => { DEBUG && console.log('loggin in') })
-  .then(_ => driver.get(`${BASE_URL}/signin`))
+  .then(_ => driver.get(`${BASE_URL}`))
   .then(_ => driver.executeScript('window.zorroa.setSeleniumTesting(true)'))
   .then(_ => driver.findElement(By.css('input[name="username"]')).sendKeys('selenium'))
   .then(_ => driver.findElement(By.css('input[name="password"]')).sendKeys('z0rr0@12'))

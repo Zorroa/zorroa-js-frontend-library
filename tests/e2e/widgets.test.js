@@ -302,4 +302,42 @@ describe('search widget', function () {
     .then(_ => selenium.clickSelector(By.css('.WidgetHeader-close')))
     .then(selenium.waitForIdle)
   })
+
+  it('check similar widget', function () {
+    return driver
+      .then(_ => { DEBUG && console.log('------ check similar widget') })
+
+      .then(_ => selenium.clickSelector(By.css('.QuickAddWidget-input')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.QuickAddWidget-item-SIMILARHASH'), 5000))
+      .then(_ => selenium.clickSelector(By.css('.QuickAddWidget-item-SIMILARHASH')))
+
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.modal .DisplayOptions'), 5000))
+      .then(_ => selenium.expectSelectorHasClassToBe(true, By.css('.DisplayOptions-update'), 'disabled'))
+      .then(_ => selenium.clickSelector(By.css('.DisplayOptions-namespace-Similarity')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.DisplayOptions-namespace-Similarity-Tensorflow'), 5000))
+      .then(_ => selenium.clickSelector(By.css('.DisplayOptions-namespace-Similarity-Tensorflow')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.DisplayOptions-namespace-Similarity-Tensorflow-byte'), 5000))
+      .then(_ => selenium.clickSelector(By.css('.DisplayOptions-namespace-Similarity-Tensorflow-byte input')))
+      .then(_ => selenium.waitForSelectorHasClassToBe(false, By.css('.DisplayOptions-update'), 'disabled', 5000))
+      .then(_ => selenium.waitForSelectorEnabledToBe(true, By.css('.DisplayOptions-update')))
+      .then(_ => selenium.clickSelector(By.css('.DisplayOptions-update')))
+      .then(selenium.waitForIdle)
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack-filters .SimilarHash'), 5000))
+
+      .then(_ => { DEBUG && console.log('Select an asset to enable') })
+
+      // click on the first row
+      .then(_ => selenium.waitForSelectorHasClassToBe(true, By.css('.SimilarHash-snap-selected'), 'disabled', 5000))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Thumb')))
+      .then(_ => selenium.clickSelector(By.css('.Thumb')))
+      .then(_ => selenium.waitForIdle())
+      .then(_ => selenium.waitForSelectorHasClassToBe(false, By.css('.SimilarHash-snap-selected'), 'disabled', 5000))
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.SimilarHash-thumb'), 5000))
+      .then(_ => selenium.clickSelector(By.css('.SimilarHash-snap-selected')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.SimilarHash-thumb'), 5000))
+
+      .then(_ => selenium.clickSelector(By.css('.WidgetHeader-close')))
+      .then(selenium.waitForIdle)
+  })
+
 })

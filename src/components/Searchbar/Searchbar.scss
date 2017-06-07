@@ -1,7 +1,7 @@
 @import '../../styles/core-mixins.scss';
 
 .Searchbar {
-  // Remove box highling when focused
+  // Remove box highlighting when focused
   .searchbar:focus {
     outline: none;
   }
@@ -21,4 +21,11 @@
     font-size: 20px; // TODO: see if we can delete this when bootstrap is gone
     &:hover { color: $zorroa-gray; }
   }
+}
+
+.Searchbar-error {
+  position: absolute;
+  font-size: 12px;
+  font-style: italic;
+  color: $zorroa-orangish;
 }
