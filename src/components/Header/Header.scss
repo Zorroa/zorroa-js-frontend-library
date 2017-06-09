@@ -22,10 +22,7 @@
 .header-logo {
   padding-top: 6px;
   padding-left: 22px;
-
-  // This matches the folder sidebar width
-  width: 25%;
-  max-width: $zorroa-Sidebar-width;
+  margin-right: 20px;
 }
 
 // Simple menu text for now
@@ -118,5 +115,39 @@
     &:focus {
       outline: none;
     }
+  }
+}
+
+.header-buttons {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.header-button {
+  @include flexRowCenter;
+
+  color: $zorroa-greyish-brown;
+  margin: 4px;
+  font-size: 20px;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  border-radius: 3px;
+
+  &.disabled {
+    color: $zorroa-lightgray;
+  }
+
+  &:hover:not(.disabled) {
+    color: white;
+    background-color: $zorroa-lightgray;
+  }
+
+  &.selected {
+    color: white;
+    background-color: $zorroa-water-blue;
+    &:hover { background-color: darken($zorroa-water-blue, 15%); }
   }
 }

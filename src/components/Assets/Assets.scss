@@ -128,20 +128,23 @@
   margin: 10px;
 
   .TableToggle-button {
-    color: #000;
+    color: black;
     width: 40px;
     height: 40px;
     border-radius: 3px;
     border: none;
     outline: none;
     font-size: 20px;
-    background-color: #fff;
+    background-color: white;
     cursor: pointer;
-    &:hover { background-color: $zorroa-lightgray; }
+    &:hover {
+      color: white;
+      background-color: $zorroa-lightgray;
+    }
   }
 
   .TableToggle-enabled {
-    color: #fff;
+    color: white;
     background-color: $zorroa-sickly-green;
     &:hover { background-color: darken($zorroa-sickly-green, 15%); }
   }
