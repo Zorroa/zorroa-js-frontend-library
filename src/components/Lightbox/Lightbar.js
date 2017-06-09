@@ -22,6 +22,7 @@ class Lightbar extends Component {
     isolatedId: PropTypes.string,
     selectedPageIds: PropTypes.instanceOf(Set),
     showPages: PropTypes.bool,
+    pages: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     lightbarFieldTemplate: PropTypes.string,
     origin: PropTypes.string,
     user: PropTypes.instanceOf(User),
@@ -81,7 +82,7 @@ class Lightbar extends Component {
   }
 
   render () {
-    const { assets, isolatedId, showPages, selectedPageIds, user, showMetadata, onMetadata, lightbarFieldTemplate } = this.props
+    const { assets, isolatedId, showPages, selectedPageIds, user, pages, showMetadata, onMetadata, lightbarFieldTemplate } = this.props
     const { actionWidth, lightbarHeight, copyingLink, showFolders, addingToCollection } = this.state
     const asset = assets.find(asset => (asset.id === isolatedId)) || pages.find(asset => (asset.id === isolatedId))
     const nselected = selectedPageIds && selectedPageIds.size
@@ -125,6 +126,7 @@ export default connect(state => ({
   assets: state.assets.all,
   isolatedId: state.assets.isolatedId,
   showPages: state.app.showPages,
+  pages: state.assets.pages,
   selectedPageIds: state.assets.selectedPageIds,
   lightbarFieldTemplate: state.app.lightbarFieldTemplate,
   origin: state.auth.origin,

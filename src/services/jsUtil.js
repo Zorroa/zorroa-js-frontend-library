@@ -146,7 +146,7 @@ export function selectId (id, shiftKey, metaKey, items, selectedIds) {
 
 // Parse a string into a list of variable names, e.g.: 'foo ${bar} ${bam}' returns ['bar', 'bam']
 export function parseVariables (template) {
-  return template.match(/\${[a-zA-Z\.\|]*}/g)
+  return template.match(/\${[a-zA-Z.|]*}/g)
 }
 
 // Replace the variables in the string template with values
@@ -154,13 +154,13 @@ export function replaceVariables (template, values) {
   let str = template
   Object.keys(values).forEach(key => {
     const s = key.replace(/\|/g, '\\|')
-    const re = new RegExp('\\${' + s + '}',"g")
+    const re = new RegExp('\\${' + s + '}', 'g')
     str = str.replace(re, values[key])
   })
   return str
 }
 
-export function valuesForFields (vars) {
+export function valuesForFields (vars, asset) {
   if (!vars || !vars.length) return
   const values = {}
   vars.forEach(re => {

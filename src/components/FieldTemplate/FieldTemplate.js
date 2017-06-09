@@ -19,7 +19,7 @@ function metadataBadge (fieldTemplate, asset) {
     if (field) return <TableField asset={asset} field={field}/>
     return <div/>
   })
-  const text = fieldTemplate.replace(/\${[a-zA-Z\.\|]*}/g, '%%')
+  const text = fieldTemplate.replace(/\${[a-zA-Z.|]*}/g, '%%')
   const texts = text.split('%%')
   const elems = texts.map((t, i) => (<div className="FieldTemplate-field" key={i}><div className="FieldTemplate-label">{t}</div>{fields[i]}</div>))
   return <div className="FieldTemplate">{elems}</div>
