@@ -1,0 +1,20 @@
+@import '../../styles/core-mixins.scss';
+
+.FieldTemplate {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+}
+
+.FieldTemplate-field {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  //font-size: 13px;
+  //line-height: 1.4em;
+}
+
+.FieldTemplate-label {
+  font-family: Roboto Condensed;
+  font-size: 12px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
