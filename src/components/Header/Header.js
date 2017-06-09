@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
-import classnames from 'classnames'
 
 import Job from '../../models/Job'
 import User from '../../models/User'
@@ -13,25 +12,21 @@ import DropdownMenu from '../../components/DropdownMenu'
 import Preferences from '../../components/Preferences'
 import Feedback from '../../components/Feedback'
 import Developer from '../../components/Developer'
+import Editbar from '../Assets/Editbar'
 import TableToggle from '../Assets/TableToggle'
+import AssetCounter from '../Assets/AssetCounter'
 import { showModal, showTable } from '../../actions/appActions'
 import { archivistBaseURL, saveUserSettings } from '../../actions/authAction'
-import { similar } from '../../actions/racetrackAction'
-import { weights } from '../Racetrack/SimilarHash'
-import { equalSets } from '../../services/jsUtil'
+import { selectAssetIds } from '../../actions/assetsAction'
 
 class Header extends Component {
   static propTypes = {
     user: PropTypes.instanceOf(User).isRequired,
     isDeveloper: PropTypes.bool,
     isAdministrator: PropTypes.bool,
+    assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     selectedIds: PropTypes.object,
-    similar: PropTypes.shape({
-      field: PropTypes.string,
-      values: PropTypes.arrayOf(PropTypes.string).isRequired,
-      assetIds: PropTypes.arrayOf(PropTypes.string).isRequired
-    }).isRequired,
-    similarAssets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+    totalCount: PropTypes.number,
     showTable: PropTypes.bool.isRequired,
     userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired
@@ -63,39 +58,25 @@ class Header extends Component {
     actions.saveUserSettings(user, { ...userSettings, showTable: !showTable })
   }
 
-  sortSimilar = () => {
-    const { similarAssets, actions } = this.props
-    const values = similarAssets.map(asset => asset.rawValue(this.props.similar.field))
-    const assetIds = similarAssets.map(asset => asset.id)
-    const similar = { values, assetIds, weights: weights(assetIds) }
-    actions.similar(similar)
-    console.log('Sort by similar: ' + JSON.stringify(similar))
+  deselectAll = () => {
+    this.props.actions.selectAssetIds(null)
   }
 
   render () {
-    const { user, isDeveloper, isAdministrator, showTable, similar, similarAssets, selectedIds } = this.props
+    const { user, isDeveloper, isAdministrator, assets, totalCount, showTable, selectedIds } = this.props
     const baseURL = archivistBaseURL()
-    const similarHashes = similarAssets.map(asset => asset.rawValue(this.props.similar.field))
-    const similarActive = similar.field && similar.field.length > 0 && similar.values && similar.values.length > 0
-    const similarValuesSelected = similar.values && similarHashes && equalSets(new Set([...similar.values]), new Set([...similarHashes]))
-
-    // Only enable similar button if selected assets have the right hash
-    const canSortSimilar = selectedIds && selectedIds.size > 0 && similar.field && similar.field.length > 0 && !similarValuesSelected && similarHashes && similarHashes.length > 0
-    const sortSimilar = canSortSimilar ? this.sortSimilar : null
 
     return (
       <nav className="header flexOff flexCenter fullWidth">
         <Link to="/" className='header-logo'><Logo/></Link>
-        <div className="header-buttons">
-          <TableToggle enabled={showTable} onClick={this.toggleShowTable} />
-          <div className={classnames('header-button', 'icon-similarity',
-            { 'selected': similarActive, 'disabled': !canSortSimilar })}
-               onClick={sortSimilar} title="Find similar assets"/>
-        </div>
+        <AssetCounter total={totalCount} collapsed={0} loaded={assets && assets.length || 0}/>
+        <div className="header-table-spacer"/>
+        <TableToggle enabled={showTable} onClick={this.toggleShowTable} />
         <div className="flexOn"></div>
         <div className="header-menu-bar fullHeight flexCenter">
-          <JobMenu jobType={Job.Import}/>
+          <Editbar selectedAssetIds={selectedIds} onDeselectAll={this.deselectAll} />
           <JobMenu jobType={Job.Export}/>
+          <JobMenu jobType={Job.Import}/>
           <div className="header-menu">
             <DropdownMenu label="Help">
               <a href="https://zorroa.com/help-center/" target="_blank" className="header-menu-item" >Tutorials</a>
@@ -137,16 +118,16 @@ export default connect(state => ({
   user: state.auth.user,
   isDeveloper: state.auth.isDeveloper,
   isAdministrator: state.auth.isAdministrator,
+  assets: state.assets.all,
   selectedIds: state.assets.selectedIds,
-  similar: state.racetrack.similar,
-  similarAssets: state.assets.similar,
+  totalCount: state.assets.totalCount,
   showTable: state.app.showTable,
   userSettings: state.app.userSettings
 }), dispatch => ({
   actions: bindActionCreators({
     showModal,
-    similar,
     showTable,
+    selectAssetIds,
     saveUserSettings
   }, dispatch)
 }))(Header)

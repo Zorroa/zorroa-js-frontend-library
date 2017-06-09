@@ -41,3 +41,12 @@
     cursor: pointer;
   }
 }
+
+.Multipage-editbar {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include flexJustifySpaceBetween;
+  @include fullWidth;
+  @include clampText;
+  padding-right: 12px;
+}

@@ -10,11 +10,10 @@ import Header from '../Header'
 import Sidebar from '../Sidebar'
 import Assets from '../Assets'
 import Folders from '../Folders'
-import Racetrack from '../Racetrack'
 import Metadata from '../Metadata'
 import Metadata2 from '../Metadata2'
 import Collapsible from '../Collapsible'
-import { iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible, showModal, hideModal } from '../../actions/appActions'
+import { iconifyLeftSidebar, toggleCollapsible, showModal, hideModal } from '../../actions/appActions'
 import { getUserPermissions, updatePassword, changePassword } from '../../actions/authAction'
 import { queueFileEntrysUpload } from '../../actions/jobActions'
 import { updateCommand, getAllCommands } from '../../actions/assetsAction'
@@ -160,11 +159,6 @@ class Workspace extends Component {
     actions.iconifyLeftSidebar(!app.leftSidebarIsIconified)
   }
 
-  toggleRightSidebar = () => {
-    const { actions, app } = this.props
-    actions.iconifyRightSidebar(!app.rightSidebarIsIconified)
-  }
-
   static collapsibleNames = new Set(['browsing', 'collection', 'simple', 'smart', 'metadata', 'metadata2'])
   toggleCollapsible = (name) => {
     const { actions, app } = this.props
@@ -288,15 +282,6 @@ class Workspace extends Component {
           {/*  center panel - thumbnails */}
           <Assets/>
 
-          <div className="Workspace-vertical-separator flexOff"/>
-
-          {/*  right panel - racetrack (search filters) */}
-          <Sidebar onToggle={this.toggleRightSidebar}
-                   isRightEdge={true}
-                   isIconified={app.rightSidebarIsIconified}>
-            <Racetrack isIconified={app.rightSidebarIsIconified}/>
-          </Sidebar>
-
         </div>
         <div className={classnames('App-dropzone', {isDroppable})}
              onDragOver={this.dragOver}
@@ -324,7 +309,6 @@ export default connect(state => ({
 }), dispatch => ({
   actions: bindActionCreators({
     iconifyLeftSidebar,
-    iconifyRightSidebar,
     toggleCollapsible,
     getUserPermissions,
     updatePassword,

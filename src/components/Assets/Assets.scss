@@ -7,6 +7,24 @@
   min-width: 0;
 }
 
+.Assets-search {
+  @include flexRow;
+  @include flexWrap;
+  @include fullWidth;
+}
+
+.Assets-workspace {
+  @include flexOn;
+  @include flexRow;
+  @include fullHeight;
+}
+
+.Assets-body {
+  @include flexOn;
+  @include flexCol;
+  @include fullWidth;
+}
+
 .assets-scroll {
   overflow-y: scroll;
   overflow-x: hidden;
@@ -128,19 +146,16 @@
   margin: 10px;
 
   .TableToggle-button {
-    color: black;
-    width: 40px;
-    height: 40px;
+    color: $zorroa-greyish-brown;
+    width: 32px;
+    height: 32px;
     border-radius: 3px;
     border: none;
     outline: none;
     font-size: 20px;
     background-color: white;
     cursor: pointer;
-    &:hover {
-      color: white;
-      background-color: $zorroa-lightgray;
-    }
+    &:hover { background-color: $zorroa-nearwhite; }
   }
 
   .TableToggle-enabled {
@@ -225,4 +240,12 @@
     font-size: 16px;
     color: #fff;
   }
+}
+
+.Assets-editbar {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include flexJustifySpaceBetween;
+  @include fullWidth;
+  @include clampText;
 }

@@ -3,27 +3,26 @@ import Measure from 'react-measure'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import keydown from 'react-keydown'
-import classnames from 'classnames'
 import * as assert from 'assert'
 
 import Thumb, { page, monopageBadges, multipageBadges } from '../Thumb'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
 import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, similarAssets } from '../../actions/assetsAction'
-import { resetRacetrackWidgets, similar, restoreSearch } from '../../actions/racetrackAction'
+import { resetRacetrackWidgets, restoreSearch } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
-import { setThumbSize, setThumbLayout, showTable, setTableHeight, showMultipage, showModal, hideModal } from '../../actions/appActions'
+import { setThumbSize, setThumbLayout, showTable, setTableHeight, showMultipage, showModal, hideModal, iconifyRightSidebar } from '../../actions/appActions'
 import Pager from './Pager'
 import Footer from './Footer'
 import Table from '../Table'
-import Editbar from './Editbar'
+import Sidebar from '../Sidebar'
+import Racetrack from '../Racetrack'
 import * as ComputeLayout from './ComputeLayout.js'
 import AssetSearch from '../../models/AssetSearch'
 import Resizer from '../../services/Resizer'
 import TrashedFolder from '../../models/TrashedFolder'
-import { weights } from '../Racetrack/SimilarHash'
-import { addSiblings, equalSets, unCamelCase } from '../../services/jsUtil'
+import { addSiblings, equalSets } from '../../services/jsUtil'
 import * as api from '../../globals/api.js'
 
 const assetsScrollPadding = 8
@@ -44,6 +43,7 @@ class Assets extends Component {
     tableHeight: PropTypes.number.isRequired,
     showMultipage: PropTypes.bool.isRequired,
     thumbFieldTemplate: PropTypes.string.isRequired,
+    rightSidebarIsIconified: PropTypes.bool,
     folders: PropTypes.instanceOf(Map),
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
     similar: PropTypes.shape({
@@ -51,7 +51,6 @@ class Assets extends Component {
       values: PropTypes.arrayOf(PropTypes.string).isRequired,
       assetIds: PropTypes.arrayOf(PropTypes.string).isRequired
     }).isRequired,
-    similarAssets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     sync: PropTypes.bool.isRequired,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
@@ -168,10 +167,6 @@ class Assets extends Component {
 
   isolateToLightbox (asset) {
     this.props.actions.isolateAssetId(asset.id)
-  }
-
-  deselectAll = () => {
-    this.props.actions.selectAssetIds(null)
   }
 
   toggleShowTable = () => {
@@ -487,69 +482,21 @@ class Assets extends Component {
     this.props.actions.sortAssets(field, ascending)
   }
 
-  sortSimilar = () => {
-    const { similarAssets } = this.props
-    const values = similarAssets.map(asset => asset.rawValue(this.props.similar.field))
-    const assetIds = similarAssets.map(asset => asset.id)
-    const similar = { values, assetIds, weights: weights(assetIds) }
-    this.props.actions.similar(similar)
-    console.log('Sort by similar: ' + JSON.stringify(similar))
+  toggleRightSidebar = () => {
+    const { actions, rightSidebarIsIconified } = this.props
+    actions.iconifyRightSidebar(!rightSidebarIsIconified)
   }
 
   renderEditbar () {
-    const { order, selectedIds, similar, similarAssets, query, sync } = this.props
-
-    const similarHashes = similarAssets.map(asset => asset.rawValue(this.props.similar.field))
-    const similarActive = similar.field && similar.field.length > 0 && similar.values && similar.values.length > 0
-    const similarValuesSelected = similar.values && similarHashes && equalSets(new Set([...similar.values]), new Set([...similarHashes]))
-
-    // Only enable similar button if selected assets have the right hash
-    const canSortSimilar = selectedIds && selectedIds.size > 0 && similar.field && similar.field.length > 0 && !similarValuesSelected && similarHashes && similarHashes.length > 0
-    const sortSimilar = canSortSimilar ? this.sortSimilar : null
-
-    const columnName = order && order.length && order[0].field !== 'source.filename' ? unCamelCase(Asset.lastNamespace(order[0].field)) : 'Field'
+    const { sync } = this.props
 
     const loader = require('./loader-rolling.svg')
     const syncer = sync ? <div className="Assets-loading sync"/> : <img className="Assets-loading" src={loader}/>
 
     return (
-      <Editbar selectedAssetIds={selectedIds}
-               onDeselectAll={this.deselectAll}>
+      <div className="Assets-editbar">
         { syncer }
-        <div className="SortingSelector">
-          <div className="SortingSelector-title">Sort By</div>
-          <div onClick={this.sortAssets}
-               className={classnames('SortingSelector-sort',
-                 {'SortingSelector-selected': !similarActive &&
-                 (!order || !order.length)})}>
-            { !query || query.empty() ? 'Latest' : 'Rank' }
-          </div>
-          { similar.field && similar.field.length > 0 &&
-          <div onClick={sortSimilar} className="SortingSelector-similar">
-            { sortSimilar && similarActive && !similarValuesSelected && selectedIds && selectedIds.size > 0 &&
-            <div onClick={sortSimilar}
-                 className="SortingSelector-icon icon-settings_backup_restore">&thinsp;</div> }
-            <div className={classnames('SortingSelector-sort',
-              { 'SortingSelector-selected': similarActive, 'SortingSelector-disabled': !canSortSimilar })}>
-              Similar
-            </div>
-          </div>
-          }
-          { !similar.field || !similar.field.length &&
-          <div onClick={_ => { this.sortAssets('source.filename', true) }}
-               className={classnames('SortingSelector-sort',
-                 {'SortingSelector-enabled': order && order.length >= 1 &&
-                 order[0].field === 'source.filename'})}>
-            Alphabetical {order && order.length >= 1 && order[0].field === 'source.filename' && !order[0].ascending ? '(Z-A)' : '(A-Z)'}
-          </div>
-          }
-          <div className={classnames('SortingSelector-sort',
-            {'SortingSelector-selected': order && order.length && order[0].field !== 'source.filename'},
-            {'SortingSelector-disabled': !order || !order.length || order[0].field === 'source.filename'})}>
-            {columnName}
-          </div>
-        </div>
-      </Editbar>
+      </div>
     )
   }
 
@@ -661,7 +608,8 @@ class Assets extends Component {
   }
 
   render () {
-    const { assets, query, totalCount, tableHeight, showTable, showMultipage, layout, thumbSize, assetsCounter } = this.props
+    const { assets, query, totalCount, tableHeight, showTable, showMultipage,
+      layout, thumbSize, assetsCounter, rightSidebarIsIconified } = this.props
     const { collapsed, tableIsResizing } = this.state
 
     // Trigger layout if assets change.
@@ -692,31 +640,41 @@ class Assets extends Component {
     return (
       <div className="Assets" ref="Assets">
         {this.renderEditbar()}
-        {this.renderAssets()}
-        { showTable && (
-          <div className='Assets-tableResize'
-               onMouseDown={this.tableResizeStart}/>
-        )}
-        { totalCount > 0 && showTable && (
-          <Table height={this.clampTableHeight(tableHeight)}
-                 tableIsResizing={tableIsResizing}
-                 selectFn={this.select}/>
-        )}
-        { totalCount > 0 &&
-        <Footer
-          total={totalCount}
-          collapsed={collapsed}
-          loaded={assets.length}
-          onUncollapse={this.uncollapse}
-          showMultipage={showMultipage}
-          toggleShowMultipage={this.toggleShowMultipage}
-          showTable={showTable}
-          toggleShowTable={this.toggleShowTable}
-          layout={layout}
-          handleLayout={this.changeLayout.bind(this)}
-          thumbSize={thumbSize}
-          handleThumbSize={this.changeThumbSize.bind(this)}
-        /> }
+        <div className="Assets-workspace">
+          <div className="Assets-body">
+            {this.renderAssets()}
+            { showTable && (
+              <div className='Assets-tableResize'
+                   onMouseDown={this.tableResizeStart}/>
+            )}
+            { totalCount > 0 && showTable && (
+              <Table height={this.clampTableHeight(tableHeight)}
+                     tableIsResizing={tableIsResizing}
+                     selectFn={this.select}/>
+            )}
+            { totalCount > 0 &&
+            <Footer
+              total={totalCount}
+              collapsed={collapsed}
+              loaded={assets.length}
+              onUncollapse={this.uncollapse}
+              showMultipage={showMultipage}
+              toggleShowMultipage={this.toggleShowMultipage}
+              showTable={showTable}
+              toggleShowTable={this.toggleShowTable}
+              layout={layout}
+              handleLayout={this.changeLayout.bind(this)}
+              thumbSize={thumbSize}
+              handleThumbSize={this.changeThumbSize.bind(this)}
+            /> }
+          </div>
+          <div className="Workspace-vertical-separator flexOff"/>
+          <Sidebar onToggle={this.toggleRightSidebar}
+                   isRightEdge={true}
+                   isIconified={rightSidebarIsIconified}>
+            <Racetrack isIconified={rightSidebarIsIconified}/>
+          </Sidebar>
+        </div>
       </div>
     )
   }
@@ -730,6 +688,7 @@ export default connect(state => ({
   selectedIds: state.assets.selectedIds,
   selectionCounter: state.assets.selectionCounter,
   totalCount: state.assets.totalCount,
+  rightSidebarIsIconified: state.app.rightSidebarIsIconified,
   folders: state.folders.all,
   trashedFolders: state.folders.trashedFolders,
   sync: state.auth.sync,
@@ -742,7 +701,6 @@ export default connect(state => ({
   showMultipage: state.app.showMultipage,
   thumbFieldTemplate: state.app.thumbFieldTemplate,
   similar: state.racetrack.similar,
-  similarAssets: state.assets.similar,
   origin: state.auth.origin
 }), dispatch => ({
   actions: bindActionCreators({
@@ -752,7 +710,6 @@ export default connect(state => ({
     searchAssets,
     similarAssets,
     resetRacetrackWidgets,
-    similar,
     restoreSearch,
     selectFolderIds,
     setThumbSize,
@@ -762,6 +719,7 @@ export default connect(state => ({
     showMultipage,
     showModal,
     hideModal,
+    iconifyRightSidebar,
     saveUserSettings
   }, dispatch)
 }))(Assets)
