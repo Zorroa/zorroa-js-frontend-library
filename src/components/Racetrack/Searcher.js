@@ -33,6 +33,7 @@ class Searcher extends Component {
     fieldTypes: PropTypes.object,
     metadataFields: PropTypes.arrayOf(PropTypes.string),
     lightbarFields: PropTypes.arrayOf(PropTypes.string),
+    thumbFields: PropTypes.arrayOf(PropTypes.string),
     jobs: PropTypes.object,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
@@ -143,7 +144,7 @@ class Searcher extends Component {
       widgets, actions, selectedFolderIds, query,
       modifiedFolderIds, trashedFolders, order,
       similar,
-      metadataFields, lightbarFields, fieldTypes } = this.props
+      metadataFields, lightbarFields, thumbFields, fieldTypes } = this.props
     if (!fieldTypes) return null
     let assetSearch = new AssetSearch({order})
     if (widgets && widgets.length) {
@@ -210,10 +211,8 @@ class Searcher extends Component {
 
     // Limit results to favorited fields, since we only display values
     // in those fields in the Table and Lightbar
-    if (metadataFields) {
-      const fields = requiredFields([...metadataFields, ...lightbarFields], fieldTypes)
-      assetSearch.fields = [...fields]
-    }
+    const fields = requiredFields([...metadataFields, ...lightbarFields, ...thumbFields], fieldTypes)
+    assetSearch.fields = [...fields]
 
     // Do not send the query unless it is different than the last returned query
     // FIXME: If assetSearch.empty() filtered counts == total, but tricky to flush cache
@@ -267,6 +266,7 @@ const mapStateToProps = state => ({
   fieldTypes: state.assets.types,
   metadataFields: state.app.metadataFields,
   lightbarFields: state.app.lightbarFields,
+  thumbFields: state.app.thumbFields,
   jobs: state.jobs.all,
   user: state.auth.user,
   userSettings: state.app.userSettings

@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import JSONTree from 'react-json-tree'
 
-import { hideModal } from '../../actions/appActions'
+import { hideModal, lightbarFieldTemplate, thumbFieldTemplate } from '../../actions/appActions'
 import { saveUserSettings, changePassword } from '../../actions/authAction'
 import { archivistInfo, archivistHealth, archivistMetrics } from '../../actions/archivistAction'
 import User from '../../models/User'
@@ -40,7 +40,9 @@ class Preferences extends Component {
     health: PropTypes.object,
     metrics: PropTypes.object,
     actions: PropTypes.object,
-    userSettings: PropTypes.object.isRequired
+    userSettings: PropTypes.object.isRequired,
+    lightbarFieldTemplate: PropTypes.string,
+    thumbFieldTemplate: PropTypes.string
   }
 
   componentDidMount () {
@@ -64,6 +66,14 @@ class Preferences extends Component {
     this.dismiss()
   }
 
+  changeThumbFieldTemplate = (event) => {
+    this.props.actions.thumbFieldTemplate(event.target.value)
+  }
+
+  changeLightbarFieldTemplate = (event) => {
+    this.props.actions.lightbarFieldTemplate(event.target.value)
+  }
+
   logoutDropbox = (event) => {
     DropboxAuthenticator.deauthorize()
     this.dismiss()
@@ -80,7 +90,7 @@ class Preferences extends Component {
   }
 
   render () {
-    const { user, info, health, metrics } = this.props
+    const { user, info, health, metrics, lightbarFieldTemplate, thumbFieldTemplate } = this.props
     return (
       <div className="Preferences">
         <div className="Preferences-header">
@@ -99,8 +109,16 @@ class Preferences extends Component {
             </div>
           </div>
           <div className="Preferences-curator flexCol">
-            <button className="Preferences-reset" onClick={this.reset}>Reset Default Settings</button>
+            <button className="Preferences-reset" onClick={this.reset}>Reset Default User Settings</button>
             <button className="Preferences-reset" onClick={this.changePassword}>Change Password</button>
+            <div className="Preferences-field-template">
+              <input type="text" className="Preferences-field-template-input" value={lightbarFieldTemplate} onChange={this.changeLightbarFieldTemplate}/>
+              <div className="Preferences-field-template-label">Lightbar Label</div>
+            </div>
+            <div className="Preferences-field-template">
+              <input type="text" className="Preferences-field-template-input" value={thumbFieldTemplate} onChange={this.changeThumbFieldTemplate}/>
+              <div className="Preferences-field-template-label">Thumbnail Label</div>
+            </div>
             { DropboxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutDropbox}>Logout Dropbox</button> }
             { BoxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutBox}>Logout Box</button> }
             { GDriveAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutGDrive}>Logout Google Drive</button> }
@@ -131,7 +149,9 @@ export default connect(state => ({
   info: state.archivist.info,
   health: state.archivist.health,
   metrics: state.archivist.metrics,
-  userSettings: state.app.userSettings
+  userSettings: state.app.userSettings,
+  lightbarFieldTemplate: state.app.lightbarFieldTemplate,
+  thumbFieldTemplate: state.app.thumbFieldTemplate
 }), dispatch => ({
   actions: bindActionCreators({
     saveUserSettings,
@@ -139,6 +159,8 @@ export default connect(state => ({
     archivistInfo,
     archivistHealth,
     archivistMetrics,
-    hideModal
+    hideModal,
+    lightbarFieldTemplate,
+    thumbFieldTemplate
   }, dispatch)
 }))(Preferences)

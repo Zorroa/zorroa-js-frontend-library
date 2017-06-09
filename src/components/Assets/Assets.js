@@ -43,6 +43,7 @@ class Assets extends Component {
     showTable: PropTypes.bool.isRequired,
     tableHeight: PropTypes.number.isRequired,
     showMultipage: PropTypes.bool.isRequired,
+    thumbFieldTemplate: PropTypes.string.isRequired,
     folders: PropTypes.instanceOf(Map),
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
     similar: PropTypes.shape({
@@ -553,7 +554,7 @@ class Assets extends Component {
   }
 
   renderAssets () {
-    const { assets, selectedIds, totalCount, layout, showMultipage, origin, thumbSize, query } = this.props
+    const { assets, selectedIds, totalCount, layout, showMultipage, origin, thumbSize, query, thumbFieldTemplate } = this.props
     const { positions, multipage, tableIsResizing } = this.state
     api.setTableIsResizing(tableIsResizing)
 
@@ -626,7 +627,7 @@ class Assets extends Component {
                   const parentId = asset.parentId()
                   const indexes = parentId && multipage[parentId]
                   const badgeHeight = thumbSize < 100 ? 15 : 25
-                  const badge = showMultipage ? multipageBadges(asset, origin, indexes && indexes.length) : monopageBadges(asset)
+                  const badge = showMultipage ? multipageBadges(asset, origin, indexes && indexes.length, thumbFieldTemplate) : monopageBadges(asset)
                   const pages = indexes && indexes.slice(0, 3).map(index => (
                       page(assets[index], width, height, origin, indexes))) ||
                     [page(asset, width, height, origin)]
@@ -739,6 +740,7 @@ export default connect(state => ({
   showTable: state.app.showTable,
   tableHeight: state.app.tableHeight,
   showMultipage: state.app.showMultipage,
+  thumbFieldTemplate: state.app.thumbFieldTemplate,
   similar: state.racetrack.similar,
   similarAssets: state.assets.similar,
   origin: state.auth.origin

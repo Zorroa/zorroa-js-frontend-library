@@ -20,20 +20,9 @@
     opacity: 1;
   }
 
-  &:hover {
+  .Thumb:hover & {
     opacity: 1;
   }
-}
-
-.Thumb-selection-overlay {
-  @include fullWidth;
-  @include fullHeight;
-
-  .Thumb.isSelected & {
-    background-color: black;
-  }
-
-  opacity: 0.5;
 }
 
 .Thumb-selection-check {
@@ -47,7 +36,7 @@
 
   .Thumb.isSelected & {
     color: white;
-    background-color: $zorroa-sickly-green;
+    background-color: $zorroa-water-blue;
   }
 }
 
@@ -55,26 +44,44 @@
   position: absolute;
   cursor: pointer;
   &.isSelected {
-    outline: 3px solid $zorroa-sickly-green;
+    outline: 5px solid $zorroa-water-blue;
   }
 }
 
 .Thumb-badges {
+}
+
+.Thumb-icon {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+
+  @include flexRow;
+
+  opacity: 0;
+  .Thumb:hover & { opacity: 1; }
+}
+
+.Thumb-field {
+  background-color: rgba(255, 255, 255, 0.65);
+}
+
+.Thumb-icon-badge {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+}
+
+.Thumb-metadata {
+  margin-right: 4px;
+
+  .small & { font-size: 10px; }
+}
+
+.Thumb-pages {
   position: absolute;
   right: 4px;
   bottom: 4px;
 
-  @include flexRow;
-  @include flexAlignItemsCenter;
-  @media screen and (max-width: 56px) { hidden: true; }
-
-  .Thumb-icon {
-    @include flexRow;
-    margin-left: 2px;
-  }
-}
-
-.Thumb-pages {
   color: $zorroa-greyish-brown;
   line-height: 2em;
   height: 25px;

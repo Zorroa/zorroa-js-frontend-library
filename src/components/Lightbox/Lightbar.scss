@@ -24,19 +24,8 @@
 }
 
 .Lightbar-metadata {
-  @include flexOn;
-  padding-top: 15px;
-  padding-bottom: 5px;
-  @include flexCol;
-  @include flexWrap;
-  align-content: flex-start;
-  max-height: 100%;
-  overflow-y: hidden;
-  position: relative;
-
-  &::-webkit-scrollbar {
-    height: 5px;
-  }
+  @include flexRow;
+  @include flexAlignItemsCenter;
 }
 
 .Lightbar-btn-icon {
@@ -46,13 +35,9 @@
 
 .Lightbar-actions {
   @include flexRow;
-  @include flexWrap;
-  @include flexJustifyEnd;
-  @include flexAlignItemsStart;
+  @include flexAlignItemsCenter;
   align-content: flex-start;
-  margin-top: 10px;
   position: relative;
-  border-left: 1px solid $zorroa-darkgray;
 }
 
 .Lightbar-action {
@@ -89,49 +74,6 @@
   background-color: black;
 }
 
-.Lightbar-resizer {
-  position: absolute;
-  cursor: row-resize;
-  height: 5px;
-  left: 0;
-  right: 0;
-  bottom: -4px;
-}
-
-.Lightbar-column {
-  position: relative;
-  @include flexCol;
-  @include flexOn;
-  overflow: hidden;
-}
-
-.Lightbar-title-resizer {
-  cursor: col-resize;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 5px;
-  border-radius: 2px;
-  margin-left: -2px;
-
-  &:hover { background-color: $zorroa-darkgray; }
-  &.isDragging { background-color: $zorroa-darkgray; }
-}
-
-.Lightbar-column-resizer {
-  cursor: col-resize;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: -2px;
-  width: 5px;
-  border-radius: 2px;
-  border-left: 1px dotted $zorroa-darkgray;
-
-  &:hover { background-color: $zorroa-darkgray; }
-  &.isDragging { background-color: $zorroa-darkgray; }
-}
-
 .Lightbar-folders {
   position: absolute;
   top: 100%;
@@ -161,39 +103,4 @@
   z-index: 1000;
   background-color: black;
   color: $zorroa-nearwhite;
-}
-
-.Lightbar-field {
-  @include flexRow;
-  @include flexAlignItemsStart;
-}
-
-.Lightbar-field-title {
-  @include flexRow;
-  //@include flexAlignItemsCenter;
-  @include flexJustifyEnd;
-  align-self: stretch;
-  padding: 4px;
-  border-right: 1px solid $zorroa-darkgray;
-}
-
-.Lightbar-field-title-head {
-  @include noSelect;
-  @include clampText;
-  @include nowrap;
-  color: $zorroa-lightgray;
-  font-size: 12px;
-  font-weight: 100;
-  text-align: right;
-}
-
-.Lightbar-field-title-tail {
-  @include noSelect;
-  @include clampText;
-  @include nowrap;
-  color: $zorroa-gray;
-  font-size: 12px;
-  font-weight: 100;
-  text-align: right;
-  margin-right: 4px;
 }

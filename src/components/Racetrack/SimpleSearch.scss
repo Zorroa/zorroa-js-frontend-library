@@ -36,10 +36,6 @@
     @include flexJustifySpaceBetween;
   }
 
-  .SimpleSearch-fuzzy .Toggle {
-    margin: 10px;
-  }
-
   .SimpleSearch-clear-search {
     @include zorroa-square-btn-darken(20px);
     margin: 5px;
