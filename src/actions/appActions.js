@@ -1,11 +1,12 @@
 import {
   SHOW_MODAL, HIDE_MODAL, SORT_FOLDERS,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
-  METADATA_FIELDS, LIGHTBAR_FIELDS, LIGHTBOX_METADATA,
+  METADATA_FIELDS, LIGHTBOX_METADATA,
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
   SHOW_MULTIPAGE, SHOW_PAGES, VIDEO_VOLUME,
-  HOVER_FIELD, CLEAR_HOVER_FIELD, SET_FUZZY
+  HOVER_FIELD, CLEAR_HOVER_FIELD,
+  THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE
 } from '../constants/actionTypes'
 
 export const MIN_THUMBSIZE = 48
@@ -51,13 +52,6 @@ export function toggleCollapsible (collapsibleName, isOpen) {
 export function updateMetadataFields (fields) {
   return ({
     type: METADATA_FIELDS,
-    payload: fields
-  })
-}
-
-export function updateLightbarFields (fields) {
-  return ({
-    type: LIGHTBAR_FIELDS,
     payload: fields
   })
 }
@@ -161,9 +155,16 @@ export function clearHoverField (field) {
   })
 }
 
-export function setFuzzy (fuzzy) {
+export function thumbFieldTemplate (template) {
   return ({
-    type: SET_FUZZY,
-    payload: fuzzy
+    type: THUMB_FIELD_TEMPLATE,
+    payload: template
+  })
+}
+
+export function lightbarFieldTemplate (template) {
+  return ({
+    type: LIGHTBAR_FIELD_TEMPLATE,
+    payload: template
   })
 }
