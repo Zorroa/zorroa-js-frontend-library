@@ -80,7 +80,8 @@ class Racebar extends Component {
     const isOpen = this.state.openId === widget.id
     const onOpen = _ => this.toggleOpen(widget)
     const floatBody = true
-    return cloneElement(widgetInfo.element, {id: widget.id, isIconified, isPinned, isEnabled, isOpen, onOpen, floatBody})
+    const maxWidth = 360
+    return cloneElement(widgetInfo.element, {id: widget.id, isIconified, isPinned, isEnabled, isOpen, onOpen, maxWidth, floatBody})
   }
 
   render () {

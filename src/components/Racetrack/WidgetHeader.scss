@@ -102,6 +102,7 @@
   @include flexRow;
   @include flexOn;
   @include flexAlignItemsCenter;
+  max-width: 100%;
 }
 
 .WidgetHeader-header-title {
@@ -109,12 +110,16 @@
   font-weight: 100;
   margin-right: 4px;
   cursor: pointer;
+  max-width: 100%;
+  @include clampText;
 }
 
 .WidgetHeader-header-field {
   @include flexOn;
   font-weight: 400;
   cursor: pointer;
+  max-width: 100%;
+  @include clampText;
 }
 
 .WidgetHeader-pin {

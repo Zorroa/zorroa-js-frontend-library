@@ -272,15 +272,16 @@ class Filetype extends Component {
 
   render () {
     const { id, floatBody, isIconified, isOpen, onOpen } = this.props
-    const { suggestions, suggestion } = this.state
+    const { exts, suggestions, suggestion } = this.state
     const isSelected = this.state.exts.length > 0
     const placeholder = isSelected ? '' : 'Search filetypes'
     const style = { width: isSelected ? '60px' : '140px' }
+    const title = exts && exts.length ? exts.join(',') : FiletypeWidgetInfo.title
     return (
       <Widget className="Filetype"
               id={id}
               floatBody={floatBody}
-              title={FiletypeWidgetInfo.title}
+              title={title}
               backgroundColor={FiletypeWidgetInfo.color}
               isIconified={isIconified}
               isOpen={isOpen}

@@ -3,11 +3,10 @@ import classnames from 'classnames'
 
 import pin from './pin.svg'
 
-const WidgetHeader = ({ isEnabled, isPinned, isOpen, isIconified, title, field, icon, backgroundColor, enableToggleFn, collapseToggleFn, pinnedToggleFn, onClose }) => {
+const WidgetHeader = ({ isEnabled, isPinned, isOpen, isIconified, maxWidth, title, field, icon, backgroundColor, enableToggleFn, collapseToggleFn, pinnedToggleFn, onClose }) => {
   const iconClassNames = classnames('WidgetHeader-icon', icon, { isEnabled, isIconified })
-  const pin = require('./pin.svg')
   return (
-    <div style={{backgroundColor}} className={classnames('WidgetHeader', {isEnabled})}>
+    <div style={{backgroundColor, maxWidth}} className={classnames('WidgetHeader', {isEnabled})}>
       <div className='WidgetHeader-hover'>
         <div className='WidgetHeader-toggle flexRowCenter fullWidth fullHeight' onClick={collapseToggleFn}>
           <div className={iconClassNames}/>
@@ -35,6 +34,7 @@ WidgetHeader.propTypes = {
   isEnabled: PropTypes.bool.isRequired,
   isOpen: PropTypes.bool.isRequired,
   isIconified: PropTypes.bool.isRequired,
+  maxWidth: PropTypes.number,
   title: PropTypes.string.isRequired,
   field: PropTypes.string,
   icon: PropTypes.string.isRequired,

@@ -61,7 +61,7 @@ class Widget extends Component {
     const widget = this.widget()
     const isEnabled = widget && widget.isEnabled
     const isPinned = widget && widget.isPinned
-
+    const maxWidth = onOpen ? 360 : undefined   // Implicitly use onOpen to restrict width of Racebar widgets
     const WidgetHeaderParams = {
       icon,
       title,
@@ -69,6 +69,7 @@ class Widget extends Component {
       backgroundColor,
       isEnabled,
       isPinned,
+      maxWidth,
       isIconified,
       isOpen,
       onClose: this.removeFilter,
@@ -79,7 +80,6 @@ class Widget extends Component {
 
     const { className } = this.props
     const widgetClasses = classnames('Widget', 'flexCol', {'parent': children, floatBody, isOpen, isIconified, isEnabled, [className]: !!className})
-
     return (
       <div className={widgetClasses}>
         <WidgetHeader {...WidgetHeaderParams}/>
