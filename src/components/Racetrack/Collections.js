@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import { createCollectionsWidget } from '../../models/Widget'
 import TrashedFolder from '../../models/TrashedFolder'
 import { CollectionsWidgetInfo } from './WidgetInfo'
 import { selectFolderIds } from '../../actions/folderAction'
@@ -50,7 +49,7 @@ class Collections extends Component {
       const iter = folders.values()
       for (let i = iter.next(); !i.done && suggestions.length < 5; i = iter.next()) {
         const folder = i.value
-        if (folder.name.toLowerCase().includes(key)) suggestions.push({text: folder.name, folder:folder})
+        if (folder.name.toLowerCase().includes(key)) suggestions.push({text: folder.name, folder: folder})
       }
       this.setState({suggestions, suggestion})
     }
@@ -99,7 +98,7 @@ class Collections extends Component {
             <Suggestions suggestions={suggestions} placeholder={placeholder}
                          value={suggestion} onChange={this.suggest} onSelect={this.select}/>
           </div>
-          { selectedFolders.size && (
+          { selectedFolderNames.length && (
             <div className="Collections-clear-all" key="clear-all">
               <div className="Collections-clear-all-label">
                 {`${selectedFolderNames.length} folders selected`}
