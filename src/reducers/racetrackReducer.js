@@ -1,8 +1,8 @@
 import {
   MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS,
-  SIMILAR_VALUES, ASSET_ORDER, ASSET_SORT, ASSET_FIELDS, UNAUTH_USER } from '../constants/actionTypes'
+  SIMILAR_VALUES, ASSET_ORDER, ASSET_SORT, ASSET_FIELDS, SELECT_FOLDERS, UNAUTH_USER } from '../constants/actionTypes'
 import Widget from '../models/Widget'
-import { SimilarHashWidgetInfo } from '../components/Racetrack/WidgetInfo'
+import { SimilarHashWidgetInfo, CollectionsWidgetInfo } from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
 
 const initialState = {
@@ -110,6 +110,18 @@ export default function (state = initialState, action) {
         }
       }
       return { ...state, similar: { ...state.similar, field } }
+    }
+    case SELECT_FOLDERS: {
+      const selectedFolderIds = action.payload
+      if (selectedFolderIds.size) {
+        const index = state.widgets.findIndex(widget => (widget.type === CollectionsWidgetInfo.type))
+        if (index < 0) {
+          const widget = new Widget({ type: CollectionsWidgetInfo.type })
+          const widgets = [...state.widgets, widget]
+          return { ...state, widgets }
+        }
+      }
+      return state
     }
     case UNAUTH_USER:
       return initialState

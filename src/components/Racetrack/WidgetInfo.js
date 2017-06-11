@@ -7,9 +7,12 @@ import Range from './Range'
 import Filetype from './Filetype'
 import DateRange from './DateRange'
 import SimilarHash from './SimilarHash'
+import Collections from './Collections'
 import { createFacetWidget, createMapWidget, createColorWidget,
   createDateRangeWidget, createRangeWidget, createSimilarityWidget,
-  createFiletypeWidget, createExistsWidget, createSearchWidget } from '../../models/Widget'
+  createFiletypeWidget, createExistsWidget, createSearchWidget,
+  createCollectionsWidget
+} from '../../models/Widget'
 
 // Pick colors from the style guide
 // https://projects.invisionapp.com/d/main#/console/8609824/184395417/preview
@@ -110,5 +113,15 @@ export const SimilarHashWidgetInfo = {
   create: createSimilarityWidget,
   fieldTypes: [],
   fieldRegex: /^Similarity\..+/,
+  color: '#77804d'
+}
+
+export const CollectionsWidgetInfo = {
+  type: 'COLLECTIONS',
+  icon: 'icon-folder-subfolders',
+  title: 'Collections',
+  description: 'Search within a folder',
+  element: <Collections/>,
+  create: createCollectionsWidget,
   color: '#77804d'
 }
