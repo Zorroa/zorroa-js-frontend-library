@@ -11,7 +11,7 @@ import TrashedFolder from '../../models/TrashedFolder'
 import { searchAssets, getAssetFields, requiredFields } from '../../actions/assetsAction'
 import { countAssetsInFolderIds, clearFolderCountQueue } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
-import { MapWidgetInfo } from './WidgetInfo'
+import { MapWidgetInfo, CollectionsWidgetInfo } from './WidgetInfo'
 
 // Searcher is a singleton. It combines AssetSearches from the Racetrack
 // and Folders and submits a new query to the Archivist server.
@@ -146,13 +146,14 @@ class Searcher extends Component {
       similar,
       metadataFields, lightbarFields, thumbFields, fieldTypes } = this.props
     if (!fieldTypes) return null
+    let foldersDisabled = false
     let assetSearch = new AssetSearch({order})
     if (widgets && widgets.length) {
       let postFilter = new AssetFilter()
       for (let widget of widgets) {
-        if (!widget || !widget.sliver) {
-          continue
-        }
+        if (!widget) continue
+        if (widget.type === CollectionsWidgetInfo.type) foldersDisabled = !widget.isEnabled
+        if (!widget.sliver) continue
         let sliver = widget.sliver
         if (sliver.aggs) {
           if (widget.isEnabled) postFilter.merge(widget.sliver.filter)
@@ -168,7 +169,7 @@ class Searcher extends Component {
     }
 
     // Add a filter for selected folders
-    if (selectedFolderIds && selectedFolderIds.size) {
+    if (!foldersDisabled && selectedFolderIds && selectedFolderIds.size) {
       // Server does not support searching of trashed folders
       let nonTrashedFolderIds
       if (trashedFolders && trashedFolders.length) {
