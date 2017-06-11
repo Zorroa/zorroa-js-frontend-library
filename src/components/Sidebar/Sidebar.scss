@@ -37,39 +37,6 @@
   }
 }
 
-.Sidebar-open-close-button {
-  font-size: 12px;
-  width: 32px;
-  height: 24px;
-  color: $zorroa-lightgray;
-  padding-left: 10px;
-  padding-right: 10px;
-  cursor: pointer;
-
-  @include flexRow;
-  @include flexAlignItemsCenter;
-  @include flexJustifyCenter;
-  @include flexOff;
-  align-self: flex-end;
-
-  &.isIconified {
-    transform: rotate(180deg);
-  }
-
-  &.isRightEdge {
-    @include flexJustifyStart;
-    transform: rotate(180deg);
-    align-self: flex-start;
-    &.isIconified {
-      transform: none;
-    }
-  }
-
-  &:hover {
-    color: $zorroa-gray;
-  }
-}
-
 .Sidebar-resize-thumb {
   position: absolute;
   top: 24px;

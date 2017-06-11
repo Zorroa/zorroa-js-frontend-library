@@ -5,7 +5,10 @@
   @include flexAlignItemsCenter;
   @include flexWrap;
   @include fullWidth;
-  margin-top: 8px;
+  margin: 4px;
+}
+
+.Racebar-widget {
   margin-left: 4px;
   margin-right: 4px;
 }

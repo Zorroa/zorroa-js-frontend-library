@@ -66,10 +66,10 @@ class Editbar extends Component {
     const removable = !disabledSelected && isRemoveEnabled && isRemoveEnabled()
     const similarHashes = similarAssets.map(asset => asset.rawValue(this.props.similar.field))
     const similarActive = similar.field && similar.field.length > 0 && similar.values && similar.values.length > 0
-    const similarValuesSelected = similar.values && similarHashes && equalSets(new Set([...similar.values]), new Set([...similarHashes]))
+    const similarValuesSelected = similarActive && similar.values && similarHashes && equalSets(new Set([...similar.values]), new Set([...similarHashes]))
 
     // Only enable similar button if selected assets have the right hash
-    const canSortSimilar = selectedAssetIds && selectedAssetIds.size > 0 && similar.field && similar.field.length > 0 && !similarValuesSelected && similarHashes && similarHashes.length > 0
+    const canSortSimilar = selectedAssetIds && selectedAssetIds.size > 0 && similar.field && similar.field.length > 0 && !similarValuesSelected
     const sortSimilar = canSortSimilar ? this.sortSimilar : null
     return (
       <div className="Editbar">

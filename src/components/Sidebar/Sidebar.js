@@ -50,8 +50,12 @@ export default class Sidebar extends Component {
   }
 
   resizeUpdate = (resizeX, resizeY) => {
-    const width = this.clampWidth(resizeX)
-    this.setState({ width })
+    if (resizeX < 160 && !this.props.isIconified) {
+      this.props.onToggle()
+    } else {
+      const width = this.clampWidth(resizeX)
+      this.setState({ width })
+    }
   }
 
   toggleIfNotIconified = (event) => {
@@ -61,13 +65,11 @@ export default class Sidebar extends Component {
   }
 
   render () {
-    const { isIconified, children, onToggle, isRightEdge } = this.props
+    const { isIconified, children, isRightEdge } = this.props
     const { width } = this.state
     const isOpen = !isIconified
     return (
       <div style={{width}} className={classnames('Sidebar', { isOpen, isRightEdge, isIconified })}>
-        <div className={classnames('Sidebar-open-close-button', 'icon-doublearrows',
-          { isRightEdge, isIconified })} onClick={onToggle} />
         <div className={classnames('scroller', { isRightEdge })} onClick={this.toggleIfNotIconified}>
           { children }
         </div>

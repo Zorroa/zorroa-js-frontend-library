@@ -108,7 +108,7 @@ class Racebar extends Component {
         </div>
         { widgets && widgets.length > 0 && widgets.map((widget, i) => (
           <div key={widget.id}
-               className={classnames('Racetrack-widget', {hoverField: hoverFields.has(widget.field())})} >
+               className={classnames('Racebar-widget', {hoverField: hoverFields.has(widget.field())})} >
             { this.renderWidget(widget, false) }
           </div>
         ))}
