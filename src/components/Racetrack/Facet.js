@@ -394,7 +394,6 @@ class Facet extends Component {
           <div className="Facet-table">
             <div className="Facet-table-header">
               { this.renderHeaderCell('keyword') }
-              { this.renderChartTypes() }
               { this.renderHeaderCell('count') }
             </div>
             <div className="Facet-value-table" style={{minHeight: '300px'}}>
@@ -431,7 +430,6 @@ class Facet extends Component {
         const activeIndex = mergedTerms.map((term, index) => (buckets.findIndex(bucket => (bucket.key === term))))
         return (
           <div className="Facet-pie-chart">
-            { this.renderChartTypes() }
             <ResponsiveContainer>
               <PieChart width={300} height={300}>
                 <Pie innerRadius={30} outerRadius={60} paddingAngle={0}
@@ -462,6 +460,7 @@ class Facet extends Component {
   }
 
   renderChartTypes () {
+    if (this.props.onOpen) return
     const buckets = this.baseBuckets()
     if (!buckets || !buckets.length) return
     return (
@@ -474,8 +473,9 @@ class Facet extends Component {
   render () {
     const { id, floatBody, isIconified, isOpen, onOpen } = this.props
     const { field, terms } = this.state
-    const title = Asset.lastNamespace(unCamelCase(field))
-    const selected = terms.join(',')
+    const lastName = Asset.lastNamespace(unCamelCase(field))
+    const title = terms && terms.length ? lastName : FacetWidgetInfo.title
+    const selected = terms && terms.length ? terms.join(',') : lastName
     return (
       <Widget className="Facet"
               id={id}
@@ -490,6 +490,7 @@ class Facet extends Component {
         <div className="Facet-body">
           { this.renderChart() }
           { this.renderClearSelection() }
+          { this.renderChartTypes() }
         </div>
       </Widget>
     )

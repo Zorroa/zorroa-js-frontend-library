@@ -38,6 +38,7 @@
 }
 
 .SimilarHash-body {
+  max-width: 35vw;
   padding: 10px;
   @include flexColCenter;
 }

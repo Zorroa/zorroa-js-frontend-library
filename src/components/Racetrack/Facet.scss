@@ -1,6 +1,7 @@
 @import '../../styles/core-mixins.scss';
 
 .Facet {
+
   .WidgetHeader {
     color: $zorroa-nearwhite;
   }
@@ -199,7 +200,7 @@
   .Facet-chart-selector {
     @include flexRow;
     @include flexJustifyCenter;
-    margin-bottom: 8px;
+    margin-top: 4px;
 
     .Facet-icon {
       @include flexRowCenter;

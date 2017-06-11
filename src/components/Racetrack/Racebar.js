@@ -33,13 +33,14 @@ class Racebar extends Component {
 
   componentWillReceiveProps (nextProps) {
     const { widgets } = nextProps
+    const isOpenPinned = widgets.findIndex(widget => widget.id === this.state.openId && widget.isPinned) >= 0
+    if (isOpenPinned) {
+      this.setState({openId: -1})
+    }
     if (widgets && widgets.length !== this.lastWidgetCount) {
       this.lastWidgetCount = widgets.length
-      if (widgets.length) {
-        this.setState({openId: widgets[widgets.length - 1].id})
-      } else {
-        this.setState({openId: -1})
-      }
+      const openId = widgets.length ? widgets[widgets.length - 1].id : -1
+      this.setState({openId})
     }
   }
 
@@ -91,7 +92,6 @@ class Racebar extends Component {
 
   render () {
     const { widgets, hoverFields } = this.props
-    console.log('Render Racebar ' + widgets.length)
     return (
       <div className="Racebar">
         <Searcher/>

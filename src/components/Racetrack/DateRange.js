@@ -58,17 +58,22 @@ class DateRange extends Component {
         const keys = Object.keys(range)
         assert.ok(keys.length === 1) // there should only be one entry here
         const field = keys[0]
-        const minStr = range[field].gte || moment().subtract(1, 'days').format(format)
-        const maxStr = range[field].lte || moment().format(format)
-        const min = moment(minStr, format).toDate()
-        const max = moment(maxStr, format).toDate()
-        if (minStr !== this.state.minStr && maxStr !== this.state.maxStr) {
-          this.setStatePromise({ min, max, minStr, maxStr })
-            .then(() => requestAnimationFrame(this.modifySliver))
-        }
         if (field !== this.state.field) {
           this.setStatePromise({ field })
             .then(() => requestAnimationFrame(this.modifySliver))
+        }
+        if (nextProps.aggs) {
+          const agg = nextProps.aggs[id]
+          if (agg && agg[field]) {
+            const minStr = agg[field].gte || moment().subtract(1, 'days').format(format)
+            const maxStr = agg[field].lte || moment().format(format)
+            const min = moment(minStr, format).toDate()
+            const max = moment(maxStr, format).toDate()
+            if (minStr !== this.state.minStr || maxStr !== this.state.maxStr) {
+              this.setStatePromise({min, max, minStr, maxStr})
+                .then(() => requestAnimationFrame(this.modifySliver))
+            }
+          }
         }
       }
     }
@@ -89,12 +94,25 @@ class DateRange extends Component {
 
   setMin = (optDate, dateStr) => {
     if (!optDate) return
-    this.setState({ min: optDate, minStr: dateStr })
+    this.setStatePromise({ min: optDate, minStr: dateStr })
+      .then(_ => this.modifySliver())
   }
 
   setMax = (optDate, dateStr) => {
     if (!optDate) return
-    this.setState({ max: optDate, maxStr: dateStr })
+    this.setStatePromise({ max: optDate, maxStr: dateStr })
+      .then(_ => this.modifySliver())
+  }
+
+  setInterval = (interval) => {
+    const minStr = moment().startOf(interval).format(format)
+    const maxStr = moment().format(format)
+    const min = moment(minStr, format).toDate()
+    const max = moment(maxStr, format).toDate()
+    if (minStr !== this.state.minStr || maxStr !== this.state.maxStr) {
+      this.setStatePromise({ min, max, minStr, maxStr })
+        .then(_ => this.modifySliver())
+    }
   }
 
   modifySliver = () => {
@@ -115,8 +133,12 @@ class DateRange extends Component {
 
   render () {
     const { isIconified, id, floatBody, isOpen, onOpen } = this.props
-    const { field } = this.state
-    const title = Asset.lastNamespace(unCamelCase(field))
+    const { field, minStr, maxStr } = this.state
+    const lastName = Asset.lastNamespace(unCamelCase(field))
+    const active = minStr && maxStr
+    const title = active ? lastName : DateRangeWidgetInfo.title
+    const label = active ? `${minStr} → ${maxStr}` : lastName
+    const intervals = ['day', 'week', 'month', 'year']
 
     return (
       <Widget className='DateRange'
@@ -124,8 +146,8 @@ class DateRange extends Component {
               isOpen={isOpen}
               onOpen={onOpen}
               floatBody={floatBody}
-              title={DateRangeWidgetInfo.title}
-              field={title}
+              title={title}
+              field={label}
               backgroundColor={DateRangeWidgetInfo.color}
               isIconified={isIconified}
               icon={DateRangeWidgetInfo.icon}>
@@ -150,6 +172,10 @@ class DateRange extends Component {
             />
             <div className="DateRange-go" onClick={this.modifySliver}>GO</div>
           </div>
+        </div>
+        <div className="DateRange-settings">
+          <div className="DateRange-label">Last:</div>
+          {intervals.map(interval => <div className="DateRange-setting" key={interval} onClick={_ => this.setInterval(interval)}>{interval}</div>)}
         </div>
       </Widget>
     )

@@ -2,10 +2,13 @@
 
 .Widget {
   position: relative;
+  margin-left: 4px;
+  margin-right: 4px;
 }
 
 .Widget-body {
   filter: grayscale(100%) opacity(50%);
+  min-width: 100%;
 
   &.floatBody {
     z-index: 10000;

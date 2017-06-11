@@ -84,13 +84,19 @@ class Range extends Component {
         if (nextProps.aggs) {
           const agg = nextProps.aggs[id]
           if (agg && agg[field]) {
-            let autoMin = Math.min(agg[field].min, this.state.min)
-            let autoMax = Math.max(agg[field].max, this.state.max)
+            let autoMin = agg[field].min
+            let autoMax = agg[field].max
+            if (this.state.min !== undefined) autoMin = Math.min(autoMin, this.state.min)
+            if (this.state.max !== undefined) autoMax = Math.max(autoMax, this.state.max)
 
             if (isNumeric(autoMin) && isNumeric(autoMax)) {
               if (autoMin === autoMax) {
                 autoMin -= 0.001
                 autoMax += 0.001
+              }
+              if (min === undefined || max === undefined || min === null || max === null) {
+                min = autoMin
+                max = autoMax
               }
               this.setState({ autoMin, autoMax })
               if (this.state.syncRangeWithAutoRange) {
@@ -252,10 +258,7 @@ class Range extends Component {
 
   render () {
     const { isIconified, id, floatBody, isOpen, onOpen } = this.props
-    const { field } = this.state
-    const title = Asset.lastNamespace(unCamelCase(field))
-
-    const { min, max, minStr, maxStr, autoMin, autoMax, prevAutoMin, prevAutoMax } = this.state
+    const { field, min, max, minStr, maxStr, autoMin, autoMax, prevAutoMin, prevAutoMax } = this.state
 
     let renderSlider = isNumeric(min) && isNumeric(max) &&
       isNumeric(autoMin) && isNumeric(autoMax) &&
@@ -271,14 +274,18 @@ class Range extends Component {
       requestAnimationFrame(() => { this.setState({ prevAutoMin: autoMin, prevAutoMax: autoMax }) })
     }
 
+    const active = min !== undefined && min !== null && max !== undefined && max !== null
+    const lastName = Asset.lastNamespace(unCamelCase(field))
+    const title = active ? lastName : RangeWidgetInfo.title
+    const label = active ? `${this.valToString(min)} → ${this.valToString(max)}` : lastName
     return (
       <Widget className='Range'
               id={id}
               isOpen={isOpen}
               onOpen={onOpen}
               floatBody={floatBody}
-              title={RangeWidgetInfo.title}
-              field={title}
+              title={title}
+              field={label}
               backgroundColor={RangeWidgetInfo.color}
               isIconified={isIconified}
               icon={RangeWidgetInfo.icon}>

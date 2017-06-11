@@ -109,6 +109,7 @@
 .WidgetHeader-header-title {
   @include flexOff;
   font-weight: 100;
+  margin-left: 4px;
   margin-right: 4px;
   cursor: pointer;
   max-width: 100%;
