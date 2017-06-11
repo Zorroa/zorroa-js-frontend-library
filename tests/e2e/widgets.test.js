@@ -51,36 +51,30 @@ describe('search widget', function () {
   // Tests below ASSUME we are logged in!
   // ------------------------------------
 
-  it('open the racetrack', function () {
+  it('pin a widget to racetrack', function () {
     return driver
-    .then(_ => { DEBUG && console.log('------ open the racetrack') })
+      .then(_ => { DEBUG && console.log('------ pin a widget to racetrack') })
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Racetrack'), 5000))
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Racebar-widget .Widget')))
 
-    .then(_ => selenium.clickSelector(By.css('.Sidebar-open-close-button.isRightEdge')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack-empty'), 5000))
+      .then(_ => { DEBUG && console.log('create a color widget') })
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racebar-add-widget')))
+      .then(_ => selenium.clickSelector(By.css('.Racebar-add-widget')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.widget-COLOR')))
+      .then(_ => selenium.clickSelector(By.css('.widget-COLOR')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Racetrack'), 5000))
+      .then(_ => { DEBUG && console.log('pin the color widget to open the racetrack') })
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.WidgetHeader-pin'), 5000))
+      .then(_ => selenium.clickSelector(By.css('.WidgetHeader-pin')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack'), 5000))
+      .then(_ => { DEBUG && console.log('unpin the color widget to hide the racetrack') })
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.WidgetHeader-pin'), 5000))
+      .then(_ => selenium.clickSelector(By.css('.WidgetHeader-pin')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Racetrack'), 5000))
+      .then(_ => selenium.clickSelector(By.css('.WidgetHeader-close')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Widget'), 5000))
+      .then(selenium.waitForIdle)
   })
-
-  it('check search widget', function () {
-    return driver
-    .then(_ => { DEBUG && console.log('------ check search widget') })
-
-    .then(_ => selenium.clickSelector(By.css('.Racetrack-add-widget')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.modal .AddWidget'), 5000))
-    .then(_ => selenium.clickSelector(By.css('.widget-SIMPLE_SEARCH')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.modal .DisplayOptions'), 5000))
-    .then(_ => selenium.expectSelectorHasClassToBe(true, By.css('.DisplayOptions-update'), 'disabled'))
-    .then(_ => selenium.clickSelector(By.css('.DisplayOptions-namespace-Disney')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.DisplayOptions-namespace-Disney-animators'), 5000))
-    .then(_ => selenium.clickSelector(By.css('.DisplayOptions-namespace-Disney-animators input')))
-    .then(_ => selenium.waitForSelectorHasClassToBe(false, By.css('.DisplayOptions-update'), 'disabled', 5000))
-    .then(_ => selenium.waitForSelectorEnabledToBe(true, By.css('.DisplayOptions-update')))
-    .then(_ => selenium.clickSelector(By.css('.DisplayOptions-update')))
-    .then(selenium.waitForIdle)
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack-filters .SimpleSearch'), 5000))
-
-    .then(_ => selenium.clickSelector(By.css('.WidgetHeader-close')))
-    .then(selenium.waitForIdle)
-  })
-
 
   it('check facet widget', function () {
     let text1, text2
@@ -88,9 +82,10 @@ describe('search widget', function () {
     return driver
     .then(_ => { DEBUG && console.log('------ check facet widget') })
 
-    .then(_ => selenium.clickSelector(By.css('.QuickAddWidget-input')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.QuickAddWidget-item-FACET'), 5000))
-    .then(_ => selenium.clickSelector(By.css('.QuickAddWidget-item-FACET')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racebar-add-widget')))
+    .then(_ => selenium.clickSelector(By.css('.Racebar-add-widget')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.widget-FACET')))
+    .then(_ => selenium.clickSelector(By.css('.widget-FACET')))
 
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.modal .DisplayOptions'), 5000))
     .then(_ => selenium.expectSelectorHasClassToBe(true, By.css('.DisplayOptions-update'), 'disabled'))
@@ -101,7 +96,7 @@ describe('search widget', function () {
     .then(_ => selenium.waitForSelectorEnabledToBe(true, By.css('.DisplayOptions-update')))
     .then(_ => selenium.clickSelector(By.css('.DisplayOptions-update')))
     .then(selenium.waitForIdle)
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack-filters .Facet'), 5000))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Facet'), 5000))
 
     .then(_ => { DEBUG && console.log('Expect Good and Bad') })
     // click on the first row
@@ -127,6 +122,7 @@ describe('search widget', function () {
 
     .then(_ => selenium.clickSelector(By.css('.WidgetHeader-close')))
     .then(selenium.waitForIdle)
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Widget'), 5000))
   })
 
   // NB no map widget -- no geo data on dev
@@ -135,12 +131,13 @@ describe('search widget', function () {
     return driver
     .then(_ => { DEBUG && console.log('------ check color widget') })
 
-    .then(_ => selenium.clickSelector(By.css('.QuickAddWidget-input')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.QuickAddWidget-item-COLOR'), 5000))
-    .then(_ => selenium.clickSelector(By.css('.QuickAddWidget-item-COLOR')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racebar-add-widget')))
+    .then(_ => selenium.clickSelector(By.css('.Racebar-add-widget')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.widget-COLOR')))
+    .then(_ => selenium.clickSelector(By.css('.widget-COLOR')))
 
     .then(selenium.waitForIdle)
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack-filters .Color'), 5000))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Color'), 5000))
 
     .then(_ => selenium.expectSelectorHasClassToBe(true, By.css('.Color'), 'isEnabled'))
     .then(_ => selenium.clickSelector(By.css('.Color .WidgetHeader-enable')))
@@ -149,15 +146,17 @@ describe('search widget', function () {
 
     .then(_ => selenium.clickSelector(By.css('.WidgetHeader-close')))
     .then(selenium.waitForIdle)
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Widget'), 5000))
   })
 
   it('check exists widget', function () {
     return driver
     .then(_ => { DEBUG && console.log('------ check exists widget') })
 
-    .then(_ => selenium.clickSelector(By.css('.QuickAddWidget-input')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.QuickAddWidget-item-EXISTS'), 5000))
-    .then(_ => selenium.clickSelector(By.css('.QuickAddWidget-item-EXISTS')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racebar-add-widget')))
+    .then(_ => selenium.clickSelector(By.css('.Racebar-add-widget')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.widget-EXISTS')))
+    .then(_ => selenium.clickSelector(By.css('.widget-EXISTS')))
 
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.modal .DisplayOptions'), 5000))
     .then(_ => selenium.expectSelectorHasClassToBe(true, By.css('.DisplayOptions-update'), 'disabled'))
@@ -168,7 +167,7 @@ describe('search widget', function () {
     .then(_ => selenium.waitForSelectorEnabledToBe(true, By.css('.DisplayOptions-update')))
     .then(_ => selenium.clickSelector(By.css('.DisplayOptions-update')))
     .then(selenium.waitForIdle)
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack-filters .Exists'), 5000))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Exists'), 5000))
 
     .then(_ => selenium.clickSelector(By.css('.Exists .Toggle')))
     .then(selenium.waitForIdle)
@@ -182,15 +181,17 @@ describe('search widget', function () {
 
     .then(_ => selenium.clickSelector(By.css('.WidgetHeader-close')))
     .then(selenium.waitForIdle)
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Widget'), 5000))
   })
 
   it('check range widget', function () {
     return driver
     .then(_ => { DEBUG && console.log('------ check range widget') })
 
-    .then(_ => selenium.clickSelector(By.css('.QuickAddWidget-input')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.QuickAddWidget-item-RANGE'), 5000))
-    .then(_ => selenium.clickSelector(By.css('.QuickAddWidget-item-RANGE')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racebar-add-widget')))
+    .then(_ => selenium.clickSelector(By.css('.Racebar-add-widget')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.widget-RANGE')))
+    .then(_ => selenium.clickSelector(By.css('.widget-RANGE')))
 
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.modal .DisplayOptions'), 5000))
     .then(_ => selenium.expectSelectorHasClassToBe(true, By.css('.DisplayOptions-update'), 'disabled'))
@@ -201,7 +202,7 @@ describe('search widget', function () {
     .then(_ => selenium.waitForSelectorEnabledToBe(true, By.css('.DisplayOptions-update')))
     .then(_ => selenium.clickSelector(By.css('.DisplayOptions-update')))
     .then(selenium.waitForIdle)
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack-filters .Range'), 5000))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Range'), 5000))
 
     .then(_ => selenium.expectSelectorHasClassToBe(true, By.css('.Range'), 'isEnabled'))
     .then(_ => selenium.clickSelector(By.css('.Range .WidgetHeader-enable')))
@@ -210,6 +211,7 @@ describe('search widget', function () {
 
     .then(_ => selenium.clickSelector(By.css('.WidgetHeader-close')))
     .then(selenium.waitForIdle)
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Widget'), 5000))
   })
 
   it('check filetype widget', function () {
@@ -218,12 +220,13 @@ describe('search widget', function () {
     return driver
     .then(_ => { DEBUG && console.log('------ check filetype widget') })
 
-    .then(_ => selenium.clickSelector(By.css('.QuickAddWidget-input')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.QuickAddWidget-item-FILETYPE'), 5000))
-    .then(_ => selenium.clickSelector(By.css('.QuickAddWidget-item-FILETYPE')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racebar-add-widget')))
+    .then(_ => selenium.clickSelector(By.css('.Racebar-add-widget')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.widget-FILETYPE')))
+    .then(_ => selenium.clickSelector(By.css('.widget-FILETYPE')))
 
     .then(selenium.waitForIdle)
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack-filters .Filetype'), 5000))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Filetype'), 5000))
 
     .then(_ => driver.findElement(By.css('.Filetype-group-Image .Filetype-group-count'))
       .getText().then(text => countImage = Number(text)))
@@ -264,21 +267,28 @@ describe('search widget', function () {
 
     .then(_ => selenium.clickSelector(By.css('.WidgetHeader-close')))
     .then(selenium.waitForIdle)
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Widget'), 5000))
   })
 
   it('check daterange widget', function () {
     return driver
     .then(_ => { DEBUG && console.log('------ check daterange widget') })
 
-    .then(_ => selenium.clickSelector(By.css('.QuickAddWidget-input')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.QuickAddWidget-item-DATERANGE'), 5000))
-    .then(_ => selenium.clickSelector(By.css('.QuickAddWidget-item-DATERANGE')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racebar-add-widget')))
+    .then(_ => selenium.clickSelector(By.css('.Racebar-add-widget')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.widget-DATERANGE')))
+    .then(_ => selenium.clickSelector(By.css('.widget-DATERANGE')))
 
     .then(selenium.waitForIdle)
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack-filters .DateRange'), 5000))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.DateRange'), 5000))
 
     .then(_ => driver.sleep(1))
     .then(selenium.waitForIdle)
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.assets-layout-empty')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.assets-footer')))
+    .then(_ => { DEBUG && console.log('Select a date range to force search') })
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.DateRange-setting')))
+    .then(_ => selenium.clickSelector(By.css('.DateRange-setting')))
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.assets-layout-empty')))
     .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.assets-footer')))
 
@@ -301,15 +311,18 @@ describe('search widget', function () {
 
     .then(_ => selenium.clickSelector(By.css('.WidgetHeader-close')))
     .then(selenium.waitForIdle)
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Widget'), 5000))
   })
 
   it('check similar widget', function () {
+    let thumb
     return driver
       .then(_ => { DEBUG && console.log('------ check similar widget') })
 
-      .then(_ => selenium.clickSelector(By.css('.QuickAddWidget-input')))
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.QuickAddWidget-item-SIMILARHASH'), 5000))
-      .then(_ => selenium.clickSelector(By.css('.QuickAddWidget-item-SIMILARHASH')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racebar-add-widget')))
+      .then(_ => selenium.clickSelector(By.css('.Racebar-add-widget')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.widget-SIMILARHASH')))
+      .then(_ => selenium.clickSelector(By.css('.widget-SIMILARHASH')))
 
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.modal .DisplayOptions'), 5000))
       .then(_ => selenium.expectSelectorHasClassToBe(true, By.css('.DisplayOptions-update'), 'disabled'))
@@ -322,14 +335,18 @@ describe('search widget', function () {
       .then(_ => selenium.waitForSelectorEnabledToBe(true, By.css('.DisplayOptions-update')))
       .then(_ => selenium.clickSelector(By.css('.DisplayOptions-update')))
       .then(selenium.waitForIdle)
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack-filters .SimilarHash'), 5000))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.SimilarHash'), 5000))
 
-      .then(_ => { DEBUG && console.log('Select an asset to enable') })
+      .then(_ => { DEBUG && console.log('Find an asset lower down, below the facet window overlay') })
+
+      .then(_ => driver.findElement(By.css('.Assets-layout')))
+        .then(e => e.findElements(By.css('.Thumb')))
+        .then(es => { expect(es.length).toBeGreaterThan(7); thumb = es[2] })
 
       // click on the first row
+      .then(_ => { DEBUG && console.log('Select the asset') })
       .then(_ => selenium.waitForSelectorHasClassToBe(true, By.css('.SimilarHash-snap-selected'), 'disabled', 5000))
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Thumb')))
-      .then(_ => selenium.clickSelector(By.css('.Thumb')))
+      .then(_ => thumb.click())
       .then(_ => selenium.waitForIdle())
       .then(_ => selenium.waitForSelectorHasClassToBe(false, By.css('.SimilarHash-snap-selected'), 'disabled', 5000))
       .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.SimilarHash-thumb'), 5000))
@@ -338,6 +355,7 @@ describe('search widget', function () {
 
       .then(_ => selenium.clickSelector(By.css('.WidgetHeader-close')))
       .then(selenium.waitForIdle)
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Widget'), 5000))
   })
 
 })

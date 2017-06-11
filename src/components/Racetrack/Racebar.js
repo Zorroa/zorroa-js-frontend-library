@@ -15,12 +15,14 @@ import CreateFolder from '../Folders/CreateFolder'
 import { showModal } from '../../actions/appActions'
 import { createFolder } from '../../actions/folderAction'
 import { resetRacetrackWidgets } from '../../actions/racetrackAction'
+import homeIcon from './home-icon.svg'
 
 class Racebar extends Component {
   static propTypes = {
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
     query: PropTypes.instanceOf(AssetSearch),
     hoverFields: PropTypes.instanceOf(Set),
+    isolatedId: PropTypes.string,
     user: PropTypes.instanceOf(User).isRequired,
     actions: PropTypes.object.isRequired
   }
@@ -83,7 +85,7 @@ class Racebar extends Component {
     if (!widgetInfo.element) return
     const isPinned = false
     const isEnabled = widget.isEnabled
-    const isOpen = this.state.openId === widget.id
+    const isOpen = !this.props.isolatedId && this.state.openId === widget.id
     const onOpen = _ => this.toggleOpen(widget)
     const floatBody = true
     const maxWidth = 360
@@ -91,15 +93,16 @@ class Racebar extends Component {
   }
 
   render () {
-    const { widgets, hoverFields } = this.props
+    const { widgets, hoverFields, query } = this.props
     return (
       <div className="Racebar">
         <Searcher/>
-        <div className="Racebar-clear" onClick={this.clearRacetrack}>
+        <div className="Racebar-clear" onClick={this.clearRacetrack} title="Clear the search">
           Clear
-          <div className="icon-apartment"/>
+          <img className="Racebar-clear-icon" src={homeIcon}/>
         </div>
-        <div className="Racebar-save" onClick={this.saveRacetrack}>
+        <div className={classnames('Racebar-save', {disabled: !query || query.empty()})}
+             onClick={this.saveRacetrack} title="Save the search">
           Save
           <div className="icon-folder-add"/>
         </div>
@@ -112,7 +115,7 @@ class Racebar extends Component {
             { this.renderWidget(widget, false) }
           </div>
         ))}
-        <div onClick={this.showAddWidget} className="Racebar-add-widget icon-plus"/>
+        <div onClick={this.showAddWidget} className="Racebar-add-widget icon-plus" title="Add a search widget"/>
       </div>
     )
   }
@@ -121,6 +124,7 @@ class Racebar extends Component {
 export default connect(state => ({
   widgets: state.racetrack.widgets,
   hoverFields: state.app.hoverFields,
+  isolatedId: state.assets.isolatedId,
   query: state.assets.query,
   user: state.auth.user
 }), dispatch => ({

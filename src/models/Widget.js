@@ -134,7 +134,7 @@ export function createSimilarityWidget (hashName, fieldType, hashVal, minScore, 
       }
     })
   }
-  return new Widget({isEnabled, type, sliver, isEnabled, isPinned})
+  return new Widget({type, sliver, isEnabled, isPinned})
 }
 
 export function createFiletypeWidget (field, fieldType, exts, isEnabled, isPinned) {

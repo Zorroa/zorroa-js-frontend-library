@@ -5,12 +5,12 @@
   @include flexAlignItemsCenter;
   @include flexWrap;
   @include fullWidth;
-  margin: 4px;
+  margin-left: 4px;
+  margin-right: 4px;
 }
 
 .Racebar-widget {
-  margin-left: 4px;
-  margin-right: 4px;
+  margin: 2px 4px;
 }
 
 .Racebar-clear {
@@ -24,9 +24,10 @@
   text-transform: uppercase;
   background-color: $zorroa-lightgray;
   border: 1px solid transparent;
+  cursor: pointer;
 
   &:hover:not(.disabled) { background-color: $zorroa-nearwhite; border: 1px solid $zorroa-gray; }
-  &.disabled { color: $zorroa-lightgray; }
+  &.disabled { color: $zorroa-lightgray; cursor: default; }
 
   div { margin-left: 8px; }
 }
@@ -41,9 +42,10 @@
   color: white;
   background-color: $zorroa-water-blue;
   text-transform: uppercase;
+  cursor: pointer;
 
   &:hover:not(.disabled) { background-color: lighten($zorroa-water-blue, 15%); }
-  &.disabled { color: $zorroa-lightgray; }
+  &.disabled { cursor: default; background-color: $zorroa-lightgray; }
 
   div { margin-left: 8px; }
 }
@@ -64,4 +66,10 @@
   border-radius: 3px;
 
   &:hover { background-color: lighten($zorroa-water-blue, 15%)}
+}
+
+.Racebar-clear-icon {
+  width: 16px;
+  height: 16px;
+  margin-left: 8px;
 }
