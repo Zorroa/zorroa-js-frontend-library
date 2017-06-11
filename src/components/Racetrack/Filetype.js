@@ -222,7 +222,7 @@ class Filetype extends Component {
       <div className={classnames('Filetype-group', `Filetype-group-${group}`, {disabled: count <= 0})} key={group}>
         <Check state={this.selectionState(exts)}
                onClick={e => this.selectTypes(exts)}
-               color='#ef4487'/>
+               color={FiletypeWidgetInfo.color}/>
         <div className="Filetype-group-icon icon-files"/>
         <div className="Filetype-group-label">{group}</div>
         { count ? <div className="Filetype-group-count">{count}</div> : null }
@@ -249,7 +249,7 @@ class Filetype extends Component {
       <div className={classnames('Filetype-type', {disabled: count <= 0})} key={ext}>
         <Check state={this.selectionState([ext])}
                onClick={e => { this.toggleType(ext) }}
-               color='#ef4487' />
+               color={FiletypeWidgetInfo.color} />
         <div className="Filetype-type-ext">{ext}&nbsp;-&nbsp;</div>
         <div className="Filetype-type-label">{allExts[ext]}</div>
         { count ? <div className="Filetype-type-count">{count}</div> : null }

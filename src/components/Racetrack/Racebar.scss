@@ -15,7 +15,7 @@
   @include flexAlignItemsCenter;
 
   border-radius: 3px;
-  padding: 4px;
+  padding: 6px;
   margin: 4px;
   color: $zorroa-greyish-brown;
   text-transform: uppercase;
@@ -33,7 +33,7 @@
   @include flexAlignItemsCenter;
 
   border-radius: 3px;
-  padding: 5px;
+  padding: 7px;
   margin: 4px;
   color: white;
   background-color: $zorroa-water-blue;
@@ -46,6 +46,7 @@
 }
 
 .Racebar-searchbar {
+  height: 30px;
   margin-left: 8px;
   margin-right: 8px;
   width: 320px;

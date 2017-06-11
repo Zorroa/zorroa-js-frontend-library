@@ -1,7 +1,6 @@
 @import '../../styles/core-mixins.scss';
 
 .Searchbar {
-
   // Remove box highlighting when focused
   .searchbar:focus {
     outline: none;
@@ -11,10 +10,12 @@
   border: 1px solid $zorroa-lightgray;
   position: relative;
   padding-left: 4px;
+  height: 100%;
 }
 
 .Searchbar-body {
   font-size: 20px;
+  height: 100%;
 }
 
 .Searchbar-error {

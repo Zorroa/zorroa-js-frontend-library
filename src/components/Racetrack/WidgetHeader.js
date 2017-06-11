@@ -15,10 +15,10 @@ const WidgetHeader = ({ isEnabled, isPinned, isOpen, isIconified, maxWidth, titl
               <div className="WidgetHeader-header-label">
                 <span className="WidgetHeader-header-title">{title}{field && field.length ? ':' : ''}</span>
                 { field && <span className="WidgetHeader-header-field">{field}</span> }
-                { collapseToggleFn && <div className={classnames('WidgetHeader-collapse', 'icon-chevron-down', {isOpen})}/> }
               </div>
             </div>
           ) }
+          { collapseToggleFn && <div className={classnames('WidgetHeader-collapse', 'icon-chevron-down', {isOpen})}/> }
           <div className='flexOn'/>
         </div>
         { !isIconified && pinnedToggleFn && (<div className="WidgetHeader-pin" onClick={pinnedToggleFn}><img className={classnames('WidgetHeader-pin-img', {isPinned})} src={pin}/></div>) }
