@@ -2,6 +2,7 @@ import 'react-widgets/lib/scss/react-widgets.scss'
 
 import Racetrack from './Racetrack'
 
+import './Racebar.scss'
 import './Racetrack.scss'
 import './Map.scss'
 import './Facet.scss'

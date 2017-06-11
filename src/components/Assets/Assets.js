@@ -8,6 +8,7 @@ import * as assert from 'assert'
 import Thumb, { page, monopageBadges, multipageBadges } from '../Thumb'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
+import Widget from '../../models/Widget'
 import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, similarAssets } from '../../actions/assetsAction'
 import { resetRacetrackWidgets, restoreSearch } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
@@ -17,6 +18,7 @@ import Pager from './Pager'
 import Footer from './Footer'
 import Table from '../Table'
 import Sidebar from '../Sidebar'
+import Racebar from '../Racetrack/Racebar'
 import Racetrack from '../Racetrack'
 import * as ComputeLayout from './ComputeLayout.js'
 import AssetSearch from '../../models/AssetSearch'
@@ -51,7 +53,7 @@ class Assets extends Component {
       values: PropTypes.arrayOf(PropTypes.string).isRequired,
       assetIds: PropTypes.arrayOf(PropTypes.string).isRequired
     }).isRequired,
-    sync: PropTypes.bool.isRequired,
+    widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     origin: PropTypes.string,
@@ -487,19 +489,6 @@ class Assets extends Component {
     actions.iconifyRightSidebar(!rightSidebarIsIconified)
   }
 
-  renderEditbar () {
-    const { sync } = this.props
-
-    const loader = require('./loader-rolling.svg')
-    const syncer = sync ? <div className="Assets-loading sync"/> : <img className="Assets-loading" src={loader}/>
-
-    return (
-      <div className="Assets-editbar">
-        { syncer }
-      </div>
-    )
-  }
-
   renderAssets () {
     const { assets, selectedIds, totalCount, layout, showMultipage, origin, thumbSize, query, thumbFieldTemplate } = this.props
     const { positions, multipage, tableIsResizing } = this.state
@@ -609,7 +598,7 @@ class Assets extends Component {
 
   render () {
     const { assets, query, totalCount, tableHeight, showTable, showMultipage,
-      layout, thumbSize, assetsCounter, rightSidebarIsIconified } = this.props
+      layout, thumbSize, assetsCounter, rightSidebarIsIconified, widgets } = this.props
     const { collapsed, tableIsResizing } = this.state
 
     // Trigger layout if assets change.
@@ -637,9 +626,11 @@ class Assets extends Component {
       this.skipNextSelectionScroll = false
     }
 
+    const pinnedWidget = widgets && widgets.findIndex(widget => widget.isPinned) >= 0
+
     return (
       <div className="Assets" ref="Assets">
-        {this.renderEditbar()}
+        <Racebar/>
         <div className="Assets-workspace">
           <div className="Assets-body">
             {this.renderAssets()}
@@ -668,12 +659,14 @@ class Assets extends Component {
               handleThumbSize={this.changeThumbSize.bind(this)}
             /> }
           </div>
-          <div className="Workspace-vertical-separator flexOff"/>
-          <Sidebar onToggle={this.toggleRightSidebar}
-                   isRightEdge={true}
-                   isIconified={rightSidebarIsIconified}>
-            <Racetrack isIconified={rightSidebarIsIconified}/>
-          </Sidebar>
+          { pinnedWidget && <div className="Workspace-vertical-separator flexOff"/> }
+          { pinnedWidget && (
+            <Sidebar onToggle={this.toggleRightSidebar}
+                     isRightEdge={true}
+                     isIconified={rightSidebarIsIconified}>
+              <Racetrack isIconified={rightSidebarIsIconified}/>
+            </Sidebar>
+          )}
         </div>
       </div>
     )
@@ -691,7 +684,6 @@ export default connect(state => ({
   rightSidebarIsIconified: state.app.rightSidebarIsIconified,
   folders: state.folders.all,
   trashedFolders: state.folders.trashedFolders,
-  sync: state.auth.sync,
   user: state.auth.user,
   userSettings: state.app.userSettings,
   thumbSize: state.app.thumbSize,
@@ -701,6 +693,7 @@ export default connect(state => ({
   showMultipage: state.app.showMultipage,
   thumbFieldTemplate: state.app.thumbFieldTemplate,
   similar: state.racetrack.similar,
+  widgets: state.racetrack.widgets,
   origin: state.auth.origin
 }), dispatch => ({
   actions: bindActionCreators({

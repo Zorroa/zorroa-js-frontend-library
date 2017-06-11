@@ -116,3 +116,19 @@
   font-weight: 400;
   cursor: pointer;
 }
+
+.WidgetHeader-pin {
+  @include zorroa-square-btn-darken(40px);
+}
+
+.WidgetHeader-pin-img {
+  width: 20px;
+  height: 20px;
+
+  &.isPinned { transform: rotate(-45deg); }
+}
+
+.WidgetHeader-collapse {
+  margin-left: 4px;
+  &.isOpen { transform: rotate(180deg); }
+}

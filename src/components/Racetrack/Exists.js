@@ -28,7 +28,7 @@ class Exists extends Component {
 
   // If the query is changed elsewhere, e.g. from the Searchbar,
   // capture the new props and update our local state to match.
-  syncWithAppState (nextProps, selectFieldIfEmpty) {
+  syncWithAppState (nextProps) {
     if (!this.state.isEnabled) return
     const { id, widgets } = nextProps
     const index = widgets && widgets.findIndex(widget => (id === widget.id))

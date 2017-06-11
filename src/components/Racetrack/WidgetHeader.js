@@ -1,9 +1,11 @@
 import React, { PropTypes } from 'react'
 import classnames from 'classnames'
 
-const WidgetHeader = ({ isEnabled, isIconified, title, field, icon, backgroundColor, enableToggleFn, collapseToggleFn, onClose }) => {
-  const iconClassNames = classnames('WidgetHeader-icon', icon, { isEnabled, isIconified })
+import pin from './pin.svg'
 
+const WidgetHeader = ({ isEnabled, isPinned, isOpen, isIconified, title, field, icon, backgroundColor, enableToggleFn, collapseToggleFn, pinnedToggleFn, onClose }) => {
+  const iconClassNames = classnames('WidgetHeader-icon', icon, { isEnabled, isIconified })
+  const pin = require('./pin.svg')
   return (
     <div style={{backgroundColor}} className={classnames('WidgetHeader', {isEnabled})}>
       <div className='WidgetHeader-hover'>
@@ -14,11 +16,13 @@ const WidgetHeader = ({ isEnabled, isIconified, title, field, icon, backgroundCo
               <div className="WidgetHeader-header-label">
                 <span className="WidgetHeader-header-title">{title}{field && field.length ? ':' : ''}</span>
                 { field && <span className="WidgetHeader-header-field">{field}</span> }
+                { collapseToggleFn && <div className={classnames('WidgetHeader-collapse', 'icon-chevron-down', {isOpen})}/> }
               </div>
             </div>
           ) }
           <div className='flexOn'/>
         </div>
+        { !isIconified && pinnedToggleFn && (<div className="WidgetHeader-pin" onClick={pinnedToggleFn}><img className={classnames('WidgetHeader-pin-img', {isPinned})} src={pin}/></div>) }
         { !isIconified && enableToggleFn && (<div className={classnames('WidgetHeader-enable', {'icon-eye2': isEnabled, 'icon-eye-crossed': !isEnabled, isEnabled})} onClick={enableToggleFn}/>) }
         { !isIconified && (<div className='WidgetHeader-close icon-cross2' onClick={onClose}/>) }
       </div>
@@ -27,14 +31,17 @@ const WidgetHeader = ({ isEnabled, isIconified, title, field, icon, backgroundCo
 }
 
 WidgetHeader.propTypes = {
+  isPinned: PropTypes.bool.isRequired,
   isEnabled: PropTypes.bool.isRequired,
+  isOpen: PropTypes.bool.isRequired,
   isIconified: PropTypes.bool.isRequired,
   title: PropTypes.string.isRequired,
   field: PropTypes.string,
   icon: PropTypes.string.isRequired,
   backgroundColor: PropTypes.string.isRequired,
   enableToggleFn: PropTypes.func,
-  collapseToggleFn: PropTypes.func.isRequired,
+  collapseToggleFn: PropTypes.func,
+  pinnedToggleFn: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired
 }
 

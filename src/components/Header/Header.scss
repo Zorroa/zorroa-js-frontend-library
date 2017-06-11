@@ -150,3 +150,20 @@
 .header-table-spacer {
   width: 40px;
 }
+
+.Header-loading {
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  cursor: pointer;
+  opacity: 1;
+
+  &.sync {
+    opacity: 0;
+  }
+  &:hover {
+    visibility: visible;
+    opacity: 1;
+    background-color: $zorroa-nearwhite;
+  }
+}

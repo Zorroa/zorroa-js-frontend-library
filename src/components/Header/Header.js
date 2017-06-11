@@ -21,6 +21,7 @@ import { selectAssetIds } from '../../actions/assetsAction'
 
 class Header extends Component {
   static propTypes = {
+    sync: PropTypes.bool.isRequired,
     user: PropTypes.instanceOf(User).isRequired,
     isDeveloper: PropTypes.bool,
     isAdministrator: PropTypes.bool,
@@ -63,12 +64,16 @@ class Header extends Component {
   }
 
   render () {
-    const { user, isDeveloper, isAdministrator, assets, totalCount, showTable, selectedIds } = this.props
+    const { sync, user, isDeveloper, isAdministrator, assets, totalCount, showTable, selectedIds } = this.props
     const baseURL = archivistBaseURL()
+
+    const loader = require('./loader-rolling.svg')
+    const syncer = sync ? <div className="Header-loading sync"/> : <img className="Header-loading" src={loader}/>
 
     return (
       <nav className="header flexOff flexCenter fullWidth">
         <Link to="/" className='header-logo'><Logo/></Link>
+        { syncer }
         <AssetCounter total={totalCount} collapsed={0} loaded={assets && assets.length || 0}/>
         <div className="header-table-spacer"/>
         <TableToggle enabled={showTable} onClick={this.toggleShowTable} />
@@ -115,6 +120,7 @@ class Header extends Component {
 }
 
 export default connect(state => ({
+  sync: state.auth.sync,
   user: state.auth.user,
   isDeveloper: state.auth.isDeveloper,
   isAdministrator: state.auth.isAdministrator,

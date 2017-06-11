@@ -1,26 +1,20 @@
 @import '../../styles/core-mixins.scss';
 
 .Searchbar {
+
   // Remove box highlighting when focused
   .searchbar:focus {
     outline: none;
   }
+
+  border-radius: 3px;
+  border: 1px solid $zorroa-lightgray;
+  position: relative;
+  padding-left: 4px;
 }
 
-  // Form layout
 .Searchbar-body {
   font-size: 20px;
-
-  // Magnifying glass
-  .search-button {
-    padding-left: 12px;
-    border: none;
-    background: none;
-    cursor: pointer;
-    color: $zorroa-sickly-green;
-    font-size: 20px; // TODO: see if we can delete this when bootstrap is gone
-    &:hover { color: $zorroa-gray; }
-  }
 }
 
 .Searchbar-error {

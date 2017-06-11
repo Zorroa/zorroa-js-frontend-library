@@ -8,12 +8,12 @@ import AssetFilter from '../models/AssetFilter'
 import { HSL2HSV } from '../services/color'
 
 export default class Widget {
-  constructor ({id, type, sliver, isEnabled, isOpen}) {
+  constructor ({id, type, sliver, isEnabled, isPinned}) {
     this.id = id || uniqueId()
     this.type = type
     this.sliver = sliver
     this.isEnabled = (isEnabled !== undefined) ? isEnabled : true
-    this.isOpen = isOpen
+    this.isPinned = (isPinned !== undefined) ? isPinned : false
   }
 
   rawField () {
@@ -59,42 +59,36 @@ export function widgetTypeForField (field, type) {
   }
 }
 
-export function createSearchWidget (field, fieldType, queryString, fuzzy) {
+export function createSearchWidget (field, fieldType, queryString, fuzzy, isEnabled, isPinned) {
   const type = SimpleSearchWidgetInfo.type
   const sliver = new AssetSearch({query: queryString, fuzzy})
   if (field.length) {
     sliver.queryFields = { [field]: 1 }
   }
-  const isEnabled = true
-  return new Widget({type, sliver, isEnabled})
+  return new Widget({type, sliver, isEnabled, isPinned})
 }
 
-export function createExistsWidget (field, fieldType, isMissing) {
+export function createExistsWidget (field, fieldType, isMissing, isEnabled, isPinned) {
   const type = ExistsWidgetInfo.type
   const sliver = new AssetSearch()
   if (field) {
     const key = (isMissing) ? 'missing' : 'exists'
     sliver.filter = new AssetFilter({ [key]: [ field ] })
   }
-  const isEnabled = true
-  return new Widget({ type, sliver, isEnabled })
+  return new Widget({ type, sliver, isEnabled, isPinned })
 }
 
-export function createFacetWidget (field, fieldType, terms, order) {
+export function createFacetWidget (field, fieldType, terms, order, isEnabled, isPinned) {
   const type = FacetWidgetInfo.type
-  const isOpen = true
-  const isEnabled = true
   const rawField = aggField(field, fieldType)
   const aggs = { facet: { terms: { field: rawField, order, size: 100 } } }
   const filter = terms && terms.length ? new AssetFilter({terms: {[rawField]: terms}}) : null
   const sliver = new AssetSearch({filter, aggs})
-  return new Widget({type, sliver, isEnabled, isOpen})
+  return new Widget({type, sliver, isEnabled, isPinned})
 }
 
-export function createMapWidget (field, fieldType, term) {
+export function createMapWidget (field, fieldType, term, isEnabled, isPinned) {
   const type = MapWidgetInfo.type
-  const isOpen = true
-  const isEnabled = true
   const aggs = { map: { geohash_grid: { field, precision: 7 } } }
   let sliver = new AssetSearch({aggs})
   if (term && term.length) {
@@ -103,21 +97,20 @@ export function createMapWidget (field, fieldType, term) {
     sliver.filter = new AssetFilter({terms, geo_bounding_box: bounds})
     // Add this.bounds and set agg precision
   }
-  return new Widget({type, sliver, isEnabled, isOpen})
+  return new Widget({type, sliver, isEnabled, isPinned})
 }
 
-export function createDateRangeWidget (field, fieldType, minStr, maxStr) {
+export function createDateRangeWidget (field, fieldType, minStr, maxStr, isEnabled, isPinned) {
   const type = DateRangeWidgetInfo.type
   let sliver = new AssetSearch({ })
   if (field) {
     const range = { [field]: { 'gte': minStr, 'lte': maxStr } }
     sliver.filter = new AssetFilter({ range })
   }
-  const isEnabled = true
-  return new Widget({ type, sliver, isEnabled })
+  return new Widget({ type, sliver, isEnabled, isPinned })
 }
 
-export function createRangeWidget (field, fieldType, min, max) {
+export function createRangeWidget (field, fieldType, min, max, isEnabled, isPinned) {
   const type = RangeWidgetInfo.type
   // let's auto-range this puppy
   const aggs = { [field]: { stats: { field } } }
@@ -127,11 +120,10 @@ export function createRangeWidget (field, fieldType, min, max) {
     const range = { [field]: { 'gte': min, 'lte': max } }
     sliver.filter = new AssetFilter({ range })
   }
-  const isEnabled = true
-  return new Widget({ type, sliver, isEnabled })
+  return new Widget({ type, sliver, isEnabled, isPinned })
 }
 
-export function createSimilarityWidget (hashName, fieldType, hashVal, minScore, hashTypes) {
+export function createSimilarityWidget (hashName, fieldType, hashVal, minScore, hashTypes, isEnabled, isPinned) {
   const type = SimilarHashWidgetInfo.type
   let sliver = new AssetSearch(/*{aggs}*/) // NB aggs break the search!
   if (hashTypes && hashTypes[hashName]) hashName = `Similarity.${hashName}.${hashTypes[hashName]}`
@@ -144,11 +136,10 @@ export function createSimilarityWidget (hashName, fieldType, hashVal, minScore, 
       }
     })
   }
-  const isEnabled = true
-  return new Widget({isEnabled, type, sliver})
+  return new Widget({isEnabled, type, sliver, isEnabled, isPinned})
 }
 
-export function createFiletypeWidget (field, fieldType, exts) {
+export function createFiletypeWidget (field, fieldType, exts, isEnabled, isPinned) {
   if (!field || !field.length) field = 'source.extension'
   const type = FiletypeWidgetInfo.type
   const order = { '_term': 'asc' }
@@ -157,11 +148,10 @@ export function createFiletypeWidget (field, fieldType, exts) {
   if (exts && exts.length) {
     sliver.filter = new AssetFilter({terms: {[field]: exts}})
   }
-  const isEnabled = true
-  return new Widget({type, sliver, isEnabled})
+  return new Widget({type, sliver, isEnabled, isPinned})
 }
 
-export function createColorWidget (field, fieldType, colors, isServerHSL) {
+export function createColorWidget (field, fieldType, colors, isServerHSL, isEnabled, isPinned) {
   const type = ColorWidgetInfo.type
   const sliver = new AssetSearch()
   const RATIO_MAX_FACTOR = 1.5  // maxRatio in query is this factor times user ratio
@@ -189,8 +179,7 @@ export function createColorWidget (field, fieldType, colors, isServerHSL) {
     })}})
   }
 
-  const isEnabled = true
-  return new Widget({type, sliver, isEnabled})
+  return new Widget({type, sliver, isEnabled, isPinned})
 }
 
 export function fieldUsedInWidget (field, widget) {
