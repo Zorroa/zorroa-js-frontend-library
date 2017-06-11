@@ -6,7 +6,7 @@ import classnames from 'classnames'
 
 import { createColorWidget } from '../../models/Widget'
 import { ColorWidgetInfo } from './WidgetInfo'
-import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
+import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import Widget from './Widget'
 import Resizer from '../../services/Resizer'
 import { hexToRgb, rgbToHex, RGB2HSL, HSL2RGB } from '../../services/color'
@@ -21,12 +21,14 @@ class Color extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
     id: PropTypes.number.isRequired,
+    isOpen: PropTypes.bool.isRequired,
+    onOpen: PropTypes.func,
+    floatBody: PropTypes.bool.isRequired,
     isIconified: PropTypes.bool.isRequired,
     widgets: PropTypes.arrayOf(PropTypes.object)
   }
 
   state = {
-    isEnabled: true,
     colors: [],
     isServerHSL: true // see toggleServerHSL
   }
@@ -37,7 +39,6 @@ class Color extends Component {
 
   // sync local state with existing app state
   syncLocalColorWithAppState (nextProps) {
-    if (!this.state.isEnabled) return
     const { id, widgets } = nextProps
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
@@ -75,9 +76,16 @@ class Color extends Component {
   }
 
   modifySliver (colors) {
-    const widget = createColorWidget('colors', 'nested', colors, this.state.isServerHSL)
+    const { id, widgets } = this.props
+    const index = widgets && widgets.findIndex(widget => (id === widget.id))
+    const oldWidget = widgets && widgets[index]
+    let isEnabled, isPinned
+    if (oldWidget) {
+      isEnabled = oldWidget.isEnabled
+      isPinned = oldWidget.isPinned
+    }
+    const widget = createColorWidget('colors', 'nested', colors, this.state.isServerHSL, isEnabled, isPinned)
     widget.id = this.props.id
-    widget.isEnabled = this.state.isEnabled
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
@@ -206,15 +214,6 @@ class Color extends Component {
     return swatchRows
   }
 
-  removeFilter = () => {
-    this.props.actions.removeRacetrackWidgetIds([this.props.id])
-  }
-
-  toggleEnabled = () => {
-    this.setStatePromise({isEnabled: !this.state.isEnabled})
-    .then(() => this.modifySliver(this.state.colors))
-  }
-
   resizer = null
   resizeIndex = -1
   resize1start = 0.5
@@ -263,8 +262,8 @@ class Color extends Component {
   }
 
   render () {
-    const { isIconified } = this.props
-    const { colors, isEnabled } = this.state
+    const { id, floatBody, isIconified, isOpen, onOpen } = this.props
+    const { colors } = this.state
 
     let hsl = [0, 0, 100]
     if (colors.length) {
@@ -278,13 +277,14 @@ class Color extends Component {
 
     return (
       <Widget className="Color"
+              id={id}
+              floatBody={floatBody}
+              isOpen={isOpen}
+              onOpen={onOpen}
               title={ColorWidgetInfo.title}
               backgroundColor={ColorWidgetInfo.color}
-              isEnabled={isEnabled}
               isIconified={isIconified}
-              icon={ColorWidgetInfo.icon}
-              onClose={this.removeFilter.bind(this)}
-              enableToggleFn={this.toggleEnabled}>
+              icon={ColorWidgetInfo.icon}>
         <div className="Color-body">
           <div className="Color-picker">
             <div className="Color-swatches">
@@ -361,6 +361,6 @@ export default connect(
   state => ({
     widgets: state.racetrack && state.racetrack.widgets
   }), dispatch => ({
-    actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds }, dispatch)
+    actions: bindActionCreators({ modifyRacetrackWidget }, dispatch)
   })
 )(Color)

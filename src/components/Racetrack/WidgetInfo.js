@@ -1,5 +1,4 @@
 import React from 'react'
-import SimpleSearch from './SimpleSearch'
 import Facet from './Facet'
 import Map from './Map'
 import Color from './Color'
@@ -20,7 +19,6 @@ export const SimpleSearchWidgetInfo = {
   icon: 'icon-search',
   title: 'Search',
   description: 'Fuzzy text search on keywords or specific fields',
-  element: <SimpleSearch/>,
   create: createSearchWidget,
   fieldTypes: [ 'string' ],
   color: '#77804d'

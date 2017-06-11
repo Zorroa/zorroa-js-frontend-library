@@ -8,7 +8,7 @@ import { createDateRangeWidget } from '../../models/Widget'
 import Asset from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
 import { DateRangeWidgetInfo } from './WidgetInfo'
-import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
+import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import Widget from './Widget'
 import { unCamelCase } from '../../services/jsUtil'
 import Resizer from '../../services/Resizer'
@@ -26,13 +26,15 @@ class DateRange extends Component {
     actions: PropTypes.object.isRequired,
     id: PropTypes.number.isRequired,
     isIconified: PropTypes.bool.isRequired,
+    isOpen: PropTypes.bool.isRequired,
+    onOpen: PropTypes.func,
+    floatBody: PropTypes.bool.isRequired,
     widgets: PropTypes.arrayOf(PropTypes.object)
   }
 
   resizer = null
 
   state = {
-    isEnabled: true,
     field: '',
     min: null, // min threshold (greater than)
     max: null, // max threshold (less than)
@@ -47,7 +49,6 @@ class DateRange extends Component {
   // If the query is changed elsewhere, e.g. from the Searchbar,
   // capture the new props and update our local state to match.
   syncWithAppState (nextProps) {
-    if (!this.state.isEnabled) return
     const { id, widgets } = nextProps
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
@@ -70,8 +71,6 @@ class DateRange extends Component {
             .then(() => requestAnimationFrame(this.modifySliver))
         }
       }
-    } else {
-      this.removeFilter()
     }
   }
 
@@ -88,11 +87,6 @@ class DateRange extends Component {
     this.resizer.release()
   }
 
-  // Remove our sliver if the close button in our header is clicked
-  removeFilter = () => {
-    this.props.actions.removeRacetrackWidgetIds([this.props.id])
-  }
-
   setMin = (optDate, dateStr) => {
     if (!optDate) return
     this.setState({ min: optDate, minStr: dateStr })
@@ -103,35 +97,38 @@ class DateRange extends Component {
     this.setState({ max: optDate, maxStr: dateStr })
   }
 
-  toggleEnabled = () => {
-    new Promise(resolve => this.setState({isEnabled: !this.state.isEnabled}, resolve))
-    .then(this.modifySliver)
-  }
-
   modifySliver = () => {
-    const { field, min, max, minStr, maxStr, isEnabled } = this.state
+    const { id, widgets } = this.props
+    const index = widgets && widgets.findIndex(widget => (id === widget.id))
+    const oldWidget = widgets && widgets[index]
+    let isEnabled, isPinned
+    if (oldWidget) {
+      isEnabled = oldWidget.isEnabled
+      isPinned = oldWidget.isPinned
+    }
+    const { field, min, max, minStr, maxStr } = this.state
     if (!field || !min || !max || !minStr || !maxStr) return
-    const widget = createDateRangeWidget(field, 'date', minStr, maxStr)
+    const widget = createDateRangeWidget(field, 'date', minStr, maxStr, isEnabled, isPinned)
     widget.id = this.props.id
-    widget.isEnabled = isEnabled
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
   render () {
-    const { isIconified, id } = this.props
-    const { field, isEnabled } = this.state
+    const { isIconified, id, floatBody, isOpen, onOpen } = this.props
+    const { field } = this.state
     const title = Asset.lastNamespace(unCamelCase(field))
 
     return (
       <Widget className='DateRange'
+              id={id}
+              isOpen={isOpen}
+              onOpen={onOpen}
+              floatBody={floatBody}
               title={DateRangeWidgetInfo.title}
               field={title}
               backgroundColor={DateRangeWidgetInfo.color}
-              isEnabled={isEnabled}
-              enableToggleFn={this.toggleEnabled}
               isIconified={isIconified}
-              icon={DateRangeWidgetInfo.icon}
-              onClose={this.removeFilter.bind(this)}>
+              icon={DateRangeWidgetInfo.icon}>
         <div className="DateRange-body">
           <div className="DateRange-row flexRowCenter">
             <DateTimePicker
@@ -160,7 +157,7 @@ class DateRange extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds }, dispatch)
+  actions: bindActionCreators({ modifyRacetrackWidget }, dispatch)
 })
 
 const mapStateToProps = state => ({

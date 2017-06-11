@@ -10,7 +10,7 @@ import Widget from './Widget'
 import { createMapWidget } from '../../models/Widget'
 import Asset from '../../models/Asset'
 import { MapWidgetInfo } from './WidgetInfo'
-import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
+import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import { unCamelCase } from '../../services/jsUtil'
 
 const accessToken = 'pk.eyJ1IjoiZGFud2V4bGVyIiwiYSI6IldaWnNGM28ifQ.e18uSb539LjXseysIC7KSw'
@@ -22,6 +22,9 @@ class Map extends Component {
     actions: PropTypes.object.isRequired,
     id: PropTypes.number.isRequired,
     isIconified: PropTypes.bool.isRequired,
+    isOpen: PropTypes.bool.isRequired,
+    onOpen: PropTypes.func,
+    floatBody: PropTypes.bool.isRequired,
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     selectedAssetIds: PropTypes.instanceOf(Set),
     aggs: PropTypes.object,
@@ -29,7 +32,6 @@ class Map extends Component {
   }
 
   state = {
-    isEnabled: true,
     locationField: '',
     searchField: '',
     term: undefined
@@ -46,7 +48,6 @@ class Map extends Component {
   }
 
   componentWillReceiveProps (props) {
-    if (!this.state.isEnabled) return
     const { id, widgets } = props
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
@@ -60,20 +61,20 @@ class Map extends Component {
         locationField = widget.sliver.aggs.map.geohash_grid.field
       }
       this.setState({locationField, searchField})
-    } else {
-      this.removeFilter()
     }
   }
 
-  toggleEnabled = () => {
-    new Promise(resolve => this.setState({isEnabled: !this.state.isEnabled}, resolve))
-    .then(() => this.modifySliver(this.state.term))
-  }
-
   modifySliver (locationField, searchField, term) {
-    const widget = createMapWidget(locationField, 'point', term)
+    const { id, widgets } = this.props
+    const index = widgets && widgets.findIndex(widget => (id === widget.id))
+    const oldWidget = widgets && widgets[index]
+    let isEnabled, isPinned
+    if (oldWidget) {
+      isEnabled = oldWidget.isEnabled
+      isPinned = oldWidget.isPinned
+    }
+    const widget = createMapWidget(locationField, 'point', term, isEnabled, isPinned)
     widget.id = this.props.id
-    widget.isEnabled = this.state.isEnabled
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
@@ -100,18 +101,14 @@ class Map extends Component {
     this.modifySliver(locationField, searchField, null)
   }
 
-  removeFilter () {
-    this.props.actions.removeRacetrackWidgetIds([this.props.id])
-  }
-
   aggBuckets () {
     const { id, aggs } = this.props
     return aggs && (id in aggs) && aggs[id].map.buckets
   }
 
   render () {
-    const { isIconified, assets, selectedAssetIds } = this.props
-    const { locationField, searchField, term, isEnabled } = this.state
+    const { id, floatBody, isOpen, onOpen, isIconified, assets, selectedAssetIds } = this.props
+    const { locationField, searchField, term } = this.state
     const title = Asset.lastNamespace(unCamelCase(searchField || locationField || '<Select Fields>'))
     const locationAssets = assets && assets.filter(asset => (asset.value(locationField)))
     const selectedAssets = assets && selectedAssetIds && locationAssets.filter(asset => (selectedAssetIds.has(asset.id)))
@@ -136,14 +133,15 @@ class Map extends Component {
     }
     return (
       <Widget className="Map"
+              id={id}
+              isOpen={isOpen}
+              onOpen={onOpen}
+              floatBody={floatBody}
               icon={MapWidgetInfo.icon}
               title={MapWidgetInfo.title}
               field={title}
               backgroundColor={MapWidgetInfo.color}
-              isEnabled={isEnabled}
-              enableToggleFn={this.toggleEnabled}
-              isIconified={isIconified}
-              onClose={this.removeFilter.bind(this)}>
+              isIconified={isIconified}>
         <ReactMapboxGl containerStyle={{height: '500px'}}
                        style={mapboxStyle}
                        center={[this.center.lng, this.center.lat]}
@@ -216,6 +214,6 @@ export default connect(
     aggs: state.assets && state.assets.aggs,
     widgets: state.racetrack && state.racetrack.widgets
   }), dispatch => ({
-    actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds }, dispatch)
+    actions: bindActionCreators({ modifyRacetrackWidget }, dispatch)
   })
 )(Map)

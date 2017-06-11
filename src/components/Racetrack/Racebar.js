@@ -35,7 +35,11 @@ class Racebar extends Component {
     const { widgets } = nextProps
     if (widgets && widgets.length !== this.lastWidgetCount) {
       this.lastWidgetCount = widgets.length
-      this.setState({openId: widgets[widgets.length - 1].id})
+      if (widgets.length) {
+        this.setState({openId: widgets[widgets.length - 1].id})
+      } else {
+        this.setState({openId: -1})
+      }
     }
   }
 
@@ -75,6 +79,7 @@ class Racebar extends Component {
     const widgetInfo = Object.keys(WidgetInfo)
       .map(k => WidgetInfo[k])
       .find(widgetInfo => (widgetInfo.type === widget.type))
+    if (!widgetInfo.element) return
     const isPinned = false
     const isEnabled = widget.isEnabled
     const isOpen = this.state.openId === widget.id

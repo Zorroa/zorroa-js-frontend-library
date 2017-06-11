@@ -60,7 +60,7 @@ export default function (state = initialState, action) {
       assert.ok(similar.values.length === similar.assetIds.length)
       assert.ok(similar.values.length === similar.weights.length)
       assert.ok(similar.values.length <= 10)
-      const index = widgets.findIndex(widget => (widget.type === SimilarHashWidgetInfo.type))
+      const index = state.widgets.findIndex(widget => (widget.type === SimilarHashWidgetInfo.type))
       if (index < 0) {
         let widgets = [...state.widgets]
         const widget = new Widget({ type: SimilarHashWidgetInfo.type })
@@ -71,7 +71,7 @@ export default function (state = initialState, action) {
     }
     case ASSET_ORDER:
     case ASSET_SORT: {
-      const index = widgets.findIndex(widget => (widget.type === SimilarHashWidgetInfo.type))
+      const index = state.widgets.findIndex(widget => (widget.type === SimilarHashWidgetInfo.type))
       if (index >= 0) {
         let widgets = [...state.widgets]
         widgets.splice(index, 1)

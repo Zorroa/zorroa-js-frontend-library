@@ -1,5 +1,3 @@
-import * as assert from 'assert'
-
 import { SimpleSearchWidgetInfo, ExistsWidgetInfo, FacetWidgetInfo,
   MapWidgetInfo, DateRangeWidgetInfo, RangeWidgetInfo, SimilarHashWidgetInfo,
   FiletypeWidgetInfo, ColorWidgetInfo } from '../components/Racetrack/WidgetInfo'

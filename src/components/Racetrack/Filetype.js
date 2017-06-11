@@ -5,7 +5,7 @@ import classnames from 'classnames'
 
 import { createFiletypeWidget } from '../../models/Widget'
 import { FiletypeWidgetInfo } from './WidgetInfo'
-import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
+import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import { showModal } from '../../actions/appActions'
 import Widget from './Widget'
 import Check from '../Check'
@@ -65,10 +65,10 @@ class Filetype extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
     id: PropTypes.number.isRequired,
-    floatBody: PropTypes.bool.isRequired,
     isIconified: PropTypes.bool.isRequired,
     isOpen: PropTypes.bool.isRequired,
     onOpen: PropTypes.func,
+    floatBody: PropTypes.bool.isRequired,
     aggs: PropTypes.object,
     widgets: PropTypes.arrayOf(PropTypes.object)
   }
@@ -314,7 +314,6 @@ export default connect(
   }), dispatch => ({
     actions: bindActionCreators({
       modifyRacetrackWidget,
-      removeRacetrackWidgetIds,
       showModal }, dispatch)
   })
 )(Filetype)

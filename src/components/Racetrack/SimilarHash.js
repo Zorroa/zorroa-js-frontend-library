@@ -5,8 +5,7 @@ import classnames from 'classnames'
 import LRUCache from 'lru-cache'
 
 import { SimilarHashWidgetInfo } from './WidgetInfo'
-import { removeRacetrackWidgetIds, similar } from '../../actions/racetrackAction'
-import { sortAssets } from '../../actions/assetsAction'
+import { similar } from '../../actions/racetrackAction'
 import { equalSets } from '../../services/jsUtil'
 import Widget from './Widget'
 import Asset from '../../models/Asset'
@@ -36,7 +35,10 @@ class SimilarHash extends Component {
 
     // input props
     id: PropTypes.number.isRequired,
-    isIconified: PropTypes.bool.isRequired
+    isIconified: PropTypes.bool.isRequired,
+    isOpen: PropTypes.bool.isRequired,
+    onOpen: PropTypes.func,
+    floatBody: PropTypes.bool.isRequired
   }
 
   state = {
@@ -66,11 +68,6 @@ class SimilarHash extends Component {
       selectedAssetId = assetIds[0]
     }
     if (selectedAssetId !== this.state.selectedAssetId) this.setState({selectedAssetId})
-  }
-
-  removeFilter = () => {
-    this.props.actions.sortAssets()
-    this.props.actions.removeRacetrackWidgetIds([this.props.id])
   }
 
   selectedValues = () => {
@@ -144,7 +141,7 @@ class SimilarHash extends Component {
   }
 
   render () {
-    const { isIconified, similar, selectedAssetIds } = this.props
+    const { id, floatBody, isOpen, onOpen, isIconified, similar, selectedAssetIds } = this.props
     const { similarity, selectedAssetId } = this.state
     const adjustable = similar && similar.assetIds && similar.assetIds.findIndex(id => (id === selectedAssetId)) >= 0
     const disabled = !selectedAssetIds || !selectedAssetIds.size ||
@@ -155,13 +152,15 @@ class SimilarHash extends Component {
     const field = similar.field.replace(/^Similarity\./, '').replace(/\.raw$/, '')
     return (
       <Widget className="SimilarHash"
+              id={id}
+              isOpen={isOpen}
+              onOpen={onOpen}
+              floatBody={floatBody}
               title={SimilarHashWidgetInfo.title}
               field={field}
               backgroundColor={SimilarHashWidgetInfo.color}
               isIconified={isIconified}
-              isEnabled={true}
-              icon={SimilarHashWidgetInfo.icon}
-              onClose={this.removeFilter.bind(this)}>
+              icon={SimilarHashWidgetInfo.icon}>
         <div className="SimilarHash-body">
           <div className="SimilarHash-carousel">
             { similar.assetIds.map(id => this.renderThumb(id)) }
@@ -210,8 +209,6 @@ export default connect(
     origin: state.auth.origin
   }), dispatch => ({
     actions: bindActionCreators({
-      removeRacetrackWidgetIds,
-      sortAssets,
       similar
     }, dispatch)
   })
