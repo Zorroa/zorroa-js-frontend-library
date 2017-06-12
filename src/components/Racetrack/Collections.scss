@@ -1,5 +1,11 @@
 @import '../../styles/core-mixins.scss';
 
+.Collections {
+  .WidgetHeader-header-title {
+    min-width: 90px;
+  }
+}
+
 .Collections-body {
   @include flexColCenter;
 }
@@ -54,4 +60,14 @@
   padding-left: 4px;
   padding-right: 4px;
   border: 1px solid $zorroa-lightgray;
+}
+
+.Collections-empty {
+  @include flexColCenter;
+  color: $zorroa-lightgray;
+  font-size: 12px;
+  .icon-emptybox {
+    font-size: 22px;
+    color: $zorroa-lightgray;
+  }
 }

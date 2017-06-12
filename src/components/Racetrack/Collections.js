@@ -87,6 +87,7 @@ class Collections extends Component {
               icon={CollectionsWidgetInfo.icon}>
         <div className="Collections-body">
           <div className="Collections-folders">
+            { !selectedFolders.length && <div className="Collections-empty"><div className="icon-emptybox"/>No Folders Selected</div> }
             { selectedFolders.map(folder => (
               <div className="Collections-folder" key={folder.id}>
                 <div className="Collections-folder-name">{folder.name}</div>
@@ -98,7 +99,7 @@ class Collections extends Component {
             <Suggestions suggestions={suggestions} placeholder={placeholder}
                          value={suggestion} onChange={this.suggest} onSelect={this.select}/>
           </div>
-          { selectedFolderNames.length && (
+          { selectedFolderNames.length > 0 && (
             <div className="Collections-clear-all" key="clear-all">
               <div className="Collections-clear-all-label">
                 {`${selectedFolderNames.length} folders selected`}
