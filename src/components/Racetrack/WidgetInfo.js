@@ -8,10 +8,10 @@ import Filetype from './Filetype'
 import DateRange from './DateRange'
 import SimilarHash from './SimilarHash'
 import Collections from './Collections'
+import SortOrder from './SortOrder'
 import { createFacetWidget, createMapWidget, createColorWidget,
   createDateRangeWidget, createRangeWidget, createSimilarityWidget,
-  createFiletypeWidget, createExistsWidget, createSearchWidget,
-  createCollectionsWidget
+  createFiletypeWidget, createExistsWidget, createSearchWidget
 } from '../../models/Widget'
 
 // Pick colors from the style guide
@@ -122,6 +122,14 @@ export const CollectionsWidgetInfo = {
   title: 'Collections',
   description: 'Search within a folder',
   element: <Collections/>,
-  create: createCollectionsWidget,
   color: '#77804d'
+}
+
+export const SortOrderWidgetInfo = {
+  type: 'SORTORDER',
+  icon: 'icon-sort',
+  title: 'Sort Order',
+  description: 'Sort matching assets',
+  element: <SortOrder/>,
+  color: '#5a7a7e'
 }

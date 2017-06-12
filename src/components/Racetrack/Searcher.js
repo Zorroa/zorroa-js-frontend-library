@@ -11,7 +11,7 @@ import TrashedFolder from '../../models/TrashedFolder'
 import { searchAssets, getAssetFields, requiredFields } from '../../actions/assetsAction'
 import { countAssetsInFolderIds, clearFolderCountQueue } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
-import { MapWidgetInfo, CollectionsWidgetInfo } from './WidgetInfo'
+import { MapWidgetInfo, CollectionsWidgetInfo, SortOrderWidgetInfo } from './WidgetInfo'
 
 // Searcher is a singleton. It combines AssetSearches from the Racetrack
 // and Folders and submits a new query to the Archivist server.
@@ -147,12 +147,14 @@ class Searcher extends Component {
       metadataFields, lightbarFields, thumbFields, fieldTypes } = this.props
     if (!fieldTypes) return null
     let foldersDisabled = false
-    let assetSearch = new AssetSearch({order})
+    let orderDisabled = false
+    let assetSearch = new AssetSearch()
     if (widgets && widgets.length) {
       let postFilter = new AssetFilter()
       for (let widget of widgets) {
         if (!widget) continue
         if (widget.type === CollectionsWidgetInfo.type) foldersDisabled = !widget.isEnabled
+        if (widget.type === SortOrderWidgetInfo.type) orderDisabled = !widget.isEnabled
         if (!widget.sliver) continue
         let sliver = widget.sliver
         if (sliver.aggs) {
@@ -167,6 +169,9 @@ class Searcher extends Component {
       }
       assetSearch.postFilter = postFilter
     }
+
+    // Add sort order if not disabled
+    if (!orderDisabled) assetSearch.order = order
 
     // Add a filter for selected folders
     if (!foldersDisabled && selectedFolderIds && selectedFolderIds.size) {

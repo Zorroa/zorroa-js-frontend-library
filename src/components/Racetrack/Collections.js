@@ -5,7 +5,6 @@ import { connect } from 'react-redux'
 import TrashedFolder from '../../models/TrashedFolder'
 import { CollectionsWidgetInfo } from './WidgetInfo'
 import { selectFolderIds } from '../../actions/folderAction'
-import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import Widget from './Widget'
 import Suggestions from '../Suggestions'
 
@@ -19,8 +18,7 @@ class Collections extends Component {
     isIconified: PropTypes.bool.isRequired,
     isOpen: PropTypes.bool.isRequired,
     onOpen: PropTypes.func,
-    floatBody: PropTypes.bool.isRequired,
-    widgets: PropTypes.arrayOf(PropTypes.object)
+    floatBody: PropTypes.bool.isRequired
   }
 
   state = {
@@ -116,12 +114,9 @@ class Collections extends Component {
 export default connect(state => ({
   folders: state.folders.all,
   selectedFolderIds: state.folders.selectedFolderIds,
-  trashedFolders: state.folders.trashedFolders,
-  query: state.assets.query,
-  widgets: state.racetrack && state.racetrack.widgets
+  trashedFolders: state.folders.trashedFolders
 }), dispatch => ({
   actions: bindActionCreators({
-    modifyRacetrackWidget,
     selectFolderIds
   }, dispatch)
 }))(Collections)

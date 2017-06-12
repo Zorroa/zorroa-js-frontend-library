@@ -2,7 +2,7 @@ import {
   MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS,
   SIMILAR_VALUES, ASSET_ORDER, ASSET_SORT, ASSET_FIELDS, SELECT_FOLDERS, UNAUTH_USER } from '../constants/actionTypes'
 import Widget from '../models/Widget'
-import { SimilarHashWidgetInfo, CollectionsWidgetInfo } from '../components/Racetrack/WidgetInfo'
+import { SimilarHashWidgetInfo, CollectionsWidgetInfo, SortOrderWidgetInfo } from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
 
 const initialState = {
@@ -71,13 +71,15 @@ export default function (state = initialState, action) {
     }
     case ASSET_ORDER:
     case ASSET_SORT: {
-      const index = state.widgets.findIndex(widget => (widget.type === SimilarHashWidgetInfo.type))
-      if (index >= 0) {
-        let widgets = [...state.widgets]
-        widgets.splice(index, 1)
-        return { ...state, widgets, similar: { ...state.similar, values: [], assetIds: [] } }
+      let widgets = [...state.widgets]
+      let index = state.widgets.findIndex(widget => (widget.type === SimilarHashWidgetInfo.type))
+      if (index >= 0) widgets.splice(index, 1)
+      index = state.widgets.findIndex(widget => (widget.type === SortOrderWidgetInfo.type))
+      if (index < 0) {
+        const widget = new Widget({ type: SortOrderWidgetInfo.type })
+        widgets.unshift(widget)
       }
-      return { ...state, similar: { ...state.similar, values: [], assetIds: [] } }
+      return { ...state, widgets, similar: { ...state.similar, values: [], assetIds: [] } }
     }
     case ASSET_FIELDS: {
       // Scan available asset fields for the preferred or a valid field

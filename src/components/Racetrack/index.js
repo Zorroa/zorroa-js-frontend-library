@@ -17,5 +17,5 @@ import './DateRange.scss'
 import './Widget.scss'
 import './SimilarHash.scss'
 import './Collections.scss'
-
+import './SortOrder.scss'
 export default Racetrack

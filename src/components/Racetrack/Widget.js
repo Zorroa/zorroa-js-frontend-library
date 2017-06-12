@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 import WidgetHeader from './WidgetHeader'
-import { SimilarHashWidgetInfo, CollectionsWidgetInfo } from './WidgetInfo'
+import { SimilarHashWidgetInfo, CollectionsWidgetInfo, SortOrderWidgetInfo } from './WidgetInfo'
 import { iconifyRightSidebar } from '../../actions/appActions'
 import { sortAssets } from '../../actions/assetsAction'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
@@ -58,6 +58,7 @@ class Widget extends Component {
   removeFilter = () => {
     const widget = this.widget()
     if (widget && widget.type === SimilarHashWidgetInfo.type) this.props.actions.sortAssets()
+    if (widget && widget.type === SortOrderWidgetInfo.type) this.props.actions.sortAssets()
     if (widget && widget.type === CollectionsWidgetInfo.type) this.props.actions.selectFolderIds()
     this.props.actions.removeRacetrackWidgetIds([this.props.id])
   }
