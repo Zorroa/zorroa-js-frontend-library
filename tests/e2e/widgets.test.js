@@ -389,7 +389,7 @@ describe('search widget', function () {
 
       .then(_ => driver.findElement(By.css('.Assets-layout')))
         .then(e => e.findElements(By.css('.Thumb')))
-        .then(es => { expect(es.length).toBeGreaterThan(7); thumb = es[2] })
+        .then(es => { expect(es.length).toBeGreaterThan(7); thumb = es[3] })
 
       // click on the first row
       .then(_ => { DEBUG && console.log('Select the asset') })
