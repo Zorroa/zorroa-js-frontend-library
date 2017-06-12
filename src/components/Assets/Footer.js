@@ -7,17 +7,11 @@ import TableToggle from './TableToggle'
 import MultipageToggle from './MultipageToggle'
 
 const Footer = (props) => (
-  <div className="assets-footer flexOff flexRow flexJustifySpaceBetween flexAlignItemsCenter">
-    <div className="flexRow">
-      <AssetCounter loaded={props.loaded} collapsed={props.collapsed}
-                    total={props.total} onUncollapse={props.onUncollapse}/>
-    </div>
-    <div className="flexRow flexJustifyEnd flexAlignItemsCenter">
-      <ThumbSizeSlider value={props.thumbSize} onChange={props.handleThumbSize} />
-      <MultipageToggle enabled={props.showMultipage} onClick={props.toggleShowMultipage}/>
-      <ThumbLayoutSelector thumbLayout={props.layout} onClick={props.handleLayout} />
-      <TableToggle enabled={props.showTable} onClick={props.toggleShowTable} />
-    </div>
+  <div className="assets-footer">
+    <ThumbSizeSlider value={props.thumbSize} onChange={props.handleThumbSize} />
+    <MultipageToggle enabled={props.showMultipage} onClick={props.toggleShowMultipage}/>
+    <ThumbLayoutSelector thumbLayout={props.layout} onClick={props.handleLayout} />
+    <TableToggle enabled={props.showTable} onClick={props.toggleShowTable} />
   </div>
 )
 
