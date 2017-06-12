@@ -27,7 +27,7 @@
   cursor: pointer;
 
   &:hover:not(.disabled) { background-color: $zorroa-nearwhite; border: 1px solid $zorroa-gray; }
-  &.disabled { color: $zorroa-lightgray; cursor: default; }
+  &.disabled { color: $zorroa-lightgray; background-color: transparent; cursor: default; }
 
   div { margin-left: 8px; }
 }
@@ -72,4 +72,7 @@
   width: 16px;
   height: 16px;
   margin-left: 8px;
+
+  // Won't work until we make the home button a font icon
+  .Racebar-clear.disabled & { color: $zorroa-lightgray; }
 }

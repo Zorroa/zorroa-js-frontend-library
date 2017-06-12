@@ -11,7 +11,7 @@ import TrashedFolder from '../../models/TrashedFolder'
 import { searchAssets, getAssetFields, requiredFields } from '../../actions/assetsAction'
 import { countAssetsInFolderIds, clearFolderCountQueue } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
-import { MapWidgetInfo, CollectionsWidgetInfo, SortOrderWidgetInfo } from './WidgetInfo'
+import { MapWidgetInfo, CollectionsWidgetInfo, SortOrderWidgetInfo, SimilarHashWidgetInfo } from './WidgetInfo'
 
 // Searcher is a singleton. It combines AssetSearches from the Racetrack
 // and Folders and submits a new query to the Archivist server.
@@ -148,6 +148,7 @@ class Searcher extends Component {
     if (!fieldTypes) return null
     let foldersDisabled = false
     let orderDisabled = false
+    let similarDisabled = false
     let assetSearch = new AssetSearch()
     if (widgets && widgets.length) {
       let postFilter = new AssetFilter()
@@ -155,6 +156,7 @@ class Searcher extends Component {
         if (!widget) continue
         if (widget.type === CollectionsWidgetInfo.type) foldersDisabled = !widget.isEnabled
         if (widget.type === SortOrderWidgetInfo.type) orderDisabled = !widget.isEnabled
+        if (widget.type === SimilarHashWidgetInfo.type) similarDisabled = !widget.isEnabled
         if (!widget.sliver) continue
         let sliver = widget.sliver
         if (sliver.aggs) {
@@ -193,7 +195,7 @@ class Searcher extends Component {
     }
 
     // Force similar ordering
-    if (similar.field && similar.values && similar.values.length) {
+    if (!similarDisabled && similar.field && similar.values && similar.values.length) {
       assetSearch.order = undefined
       // Normalize the minScore based on the total weights
       let avgWeight = 0

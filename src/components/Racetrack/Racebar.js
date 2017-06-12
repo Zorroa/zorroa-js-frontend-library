@@ -94,14 +94,16 @@ class Racebar extends Component {
 
   render () {
     const { widgets, hoverFields, query } = this.props
+    const disabled = !query || query.empty()
     return (
       <div className="Racebar">
         <Searcher/>
-        <div className="Racebar-clear" onClick={this.clearRacetrack} title="Clear the search">
+        <div className={classnames('Racebar-clear', {disabled})}
+             onClick={this.clearRacetrack} title="Clear the search">
           Clear
           <img className="Racebar-clear-icon" src={homeIcon}/>
         </div>
-        <div className={classnames('Racebar-save', {disabled: !query || query.empty()})}
+        <div className={classnames('Racebar-save', {disabled})}
              onClick={this.saveRacetrack} title="Save the search">
           Save
           <div className="icon-folder-add"/>
