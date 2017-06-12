@@ -471,7 +471,7 @@ class Assets extends Component {
   clampTableHeight = (tableHeight) => {
     const minTableHeight = 26
     const hardMaxTableHeight = 2000
-    const footerEditbarAndPaddingHeight = 0 // No ref available for 'stateless' Footer
+    const footerEditbarAndPaddingHeight = 180 // No ref available for 'stateless' Footer
     const maxTableHeight = (this.refs.Assets && this.refs.Assets.clientHeight - footerEditbarAndPaddingHeight) || hardMaxTableHeight // worst case: table is too big, but drag handle is on-screen
     var clampedTableHeight = Math.min(maxTableHeight, Math.max(minTableHeight, tableHeight))
     if (!clampedTableHeight || !isFinite(clampedTableHeight)) {
