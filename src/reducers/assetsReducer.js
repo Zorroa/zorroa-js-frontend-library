@@ -95,7 +95,7 @@ export default function (state = initialState, action) {
       return { ...state, order: action.payload, similar: [] }
 
     case SIMILAR_VALUES:
-      const hashes = action.payload
+      const hashes = action.payload.values
       if (hashes.length) return { ...state, order: null }
       break
 
