@@ -638,11 +638,6 @@ class Assets extends Component {
               <div className='Assets-tableResize'
                    onMouseDown={this.tableResizeStart}/>
             )}
-            { totalCount > 0 && showTable && (
-              <Table height={this.clampTableHeight(tableHeight)}
-                     tableIsResizing={tableIsResizing}
-                     selectFn={this.select}/>
-            )}
             { totalCount > 0 &&
             <Footer
               total={totalCount}
@@ -658,6 +653,11 @@ class Assets extends Component {
               thumbSize={thumbSize}
               handleThumbSize={this.changeThumbSize.bind(this)}
             /> }
+            { totalCount > 0 && showTable && (
+              <Table height={this.clampTableHeight(tableHeight)}
+                     tableIsResizing={tableIsResizing}
+                     selectFn={this.select}/>
+            )}
           </div>
           { pinnedWidget && <div className="Workspace-vertical-separator flexOff"/> }
           { pinnedWidget && (

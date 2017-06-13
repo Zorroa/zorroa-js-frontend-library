@@ -10,9 +10,11 @@ import {
   ExistsWidgetInfo,
   RangeWidgetInfo,
   DateRangeWidgetInfo,
-  FiletypeWidgetInfo
+  FiletypeWidgetInfo,
+  CollectionsWidgetInfo
 } from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
+import { selectFolderIds } from './folderAction'
 
 export function modifyRacetrackWidget (widget) {
   assert.ok(widget instanceof Widget)
@@ -38,7 +40,7 @@ export function resetRacetrackWidgets (widgets) {
 
 export function similar (similar) {
   const maxValues = 10
-  if (similar.values.length > maxValues) {
+  if (similar && similar.values && similar.values.length > maxValues) {
     assert.ok(similar.assetIds.length === similar.values.length)
     assert.ok(similar.weights.length === similar.values.length)
     similar.values = similar.values.slice(0, maxValues)
@@ -135,8 +137,18 @@ export function restoreSearch (search) {
     widgets.push(color)
   }
 
+  // Select the folders specified in the search
+  let selectedFolderIds
+  if (search.filter && search.filter.links && search.filter.links.folder) {
+    const type = CollectionsWidgetInfo.type
+    selectedFolderIds = new Set([...search.filter.links.folder])
+    let sliver = new AssetSearch()
+    const collections = new Widget({type, sliver})
+    widgets.push(collections)
+  }
+
   // Return actions to update the racetrack for the new search
-  const actions = [resetRacetrackWidgets(widgets)]
+  const actions = [resetRacetrackWidgets(widgets), selectFolderIds(selectedFolderIds)]
 
   // Create a SimilarHash widget if there's a hash query
   if (search.filter && search.filter.hamming) {

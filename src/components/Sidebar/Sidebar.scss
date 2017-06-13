@@ -14,6 +14,11 @@
 
   background-color: $zorroa-nearwhite;
 
+  &.isIconified {
+    cursor: e-resize;
+    &.isRightEdge { cursor: w-resize; }
+  }
+
   &.isOpen {
     min-width: $zorroa-Sidebar-width;
     max-width: 3 * $zorroa-Sidebar-width;
@@ -45,6 +50,7 @@
   height: 100%;
   cursor: col-resize;
   background: none;
+  z-index: 1;
 
   &.isRightEdge {
     // place right sidebar resizer in the sidebar's left side padding

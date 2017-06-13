@@ -4,10 +4,11 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 import WidgetHeader from './WidgetHeader'
-import { SimilarHashWidgetInfo } from './WidgetInfo'
+import { SimilarHashWidgetInfo, CollectionsWidgetInfo, SortOrderWidgetInfo } from './WidgetInfo'
 import { iconifyRightSidebar } from '../../actions/appActions'
 import { sortAssets } from '../../actions/assetsAction'
-import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
+import { modifyRacetrackWidget, removeRacetrackWidgetIds, similar } from '../../actions/racetrackAction'
+import { selectFolderIds } from '../../actions/folderAction'
 
 class Widget extends Component {
   static displayName = 'Widget'
@@ -56,7 +57,9 @@ class Widget extends Component {
 
   removeFilter = () => {
     const widget = this.widget()
-    if (widget && widget.type === SimilarHashWidgetInfo.type) this.props.actions.sortAssets()
+    if (widget && widget.type === SimilarHashWidgetInfo.type) this.props.actions.similar()
+    if (widget && widget.type === SortOrderWidgetInfo.type) this.props.actions.sortAssets()
+    if (widget && widget.type === CollectionsWidgetInfo.type) this.props.actions.selectFolderIds()
     this.props.actions.removeRacetrackWidgetIds([this.props.id])
   }
 
@@ -103,7 +106,9 @@ export default connect(
   }), dispatch => ({
     actions: bindActionCreators({
       iconifyRightSidebar,
+      similar,
       sortAssets,
+      selectFolderIds,
       modifyRacetrackWidget,
       removeRacetrackWidgetIds
     }, dispatch)

@@ -11,7 +11,7 @@ import TrashedFolder from '../../models/TrashedFolder'
 import { searchAssets, getAssetFields, requiredFields } from '../../actions/assetsAction'
 import { countAssetsInFolderIds, clearFolderCountQueue } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
-import { MapWidgetInfo } from './WidgetInfo'
+import { MapWidgetInfo, CollectionsWidgetInfo, SortOrderWidgetInfo, SimilarHashWidgetInfo } from './WidgetInfo'
 
 // Searcher is a singleton. It combines AssetSearches from the Racetrack
 // and Folders and submits a new query to the Archivist server.
@@ -146,13 +146,18 @@ class Searcher extends Component {
       similar,
       metadataFields, lightbarFields, thumbFields, fieldTypes } = this.props
     if (!fieldTypes) return null
-    let assetSearch = new AssetSearch({order})
+    let foldersDisabled = false
+    let orderDisabled = false
+    let similarDisabled = false
+    let assetSearch = new AssetSearch()
     if (widgets && widgets.length) {
       let postFilter = new AssetFilter()
       for (let widget of widgets) {
-        if (!widget || !widget.sliver) {
-          continue
-        }
+        if (!widget) continue
+        if (widget.type === CollectionsWidgetInfo.type) foldersDisabled = !widget.isEnabled
+        if (widget.type === SortOrderWidgetInfo.type) orderDisabled = !widget.isEnabled
+        if (widget.type === SimilarHashWidgetInfo.type) similarDisabled = !widget.isEnabled
+        if (!widget.sliver) continue
         let sliver = widget.sliver
         if (sliver.aggs) {
           if (widget.isEnabled) postFilter.merge(widget.sliver.filter)
@@ -167,8 +172,11 @@ class Searcher extends Component {
       assetSearch.postFilter = postFilter
     }
 
+    // Add sort order if not disabled
+    if (!orderDisabled) assetSearch.order = order
+
     // Add a filter for selected folders
-    if (selectedFolderIds && selectedFolderIds.size) {
+    if (!foldersDisabled && selectedFolderIds && selectedFolderIds.size) {
       // Server does not support searching of trashed folders
       let nonTrashedFolderIds
       if (trashedFolders && trashedFolders.length) {
@@ -187,7 +195,7 @@ class Searcher extends Component {
     }
 
     // Force similar ordering
-    if (similar.field && similar.values && similar.values.length) {
+    if (!similarDisabled && similar.field && similar.values && similar.values.length) {
       assetSearch.order = undefined
       // Normalize the minScore based on the total weights
       let avgWeight = 0

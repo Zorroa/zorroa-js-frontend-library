@@ -67,7 +67,7 @@ class AddWidget extends Component {
   static widgetInfos = (widgets, filterText, permissions) => {
     const filter = filterText.toLowerCase()
     const singletonTypes = new Set([ WidgetInfo.SimilarHashWidgetInfo.type,
-      WidgetInfo.FiletypeWidgetInfo.type ])
+      WidgetInfo.FiletypeWidgetInfo.type, WidgetInfo.CollectionsWidgetInfo.type ])
     const singletons = new Set()
     widgets.forEach(widget => {
       if (singletonTypes.has(widget.type)) singletons.add(widget.type)

@@ -76,6 +76,54 @@ describe('search widget', function () {
       .then(selenium.waitForIdle)
   })
 
+  it('check collection widget', function () {
+    let allUsersFolder, folderName
+    return driver
+      .then(_ => { DEBUG && console.log('------ check collection widget') })
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Collections-collapsible'), 5000))
+      .then(_ => selenium.doesSelectorHaveClass(By.css('.Collections-collapsible'), 'isOpen'))
+      .then(isOpen => {
+        if (!isOpen) {
+          driver.then(_ => selenium.clickSelector(By.css('.Collections-collapsible')))
+          driver.then(_ => selenium.waitForIdle())
+        }
+        // wait until some folders appear
+        return selenium.waitForSelectorVisibleToBe(true, By.css('.FolderItem'), 15000)
+      })
+      .then(_ => selenium.waitForIdle())
+      .then(_ => { DEBUG && console.log('find & toggle the Users folder ' + Date.now()) })
+      .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
+      .then(_ => selenium.getFolderNamed('Users').then(ele => { allUsersFolder = ele }))
+      // Toggle open the users folder
+      .then(_ => { DEBUG && console.log('toggle the Users folder') })
+      .then(_ => allUsersFolder.click())
+      .then(_ => selenium.waitForIdle())
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Collections'), 5000))
+      .then(_ => driver.findElement(By.css('.Collections-folder-name')).then(ele => { folderName = ele }))
+      .then(_ => expect(folderName.value === 'Users'))
+      .then(_ => selenium.clickSelector(By.css('.Collections-folder-close')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Collections-folder-name'), 5000))
+      .then(_ => allUsersFolder.click())
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Collections-folder-name'), 5000))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Folders-selected'), 5000))
+      .then(_ => selenium.clickSelector(By.css('.WidgetHeader-close')))
+      .then(_ => selenium.waitForIdle())
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Widget.Collections'), 5000))
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Folders-selected'), 5000))
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Widget'), 5000))
+  })
+
+  function pageDown(by) {
+    return driver.then(_ => {
+      return driver.findElement(by)
+        .then(ele => {
+          return ele.getSize()
+            .then(size => { return driver.actions().mouseMove(ele, {x:size.width - 5, y: size.height - 5}).click().sendKeys(Key.PAGE_DOWN, Key.PAGE_DOWN, Key.PAGE_DOWN).perform() })
+        })
+    })
+      .then(_ => driver.sleep(100))
+  }
+
   it('check facet widget', function () {
     let text1, text2
 
@@ -341,7 +389,7 @@ describe('search widget', function () {
 
       .then(_ => driver.findElement(By.css('.Assets-layout')))
         .then(e => e.findElements(By.css('.Thumb')))
-        .then(es => { expect(es.length).toBeGreaterThan(7); thumb = es[2] })
+        .then(es => { expect(es.length).toBeGreaterThan(7); thumb = es[3] })
 
       // click on the first row
       .then(_ => { DEBUG && console.log('Select the asset') })

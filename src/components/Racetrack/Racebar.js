@@ -13,8 +13,9 @@ import Searchbar from '../Searchbar'
 import AddWidget from './AddWidget'
 import CreateFolder from '../Folders/CreateFolder'
 import { showModal } from '../../actions/appActions'
-import { createFolder } from '../../actions/folderAction'
-import { resetRacetrackWidgets } from '../../actions/racetrackAction'
+import { unorderAssets } from '../../actions/assetsAction'
+import { createFolder, selectFolderIds } from '../../actions/folderAction'
+import { resetRacetrackWidgets, similar } from '../../actions/racetrackAction'
 import homeIcon from './home-icon.svg'
 
 class Racebar extends Component {
@@ -75,6 +76,9 @@ class Racebar extends Component {
   }
 
   clearRacetrack = () => {
+    this.props.actions.selectFolderIds()
+    this.props.actions.similar()
+    this.props.actions.unorderAssets()
     this.props.actions.resetRacetrackWidgets()
   }
 
@@ -94,14 +98,16 @@ class Racebar extends Component {
 
   render () {
     const { widgets, hoverFields, query } = this.props
+    const disabled = !query || query.empty()
     return (
       <div className="Racebar">
         <Searcher/>
-        <div className="Racebar-clear" onClick={this.clearRacetrack} title="Clear the search">
+        <div className={classnames('Racebar-clear', {disabled})}
+             onClick={this.clearRacetrack} title="Clear the search">
           Clear
           <img className="Racebar-clear-icon" src={homeIcon}/>
         </div>
-        <div className={classnames('Racebar-save', {disabled: !query || query.empty()})}
+        <div className={classnames('Racebar-save', {disabled})}
              onClick={this.saveRacetrack} title="Save the search">
           Save
           <div className="icon-folder-add"/>
@@ -131,6 +137,9 @@ export default connect(state => ({
   actions: bindActionCreators({
     resetRacetrackWidgets,
     createFolder,
+    similar,
+    unorderAssets,
+    selectFolderIds,
     showModal
   }, dispatch)
 }))(Racebar)
