@@ -73,6 +73,7 @@ class AddWidget extends Component {
       if (singletonTypes.has(widget.type)) singletons.add(widget.type)
     })
     return Object.keys(WidgetInfo).map(k => WidgetInfo[k]).filter(widgetInfo => (
+      widgetInfo.element &&
       !singletons.has(widgetInfo.type)) &&
       widgetInfo.title.toLowerCase().includes(filter) &&
       AddWidget.hasPermission(widgetInfo.permissions, permissions)

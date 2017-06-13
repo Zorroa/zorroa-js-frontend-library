@@ -1,0 +1,75 @@
+@import '../../styles/core-mixins.scss';
+
+.Racebar {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include flexWrap;
+  @include fullWidth;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+.Racebar-widget {
+  margin: 2px 4px;
+}
+
+.Racebar-clear {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+
+  border-radius: 3px;
+  padding: 6px;
+  margin: 4px;
+  color: $zorroa-greyish-brown;
+  text-transform: uppercase;
+  background-color: $zorroa-lightgray;
+  border: 1px solid transparent;
+  cursor: pointer;
+
+  &:hover:not(.disabled) { background-color: $zorroa-nearwhite; border: 1px solid $zorroa-gray; }
+  &.disabled { color: $zorroa-lightgray; cursor: default; }
+
+  div { margin-left: 8px; }
+}
+
+.Racebar-save {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+
+  border-radius: 3px;
+  padding: 7px;
+  margin: 4px;
+  color: white;
+  background-color: $zorroa-water-blue;
+  text-transform: uppercase;
+  cursor: pointer;
+
+  &:hover:not(.disabled) { background-color: lighten($zorroa-water-blue, 15%); }
+  &.disabled { cursor: default; background-color: $zorroa-lightgray; }
+
+  div { margin-left: 8px; }
+}
+
+.Racebar-searchbar {
+  height: 30px;
+  margin-left: 8px;
+  margin-right: 8px;
+  width: 240px;
+}
+
+.Racebar-add-widget {
+  font-size: 12px;
+  margin: 8px;
+  padding: 8px;
+  background-color: $zorroa-water-blue;
+  color: white;
+  border-radius: 3px;
+
+  &:hover { background-color: lighten($zorroa-water-blue, 15%)}
+}
+
+.Racebar-clear-icon {
+  width: 16px;
+  height: 16px;
+  margin-left: 8px;
+}

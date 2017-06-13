@@ -107,10 +107,7 @@ class Multipage extends Component {
 
       return (
         <div className="Multipage">
-          <Editbar selectedAssetIds={selectedPageIds}
-                   onDeselectAll={this.deselectAllPages}
-                   isRemoveEnabled={this.canRemovePageFromFolder}
-                   onRemove={this.removePagesFromFolder}>
+          <div className="Multipage-editbar">
             <div className="Multipage-document-switch">
               <div onClick={e => this.showDocument(false)}
                    className={classnames('Multipage-document-mode left', {selected: !showDocument})}>
@@ -121,7 +118,11 @@ class Multipage extends Component {
                 Full Document
               </div>
             </div>
-          </Editbar>
+            <Editbar selectedAssetIds={selectedPageIds}
+                     onDeselectAll={this.deselectAllPages}
+                     isRemoveEnabled={this.canRemovePageFromFolder}
+                     onRemove={this.removePagesFromFolder} />
+          </div>
           { pages && <Thumbs assets={pages} onMonopage={this.switchToPanZoom}/> }
           <Controlbar onZoomIn={!zoomInDisabled && this.zoomIn}
                       onZoomOut={!zoomOutDisabled && this.zoomOut}

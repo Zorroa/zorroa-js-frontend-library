@@ -91,7 +91,6 @@ class Searchbar extends Component {
                        value={value}
                        onChange={this.suggest}
                        onSelect={this.search.bind(this)} />
-          <button onClick={this.forceSearch} className="search-button icon-search" />
         </div>
         { error && <div className="Searchbar-error">Search syntax error</div> }
       </div>

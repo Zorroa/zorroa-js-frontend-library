@@ -18,21 +18,6 @@
   ::-webkit-scrollbar {
     width: 5px;
   }
-
-  .Suggestions-search {
-    border: none;
-    color: $zorroa-gray;
-    font-size: 12px;
-  }
-
-  .Suggestions-typeahead {
-    font-size: 12px;
-  }
-
-  .Suggestions-suggestion {
-    font-size: 12px;
-    color: $zorroa-gray;
-  }
 }
 
 .Filetype-fixed {
@@ -119,6 +104,8 @@
   min-height: 12px;
   font-size: 12px;
   color: $zorroa-gray;
+  margin-right: 10px;
+  @include nowrap;
 
   .Filetype-group.disabled & {
     color: $zorroa-lightgray;
@@ -168,6 +155,8 @@
   min-height: 12px;
   font-size: 12px;
   color: $zorroa-gray;
+  margin-right: 10px;
+  @include nowrap;
 
   .Filetype-type.disabled & {
     color: $zorroa-lightgray;
@@ -184,24 +173,24 @@
 
 
 .Filetype-suggestions {
-  min-width: 50px;
+  min-width: 60px;
   margin-left: 4px;
+  margin-top: 1px;
+  margin-bottom: 2px;
+  border-radius: 3px;
+  padding-left: 4px;
   @include flexRow;
   @include flexAlignItemsCenter;
+  border: 1px solid$zorroa-nearwhite;
 }
 
-.Filetype-suggestions-input {
+.Filetype-suggestions-body {
   @include flexOn;
-  padding-left: 18px;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  color: $zorroa-gray;
-  border: none;
 }
 
 .Filetype-suggestions-search-icon {
   color: $zorroa-gray;
   width: 14px;
   height: 14px;
-  margin-right: 4px;
+  margin-right: 2px;
 }

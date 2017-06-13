@@ -151,6 +151,7 @@ export function parseVariables (template) {
 
 // Replace the variables in the string template with values
 export function replaceVariables (template, values) {
+  if (!values) return template
   let str = template
   Object.keys(values).forEach(key => {
     const s = key.replace(/\|/g, '\\|')
@@ -161,8 +162,8 @@ export function replaceVariables (template, values) {
 }
 
 export function valuesForFields (vars, asset) {
-  if (!vars || !vars.length) return
   const values = {}
+  if (!vars || !vars.length) return values
   vars.forEach(re => {
     const key = re.slice(2, -1)
     const fields = key.split('|')
@@ -178,6 +179,7 @@ export function valuesForFields (vars, asset) {
 }
 
 export function fieldsForVariables (vars) {
+  if (!vars || !vars.length) return []
   const fields = []
   vars.forEach(re => {
     const key = re.slice(2, -1)

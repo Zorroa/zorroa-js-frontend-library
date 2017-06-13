@@ -52,6 +52,14 @@
     }
   }
 
+  .DateRange-min {
+    min-width: 125px;
+  }
+
+  .DateRange-max {
+    min-width: 125px;
+  }
+
   .DateRange-min .rw-popup-container {
     left: 0;
     right: unset;
@@ -75,4 +83,21 @@
   color: white;
   margin-left: 6px;
   font-size: 14px;
+}
+
+.DateRange-settings {
+  @include flexRowCenter;
+  margin-bottom: 8px;
+}
+
+.DateRange-setting {
+  margin: 4px;
+  border-radius: 3px;
+  background-color: $zorroa-gray;
+  color: white;
+  cursor: pointer;
+  padding: 2px 6px;
+  font-size: 12px;
+  text-transform: capitalize;
+  &:hover { background-color: lighten($zorroa-gray, 15%); }
 }

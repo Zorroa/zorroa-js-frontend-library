@@ -236,13 +236,13 @@ class JobMenu extends Component {
     return (
       <div className={classnames('header-menu', 'header-menu-jobs', `header-menu-${jobType}`)}>
         { this.renderJobBadge() }
-        <DropdownMenu label={`${jobType}s`} onChange={this.refreshJobs} show={this.show}>
-          { jobType === Job.Import ? (
-            <div onClick={this.createImport} className="JobMenu-jobs-create-import">
-              <div className="icon-import"/>
-              <div>Import assets</div>
-            </div>
-          ) : null }
+        { jobType === Job.Import && (
+          <div onClick={this.createImport} className="JobMenu-jobs-create-import">
+            <div>Import</div>
+            <div className="icon-import"/>
+          </div>
+        )}
+        <DropdownMenu onChange={this.refreshJobs} show={this.show}>
           { this.renderJobs() }
         </DropdownMenu>
       </div>

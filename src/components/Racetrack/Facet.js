@@ -7,7 +7,7 @@ import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Text, Sector } from 
 import { createFacetWidget, aggField } from '../../models/Widget'
 import Asset from '../../models/Asset'
 import { FacetWidgetInfo } from './WidgetInfo'
-import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
+import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import Widget from './Widget'
 import { unCamelCase } from '../../services/jsUtil'
 
@@ -24,15 +24,15 @@ class Facet extends Component {
     actions: PropTypes.object.isRequired,
     id: PropTypes.number.isRequired,
     isIconified: PropTypes.bool.isRequired,
+    isOpen: PropTypes.bool.isRequired,
+    onOpen: PropTypes.func,
+    floatBody: PropTypes.bool.isRequired,
     aggs: PropTypes.object,
     fieldTypes: PropTypes.object,
     widgets: PropTypes.arrayOf(PropTypes.object)
   }
 
   state = {
-    isOpen: true,
-    isEnabled: true,
-    isMinimized: false,
     otherIsSelected: false,
     field: '',
     order: { '_count': 'desc' },
@@ -84,26 +84,22 @@ class Facet extends Component {
         const order = widget.sliver.aggs.facet.terms.order
         if (order) this.setState({order})
       }
-    } else {
-      this.removeFilter()
     }
   }
 
-  toggleEnabled = () => {
-    new Promise(resolve => this.setState({isEnabled: !this.state.isEnabled}, resolve))
-    .then(() => this.modifySliver(this.state.field, this.state.terms, this.state.order))
-  }
-
   modifySliver = (field, terms, order) => {
+    const { id, widgets } = this.props
+    const index = widgets && widgets.findIndex(widget => (id === widget.id))
+    const oldWidget = widgets && widgets[index]
+    let isEnabled, isPinned
+    if (oldWidget) {
+      isEnabled = oldWidget.isEnabled
+      isPinned = oldWidget.isPinned
+    }
     const fieldType = this.props.fieldTypes[field.replace(/\.raw$/, '')]
-    const widget = createFacetWidget(field, fieldType, terms, order)
-    widget.isEnabled = this.state.isEnabled
+    const widget = createFacetWidget(field, fieldType, terms, order, isEnabled, isPinned)
     widget.id = this.props.id
     this.props.actions.modifyRacetrackWidget(widget)
-  }
-
-  removeFilter = () => {
-    this.props.actions.removeRacetrackWidgetIds([this.props.id])
   }
 
   selectGraph (chartType) {
@@ -167,9 +163,6 @@ class Facet extends Component {
       if (!(this.state.terms && this.state.terms.length === 1 && this.state.terms[0] === term)) {
         terms = [term]
       }
-    }
-    if (this.state.isMinimized && !terms.length) {
-      this.setState({ isMinimized: false, isOpen: false })
     }
     this.modifySliver(this.state.field, terms, this.state.order)
   }
@@ -325,8 +318,8 @@ class Facet extends Component {
   }
 
   renderClearSelection () {
-    const { terms, isMinimized } = this.state
-    if (isMinimized || !this.baseBuckets().length) return
+    const { terms } = this.state
+    if (!this.baseBuckets().length) return
     if (!terms || terms.length === 0) return <div className="Facet-clear-selection"/>
     return (
       <div className="Facet-clear-selection">
@@ -369,7 +362,7 @@ class Facet extends Component {
   }
 
   renderChart () {
-    const { field, terms, chartType, isMinimized } = this.state
+    const { field, terms, chartType } = this.state
     let maxCount = 0
     let minCount = Number.MAX_SAFE_INTEGER
     // Extract the buckets for this widget from the global query using id
@@ -395,50 +388,12 @@ class Facet extends Component {
     if (mergedTerms.length < terms.length) mergedTerms.push(OTHER_BUCKET)
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042',
       '#ce2d3f', '#fc6c2c', ' #a11e77', '#b7df4d', '#1875d1' ]
-    const selectedBuckets = buckets.filter(b => mergedTerms.indexOf(b.key) >= 0)
     switch (chartType) {
       case BAR_CHART:
-        if (isMinimized) {
-          return (
-            <div className="Facet-table">
-              <div className="Facet-value-table">
-                <table>
-                  <thead>
-                  <tr>
-                    <td style={{width: '80%'}}/>
-                    <td style={{width: '20%'}}/>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  { selectedBuckets.slice(0, 3).map(bucket => (
-                    <tr className={classnames('Facet-value-table-row', {selected: true})}
-                        title={`Click to de-select ${bucket.key}`}
-                        key={bucket.key} onClick={e => this.selectTerm(bucket.key, {...e, metaKey: true})}>
-                      <td className="Facet-value-cell">
-                        <div className="Facet-value-table-key">
-                          <div className="Facet-value-pct-bar" style={{width: `${100 * bucket.doc_count / maxCount}%`}} />
-                          <div className="Facet-value-key">{this.renderBucketKey(bucket.key)}</div>
-                        </div>
-                      </td>
-                      <td className="Facet-value-count">{bucket.doc_count}</td>
-                    </tr>
-                  )) }
-                  </tbody>
-                </table>
-                { selectedBuckets.length > 3 && (
-                  <div className="Facet-value-table-row-extra">
-                    and { selectedBuckets.length - 3} more...
-                  </div>
-                )}
-              </div>
-            </div>
-          )
-        }
         return (
           <div className="Facet-table">
             <div className="Facet-table-header">
               { this.renderHeaderCell('keyword') }
-              { this.renderChartTypes() }
               { this.renderHeaderCell('count') }
             </div>
             <div className="Facet-value-table" style={{minHeight: '300px'}}>
@@ -475,7 +430,6 @@ class Facet extends Component {
         const activeIndex = mergedTerms.map((term, index) => (buckets.findIndex(bucket => (bucket.key === term))))
         return (
           <div className="Facet-pie-chart">
-            { this.renderChartTypes() }
             <ResponsiveContainer>
               <PieChart width={300} height={300}>
                 <Pie innerRadius={30} outerRadius={60} paddingAngle={0}
@@ -506,9 +460,9 @@ class Facet extends Component {
   }
 
   renderChartTypes () {
-    const { isMinimized } = this.state
+    if (this.props.onOpen) return
     const buckets = this.baseBuckets()
-    if (isMinimized || !buckets || !buckets.length) return
+    if (!buckets || !buckets.length) return
     return (
       <div className="Facet-chart-selector">
         { chartTypes.map(type => this.renderChartIcon(type)) }
@@ -516,37 +470,28 @@ class Facet extends Component {
     )
   }
 
-  minimize = (wasOpen) => {
-    const { chartType, terms } = this.state
-    wasOpen = this.state.isOpen   // Override Widget open state to handle all removed when minimized
-    const shouldMinimize = chartType === BAR_CHART && terms && terms.length > 0
-    const isMinimized = shouldMinimize && wasOpen && !this.state.isMinimized
-    const isOpen = shouldMinimize ? true : !wasOpen  // Always leave open if we have selected bar terms
-    this.setState({isMinimized, isOpen})
-    return isOpen
-  }
-
   render () {
-    const { isIconified } = this.props
-    const { isEnabled, field, isOpen } = this.state
-    const title = Asset.lastNamespace(unCamelCase(field))
+    const { id, floatBody, isIconified, isOpen, onOpen } = this.props
+    const { field, terms } = this.state
+    const lastName = Asset.lastNamespace(unCamelCase(field))
+    const title = terms && terms.length ? lastName : FacetWidgetInfo.title
+    const selected = terms && terms.length ? terms.join(',') : lastName
     return (
       <Widget className="Facet"
-              title={FacetWidgetInfo.title}
-              field={title}
+              id={id}
+              title={title}
+              floatBody={floatBody}
+              field={selected}
               backgroundColor={FacetWidgetInfo.color}
-              isEnabled={isEnabled}
-              enableToggleFn={this.toggleEnabled}
               isIconified={isIconified}
               icon={FacetWidgetInfo.icon}
-              onOpen={this.minimize}
-              onClose={this.removeFilter.bind(this)}>
-        { isOpen && (
-          <div className="Facet-body">
-            { this.renderChart() }
-            { this.renderClearSelection() }
-          </div>
-        )}
+              isOpen={isOpen}
+              onOpen={onOpen}>
+        <div className="Facet-body">
+          { this.renderChart() }
+          { this.renderClearSelection() }
+          { this.renderChartTypes() }
+        </div>
       </Widget>
     )
   }
@@ -558,6 +503,6 @@ export default connect(
     fieldTypes: state.assets && state.assets.types,
     widgets: state.racetrack && state.racetrack.widgets
   }), dispatch => ({
-    actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds }, dispatch)
+    actions: bindActionCreators({ modifyRacetrackWidget }, dispatch)
   })
 )(Facet)

@@ -5,7 +5,7 @@ import classnames from 'classnames'
 
 import { createFiletypeWidget } from '../../models/Widget'
 import { FiletypeWidgetInfo } from './WidgetInfo'
-import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
+import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import { showModal } from '../../actions/appActions'
 import Widget from './Widget'
 import Check from '../Check'
@@ -66,12 +66,14 @@ class Filetype extends Component {
     actions: PropTypes.object.isRequired,
     id: PropTypes.number.isRequired,
     isIconified: PropTypes.bool.isRequired,
+    isOpen: PropTypes.bool.isRequired,
+    onOpen: PropTypes.func,
+    floatBody: PropTypes.bool.isRequired,
     aggs: PropTypes.object,
     widgets: PropTypes.arrayOf(PropTypes.object)
   }
 
   state = {
-    isEnabled: true,
     exts: [],
     suggestions: [],
     suggestion: ''
@@ -82,7 +84,6 @@ class Filetype extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    if (!this.state.isEnabled) return
     const { id, widgets } = nextProps
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
@@ -100,20 +101,18 @@ class Filetype extends Component {
     }
   }
 
-  toggleEnabled = () => {
-    this.setState({isEnabled: !this.state.isEnabled},
-      () => { this.modifySliver(this.state.exts) })
-  }
-
   modifySliver = (exts) => {
-    const widget = createFiletypeWidget(extField, 'string', exts)
+    const { id, widgets } = this.props
+    const index = widgets && widgets.findIndex(widget => (id === widget.id))
+    const oldWidget = widgets && widgets[index]
+    let isEnabled, isPinned
+    if (oldWidget) {
+      isEnabled = oldWidget.isEnabled
+      isPinned = oldWidget.isPinned
+    }
+    const widget = createFiletypeWidget(extField, 'string', exts, isEnabled, isPinned)
     widget.id = this.props.id
-    widget.isEnabled = this.state.isEnabled
     this.props.actions.modifyRacetrackWidget(widget)
-  }
-
-  removeFilter = () => {
-    this.props.actions.removeRacetrackWidgetIds([this.props.id])
   }
 
   selectTypes = (exts) => {
@@ -167,15 +166,15 @@ class Filetype extends Component {
     return 'empty'
   }
 
-  suggest = (suggestion) => {
+  suggest = (suggestion, lastAction) => {
     console.log('Suggest ' + suggestion)
     let suggestions = []
-    if (suggestion && suggestion.length) {
+    if (suggestion && suggestion.length && lastAction === 'type') {
       const key = suggestion.toLowerCase()
       Object.keys(allExts).filter(ext => (ext.toLowerCase().includes(key))).forEach(text => suggestions.push({text}))
       Object.keys(groupExts).filter(ext => (ext.toLowerCase().includes(key))).forEach(text => suggestions.push({text}))
+      this.setState({suggestions, suggestion})
     }
-    this.setState({suggestions, suggestion})
   }
 
   select = (text) => {
@@ -223,7 +222,7 @@ class Filetype extends Component {
       <div className={classnames('Filetype-group', `Filetype-group-${group}`, {disabled: count <= 0})} key={group}>
         <Check state={this.selectionState(exts)}
                onClick={e => this.selectTypes(exts)}
-               color='#ef4487'/>
+               color={FiletypeWidgetInfo.color}/>
         <div className="Filetype-group-icon icon-files"/>
         <div className="Filetype-group-label">{group}</div>
         { count ? <div className="Filetype-group-count">{count}</div> : null }
@@ -250,7 +249,7 @@ class Filetype extends Component {
       <div className={classnames('Filetype-type', {disabled: count <= 0})} key={ext}>
         <Check state={this.selectionState([ext])}
                onClick={e => { this.toggleType(ext) }}
-               color='#ef4487' />
+               color={FiletypeWidgetInfo.color} />
         <div className="Filetype-type-ext">{ext}&nbsp;-&nbsp;</div>
         <div className="Filetype-type-label">{allExts[ext]}</div>
         { count ? <div className="Filetype-type-count">{count}</div> : null }
@@ -272,27 +271,30 @@ class Filetype extends Component {
   }
 
   render () {
-    const { isIconified } = this.props
-    const { suggestions, suggestion, isEnabled } = this.state
+    const { id, floatBody, isIconified, isOpen, onOpen } = this.props
+    const { exts, suggestions, suggestion } = this.state
     const isSelected = this.state.exts.length > 0
     const placeholder = isSelected ? '' : 'Search filetypes'
-    const style = { height: '14px', width: isSelected ? '40px' : '90px' }
+    const style = { width: isSelected ? '60px' : '140px' }
+    const title = exts && exts.length ? exts.join(',') : FiletypeWidgetInfo.title
     return (
       <Widget className="Filetype"
-              title={FiletypeWidgetInfo.title}
+              id={id}
+              floatBody={floatBody}
+              title={title}
               backgroundColor={FiletypeWidgetInfo.color}
-              isEnabled={isEnabled}
-              enableToggleFn={this.toggleEnabled}
               isIconified={isIconified}
-              icon={FiletypeWidgetInfo.icon}
-              onClose={this.removeFilter.bind(this)}>
+              isOpen={isOpen}
+              onOpen={onOpen}
+              icon={FiletypeWidgetInfo.icon}>
         <div className="Filetype-body">
           <div className="Filetype-selected">
             { this.renderSelected() }
             <div className="Filetype-suggestions">
-              <div className="Filetype-suggestions-search-icon icon-search"/>
-              <Suggestions suggestions={suggestions} placeholder={placeholder} style={style}
-                           value={suggestion} onChange={this.suggest} onSelect={this.select}/>
+              <div className="Filetype-suggestions-body">
+                <Suggestions suggestions={suggestions} placeholder={placeholder} style={style}
+                             value={suggestion} onChange={this.suggest} onSelect={this.select}/>
+              </div>
             </div>
           </div>
           <div className="Filetype-type-sections">
@@ -312,7 +314,6 @@ export default connect(
   }), dispatch => ({
     actions: bindActionCreators({
       modifyRacetrackWidget,
-      removeRacetrackWidgetIds,
       showModal }, dispatch)
   })
 )(Filetype)

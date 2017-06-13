@@ -16,7 +16,8 @@ export default class Suggestions extends Component {
 
   static defaultProps = {
     placeholder: 'Search...',
-    style: { width: '100%' }
+    style: { width: '100%' },
+    showSuggestions: true
   }
 
   state = {
@@ -159,6 +160,7 @@ export default class Suggestions extends Component {
 
     return (
     <div className="Suggestions" style={style}>
+      <button onClick={this.forceSearch} className="Suggestions-search-button icon-search" />
       <div className="Suggestions-overlapping-inputs">
         { showSuggestions &&
           <input value={this.selectedSuggestionString()}

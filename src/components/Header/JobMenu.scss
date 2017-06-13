@@ -70,10 +70,13 @@
   @include flexAlignItemsCenter;
   color: $zorroa-greyish-brown;
   border-radius: 4px;
-  margin-bottom: 10px;
+  text-transform: uppercase;
+  padding-left: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 
   .icon-import {
-    margin-right: 8px;
+    margin-left: 5px;
   }
 
   &:hover {

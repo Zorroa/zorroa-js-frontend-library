@@ -60,22 +60,24 @@ export default function (state = initialState, action) {
       assert.ok(similar.values.length === similar.assetIds.length)
       assert.ok(similar.values.length === similar.weights.length)
       assert.ok(similar.values.length <= 10)
-      let widgets = state.widgets
-      const index = widgets.findIndex(widget => (widget.type === SimilarHashWidgetInfo.type))
+      const index = state.widgets.findIndex(widget => (widget.type === SimilarHashWidgetInfo.type))
       if (index < 0) {
+        let widgets = [...state.widgets]
         const widget = new Widget({ type: SimilarHashWidgetInfo.type })
         widgets.unshift(widget)
+        return { ...state, similar, widgets }
       }
-      return { ...state, similar, widgets }
+      return { ...state, similar }
     }
     case ASSET_ORDER:
     case ASSET_SORT: {
-      let widgets = state.widgets
-      const index = widgets.findIndex(widget => (widget.type === SimilarHashWidgetInfo.type))
+      const index = state.widgets.findIndex(widget => (widget.type === SimilarHashWidgetInfo.type))
       if (index >= 0) {
+        let widgets = [...state.widgets]
         widgets.splice(index, 1)
+        return { ...state, widgets, similar: { ...state.similar, values: [], assetIds: [] } }
       }
-      return { ...state, widgets, similar: { ...state.similar, values: [], assetIds: [] } }
+      return { ...state, similar: { ...state.similar, values: [], assetIds: [] } }
     }
     case ASSET_FIELDS: {
       // Scan available asset fields for the preferred or a valid field

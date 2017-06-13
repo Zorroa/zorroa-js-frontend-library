@@ -1,5 +1,4 @@
 import React from 'react'
-import SimpleSearch from './SimpleSearch'
 import Facet from './Facet'
 import Map from './Map'
 import Color from './Color'
@@ -20,10 +19,9 @@ export const SimpleSearchWidgetInfo = {
   icon: 'icon-search',
   title: 'Search',
   description: 'Fuzzy text search on keywords or specific fields',
-  element: <SimpleSearch/>,
   create: createSearchWidget,
   fieldTypes: [ 'string' ],
-  color: '#73b61c' // $zorroa-sickly-green
+  color: '#77804d'
 }
 
 export const FacetWidgetInfo = {
@@ -34,7 +32,7 @@ export const FacetWidgetInfo = {
   element: <Facet/>,
   create: createFacetWidget,
   fieldTypes: [ 'string', 'long', 'double', 'integer', 'date', 'boolean' ],
-  color: '#a11d77' // zorroa-darkish-purple
+  color: '#786974'
 }
 
 export const MapWidgetInfo = {
@@ -45,7 +43,7 @@ export const MapWidgetInfo = {
   element: <Map/>,
   create: createMapWidget,
   fieldTypes: [ 'point' ],
-  color: '#785549'
+  color: '#7b5f52'
 }
 
 export const ColorWidgetInfo = {
@@ -56,7 +54,7 @@ export const ColorWidgetInfo = {
   fieldTypes: [ 'nested' ],
   element: <Color/>,
   create: createColorWidget,
-  color: '#fc6c2c' // $zorroa-orangish
+  color: '#7d6358'
 }
 
 export const ExistsWidgetInfo = {
@@ -67,7 +65,7 @@ export const ExistsWidgetInfo = {
   element: <Exists/>,
   create: createExistsWidget,
   fieldTypes: null,
-  color: '#a11e77' // $zorroa-darkish-purple
+  color: '#5a7a7e'
 }
 
 export const RangeWidgetInfo = {
@@ -78,7 +76,7 @@ export const RangeWidgetInfo = {
   element: <Range/>,
   create: createRangeWidget,
   fieldTypes: [ 'long', 'integer', 'double' ],
-  color: '#1875d1' // $zorroa-water-blue
+  color: '#5a7a7e'
 }
 
 export const FiletypeWidgetInfo = {
@@ -89,7 +87,7 @@ export const FiletypeWidgetInfo = {
   element: <Filetype/>,
   create: createFiletypeWidget,
   fieldTypes: [],
-  color: '#ef4487'
+  color: '#7b5f52'
 }
 
 export const DateRangeWidgetInfo = {
@@ -100,7 +98,7 @@ export const DateRangeWidgetInfo = {
   element: <DateRange/>,
   create: createDateRangeWidget,
   fieldTypes: [ 'date' ],
-  color: '#1875d1' // $zorroa-water-blue
+  color: '#5a7a7e'
 }
 
 export const SimilarHashWidgetInfo = {
@@ -112,5 +110,5 @@ export const SimilarHashWidgetInfo = {
   create: createSimilarityWidget,
   fieldTypes: [],
   fieldRegex: /^Similarity\..+/,
-  color: '#a11e77' // $zorroa-darkish-purple
+  color: '#77804d'
 }

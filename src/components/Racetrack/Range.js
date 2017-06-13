@@ -8,7 +8,7 @@ import { createRangeWidget } from '../../models/Widget'
 import Asset from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
 import { RangeWidgetInfo } from './WidgetInfo'
-import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
+import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import Widget from './Widget'
 import { unCamelCase } from '../../services/jsUtil'
 import Resizer from '../../services/Resizer'
@@ -38,13 +38,15 @@ class Range extends Component {
     actions: PropTypes.object.isRequired,
     id: PropTypes.number.isRequired,
     isIconified: PropTypes.bool.isRequired,
+    isOpen: PropTypes.bool.isRequired,
+    onOpen: PropTypes.func,
+    floatBody: PropTypes.bool.isRequired,
     widgets: PropTypes.arrayOf(PropTypes.object)
   }
 
   resizer = null
 
   state = {
-    isEnabled: true,
     field: '',
     min: null, // min threshold (greater than)
     max: null, // max threshold (less than)
@@ -65,7 +67,6 @@ class Range extends Component {
   // If the query is changed elsewhere, e.g. from the Searchbar,
   // capture the new props and update our local state to match.
   syncWithAppState (nextProps) {
-    if (!this.state.isEnabled) return
     const { id, widgets } = nextProps
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
@@ -83,13 +84,19 @@ class Range extends Component {
         if (nextProps.aggs) {
           const agg = nextProps.aggs[id]
           if (agg && agg[field]) {
-            let autoMin = Math.min(agg[field].min, this.state.min)
-            let autoMax = Math.max(agg[field].max, this.state.max)
+            let autoMin = agg[field].min
+            let autoMax = agg[field].max
+            if (this.state.min !== undefined) autoMin = Math.min(autoMin, this.state.min)
+            if (this.state.max !== undefined) autoMax = Math.max(autoMax, this.state.max)
 
             if (isNumeric(autoMin) && isNumeric(autoMax)) {
               if (autoMin === autoMax) {
                 autoMin -= 0.001
                 autoMax += 0.001
+              }
+              if (min === undefined || max === undefined || min === null || max === null) {
+                min = autoMin
+                max = autoMax
               }
               this.setState({ autoMin, autoMax })
               if (this.state.syncRangeWithAutoRange) {
@@ -113,8 +120,6 @@ class Range extends Component {
         this.setStatePromise({ field, min, max, minStr, maxStr, usePrefix })
           .then(() => { if (reQuery) this.modifySliver() })
       }
-    } else {
-      this.removeFilter()
     }
   }
 
@@ -131,22 +136,19 @@ class Range extends Component {
     this.resizer.release()
   }
 
-  // Remove our sliver if the close button in our header is clicked
-  removeFilter = () => {
-    this.props.actions.removeRacetrackWidgetIds([this.props.id])
-  }
-
-  toggleEnabled = () => {
-    this.setStatePromise({isEnabled: !this.state.isEnabled})
-    .then(this.modifySliver)
-  }
-
   modifySliver = () => {
-    const { field, min, max, isEnabled } = this.state
+    const { id, widgets } = this.props
+    const index = widgets && widgets.findIndex(widget => (id === widget.id))
+    const oldWidget = widgets && widgets[index]
+    let isEnabled, isPinned
+    if (oldWidget) {
+      isEnabled = oldWidget.isEnabled
+      isPinned = oldWidget.isPinned
+    }
+    const { field, min, max } = this.state
     if (!field) return
-    const widget = createRangeWidget(field, 'double', min, max)
+    const widget = createRangeWidget(field, 'double', min, max, isEnabled, isPinned)
     widget.id = this.props.id
-    widget.isEnabled = isEnabled
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
@@ -255,11 +257,8 @@ class Range extends Component {
   }
 
   render () {
-    const { isIconified, id } = this.props
-    const { isEnabled, field } = this.state
-    const title = Asset.lastNamespace(unCamelCase(field))
-
-    const { min, max, minStr, maxStr, autoMin, autoMax, prevAutoMin, prevAutoMax } = this.state
+    const { isIconified, id, floatBody, isOpen, onOpen } = this.props
+    const { field, min, max, minStr, maxStr, autoMin, autoMax, prevAutoMin, prevAutoMax } = this.state
 
     let renderSlider = isNumeric(min) && isNumeric(max) &&
       isNumeric(autoMin) && isNumeric(autoMax) &&
@@ -275,16 +274,21 @@ class Range extends Component {
       requestAnimationFrame(() => { this.setState({ prevAutoMin: autoMin, prevAutoMax: autoMax }) })
     }
 
+    const active = min !== undefined && min !== null && max !== undefined && max !== null
+    const lastName = Asset.lastNamespace(unCamelCase(field))
+    const title = active ? lastName : RangeWidgetInfo.title
+    const label = active ? `${this.valToString(min)} → ${this.valToString(max)}` : lastName
     return (
       <Widget className='Range'
-              title={RangeWidgetInfo.title}
-              field={title}
+              id={id}
+              isOpen={isOpen}
+              onOpen={onOpen}
+              floatBody={floatBody}
+              title={title}
+              field={label}
               backgroundColor={RangeWidgetInfo.color}
-              isEnabled={isEnabled}
-              enableToggleFn={this.toggleEnabled}
               isIconified={isIconified}
-              icon={RangeWidgetInfo.icon}
-              onClose={this.removeFilter.bind(this)}>
+              icon={RangeWidgetInfo.icon}>
         <div className="Range-body">
 
           <div className="Range-row flexRowCenter">
@@ -366,7 +370,7 @@ class Range extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds }, dispatch)
+  actions: bindActionCreators({ modifyRacetrackWidget }, dispatch)
 })
 
 const mapStateToProps = state => ({
