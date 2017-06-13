@@ -22,11 +22,11 @@ const initialState = {
   rightSidebarIsIconified: true,
   collapsibleOpen: {
     browsing: false,
-    collection: false,
+    collection: true,
     smart: false,
     simple: false,
     metadata: false,
-    metadata2: false,
+    metadata2: true,
     source: false,
     proxies: false,
     'proxies.proxies': false

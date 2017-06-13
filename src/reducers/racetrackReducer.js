@@ -53,7 +53,7 @@ export default function (state = initialState, action) {
       return { ...state, widgets }
     }
     case SIMILAR_VALUES: {
-      const similar = { ...state.similar, ...action.payload }
+      const similar = action.payload ? { ...state.similar, ...action.payload } : { ...state.similar, values: [], assetIds: [], weights: [] }
       assert.ok(Array.isArray(similar.values))
       assert.ok(Array.isArray(similar.assetIds))
       assert.ok(Array.isArray(similar.weights))
@@ -71,17 +71,19 @@ export default function (state = initialState, action) {
     }
     case ASSET_ORDER:
     case ASSET_SORT: {
-      let widgets = [...state.widgets]
-      let index = state.widgets.findIndex(widget => (widget.type === SimilarHashWidgetInfo.type))
-      if (index >= 0) widgets.splice(index, 1)
+      const widgets = [...state.widgets]
+      const similar = {...state.similar}
       if (action.type === ASSET_SORT || (action.payload && action.payload.length > 0)) {
-        index = state.widgets.findIndex(widget => (widget.type === SortOrderWidgetInfo.type))
+        // Actively sorting by another field, remove all similar assets, add a sort widget if needed
+        similar.values = []
+        similar.assetIds = []
+        const index = state.widgets.findIndex(widget => (widget.type === SortOrderWidgetInfo.type))
         if (index < 0) {
           const widget = new Widget({type: SortOrderWidgetInfo.type})
           widgets.unshift(widget)
         }
       }
-      return { ...state, widgets, similar: {...state.similar, values: [], assetIds: []} }
+      return { ...state, widgets, similar }
     }
     case ASSET_FIELDS: {
       // Scan available asset fields for the preferred or a valid field

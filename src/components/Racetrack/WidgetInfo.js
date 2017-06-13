@@ -11,7 +11,8 @@ import Collections from './Collections'
 import SortOrder from './SortOrder'
 import { createFacetWidget, createMapWidget, createColorWidget,
   createDateRangeWidget, createRangeWidget, createSimilarityWidget,
-  createFiletypeWidget, createExistsWidget, createSearchWidget
+  createFiletypeWidget, createExistsWidget, createSearchWidget,
+  createCollectionsWidget, createSortOrderWidget
 } from '../../models/Widget'
 
 // Pick colors from the style guide
@@ -122,6 +123,8 @@ export const CollectionsWidgetInfo = {
   title: 'Collections',
   description: 'Search within a folder',
   element: <Collections/>,
+  create: createCollectionsWidget,
+  fieldTypes: [],
   color: '#77804d'
 }
 
@@ -131,5 +134,7 @@ export const SortOrderWidgetInfo = {
   title: 'Sort Order',
   description: 'Sort matching assets',
   element: <SortOrder/>,
+  create: createSortOrderWidget,
+  fieldTypes: [],
   color: '#5a7a7e'
 }

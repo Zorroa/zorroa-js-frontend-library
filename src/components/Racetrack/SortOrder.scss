@@ -40,6 +40,7 @@
 .SortOrder-label {
   color: $zorroa-gray;
   margin: 4px;
+  &:hover { color: $zorroa-sickly-green; }
 }
 
 .SortOrder-suggestions {

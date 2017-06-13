@@ -13,8 +13,9 @@ import Searchbar from '../Searchbar'
 import AddWidget from './AddWidget'
 import CreateFolder from '../Folders/CreateFolder'
 import { showModal } from '../../actions/appActions'
-import { createFolder } from '../../actions/folderAction'
-import { resetRacetrackWidgets } from '../../actions/racetrackAction'
+import { unorderAssets } from '../../actions/assetsAction'
+import { createFolder, selectFolderIds } from '../../actions/folderAction'
+import { resetRacetrackWidgets, similar } from '../../actions/racetrackAction'
 import homeIcon from './home-icon.svg'
 
 class Racebar extends Component {
@@ -75,6 +76,9 @@ class Racebar extends Component {
   }
 
   clearRacetrack = () => {
+    this.props.actions.selectFolderIds()
+    this.props.actions.similar()
+    this.props.actions.unorderAssets()
     this.props.actions.resetRacetrackWidgets()
   }
 
@@ -133,6 +137,9 @@ export default connect(state => ({
   actions: bindActionCreators({
     resetRacetrackWidgets,
     createFolder,
+    similar,
+    unorderAssets,
+    selectFolderIds,
     showModal
   }, dispatch)
 }))(Racebar)

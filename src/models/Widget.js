@@ -1,6 +1,7 @@
 import { SimpleSearchWidgetInfo, ExistsWidgetInfo, FacetWidgetInfo,
   MapWidgetInfo, DateRangeWidgetInfo, RangeWidgetInfo, SimilarHashWidgetInfo,
-  FiletypeWidgetInfo, ColorWidgetInfo } from '../components/Racetrack/WidgetInfo'
+  FiletypeWidgetInfo, ColorWidgetInfo, CollectionsWidgetInfo, SortOrderWidgetInfo
+} from '../components/Racetrack/WidgetInfo'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
 import { HSL2HSV } from '../services/color'
@@ -178,6 +179,16 @@ export function createColorWidget (field, fieldType, colors, isServerHSL, isEnab
   }
 
   return new Widget({type, sliver, isEnabled, isPinned})
+}
+
+// Bare ctor used by AddWidget, values come directly from app state
+export function createCollectionsWidget (field, fieldType, isEnabled, isPinned) {
+  return new Widget({type: CollectionsWidgetInfo.type, isEnabled, isPinned})
+}
+
+// Bare ctor used by AddWidget, values come directly from app state
+export function createSortOrderWidget (field, filedType, isEnabled, isPinned) {
+  return new Widget({type: SortOrderWidgetInfo.type, isEnabled, isPinned})
 }
 
 export function fieldUsedInWidget (field, widget) {

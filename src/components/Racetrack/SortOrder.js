@@ -6,7 +6,7 @@ import Asset from '../../models/Asset'
 import Widget from './Widget'
 import Suggestions from '../Suggestions'
 import { SortOrderWidgetInfo } from './WidgetInfo'
-import { sortAssets } from '../../actions/assetsAction'
+import { sortAssets, orderAssets } from '../../actions/assetsAction'
 import { unCamelCase } from '../../services/jsUtil'
 
 class SortOrder extends Component {
@@ -68,6 +68,13 @@ class SortOrder extends Component {
     console.log('Select suggestion ' + field)
   }
 
+  toggle = (idx) => {
+    // Deep copy to avoid changing shared object state.assets.order and state.assets.query.order
+    const order = JSON.parse(JSON.stringify(this.props.order))
+    order[idx].ascending = !order[idx].ascending
+    this.props.actions.orderAssets(order)
+  }
+
   render () {
     const { order, id, floatBody, isOpen, onOpen, isIconified } = this.props
     const { suggestions, suggestion } = this.state
@@ -88,7 +95,7 @@ class SortOrder extends Component {
           { !active && <div className="SortOrder-empty"><div className="icon-emptybox"/>No sort order</div> }
           <div className="SortOrder-orders">
             { active && <div key="title" className="SortOrder-title">Sort by:</div> }
-            { active && order.map(i => <div key={i.field} className="SortOrder-label">{this.title(i, false)}</div>) }
+            { active && order.map((i, j) => <div key={i.field} onClick={_ => this.toggle(j)} className="SortOrder-label">{this.title(i, false)}</div>) }
           </div>
           <div className="SortOrder-suggestions">
             <Suggestions suggestions={suggestions} placeholder="Search fields"
@@ -113,6 +120,7 @@ export default connect(state => ({
   fields: state.assets.fields
 }), dispatch => ({
   actions: bindActionCreators({
-    sortAssets
+    sortAssets,
+    orderAssets
   }, dispatch)
 }))(SortOrder)

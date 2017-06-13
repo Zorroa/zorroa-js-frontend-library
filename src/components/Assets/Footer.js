@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react'
 
-import AssetCounter from './AssetCounter'
 import ThumbSizeSlider from './ThumbSizeSlider'
 import ThumbLayoutSelector from './ThumbLayoutSelector'
 import TableToggle from './TableToggle'
