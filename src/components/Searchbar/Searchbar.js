@@ -61,7 +61,7 @@ class Searchbar extends Component {
       widget.type === SimpleSearchWidgetInfo.type))
     let widgets = [...this.props.widgets]
     if (index < 0) {
-      widgets.unshift(widget)
+      widgets.push(widget)
     } else {
       widgets[index] = widget
     }

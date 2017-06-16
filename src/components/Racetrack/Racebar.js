@@ -6,7 +6,7 @@ import classnames from 'classnames'
 import User from '../../models/User'
 import Widget from '../../models/Widget'
 import Folder from '../../models/Folder'
-import AssetSearch from '../../models/AssetSearch'
+import TrashedFolder from '../../models/TrashedFolder'
 import * as WidgetInfo from './WidgetInfo'
 import Searcher from './Searcher'
 import Searchbar from '../Searchbar'
@@ -14,16 +14,25 @@ import AddWidget from './AddWidget'
 import CreateFolder from '../Folders/CreateFolder'
 import { showModal } from '../../actions/appActions'
 import { unorderAssets } from '../../actions/assetsAction'
-import { createFolder, selectFolderIds } from '../../actions/folderAction'
+import { createFolder, selectFolderIds, createDyHiFolder } from '../../actions/folderAction'
 import { resetRacetrackWidgets, similar } from '../../actions/racetrackAction'
 import homeIcon from './home-icon.svg'
 
 class Racebar extends Component {
   static propTypes = {
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
-    query: PropTypes.instanceOf(AssetSearch),
     hoverFields: PropTypes.instanceOf(Set),
     isolatedId: PropTypes.string,
+    folderCounts: PropTypes.instanceOf(Map),
+    selectedFolderIds: PropTypes.object,
+    trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
+    order: PropTypes.arrayOf(PropTypes.object),
+    similar: PropTypes.shape({
+      field: PropTypes.string,
+      values: PropTypes.arrayOf(PropTypes.string),
+      assetIds: PropTypes.arrayOf(PropTypes.string)
+    }),
+    libraryId: PropTypes.number,
     user: PropTypes.instanceOf(User).isRequired,
     actions: PropTypes.object.isRequired
   }
@@ -42,8 +51,11 @@ class Racebar extends Component {
     }
     if (widgets && widgets.length !== this.lastWidgetCount) {
       this.lastWidgetCount = widgets.length
-      const openId = widgets.length ? widgets[widgets.length - 1].id : -1
-      this.setState({openId})
+      if (widgets.length === this.lastWidgetCount + 1) {
+        // Only open the widget if we've added a single new widget
+        const openId = widgets.length ? widgets[widgets.length - 1].id : -1
+        this.setState({openId})
+      }
     }
   }
 
@@ -59,20 +71,45 @@ class Racebar extends Component {
   }
 
   saveRacetrack = () => {
-    const width = '300px'
+    const { widgets } = this.props
+    const dyhiLevels = []
+    widgets.forEach(widget => {
+      if (widget.type === WidgetInfo.FacetWidgetInfo.type) {
+        const field = widget.sliver.aggs.facet.terms.field
+        dyhiLevels.push({ field, type: 'Attr' })
+      }
+    })
+    const width = '400px'
     const body = <CreateFolder title='Create Smart Collection' acl={[]}
                                includeAssets={false}
+                               dyhiLevels={dyhiLevels} widgetLayout={true}
                                onCreate={this.saveSearch}/>
     this.props.actions.showModal({body, width})
   }
 
-  saveSearch = (name, acl) => {
-    const { query, user } = this.props
-    const parentId = user ? user.homeFolderId : Folder.ROOT_ID
-    const search = new AssetSearch(query)
-    search.aggs = undefined             // Remove widget aggs
-    const folder = new Folder({ name, acl, parentId, search })
-    this.props.actions.createFolder(folder)
+  saveSearch = (name, acl, dyhiLevels) => {
+    const { widgets, selectedFolderIds, trashedFolders, order, similar, user, libraryId } = this.props
+    const parentId = dyhiLevels && dyhiLevels.length ? libraryId : (user ? user.homeFolderId : Folder.ROOT_ID)
+    const nonTrashedFolderIds = Searcher.nonTrashedFolderIds(selectedFolderIds, trashedFolders)
+    const search = Searcher.build(widgets, nonTrashedFolderIds, order, similar)
+    const saveSearch = dyhiLevels && typeof dyhiLevels === 'string' && dyhiLevels === 'Search'
+    const saveLayout = dyhiLevels && typeof dyhiLevels === 'string' && dyhiLevels === 'Layout'
+    if (!saveLayout && !saveSearch && dyhiLevels && dyhiLevels.length) {
+      if (search.filter && search.filter.terms) {
+        dyhiLevels.forEach(dyhi => { search.filter.terms[dyhi.field] = undefined })
+      }
+      const folder = new Folder({ name, acl, parentId, search })
+      this.props.actions.createDyHiFolder(folder, dyhiLevels)
+    } else {
+      if (saveLayout) {                 // Just save aggs
+        search.query = undefined
+        search.filter = undefined
+        search.postFilter = undefined
+        search.order = []
+      }
+      const folder = new Folder({ name, acl, parentId, search })
+      this.props.actions.createFolder(folder)
+    }
   }
 
   clearRacetrack = () => {
@@ -97,8 +134,9 @@ class Racebar extends Component {
   }
 
   render () {
-    const { widgets, hoverFields, query } = this.props
-    const disabled = !query || query.empty()
+    const { widgets, hoverFields, order, similar } = this.props
+    const disabled = !(widgets && widgets.length) && !(order && order.length) &&
+      !(similar && similar.field && similar.values && similar.values.length)
     return (
       <div className="Racebar">
         <Searcher/>
@@ -131,12 +169,17 @@ export default connect(state => ({
   widgets: state.racetrack.widgets,
   hoverFields: state.app.hoverFields,
   isolatedId: state.assets.isolatedId,
-  query: state.assets.query,
+  order: state.assets.order,
+  selectedFolderIds: state.folders.selectedFolderIds,
+  trashedFolders: state.folders.trashedFolders,
+  similar: state.racetrack.similar,
+  libraryId: state.folders.libraryId,
   user: state.auth.user
 }), dispatch => ({
   actions: bindActionCreators({
     resetRacetrackWidgets,
     createFolder,
+    createDyHiFolder,
     similar,
     unorderAssets,
     selectFolderIds,

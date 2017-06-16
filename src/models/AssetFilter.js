@@ -79,6 +79,7 @@ export default class AssetFilter {
     if (filter.hamming) {
       if (this.hamming) {
         for (let key in filter.hamming) {
+          if (key === 'field') continue   // FIXME: breaks for mixed similarity fields!
           if (key in filter.hamming) {
             if (key in this.hamming) {
               this.hamming[key] = union([this.hamming[key], filter.hamming[key]])

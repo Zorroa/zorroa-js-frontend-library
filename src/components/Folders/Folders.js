@@ -40,6 +40,7 @@ class Folders extends Component {
     // state props
     folders: PropTypes.object.isRequired,
     sortFolders: PropTypes.string,
+    selectedFolderIds: PropTypes.instanceOf(Set),
     user: PropTypes.instanceOf(User)
   }
 
@@ -178,7 +179,7 @@ class Folders extends Component {
     const rootFolder = folders.all.get(Folder.ROOT_ID)
     const folderList = this.folderList(rootFolder)
     this.props.actions.selectFolderId(folder.id, event.shiftKey, event.metaKey,
-      folderList, this.props.folders.selectedFolderIds)
+      folderList, this.props.folders.selectedFolderIds, this.props.folders.all)
   }
 
   filterFolders = (event) => {
@@ -475,6 +476,7 @@ export default connect(state => ({
   folders: state.folders,
   sortFolders: state.app.sortFolders,
   assetsCounter: state.assets.assetsCounter,
+  selectedFolderIds: state.folders.selectedFolderIds,
   user: state.auth.user
 }), dispatch => ({
   actions: bindActionCreators({

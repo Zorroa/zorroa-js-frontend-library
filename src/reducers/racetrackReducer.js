@@ -56,6 +56,8 @@ export default function (state = initialState, action) {
       const similar = action.payload ? { ...state.similar, ...action.payload } : { ...state.similar, values: [], assetIds: [], weights: [] }
       assert.ok(Array.isArray(similar.values))
       assert.ok(Array.isArray(similar.assetIds))
+      // Backwards compatibility for saved searches prior to weights
+      if (similar.values && (!similar.weights || similar.weights.length !== similar.values.length)) similar.weights = similar.values.map(_ => (1))
       assert.ok(Array.isArray(similar.weights))
       assert.ok(similar.values.length === similar.assetIds.length)
       assert.ok(similar.values.length === similar.weights.length)
@@ -64,7 +66,7 @@ export default function (state = initialState, action) {
       if (index < 0) {
         let widgets = [...state.widgets]
         const widget = new Widget({ type: SimilarHashWidgetInfo.type })
-        widgets.unshift(widget)
+        widgets.push(widget)
         return { ...state, similar, widgets }
       }
       return { ...state, similar }
@@ -80,7 +82,7 @@ export default function (state = initialState, action) {
         const index = state.widgets.findIndex(widget => (widget.type === SortOrderWidgetInfo.type))
         if (index < 0) {
           const widget = new Widget({type: SortOrderWidgetInfo.type})
-          widgets.unshift(widget)
+          widgets.push(widget)
         }
       }
       return { ...state, widgets, similar }

@@ -7,6 +7,7 @@ import {
   QUEUE_FOLDER_COUNTS, CLEAR_FOLDER_COUNT_QUEUE, ASSET_SEARCH
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
+import AssetSearch from '../models/AssetSearch'
 import * as assert from 'assert'
 
 // Folders are stored in the all map indexed by id.
@@ -30,7 +31,10 @@ export var createInitialState = () => ({
   trashedFolders: null,
 
   // Modified folder ids and ancestors since last clearModifiedFolders
-  modifiedIds: new Set()
+  modifiedIds: new Set(),
+
+  // Library folder id for DyHi
+  libraryId: Folder.ROOT_ID
 })
 export const initialState = createInitialState()
 
@@ -74,8 +78,9 @@ export default function (state = initialState, action) {
       }
       break
 
-    case SELECT_FOLDERS:
+    case SELECT_FOLDERS: {
       return { ...state, selectedFolderIds: action.payload }
+    }
 
     case CREATE_FOLDER: {
       const folder = action.payload
