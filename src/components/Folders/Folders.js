@@ -40,7 +40,6 @@ class Folders extends Component {
     // state props
     folders: PropTypes.object.isRequired,
     sortFolders: PropTypes.string,
-    selectedFolderIds: PropTypes.instanceOf(Set),
     user: PropTypes.instanceOf(User)
   }
 
@@ -476,7 +475,6 @@ export default connect(state => ({
   folders: state.folders,
   sortFolders: state.app.sortFolders,
   assetsCounter: state.assets.assetsCounter,
-  selectedFolderIds: state.folders.selectedFolderIds,
   user: state.auth.user
 }), dispatch => ({
   actions: bindActionCreators({

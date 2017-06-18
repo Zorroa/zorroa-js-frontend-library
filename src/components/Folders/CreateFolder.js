@@ -31,6 +31,7 @@ class CreateFolder extends Component {
     isolatedId: PropTypes.string,
     selectedAssetIds: PropTypes.instanceOf(Set),
     isManager: PropTypes.bool,
+    uxLevel: PropTypes.number,
     actions: PropTypes.object.isRequired
   }
 
@@ -108,11 +109,11 @@ class CreateFolder extends Component {
   renderModes () {
     const { isManager } = this.props
     if (!isManager) return
-    const { widgetLayout, dyhiLevels } = this.props
+    const { widgetLayout, dyhiLevels, uxLevel } = this.props
     const { name, mode } = this.state
     const modes = ['Search']
-    if (widgetLayout) modes.push('Layout')
-    if (dyhiLevels) modes.push('Hierarchy')
+    if (uxLevel > 0 && widgetLayout) modes.push('Layout')
+    if (dyhiLevels && dyhiLevels.length) modes.push('Hierarchy')
     const cleanField = (field) => (field.endsWith('.raw') ? field.slice(0, -4) : field)
     return (
       <div>
@@ -174,7 +175,7 @@ class CreateFolder extends Component {
   }
 
   render () {
-    const { title, onLink, onDelete, user, date, selectedAssetIds, includeAssets, isManager } = this.props
+    const { title, onLink, onDelete, user, date, selectedAssetIds, includeAssets, isManager, uxLevel } = this.props
     const { isShared, name, includeSelectedAssets } = this.state
     const disableIncludeSelected = !selectedAssetIds || !selectedAssetIds.size
     return (
@@ -200,7 +201,7 @@ class CreateFolder extends Component {
                 <div onClick={this.toggleShareSelected}>Include Selected Assets</div>
               </div>
             )}
-            { isManager && !includeAssets && this.props.name && this.props.name.length && (
+            { isManager && uxLevel > 0 && !includeAssets && this.props.name && this.props.name.length && (
               <div className="CreateFolder-permissions">
                 <div className="CreateFolder-public-private flexRow flexAlignItemsCenter">
                   <div>Collection is</div>
@@ -239,7 +240,8 @@ export default connect(state => ({
   user: state.auth && state.auth.user,
   isolatedId: state.assets.isolatedId,
   selectedAssetIds: state.assets.selectedIds,
-  isManager: state.auth.isManager
+  isManager: state.auth.isManager,
+  uxLevel: state.app.uxLevel
 }), dispatch => ({
   actions: bindActionCreators({ hideModal }, dispatch)
 }))(CreateFolder)

@@ -7,13 +7,14 @@ const WidgetHeader = ({ isEnabled, isPinned, isOpen, isIconified, maxWidth, titl
   const iconClassNames = classnames('WidgetHeader-icon', icon, { isEnabled, isIconified })
   return (
     <div style={{backgroundColor, maxWidth}} className={classnames('WidgetHeader', {isEnabled})}>
+      { !isIconified && (<div className='WidgetHeader-close icon-cancel-circle' onClick={onClose}/>) }
       <div className='WidgetHeader-hover'>
         <div className='WidgetHeader-toggle flexRowCenter fullWidth fullHeight' onClick={collapseToggleFn}>
           <div className={iconClassNames}/>
           { !isIconified && (
             <div className="WidgetHeader-header">
               <div className="WidgetHeader-header-label">
-                <span className="WidgetHeader-header-title">{title}{field && field.length ? ':' : ''}</span>
+                { title && <span className="WidgetHeader-header-title">{title}{field && field.length ? ':' : ''}</span> }
                 { field && <span className="WidgetHeader-header-field">{field}</span> }
               </div>
             </div>
@@ -23,7 +24,6 @@ const WidgetHeader = ({ isEnabled, isPinned, isOpen, isIconified, maxWidth, titl
         </div>
         { !isIconified && pinnedToggleFn && (<div className="WidgetHeader-pin" onClick={pinnedToggleFn}><img className={classnames('WidgetHeader-pin-img', {isPinned})} src={pin}/></div>) }
         { !isIconified && enableToggleFn && (<div className={classnames('WidgetHeader-enable', {'icon-eye2': isEnabled, 'icon-eye-crossed': !isEnabled, isEnabled})} onClick={enableToggleFn}/>) }
-        { !isIconified && (<div className='WidgetHeader-close icon-cross2' onClick={onClose}/>) }
       </div>
     </div>
   )
@@ -41,7 +41,7 @@ WidgetHeader.propTypes = {
   backgroundColor: PropTypes.string.isRequired,
   enableToggleFn: PropTypes.func,
   collapseToggleFn: PropTypes.func,
-  pinnedToggleFn: PropTypes.func.isRequired,
+  pinnedToggleFn: PropTypes.func,
   onClose: PropTypes.func.isRequired
 }
 

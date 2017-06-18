@@ -25,6 +25,7 @@ class Widget extends Component {
     onOpen: PropTypes.func,
     className: PropTypes.string,
     widgets: PropTypes.arrayOf(PropTypes.object),
+    uxLevel: PropTypes.number,
     actions: PropTypes.object
   }
 
@@ -64,10 +65,11 @@ class Widget extends Component {
   }
 
   render () {
-    const { children, icon, title, field, backgroundColor, isIconified, floatBody, isOpen, onOpen } = this.props
+    const { children, icon, title, field, backgroundColor, isIconified, floatBody, isOpen, onOpen, uxLevel } = this.props
     const widget = this.widget()
-    const isEnabled = widget && widget.isEnabled
-    const isPinned = widget && widget.isPinned
+    const advanced = uxLevel > 0
+    const isEnabled = advanced || (widget && widget.isEnabled)
+    const isPinned = advanced && widget && widget.isPinned
     const maxWidth = onOpen ? 360 : undefined   // Implicitly use onOpen to restrict width of Racebar widgets
     const WidgetHeaderParams = {
       icon,
@@ -80,8 +82,8 @@ class Widget extends Component {
       isIconified,
       isOpen,
       onClose: this.removeFilter,
-      enableToggleFn: this.toggleEnabled,
-      pinnedToggleFn: this.togglePinned,
+      enableToggleFn: advanced ? this.toggleEnabled : null,
+      pinnedToggleFn: advanced ? this.togglePinned : null,
       collapseToggleFn: onOpen
     }
 
@@ -102,7 +104,8 @@ class Widget extends Component {
 
 export default connect(
   state => ({
-    widgets: state.racetrack && state.racetrack.widgets
+    widgets: state.racetrack && state.racetrack.widgets,
+    uxLevel: state.app.uxLevel
   }), dispatch => ({
     actions: bindActionCreators({
       iconifyRightSidebar,

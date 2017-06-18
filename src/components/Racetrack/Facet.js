@@ -29,7 +29,8 @@ class Facet extends Component {
     floatBody: PropTypes.bool.isRequired,
     aggs: PropTypes.object,
     fieldTypes: PropTypes.object,
-    widgets: PropTypes.arrayOf(PropTypes.object)
+    widgets: PropTypes.arrayOf(PropTypes.object),
+    uxLevel: PropTypes.number,
   }
 
   state = {
@@ -362,6 +363,7 @@ class Facet extends Component {
   }
 
   renderChart () {
+    const { uxLevel } = this.props
     const { field, terms, chartType } = this.state
     let maxCount = 0
     let minCount = Number.MAX_SAFE_INTEGER
@@ -392,17 +394,23 @@ class Facet extends Component {
       case BAR_CHART:
         return (
           <div className="Facet-table">
-            <div className="Facet-table-header">
+            { uxLevel > 0 && <div className="Facet-table-header">
               { this.renderHeaderCell('keyword') }
               { this.renderHeaderCell('count') }
-            </div>
+            </div> }
             <div className="Facet-value-table" style={{minHeight: '300px'}}>
               <table>
                 <thead>
+                { uxLevel === 0 ? (
+                  <tr>
+                    <td style={{width: '100%'}}/>
+                  </tr>
+                ) : (
                   <tr>
                     <td style={{width: '80%'}}/>
                     <td style={{width: '20%'}}/>
                   </tr>
+                )}
                 </thead>
                 <tbody>
                 { buckets && buckets.map(bucket => (
@@ -410,13 +418,13 @@ class Facet extends Component {
                     { selected: mergedTerms.indexOf(bucket.key) >= 0 })}
                       title={`Click to filter for ${bucket.key}`}
                       key={bucket.key} onClick={this.selectTerm.bind(this, bucket.key)}>
-                    <td className="Facet-value-cell">
+                    <td className="Facet-value-cell" style={{ maxWidth: uxLevel > 0 ? 0 : 360 }}>
                       <div className="Facet-value-table-key">
-                        <div className="Facet-value-pct-bar" style={{width: `${100 * bucket.doc_count / maxCount}%`}} />
+                        { uxLevel > 0 && <div className="Facet-value-pct-bar" style={{width: `${100 * bucket.doc_count / maxCount}%`}} /> }
                         <div className="Facet-value-key">{this.renderBucketKey(bucket.key)}</div>
                       </div>
                     </td>
-                    <td className="Facet-value-count">{bucket.doc_count}</td>
+                    { uxLevel > 0 && <td className="Facet-value-count">{bucket.doc_count}</td> }
                   </tr>
                 )) }
                 </tbody>
@@ -501,7 +509,8 @@ export default connect(
   state => ({
     aggs: state.assets && state.assets.aggs,
     fieldTypes: state.assets && state.assets.types,
-    widgets: state.racetrack && state.racetrack.widgets
+    widgets: state.racetrack && state.racetrack.widgets,
+    uxLevel: state.app.uxLevel
   }), dispatch => ({
     actions: bindActionCreators({ modifyRacetrackWidget }, dispatch)
   })

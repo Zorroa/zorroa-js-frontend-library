@@ -50,12 +50,12 @@ class Racebar extends Component {
       this.setState({openId: -1})
     }
     if (widgets && widgets.length !== this.lastWidgetCount) {
-      this.lastWidgetCount = widgets.length
       if (widgets.length === this.lastWidgetCount + 1) {
         // Only open the widget if we've added a single new widget
         const openId = widgets.length ? widgets[widgets.length - 1].id : -1
         this.setState({openId})
       }
+      this.lastWidgetCount = widgets.length
     }
   }
 

@@ -5,6 +5,7 @@
   @include flexAlignItemsCenter;
   @include flexWrap;
   @include fullWidth;
+  margin-top: 6px;
   margin-left: 4px;
   margin-right: 4px;
 }
@@ -19,7 +20,7 @@
 
   border-radius: 3px;
   padding: 6px;
-  margin: 4px;
+  margin: 2px 4px;
   color: $zorroa-greyish-brown;
   text-transform: uppercase;
   background-color: $zorroa-lightgray;
@@ -59,7 +60,7 @@
 
 .Racebar-add-widget {
   font-size: 12px;
-  margin: 8px;
+  margin: 4px 8px;
   padding: 8px;
   background-color: $zorroa-water-blue;
   color: white;

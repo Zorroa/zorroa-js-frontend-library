@@ -22,7 +22,7 @@ export default class AssetSearch {
       this.order = json.order     // {string field, bool ascending}
       this.size = json.size       // int:              Number of assets to return
       this.from = json.from       // int:              First asset index to return
-      this.fuzzy = json.fuzzy     // bool:             Enable fuzzy search
+      this.fuzzy = json.fuzzy || false    // bool:             Enable fuzzy search
       this.aggs = json.aggs       // {string, {string, object}}
     }
   }

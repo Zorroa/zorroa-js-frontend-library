@@ -70,7 +70,8 @@ class Collections extends Component {
     const { suggestions, suggestion } = this.state
     const selectedFolders = [...selectedFolderIds.values()].map(id => folders.get(id))
     const selectedFolderNames = selectedFolders.map(folder => folder.name)
-    const title = selectedFolderNames.length ? selectedFolderNames.join(',') : CollectionsWidgetInfo.title
+    const title = selectedFolderNames.length ? undefined : CollectionsWidgetInfo.title
+    const field = selectedFolderNames.length ? selectedFolderNames.join(',') : undefined
     const placeholder = selectedFolders.size ? '' : 'Search folders'
 
     return (
@@ -80,6 +81,7 @@ class Collections extends Component {
               onOpen={onOpen}
               floatBody={floatBody}
               title={title}
+              field={field}
               backgroundColor={CollectionsWidgetInfo.color}
               isIconified={isIconified}
               icon={CollectionsWidgetInfo.icon}>
