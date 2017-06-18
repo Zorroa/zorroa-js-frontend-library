@@ -36,7 +36,7 @@ export const FacetWidgetInfo = {
   element: <Facet/>,
   create: createFacetWidget,
   fieldTypes: [ 'string', 'long', 'double', 'integer', 'date', 'boolean' ],
-  color: '#786974'
+  color: '#775980'
 }
 
 export const MapWidgetInfo = {
@@ -47,7 +47,7 @@ export const MapWidgetInfo = {
   element: <Map/>,
   create: createMapWidget,
   fieldTypes: [ 'point' ],
-  color: '#7b5f52'
+  color: '#807059'
 }
 
 export const ColorWidgetInfo = {
@@ -58,7 +58,7 @@ export const ColorWidgetInfo = {
   fieldTypes: [ 'nested' ],
   element: <Color/>,
   create: createColorWidget,
-  color: '#7d6358'
+  color: '#807859'
 }
 
 export const ExistsWidgetInfo = {
@@ -69,7 +69,7 @@ export const ExistsWidgetInfo = {
   element: <Exists/>,
   create: createExistsWidget,
   fieldTypes: null,
-  color: '#5a7a7e'
+  color: '#80596a'
 }
 
 export const RangeWidgetInfo = {
@@ -80,7 +80,7 @@ export const RangeWidgetInfo = {
   element: <Range/>,
   create: createRangeWidget,
   fieldTypes: [ 'long', 'integer', 'double' ],
-  color: '#5a7a7e'
+  color: '#597180'
 }
 
 export const FiletypeWidgetInfo = {
@@ -91,7 +91,7 @@ export const FiletypeWidgetInfo = {
   element: <Filetype/>,
   create: createFiletypeWidget,
   fieldTypes: [],
-  color: '#7b5f52'
+  color: '#80595b'
 }
 
 export const DateRangeWidgetInfo = {
@@ -102,7 +102,7 @@ export const DateRangeWidgetInfo = {
   element: <DateRange/>,
   create: createDateRangeWidget,
   fieldTypes: [ 'date' ],
-  color: '#5a7a7e'
+  color: '#59807a'
 }
 
 export const SimilarHashWidgetInfo = {
@@ -114,7 +114,7 @@ export const SimilarHashWidgetInfo = {
   create: createSimilarityWidget,
   fieldTypes: [],
   fieldRegex: /^Similarity\..+/,
-  color: '#77804d'
+  color: '#775980'
 }
 
 export const CollectionsWidgetInfo = {
@@ -125,7 +125,7 @@ export const CollectionsWidgetInfo = {
   element: <Collections/>,
   create: createCollectionsWidget,
   fieldTypes: [],
-  color: '#77804d'
+  color: '#596380'
 }
 
 export const SortOrderWidgetInfo = {
@@ -136,5 +136,5 @@ export const SortOrderWidgetInfo = {
   element: <SortOrder/>,
   create: createSortOrderWidget,
   fieldTypes: [],
-  color: '#5a7a7e'
+  color: '#806a59'
 }

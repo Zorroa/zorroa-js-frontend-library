@@ -135,6 +135,7 @@ class Racebar extends Component {
 
   render () {
     const { widgets, hoverFields, order, similar } = this.props
+    const blacklist = [WidgetInfo.SimpleSearchWidgetInfo.type]
     const disabled = !(widgets && widgets.length) && !(order && order.length) &&
       !(similar && similar.field && similar.values && similar.values.length)
     return (
@@ -153,7 +154,7 @@ class Racebar extends Component {
         <div className="Racebar-searchbar">
           <Searchbar/>
         </div>
-        { widgets && widgets.length > 0 && widgets.filter(w => w.element).map((widget, i) => (
+        { widgets && widgets.length > 0 && widgets.filter(w => (blacklist.indexOf(w.type) < 0)).map((widget, i) => (
           <div key={widget.id}
                className={classnames('Racebar-widget', {hoverField: hoverFields.has(widget.field())})} >
             { this.renderWidget(widget, false) }
