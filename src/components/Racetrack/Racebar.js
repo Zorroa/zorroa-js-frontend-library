@@ -153,7 +153,7 @@ class Racebar extends Component {
         <div className="Racebar-searchbar">
           <Searchbar/>
         </div>
-        { widgets && widgets.length > 0 && widgets.map((widget, i) => (
+        { widgets && widgets.length > 0 && widgets.filter(w => w.element).map((widget, i) => (
           <div key={widget.id}
                className={classnames('Racebar-widget', {hoverField: hoverFields.has(widget.field())})} >
             { this.renderWidget(widget, false) }
