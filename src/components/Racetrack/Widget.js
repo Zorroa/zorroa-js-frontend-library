@@ -17,7 +17,7 @@ class Widget extends Component {
     floatBody: PropTypes.bool.isRequired,
     children: PropTypes.node,
     icon: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
+    title: PropTypes.string,
     field: PropTypes.string,
     backgroundColor: PropTypes.string.isRequired,
     isIconified: PropTypes.bool.isRequired,

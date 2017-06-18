@@ -73,7 +73,7 @@ class Exists extends Component {
     const { id, floatBody, isOpen, onOpen, isIconified } = this.props
     const { field, isMissing } = this.state
     const lastName = Asset.lastNamespace(unCamelCase(field))
-    const title = isMissing ? 'Missing' : 'Exists'
+    const title = isOpen ? undefined : (isMissing ? 'Missing' : 'Exists')
     return (
       <Widget className='Exists'
               id={id}

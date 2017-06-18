@@ -109,7 +109,7 @@ class Map extends Component {
   render () {
     const { id, floatBody, isOpen, onOpen, isIconified, assets, selectedAssetIds } = this.props
     const { locationField, searchField, term } = this.state
-    const title = Asset.lastNamespace(unCamelCase(searchField || locationField || '<Select Fields>'))
+    const field = Asset.lastNamespace(unCamelCase(searchField || locationField || '<Select Fields>'))
     const locationAssets = assets && assets.filter(asset => (asset.value(locationField)))
     const selectedAssets = assets && selectedAssetIds && locationAssets.filter(asset => (selectedAssetIds.has(asset.id)))
     const geohashes = this.aggBuckets()
@@ -138,8 +138,7 @@ class Map extends Component {
               onOpen={onOpen}
               floatBody={floatBody}
               icon={MapWidgetInfo.icon}
-              title={MapWidgetInfo.title}
-              field={title}
+              field={field}
               backgroundColor={MapWidgetInfo.color}
               isIconified={isIconified}>
         <ReactMapboxGl containerStyle={{height: '500px'}}

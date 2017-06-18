@@ -482,8 +482,8 @@ class Facet extends Component {
     const { id, floatBody, isIconified, isOpen, onOpen } = this.props
     const { field, terms } = this.state
     const lastName = Asset.lastNamespace(unCamelCase(field))
-    const title = terms && terms.length ? lastName : FacetWidgetInfo.title
-    const selected = terms && terms.length ? terms.join(',') : lastName
+    const title = terms && terms.length ? (isOpen ? lastName : undefined) : undefined
+    const selected = terms && terms.length ? (isOpen ? undefined : terms.join(',')) : lastName
     return (
       <Widget className="Facet"
               id={id}

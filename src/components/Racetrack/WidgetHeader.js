@@ -35,7 +35,7 @@ WidgetHeader.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   isIconified: PropTypes.bool.isRequired,
   maxWidth: PropTypes.number,
-  title: PropTypes.string.isRequired,
+  title: PropTypes.string,
   field: PropTypes.string,
   icon: PropTypes.string.isRequired,
   backgroundColor: PropTypes.string.isRequired,

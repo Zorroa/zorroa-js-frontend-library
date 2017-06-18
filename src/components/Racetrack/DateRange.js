@@ -136,8 +136,8 @@ class DateRange extends Component {
     const { field, minStr, maxStr } = this.state
     const lastName = Asset.lastNamespace(unCamelCase(field))
     const active = minStr && maxStr
-    const title = active ? lastName : DateRangeWidgetInfo.title
-    const label = active ? `${minStr} → ${maxStr}` : lastName
+    const title = active ? (isOpen ? lastName : undefined) : undefined
+    const label = active ? (isOpen ? undefined: `${minStr} → ${maxStr}`) : lastName
     const intervals = ['day', 'week', 'month', 'year']
 
     return (

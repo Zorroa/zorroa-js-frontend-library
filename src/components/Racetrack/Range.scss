@@ -8,7 +8,7 @@
   }
 
   .WidgetHeader-header-field {
-    min-width: 100px;
+    //min-width: 70px;
   }
 
   .Range-body {
@@ -18,7 +18,7 @@
     flex-direction: column;
     padding: 10px;
     overflow: hidden;
-
+    min-width: 200px;
     input {
       outline: none;
       background: none;

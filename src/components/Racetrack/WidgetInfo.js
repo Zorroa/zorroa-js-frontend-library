@@ -53,7 +53,7 @@ export const MapWidgetInfo = {
 export const ColorWidgetInfo = {
   type: 'COLOR',
   icon: 'icon-eyedropper',
-  title: 'Color Search',
+  title: 'Colors',
   description: 'Search by color',
   fieldTypes: [ 'nested' ],
   element: <Color/>,

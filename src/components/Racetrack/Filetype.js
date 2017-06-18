@@ -204,6 +204,30 @@ class Filetype extends Component {
     return count
   }
 
+  title () {
+    let title = ''
+    const all = [...this.state.exts]
+    Object.keys(groupExts).forEach(group => {
+      const exts = groupExts[group]
+      let count = 0
+      for (let i = 0; i < exts.length; ++i) if (all.indexOf(exts[i]) >= 0) count++
+      if (count === exts.length) {
+        // All extensions for group are selected, add to title and remove extensions
+        if (title.length) title += ','
+        title += group
+        exts.forEach(ext => {
+          const idx = all.indexOf(ext)
+          all.splice(idx, 1)
+        })
+      }
+    })
+    if (all.length) {
+      if (title.length) title += ','
+      title += all.join(',')
+    }
+    return title
+  }
+
   renderSelected () {
     const { exts } = this.state
     if (!exts || !exts.length) return null
@@ -276,12 +300,15 @@ class Filetype extends Component {
     const isSelected = this.state.exts.length > 0
     const placeholder = isSelected ? '' : 'Search filetypes'
     const style = { width: isSelected ? '60px' : '140px' }
-    const title = exts && exts.length ? exts.join(',') : FiletypeWidgetInfo.title
+    const active = exts && exts.length
+    const title = active ? (isOpen ? FiletypeWidgetInfo.title : undefined) : FiletypeWidgetInfo.title
+    const field = active ? (isOpen ? undefined : this.title()) : undefined
     return (
       <Widget className="Filetype"
               id={id}
               floatBody={floatBody}
               title={title}
+              field={field}
               backgroundColor={FiletypeWidgetInfo.color}
               isIconified={isIconified}
               isOpen={isOpen}

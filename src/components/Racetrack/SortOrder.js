@@ -79,8 +79,8 @@ class SortOrder extends Component {
     const { order, id, floatBody, isOpen, onOpen, isIconified } = this.props
     const { suggestions, suggestion } = this.state
     const active = order && order.length > 0
-    const title = active ? this.title(order[0], true) : SortOrderWidgetInfo.title
-
+    const title = active ? (isOpen ? SortOrderWidgetInfo.title : undefined) : SortOrderWidgetInfo.title
+    const field = active ? (isOpen ? undefined : this.title(order[0], true)) : undefined
     return (
       <Widget className='SortOrder'
               id={id}
@@ -88,6 +88,7 @@ class SortOrder extends Component {
               onOpen={onOpen}
               floatBody={floatBody}
               title={title}
+              field={field}
               backgroundColor={SortOrderWidgetInfo.color}
               isIconified={isIconified}
               icon={SortOrderWidgetInfo.icon}>

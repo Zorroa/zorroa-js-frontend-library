@@ -70,8 +70,8 @@ class Collections extends Component {
     const { suggestions, suggestion } = this.state
     const selectedFolders = [...selectedFolderIds.values()].map(id => folders.get(id))
     const selectedFolderNames = selectedFolders.map(folder => folder.name)
-    const title = selectedFolderNames.length ? undefined : CollectionsWidgetInfo.title
-    const field = selectedFolderNames.length ? selectedFolderNames.join(',') : undefined
+    const title = selectedFolderNames.length ? (isOpen ? CollectionsWidgetInfo.title : undefined) : CollectionsWidgetInfo.title
+    const field = selectedFolderNames.length ? (isOpen ? undefined : selectedFolderNames.join(',')) : undefined
     const placeholder = selectedFolders.size ? '' : 'Search folders'
 
     return (
