@@ -169,10 +169,10 @@ describe('Workspace', function () {
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.AssetPermissions-apply')))
       .then(_ => selenium.clickSelector(By.css('.AssetPermissions-apply')))
       .then(_ => { DEBUG && console.log('command progress - started command') })
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.CommandProgress-progress-bar')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.ProgressBar')))
       .then(_ => driver.sleep(5000)) // progress bar is supposed to be visible for 5 seconds
       .then(_ => { DEBUG && console.log('command progress - woke up') })
-      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.CommandProgress-progress-bar')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.ProgressBar')))
       .then(_ => { DEBUG && console.log('command progress - finished') })
   })
 

@@ -119,7 +119,7 @@ class Preferences extends Component {
             <button className="Preferences-reset" onClick={this.reset}>Reset Default User Settings</button>
             <button className="Preferences-reset" onClick={this.changePassword}>Change Password</button>
             <div className="Preferences-uxlevel">
-              <input type="checkbox" checked={uxLevel > 0} onClick={this.toggleUXLevel}/>
+              <input type="checkbox" className="Preferences-uxlevel-input" checked={uxLevel > 0} onClick={this.toggleUXLevel}/>
               <div className="Preferences-uxlevel-label">Advanced Controls</div>
             </div>
             <div className="Preferences-field-template">

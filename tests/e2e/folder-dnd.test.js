@@ -148,6 +148,7 @@ describe('Folder dnd', function () {
       .then(ele => ele.click())
     .then(_ => selenium.waitForIdle())
     .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
+      .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
 
     .then(_ => { DEBUG && console.log('find & toggle the Users folder ' + Date.now()) })
     .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down

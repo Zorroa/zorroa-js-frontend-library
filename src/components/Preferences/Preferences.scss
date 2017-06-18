@@ -1,6 +1,8 @@
 @import '../../styles/core-mixins.scss';
 
 .Preferences {
+  overflow: auto;
+  max-height: 95vh;
   .Preferences-header {
     text-transform: uppercase;
     color: white;

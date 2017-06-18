@@ -114,7 +114,7 @@ export const SimilarHashWidgetInfo = {
   create: createSimilarityWidget,
   fieldTypes: [],
   fieldRegex: /^Similarity\..+/,
-  color: '#775980'
+  color: '#6f8059'
 }
 
 export const CollectionsWidgetInfo = {

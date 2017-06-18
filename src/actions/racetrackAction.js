@@ -65,7 +65,7 @@ export function restoreSearch (search, doNotRestoreSelectedFolders) {
     widgets.push(simpleSearch)
   }
 
-  // Restore widgets from aggs
+  // Restore widgets from aggs to restore widgets that have no active filter
   if (search.aggs) {
     // Missing Color, Exists, Similar, SortOrder
     Object.keys(search.aggs).forEach(id => {

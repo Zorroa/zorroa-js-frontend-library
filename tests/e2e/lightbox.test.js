@@ -63,6 +63,8 @@ describe('Lightbox', function () {
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Filetype')))
     .then(_ => selenium.waitForIdle())
     .then(_ => selenium.clickSelector(By.css('.Filetype-group-Image .Check')))
+    .then(_ => selenium.clickSelector(By.css('.Widget.Filetype')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Widget-body')))
     .then(_ => selenium.waitForIdle())
 
     .then(_ => { DEBUG && console.log('open the lightbox') })
