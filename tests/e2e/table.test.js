@@ -2,7 +2,7 @@ require('babel-register')({})
 // import * as assert from 'assert'
 import * as selenium from './selenium.js'
 var driver
-const { By, until } = selenium.webdriver
+const { By, Key, until } = selenium.webdriver
 
 const DEBUG = true
 
@@ -56,10 +56,21 @@ describe('Table', function () {
   // Tests below ASSUME we are logged in!
   // ------------------------------------
 
+  function pageDown (by) {
+    return driver.then(_ => {
+      return driver.findElement(by)
+        .then(ele => {
+          return ele.getSize()
+            .then(size => { return driver.actions().mouseMove(ele, {x: size.width - 5, y: size.height - 5}).click().sendKeys(Key.PAGE_DOWN, Key.PAGE_DOWN, Key.PAGE_DOWN, Key.PAGE_DOWN, Key.PAGE_DOWN).perform() })
+        })
+    })
+      .then(_ => driver.sleep(100))
+  }
+
   it('test the Table', function () {
     var TableToggle
     var assetsScrollHeight
-    var expectedMinAssetsScrollHeight = '139.031px' // see Assets.js:footerEditbarAndPaddingHeight
+    var expectedMinAssetsScrollHeight = '133.953px' // see Assets.js:footerEditbarAndPaddingHeight
     var expectedMinTableHeight = '26px' // see Assets.js:minTableHeight
     var elements
 
@@ -108,6 +119,26 @@ describe('Table', function () {
 
     .then(_ => { DEBUG && console.log('Table shouldnt be visible initially') })
     .then(_ => selenium.expectSelectorVisibleToBe(false, By.css('.Table')))
+
+      .then(_ => { DEBUG && console.log('admin menu preferences') })
+      .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.header-menu-user')))
+      .then(_ => { DEBUG && console.log('admin menu preferences - 1') })
+      .then(_ => selenium.clickSelector(By.css('.header-menu-user')))
+      .then(_ => { DEBUG && console.log('admin menu preferences - 2') })
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.header-menu-prefs')))
+      .then(_ => { DEBUG && console.log('admin menu preferences - 3') })
+      .then(_ => selenium.clickSelector(By.css('.header-menu-prefs')))
+      .then(_ => { DEBUG && console.log('admin menu preferences - 4') })
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Preferences')))
+      .then(_ => { DEBUG && console.log('admin menu preferences - 6') })
+      .then(_ => driver.findElement(By.css('.Preferences-uxlevel-input')))
+        .then(ele => {
+          DEBUG && console.log('found uxlevel input')
+          if (ele.value !== 'on') ele.click()
+        })
+      .then(_ => { DEBUG && console.log('admin menu preferences - 7') })
+      .then(_ => selenium.clickSelector(By.css('.Preferences-close')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Preferences')))
 
     .then(_ => { DEBUG && console.log('Open the Table') })
     .then(_ => driver.findElement(By.css('.TableToggle')))

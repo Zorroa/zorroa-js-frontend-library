@@ -6,14 +6,12 @@
   height: 30px;
   text-transform: uppercase;
   font-weight: 100;
-  overflow: hidden;
   filter: grayscale(100%) opacity(50%);
   cursor: pointer;
   color: $zorroa-gray;
   background-color: $zorroa-darkwhite;
-  & .WidgetHeader-enable {
-    filter: none;
-  }
+  position: relative;
+  & .WidgetHeader-enable { filter: none; }
 
   border-radius: 3px;
   .Widget.isOpen & { border-radius: 3px 3px 0 0; }
@@ -48,7 +46,8 @@
   @include zorroa-square-icon(20px);
   font-size: 16px;
   opacity: 0.5;
-  margin-left: 8px;
+  margin-left: 4px;
+  margin-right: 4px;
 }
 
 .WidgetHeader-label {
@@ -64,10 +63,11 @@
   cursor: pointer;
   filter: none;
   font-size: 16px;
+  margin-right: 8px;
 
   &:hover {
     // showing green is the intent, but the color is currently not visible due to parent's filter when disabled
-    background-color: $zorroa-sickly-green;
+    background-color: $zorroa-gray;
   }
   &.isEnabled:hover {
     background-color: $zorroa-faded-red;
@@ -75,9 +75,17 @@
 }
 
 .WidgetHeader-close {
-  margin-right: 8px;
   font-size: 12px;
-  @include zorroa-square-btn-darken(20px);
+  position: absolute;
+  right: -9px;
+  top: -9px;
+  color: $zorroa-greyish-brown;
+  filter: none;
+  padding: 2px;
+  border-radius: 3px;
+  opacity: 0;
+  .WidgetHeader:hover & { opacity: 1; }
+  &:hover { color: red; background-color: white; }
 }
 
 .WidgetHeader-caret {
@@ -109,7 +117,7 @@
 .WidgetHeader-header-title {
   @include flexOff;
   font-weight: 100;
-  margin-left: 4px;
+  font-size: 12px;
   margin-right: 4px;
   cursor: pointer;
   max-width: 100%;
@@ -118,6 +126,7 @@
 
 .WidgetHeader-header-field {
   @include flexOn;
+  font-family: "Roboto Condensed";
   font-weight: 400;
   cursor: pointer;
   max-width: 100%;
@@ -126,7 +135,6 @@
 
 .WidgetHeader-pin {
   @include zorroa-square-btn-darken(20px);
-  margin-left: 10px;
 }
 
 .WidgetHeader-pin-img {
@@ -137,6 +145,7 @@
 }
 
 .WidgetHeader-collapse {
-  margin-left: 4px;
+  margin-left: 6px;
+  margin-right: 8px;
   &.isOpen { transform: rotate(180deg); }
 }

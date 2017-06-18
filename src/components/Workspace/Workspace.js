@@ -266,7 +266,6 @@ class Workspace extends Component {
           {/*  left panel - folders */}
           <Sidebar onToggle={this.toggleLeftSidebar}
                    isIconified={app.leftSidebarIsIconified}>
-            <div className="Workspace-sidebar-spacer"/>
             <Collapsible {...CollectionParams()}>
               <Folders/>
             </Collapsible>

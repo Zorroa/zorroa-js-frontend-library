@@ -16,7 +16,7 @@ export default class Folder {
       this.id = json.id
       this.parentId = json.parentId
       this.dyhiId = json.dyhiId
-      this.name = json.name
+      this.name = json.name || '(none)'
       this.user = json.user && new User(json.user)
       this.timeCreated = json.timeCreated
       this.timeModified = json.timeModified

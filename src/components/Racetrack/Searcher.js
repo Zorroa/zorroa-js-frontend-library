@@ -81,18 +81,6 @@ class Searcher extends Component {
     return folderCounts && folderCounts.has(folderId) && filteredFolderCounts && filteredFolderCounts.has(folderId)
   }
 
-  // Return a filter comprised of all widget filters except one
-  allOtherFilters (widget) {
-    const { widgets } = this.props
-    let allOther = new AssetFilter()
-    for (let w of widgets) {
-      if (w !== widget && w.isEnabled && w.sliver && w.sliver.filter && w.sliver.aggs) {
-        allOther.merge(w.sliver.filter)
-      }
-    }
-    return allOther
-  }
-
   // Manage a cache of pending count ids for both full and query counts.
   queueFolderCounts = (ids, query) => {
     if (this.pendingQuery && query && !this.pendingQuery.equals(query)) {
@@ -139,13 +127,7 @@ class Searcher extends Component {
   // facet are placed in a filter-bucket with the allOtherFilter so
   // they show the results that do not include their own filter.
   // Note that post-filter is less efficient than a standard filter.
-  render () {
-    const {
-      widgets, actions, selectedFolderIds, query,
-      modifiedFolderIds, trashedFolders, order,
-      similar,
-      metadataFields, lightbarFields, thumbFields, fieldTypes } = this.props
-    if (!fieldTypes) return null
+  static build = (widgets, nonTrashedFolderIds, order, similar) => {
     let foldersDisabled = false
     let orderDisabled = false
     let similarDisabled = false
@@ -161,7 +143,17 @@ class Searcher extends Component {
         let sliver = widget.sliver
         if (sliver.aggs) {
           if (widget.isEnabled) postFilter.merge(widget.sliver.filter)
-          const allOthers = widget.type === MapWidgetInfo.type ? new AssetFilter() : this.allOtherFilters(widget).convertToBool()
+          // Return a filter comprised of all widget filters except one
+          const allOtherFilters = (widget) => {
+            let allOther = new AssetFilter()
+            for (let w of widgets) {
+              if (w !== widget && w.isEnabled && w.sliver && w.sliver.filter && w.sliver.aggs) {
+                allOther.merge(w.sliver.filter)
+              }
+            }
+            return allOther
+          }
+          const allOthers = widget.type === MapWidgetInfo.type ? new AssetFilter() : allOtherFilters(widget).convertToBool()
           let aggs = {[widget.id]: {filter: allOthers, aggs: sliver.aggs}}
           sliver = new AssetSearch({aggs})
         }
@@ -176,22 +168,9 @@ class Searcher extends Component {
     if (!orderDisabled) assetSearch.order = order
 
     // Add a filter for selected folders
-    if (!foldersDisabled && selectedFolderIds && selectedFolderIds.size) {
-      // Server does not support searching of trashed folders
-      let nonTrashedFolderIds
-      if (trashedFolders && trashedFolders.length) {
-        nonTrashedFolderIds = []
-        selectedFolderIds.forEach(id => {
-          const index = trashedFolders.findIndex(trashedFolder => (trashedFolder.folderId === id))
-          if (index < 0) nonTrashedFolderIds.push(id)
-        })
-      } else {
-        nonTrashedFolderIds = [...selectedFolderIds]
-      }
-      if (nonTrashedFolderIds && nonTrashedFolderIds.length) {
-        const filter = new AssetFilter({links: {folder: nonTrashedFolderIds}})
-        assetSearch.merge(new AssetSearch({filter}))
-      }
+    if (!foldersDisabled && nonTrashedFolderIds && nonTrashedFolderIds.length) {
+      const filter = new AssetFilter({links: {folder: nonTrashedFolderIds}})
+      assetSearch.merge(new AssetSearch({filter}))
     }
 
     // Force similar ordering
@@ -216,6 +195,36 @@ class Searcher extends Component {
       })
       assetSearch.merge(new AssetSearch({filter}))
     }
+
+    return assetSearch
+  }
+
+  static nonTrashedFolderIds = (selectedFolderIds, trashedFolders) => {
+    let nonTrashedFolderIds
+    if (trashedFolders && trashedFolders.length) {
+      nonTrashedFolderIds = []
+      selectedFolderIds.forEach(id => {
+        const index = trashedFolders.findIndex(trashedFolder => (trashedFolder.folderId === id))
+        if (index < 0) nonTrashedFolderIds.push(id)
+      })
+    } else {
+      nonTrashedFolderIds = [...selectedFolderIds]
+    }
+    return nonTrashedFolderIds
+  }
+
+  render () {
+    const {
+      widgets, actions, selectedFolderIds, query,
+      modifiedFolderIds, trashedFolders, order,
+      similar,
+      metadataFields, lightbarFields, thumbFields, fieldTypes
+    } = this.props
+    if (!fieldTypes) return null
+
+    // Server does not support searching of trashed folders
+    const nonTrashedFolderIds = Searcher.nonTrashedFolderIds(selectedFolderIds, trashedFolders)
+    const assetSearch = Searcher.build(widgets, nonTrashedFolderIds, order, similar)
 
     // Limit results to favorited fields, since we only display values
     // in those fields in the Table and Lightbar

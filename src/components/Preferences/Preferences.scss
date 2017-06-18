@@ -1,6 +1,8 @@
 @import '../../styles/core-mixins.scss';
 
 .Preferences {
+  overflow: auto;
+  max-height: 95vh;
   .Preferences-header {
     text-transform: uppercase;
     color: white;
@@ -151,5 +153,16 @@
 .Preferences-field-template-label {
   width: 120px;
   margin-left: 8px;
+  color: $zorroa-gray;
+}
+
+.Preferences-uxlevel {
+  @include flexRowCenter;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.Preferences-uxlevel-label {
+  margin-left: 4px;
   color: $zorroa-gray;
 }

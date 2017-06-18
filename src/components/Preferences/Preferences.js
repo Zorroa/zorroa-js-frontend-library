@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import JSONTree from 'react-json-tree'
 
-import { hideModal, lightbarFieldTemplate, thumbFieldTemplate } from '../../actions/appActions'
+import { hideModal, lightbarFieldTemplate, thumbFieldTemplate, uxLevel } from '../../actions/appActions'
 import { saveUserSettings, changePassword } from '../../actions/authAction'
 import { archivistInfo, archivistHealth, archivistMetrics } from '../../actions/archivistAction'
 import User from '../../models/User'
@@ -40,6 +40,7 @@ class Preferences extends Component {
     health: PropTypes.object,
     metrics: PropTypes.object,
     actions: PropTypes.object,
+    uxLevel: PropTypes.number,
     userSettings: PropTypes.object.isRequired,
     lightbarFieldTemplate: PropTypes.string,
     thumbFieldTemplate: PropTypes.string
@@ -89,8 +90,14 @@ class Preferences extends Component {
     this.dismiss()
   }
 
+  toggleUXLevel = (event) => {
+    const uxLevel = this.props.uxLevel === 0 ? 1 : 0
+    this.props.actions.uxLevel(uxLevel)
+    this.props.actions.saveUserSettings(this.props.user, {...this.props.userSettings, uxLevel })
+  }
+
   render () {
-    const { user, info, health, metrics, lightbarFieldTemplate, thumbFieldTemplate } = this.props
+    const { user, info, health, metrics, lightbarFieldTemplate, thumbFieldTemplate, uxLevel } = this.props
     return (
       <div className="Preferences">
         <div className="Preferences-header">
@@ -111,6 +118,10 @@ class Preferences extends Component {
           <div className="Preferences-curator flexCol">
             <button className="Preferences-reset" onClick={this.reset}>Reset Default User Settings</button>
             <button className="Preferences-reset" onClick={this.changePassword}>Change Password</button>
+            <div className="Preferences-uxlevel">
+              <input type="checkbox" className="Preferences-uxlevel-input" checked={uxLevel > 0} onClick={this.toggleUXLevel}/>
+              <div className="Preferences-uxlevel-label">Advanced Controls</div>
+            </div>
             <div className="Preferences-field-template">
               <input type="text" className="Preferences-field-template-input" value={lightbarFieldTemplate} onChange={this.changeLightbarFieldTemplate}/>
               <div className="Preferences-field-template-label">Lightbar Label</div>
@@ -149,6 +160,7 @@ export default connect(state => ({
   info: state.archivist.info,
   health: state.archivist.health,
   metrics: state.archivist.metrics,
+  uxLevel: state.app.uxLevel,
   userSettings: state.app.userSettings,
   lightbarFieldTemplate: state.app.lightbarFieldTemplate,
   thumbFieldTemplate: state.app.thumbFieldTemplate
@@ -161,6 +173,7 @@ export default connect(state => ({
     archivistMetrics,
     hideModal,
     lightbarFieldTemplate,
-    thumbFieldTemplate
+    thumbFieldTemplate,
+    uxLevel
   }, dispatch)
 }))(Preferences)

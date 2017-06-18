@@ -7,7 +7,7 @@ import {
   SHOW_MULTIPAGE, SHOW_PAGES, VIDEO_VOLUME,
   HOVER_FIELD, CLEAR_HOVER_FIELD,
   USER_SETTINGS, UNAUTH_USER,
-  THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE
+  THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE, UX_LEVEL
 } from '../constants/actionTypes'
 import { DEFAULT_THUMBSIZE } from '../actions/appActions'
 import { parseVariables, fieldsForVariables } from '../services/jsUtil'
@@ -18,6 +18,7 @@ export const defaultLightbarFields = [ 'source.type', 'source.filename', 'source
 export const defaultThumbFields = [ 'source.type', 'image.width', 'image.height', 'video.width', 'video.height' ]
 const initialState = {
   modal: null,
+  uxLevel: 0,
   leftSidebarIsIconified: false,
   rightSidebarIsIconified: true,
   collapsibleOpen: {
@@ -130,6 +131,9 @@ export default function app (state = initialState, action) {
       const lightbarFieldTemplate = action.payload
       const lightbarFields = fieldsForVariables(parseVariables(lightbarFieldTemplate))
       return { ...state, lightbarFieldTemplate, lightbarFields }
+    }
+    case UX_LEVEL: {
+      return { ...state, uxLevel: action.payload }
     }
     case USER_SETTINGS:
       return { ...state, userSettings: action.payload.metadata }

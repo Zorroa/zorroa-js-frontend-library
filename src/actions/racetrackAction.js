@@ -15,6 +15,7 @@ import {
 } from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
 import { selectFolderIds } from './folderAction'
+import { similarAssets } from './assetsAction'
 
 export function modifyRacetrackWidget (widget) {
   assert.ok(widget instanceof Widget)
@@ -54,7 +55,7 @@ export function similar (similar) {
 }
 
 // Reconstruct Racetrack widgets from a search.
-export function restoreSearch (search) {
+export function restoreSearch (search, doNotRestoreSelectedFolders) {
   let widgets = []
 
   // Create a SimpleSearch if we have a query string
@@ -64,14 +65,45 @@ export function restoreSearch (search) {
     widgets.push(simpleSearch)
   }
 
+  // Restore widgets from aggs to restore widgets that have no active filter
+  if (search.aggs) {
+    // Missing Color, Exists, Similar, SortOrder
+    Object.keys(search.aggs).forEach(id => {
+      const agg = search.aggs[id]
+      if (agg.aggs.facet) {
+        const field = agg.aggs.facet.terms.field
+        console.log('Restore Facet ' + field)
+        const type = field === 'source.extension' ? FiletypeWidgetInfo.type : FacetWidgetInfo.type
+        const name = type === FiletypeWidgetInfo.type ? 'filetype' : 'facet'
+        const aggs = { [name]: { terms: {field, size: 100} } }
+        let sliver = new AssetSearch({aggs})
+        const facet = new Widget({type, sliver})
+        widgets.push(facet)
+      } else if (agg.aggs.filetype) {
+        console.log('Restore Filetype')
+      } else if (agg.aggs.map) {
+        console.log('Restore Map')
+      } else {
+        Object.values(agg).forEach(field => {
+          const range = agg[field]
+          if (range.gte && range.lte) {
+            console.log('Restore DateRange ' + field)
+          } else if (range.min && range.max) {
+            console.log('Restore Range')
+          }
+        })
+      }
+    })
+  }
+
   // Create a facet for each term.
   // FIXME: Maps create a term facet too!
   if (search.postFilter && search.postFilter.terms) {
     Object.keys(search.postFilter.terms).forEach(field => {
       const type = field === 'source.extension' ? FiletypeWidgetInfo.type : FacetWidgetInfo.type
       const terms = search.postFilter.terms[field]
-      const agg = type === FiletypeWidgetInfo.type ? 'filetype' : 'facet'
-      const aggs = { [agg]: { terms: {field, size: 100} } }
+      const name = type === FiletypeWidgetInfo.type ? 'filetype' : 'facet'
+      const aggs = { [name]: { terms: {field, size: 100} } }
       let sliver = new AssetSearch({aggs})
       if (terms && terms.length) {
         sliver.filter = new AssetFilter({terms: {[field]: terms}})
@@ -148,15 +180,19 @@ export function restoreSearch (search) {
   }
 
   // Return actions to update the racetrack for the new search
-  const actions = [resetRacetrackWidgets(widgets), selectFolderIds(selectedFolderIds)]
+  const actions = [resetRacetrackWidgets(widgets)]
+  if (!doNotRestoreSelectedFolders) actions.push(selectFolderIds(selectedFolderIds))
 
   // Create a SimilarHash widget if there's a hash query
   if (search.filter && search.filter.hamming) {
     actions.push(similar({
       field: search.filter.hamming.field,
       values: search.filter.hamming.hashes,
-      assetIds: search.filter.hamming.assetIds
+      assetIds: search.filter.hamming.assetIds,
+      weights: search.filter.hamming.weights
     }))
+    const fields = [search.filter.hamming.field, 'image.width', 'image.height', 'video.width', 'video.height', 'proxies*']
+    actions.push(similarAssets(search.filter.hamming.assetIds, fields))
   }
 
   // Reset the racetrack to the new widget

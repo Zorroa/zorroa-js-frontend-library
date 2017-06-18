@@ -126,11 +126,14 @@ class SimilarHash extends Component {
     const { similarAssets } = this.props
     const { selectedAssetId } = this.state
     const asset = similarAssets.find(asset => asset.id === id)
-    const height = 120
-    const aspect = asset.aspect() || asset.proxyAspect() || 1
-    const width = aspect * height
-    const url = asset.closestProxyURL(this.props.origin, width, height)
-    const style = { backgroundImage: `url(${url})`, minWidth: width, minHeight: height }
+    let style
+    if (asset) {
+      const height = 120
+      const aspect = asset.aspect() || asset.proxyAspect() || 1
+      const width = aspect * height
+      const url = asset.closestProxyURL(this.props.origin, width, height)
+      style = { backgroundImage: `url(${url})`, minWidth: width, minHeight: height }
+    }
     return (
       <div className={classnames('SimilarHash-thumb', {selected: id === selectedAssetId})} key={id}
            style={style}

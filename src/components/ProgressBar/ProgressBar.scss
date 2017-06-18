@@ -1,0 +1,48 @@
+@import '../../styles/core-mixins';
+
+.ProgressBar {
+  @include flexOn;
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  height: 5px;
+  border-radius: 2.5px;
+  background-color: $zorroa-darkgray;
+
+  &.indeterminate {
+    opacity: 0.75;
+    background: repeating-linear-gradient(-45deg,#777,#777 10px,#888 10px,#888 20px);
+    background-size: 28px 28px;
+    -webkit-animation: slide 20s infinite linear forwards;
+    -moz-animation: slide 20s infinite linear forwards;
+    animation: slide 20s infinite linear forwards;
+  }
+}
+
+@-webkit-keyframes slide {
+  0% { background-position: 0% 0; }
+  100% { background-position: 100% 0; }
+}
+
+@-moz-keyframes slide {
+  0% { background-position: 0% 0; }
+  100% { background-position: 100% 0; }
+}
+
+@keyframes slide {
+  0% { background-position: 0% 0; }
+  100% { background-position: 100% 0; }
+}
+
+.ProgressBar-progress {
+  @include fullHeight;
+  background-color: cornflowerblue;
+  border-radius: 2.5px;
+  &.hasErrors { border-radius: 0; }
+}
+
+.ProgressBar-errors {
+  @include fullHeight;
+  background-color: $zorroa-faded-red;
+  border-top-right-radius: 2.5px;
+  border-bottom-right-radius: 2.5px;
+}

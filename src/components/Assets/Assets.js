@@ -9,8 +9,8 @@ import Thumb, { page, monopageBadges, multipageBadges } from '../Thumb'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
 import Widget from '../../models/Widget'
-import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, similarAssets } from '../../actions/assetsAction'
-import { resetRacetrackWidgets, restoreSearch } from '../../actions/racetrackAction'
+import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, similarAssets, unorderAssets } from '../../actions/assetsAction'
+import { resetRacetrackWidgets, restoreSearch, similar } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
 import { setThumbSize, setThumbLayout, showTable, setTableHeight, showMultipage, showModal, hideModal, iconifyRightSidebar } from '../../actions/appActions'
@@ -20,6 +20,7 @@ import Table from '../Table'
 import Sidebar from '../Sidebar'
 import Racebar from '../Racetrack/Racebar'
 import Racetrack from '../Racetrack'
+import ProgressBar from '../ProgressBar'
 import * as ComputeLayout from './ComputeLayout.js'
 import AssetSearch from '../../models/AssetSearch'
 import Resizer from '../../services/Resizer'
@@ -32,6 +33,7 @@ const defaultTableHeight = 300
 
 class Assets extends Component {
   static propTypes = {
+    searching: PropTypes.bool.isRequired,
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     assetsCounter: PropTypes.number.isRequired,
     query: PropTypes.instanceOf(AssetSearch),
@@ -54,6 +56,7 @@ class Assets extends Component {
       assetIds: PropTypes.arrayOf(PropTypes.string).isRequired
     }).isRequired,
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
+    uxLevel: PropTypes.number,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     origin: PropTypes.string,
@@ -213,6 +216,8 @@ class Assets extends Component {
   clearSearch = () => {
     this.props.actions.resetRacetrackWidgets()
     this.props.actions.selectFolderIds()
+    this.props.actions.similar()
+    this.props.actions.unorderAssets()
   }
 
   tableResizeStart = (event) => {
@@ -598,7 +603,7 @@ class Assets extends Component {
 
   render () {
     const { assets, query, totalCount, tableHeight, showTable, showMultipage,
-      layout, thumbSize, assetsCounter, rightSidebarIsIconified, widgets } = this.props
+      layout, thumbSize, assetsCounter, rightSidebarIsIconified, widgets, uxLevel, searching } = this.props
     const { collapsed, tableIsResizing } = this.state
 
     // Trigger layout if assets change.
@@ -626,11 +631,14 @@ class Assets extends Component {
       this.skipNextSelectionScroll = false
     }
 
-    const pinnedWidget = widgets && widgets.findIndex(widget => widget.isPinned) >= 0
+    const pinnedWidget = uxLevel > 0 && widgets && widgets.findIndex(widget => widget.isPinned) >= 0
 
     return (
       <div className="Assets" ref="Assets">
         <Racebar/>
+        <div className="Assets-searching">
+          { searching && <ProgressBar successPct={0} errorPct={0}/> }
+        </div>
         <div className="Assets-workspace">
           <div className="Assets-body">
             {this.renderAssets()}
@@ -647,13 +655,13 @@ class Assets extends Component {
               showMultipage={showMultipage}
               toggleShowMultipage={this.toggleShowMultipage}
               showTable={showTable}
-              toggleShowTable={this.toggleShowTable}
+              toggleShowTable={uxLevel > 0 ? this.toggleShowTable : null}
               layout={layout}
               handleLayout={this.changeLayout.bind(this)}
               thumbSize={thumbSize}
               handleThumbSize={this.changeThumbSize.bind(this)}
             /> }
-            { totalCount > 0 && showTable && (
+            { totalCount > 0 && showTable && uxLevel > 0 && (
               <Table height={this.clampTableHeight(tableHeight)}
                      tableIsResizing={tableIsResizing}
                      selectFn={this.select}/>
@@ -684,6 +692,7 @@ export default connect(state => ({
   rightSidebarIsIconified: state.app.rightSidebarIsIconified,
   folders: state.folders.all,
   trashedFolders: state.folders.trashedFolders,
+  uxLevel: state.app.uxLevel,
   user: state.auth.user,
   userSettings: state.app.userSettings,
   thumbSize: state.app.thumbSize,
@@ -694,6 +703,7 @@ export default connect(state => ({
   thumbFieldTemplate: state.app.thumbFieldTemplate,
   similar: state.racetrack.similar,
   widgets: state.racetrack.widgets,
+  searching: state.assets.searching,
   origin: state.auth.origin
 }), dispatch => ({
   actions: bindActionCreators({
@@ -702,6 +712,8 @@ export default connect(state => ({
     sortAssets,
     searchAssets,
     similarAssets,
+    unorderAssets,
+    similar,
     resetRacetrackWidgets,
     restoreSearch,
     selectFolderIds,

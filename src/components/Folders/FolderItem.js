@@ -15,7 +15,6 @@ import CreateFolder from './CreateFolder'
 import AssetPermissions from '../AssetPermissions'
 import {
   createFolder,
-  selectFolderIds,
   addAssetIdsToFolderId,
   removeAssetIdsFromFolderId,
   deleteFolderIds,
@@ -111,12 +110,6 @@ class FolderItem extends Component {
     event.preventDefault()
     const { folder, actions } = this.props
     actions.restoreSearch(folder.search)
-    let folders = []
-    if (folder.search && folder.search.filter &&
-      folder.search.filter.links && folder.search.filter.links.folder) {
-      folders = folder.search.filter.links.folder
-    }
-    actions.selectFolderIds(folders)
     this.dismissContextMenu(event)
   }
 
@@ -521,7 +514,6 @@ export default connect(state => ({
 }), dispatch => ({
   actions: bindActionCreators({
     createFolder,
-    selectFolderIds,
     addAssetIdsToFolderId,
     removeAssetIdsFromFolderId,
     exportAssets,

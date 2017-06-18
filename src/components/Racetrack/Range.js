@@ -276,8 +276,8 @@ class Range extends Component {
 
     const active = min !== undefined && min !== null && max !== undefined && max !== null
     const lastName = Asset.lastNamespace(unCamelCase(field))
-    const title = active ? lastName : RangeWidgetInfo.title
-    const label = active ? `${this.valToString(min)} → ${this.valToString(max)}` : lastName
+    const title = active ? (isOpen ? lastName : undefined) : undefined
+    const label = active ? (isOpen ? undefined : `${this.valToString(min)} → ${this.valToString(max)}`) : lastName
     return (
       <Widget className='Range'
               id={id}

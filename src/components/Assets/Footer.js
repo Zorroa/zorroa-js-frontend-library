@@ -10,7 +10,7 @@ const Footer = (props) => (
     <ThumbSizeSlider value={props.thumbSize} onChange={props.handleThumbSize} />
     <MultipageToggle enabled={props.showMultipage} onClick={props.toggleShowMultipage}/>
     <ThumbLayoutSelector thumbLayout={props.layout} onClick={props.handleLayout} />
-    <TableToggle enabled={props.showTable} onClick={props.toggleShowTable} />
+    { props.toggleShowTable && <TableToggle enabled={props.showTable} onClick={props.toggleShowTable} /> }
   </div>
 )
 
@@ -20,7 +20,7 @@ Footer.propTypes = {
   total: PropTypes.number.isRequired,
   onUncollapse: PropTypes.func.isRequired,
   showTable: PropTypes.bool.isRequired,
-  toggleShowTable: PropTypes.func.isRequired,
+  toggleShowTable: PropTypes.func,
   layout: PropTypes.string.isRequired,
   handleLayout: PropTypes.func.isRequired,
   thumbSize: PropTypes.number.isRequired,

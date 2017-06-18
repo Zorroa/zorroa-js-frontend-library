@@ -128,11 +128,6 @@
     border-spacing: 0;
   }
 
-  td:last-child {
-    text-align: right;
-    width: 60px;
-  }
-
   .Facet-value-cell {
     padding: 0;
     max-width: 0; // This looks weird, but is important! It allows cells to chop content
@@ -143,6 +138,8 @@
     padding: 0 10px 0 0;
     max-width: 0; // This looks weird, but is important! It allows cells to chop content
     @include clampText;
+    text-align: right;
+    width: 60px;
   }
 
   .Facet-table-header {
