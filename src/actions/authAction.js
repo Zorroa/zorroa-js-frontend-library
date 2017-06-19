@@ -179,7 +179,7 @@ function authorize (dispatch, json, source) {
       dispatch({type: SET_TABLE_FIELD_WIDTH, payload: metadata.tableFieldWidths})
     }
     if (metadata.uxLevel) {
-      dispatch({type: UX_LEVEL, payload: metadata.uxLevel })
+      dispatch({type: UX_LEVEL, payload: metadata.uxLevel})
     }
   }
   const url = source && source.length ? '?source=' + source : ''

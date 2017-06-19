@@ -93,7 +93,7 @@ class Preferences extends Component {
   toggleUXLevel = (event) => {
     const uxLevel = this.props.uxLevel === 0 ? 1 : 0
     this.props.actions.uxLevel(uxLevel)
-    this.props.actions.saveUserSettings(this.props.user, {...this.props.userSettings, uxLevel })
+    this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, uxLevel })
   }
 
   render () {

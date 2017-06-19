@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import * as assert from 'assert'
 import DateTimePicker from 'react-widgets/lib/DateTimePicker'
 
 import { createDateRangeWidget } from '../../models/Widget'
@@ -53,30 +52,41 @@ class DateRange extends Component {
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
     if (widget && widget.sliver) {
-      if (widget.sliver.filter && widget.sliver.filter.range) {
-        const range = widget.sliver.filter.range
-        const keys = Object.keys(range)
-        assert.ok(keys.length === 1) // there should only be one entry here
-        const field = keys[0]
-        if (field !== this.state.field) {
-          this.setStatePromise({ field })
-            .then(() => requestAnimationFrame(this.modifySliver))
-        }
-        if (nextProps.aggs) {
-          const agg = nextProps.aggs[id]
-          if (agg && agg[field]) {
-            const minStr = agg[field].gte || moment().subtract(1, 'days').format(format)
-            const maxStr = agg[field].lte || moment().format(format)
-            const min = moment(minStr, format).toDate()
-            const max = moment(maxStr, format).toDate()
-            if (minStr !== this.state.minStr || maxStr !== this.state.maxStr) {
-              this.setStatePromise({min, max, minStr, maxStr})
-                .then(() => requestAnimationFrame(this.modifySliver))
-            }
-          }
+      const field = widget.sliver.aggs && widget.sliver.aggs.dateRange && widget.sliver.aggs.dateRange.stats.field
+      if (!this.state.field || this.state.field !== field) {
+        this.setState({field, min: null, max: null, minStr: null, maxStr: null})
+      }
+    } else if (nextProps.aggs) {
+      const field = this.aggField(nextProps)
+      if (field && (!this.state.field || field !== this.state.field)) {
+        const range = this.aggRange(field)
+        if (range) {
+          const minStr = range.min
+          const maxStr = range.max
+          const min = moment(minStr, format).toDate()
+          const max = moment(maxStr, format).toDate()
+          this.setState({field, min, max, minStr, maxStr})
         }
       }
     }
+  }
+
+  aggField = (props) => {
+    const { aggs, id } = props
+    if (!aggs) return
+    const agg = aggs[id]
+    if (!agg) return
+    const keys = Object.keys(agg)
+    const idx = keys.findIndex(key => typeof agg[key] === 'object')
+    return keys[idx]
+  }
+
+  aggRange = (field) => {
+    const { aggs, id } = this.props
+    if (!aggs) return
+    const agg = aggs[id]
+    if (!agg) return
+    return agg[field]
   }
 
   componentWillReceiveProps (nextProps) {
@@ -137,7 +147,7 @@ class DateRange extends Component {
     const lastName = Asset.lastNamespace(unCamelCase(field))
     const active = minStr && maxStr
     const title = active ? (isOpen ? lastName : undefined) : undefined
-    const label = active ? (isOpen ? undefined: `${minStr} → ${maxStr}`) : lastName
+    const label = active ? (isOpen ? undefined : `${minStr} → ${maxStr}`) : lastName
     const intervals = ['day', 'week', 'month', 'year']
 
     return (

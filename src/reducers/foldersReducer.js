@@ -7,7 +7,6 @@ import {
   QUEUE_FOLDER_COUNTS, CLEAR_FOLDER_COUNT_QUEUE, ASSET_SEARCH
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
-import AssetSearch from '../models/AssetSearch'
 import * as assert from 'assert'
 
 // Folders are stored in the all map indexed by id.

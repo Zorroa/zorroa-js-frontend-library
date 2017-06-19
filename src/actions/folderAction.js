@@ -7,7 +7,7 @@ import Folder from '../models/Folder'
 import AssetSearch from '../models/AssetSearch'
 import { restoreSearch } from './racetrackAction'
 import { archivistGet, archivistPut, archivistPost, archivistRequest } from './authAction'
-import { selectId } from '../services/jsUtil'
+import { selectId, equalSets } from '../services/jsUtil'
 
 const rootEndpoint = '/api/v1/folders'
 
@@ -47,25 +47,16 @@ export function selectFolderIds (ids, curIds, folders) {
   let actions = []
   // If a new folder is added to the current selection,
   // restore the merged search from all selected folders
-  if (curIds && folders) {
-    let addedFolder = false
+  if (curIds && folders && !equalSets(ids, curIds)) {
+    const search = new AssetSearch()
     const iter = ids.keys()
-    for (let i = iter.next(); !i.done && !addedFolder; i = iter.next()) {
-      if (!curIds.has(i.value)) addedFolder = true
+    for (let i = iter.next(); !i.done; i = iter.next()) {
+      const folder = folders.get(i.value)
+      if (folder && folder.search) search.merge(folder.search)
     }
-    if (addedFolder) {
-      const search = new AssetSearch()
-      const iter = ids.keys()
-      for (let i = iter.next(); !i.done; i = iter.next()) {
-        const folder = folders.get(i.value)
-        if (folder && folder.search) {
-          search.merge(folder.search)
-        }
-      }
-      if (JSON.stringify(search) !== JSON.stringify(new AssetSearch())) {
-        const restoreActions = restoreSearch(search, true /* avoid infinite folder selection recursion */)
-        restoreActions.forEach(action => actions.push(action))
-      }
+    if (JSON.stringify(search) !== JSON.stringify(new AssetSearch())) {
+      const restoreActions = restoreSearch(search, true /* avoid infinite folder selection recursion */)
+      restoreActions.forEach(action => actions.push(action))
     }
   }
   actions.push({

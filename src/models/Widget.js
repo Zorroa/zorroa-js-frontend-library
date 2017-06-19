@@ -69,7 +69,8 @@ export function createSearchWidget (field, fieldType, queryString, fuzzy, isEnab
 
 export function createExistsWidget (field, fieldType, isMissing, isEnabled, isPinned) {
   const type = ExistsWidgetInfo.type
-  const sliver = new AssetSearch()
+  const aggs = { exists: { stats: { field } } }   // Just for restore, refactor for Folder data
+  const sliver = new AssetSearch({ aggs })
   if (field) {
     const key = (isMissing) ? 'missing' : 'exists'
     sliver.filter = new AssetFilter({ [key]: [ field ] })
@@ -101,8 +102,9 @@ export function createMapWidget (field, fieldType, term, isEnabled, isPinned) {
 
 export function createDateRangeWidget (field, fieldType, minStr, maxStr, isEnabled, isPinned) {
   const type = DateRangeWidgetInfo.type
-  let sliver = new AssetSearch({ })
-  if (field) {
+  const aggs = { dateRange: { stats: { field } } }     // Just for restore, refactor for Folder data
+  let sliver = new AssetSearch({ aggs })
+  if (field && minStr !== undefined && minStr !== null && maxStr !== undefined && maxStr !== null) {
     const range = { [field]: { 'gte': minStr, 'lte': maxStr } }
     sliver.filter = new AssetFilter({ range })
   }
@@ -115,26 +117,17 @@ export function createRangeWidget (field, fieldType, min, max, isEnabled, isPinn
   const aggs = { [field]: { stats: { field } } }
   let sliver = new AssetSearch({ aggs })
   // assert.ok(min !== null && max !== null)
-  if (field) {
+  if (field && min !== undefined && max !== undefined && min !== null && max !== null && min !== Number.MAX_SAFE_INTEGER && max !== -Number.MAX_SAFE_INTEGER) {
     const range = { [field]: { 'gte': min, 'lte': max } }
     sliver.filter = new AssetFilter({ range })
   }
   return new Widget({ type, sliver, isEnabled, isPinned })
 }
 
-export function createSimilarityWidget (hashName, fieldType, hashVal, minScore, hashTypes, isEnabled, isPinned) {
+export function createSimilarityWidget (field, fieldType, isEnabled, isPinned) {
   const type = SimilarHashWidgetInfo.type
-  let sliver = new AssetSearch(/*{aggs}*/) // NB aggs break the search!
-  if (hashTypes && hashTypes[hashName]) hashName = `Similarity.${hashName}.${hashTypes[hashName]}`
-  if (hashName) {
-    sliver.filter = new AssetFilter({
-      hamming: {
-        field: `${hashName}.raw`,
-        hashes: hashVal ? [ hashVal ] : undefined,
-        minScore
-      }
-    })
-  }
+  const aggs = { similar: { stats: { field } } }     // Just for restore, refactor for Folder data
+  let sliver = new AssetSearch({ aggs }) // NB aggs break the search!
   return new Widget({type, sliver, isEnabled, isPinned})
 }
 
@@ -152,7 +145,8 @@ export function createFiletypeWidget (field, fieldType, exts, isEnabled, isPinne
 
 export function createColorWidget (field, fieldType, colors, isServerHSL, isEnabled, isPinned) {
   const type = ColorWidgetInfo.type
-  const sliver = new AssetSearch()
+  const aggs = { colors: { stats: { field } } }     // Just for restore, refactor for Folder data
+  const sliver = new AssetSearch({ aggs })
   const RATIO_MAX_FACTOR = 1.5  // maxRatio in query is this factor times user ratio
   const RATIO_MIN_FACTOR = 0.25 // minRatio in query is this factor times user ratio
 
@@ -183,12 +177,18 @@ export function createColorWidget (field, fieldType, colors, isServerHSL, isEnab
 
 // Bare ctor used by AddWidget, values come directly from app state
 export function createCollectionsWidget (field, fieldType, isEnabled, isPinned) {
-  return new Widget({type: CollectionsWidgetInfo.type, isEnabled, isPinned})
+  field = 'source.filename'
+  const aggs = { collections: { stats: { field } } }     // Just for restore, refactor for Folder data
+  const sliver = new AssetSearch({aggs})
+  return new Widget({type: CollectionsWidgetInfo.type, sliver, isEnabled, isPinned})
 }
 
 // Bare ctor used by AddWidget, values come directly from app state
 export function createSortOrderWidget (field, filedType, isEnabled, isPinned) {
-  return new Widget({type: SortOrderWidgetInfo.type, isEnabled, isPinned})
+  field = 'source.filename'
+  const aggs = { sortOrder: { stats: { field } } }     // Just for restore, refactor for Folder data
+  const sliver = new AssetSearch({aggs})
+  return new Widget({type: SortOrderWidgetInfo.type, sliver, isEnabled, isPinned})
 }
 
 export function fieldUsedInWidget (field, widget) {
