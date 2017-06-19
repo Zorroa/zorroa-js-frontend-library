@@ -129,14 +129,46 @@ export default class AssetFilter {
   convertToBool () {
     // convert to elasticSearch schema:
     // multiple terms in the aggs fields need to be boolean queries
-    if (this.terms && Object.keys(this.terms).length > 1) {
-      let terms = this.terms
-      delete this.terms
-      let boolMust = []
-      for (let termKey in terms) {
-        boolMust.push({ terms: { [termKey]: terms[termKey] } })
+    const count =
+      (this.terms ? Object.keys(this.terms).length : 0) +
+      (this.range ? Object.keys(this.range).length : 0) +
+      (this.exists ? this.exists.length : 0) +
+      (this.missing ? this.missing.length : 0) +
+      (this.scripts ? this.scripts.length : 0) +
+      (this.hamming ? 1 : 0)
+
+    if (count > 1) {
+      const must = []
+      if (this.terms) {
+        let terms = this.terms
+        delete this.terms
+        for (let termKey in terms) {
+          must.push({terms: {[termKey]: terms[termKey]}})
+        }
       }
-      this.bool = { must: boolMust }
+      if (this.range) {
+        let range = this.range
+        delete this.range
+        for (let rangeKey in range) {
+          must.push({range: {[rangeKey]: range[rangeKey]}})
+        }
+      }
+      if (this.exists) {
+        let exists = this.exists
+        delete this.exists
+        must.push({exists})
+      }
+      if (this.missing) {
+        let missing = this.missing
+        delete this.missing
+        must.push({missing})
+      }
+      if (this.scripts) {
+        let scripts = this.scripts
+        delete this.scripts
+        must.push({scripts})
+      }
+      this.bool = { must }
     }
     return this   // Allow chaining
   }

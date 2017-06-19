@@ -1,6 +1,8 @@
 import { MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS,
   SIMILAR_VALUES } from '../constants/actionTypes'
-import Widget from '../models/Widget'
+import Widget, { createFacetWidget, createExistsWidget, createMapWidget,
+  createDateRangeWidget, createRangeWidget, createSimilarityWidget,
+  createFiletypeWidget, createColorWidget, createSortOrderWidget } from '../models/Widget'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
 import {
@@ -66,30 +68,62 @@ export function restoreSearch (search, doNotRestoreSelectedFolders) {
   }
 
   // Restore widgets from aggs to restore widgets that have no active filter
+  // using the master widget constructors for consistent agg definitions.
   if (search.aggs) {
-    // Missing Color, Exists, Similar, SortOrder
+    const isEnabled = true
+    const isPinned = true
     Object.keys(search.aggs).forEach(id => {
       const agg = search.aggs[id]
       if (agg.aggs.facet) {
         const field = agg.aggs.facet.terms.field
-        console.log('Restore Facet ' + field)
-        const type = field === 'source.extension' ? FiletypeWidgetInfo.type : FacetWidgetInfo.type
-        const name = type === FiletypeWidgetInfo.type ? 'filetype' : 'facet'
-        const aggs = { [name]: { terms: {field, size: 100} } }
-        let sliver = new AssetSearch({aggs})
-        const facet = new Widget({type, sliver})
+        const fieldType = 'string'
+        const order = { '_count': 'desc' }
+        const terms = undefined
+        const facet = createFacetWidget(field, fieldType, terms, order, isEnabled, isPinned)
         widgets.push(facet)
       } else if (agg.aggs.filetype) {
-        console.log('Restore Filetype')
+        const field = 'source.extension'
+        const fieldType = 'string'
+        const exts = undefined
+        const filetype = createFiletypeWidget(field, fieldType, exts, isEnabled, isPinned)
+        widgets.push(filetype)
       } else if (agg.aggs.map) {
-        console.log('Restore Map')
+        const field = agg.aggs.map.geohash_grid.field
+        const map = createMapWidget(field, 'point', undefined, isEnabled, isPinned)
+        widgets.push(map)
+      } else if (agg.aggs.exists) {
+        const isMissing = true
+        const field = agg.aggs.exists.stats.field
+        const exists = createExistsWidget(field, null, isMissing, isEnabled, isPinned)
+        widgets.push(exists)
+      } else if (agg.aggs.dateRange) {
+        const field = agg.aggs.dateRange.stats.field
+        const minStr = undefined
+        const maxStr = undefined
+        const dateRange = createDateRangeWidget(field, 'date', minStr, maxStr, isEnabled, isPinned)
+        widgets.push(dateRange)
+      } else if (agg.aggs.similar) {
+        const hashName = agg.aggs.similar.stats.field
+        const similar = createSimilarityWidget(hashName, 'string', isEnabled, isPinned)
+        widgets.push(similar)
+      } else if (agg.aggs.colors) {
+        const vals = undefined
+        const isServerHSL = true
+        const colors = createColorWidget('colors', 'color', vals, isServerHSL, isEnabled, isPinned)
+        widgets.push(colors)
+      } else if (agg.aggs.sortOrder) {
+        const field = undefined
+        const fieldType = undefined
+        const sortOrder = createSortOrderWidget(field, fieldType, isEnabled, isPinned)
+        widgets.push(sortOrder)
       } else {
-        Object.values(agg).forEach(field => {
-          const range = agg[field]
-          if (range.gte && range.lte) {
-            console.log('Restore DateRange ' + field)
-          } else if (range.min && range.max) {
-            console.log('Restore Range')
+        Object.keys(agg.aggs).forEach(field => {
+          const range = agg.aggs[field]
+          if (range && range.stats && range.stats.field === field) {
+            const min = undefined
+            const max = undefined
+            const range = createRangeWidget(field, 'double', min, max, isEnabled)
+            widgets.push(range)
           }
         })
       }
@@ -100,27 +134,30 @@ export function restoreSearch (search, doNotRestoreSelectedFolders) {
   // FIXME: Maps create a term facet too!
   if (search.postFilter && search.postFilter.terms) {
     Object.keys(search.postFilter.terms).forEach(field => {
-      const type = field === 'source.extension' ? FiletypeWidgetInfo.type : FacetWidgetInfo.type
       const terms = search.postFilter.terms[field]
-      const name = type === FiletypeWidgetInfo.type ? 'filetype' : 'facet'
-      const aggs = { [name]: { terms: {field, size: 100} } }
-      let sliver = new AssetSearch({aggs})
       if (terms && terms.length) {
-        sliver.filter = new AssetFilter({terms: {[field]: terms}})
+        const facet = widgets.find(widget => (
+          (widget.type === FacetWidgetInfo.type &&
+          field === widget.sliver.aggs.facet.terms.field) ||
+          (widget.type === FiletypeWidgetInfo.type &&
+          field === widget.sliver.aggs.filetype.terms.field)
+        ))
+        if (facet) {
+          facet.sliver.filter = new AssetFilter({terms: {[field]: terms}})
+        }
       }
-      const facet = new Widget({type, sliver})
-      widgets.push(facet)
     })
   }
 
   // Create an exists widget for each "exists" & "missing" field
   if (search.filter && (search.filter.exists || search.filter.missing)) {
-    const type = ExistsWidgetInfo.type
     var mkExistsWidget = (field, isMissing) => {
-      let sliver = new AssetSearch()
-      sliver.filter = new AssetFilter({[isMissing ? 'missing' : 'exists']: [field]})
-      const existsWidget = new Widget({type, sliver})
-      widgets.push(existsWidget)
+      const exists = widgets.find(widget => (
+        widget.type === ExistsWidgetInfo.type &&
+        field === widget.sliver.aggs.exists.stats.field
+      ))
+      assert.ok(exists)
+      exists.sliver.filter = new AssetFilter({[isMissing ? 'missing' : 'exists']: [field]})
     }
     if (search.filter.exists) {
       search.filter.exists.forEach(field => mkExistsWidget(field, false))
@@ -136,12 +173,12 @@ export function restoreSearch (search, doNotRestoreSelectedFolders) {
   // TODO: fix all this during the widget state refactor
   // when we store an explicit racetrack data block on the server
   if (search.postFilter && search.postFilter.range) {
-    const type = RangeWidgetInfo.type
     for (let field in search.postFilter.range) {
-      let sliver = new AssetSearch()
-      sliver.filter = new AssetFilter({ range: { [field]: search.postFilter.range[field] } })
-      const rangeWidget = new Widget({type, sliver})
-      widgets.push(rangeWidget)
+      const range = widgets.find(widget => (
+        widget.type === RangeWidgetInfo.type &&
+        field === widget.sliver.aggs[field].stats.field
+      ))
+      range.sliver.filter = new AssetFilter({ range: { [field]: search.postFilter.range[field] } })
     }
   }
 
@@ -151,22 +188,19 @@ export function restoreSearch (search, doNotRestoreSelectedFolders) {
   // TODO: fix all this during the widget state refactor
   // when we store an explicit racetrack data block on the server
   if (search.filter && search.filter.range) {
-    const type = DateRangeWidgetInfo.type
     for (let field in search.filter.range) {
-      let sliver = new AssetSearch()
-      sliver.filter = new AssetFilter({ range: { [field]: search.filter.range[field] } })
-      const rangeWidget = new Widget({type, sliver})
-      widgets.push(rangeWidget)
+      const range = widgets.find(widget => (
+        widget.type === DateRangeWidgetInfo.type &&
+        field === widget.sliver.aggs.dateRange.stats.field
+      ))
+      range.sliver.filter = new AssetFilter({ range: { [field]: search.filter.range[field] } })
     }
   }
 
   // Create a color widget if there's a color query
   if (search.filter && search.filter.colors) {
-    const type = ColorWidgetInfo.type
-    let sliver = new AssetSearch()
-    sliver.filter = new AssetFilter({colors: search.filter.colors})
-    const color = new Widget({type, sliver})
-    widgets.push(color)
+    const colors = widgets.find(widget => (widget.type === ColorWidgetInfo.type))
+    colors.sliver.filter = new AssetFilter({colors: search.filter.colors})
   }
 
   // Select the folders specified in the search
