@@ -81,7 +81,7 @@ export function createExistsWidget (field, fieldType, isMissing, isEnabled, isPi
 export function createFacetWidget (field, fieldType, terms, order, isEnabled, isPinned) {
   const type = FacetWidgetInfo.type
   const rawField = aggField(field, fieldType)
-  const aggs = { facet: { terms: { field: rawField, order, size: 100 } } }
+  const aggs = { facet: { terms: { field: rawField, order, size: 1000 } } }
   const filter = terms && terms.length ? new AssetFilter({terms: {[rawField]: terms}}) : null
   const sliver = new AssetSearch({filter, aggs})
   return new Widget({type, sliver, isEnabled, isPinned})

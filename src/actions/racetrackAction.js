@@ -69,9 +69,10 @@ export function restoreSearch (search, doNotRestoreSelectedFolders) {
 
   // Restore widgets from aggs to restore widgets that have no active filter
   // using the master widget constructors for consistent agg definitions.
+  // Note that Dynamic Hierarchies do not have aggs saved, like saved searches.
+  const isEnabled = true
+  const isPinned = false
   if (search.aggs) {
-    const isEnabled = true
-    const isPinned = true
     Object.keys(search.aggs).forEach(id => {
       const agg = search.aggs[id]
       if (agg.aggs.facet) {
@@ -144,6 +145,10 @@ export function restoreSearch (search, doNotRestoreSelectedFolders) {
         ))
         if (facet) {
           facet.sliver.filter = new AssetFilter({terms: {[field]: terms}})
+        } else {
+          const order = { '_count': 'desc' }
+          const w = createFacetWidget(field, 'string', terms, order, isEnabled, isPinned)
+          widgets.push(w)
         }
       }
     })
@@ -156,8 +161,12 @@ export function restoreSearch (search, doNotRestoreSelectedFolders) {
         widget.type === ExistsWidgetInfo.type &&
         field === widget.sliver.aggs.exists.stats.field
       ))
-      assert.ok(exists)
-      exists.sliver.filter = new AssetFilter({[isMissing ? 'missing' : 'exists']: [field]})
+      if (exists) {
+        exists.sliver.filter = new AssetFilter({[isMissing ? 'missing' : 'exists']: [field]})
+      } else {
+        const w = createExistsWidget(field, null, isMissing, isEnabled, isPinned)
+        widgets.push(w)
+      }
     }
     if (search.filter.exists) {
       search.filter.exists.forEach(field => mkExistsWidget(field, false))
@@ -178,7 +187,12 @@ export function restoreSearch (search, doNotRestoreSelectedFolders) {
         widget.type === RangeWidgetInfo.type &&
         field === widget.sliver.aggs[field].stats.field
       ))
-      range.sliver.filter = new AssetFilter({ range: { [field]: search.postFilter.range[field] } })
+      if (range) {
+        range.sliver.filter = new AssetFilter({ range: { [field]: search.postFilter.range[field] } })
+      } else {
+        const w = createRangeWidget(field, 'double', undefined, undefined, isEnabled, isPinned)
+        widgets.push(w)
+      }
     }
   }
 
@@ -193,14 +207,24 @@ export function restoreSearch (search, doNotRestoreSelectedFolders) {
         widget.type === DateRangeWidgetInfo.type &&
         field === widget.sliver.aggs.dateRange.stats.field
       ))
-      range.sliver.filter = new AssetFilter({ range: { [field]: search.filter.range[field] } })
+      if (range) {
+        range.sliver.filter = new AssetFilter({range: {[field]: search.filter.range[field]}})
+      } else {
+        const w = createDateRangeWidget(field, 'date', undefined, undefined, isEnabled, isPinned)
+        widgets.push(w)
+      }
     }
   }
 
   // Create a color widget if there's a color query
   if (search.filter && search.filter.colors) {
     const colors = widgets.find(widget => (widget.type === ColorWidgetInfo.type))
-    colors.sliver.filter = new AssetFilter({colors: search.filter.colors})
+    if (colors) {
+      colors.sliver.filter = new AssetFilter({colors: search.filter.colors})
+    } else {
+      const w = createColorWidget('colors', 'color', search.filter.colors, true, isEnabled, isPinned)
+      widgets.push(w)
+    }
   }
 
   // Select the folders specified in the search
