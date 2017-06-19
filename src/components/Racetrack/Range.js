@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import * as assert from 'assert'
 import classnames from 'classnames'
 
 import { createRangeWidget } from '../../models/Widget'
@@ -72,10 +71,12 @@ class Range extends Component {
       } else {
         this.setState({field})
       }
-    } else if (!this.state.field && nextProps.aggs) {
+    } else if (nextProps.aggs) {
       const field = this.aggField(nextProps)
-      const range = this.aggRange(field)
-      if (field && range) this.setState({field, min: range.min, max: range.max})
+      if (field && (!this.state.field || field !== this.state.field)) {
+        const range = this.aggRange(field)
+        if (range) this.setState({field, min: range.min, max: range.max})
+      }
     }
   }
 

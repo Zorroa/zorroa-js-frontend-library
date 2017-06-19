@@ -52,10 +52,7 @@ export function selectFolderIds (ids, curIds, folders) {
     const iter = ids.keys()
     for (let i = iter.next(); !i.done; i = iter.next()) {
       const folder = folders.get(i.value)
-      if (folder && folder.search) {
-        search.merge(folder.search)
-        console.log('Merging ' + folder.name + ': ' + JSON.stringify(search))
-      }
+      if (folder && folder.search) search.merge(folder.search)
     }
     if (JSON.stringify(search) !== JSON.stringify(new AssetSearch())) {
       const restoreActions = restoreSearch(search, true /* avoid infinite folder selection recursion */)

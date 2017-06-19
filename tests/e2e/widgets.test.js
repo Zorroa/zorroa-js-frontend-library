@@ -116,7 +116,7 @@ describe('search widget', function () {
       .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
       .then(_ => selenium.getFolderNamed('Users').then(ele => { allUsersFolder = ele }))
       // Toggle open the users folder
-      .then(_ => { DEBUG && console.log('toggle the Users folder') })
+      .then(_ => { DEBUG && console.log('toggle the Users folder ' + allUsersFolder.id) })
       .then(_ => allUsersFolder.click())
       .then(_ => selenium.waitForIdle())
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Collections'), 5000))

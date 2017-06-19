@@ -30,7 +30,7 @@ class Facet extends Component {
     aggs: PropTypes.object,
     fieldTypes: PropTypes.object,
     widgets: PropTypes.arrayOf(PropTypes.object),
-    uxLevel: PropTypes.number,
+    uxLevel: PropTypes.number
   }
 
   state = {
