@@ -145,13 +145,6 @@
   div { margin-left: 4px; }
 }
 
-.CreateFolder-section {
-  font-family: "Roboto Condensed";
-  color: $zorroa-lightgray;
-  text-transform: uppercase;
-  margin-bottom: 2px;
-}
-
 .CreateFolder-dyhis {
   @include flexCol;
   margin-top: 10px;
@@ -212,7 +205,6 @@
 
 .CreateFolder-mode-info {
   color: $zorroa-gray;
-  min-height: 130px;
   margin-left: 20px;
   margin-right: 20px;
 }

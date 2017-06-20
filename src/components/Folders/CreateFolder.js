@@ -20,7 +20,6 @@ class CreateFolder extends Component {
     onDelete: PropTypes.func,             // optional delete button
     onLink: PropTypes.func,               // optional link button
     includeAssets: PropTypes.bool,        // optionally include selected assets
-    widgetLayout: PropTypes.bool,         // optionally allow save un-selected widgets
     dyhiLevels: PropTypes.arrayOf(PropTypes.shape({
       field: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired   // [Attr, Year, Month, Day, Path]
@@ -40,7 +39,7 @@ class CreateFolder extends Component {
     isShared: false,
     acl: null,
     includeSelectedAssets: this.props.includeAssets,
-    mode: 'Search'                        // 'Search', 'Layout', 'Hierarchy'
+    mode: 'Search'                        // 'Search', 'Hierarchy'
   }
 
   changeName = (event) => {
@@ -109,10 +108,9 @@ class CreateFolder extends Component {
   renderModes () {
     const { isManager } = this.props
     if (!isManager) return
-    const { widgetLayout, dyhiLevels, uxLevel } = this.props
+    const { dyhiLevels } = this.props
     const { name, mode } = this.state
     const modes = ['Search']
-    if (uxLevel > 0 && widgetLayout) modes.push('Layout')
     if (dyhiLevels && dyhiLevels.length) modes.push('Hierarchy')
     const cleanField = (field) => (field.endsWith('.raw') ? field.slice(0, -4) : field)
     return (
@@ -129,33 +127,12 @@ class CreateFolder extends Component {
           <div className="CreateFolder-mode-info">
             Save the current search as a smart folder.
             Select the folder to restore the search.
-            <div className="CreateFolder-dyhis">
-              <div className="CreateFolder-section">Home</div>
-              <div className="CreateFolder-dyhi">
-                <div className="CreateFolder-dyhi-icon icon-collections-smart"/>
-                <div className="CreateFolder-dyhi-root">{name}</div>
-              </div>
-            </div>
-          </div>
-        )}
-        { mode === 'Layout' && (
-          <div className="CreateFolder-mode-info">
-            Save the current search without anything selected.
-            Store layouts for each common workflow.
-            <div className="CreateFolder-dyhis">
-              <div className="CreateFolder-section">Home</div>
-              <div className="CreateFolder-dyhi">
-                <div className="CreateFolder-dyhi-icon icon-collections-smart"/>
-                <div className="CreateFolder-dyhi-root">{name}</div>
-              </div>
-            </div>
           </div>
         )}
         { mode === 'Hierarchy' && (
           <div className="CreateFolder-mode-info">
             Save the current search as a folder hierarchy of the facet widgets from the current search:
             <div className="CreateFolder-dyhis">
-              <div className="CreateFolder-section">Library</div>
               <div className="CreateFolder-dyhi">
                 <div className="CreateFolder-dyhi-icon icon-foldercog"/>
                 <div className="CreateFolder-dyhi-root">{name}</div>

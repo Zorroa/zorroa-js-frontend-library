@@ -1,7 +1,8 @@
 import {
   GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, UPDATE_FOLDER,
   DELETE_FOLDER, TOGGLE_FOLDER, ADD_ASSETS_TO_FOLDER,
-  REMOVE_ASSETS_FROM_FOLDER, FOLDER_COUNTS, QUEUE_FOLDER_COUNTS, CLEAR_FOLDER_COUNT_QUEUE
+  REMOVE_ASSETS_FROM_FOLDER, DROP_FOLDER_ID,
+  FOLDER_COUNTS, QUEUE_FOLDER_COUNTS, CLEAR_FOLDER_COUNT_QUEUE
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import AssetSearch from '../models/AssetSearch'
@@ -252,5 +253,12 @@ export function createDyHiFolder (folder, dyhiLevels) {
       .catch(error => {
         console.error('Error creating folder ' + folder.name + ': ' + error)
       })
+  }
+}
+
+export function dropFolderId (id) {
+  return {
+    type: DROP_FOLDER_ID,
+    payload: id
   }
 }
