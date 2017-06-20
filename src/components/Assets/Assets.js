@@ -21,6 +21,7 @@ import Sidebar from '../Sidebar'
 import Racebar from '../Racetrack/Racebar'
 import Racetrack from '../Racetrack'
 import ProgressBar from '../ProgressBar'
+import FieldTemplate from '../FieldTemplate'
 import * as ComputeLayout from './ComputeLayout.js'
 import AssetSearch from '../../models/AssetSearch'
 import Resizer from '../../services/Resizer'
@@ -569,6 +570,8 @@ class Assets extends Component {
                   const indexes = parentId && multipage[parentId]
                   const badgeHeight = thumbSize < 100 ? 15 : 25
                   const badge = showMultipage ? multipageBadges(asset, origin, indexes && indexes.length, thumbFieldTemplate) : monopageBadges(asset)
+                  const iconBadge = <div className="Thumb-field"><FieldTemplate asset={asset} template={thumbFieldTemplate} extensionOnLeft={false}/></div>
+
                   const pages = indexes && indexes.slice(0, 3).map(index => (
                       page(assets[index], width, height, origin, indexes))) ||
                     [page(asset, width, height, origin)]
@@ -579,6 +582,7 @@ class Assets extends Component {
                            assetId={asset.id}
                            pages={pages}
                            badgeHeight={badgeHeight}
+                           iconBadge={iconBadge}
                            { ...badge }
                            onClick={event => {
                              // don't scroll assets when we select thumbs. (table selection will scroll)
