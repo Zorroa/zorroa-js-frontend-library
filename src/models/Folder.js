@@ -1,6 +1,7 @@
 import AclEntry, { hasAccess, isPublic } from './Acl'
 import User from './User'
 import AssetSearch from './AssetSearch'
+import Permission from './Permission'
 
 export default class Folder {
   static ROOT_ID = 0
@@ -35,7 +36,7 @@ export default class Folder {
   }
 
   isSmartCollection () {
-    return this.search && !this.search.empty() && !this.isDyhi()
+    return this.search && (this.search.aggs || !this.search.empty()) && !this.isDyhi()
   }
 
   isSimpleCollection () {
@@ -53,9 +54,13 @@ export default class Folder {
   hasAccess (user, access) {
     if (this.user && user && this.user.id === user.id) return true
     if (!user.permissions) return false
+    let isAdministrator = false
     for (let permission of user.permissions) {
+      if (permission.type === Permission.GroupType &&
+        permission.name === Permission.Administrator) isAdministrator = true
       if (hasAccess(this.acl, permission, access)) return true
     }
+    if (isAdministrator) return true
     return false
   }
 
@@ -68,6 +73,8 @@ export default class Folder {
   }
 
   canAddChildFolderIds (draggedFolderIds, folders, user) {
+    if (this.isDyhi()) return false
+    if (this.isSmartCollection()) return false
     if (draggedFolderIds instanceof Set) draggedFolderIds = [...draggedFolderIds]
     if (!draggedFolderIds || !draggedFolderIds.length || !folders || !user) return false
 

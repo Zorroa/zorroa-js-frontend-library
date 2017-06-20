@@ -12,7 +12,7 @@ import Searcher from './Searcher'
 import Searchbar from '../Searchbar'
 import AddWidget from './AddWidget'
 import CreateFolder from '../Folders/CreateFolder'
-import { showModal } from '../../actions/appActions'
+import { showModal, toggleCollapsible } from '../../actions/appActions'
 import { unorderAssets } from '../../actions/assetsAction'
 import { createFolder, selectFolderIds, createDyHiFolder } from '../../actions/folderAction'
 import { resetRacetrackWidgets, similar } from '../../actions/racetrackAction'
@@ -32,7 +32,6 @@ class Racebar extends Component {
       values: PropTypes.arrayOf(PropTypes.string),
       assetIds: PropTypes.arrayOf(PropTypes.string)
     }),
-    libraryId: PropTypes.number,
     user: PropTypes.instanceOf(User).isRequired,
     actions: PropTypes.object.isRequired
   }
@@ -82,14 +81,14 @@ class Racebar extends Component {
     const width = '400px'
     const body = <CreateFolder title='Create Smart Collection' acl={[]}
                                includeAssets={false}
-                               dyhiLevels={dyhiLevels} widgetLayout={true}
+                               dyhiLevels={dyhiLevels}
                                onCreate={this.saveSearch}/>
     this.props.actions.showModal({body, width})
   }
 
   saveSearch = (name, acl, dyhiLevels) => {
-    const { widgets, selectedFolderIds, trashedFolders, order, similar, user, libraryId } = this.props
-    const parentId = dyhiLevels && dyhiLevels.length ? libraryId : (user ? user.homeFolderId : Folder.ROOT_ID)
+    const { widgets, selectedFolderIds, trashedFolders, order, similar, user } = this.props
+    const parentId = user && user.homeFolderId
     const nonTrashedFolderIds = Searcher.nonTrashedFolderIds(selectedFolderIds, trashedFolders)
     const search = Searcher.build(widgets, nonTrashedFolderIds, order, similar)
     const saveSearch = dyhiLevels && typeof dyhiLevels === 'string' && dyhiLevels === 'Search'
@@ -109,6 +108,7 @@ class Racebar extends Component {
       }
       const folder = new Folder({ name, acl, parentId, search })
       this.props.actions.createFolder(folder)
+      this.props.actions.toggleCollapsible('home', true)
     }
   }
 
@@ -174,7 +174,6 @@ export default connect(state => ({
   selectedFolderIds: state.folders.selectedFolderIds,
   trashedFolders: state.folders.trashedFolders,
   similar: state.racetrack.similar,
-  libraryId: state.folders.libraryId,
   user: state.auth.user
 }), dispatch => ({
   actions: bindActionCreators({
@@ -184,6 +183,7 @@ export default connect(state => ({
     similar,
     unorderAssets,
     selectFolderIds,
-    showModal
+    showModal,
+    toggleCollapsible
   }, dispatch)
 }))(Racebar)

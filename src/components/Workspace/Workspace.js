@@ -21,6 +21,7 @@ import ChangePassword from '../auth/ChangePassword'
 import User from '../../models/User'
 import Job, { countOfJobsOfType } from '../../models/Job'
 import Asset from '../../models/Asset'
+import Folder from '../../models/Folder'
 import CommandProgress from '../Workspace/CommandProgress'
 import Lightbox from '../Lightbox'
 import Feedback from '../Feedback'
@@ -159,7 +160,7 @@ class Workspace extends Component {
     actions.iconifyLeftSidebar(!app.leftSidebarIsIconified)
   }
 
-  static collapsibleNames = new Set(['browsing', 'collection', 'simple', 'smart', 'metadata', 'metadata2'])
+  static collapsibleNames = new Set(['library', 'home', 'simple', 'smart', 'metadata', 'metadata2'])
   toggleCollapsible = (name) => {
     const { actions, app } = this.props
     // If the Sidebar is iconified, ignore the click, the sidebar will open itself instead
@@ -208,15 +209,23 @@ class Workspace extends Component {
   }
 
   render () {
-    const { app, isolatedId, selectedAssetIds } = this.props
+    const { app, isolatedId, selectedAssetIds, user } = this.props
 
-    const CollectionParams = () => ({
-      header: (<span>Collections</span>),
-      isOpen: app.collapsibleOpen.collection,
+    const LibraryParams = () => ({
+      header: (<span>Library</span>),
+      isOpen: app.collapsibleOpen.library,
       isIconified: app.leftSidebarIsIconified,
-      onOpen: this.toggleCollapsible.bind(this, 'collection'),
+      onOpen: this.toggleCollapsible.bind(this, 'library'),
+      closeIcon: 'icon-collections-smart',
+      className: 'Library-collapsible Collections-library'
+    })
+    const HomeParams = () => ({
+      header: (<span>Home</span>),
+      isOpen: app.collapsibleOpen.home,
+      isIconified: app.leftSidebarIsIconified,
+      onOpen: this.toggleCollapsible.bind(this, 'home'),
       closeIcon: 'icon-collections-simple',
-      className: 'Collections-collapsible'
+      className: 'Home-collapsible Collections-home'
     })
     const MetadataParams = () => ({
       header: (<span>Explore</span>),
@@ -266,8 +275,11 @@ class Workspace extends Component {
           {/*  left panel - folders */}
           <Sidebar onToggle={this.toggleLeftSidebar}
                    isIconified={app.leftSidebarIsIconified}>
-            <Collapsible {...CollectionParams()}>
-              <Folders/>
+            <Collapsible {...LibraryParams()}>
+              <Folders rootId={Folder.ROOT_ID} filter={folder => (folder.name !== 'Users')}/>
+            </Collapsible>
+            <Collapsible {...HomeParams()}>
+              <Folders rootId={user.homeFolderId}/>
             </Collapsible>
             <Collapsible {...MetadataParams()}>
               <Metadata/>

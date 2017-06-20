@@ -23,7 +23,8 @@ const initialState = {
   rightSidebarIsIconified: true,
   collapsibleOpen: {
     browsing: false,
-    collection: true,
+    library: true,
+    home: false,
     smart: false,
     simple: false,
     metadata: false,

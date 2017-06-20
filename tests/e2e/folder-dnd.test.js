@@ -41,22 +41,22 @@ describe('Folder dnd', function () {
   var emptyTrash = function () {
     return driver
 
-    .then(_ => selenium.getSelectorVisible(By.css('.Collections-collapsible .Trash')))
+    .then(_ => selenium.getSelectorVisible(By.css('.Home-collapsible .Trash')))
     .then(trashVisible => {
       if (!trashVisible) return driver.then(_ => { DEBUG && console.log('no trash to empty 1') })
       return selenium.getSelectorVisible(By.css('.Trash-body'))
       .then(trashBodyVisible => {
         if (!trashBodyVisible) return selenium.clickSelector(By.css('.Trash-toggle'))
       })
-      .then(_ => selenium.getSelectorVisible(By.css('.Collections-collapsible .Trash-empty')))
+      .then(_ => selenium.getSelectorVisible(By.css('.Home-collapsible .Trash-empty')))
       .then(trashEmptyVisible => {
         if (!trashEmptyVisible) return driver.then(_ => { DEBUG && console.log('no trash to empty 2') })
         return driver
         .then(_ => { DEBUG && console.log('emptying trash') })
-        .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Collections-collapsible .Trash-empty'), 5000))
-        .then(_ => selenium.clickSelector(By.css('.Collections-collapsible .Trash-empty')))
+        .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Home-collapsible .Trash-empty'), 5000))
+        .then(_ => selenium.clickSelector(By.css('.Home-collapsible .Trash-empty')))
         .then(_ => selenium.waitForIdle(15000))
-        .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Collections-collapsible .Trash'), 5000))
+        .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Home-collapsible .Trash'), 5000))
       })
     })
   }
@@ -64,11 +64,11 @@ describe('Folder dnd', function () {
   // open the collections panel if not already open
   var openCollectionsPanel = function () {
     return driver.then(_ => { DEBUG && console.log('open the collections panel') })
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Collections-collapsible'), 5000))
-    .then(_ => selenium.doesSelectorHaveClass(By.css('.Collections-collapsible'), 'isOpen'))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Home-collapsible'), 5000))
+    .then(_ => selenium.doesSelectorHaveClass(By.css('.Home-collapsible'), 'isOpen'))
       .then(isOpen => {
         if (!isOpen) {
-          driver.then(_ => selenium.clickSelector(By.css('.Collections-collapsible')))
+          driver.then(_ => selenium.clickSelector(By.css('.Home-collapsible')))
           driver.then(_ => selenium.waitForIdle())
         }
         // wait until some folders appear
@@ -118,7 +118,6 @@ describe('Folder dnd', function () {
   }
 
   it('add & remove assets + dnd', function () {
-    let allUsersFolder
     let myUserFolder
     const myUserName = `selenium-${Date.now()}`
 
@@ -146,24 +145,6 @@ describe('Folder dnd', function () {
     .then(_ => selenium.getFolderNamed('Film'))
       .then(folderEle => folderEle.findElement(By.css('.FolderItem-toggle')))
       .then(ele => ele.click())
-    .then(_ => selenium.waitForIdle())
-    .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
-      .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
-
-    .then(_ => { DEBUG && console.log('find & toggle the Users folder ' + Date.now()) })
-    .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
-    .then(_ => selenium.getFolderNamed('Users').then(ele => { allUsersFolder = ele }))
-    // Toggle open the users folder
-    .then(_ => { DEBUG && console.log('toggle the Users folder') })
-    .then(_ => allUsersFolder.findElement(By.css('.FolderItem-toggle')).click())
-    .then(_ => selenium.waitForIdle())
-    // select the users folder
-    .then(_ => { DEBUG && console.log('select the Users folder') })
-    .then(_ => allUsersFolder.click())
-    .then(_ => selenium.waitForIdle())
-    .then(_ => { DEBUG && console.log('deselect the Users folder') })
-    .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
-    .then(_ => allUsersFolder.click())
     .then(_ => selenium.waitForIdle())
 
     .then(_ => { DEBUG && console.log('Add a "selenium" user folder') })
@@ -352,7 +333,7 @@ describe('Folder dnd', function () {
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.FolderItem-context-remove-folder')))
     .then(_ => selenium.clickSelector(By.css('.FolderItem-context-remove-folder')))
     .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.FolderItem-context-remove-folder'), 5000))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Collections-collapsible .Trash'), 15000))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Home-collapsible .Trash'), 15000))
 
     .then(emptyTrash)
   })

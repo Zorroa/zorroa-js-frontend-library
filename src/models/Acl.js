@@ -16,6 +16,7 @@ export default class AclEntry {
 
 // Utility method to check for permission
 export function hasAccess (acl, permission, access) {
+  if (!acl) return false
   // Empty Acl gets read access?
   if (acl && !acl.length && access === AclEntry.ReadAccess) {
     return true
