@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
-import FieldTemplate from '../FieldTemplate'
 import Duration from '../Duration'
 import { DragSource } from '../../services/DragDrop'
 import Asset from '../../models/Asset'
@@ -32,8 +31,8 @@ export function monopageBadges (asset) {
   return { pageBadge }
 }
 
-export function multipageBadges (asset, origin, stackCount, fieldTemplate) {
-  let pageBadge, iconBadge, parentURL
+export function multipageBadges (asset, origin, stackCount) {
+  let pageBadge, parentURL
 
   const pageCount = asset.pageCount() || stackCount
   const startPage = asset.startPage()
@@ -52,14 +51,12 @@ export function multipageBadges (asset, origin, stackCount, fieldTemplate) {
     pageBadge = <Duration duration={asset.duration()}/>
   }
 
-  iconBadge = <div className="Thumb-field"><FieldTemplate asset={asset} template={fieldTemplate} extensionOnLeft={false}/></div>
-
   // Show the icon & inset if we have any page badging
   if (pageBadge) {
     parentURL = asset.smallestParentProxyURL(origin)
   }
 
-  return { pageBadge, iconBadge, parentURL }
+  return { pageBadge, parentURL }
 }
 
 // Called when dragging an asset to assign assetIds to drop info
