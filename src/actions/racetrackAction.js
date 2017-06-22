@@ -92,21 +92,12 @@ export function restoreSearch (search, doNotRestoreSelectedFolders) {
         const field = agg.aggs.map.geohash_grid.field
         const map = createMapWidget(field, 'point', undefined, isEnabled, isPinned)
         widgets.push(map)
-      } else if (agg.aggs.exists) {
-        const isMissing = true
-        const field = agg.aggs.exists.stats.field
-        const exists = createExistsWidget(field, null, isMissing, isEnabled, isPinned)
-        widgets.push(exists)
       } else if (agg.aggs.dateRange) {
         const field = agg.aggs.dateRange.stats.field
         const minStr = undefined
         const maxStr = undefined
         const dateRange = createDateRangeWidget(field, 'date', minStr, maxStr, isEnabled, isPinned)
         widgets.push(dateRange)
-      } else if (agg.aggs.similar) {
-        const hashName = agg.aggs.similar.stats.field
-        const similar = createSimilarityWidget(hashName, 'string', isEnabled, isPinned)
-        widgets.push(similar)
       } else if (agg.aggs.colors) {
         const vals = undefined
         const isServerHSL = true

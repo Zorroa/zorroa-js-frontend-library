@@ -69,8 +69,7 @@ export function createSearchWidget (field, fieldType, queryString, fuzzy, isEnab
 
 export function createExistsWidget (field, fieldType, isMissing, isEnabled, isPinned) {
   const type = ExistsWidgetInfo.type
-  const aggs = { exists: { stats: { field } } }   // Just for restore, refactor for Folder data
-  const sliver = new AssetSearch({ aggs })
+  const sliver = new AssetSearch()
   if (field) {
     const key = (isMissing) ? 'missing' : 'exists'
     sliver.filter = new AssetFilter({ [key]: [ field ] })
@@ -126,8 +125,7 @@ export function createRangeWidget (field, fieldType, min, max, isEnabled, isPinn
 
 export function createSimilarityWidget (field, fieldType, isEnabled, isPinned) {
   const type = SimilarHashWidgetInfo.type
-  const aggs = { similar: { stats: { field } } }     // Just for restore, refactor for Folder data
-  let sliver = new AssetSearch({ aggs }) // NB aggs break the search!
+  let sliver = new AssetSearch() // NB aggs break the search!
   return new Widget({type, sliver, isEnabled, isPinned})
 }
 
