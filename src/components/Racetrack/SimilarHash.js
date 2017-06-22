@@ -152,7 +152,7 @@ class SimilarHash extends Component {
         !similar.field || !similar.field.length ||
         !SimilarHash.canSortSimilar(selectedAssetIds, similar.field,
           this.selectedValues(), similar.values)
-    const field = similar.field.replace(/^Similarity\./, '').replace(/\.raw$/, '')
+    const field = similar.field.replace(/^similarity\./, '').replace(/^Similarity\./, '').replace(/\.raw$/, '')
     return (
       <Widget className="SimilarHash"
               id={id}
