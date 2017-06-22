@@ -89,14 +89,14 @@ export default function (state = initialState, action) {
     }
     case ASSET_FIELDS: {
       // Scan available asset fields for the preferred or a valid field
-      let field = state.similar.field || 'Similarity.Tensorflow.byte'
+      let field = state.similar.field || 'similarity.tensorflow.byte'
       let found = false
       const types = Object.keys(action.payload)
       for (let i = 0; !found && i < types.length; ++i) {
         const type = types[i]
         const fields = action.payload[type]
         for (let j = 0; !found && j < fields.length; ++j) {
-          if (fields[j].toLowerCase() === field.toLowerCase()) {
+          if (fields[j] === field) {
             field = fields[j]  // In case toLowerCase masked the field
             found = true
           }
