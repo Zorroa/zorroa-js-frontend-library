@@ -43,15 +43,26 @@ class Racebar extends Component {
   lastWidgetCount = -1
 
   componentWillReceiveProps (nextProps) {
-    const { widgets } = nextProps
+    const { widgets, similar, order, selectedFolderIds, trashedFolders } = nextProps
     const isOpenPinned = widgets.findIndex(widget => widget.id === this.state.openId && widget.isPinned) >= 0
     if (isOpenPinned) {
       this.setState({openId: -1})
     }
     if (widgets && widgets.length !== this.lastWidgetCount) {
       if (widgets.length === this.lastWidgetCount + 1) {
-        // Only open the widget if we've added a single new widget
-        const openId = widgets.length ? widgets[widgets.length - 1].id : -1
+        // Only open the widget if we've added a single new widget without a search
+        const widget = widgets.length && widgets[widgets.length - 1]
+        let openId = widget ? widget.id : -1
+        if (widget.type === WidgetInfo.SimilarHashWidgetInfo.type) {
+          if (similar.values && similar.values.length) openId = -1
+        } else if (widget.type === WidgetInfo.SortOrderWidgetInfo.type) {
+          if (order && order.length) openId = -1
+        } else if (widget.type === WidgetInfo.CollectionsWidgetInfo.type) {
+          const nonTrashedFolderIds = Searcher.nonTrashedFolderIds(selectedFolderIds, trashedFolders)
+          if (nonTrashedFolderIds && nonTrashedFolderIds.length) openId = -1
+        } else {
+          if (widget.sliver && !widget.sliver.empty()) openId = -1
+        }
         this.setState({openId})
       }
       this.lastWidgetCount = widgets.length

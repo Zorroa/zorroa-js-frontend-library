@@ -125,8 +125,7 @@ export function createRangeWidget (field, fieldType, min, max, isEnabled, isPinn
 
 export function createSimilarityWidget (field, fieldType, isEnabled, isPinned) {
   const type = SimilarHashWidgetInfo.type
-  let sliver = new AssetSearch() // NB aggs break the search!
-  return new Widget({type, sliver, isEnabled, isPinned})
+  return new Widget({type, isEnabled, isPinned})
 }
 
 export function createFiletypeWidget (field, fieldType, exts, isEnabled, isPinned) {
