@@ -71,7 +71,7 @@ class CreateFolder extends Component {
     const { user, isolatedId, selectedAssetIds, dyhiLevels } = this.props
     const { name, isShared, includeSelectedAssets, mode } = this.state
     let acl = null
-    if (isShared && acl) {
+    if (isShared && this.state.acl) {
       acl = this.state.acl
     } else if (user && user.permissions) {
       // Look through this user's permissions for the one with 'user' type

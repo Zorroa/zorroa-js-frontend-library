@@ -50,7 +50,8 @@ class Workspace extends Component {
     location: PropTypes.object,
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     selectedAssetIds: PropTypes.instanceOf(Set),
-    commands: PropTypes.instanceOf(Map)
+    commands: PropTypes.instanceOf(Map),
+    isAdministrator: PropTypes.bool
   }
 
   state = {
@@ -209,7 +210,7 @@ class Workspace extends Component {
   }
 
   render () {
-    const { app, isolatedId, selectedAssetIds, user } = this.props
+    const { app, isolatedId, selectedAssetIds, user, isAdministrator } = this.props
 
     const LibraryParams = () => ({
       header: (<span>Library</span>),
@@ -276,7 +277,9 @@ class Workspace extends Component {
           <Sidebar onToggle={this.toggleLeftSidebar}
                    isIconified={app.leftSidebarIsIconified}>
             <Collapsible {...LibraryParams()}>
-              <Folders rootId={Folder.ROOT_ID} filter={folder => (folder.name !== 'Users')}/>
+              <Folders rootName={isAdministrator ? undefined : "Library"}
+                       rootId={isAdministrator ? Folder.ROOT_ID : undefined}
+                       filter={isAdministrator ? undefined : folder => (folder.name !== 'Users')}/>
             </Collapsible>
             <Collapsible {...HomeParams()}>
               <Folders rootId={user.homeFolderId}/>
@@ -317,7 +320,8 @@ export default connect(state => ({
   assets: state.assets.all,
   selectedAssetIds: state.assets.selectedIds,
   jobs: state.jobs.all,
-  commands: state.assets.commands
+  commands: state.assets.commands,
+  isAdministrator: state.auth.isAdministrator
 }), dispatch => ({
   actions: bindActionCreators({
     iconifyLeftSidebar,
