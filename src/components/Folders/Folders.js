@@ -56,7 +56,7 @@ class Folders extends Component {
     super(props)
 
     this.state = {
-      rootId: this.props.rootId,
+      rootId: undefined,
       filterString: '',
       foldersScrollTop: 0,
       foldersScrollHeight: 0
@@ -94,8 +94,8 @@ class Folders extends Component {
 
   componentWillMount () {
     const all = this.props.folders.all
-    const rootId = this.state.rootId === undefined ? Folder.ROOT_ID : this.state.rootId
-    const rootFolder = all.get(rootId)
+    const { rootId } = this.props
+    const rootFolder = all.get(rootId === undefined ? Folder.ROOT_ID : rootId)
     if (!rootFolder.childIds || !rootFolder.childIds.size) {
       this.loadChildren(rootFolder)
     }
@@ -103,9 +103,8 @@ class Folders extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    // Force load the User folder's children so that we can open the
-    // full ancestor path when creating new folders in the user's folder.
-    const all = this.props.folders.all
+    // Force load the User folder's children so we can find the home folder
+    const all = nextProps.folders.all
     const rootFolder = all.get(Folder.ROOT_ID)
     if (rootFolder && rootFolder.childIds) {
       const rootChildIds = [...rootFolder.childIds]
@@ -115,7 +114,9 @@ class Folders extends Component {
         if (!userFolder.childIds) this.loadChildren(userFolder)
       }
     }
-    if (!this.state.rootId && nextProps.rootName) {
+
+    // Search through the root folder to find the named root, if needed
+    if (this.state.rootId === undefined && nextProps.rootName) {
       // Find the folder in the root node that matches the requested prop root name
       const all = nextProps.folders.all
       const rootFolder = all.get(Folder.ROOT_ID)
@@ -124,6 +125,8 @@ class Folders extends Component {
         const index = rootChildIds.findIndex(id => all.get(id).name === nextProps.rootName)
         if (index >= 0) this.setState({ rootId: rootChildIds[index] })
       }
+    } else if (this.state.rootId === undefined && nextProps.rootId !== undefined) {
+      this.setState({ rootId: nextProps.rootId })
     }
   }
 

@@ -277,7 +277,7 @@ class Workspace extends Component {
           <Sidebar onToggle={this.toggleLeftSidebar}
                    isIconified={app.leftSidebarIsIconified}>
             <Collapsible {...LibraryParams()}>
-              <Folders rootName={isAdministrator ? undefined : "Library"}
+              <Folders rootName={isAdministrator ? undefined : 'Library'}
                        rootId={isAdministrator ? Folder.ROOT_ID : undefined}
                        filter={isAdministrator ? undefined : folder => (folder.name !== 'Users')}/>
             </Collapsible>
