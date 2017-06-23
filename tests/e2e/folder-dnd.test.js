@@ -63,7 +63,7 @@ describe('Folder dnd', function () {
 
   // open the collections panel if not already open
   var openCollectionsPanel = function () {
-    return driver.then(_ => { DEBUG && console.log('open the collections panel') })
+    return driver.then(_ => { DEBUG && console.log('open the home panel') })
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Home-collapsible'), 5000))
     .then(_ => selenium.doesSelectorHaveClass(By.css('.Home-collapsible'), 'isOpen'))
       .then(isOpen => {
@@ -72,7 +72,7 @@ describe('Folder dnd', function () {
           driver.then(_ => selenium.waitForIdle())
         }
         // wait until some folders appear
-        return selenium.waitForSelectorVisibleToBe(true, By.css('.FolderItem'), 15000)
+        return selenium.waitForSelectorVisibleToBe(true, By.css('.Folders-filter'), 15000)
       })
     .then(_ => selenium.waitForIdle())
   }

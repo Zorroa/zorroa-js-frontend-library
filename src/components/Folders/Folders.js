@@ -35,7 +35,8 @@ const target = { drop (props, se) { /* only needed for highlighting -- drop happ
 class Folders extends Component {
   static propTypes = {
     // input props
-    rootId: PropTypes.number.isRequired,
+    rootId: PropTypes.number,
+    rootName: PropTypes.string,
     filter: PropTypes.func,
     onSelect: PropTypes.func,
 
@@ -55,6 +56,7 @@ class Folders extends Component {
     super(props)
 
     this.state = {
+      rootId: undefined,
       filterString: '',
       foldersScrollTop: 0,
       foldersScrollHeight: 0
@@ -92,7 +94,8 @@ class Folders extends Component {
 
   componentWillMount () {
     const all = this.props.folders.all
-    const rootFolder = all.get(this.props.rootId)
+    const { rootId } = this.props
+    const rootFolder = all.get(rootId === undefined ? Folder.ROOT_ID : rootId)
     if (!rootFolder.childIds || !rootFolder.childIds.size) {
       this.loadChildren(rootFolder)
     }
@@ -100,10 +103,9 @@ class Folders extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    // Force load the User folder's children so that we can open the
-    // full ancestor path when creating new folders in the user's folder.
-    const all = this.props.folders.all
-    const rootFolder = all.get(nextProps.rootId)
+    // Force load the User folder's children so we can find the home folder
+    const all = nextProps.folders.all
+    const rootFolder = all.get(Folder.ROOT_ID)
     if (rootFolder && rootFolder.childIds) {
       const rootChildIds = [...rootFolder.childIds]
       const index = rootChildIds.findIndex(id => all.get(id).name === 'Users')
@@ -111,6 +113,20 @@ class Folders extends Component {
         const userFolder = all.get(rootChildIds[index])
         if (!userFolder.childIds) this.loadChildren(userFolder)
       }
+    }
+
+    // Search through the root folder to find the named root, if needed
+    if (this.state.rootId === undefined && nextProps.rootName) {
+      // Find the folder in the root node that matches the requested prop root name
+      const all = nextProps.folders.all
+      const rootFolder = all.get(Folder.ROOT_ID)
+      if (rootFolder && rootFolder.childIds) {
+        const rootChildIds = [...rootFolder.childIds]
+        const index = rootChildIds.findIndex(id => all.get(id).name === nextProps.rootName)
+        if (index >= 0) this.setState({ rootId: rootChildIds[index] })
+      }
+    } else if (this.state.rootId === undefined && nextProps.rootId !== undefined) {
+      this.setState({ rootId: nextProps.rootId })
     }
   }
 
@@ -123,7 +139,7 @@ class Folders extends Component {
     this.props.actions.getFolderChildren(folder.id)
   }
 
-  isOpen = (folderId) => (folderId === this.props.rootId || this.props.folders.openFolderIds.has(folderId))
+  isOpen = (folderId) => (folderId === this.state.rootId || this.props.folders.openFolderIds.has(folderId))
 
   toggleFolder = (folder) => {
     const { folders } = this.props
@@ -165,8 +181,8 @@ class Folders extends Component {
   }
 
   scrollToFolder = (folderId) => {
-    const { folders, rootId } = this.props
-    const { foldersScrollTop, foldersScrollHeight } = this.state
+    const { folders } = this.props
+    const { foldersScrollTop, foldersScrollHeight, rootId } = this.state
     const folderList = this.folderList(folders.all.get(rootId))
     const folderPosition = folderList.findIndex(folder => folder.id === folderId)
     if (folderPosition < 0) return
@@ -183,9 +199,9 @@ class Folders extends Component {
 
   // Apply standard desktop shift+meta multi-select on click and update state.
   selectFolder (folder, event) {
-    const { folders, onSelect, rootId } = this.props
+    const { folders, onSelect } = this.props
     if (onSelect) return onSelect(folder, event)
-    const rootFolder = folders.all.get(rootId)
+    const rootFolder = folders.all.get(this.state.rootId)
     const folderList = this.folderList(rootFolder)
     this.props.actions.selectFolderId(folder.id, event.shiftKey, event.metaKey,
       folderList, this.props.folders.selectedFolderIds, this.props.folders.all)
@@ -235,7 +251,7 @@ class Folders extends Component {
   }
 
   createFolder = (name, acl, assetIds) => {
-    const parentId = this.props.rootId
+    const parentId = this.state.rootId
     const folder = new Folder({ name, parentId, acl })
     this.props.actions.createFolder(folder, assetIds)
   }
@@ -289,8 +305,8 @@ class Folders extends Component {
   }
 
   folderList (folder) {
-    const { folders, filter, rootId } = this.props
-    const { filterString } = this.state
+    const { folders, filter } = this.props
+    const { filterString, rootId } = this.state
     const isOpen = this.isOpen(folder.id)
     const childIds = folder.childIds
 
@@ -339,16 +355,16 @@ class Folders extends Component {
   }
 
   depth (folder) {
-    const { folders, rootId } = this.props
-    if (folder.id === rootId) return 0
+    const { folders } = this.props
+    if (folder.id === this.state.rootId) return 0
     const parent = folders.all.get(folder.parentId)
     return this.depth(parent) + 1
   }
 
   isDropTarget () {
-    const { rootId, dragInfo, folders, user } = this.props
+    const { dragInfo, folders, user } = this.props
     if (!dragInfo) return false
-    const root = folders.all.get(rootId)
+    const root = folders.all.get(this.state.rootId)
     if (root && dragInfo.type === 'FOLDER' && dragInfo.folderIds) {
       return root.canAddChildFolderIds(dragInfo.folderIds, folders.all, user)
     }
@@ -412,8 +428,8 @@ class Folders extends Component {
   }
 
   render () {
-    const { folders, rootId, user } = this.props
-    const { filterString } = this.state
+    const { folders, user } = this.props
+    const { filterString, rootId } = this.state
     const rootLoaded = folders.all.has(rootId)
     if (!rootLoaded) return null
 
