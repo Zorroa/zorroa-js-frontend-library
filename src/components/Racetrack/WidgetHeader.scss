@@ -4,7 +4,6 @@
   @include nowrap;
   width: 100%;
   height: 30px;
-  text-transform: uppercase;
   font-weight: 100;
   filter: grayscale(100%) opacity(50%);
   cursor: pointer;
@@ -102,6 +101,7 @@
 
 .WidgetHeader-header-title {
   @include flexOff;
+  text-transform: uppercase;
   font-weight: 100;
   font-size: 12px;
   margin-right: 4px;
@@ -116,6 +116,7 @@
   font-weight: 400;
   cursor: pointer;
   max-width: 100%;
+  text-transform: capitalize;
   @include clampText;
 }
 

@@ -3,7 +3,7 @@ import classnames from 'classnames'
 
 import pin from './pin.svg'
 
-const WidgetHeader = ({ isEnabled, isPinned, isOpen, isIconified, maxWidth, title, field, icon, backgroundColor, enableToggleFn, collapseToggleFn, pinnedToggleFn, onClose }) => {
+const WidgetHeader = ({ isEnabled, isPinned, isIconified, maxWidth, title, field, icon, backgroundColor, enableToggleFn, collapseToggleFn, pinnedToggleFn, onClose }) => {
   const iconClassNames = classnames('WidgetHeader-icon', icon, { isEnabled, isIconified })
   return (
     <div style={{backgroundColor, maxWidth}} className={classnames('WidgetHeader', {isEnabled})}>

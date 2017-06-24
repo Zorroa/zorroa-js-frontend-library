@@ -481,13 +481,12 @@ class Facet extends Component {
   render () {
     const { id, floatBody, isIconified, isOpen, onOpen } = this.props
     const { field, terms } = this.state
-    const lastName = Asset.lastNamespace(unCamelCase(field))
-    const title = terms && terms.length ? (isOpen ? lastName : undefined) : undefined
-    const selected = terms && terms.length ? (isOpen ? undefined : terms.join(',')) : lastName
+    const lastName = Asset.lastNamespace(unCamelCase(field)).toUpperCase()
+    const active = terms && terms.length
+    const selected = active ? (isOpen ? lastName : terms.join(', ')) : lastName
     return (
       <Widget className="Facet"
               id={id}
-              title={title}
               floatBody={floatBody}
               field={selected}
               backgroundColor={FacetWidgetInfo.color}
