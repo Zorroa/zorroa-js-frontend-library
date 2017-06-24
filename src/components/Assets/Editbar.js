@@ -29,7 +29,6 @@ class Editbar extends Component {
     onRemove: PropTypes.func,
     onDeselectAll: PropTypes.func.isRequired,
 
-    assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     query: PropTypes.instanceOf(AssetSearch),
     metadataFields: PropTypes.arrayOf(PropTypes.string),
     actions: PropTypes.object
@@ -52,12 +51,13 @@ class Editbar extends Component {
   }
 
   sortSimilar = () => {
-    const { similarAssets, actions } = this.props
-    const values = similarAssets.map(asset => asset.rawValue(this.props.similar.field))
-    const assetIds = similarAssets.map(asset => asset.id)
+    const { actions, selectedAssetIds, similarAssets } = this.props
+    if (!selectedAssetIds || !selectedAssetIds.size) return
+    const selectedAssets = [...selectedAssetIds].map(id => (similarAssets.find(asset => (asset.id === id)))).filter(asset => asset)
+    const values = selectedAssets.map(asset => asset.rawValue(this.props.similar.field))
+    const assetIds = selectedAssets.map(asset => asset.id)
     const similar = { values, assetIds, weights: weights(assetIds) }
     actions.similar(similar)
-    console.log('Sort by similar: ' + JSON.stringify(similar))
   }
 
   render () {
@@ -65,7 +65,8 @@ class Editbar extends Component {
     const nAssetsSelected = selectedAssetIds ? selectedAssetIds.size : 0
     const disabledSelected = !selectedAssetIds || !selectedAssetIds.size
     const removable = !disabledSelected && isRemoveEnabled && isRemoveEnabled()
-    const similarHashes = similarAssets.map(asset => asset.rawValue(this.props.similar.field))
+    const selectedAssets = nAssetsSelected && [...selectedAssetIds].map(id => (similarAssets.find(asset => (asset.id === id)))).filter(asset => asset)
+    const similarHashes = selectedAssets && selectedAssets.map(asset => asset.rawValue(this.props.similar.field))
     const similarActive = similar.field && similar.field.length > 0 && similar.values && similar.values.length > 0
     const similarValuesSelected = similarActive && similar.values && similarHashes && equalSets(new Set([...similar.values]), new Set([...similarHashes]))
 
@@ -102,7 +103,6 @@ class Editbar extends Component {
 }
 
 export default connect(state => ({
-  assets: state.assets.all,
   query: state.assets.query,
   metadataFields: state.app.metadataFields,
   similar: state.racetrack.similar,
