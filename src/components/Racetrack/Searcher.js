@@ -190,7 +190,7 @@ class Searcher extends Component {
           hashes: similar.values,
           assetIds: similar.assetIds,
           weights: similar.weights,
-          minScore: avgWeight * 75
+          minScore: avgWeight * (similar.minScore || 75)
         }
       })
       assetSearch.merge(new AssetSearch({filter}))

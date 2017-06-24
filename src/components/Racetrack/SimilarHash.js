@@ -42,8 +42,7 @@ class SimilarHash extends Component {
   }
 
   state = {
-    similarity: DEFAULT_WEIGHT,
-    selectedAssetId: ''
+    minScore: 75
   }
 
   adjustTimout = null
@@ -58,16 +57,6 @@ class SimilarHash extends Component {
     assetIds && assetIds.forEach(id => {
       if (!similarityCache.has(id)) similarityCache.set(id, DEFAULT_WEIGHT)
     })
-
-    // Select one of the assets, if none match
-    let selectedAssetId = this.state.selectedAssetId
-    if (!assetIds.length) {
-      selectedAssetId = ''
-    } else if (!selectedAssetId || !selectedAssetId.length ||
-      assetIds.findIndex(id => (id === selectedAssetId)) < 0) {
-      selectedAssetId = assetIds[0]
-    }
-    if (selectedAssetId !== this.state.selectedAssetId) this.setState({selectedAssetId})
   }
 
   selectedValues = () => {
@@ -83,22 +72,25 @@ class SimilarHash extends Component {
     return selectedAssetIds && selectedAssetIds.size && field && field.length && !similarValuesSelected && curHashes && curHashes.length > 0
   }
 
-  changeSimilarity = (event) => {
-    const similarity = event.target.value
-    this.setState({similarity})
-    similarityCache.set(this.state.selectedAssetId, similarity)
+  changeMinScore = (event) => {
+    this.setState({ minScore: event.target.value })
+    if (this.adjustTimout) clearTimeout(this.adjustTimout)
+    this.adjustTimout = setTimeout(this.adjustSimilarity, 500)
+  }
+
+  changeSimilarity = (id, weight) => {
+    similarityCache.set(id, weight)
     if (this.adjustTimout) clearTimeout(this.adjustTimout)
     this.adjustTimout = setTimeout(this.adjustSimilarity, 500)
   }
 
   adjustSimilarity = () => {
-    const similar = { ...this.props.similar, weights: weights(this.props.similar.assetIds) }
+    const similar = {
+      ...this.props.similar,
+      weights: weights(this.props.similar.assetIds),
+      minScore: this.state.minScore
+    }
     this.props.actions.similar(similar)
-    console.log('Adjust similar: ' + JSON.stringify(similar))
-  }
-
-  selectAsset = (id) => {
-    this.setState({selectedAssetId: id, similarity: parseFloat(similarityCache.get(id))})
   }
 
   addSelected = () => {
@@ -106,7 +98,6 @@ class SimilarHash extends Component {
     const values = this.selectedValues()
     const similar = { values, assetIds, weights: weights(assetIds) }
     this.props.actions.similar(similar)
-    console.log('Add similar: ' + JSON.stringify(similar))
   }
 
   removeAssetId = (id) => {
@@ -118,13 +109,11 @@ class SimilarHash extends Component {
       values.splice(index, 1)
       const similar = { values, assetIds, weights: weights(assetIds) }
       this.props.actions.similar(similar)
-      console.log('Remove similar: ' + JSON.stringify())
     }
   }
 
   renderThumb (id) {
     const { similarAssets } = this.props
-    const { selectedAssetId } = this.state
     const asset = similarAssets.find(asset => asset.id === id)
     let style
     if (asset) {
@@ -135,18 +124,20 @@ class SimilarHash extends Component {
       style = { backgroundImage: `url(${url})`, minWidth: width, minHeight: height }
     }
     return (
-      <div className={classnames('SimilarHash-thumb', {selected: id === selectedAssetId})} key={id}
-           style={style}
-           onClick={_ => this.selectAsset(id)}>
+      <div className="SimilarHash-thumb" key={id} style={style}>
         <div className="SimilarHash-thumb-cancel icon-cancel-circle" onClick={_ => this.removeAssetId(id)}/>
+        <div className={classnames('SimilarHash-thumb-thumbs-up', 'icon-thumbs-up', {selected: similarityCache.get(id) > 0})}
+             onClick={_ => this.changeSimilarity(id, 1)}/>
+        <div className={classnames('SimilarHash-thumb-thumbs-down', 'icon-thumbs-up', {selected: similarityCache.get(id) < 0})}
+             onClick={_ => this.changeSimilarity(id, -0.2)}/>
       </div>
     )
   }
 
   render () {
     const { id, floatBody, isOpen, onOpen, isIconified, similar, selectedAssetIds } = this.props
-    const { similarity, selectedAssetId } = this.state
-    const adjustable = similar && similar.assetIds && similar.assetIds.findIndex(id => (id === selectedAssetId)) >= 0
+    const { minScore } = this.state
+    const adjustable = similar && similar.assetIds
     const disabled = !selectedAssetIds || !selectedAssetIds.size ||
         (similar.values && similar.values.length >= 10) ||
         !similar.field || !similar.field.length ||
@@ -180,8 +171,8 @@ class SimilarHash extends Component {
             <div className="SimilarHash-slider-icon icon-dissimilar"/>
             <input className="SimilarHash-slider-input" type="range"
                    disabled={!adjustable}
-                   min="-1.5" max="1.5" step="0.01" list="similarity_ticks"
-                   value={similarity} onChange={this.changeSimilarity}/>
+                   min="60" max="90" step="0.1" list="similarity_ticks"
+                   value={minScore} onChange={this.changeMinScore}/>
             <datalist id="similarity_ticks">
               <option>-1</option>
               <option>-0.5</option>
