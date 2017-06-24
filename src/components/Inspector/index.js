@@ -7,6 +7,8 @@ import './PanZoom.scss'
 import './Image.scss'
 import './Video.scss'
 import './Pdf.scss'
+import './VolumeBar.scss'
+import './VideoRange.scss'
 export default Inspector
 
 /*

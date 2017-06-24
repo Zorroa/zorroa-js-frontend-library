@@ -22,7 +22,7 @@ export function requiredFields (fields, fieldTypes) {
     'id',
     'source.filename', 'source.mediaType', 'source.extension',
     'image.width', 'image.height', 'image.pages',
-    'video.width', 'video.height', 'video.pages', 'video.frameRate', 'video.frames'
+    'video.width', 'video.height', 'video.pages', 'video.frameRate', 'video.frames', 'video.background'
   ]
   const prefix = [
     'links', 'clip', 'source.clip', 'pages', 'proxies'
