@@ -60,13 +60,15 @@ class Header extends Component {
     const baseURL = archivistBaseURL()
 
     const loader = require('./loader-rolling.svg')
-    const syncer = sync ? <div className="Header-loading sync"/> : <img className="Header-loading" src={loader}/>
+    const syncer = isDeveloper && sync ? <div className="Header-loading sync"/> : <img className="Header-loading" src={loader}/>
 
     return (
       <nav className="header flexOff flexCenter fullWidth">
         <Link to="/" className='header-logo'><Logo/></Link>
         { syncer }
-        <AssetCounter total={totalCount} collapsed={0} loaded={assets && assets.length || 0}/>
+        <div className="header-asset-counter">
+          <AssetCounter total={totalCount} collapsed={0} loaded={assets && assets.length || 0}/>
+        </div>
         <div className="flexOn"></div>
         <div className="header-menu-bar fullHeight flexCenter">
           <Editbar selectedAssetIds={selectedIds} onDeselectAll={this.deselectAll} />

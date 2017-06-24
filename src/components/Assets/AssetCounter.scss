@@ -13,6 +13,7 @@
   .asset-counter-of {
     &:after {
       content: ' of ';
+      font-size: 12px;
       @media screen and (max-width: 1300px) { content: ' / '; }
     }
   }
@@ -20,6 +21,7 @@
   .asset-counter-results {
     &:after {
       content: ' RESULTS';
+      font-size: 12px;
       @media screen and (max-width: 1300px) { content: ''; }
     }
   }

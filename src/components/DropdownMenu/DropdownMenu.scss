@@ -12,7 +12,7 @@
     @include noSelect;
 
     // -webkit-appearance: button;
-    background-color: #fff;
+    //background-color: #fff;
     border: 1px solid transparent;
     box-sizing: border-box;
     color: #444444;
@@ -28,7 +28,7 @@
       outline: none;
     }
     &:hover {
-      background-color: $zorroa-nearwhite;
+      background-color: white;
     }
   }
 
@@ -61,7 +61,7 @@
     &:not(.DropdownMenu-separator) {
       cursor: pointer;
       &:hover {
-        background-color: $zorroa-nearwhite;
+        background-color: white;
       }
     }
   }
@@ -80,7 +80,7 @@
 
   .DropdownMenu-separator {
     height: 1px;
-    background-color: $zorroa-nearwhite;
+    background-color: white;
     padding: 0;
   }
 }

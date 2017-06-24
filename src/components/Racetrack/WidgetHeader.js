@@ -3,11 +3,10 @@ import classnames from 'classnames'
 
 import pin from './pin.svg'
 
-const WidgetHeader = ({ isEnabled, isPinned, isOpen, isIconified, maxWidth, title, field, icon, backgroundColor, enableToggleFn, collapseToggleFn, pinnedToggleFn, onClose }) => {
+const WidgetHeader = ({ isEnabled, isPinned, isIconified, maxWidth, title, field, icon, backgroundColor, enableToggleFn, collapseToggleFn, pinnedToggleFn, onClose }) => {
   const iconClassNames = classnames('WidgetHeader-icon', icon, { isEnabled, isIconified })
   return (
     <div style={{backgroundColor, maxWidth}} className={classnames('WidgetHeader', {isEnabled})}>
-      { !isIconified && (<div className='WidgetHeader-close icon-cancel-circle' onClick={onClose}/>) }
       <div className='WidgetHeader-hover'>
         <div className='WidgetHeader-toggle flexRowCenter fullWidth fullHeight' onClick={collapseToggleFn}>
           <div className={iconClassNames}/>
@@ -19,11 +18,11 @@ const WidgetHeader = ({ isEnabled, isPinned, isOpen, isIconified, maxWidth, titl
               </div>
             </div>
           ) }
-          { collapseToggleFn && <div className={classnames('WidgetHeader-collapse', 'icon-chevron-down', {isOpen})}/> }
           <div className='flexOn'/>
         </div>
         { !isIconified && pinnedToggleFn && (<div className="WidgetHeader-pin" onClick={pinnedToggleFn}><img className={classnames('WidgetHeader-pin-img', {isPinned})} src={pin}/></div>) }
         { !isIconified && enableToggleFn && (<div className={classnames('WidgetHeader-enable', {'icon-eye2': isEnabled, 'icon-eye-crossed': !isEnabled, isEnabled})} onClick={enableToggleFn}/>) }
+        { !isIconified && (<div className='WidgetHeader-close icon-cross2' onClick={onClose}/>) }
       </div>
     </div>
   )

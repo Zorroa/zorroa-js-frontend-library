@@ -160,7 +160,6 @@ export default class Suggestions extends Component {
 
     return (
     <div className="Suggestions" style={style}>
-      <button onClick={this.forceSearch} className="Suggestions-search-button icon-search" />
       <div className="Suggestions-overlapping-inputs">
         { showSuggestions &&
           <input value={this.selectedSuggestionString()}
@@ -176,8 +175,11 @@ export default class Suggestions extends Component {
         <button onClick={this.clearValue}
                 disabled={!value || !value.length}
                 className="Suggestions-clear icon-cancel-circle" />
-        { showSuggestions && this.renderSuggestions() }
       </div>
+      <div onClick={this.forceSearch} className="Suggestions-search-button icon-search" >
+        <div className="Suggestions-search-button-label">Search</div>
+      </div>
+      { showSuggestions && this.renderSuggestions() }
     </div>
     )
   }

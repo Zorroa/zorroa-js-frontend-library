@@ -133,7 +133,7 @@ export function searchAssets (query, lastQuery, force) {
       } else if (query.postFilter) {
         mainQuery.filter = query.postFilter
       }
-      requestAnimationFrame(_ => { dispatch({ type: ASSET_SEARCHING, payload: true }) })
+      if (!query.from) requestAnimationFrame(_ => { dispatch({ type: ASSET_SEARCHING, payload: true }) })
       promises.push(searchAssetsRequestProm(dispatch, mainQuery))
     }
     const aggsChanged = !lastQuery || !lastQuery.aggs || JSON.stringify(query.aggs) !== JSON.stringify(lastQuery.aggs)

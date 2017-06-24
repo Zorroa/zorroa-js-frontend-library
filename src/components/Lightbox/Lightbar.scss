@@ -10,12 +10,12 @@
   background-color: black;
   justify-content: space-between;
   width: 100%;
-  min-height: 60px;
+  min-height: 42px;
 }
 
 .Lightbar-settings {
-  @include zorroa-square-btn-lighten(60px);
-  font-size: 20px;
+  @include zorroa-square-btn-lighten(42px);
+  font-size: 16px;
   color: white;
   background-color: black;
   border: none;
@@ -65,9 +65,9 @@
 }
 
 .Lightbar-close {
-  @include zorroa-square-btn-lighten(60px);
+  @include zorroa-square-btn-lighten(42px);
   @include flexCenter;
-  font-size: 20px;
+  font-size: 16px;
   border: none;
   outline: none;
   color: white;

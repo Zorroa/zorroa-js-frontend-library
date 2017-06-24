@@ -89,20 +89,22 @@ export default class VideoRange extends Component {
     return (
       <div className="VideoRange">
         <div className="VideoRange-clip" ref='clip' onMouseDown={e => this.resizeStart(this.resizeUpdate, e)} style={clipBackground}>
-          <div className="VideoRange-clip-range" style={{ marginLeft: `${clipLeftPx}px`, width: `${clipWidthPx}px` }}>
-            <div className="VideoRange-clip-range-left" onMouseDown={e => this.resizeStart(this.resizeLeft, e)}/>
-            <div className="VideoRange-clip-range-middle"/>
-            <div className="VideoRange-clip-range-right" onMouseDown={e => this.resizeStart(this.resizeRight, e)}/>
-          </div>
-          <div className={classnames('VideoRange-clip-playhead', {scrubbing})} style={{ left: playhead }}/>
+          { clipWidth && (
+            <div className="VideoRange-clip-range" style={{ marginLeft: `${clipLeftPx}px`, width: `${clipWidthPx}px` }}>
+              <div className="VideoRange-clip-range-left" onMouseDown={e => this.resizeStart(this.resizeLeft, e)}/>
+              <div className="VideoRange-clip-range-middle"/>
+              <div className="VideoRange-clip-range-right" onMouseDown={e => this.resizeStart(this.resizeRight, e)}/>
+            </div>
+          )}
+          { clipWidth && <div className={classnames('VideoRange-clip-playhead', {scrubbing})} style={{ left: playhead }}/> }
         </div>
-        { clipFrames !== frames && (
+        { clipWidth && clipFrames !== frames && (
           <div className="VideoRange-movie" style={barBackground}>
             <div className="VideoRange-bar-range" style={{ marginLeft: `${barLeftPx}px`, width: `${barWidthPx}px` }}/>
             <div className="VideoRange-movie-thumb" style={{ left: `${clipWidth * played}px` }}>
               <div className="VideoRange-movie-thumb-marker"/>
               <div className="VideoRange-movie-thumb-duration">
-                { formatDuration(parseFormattedFloat(played * frames / frameRate), frameRate) }
+                { formatDuration(played * frames / frameRate, frameRate) }
               </div>
             </div>
           </div>
