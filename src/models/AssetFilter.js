@@ -103,6 +103,24 @@ export default class AssetFilter {
         this.range = { ...filter.range }
       }
     }
+    if (filter.colors) {
+      if (this.colors) {
+        for (let key in filter.colors) {
+          this.colors[key] = filter.colors[key]
+        }
+      } else {
+        this.colors = { ...filter.colors }
+      }
+    }
+
+    if (filter.scripts) {
+      if (this.scripts) {
+        this.scripts = [...this.scripts, filter.scripts]
+      } else {
+        this.scripts = [...filter.scripts]
+      }
+    }
+
     if (filter.must) {
       if (this.must) {
         filter.must.forEach(f => { this.must.push(new AssetFilter(f)) })
