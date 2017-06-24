@@ -107,7 +107,7 @@ export default connect(state => ({
   metadataFields: state.app.metadataFields,
   similar: state.racetrack.similar,
   similarAssets: state.assets.similar,
-  isolatedId: PropTypes.string
+  isolatedId: state.assets.isolatedId
 }), dispatch => ({
   actions: bindActionCreators({
     showModal,

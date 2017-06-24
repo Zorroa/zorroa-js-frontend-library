@@ -91,7 +91,9 @@ export default class PanZoom extends Component {
     const scalePct = 1 + Math.abs(event.deltaY) * 0.005
     const scaleMult = (event.deltaY > 0 ? scalePct : 1 / scalePct)
     const zoomFactor = Math.min(PanZoom.maxZoom, Math.max(PanZoom.minZoom, scale * scaleMult))
-    this.panner.zoom(zoomFactor, {x: event.pageX, y: event.pageY})
+    const topPadding = 50
+    const leftPadding = 8
+    this.panner.zoom(zoomFactor, {x: event.pageX - leftPadding, y: event.pageY - topPadding})
     this.setStateToPanner()
     this.startMoving()
   }
