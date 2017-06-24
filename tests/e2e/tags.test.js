@@ -166,7 +166,7 @@ describe('Tags', function () {
       .then(ele => ele.click())
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Color')), 5000)
     // .then(_ => selenium.expectSelectorHasClassToBe(true, By.css('.Metadata-item-colors'), '.isSelected'))
-    .then(_ => selenium.clickSelector(By.css('.Metadata-item-colors')))
+    .then(_ => selenium.clickSelector(By.css('.Metadata-item-colors .Metadata-left')))
     .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Racebar-widget .Widget')))
 
     .then(_ => { DEBUG && console.log('open source tag folder') })
