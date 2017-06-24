@@ -1,0 +1,92 @@
+@import '../../styles/core-mixins.scss';
+
+.VideoRange {
+  @include fullWidth;
+}
+
+.VideoRange-clip {
+  position: relative;
+  height: 30px;
+  @include fullWidth;
+  @include flexRow;
+  //background-color: yellow;
+}
+
+.VideoRange-clip-range {
+  //background-color: red;
+  @include flexOff;
+  @include flexRow;
+  @include flexJustifySpaceBetween;
+  @include fullHeight;
+}
+
+.VideoRange-clip-range-left {
+  cursor: pointer;
+  width: 5px;
+  @include fullHeight;
+  border-radius: 2px;
+  background-color: $zorroa-golden-yellow;
+  &:hover { background-color: lightyellow; }
+}
+
+.VideoRange-clip-range-middle{
+  @include flexOn;
+}
+
+.VideoRange-clip-range-right {
+  cursor: pointer;
+  width: 5px;
+  @include fullHeight;
+  border-radius: 2px;
+  background-color: $zorroa-golden-yellow;
+  &:hover { background-color: lightyellow; }
+}
+
+.VideoRange-clip-playhead {
+  width: 8px;
+  border-radius: 2px;
+  border: solid 3px $zorroa-water-blue;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  cursor: pointer;
+  &:hover:not(.scrubbing) { background-color: $zorroa-water-blue; }
+  &.scrubbing { background-color: $zorroa-water-blue; }
+}
+
+.VideoRange-movie {
+  height: 30px;
+  @include fullWidth;
+  position: relative;
+}
+
+.VideoRange-movie-thumb {
+  @include flexColCenter;
+  position: absolute;
+  width: 0;   /* left, set in code to align */
+}
+
+.VideoRange-movie-thumb-marker {
+  width: 3px;
+  max-width: 3px;
+  min-width: 3px;
+  min-height: 10px;
+  @include flexOn;
+  background-color: $zorroa-water-blue;
+}
+
+.VideoRange-movie-thumb-duration {
+  font-size: 14px;
+  font-weight: 200;
+  font-family: "Roboto Condensed";
+  border-radius: 3px;
+  padding: 1px 4px;
+  background-color: rgba(0,0,0,0.75);
+}
+
+.VideoRange-bar-range {
+  position: absolute;
+  border: 2px solid $zorroa-golden-yellow;
+  border-radius: 2px;
+  @include fullHeight;
+}

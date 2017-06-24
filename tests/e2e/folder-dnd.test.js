@@ -40,14 +40,16 @@ describe('Folder dnd', function () {
 
   var emptyTrash = function () {
     return driver
-
+    .then(_ => { DEBUG && console.log('Check the trash and empty') })
     .then(_ => selenium.getSelectorVisible(By.css('.Home-collapsible .Trash')))
     .then(trashVisible => {
       if (!trashVisible) return driver.then(_ => { DEBUG && console.log('no trash to empty 1') })
       return selenium.getSelectorVisible(By.css('.Trash-body'))
       .then(trashBodyVisible => {
+        DEBUG && console.log('trashBodyVisible = ' + trashBodyVisible)
         if (!trashBodyVisible) return selenium.clickSelector(By.css('.Trash-toggle'))
       })
+      .then(_ => { DEBUG && console.log('opened trash') })
       .then(_ => selenium.getSelectorVisible(By.css('.Home-collapsible .Trash-empty')))
       .then(trashEmptyVisible => {
         if (!trashEmptyVisible) return driver.then(_ => { DEBUG && console.log('no trash to empty 2') })
@@ -335,6 +337,6 @@ describe('Folder dnd', function () {
     .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.FolderItem-context-remove-folder'), 5000))
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Home-collapsible .Trash'), 15000))
 
-    .then(emptyTrash)
+    // .then(emptyTrash)
   })
 })

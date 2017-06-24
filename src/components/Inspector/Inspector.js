@@ -44,7 +44,8 @@ class Inspector extends Component {
                               onMultipage={onMultipage} />
     } else if (mediaType.startsWith('video')) {
       field = 'frame'
-      inspector = <Video url={url} onMultipage={onMultipage}
+      inspector = <Video url={url} backgroundURL={asset.backgroundURL(origin)}
+                         onMultipage={onMultipage}
                          frames={asset.frames()} frameRate={asset.frameRate()}
                          startFrame={asset.startFrame()} stopFrame={asset.stopFrame()}/>
     } else if (mediaType === 'application/pdf') {
