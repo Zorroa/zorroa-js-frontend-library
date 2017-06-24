@@ -160,25 +160,25 @@ function authorize (dispatch, json, source) {
     if (metadata.thumbSize) {
       dispatch({type: THUMB_SIZE, payload: metadata.thumbSize})
     }
-    if (metadata.thumbLayout) {
+    if (metadata.thumbLayout !== undefined) {
       dispatch({type: THUMB_LAYOUT, payload: metadata.thumbLayout})
     }
-    if (metadata.showTable) {
+    if (metadata.showTable !== undefined) {
       dispatch({type: SHOW_TABLE, payload: metadata.showTable})
     }
     if (metadata.tableHeight) {
       dispatch({type: TABLE_HEIGHT, payload: metadata.tableHeight})
     }
-    if (metadata.showMultipage) {
+    if (metadata.showMultipage !== undefined) {
       dispatch({type: SHOW_MULTIPAGE, payload: metadata.showMultipage})
     }
-    if (metadata.videoVolume) {
+    if (metadata.videoVolume !== undefined) {
       dispatch({type: VIDEO_VOLUME, payload: metadata.videoVolume})
     }
     if (metadata.tableFieldWidths) {
       dispatch({type: SET_TABLE_FIELD_WIDTH, payload: metadata.tableFieldWidths})
     }
-    if (metadata.uxLevel) {
+    if (metadata.uxLevel !== undefined) {
       dispatch({type: UX_LEVEL, payload: metadata.uxLevel})
     }
   }
