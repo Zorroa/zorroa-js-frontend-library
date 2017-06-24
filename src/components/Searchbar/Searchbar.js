@@ -62,7 +62,7 @@ class Searchbar extends Component {
     let widgets = [...this.props.widgets]
     if (index < 0) {
       widgets.push(widget)
-    } else if (index >= 0 && !query.query || !query.query.length) {
+    } else if (index >= 0 && !query || !query.length) {
       widgets.splice(index, 1)
     } else {
       widgets[index] = widget
