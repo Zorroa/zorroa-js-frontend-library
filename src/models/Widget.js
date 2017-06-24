@@ -142,7 +142,7 @@ export function createFiletypeWidget (field, fieldType, exts, isEnabled, isPinne
 
 export function createColorWidget (field, fieldType, colors, isServerHSL, isEnabled, isPinned) {
   const type = ColorWidgetInfo.type
-  const aggs = { colors: { stats: { field } } }     // Just for restore, refactor for Folder data
+  const aggs = { colors: { stats: { field: 'source.fileSize' } } }     // Just for restore, refactor for Folder data
   const sliver = new AssetSearch({ aggs })
   const RATIO_MAX_FACTOR = 1.5  // maxRatio in query is this factor times user ratio
   const RATIO_MIN_FACTOR = 0.25 // minRatio in query is this factor times user ratio
@@ -175,7 +175,7 @@ export function createColorWidget (field, fieldType, colors, isServerHSL, isEnab
 // Bare ctor used by AddWidget, values come directly from app state
 export function createCollectionsWidget (field, fieldType, isEnabled, isPinned) {
   field = 'source.filename'
-  const aggs = { collections: { stats: { field } } }     // Just for restore, refactor for Folder data
+  const aggs = { collections: { stats: { field: 'source.fileSize' } } }     // Just for restore, refactor for Folder data
   const sliver = new AssetSearch({aggs})
   return new Widget({type: CollectionsWidgetInfo.type, sliver, isEnabled, isPinned})
 }
@@ -183,7 +183,7 @@ export function createCollectionsWidget (field, fieldType, isEnabled, isPinned) 
 // Bare ctor used by AddWidget, values come directly from app state
 export function createSortOrderWidget (field, filedType, isEnabled, isPinned) {
   field = 'source.filename'
-  const aggs = { sortOrder: { stats: { field } } }     // Just for restore, refactor for Folder data
+  const aggs = { sortOrder: { stats: { field: 'source.fileSize' } } }     // Just for restore, refactor for Folder data
   const sliver = new AssetSearch({aggs})
   return new Widget({type: SortOrderWidgetInfo.type, sliver, isEnabled, isPinned})
 }
