@@ -18,9 +18,7 @@ import Pager from './Pager'
 import Footer from './Footer'
 import Table from '../Table'
 import Sidebar from '../Sidebar'
-import Racebar from '../Racetrack/Racebar'
 import Racetrack from '../Racetrack'
-import ProgressBar from '../ProgressBar'
 import FieldTemplate from '../FieldTemplate'
 import * as ComputeLayout from './ComputeLayout.js'
 import AssetSearch from '../../models/AssetSearch'
@@ -34,7 +32,6 @@ const defaultTableHeight = 300
 
 class Assets extends Component {
   static propTypes = {
-    searching: PropTypes.bool.isRequired,
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     assetsCounter: PropTypes.number.isRequired,
     query: PropTypes.instanceOf(AssetSearch),
@@ -607,7 +604,7 @@ class Assets extends Component {
 
   render () {
     const { assets, query, totalCount, tableHeight, showTable, showMultipage,
-      layout, thumbSize, assetsCounter, rightSidebarIsIconified, widgets, uxLevel, searching } = this.props
+      layout, thumbSize, assetsCounter, rightSidebarIsIconified, widgets, uxLevel } = this.props
     const { collapsed, tableIsResizing } = this.state
 
     // Trigger layout if assets change.
@@ -639,10 +636,6 @@ class Assets extends Component {
 
     return (
       <div className="Assets" ref="Assets">
-        <Racebar/>
-        <div className="Assets-searching">
-          { searching && <ProgressBar successPct={0} errorPct={0}/> }
-        </div>
         <div className="Assets-workspace">
           <div className="Assets-body">
             {this.renderAssets()}
@@ -707,7 +700,6 @@ export default connect(state => ({
   thumbFieldTemplate: state.app.thumbFieldTemplate,
   similar: state.racetrack.similar,
   widgets: state.racetrack.widgets,
-  searching: state.assets.searching,
   origin: state.auth.origin
 }), dispatch => ({
   actions: bindActionCreators({

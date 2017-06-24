@@ -4,10 +4,11 @@
   position: relative;
   @include flexRow;
   @include flexAlignItemsCenter;
+  @include fullHeight;
 }
 
 .Suggestions-overlapping-inputs {
-  @include fullWidth;
+  @include flexOn;
   @include flexColCenter;
   height: 25px;
   position: relative;
@@ -17,7 +18,7 @@
   font-size: 14px;
   border: none;
   position: absolute;
-  padding-left: 20px;
+  padding-left: 4px;
   padding-right: 20px;
   left: 0;
   width: 100%;
@@ -30,7 +31,7 @@
   font-size: 14px;
   border: none;
   position: absolute;
-  padding-left: 20px;
+  padding-left: 4px;
   padding-right: 20px;
   left: 0;
   width: 100%;
@@ -100,13 +101,19 @@
 
 // Magnifying glass
 .Suggestions-search-button {
-  position: absolute;
-  left: 0;
-  padding: 0;
-  border: none;
-  background: none;
+  @include fullHeight;
+  @include flexRowCenter;
+  font-size: 14px;
   cursor: pointer;
-  color: $zorroa-gray;
-  font-size: 14px; // TODO: see if we can delete this when bootstrap is gone
+  color: white;
+  background-color: $zorroa-darkgray;
+  padding-left: 8px;
+  padding-right: 8px;
   &:hover { color: $zorroa-gray; }
+}
+
+.Suggestions-search-button-label {
+  text-transform: uppercase;
+  font-size: 12px;
+  margin-left: 4px;
 }

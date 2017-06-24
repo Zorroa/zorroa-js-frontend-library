@@ -3,11 +3,28 @@
 .Racebar {
   @include flexRow;
   @include flexAlignItemsCenter;
-  @include flexWrap;
   @include fullWidth;
-  margin-top: 6px;
-  margin-left: 4px;
-  margin-right: 4px;
+  z-index: 1;
+  box-shadow: 0 0 6px $zorroa-gray;
+  padding-left: 8px;
+  padding-right: 8px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.Racebar-wrap {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include flexWrap;
+  @include flexOn;
+}
+
+.Racebar-right {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include fullHeight;
+  padding-left: 8px;
+  border-left: 1px solid $zorroa-nearwhite;
 }
 
 .Racebar-widget {
@@ -19,7 +36,7 @@
   @include flexAlignItemsCenter;
 
   border-radius: 3px;
-  padding: 6px;
+  padding: 4px 8px;
   margin: 2px 4px;
   color: $zorroa-greyish-brown;
   text-transform: uppercase;
@@ -38,7 +55,7 @@
   @include flexAlignItemsCenter;
 
   border-radius: 3px;
-  padding: 7px;
+  padding: 4px 8px;
   margin: 4px;
   color: white;
   background-color: $zorroa-water-blue;
@@ -53,16 +70,15 @@
 
 .Racebar-searchbar {
   height: 30px;
-  margin-left: 8px;
   margin-right: 8px;
-  width: 240px;
+  width: 300px;
 }
 
 .Racebar-add-widget {
   font-size: 12px;
   margin: 4px 8px;
-  padding: 8px;
-  background-color: $zorroa-water-blue;
+  padding: 6px;
+  background-color: $zorroa-sickly-green;
   color: white;
   border-radius: 3px;
 

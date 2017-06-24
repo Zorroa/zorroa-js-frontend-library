@@ -24,6 +24,7 @@ class Editbar extends Component {
       assetIds: PropTypes.arrayOf(PropTypes.string).isRequired
     }).isRequired,
     similarAssets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+    isolatedId: PropTypes.string,
     isRemoveEnabled: PropTypes.func,
     onRemove: PropTypes.func,
     onDeselectAll: PropTypes.func.isRequired,
@@ -60,7 +61,7 @@ class Editbar extends Component {
   }
 
   render () {
-    const { selectedAssetIds, isRemoveEnabled, onRemove, onDeselectAll, similar, similarAssets } = this.props
+    const { selectedAssetIds, isRemoveEnabled, onRemove, onDeselectAll, similar, similarAssets, isolatedId } = this.props
     const nAssetsSelected = selectedAssetIds ? selectedAssetIds.size : 0
     const disabledSelected = !selectedAssetIds || !selectedAssetIds.size
     const removable = !disabledSelected && isRemoveEnabled && isRemoveEnabled()
@@ -77,19 +78,23 @@ class Editbar extends Component {
           { nAssetsSelected ? `${nAssetsSelected} assets selected` : '' }
           { nAssetsSelected ? (<div onClick={onDeselectAll} className={classnames('Editbar-cancel', 'icon-cancel-circle', {disabledSelected})}/>) : null }
         </div>
-        <div className={classnames('Editbar-similar', { 'selected': similarActive, 'disabled': !canSortSimilar })}
-             onClick={sortSimilar} title="Find similar assets">
-          Similar
-          <span className="icon-similarity"/>
-        </div>
+        { !isolatedId && (
+          <div className="Editbar-similar-section">
+            <div className={classnames('Editbar-similar', { 'selected': similarActive, 'disabled': !canSortSimilar })}
+                 onClick={sortSimilar} title="Find similar assets">
+              <span className="icon-similarity"/>
+              Similar
+            </div>
+          </div>
+        )}
         <div onClick={!disabledSelected && this.exportAssets} className={classnames('Editbar-export', {disabled: disabledSelected})}>
-          Export
           <span onClick={!disabledSelected && this.exportAssets} className="icon-export" />
+          Export
         </div>
         { onRemove &&
         <div onClick={removable && onRemove} className={classnames('Editbar-remove', {disabled: !removable})}>
-          Remove
           <span onClick={removable && onRemove} className={classnames('icon-removeasset', {disabled: !removable})} />
+          Remove
         </div> }
       </div>
     )
@@ -101,7 +106,8 @@ export default connect(state => ({
   query: state.assets.query,
   metadataFields: state.app.metadataFields,
   similar: state.racetrack.similar,
-  similarAssets: state.assets.similar
+  similarAssets: state.assets.similar,
+  isolatedId: PropTypes.string
 }), dispatch => ({
   actions: bindActionCreators({
     showModal,

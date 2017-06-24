@@ -152,26 +152,28 @@ class Racebar extends Component {
     return (
       <div className="Racebar">
         <Searcher/>
-        <div className={classnames('Racebar-clear', {disabled})}
-             onClick={this.clearRacetrack} title="Clear the search">
-          Clear
-          <img className="Racebar-clear-icon" src={homeIcon}/>
-        </div>
-        <div className={classnames('Racebar-save', {disabled})}
-             onClick={this.saveRacetrack} title="Save the search">
-          Save
-          <div className="icon-folder-add"/>
-        </div>
-        <div className="Racebar-searchbar">
-          <Searchbar/>
-        </div>
-        { widgets && widgets.length > 0 && widgets.filter(w => (blacklist.indexOf(w.type) < 0)).map((widget, i) => (
-          <div key={widget.id}
-               className={classnames('Racebar-widget', {hoverField: hoverFields.has(widget.field())})} >
-            { this.renderWidget(widget, false) }
+        <div className="Racebar-wrap">
+          <div className="Racebar-searchbar">
+            <Searchbar/>
           </div>
-        ))}
-        <div onClick={this.showAddWidget} className="Racebar-add-widget icon-plus" title="Add a search widget"/>
+          { widgets && widgets.length > 0 && widgets.filter(w => (blacklist.indexOf(w.type) < 0)).map((widget, i) => (
+            <div key={widget.id}
+                 className={classnames('Racebar-widget', {hoverField: hoverFields.has(widget.field())})} >
+              { this.renderWidget(widget, false) }
+            </div>
+          ))}
+          <div onClick={this.showAddWidget} className="Racebar-add-widget icon-plus" title="Add a search widget"/>
+        </div>
+        <div className="Racebar-right">
+          <div className={classnames('Racebar-save', {disabled})}
+               onClick={!disabled && this.saveRacetrack} title="Save the search">
+            Save
+          </div>
+          <div className={classnames('Racebar-clear', {disabled})}
+               onClick={!disabled && this.clearRacetrack} title="Clear the search">
+            Clear
+          </div>
+        </div>
       </div>
     )
   }

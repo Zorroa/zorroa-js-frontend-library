@@ -5,8 +5,9 @@
 // the menu right justified
 .header {
   padding: 0;
-  height: 60px;
+  height: 42px;
   position: relative;
+  background-color: $zorroa-nearwhite;
 }
 
 // Box to left-justify the logo and search
@@ -20,9 +21,11 @@
 
 // Adjust the logo size so search starts at expanded sidebar
 .header-logo {
-  padding-top: 6px;
-  padding-left: 22px;
+  height: 28px;
+  //padding-top: 6px;
+  //padding-left: 22px;
   margin-right: 20px;
+  margin-left: 10px;
 }
 
 // Simple menu text for now
@@ -166,4 +169,13 @@
     opacity: 1;
     background-color: $zorroa-nearwhite;
   }
+}
+
+.header-asset-counter {
+  @include flexRowCenter;
+  @include fullHeight;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-left: 1px solid $zorroa-lightgray;
+  border-right: 1px solid $zorroa-lightgray;
 }

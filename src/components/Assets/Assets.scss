@@ -56,19 +56,19 @@
     margin-top: 40px;
     font-weight: 500;
     background-color: $zorroa-greyish-brown;
-    color: $zorroa-nearwhite;
+    color: $zorroa-lightgray;
     border-radius: 3px;
     border: none;
 
     &:hover {
       background-color: #a5a5a5;
-      color: $zorroa-nearwhite;
+      color: $zorroa-lightgray;
       font-weight: 500;
     }
 
     &:active {
       background-color: $zorroa-sickly-green;
-      color: $zorroa-nearwhite;
+      color: white;
       font-weight: 500;
     }
   }
@@ -87,17 +87,15 @@
 }
 
 .assets-footer {
-  //padding-left: 8px;
-  //padding-right: 8px;
   align-self: center;
   z-index: 1;
   margin-top: -80px;
   margin-bottom: 20px;
   max-width: 500px;
   border-radius: 3px;
-  box-shadow: 0 2px 4px 4px rgba(128,128,128,.25);
-  color: white;
-  background-color: white;
+  box-shadow: 0 2px 4px 4px rgba(0,0,0,.25);
+  color: $zorroa-lightgray;
+  background-color: rgba(0,0,0,0.75);
   padding: 0 10px;
 
   width: auto;
@@ -121,25 +119,26 @@
   border-radius: 3px;
   overflow: hidden;
   position: relative;
+  border: 1px solid $zorroa-gray;
 
   .thumb-layout-button {
-    color: #000;
     width: 30px;
     height: 30px;
     border: none;
     outline: none;
     font-size: 16px;
-    background-color: #fff;
     cursor: pointer;
+    color: $zorroa-gray;
+    background-color: transparent;
 
-    &:hover { background-color: $zorroa-lightgray; }
+    &:hover { color: white; background-color: $zorroa-lightgray; }
   }
 
   .thumb-layout-enabled {
-    color: #fff;
+    color: white;
     background-color: $zorroa-sickly-green;
     box-shadow: 0 0 2px 0 rgba(0,0,0,0.40);
-    &:hover { background-color: darken($zorroa-sickly-green, 15%); }
+    &:hover { background-color: darken($zorroa-sickly-green, 15%);}
   }
 }
 
@@ -179,10 +178,9 @@
 .MultipageToggle {
   @include flexRowCenter;
 
-  background-color: #fff;
   margin: 10px 0;
 
-  color: #000;
+  color: $zorroa-gray;
   width: 30px;
   height: 30px;
   border-radius: 3px;
@@ -196,7 +194,7 @@
   &:hover { background-color: $zorroa-lightgray; }
 
   &.MultipageToggle-enabled {
-    color: #fff;
+    color: white;
     background-color: $zorroa-sickly-green;
     &:hover { background-color: darken($zorroa-sickly-green, 15%); }
   }

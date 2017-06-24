@@ -13,6 +13,8 @@ import Folders from '../Folders'
 import Metadata from '../Metadata'
 import Metadata2 from '../Metadata2'
 import Collapsible from '../Collapsible'
+import ProgressBar from '../ProgressBar'
+import Racebar from '../Racetrack/Racebar'
 import { iconifyLeftSidebar, toggleCollapsible, showModal, hideModal } from '../../actions/appActions'
 import { getUserPermissions, updatePassword, changePassword } from '../../actions/authAction'
 import { queueFileEntrysUpload } from '../../actions/jobActions'
@@ -45,6 +47,7 @@ class Workspace extends Component {
     user: PropTypes.instanceOf(User),
     isolatedId: PropTypes.string,
     changePassword: PropTypes.bool,
+    searching: PropTypes.bool.isRequired,
     onboarding: PropTypes.bool,
     jobs: PropTypes.object,
     location: PropTypes.object,
@@ -210,7 +213,7 @@ class Workspace extends Component {
   }
 
   render () {
-    const { app, isolatedId, selectedAssetIds, user, isAdministrator } = this.props
+    const { app, isolatedId, selectedAssetIds, user, isAdministrator, searching } = this.props
 
     const LibraryParams = () => ({
       header: (<span>Library</span>),
@@ -271,6 +274,11 @@ class Workspace extends Component {
 
         { command && <CommandProgress successPct={commandSuccessPct} errorPct={commandErrorPct}/>}
 
+        <Racebar/>
+        <div className="Assets-searching">
+          { searching && <ProgressBar successPct={0} errorPct={0}/> }
+        </div>
+
         <div className="Workspace flexOn flexRow fullWidth fullHeight">
 
           {/*  left panel - folders */}
@@ -316,6 +324,7 @@ export default connect(state => ({
   user: state.auth.user,
   isolatedId: state.assets.isolatedId,
   changePassword: state.auth.changePassword,
+  searching: state.assets.searching,
   onboarding: state.auth.onboarding,
   assets: state.assets.all,
   selectedAssetIds: state.assets.selectedIds,

@@ -238,8 +238,8 @@ class JobMenu extends Component {
         { this.renderJobBadge() }
         { jobType === Job.Import && (
           <div onClick={this.createImport} className="JobMenu-jobs-create-import">
-            <div>Import</div>
             <div className="icon-import"/>
+            <div>Import</div>
           </div>
         )}
         <DropdownMenu onChange={this.refreshJobs} show={this.show}>

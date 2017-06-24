@@ -75,24 +75,10 @@
 }
 
 .WidgetHeader-close {
-  font-size: 12px;
-  position: absolute;
-  right: -9px;
-  top: -9px;
-  color: $zorroa-greyish-brown;
-  filter: none;
-  padding: 2px;
-  border-radius: 3px;
-  opacity: 0;
-  .WidgetHeader:hover & { opacity: 1; }
-  &:hover { color: red; background-color: white; }
-}
-
-.WidgetHeader-caret {
-  font-size: 16px;
-  width: 20px;
-  min-width: 20px;
-  max-width: 16px;
+  @include zorroa-square-btn-darken(20px);
+  margin-right: 2px;
+  margin-left: 4px;
+  font-size: 9px;
 }
 
 .WidgetHeader-header {
@@ -142,10 +128,4 @@
   height: 16px;
 
   &.isPinned { transform: rotate(-45deg); }
-}
-
-.WidgetHeader-collapse {
-  margin-left: 6px;
-  margin-right: 8px;
-  &.isOpen { transform: rotate(180deg); }
 }
