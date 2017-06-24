@@ -56,26 +56,27 @@ export default class VideoRange extends Component {
   }
 
   resizeLeft = (x) => {
-    const clipStartFrame = this.frameAtX(x)
-    this.props.onClipRange(clipStartFrame, this.props.stopFrame)
-    if (clipStartFrame < this.state.clipStartFrame) this.setState({clipStartFrame})
+    const frame = Math.min(this.frameAtX(x), this.props.stopFrame)
+    this.props.onClipRange(frame, this.props.stopFrame)
+    if (frame < this.state.clipStartFrame) this.setState({clipStartFrame: frame})
   }
 
   resizeRight = (x) => {
-    const clipStopFrame = this.frameAtX(x)
-    this.props.onClipRange(this.props.startFrame, clipStopFrame)
-    if (clipStopFrame > this.state.clipStopFrame) this.setState({clipStopFrame})
+    const frame = Math.max(this.frameAtX(x), this.props.startFrame)
+    this.props.onClipRange(this.props.startFrame, frame)
+    if (frame > this.state.clipStopFrame) this.setState({clipStopFrame: frame})
   }
 
   render () {
     const { clipStartFrame, clipStopFrame } = this.state
     const { played, frames, frameRate, backgroundURL, startFrame, stopFrame } = this.props
+    if (!frames) return
     const clipWidth = this.refs.clip && this.refs.clip.clientWidth || 0
     const clipHeight = this.refs.clip && this.refs.clip.clientHeight || 0
     const clipFrames = clipStopFrame - clipStartFrame + 1
     const clipLeftPx = clipWidth * (startFrame - clipStartFrame) / clipFrames
     const clipRightPx = clipWidth * (stopFrame - clipStartFrame) / clipFrames
-    const clipWidthPx = clipRightPx - clipLeftPx
+    const clipWidthPx = Math.max(10, clipRightPx - clipLeftPx)
     const barLeftPx = clipWidth * clipStartFrame / frames
     const barRightPx = clipWidth * clipStopFrame / frames
     const barWidthPx = Math.max(5, barRightPx - barLeftPx)
