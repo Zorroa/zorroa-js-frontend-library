@@ -42,10 +42,6 @@ class Video extends Component {
     error: null
   }
 
-  componentWillMount () {
-    console.log('---Mounting Video')
-  }
-
   @keydown('space')
   playPause () {
     this.setState({ playing: !this.state.playing })
