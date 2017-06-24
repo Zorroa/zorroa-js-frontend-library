@@ -1,7 +1,7 @@
 import { MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS,
   SIMILAR_VALUES } from '../constants/actionTypes'
 import Widget, { createFacetWidget, createExistsWidget, createMapWidget,
-  createDateRangeWidget, createRangeWidget, createSimilarityWidget,
+  createDateRangeWidget, createRangeWidget,
   createFiletypeWidget, createColorWidget, createSortOrderWidget } from '../models/Widget'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
@@ -13,11 +13,12 @@ import {
   RangeWidgetInfo,
   DateRangeWidgetInfo,
   FiletypeWidgetInfo,
-  CollectionsWidgetInfo
+  CollectionsWidgetInfo,
+  SortOrderWidgetInfo
 } from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
 import { selectFolderIds } from './folderAction'
-import { similarAssets } from './assetsAction'
+import { similarAssets, orderAssets } from './assetsAction'
 
 export function modifyRacetrackWidget (widget) {
   assert.ok(widget instanceof Widget)
@@ -218,6 +219,17 @@ export function restoreSearch (search, doNotRestoreSelectedFolders) {
     }
   }
 
+  // Set the sort order
+  if (search.order) {
+    const order = widgets.find(widget => (widget.type === SortOrderWidgetInfo.type))
+    if (order) {
+      order.sliver = new AssetSearch({order: search.order})
+    } else {
+      const w = createSortOrderWidget(undefined, undefined, isEnabled, isPinned)  // use global ordering
+      widgets.push(w)
+    }
+  }
+
   // Select the folders specified in the search
   let selectedFolderIds
   if (search.filter && search.filter.links && search.filter.links.folder) {
@@ -231,6 +243,11 @@ export function restoreSearch (search, doNotRestoreSelectedFolders) {
   // Return actions to update the racetrack for the new search
   const actions = [resetRacetrackWidgets(widgets)]
   if (!doNotRestoreSelectedFolders) actions.push(selectFolderIds(selectedFolderIds))
+
+  // Set the global order to match the search
+  if (search.order) {
+    actions.push(orderAssets(search.order))
+  }
 
   // Create a SimilarHash widget if there's a hash query
   if (search.filter && search.filter.hamming) {
