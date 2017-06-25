@@ -99,7 +99,7 @@ class SortOrder extends Component {
             { active && order.map((i, j) => <div key={i.field} onClick={_ => this.toggle(j)} className="SortOrder-label">{this.title(i, false)}</div>) }
           </div>
           <div className="SortOrder-suggestions">
-            <Suggestions suggestions={suggestions} placeholder="Search fields"
+            <Suggestions suggestions={suggestions} placeholder="Search fields" className="clear"
                          value={suggestion} onChange={this.suggest} onSelect={this.select}/>
           </div>
           { active && (

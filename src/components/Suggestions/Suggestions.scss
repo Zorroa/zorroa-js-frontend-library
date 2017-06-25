@@ -110,10 +110,14 @@
   padding-left: 8px;
   padding-right: 8px;
   &:hover { color: $zorroa-gray; }
+
+  .Suggestions.clear & { padding: 0; color: $zorroa-gray; background-color: transparent; }
 }
 
 .Suggestions-search-button-label {
   text-transform: uppercase;
   font-size: 12px;
   margin-left: 4px;
+
+  .Suggestions.clear & { display: none; }
 }

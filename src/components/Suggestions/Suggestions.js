@@ -10,6 +10,7 @@ export default class Suggestions extends Component {
     showSuggestions: PropTypes.bool,
     placeholder: PropTypes.string,
     style: PropTypes.object,
+    className: PropTypes.string,
     onChange: PropTypes.func.isRequired,
     onSelect: PropTypes.func.isRequired
   }
@@ -152,14 +153,14 @@ export default class Suggestions extends Component {
   }
 
   render () {
-    const { placeholder, style, query } = this.props
+    const { placeholder, style, query, className } = this.props
     const { value } = this.state
 
     /* dont show suggestions if input matches current results */
     const showSuggestions = this.props.showSuggestions && value && (!query || query.query !== value)
 
     return (
-    <div className="Suggestions" style={style}>
+    <div className={'Suggestions' + (className ? ' ' + className : '')} style={style}>
       <div className="Suggestions-overlapping-inputs">
         { showSuggestions &&
           <input value={this.selectedSuggestionString()}
