@@ -319,7 +319,8 @@ class Filetype extends Component {
             { this.renderSelected() }
             <div className="Filetype-suggestions">
               <div className="Filetype-suggestions-body">
-                <Suggestions suggestions={suggestions} placeholder={placeholder} style={style}
+                <Suggestions suggestions={suggestions} placeholder={placeholder}
+                             style={style} className="clear"
                              value={suggestion} onChange={this.suggest} onSelect={this.select}/>
               </div>
             </div>

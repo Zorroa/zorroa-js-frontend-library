@@ -96,7 +96,7 @@ class Collections extends Component {
             ))}
           </div>
           <div className="Collections-suggestions">
-            <Suggestions suggestions={suggestions} placeholder={placeholder}
+            <Suggestions suggestions={suggestions} placeholder={placeholder} className="clear"
                          value={suggestion} onChange={this.suggest} onSelect={this.select}/>
           </div>
           { selectedFolderNames.length > 0 && (
