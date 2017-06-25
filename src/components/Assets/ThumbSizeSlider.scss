@@ -1,7 +1,7 @@
 @import '../../styles/core-mixins.scss';
 
 .ThumbSizeSlider {
-  color: $zorroa-gray;
+  color: white;
   padding: 0 8px;
   border-radius: 3px;
 }
@@ -38,12 +38,12 @@
   position: relative;
   input::-webkit-slider-thumb {
     border: none;
-    background: $zorroa-gray;
+    background: $zorroa-lightgray;
     &:active { background-color: $zorroa-sickly-green; }
   }
   input::-moz-range-thumb {
     border: none;
-    background: $zorroa-gray;
+    background: $zorroa-lightgray;
     &:active { background-color: $zorroa-sickly-green; }
   }
 }
