@@ -10,13 +10,12 @@ import TrashedFolder from '../../models/TrashedFolder'
 import * as WidgetInfo from './WidgetInfo'
 import Searcher from './Searcher'
 import Searchbar from '../Searchbar'
-import AddWidget from './AddWidget'
+import QuickAddWidget from './QuickAddWidget'
 import CreateFolder from '../Folders/CreateFolder'
 import { showModal, toggleCollapsible } from '../../actions/appActions'
 import { unorderAssets } from '../../actions/assetsAction'
 import { createFolder, selectFolderIds, createDyHiFolder } from '../../actions/folderAction'
 import { resetRacetrackWidgets, similar } from '../../actions/racetrackAction'
-import homeIcon from './home-icon.svg'
 
 class Racebar extends Component {
   static propTypes = {
@@ -67,12 +66,6 @@ class Racebar extends Component {
       }
       this.lastWidgetCount = widgets.length
     }
-  }
-
-  showAddWidget = (event) => {
-    const width = '732px'   // Exactly fits three widgets across
-    const body = <AddWidget/>
-    this.props.actions.showModal({body, width})
   }
 
   toggleOpen = (widget) => {
@@ -162,7 +155,7 @@ class Racebar extends Component {
               { this.renderWidget(widget, false) }
             </div>
           ))}
-          <div onClick={this.showAddWidget} className="Racebar-add-widget icon-plus" title="Add a search widget"/>
+          <QuickAddWidget/>
         </div>
         <div className="Racebar-right">
           <div className={classnames('Racebar-save', {disabled})}
