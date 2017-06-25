@@ -363,8 +363,10 @@ class Facet extends Component {
   }
 
   renderChart () {
-    const { uxLevel } = this.props
+    const { uxLevel, id, widgets } = this.props
     const { field, terms, chartType } = this.state
+    const index = widgets && widgets.findIndex(widget => (id === widget.id))
+    const isPinned = widgets && widgets[index] && widgets[index].isPinned
     let maxCount = 0
     let minCount = Number.MAX_SAFE_INTEGER
     // Extract the buckets for this widget from the global query using id
@@ -398,7 +400,7 @@ class Facet extends Component {
               { this.renderHeaderCell('keyword') }
               { this.renderHeaderCell('count') }
             </div> }
-            <div className="Facet-value-table" style={{minHeight: '300px'}}>
+            <div className="Facet-value-table" style={{minHeight: isPinned ? '300px' : undefined}}>
               <table>
                 <thead>
                 { uxLevel === 0 ? (
@@ -408,7 +410,7 @@ class Facet extends Component {
                 ) : (
                   <tr>
                     <td style={{width: '80%'}}/>
-                    <td style={{width: '20%'}}/>
+                    <td style={{width: '20%', minWidth: '60px'}}/>
                   </tr>
                 )}
                 </thead>
@@ -418,7 +420,7 @@ class Facet extends Component {
                     { selected: mergedTerms.indexOf(bucket.key) >= 0 })}
                       title={`Click to filter for ${bucket.key}`}
                       key={bucket.key} onClick={this.selectTerm.bind(this, bucket.key)}>
-                    <td className="Facet-value-cell" style={{ maxWidth: uxLevel > 0 ? 0 : 360 }}>
+                    <td className="Facet-value-cell">
                       <div className="Facet-value-table-key">
                         { uxLevel > 0 && <div className="Facet-value-pct-bar" style={{width: `${100 * bucket.doc_count / maxCount}%`}} /> }
                         <div className="Facet-value-key">{this.renderBucketKey(bucket.key)}</div>

@@ -130,7 +130,8 @@
 
   .Facet-value-cell {
     padding: 0;
-    max-width: 0; // This looks weird, but is important! It allows cells to chop content
+    max-width: 360px;
+    //max-width: 0; // This looks weird, but is important! It allows cells to chop content
     @include clampText;
   }
 
@@ -140,6 +141,7 @@
     @include clampText;
     text-align: right;
     width: 60px;
+    min-width: 60px;
   }
 
   .Facet-table-header {
