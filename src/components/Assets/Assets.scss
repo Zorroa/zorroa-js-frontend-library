@@ -90,7 +90,7 @@
   align-self: center;
   z-index: 1;
   margin-top: -80px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   max-width: 500px;
   border-radius: 3px;
   box-shadow: 0 2px 4px 4px rgba(0,0,0,.25);
@@ -99,6 +99,7 @@
   padding: 0 10px;
 
   width: auto;
+  height: 45px;
 
   @include flexRow;
   @include flexAlignItemsCenter;
@@ -116,29 +117,27 @@
 .thumb-layout {
   margin: 0 10px;
   white-space: nowrap;
-  border-radius: 3px;
   overflow: hidden;
   position: relative;
-  border: 1px solid $zorroa-gray;
+  padding-left: 8px;
+  padding-right: 8px;
+  border-left: 1px solid $zorroa-gray;
+  border-right: 1px solid $zorroa-gray;
+  @include flexRowCenter;
 
   .thumb-layout-button {
     width: 30px;
     height: 30px;
-    border: none;
-    outline: none;
-    font-size: 16px;
+    font-size: 20px;
     cursor: pointer;
     color: $zorroa-gray;
-    background-color: transparent;
+    @include flexRowCenter;
 
-    &:hover { color: white; background-color: $zorroa-lightgray; }
+    &:not(.thumb-layout-enabled):hover { color: lighten($zorroa-sickly-green, 15%); }
   }
 
   .thumb-layout-enabled {
-    color: white;
-    background-color: $zorroa-sickly-green;
-    box-shadow: 0 0 2px 0 rgba(0,0,0,0.40);
-    &:hover { background-color: darken($zorroa-sickly-green, 15%);}
+    color: $zorroa-sickly-green;
   }
 }
 
@@ -155,30 +154,26 @@
   margin: 0 10px;
 
   .TableToggle-button {
-    color: $zorroa-greyish-brown;
+    color: $zorroa-gray;
     width: 30px;
     height: 30px;
-    border-radius: 3px;
     border: none;
     outline: none;
     font-size: 20px;
-    background-color: white;
     cursor: pointer;
-    &:hover { background-color: $zorroa-nearwhite; }
+    @include flexRowCenter;
+    &:hover { color: lighten($zorroa-sickly-green, 15%); }
   }
 
   .TableToggle-enabled {
-    color: white;
-    background-color: $zorroa-sickly-green;
-    &:hover { background-color: darken($zorroa-sickly-green, 15%); }
+    color: $zorroa-sickly-green;
+    &:hover { color: darken($zorroa-sickly-green, 15%); }
   }
 
 }
 
 .MultipageToggle {
   @include flexRowCenter;
-
-  margin: 10px 0;
 
   color: $zorroa-gray;
   width: 30px;
@@ -191,12 +186,11 @@
 
   transform: scaleX(-1) rotate(90deg);
 
-  &:hover { background-color: $zorroa-lightgray; }
+  &:hover { color: $zorroa-sickly-green; }
 
   &.MultipageToggle-enabled {
-    color: white;
-    background-color: $zorroa-sickly-green;
-    &:hover { background-color: darken($zorroa-sickly-green, 15%); }
+    color: $zorroa-sickly-green;
+    &:hover { color: lighten($zorroa-sickly-green, 15%); }
   }
 }
 

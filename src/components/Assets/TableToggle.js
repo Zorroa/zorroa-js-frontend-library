@@ -3,7 +3,7 @@ import classnames from 'classnames'
 
 const TableToggle = (props) => (
   <div className="TableToggle" title="Show metadata spreadsheet">
-    <button onClick={props.onClick} className={
+    <div onClick={props.onClick} className={
       classnames('TableToggle-button', 'icon-table', {
         'TableToggle-enabled': props.enabled
       })
