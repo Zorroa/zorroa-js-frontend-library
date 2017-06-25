@@ -7,7 +7,8 @@ import {
   SHOW_MULTIPAGE, SHOW_PAGES, VIDEO_VOLUME,
   HOVER_FIELD, CLEAR_HOVER_FIELD,
   USER_SETTINGS, UNAUTH_USER,
-  THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE, UX_LEVEL
+  THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE,
+  UX_LEVEL, MONOCHROME
 } from '../constants/actionTypes'
 import { DEFAULT_THUMBSIZE } from '../actions/appActions'
 import { parseVariables, fieldsForVariables } from '../services/jsUtil'
@@ -19,6 +20,7 @@ export const defaultThumbFields = [ 'source.type', 'image.width', 'image.height'
 const initialState = {
   modal: null,
   uxLevel: 0,
+  monochrome: false,
   leftSidebarIsIconified: false,
   rightSidebarIsIconified: true,
   collapsibleOpen: {
@@ -135,6 +137,9 @@ export default function app (state = initialState, action) {
     }
     case UX_LEVEL: {
       return { ...state, uxLevel: action.payload }
+    }
+    case MONOCHROME: {
+      return { ...state, monochrome: action.payload }
     }
     case USER_SETTINGS:
       return { ...state, userSettings: action.payload.metadata }

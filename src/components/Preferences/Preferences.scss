@@ -159,10 +159,21 @@
 .Preferences-uxlevel {
   @include flexRowCenter;
   margin-top: 20px;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 .Preferences-uxlevel-label {
+  margin-left: 4px;
+  color: $zorroa-gray;
+}
+
+.Preferences-monochrome {
+  @include flexRowCenter;
+  margin-top: 5px;
+  margin-bottom: 20px;
+}
+
+.Preferences-monochrome-label {
   margin-left: 4px;
   color: $zorroa-gray;
 }
