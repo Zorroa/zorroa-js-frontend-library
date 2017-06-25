@@ -26,6 +26,7 @@ class Widget extends Component {
     className: PropTypes.string,
     widgets: PropTypes.arrayOf(PropTypes.object),
     uxLevel: PropTypes.number,
+    monochrome: PropTypes.bool,
     actions: PropTypes.object
   }
 
@@ -65,7 +66,7 @@ class Widget extends Component {
   }
 
   render () {
-    const { children, icon, title, field, backgroundColor, isIconified, floatBody, isOpen, onOpen, uxLevel } = this.props
+    const { children, icon, title, field, backgroundColor, isIconified, floatBody, isOpen, onOpen, uxLevel, monochrome } = this.props
     const widget = this.widget()
     const advanced = uxLevel > 0
     const isEnabled = !advanced || (widget && widget.isEnabled)
@@ -75,7 +76,7 @@ class Widget extends Component {
       icon,
       title,
       field,
-      backgroundColor,
+      backgroundColor: monochrome ? '#888' : backgroundColor,
       isEnabled,
       isPinned,
       maxWidth,
@@ -105,7 +106,8 @@ class Widget extends Component {
 export default connect(
   state => ({
     widgets: state.racetrack && state.racetrack.widgets,
-    uxLevel: state.app.uxLevel
+    uxLevel: state.app.uxLevel,
+    monochrome: state.app.monochrome
   }), dispatch => ({
     actions: bindActionCreators({
       iconifyRightSidebar,

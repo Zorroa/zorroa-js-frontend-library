@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import JSONTree from 'react-json-tree'
 
-import { hideModal, lightbarFieldTemplate, thumbFieldTemplate, uxLevel } from '../../actions/appActions'
+import { hideModal, lightbarFieldTemplate, thumbFieldTemplate, uxLevel, monochrome } from '../../actions/appActions'
 import { saveUserSettings, changePassword } from '../../actions/authAction'
 import { archivistInfo, archivistHealth, archivistMetrics } from '../../actions/archivistAction'
 import User from '../../models/User'
@@ -41,6 +41,7 @@ class Preferences extends Component {
     metrics: PropTypes.object,
     actions: PropTypes.object,
     uxLevel: PropTypes.number,
+    monochrome: PropTypes.bool,
     userSettings: PropTypes.object.isRequired,
     lightbarFieldTemplate: PropTypes.string,
     thumbFieldTemplate: PropTypes.string
@@ -96,8 +97,14 @@ class Preferences extends Component {
     this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, uxLevel })
   }
 
+  toggleMonochrome = (event) => {
+    const monochrome = !this.props.monochrome
+    this.props.actions.monochrome(monochrome)
+    this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, monochrome })
+  }
+
   render () {
-    const { user, info, health, metrics, lightbarFieldTemplate, thumbFieldTemplate, uxLevel } = this.props
+    const { user, info, health, metrics, lightbarFieldTemplate, thumbFieldTemplate, uxLevel, monochrome } = this.props
     return (
       <div className="Preferences">
         <div className="Preferences-header">
@@ -121,6 +128,10 @@ class Preferences extends Component {
             <div className="Preferences-uxlevel">
               <input type="checkbox" className="Preferences-uxlevel-input" checked={uxLevel > 0} onClick={this.toggleUXLevel}/>
               <div className="Preferences-uxlevel-label">Advanced Controls</div>
+            </div>
+            <div className="Preferences-monochrome">
+              <input type="checkbox" className="Preferences-monochrome-input" checked={monochrome} onClick={this.toggleMonochrome}/>
+              <div className="Preferences-monochrome-label">Monochrome</div>
             </div>
             <div className="Preferences-field-template">
               <input type="text" className="Preferences-field-template-input" value={lightbarFieldTemplate} onChange={this.changeLightbarFieldTemplate}/>
@@ -161,6 +172,7 @@ export default connect(state => ({
   health: state.archivist.health,
   metrics: state.archivist.metrics,
   uxLevel: state.app.uxLevel,
+  monochrome: state.app.monochrome,
   userSettings: state.app.userSettings,
   lightbarFieldTemplate: state.app.lightbarFieldTemplate,
   thumbFieldTemplate: state.app.thumbFieldTemplate
@@ -174,6 +186,7 @@ export default connect(state => ({
     hideModal,
     lightbarFieldTemplate,
     thumbFieldTemplate,
-    uxLevel
+    uxLevel,
+    monochrome
   }, dispatch)
 }))(Preferences)

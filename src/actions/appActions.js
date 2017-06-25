@@ -6,7 +6,8 @@ import {
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
   SHOW_MULTIPAGE, SHOW_PAGES, VIDEO_VOLUME,
   HOVER_FIELD, CLEAR_HOVER_FIELD,
-  THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE, UX_LEVEL
+  THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE,
+  UX_LEVEL, MONOCHROME
 } from '../constants/actionTypes'
 
 export const MIN_THUMBSIZE = 48
@@ -173,5 +174,12 @@ export function uxLevel (level) {
   return ({
     type: UX_LEVEL,
     payload: level
+  })
+}
+
+export function monochrome (state) {
+  return ({
+    type: MONOCHROME,
+    payload: state
   })
 }
