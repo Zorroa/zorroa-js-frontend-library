@@ -25,7 +25,8 @@ class SimilarHash extends Component {
     similar: PropTypes.shape({
       field: PropTypes.string,
       values: PropTypes.arrayOf(PropTypes.string).isRequired,
-      assetIds: PropTypes.arrayOf(PropTypes.string).isRequired
+      assetIds: PropTypes.arrayOf(PropTypes.string).isRequired,
+      minScore: PropTypes.number
     }).isRequired,
     similarAssets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     selectedAssetIds: PropTypes.instanceOf(Set),
@@ -42,7 +43,7 @@ class SimilarHash extends Component {
   }
 
   state = {
-    minScore: 75
+    minScore: this.props.similar.minScore
   }
 
   adjustTimout = null
