@@ -34,7 +34,8 @@
       }
 
       &.selected {
-        border: 3px solid $zorroa-gray;
+        opacity: 0.75;
+        border: 3px solid $zorroa-darkgray;
       }
     }
   }
