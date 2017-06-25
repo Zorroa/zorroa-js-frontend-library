@@ -255,7 +255,8 @@ export function restoreSearch (search, doNotRestoreSelectedFolders) {
       field: search.filter.hamming.field,
       values: search.filter.hamming.hashes,
       assetIds: search.filter.hamming.assetIds,
-      weights: search.filter.hamming.weights
+      weights: search.filter.hamming.weights,
+      minScore: search.filter.hamming.minScore
     }))
     const fields = [search.filter.hamming.field, 'image.width', 'image.height', 'video.width', 'video.height', 'proxies*']
     actions.push(similarAssets(search.filter.hamming.assetIds, fields))
