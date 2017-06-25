@@ -62,7 +62,6 @@
   cursor: pointer;
   filter: none;
   font-size: 16px;
-  margin-right: 8px;
 
   &:hover {
     // showing green is the intent, but the color is currently not visible due to parent's filter when disabled
@@ -122,6 +121,7 @@
 
 .WidgetHeader-pin {
   @include zorroa-square-btn-darken(20px);
+  margin-left: 10px;
 }
 
 .WidgetHeader-pin-img {

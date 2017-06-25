@@ -324,11 +324,12 @@ class Assets extends Component {
 
   saveHistory = (optFirstTimeHistoryKey) => {
     if (this.historyNav && !optFirstTimeHistoryKey) return
+    const query = this.props.query
+    if (query && query.from) return
     this.stopHistoryNav()
 
     const path = location.pathname + location.search
     const historyKey = optFirstTimeHistoryKey || Date.now().toString()
-    const query = this.props.query
     this.history[historyKey] = { query }
 
     // Trying to keep the URL clean by hiding our key in the previous entry,

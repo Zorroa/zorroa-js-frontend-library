@@ -70,8 +70,8 @@ describe('Table', function () {
   it('test the Table', function () {
     var TableToggle
     var assetsScrollHeight
-    var expectedMinAssetsScrollHeight = '195.438px' // see Assets.js:footerEditbarAndPaddingHeight
-    var expectedMinTableHeight = '33px' // see Assets.js:minTableHeight
+    var expectedMinAssetsScrollHeight = '175.438px' // see Assets.js:footerEditbarAndPaddingHeight
+    var expectedMinTableHeight = '26px' // see Assets.js:minTableHeight
     var elements
 
     const dragVertFn = (fromEleName, toEleName, yoffset) => {
