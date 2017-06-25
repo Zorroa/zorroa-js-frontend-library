@@ -17,7 +17,7 @@ const ThumbLayoutSelector = (props) => (
       const classNames = classnames('thumb-layout-button', layout.icon, {
         'thumb-layout-enabled': (layout.name === props.thumbLayout)
       })
-      return (<button key={layout.name} className={classNames} onClick={onClick}/>)
+      return (<div key={layout.name} className={classNames} onClick={onClick}/>)
     }) }
   </div>
 )

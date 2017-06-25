@@ -61,7 +61,7 @@
     &:not(.DropdownMenu-separator) {
       cursor: pointer;
       &:hover {
-        background-color: white;
+        background-color: $zorroa-nearwhite;
       }
     }
   }

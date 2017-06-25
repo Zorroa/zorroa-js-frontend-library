@@ -8,8 +8,8 @@ import MultipageToggle from './MultipageToggle'
 const Footer = (props) => (
   <div className="assets-footer">
     <ThumbSizeSlider value={props.thumbSize} onChange={props.handleThumbSize} />
-    <MultipageToggle enabled={props.showMultipage} onClick={props.toggleShowMultipage}/>
     <ThumbLayoutSelector thumbLayout={props.layout} onClick={props.handleLayout} />
+    <MultipageToggle enabled={props.showMultipage} onClick={props.toggleShowMultipage}/>
     { props.toggleShowTable && <TableToggle enabled={props.showTable} onClick={props.toggleShowTable} /> }
   </div>
 )
