@@ -20,6 +20,50 @@ function extractSimilar (similar, widget) {
   return { ...similar, field }
 }
 
+function fieldExists(field, fieldTypes) {
+  const types = Object.keys(fieldTypes)
+  for (let i = 0; i < types.length; ++i) {
+    const type = types[i]
+    const fields = fieldTypes[type]
+    for (let j = 0; j < fields.length; ++j) {
+      if (fields[j] === field) return true
+    }
+  }
+  return false
+}
+
+function bestSimilarityField (curField, fieldTypes) {
+  if (curField && fieldExists(curField, fieldTypes)) return curField
+  const defaultFields = [
+    'similarity.mxnet.byte',
+    'similarity.tensorflow.byte',
+    'similarity.Tensorflow.byte',
+    'similarity.TensorFlow.byte',
+    'Similarity.Tensorflow.byte',
+    'Similarity.TensorFlow.byte',
+    'Similarity.tensorflow.byte',
+    'similarity.hsv.byte'
+  ]
+  for (let i = 0; i < defaultFields.length; ++i) {
+    if (fieldExists(defaultFields[i], fieldTypes)) return defaultFields[i]
+  }
+  const types = Object.keys(fieldTypes)
+  for (let i = 0; i < types.length; ++i) {
+    const type = types[i]
+    const fields = fieldTypes[type]
+    for (let j = 0; j < fields.length; ++j) {
+      if (fields[j].startsWith('similarity')) return fields[j]
+    }
+  }
+  for (let i = 0; i < types.length; ++i) {
+    const type = types[i]
+    const fields = fieldTypes[type]
+    for (let j = 0; j < fields.length; ++j) {
+      if (fields[j].toLowerCase().startsWith('similarity')) return fields[j]
+    }
+  }
+}
+
 export default function (state = initialState, action) {
   switch (action.type) {
     case MODIFY_RACETRACK_WIDGET: {
@@ -89,34 +133,7 @@ export default function (state = initialState, action) {
     }
     case ASSET_FIELDS: {
       // Scan available asset fields for the preferred or a valid field
-      let field = state.similar.field || 'similarity.tensorflow.byte'
-      let found = false
-      const types = Object.keys(action.payload)
-      for (let i = 0; !found && i < types.length; ++i) {
-        const type = types[i]
-        const fields = action.payload[type]
-        for (let j = 0; !found && j < fields.length; ++j) {
-          if (fields[j] === field) {
-            field = fields[j]  // In case toLowerCase masked the field
-            found = true
-          }
-        }
-      }
-      if (!found) {
-        field = null
-      }
-      if (!field) {
-        const types = Object.keys(action.payload)
-        for (let i = 0; !field && i < types.length; ++i) {
-          const type = types[i]
-          const fields = action.payload[type]
-          for (let j = 0; !field && j < fields.length; ++j) {
-            if (fields[j].toLowerCase().startsWith('similarity')) {
-              field = fields[j]
-            }
-          }
-        }
-      }
+      const field = bestSimilarityField(state.similar.field, action.payload)
       return { ...state, similar: { ...state.similar, field } }
     }
     case SELECT_FOLDERS: {
