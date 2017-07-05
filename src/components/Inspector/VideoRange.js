@@ -1,8 +1,9 @@
 import React, { Component, PropTypes } from 'react'
 import classnames from 'classnames'
 
-import { formatDuration, parseFormattedFloat } from '../../services/jsUtil'
+import { formatDuration } from '../../services/jsUtil'
 import Resizer from '../../services/Resizer'
+import { TimeAxis } from 'react-axis'
 
 export default class VideoRange extends Component {
   static propTypes = {
@@ -84,8 +85,13 @@ export default class VideoRange extends Component {
     const scrubbing = this.resizer.active
     const clipScale = clipWidth * frames / clipFrames
     const clipOffset = -clipScale * clipStartFrame / frames
-    const barBackground = { backgroundSize: `${clipWidth}px ${clipHeight}px`, backgroundImage: `url(${backgroundURL})` }
-    const clipBackground = { backgroundSize: `${clipScale}px ${clipHeight}px`, backgroundPosition: `${clipOffset}px 0`, backgroundImage: `url(${backgroundURL})` }
+    const barBackground = backgroundURL ? { backgroundSize: `${clipWidth}px ${clipHeight}px`, backgroundImage: `url(${backgroundURL})` } : {}
+    const clipBackground = backgroundURL ? { backgroundSize: `${clipScale}px ${clipHeight}px`, backgroundPosition: `${clipOffset}px 0`, backgroundImage: `url(${backgroundURL})` } : {}
+    const clipStartTime = new Date(1000 * clipStartFrame / frameRate)
+    const clipStopTime = new Date(1000 * clipStopFrame / frameRate)
+    const startTime = new Date(0)
+    const stopTime = new Date(1000 * frames / frameRate)
+    const tickCount = Math.min(10, Math.max(3, Math.round(clipWidth / 100)))
     return (
       <div className="VideoRange">
         <div className="VideoRange-clip" ref='clip' onMouseDown={e => this.resizeStart(this.resizeUpdate, e)} style={clipBackground}>
@@ -97,15 +103,21 @@ export default class VideoRange extends Component {
             </div>
           )}
           { clipWidth && <div className={classnames('VideoRange-clip-playhead', {scrubbing})} style={{ left: playhead }}/> }
+          <div className="VideoRange-axis">
+            <TimeAxis format="duration" position="bottom" width={clipWidth} height={clipHeight} margin={0}
+                      beginTime={clipStartTime} endTime={clipStopTime} tickCount={tickCount} standalone={true} />
+          </div>
         </div>
         { clipWidth && clipFrames !== frames && (
-          <div className="VideoRange-movie" style={barBackground}>
+          <div className="VideoRange-movie">
+            <div className="VideoRange-movie-background" style={barBackground}/>
             <div className="VideoRange-bar-range" style={{ marginLeft: `${barLeftPx}px`, width: `${barWidthPx}px` }}/>
             <div className="VideoRange-movie-thumb" style={{ left: `${clipWidth * played}px` }}>
               <div className="VideoRange-movie-thumb-marker"/>
-              <div className="VideoRange-movie-thumb-duration">
-                { formatDuration(played * frames / frameRate, frameRate) }
-              </div>
+            </div>
+            <div className="VideoRange-axis">
+              <TimeAxis format="duration" position="top" width={clipWidth} height={clipHeight} margin={0}
+                        beginTime={startTime} endTime={stopTime} tickCount={tickCount} standalone={true} />
             </div>
           </div>
         )}

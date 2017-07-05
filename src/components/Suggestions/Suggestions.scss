@@ -9,7 +9,7 @@
 
 .Suggestions-overlapping-inputs {
   @include flexOn;
-  @include flexColCenter;
+  @include flexRowCenter;
   height: 25px;
   position: relative;
 }
