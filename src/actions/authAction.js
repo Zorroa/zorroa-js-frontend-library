@@ -7,7 +7,7 @@ import {
   AUTH_PERMISSIONS, AUTH_SYNC, METADATA_FIELDS, AUTH_ONBOARDING, AUTH_HMAC,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT, SET_TABLE_FIELD_WIDTH,
   SHOW_MULTIPAGE, VIDEO_VOLUME, AUTH_CHANGE_PASSWORD, AUTH_DEFAULTS,
-  UX_LEVEL, MONOCHROME
+  UX_LEVEL, MONOCHROME, THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE
 } from '../constants/actionTypes'
 import { USER_ITEM, ORIGIN_ITEM } from '../constants/localStorageItems'
 import User from '../models/User'
@@ -184,6 +184,12 @@ function authorize (dispatch, json, source) {
     }
     if (metadata.monochrome !== undefined) {
       dispatch({type: MONOCHROME, payload: metadata.monochrome})
+    }
+    if (metadata.thumbFieldTemplate !== undefined) {
+      dispatch({type: THUMB_FIELD_TEMPLATE, payload: metadata.thumbFieldTemplate})
+    }
+    if (metadata.lightbarFieldTemplate !== undefined) {
+      dispatch({type: LIGHTBAR_FIELD_TEMPLATE, payload: metadata.lightbarFieldTemplate})
     }
   }
   const url = source && source.length ? '?source=' + source : ''

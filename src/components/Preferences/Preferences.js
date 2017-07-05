@@ -69,11 +69,15 @@ class Preferences extends Component {
   }
 
   changeThumbFieldTemplate = (event) => {
-    this.props.actions.thumbFieldTemplate(event.target.value)
+    const thumbFieldTemplate = event.target.value
+    this.props.actions.thumbFieldTemplate(thumbFieldTemplate)
+    this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, thumbFieldTemplate })
   }
 
   changeLightbarFieldTemplate = (event) => {
-    this.props.actions.lightbarFieldTemplate(event.target.value)
+    const lightbarFieldTemplate = event.target.value
+    this.props.actions.lightbarFieldTemplate(lightbarFieldTemplate)
+    this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, lightbarFieldTemplate })
   }
 
   logoutDropbox = (event) => {
