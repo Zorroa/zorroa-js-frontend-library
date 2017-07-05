@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 import { humanFileSize, makePromiseQueue } from '../../services/jsUtil'
-import { queueFileEntrysUpload, dequeueUploadFileEntrys } from '../../actions/jobActions'
+import { queueFileEntrysUpload, dequeueUploadFileEntrys, uploadFiles } from '../../actions/jobActions'
 
 const initialState = {
   isDroppable: false,     // true when file over drop target
@@ -21,7 +21,7 @@ const initialState = {
 class LocalChooser extends Component {
   static propTypes = {
     onImport: PropTypes.func,
-    onBack: PropTypes.func.isRequired,
+    onBack: PropTypes.func,
     onDone: PropTypes.func,
     fileEntries: PropTypes.instanceOf(Map),
     actions: PropTypes.object
@@ -120,7 +120,8 @@ class LocalChooser extends Component {
   }
 
   dragEnter = (event) => {
-    if (!this.props.onImport || this.state.progressEvent) return   // No dropping after upload started
+    const importing = this.props.onImport || !this.props.onBack
+    if (!importing || this.state.progressEvent) return   // No dropping after upload started
     this.setState({isDroppable: true})
   }
 
@@ -201,17 +202,29 @@ class LocalChooser extends Component {
     return fileCount
   }
 
+  similar = (event) => {
+    console.log('Upload and find similar')
+  }
+
   upload = (event) => {
     if (this.state.progressEvent && !this.state.cancelUpload) {
       this.setState({cancelUpload: true})
     }
-    if (this.props.onImport) {
+    if (this.props.onImport || !this.props.onDone) {
       const totalSize = this.totalSize()
       this.setState({totalSize})
       this.generateFileBatches(event)
     } else {
       this.onDone(event)
     }
+  }
+
+  configureUploadFileImport = (uploadFiles, progress) => {
+    if (!uploadFiles || !uploadFiles.length) return {}
+    const pipelineId = -1
+    const now = new Date()
+    const name = `Upload ${now.toLocaleString('en-GB')}`
+    this.props.actions.uploadFiles(name, pipelineId, uploadFiles, progress)
   }
 
   generateFileBatches = (event) => {
@@ -262,7 +275,8 @@ class LocalChooser extends Component {
     Promise.all(promises)
       .then(_ => {
         if (files.length) batches.push(files)
-        this.setState({uploadedSize: 0, onImport: this.props.onImport, cancelUpload: false})
+        const onImport = this.props.onImport || this.configureUploadFileImport
+        this.setState({uploadedSize: 0, onImport, cancelUpload: false})
         makePromiseQueue(batches, this.launchImport, 1, this.launchProgress)
       })
   }
@@ -280,7 +294,8 @@ class LocalChooser extends Component {
 
         // Note that we use a private copy of the import callback because
         // props.onImport is not passed after initiating an upload.
-        this.state.onImport(batch, uploadProgress)
+        const onImport = this.props.onImport || this.configureUploadFileImport
+        onImport(batch, uploadProgress)
       }
     })
   )
@@ -306,7 +321,8 @@ class LocalChooser extends Component {
 
   renderFileList () {
     const { isDroppable, entryInfos } = this.state
-    const isDraggable = !this.props.onImport
+    const importing = this.props.onImport || !this.props.onBack
+    const isDraggable = !importing
     const uploadFiles = this.sortedFiles()
     return (
       <div className="LocalChooser-activity-region">
@@ -347,7 +363,8 @@ class LocalChooser extends Component {
   }
 
   renderSelectFiles () {
-    if (!this.props.onImport) return
+    const importing = this.props.onImport || !this.props.onBack
+    if (!importing) return
     return (
       <div className="LocalChooser-dropzone-select-file">
         <input className="LocalChooser-dropzone-select-file-input"
@@ -384,33 +401,41 @@ class LocalChooser extends Component {
   }
 
   render () {
-    const { onImport } = this.props
+    const { onImport, onBack } = this.props
     const { progressEvent, directoryCount } = this.state
     const fileCount = this.props.fileEntries.size - directoryCount
     const uploadsCompleted = progressEvent && progressEvent.loaded >= progressEvent.total
     const disabled = (progressEvent && !uploadsCompleted) || (!fileCount && !directoryCount)
-    const step = onImport ? 2 : 3
-    const running = !onImport
-    let title = onImport ? 'Upload' : 'Stop'
-    if (onImport && fileCount) title += ` ${fileCount} File${fileCount > 1 ? 's' : ''}`
-    if (onImport && fileCount && directoryCount) title += ' and'
-    if (onImport && directoryCount) title += ` ${directoryCount} Folder${directoryCount > 1 ? 's' : ''}`
+    const importing = onImport || !onBack
+    const step = importing ? 2 : 3
+    const stepTitle = onBack ? `Step ${step}:` : 'Upload Files'
+    const running = !importing
+    let title = importing ? 'Upload' : 'Stop'
+    if (importing && fileCount) title += ` ${fileCount} File${fileCount > 1 ? 's' : ''}`
+    if (importing && fileCount && directoryCount) title += ' and'
+    if (importing && directoryCount) title += ` ${directoryCount} Folder${directoryCount > 1 ? 's' : ''}`
+    const similarDisabled = directoryCount || fileCount > 5 || !fileCount
     return (
       <div className="LocalChooser">
-        <div className="Import-back" onClick={this.back}>
-          <div className="icon-chevron-right" style={{transform: 'rotate(180deg)'}}/>
-          Back
-        </div>
+        { onBack && (
+          <div className="Import-back" onClick={this.back}>
+            <div className="icon-chevron-right" style={{transform: 'rotate(180deg)'}}/>
+            Back
+          </div>
+        )}
         <div className="Import-title">
-          <div className="Import-step">Step {step}:</div>
+          <div className="Import-step">{stepTitle}</div>
           { step === 2 ? 'Drop files to import.' : 'Uploading files.' }
         </div>
         <div className="LocalChooser-body">
           { fileCount || directoryCount ? this.renderFileList() : this.renderDropzone() }
         </div>
         <div className="LocalChooser-start">
-          <div className={classnames('Import-button', {disabled, running})} onClick={this.upload}>
+          <div className={classnames('Import-button', {disabled, running})} onClick={!disabled && this.upload}>
             {title}
+          </div>
+          <div className={classnames('Import-button', {disabled: similarDisabled})} onClick={!similarDisabled && this.similar}>
+            Upload & Find Similar
           </div>
         </div>
       </div>
@@ -423,6 +448,7 @@ export default connect(state => ({
 }), dispatch => ({
   actions: bindActionCreators({
     queueFileEntrysUpload,
-    dequeueUploadFileEntrys
+    dequeueUploadFileEntrys,
+    uploadFiles
   }, dispatch)
 }))(LocalChooser)
