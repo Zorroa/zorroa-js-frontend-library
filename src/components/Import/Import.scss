@@ -64,6 +64,7 @@
 
 .Import-button {
   @include zorroa-ok-btn;
+  @include flexRowCenter;
   margin-left: 20px;
   margin-right: 20px;
 }

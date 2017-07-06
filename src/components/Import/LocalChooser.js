@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 import { humanFileSize, makePromiseQueue } from '../../services/jsUtil'
-import { queueFileEntrysUpload, dequeueUploadFileEntrys, uploadFiles } from '../../actions/jobActions'
+import { queueFileEntrysUpload, dequeueUploadFileEntrys, uploadFiles, analyzeFileEntries } from '../../actions/jobActions'
 
 const initialState = {
   isDroppable: false,     // true when file over drop target
@@ -204,16 +204,24 @@ class LocalChooser extends Component {
 
   similar = (event) => {
     console.log('Upload and find similar')
+    this.upload(event, this.configureAnalyzeFileImport)
   }
 
-  upload = (event) => {
+  configureAnalyzeFileImport = (uploadFiles, progress) => {
+    if (!uploadFiles || !uploadFiles.length) return {}
+    const pipeline = []
+    const args = {}
+    this.props.actions.analyzeFileEntries(uploadFiles, pipeline, args, progress)
+  }
+
+  upload = (event, onImport) => {
     if (this.state.progressEvent && !this.state.cancelUpload) {
       this.setState({cancelUpload: true})
     }
-    if (this.props.onImport || !this.props.onDone) {
+    if (onImport) {
       const totalSize = this.totalSize()
       this.setState({totalSize})
-      this.generateFileBatches(event)
+      this.generateFileBatches(onImport || this.configureUploadFileImport)
     } else {
       this.onDone(event)
     }
@@ -227,7 +235,7 @@ class LocalChooser extends Component {
     this.props.actions.uploadFiles(name, pipelineId, uploadFiles, progress)
   }
 
-  generateFileBatches = (event) => {
+  generateFileBatches = (onImport) => {
     const batchSize = 20
     const files = []      // const so it can be used in recursive promises
     const batches = []
@@ -275,7 +283,6 @@ class LocalChooser extends Component {
     Promise.all(promises)
       .then(_ => {
         if (files.length) batches.push(files)
-        const onImport = this.props.onImport || this.configureUploadFileImport
         this.setState({uploadedSize: 0, onImport, cancelUpload: false})
         makePromiseQueue(batches, this.launchImport, 1, this.launchProgress)
       })
@@ -294,8 +301,7 @@ class LocalChooser extends Component {
 
         // Note that we use a private copy of the import callback because
         // props.onImport is not passed after initiating an upload.
-        const onImport = this.props.onImport || this.configureUploadFileImport
-        onImport(batch, uploadProgress)
+        this.state.onImport(batch, uploadProgress)
       }
     })
   )
@@ -431,11 +437,15 @@ class LocalChooser extends Component {
           { fileCount || directoryCount ? this.renderFileList() : this.renderDropzone() }
         </div>
         <div className="LocalChooser-start">
-          <div className={classnames('Import-button', {disabled, running})} onClick={!disabled && this.upload}>
-            {title}
+          <div className="LocalChooser-button">
+            <div className={classnames('Import-button', {disabled, running})} onClick={!disabled && this.upload}>
+              {title}
+            </div>
           </div>
-          <div className={classnames('Import-button', {disabled: similarDisabled})} onClick={!similarDisabled && this.similar}>
-            Upload & Find Similar
+          <div className="LocalChooser-button">
+            <div className={classnames('Import-button', {disabled: similarDisabled})} onClick={!similarDisabled && this.similar}>
+              Upload & Find Similar
+            </div>
           </div>
         </div>
       </div>
@@ -449,6 +459,7 @@ export default connect(state => ({
   actions: bindActionCreators({
     queueFileEntrysUpload,
     dequeueUploadFileEntrys,
-    uploadFiles
+    uploadFiles,
+    analyzeFileEntries
   }, dispatch)
 }))(LocalChooser)

@@ -4,7 +4,7 @@ import Job from '../models/Job'
 import Pipeline from '../models/Pipeline'
 import AssetSearch from '../models/AssetSearch'
 import {
-  EXPORT_ASSETS, IMPORT_ASSETS,
+  EXPORT_ASSETS, IMPORT_ASSETS, ANALYZE_ASSETS,
   GET_PIPELINES, GET_JOBS,
   QUEUE_UPLOAD_FILE_ENTRIES, DEQUEUE_UPLOADED_FILE_ENTRIES,
   MARK_JOB_DOWNLOADED, GET_PROCESSORS,
@@ -191,4 +191,31 @@ export function dequeueUploadFileEntrys (fileEntries) {
     type: DEQUEUE_UPLOADED_FILE_ENTRIES,
     payload: fileEntries
   })
+}
+
+export function analyzeFileEntries (files, pipeline, args, onUploadProgress) {
+  return dispatch => {
+    const formData = new FormData()
+    formData.append('pipeline', pipeline)
+    formData.append('args', args)
+    files.forEach(file => { formData.append('files', file, file.name) })
+    const request = {
+      method: 'post',
+      url: '/api/v1/analyze/_files',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      onUploadProgress,
+      data: formData
+    }
+    archivistRequest(dispatch, request)
+      .then(response => {
+        console.log('Analyze assets: ' + JSON.stringify(response.data))
+        dispatch({
+          type: ANALYZE_ASSETS,
+          payload: response.data
+        })
+      })
+      .catch(error => {
+        console.error('Error uploading ' + files.length + ' files: ' + error)
+      })
+  }
 }

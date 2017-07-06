@@ -1,7 +1,6 @@
 @import '../../styles/core-mixins';
 
 .LocalChooser {
-  padding-top: 40px;
   @include flexColCenter;
 }
 
@@ -239,4 +238,9 @@ $dropcolor: rgba(115, 182, 28, 0.1);
 .LocalChooser-similar-label {
   margin-left: 4px;
   color: $zorroa-gray;
+}
+
+.LocalChooser-button {
+  width: 240px;
+  @include flexRowCenter;
 }

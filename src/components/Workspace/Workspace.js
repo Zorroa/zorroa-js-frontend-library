@@ -204,6 +204,10 @@ class Workspace extends Component {
     }
   }
 
+  cancelLocalImport = (event) => {
+    this.props.actions.hideModal()
+  }
+
   createLocalImport = (event) => {
     const source = LOCAL_IMPORT
     const items = source === LOCAL_IMPORT && event && event.dataTransfer && event.dataTransfer.items ? event.dataTransfer.items : null
@@ -214,7 +218,7 @@ class Workspace extends Component {
     this.props.actions.queueFileEntrysUpload(entries)
 
     const width = '65vw'
-    const body = <LocalChooser/>
+    const body = <div className="Workspace-local-chooser"><div onClick={this.cancelLocalImport} className="Workspace-local-chooser-cancel icon-cross2"/><LocalChooser/></div>
     this.props.actions.showModal({body, width})
     this.setState({isDroppable: false})
     event.preventDefault()
