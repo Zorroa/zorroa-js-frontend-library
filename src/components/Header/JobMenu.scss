@@ -49,6 +49,10 @@
   -webkit-background-clip: text;
   -moz-background-clip: text;
   background-clip: text;
+  .dark & {
+    background-color: rgba(64,64,64,1);
+    text-shadow: 0px 2px 3px rgba(32,32,32,0.5);
+  }
 }
 
 .JobMenu-jobs-empty-icon {
@@ -69,6 +73,7 @@
   @include flexRow;
   @include flexAlignItemsCenter;
   color: $zorroa-greyish-brown;
+  .dark & { color: black; }
   border-radius: 4px;
   text-transform: uppercase;
   padding-left: 5px;
@@ -81,6 +86,7 @@
 
   &:hover {
     background-color: white;
+    .dark & { background-color: $zorroa-dimgray; }
   }
 }
 
@@ -95,10 +101,6 @@
   padding-left: 30px;
   padding-right: 30px;
   color: $zorroa-lightgray;
-
-  &:hover {
-    background-color: $zorroa-nearwhite;
-  }
 }
 
 .JobMenu {
@@ -113,6 +115,7 @@
 
   &:not(:last-child) {
     border-bottom: 1px solid $zorroa-nearwhite;
+    .dark & { border-bottom: 1px solid $zorroa-dimgray; }
   }
 }
 

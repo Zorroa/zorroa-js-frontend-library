@@ -12,6 +12,7 @@
   color: $zorroa-gray;
   background-color: transparent;
 
+  .dark & { color: black; }
   span[class*="icon-"] {
     margin-right: 6px;
   }
@@ -63,10 +64,12 @@
 
     &.disabled {
       color: $zorroa-lightgray;
+      .dark & { color: $zorroa-dimgray; }
     }
 
     &:not(.disabled):hover {
       background-color: white;
+      .dark & { background-color: $zorroa-dimgray; }
       cursor:pointer;
     }
   }
@@ -75,19 +78,19 @@
     margin-left: 12px;
     text-transform: uppercase;
     border-radius: 3px;
-    padding-left: 5px;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding: 5px;
     @include flexRow;
     @include flexAlignItemsCenter;
     @include clampText;
 
     &.disabled {
       color: $zorroa-lightgray;
+      .dark & { color: $zorroa-dimgray; }
     }
 
     &:not(.disabled):hover {
       background-color: white;
+      .dark & { background-color: $zorroa-dimgray; }
       cursor:pointer;
     }
   }
@@ -117,4 +120,8 @@
   padding-right: 20px;
   border-left: 1px solid $zorroa-lightgray;
   border-right: 1px solid $zorroa-lightgray;
+  .dark & {
+    border-left: 1px solid $zorroa-dimgray;
+    border-right: 1px solid $zorroa-dimgray;
+  }
 }

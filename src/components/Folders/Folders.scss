@@ -11,6 +11,7 @@
   @include flexCol;
   height: auto;
   background-color: white;
+  .dark & { background-color: $zorroa-nearblack; color: $zorroa-lightgray; }
 }
 
 .Folders-scroll {
@@ -63,6 +64,7 @@
     bottom: 0;
     height: 16px;
     color: $zorroa-lightgray;
+    .dark & { color: $zorroa-dimgray; }
   }
 }
 
@@ -72,6 +74,7 @@
   border-radius: 3px;
   background: none;
   border: 1px solid $zorroa-lightgray;
+  .dark & { border: 1px solid $zorroa-dimgray; }
   padding: 8px;
   padding-right: 42px;
   font-size: 12px;
@@ -127,6 +130,8 @@
   &.enabled {
     color: $zorroa-gray;
     background-color: $zorroa-nearwhite;
+
+    .dark & { background-color: $zorroa-gray; color: $zorroa-nearwhite; }
   }
 }
 

@@ -20,9 +20,11 @@ $FolderItemHeight : 25px;
   }
 
   background-color: #f1f1f1;
+  .dark & { background-color: #555; }
   &:nth-child(even) {
     background-color: white;
     &.isSelected { background-color: $zorroa-selected; }
+    .dark & { background-color: $zorroa-darkgray; }
   }
 
   &:hover:not(.isSelected) { background-color: $zorroa-hover; }
@@ -68,6 +70,7 @@ $FolderItemHeight : 25px;
 .FolderItem-icon {
   font-size: 18px;
   color: $zorroa-greyish-brown;
+  .dark & { color: $zorroa-lightgray; }
 }
 
 .FolderItem-text {
@@ -75,6 +78,7 @@ $FolderItemHeight : 25px;
   @include noSelect;
   margin-left: 10px;
   color: $zorroa-greyish-brown;
+  .dark & { color: $zorroa-lightgray; }
   cursor: pointer;
 }
 
@@ -87,6 +91,7 @@ $FolderItemHeight : 25px;
 .FolderItem-count {
   margin-right: 4px;
   color: $zorroa-lightgray;
+  .dark & { color: $zorroa-gray; }
   font-weight: 300;
 }
 
