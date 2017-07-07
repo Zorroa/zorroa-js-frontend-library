@@ -195,9 +195,9 @@ export function dequeueUploadFileEntrys (fileEntries) {
 
 export function analyzeFileEntries (files, pipeline, args, onUploadProgress) {
   return dispatch => {
+    const body = { }
     const formData = new FormData()
-    formData.append('pipeline', pipeline)
-    formData.append('args', args)
+    formData.append('body', '{}')
     files.forEach(file => { formData.append('files', file, file.name) })
     const request = {
       method: 'post',
