@@ -56,7 +56,7 @@ class Assets extends Component {
     similar: PropTypes.shape({
       field: PropTypes.string,
       values: PropTypes.arrayOf(PropTypes.string).isRequired,
-      assetIds: PropTypes.arrayOf(PropTypes.string).isRequired
+      ofsIds: PropTypes.arrayOf(PropTypes.string).isRequired
     }).isRequired,
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
     uxLevel: PropTypes.number,
@@ -359,13 +359,16 @@ class Assets extends Component {
 
   updateSelectedHashes = (similarField, selectedIds) => {
     if (similarField && similarField.length && selectedIds && selectedIds.size) {
-      const ids = new Set([...this.props.similar.assetIds, ...selectedIds])
+      const ids = new Set([...selectedIds])
       if (this.similarIds && equalSets(ids, this.similarIds) && this.similarField && this.similarField === similarField) return
       this.similarIds = ids
       this.similarField = similarField
       const assetIds = [...ids]
-      const fields = [similarField, 'image.width', 'image.height', 'video.width', 'video.height', 'proxies*']
+      const fields = [similarField, 'proxies*']
       this.props.actions.similarAssets(assetIds, fields)
+    } else {
+      this.similarIds = null
+      this.props.actions.similarAssets()
     }
   }
 

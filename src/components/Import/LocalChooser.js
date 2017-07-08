@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 import Processor from '../../models/Processor'
+import { ANALYZE_SIMILAR } from '../../constants/actionTypes'
 import { humanFileSize, makePromiseQueue } from '../../services/jsUtil'
 import { queueFileEntrysUpload, dequeueUploadFileEntrys, uploadFiles, analyzeFileEntries, getProcessors } from '../../actions/jobActions'
 
@@ -25,6 +26,12 @@ class LocalChooser extends Component {
     onBack: PropTypes.func,
     onDone: PropTypes.func,
     fileEntries: PropTypes.instanceOf(Map),
+    similar: PropTypes.shape({
+      field: PropTypes.string,
+      values: PropTypes.arrayOf(PropTypes.string).isRequired,
+      ofsIds: PropTypes.arrayOf(PropTypes.string).isRequired,
+      minScore: PropTypes.number
+    }).isRequired,
     processors: PropTypes.arrayOf(PropTypes.instanceOf(Processor)),
     actions: PropTypes.object
   }
@@ -221,7 +228,7 @@ class LocalChooser extends Component {
     const tensorFlowHashRef = tensorFlowHash && tensorFlowHash.ref()
     const pipeline = [ proxyIngestorRef, tensorFlowHashRef ]
     const args = {}
-    this.props.actions.analyzeFileEntries(uploadFiles, pipeline, args, progress)
+    this.props.actions.analyzeFileEntries(ANALYZE_SIMILAR, uploadFiles, pipeline, args, progress)
   }
 
   upload = (event, onImport) => {
@@ -417,7 +424,7 @@ class LocalChooser extends Component {
   }
 
   render () {
-    const { onImport, onBack } = this.props
+    const { onImport, onBack, similar } = this.props
     const { progressEvent, directoryCount } = this.state
     const fileCount = this.props.fileEntries.size - directoryCount
     const uploadsCompleted = progressEvent && progressEvent.loaded >= progressEvent.total
@@ -430,7 +437,8 @@ class LocalChooser extends Component {
     if (importing && fileCount) title += ` ${fileCount} File${fileCount > 1 ? 's' : ''}`
     if (importing && fileCount && directoryCount) title += ' and'
     if (importing && directoryCount) title += ` ${directoryCount} Folder${directoryCount > 1 ? 's' : ''}`
-    const similarDisabled = directoryCount || fileCount > 5 || !fileCount
+    const similarDisabled = directoryCount || fileCount > 5 || !fileCount || !similar.field || similar.field !== 'similarity.tensorflow.byte'
+    const similarTitle = similarDisabled ? (!similar.field || similar.field !== 'similarity.tensorflow.byte' ? 'Compute Similarity on Repo' : 'Similarity requires files only') : 'Analyze for Similarity'
     return (
       <div className="LocalChooser">
         { onBack && (
@@ -452,7 +460,7 @@ class LocalChooser extends Component {
               {title}
             </div>
           </div>
-          <div className="LocalChooser-button">
+          <div className="LocalChooser-button" title={similarTitle}>
             <div className={classnames('Import-button', {disabled: similarDisabled})} onClick={!similarDisabled && this.similar}>
               Upload & Find Similar
             </div>
@@ -465,6 +473,7 @@ class LocalChooser extends Component {
 
 export default connect(state => ({
   fileEntries: state.jobs.fileEntries,
+  similar: state.racetrack.similar,
   processors: state.jobs.processors
 }), dispatch => ({
   actions: bindActionCreators({

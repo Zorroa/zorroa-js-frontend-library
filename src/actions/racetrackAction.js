@@ -35,10 +35,10 @@ export function resetRacetrackWidgets (widgets) {
 export function similar (similar) {
   const maxValues = 10
   if (similar && similar.values && similar.values.length > maxValues) {
-    assert.ok(similar.assetIds.length === similar.values.length)
+    assert.ok(similar.ofsIds.length === similar.values.length)
     assert.ok(similar.weights.length === similar.values.length)
     similar.values = similar.values.slice(0, maxValues)
-    similar.assetIds = similar.assetIds.slice(0, maxValues)
+    similar.ofsIds = similar.ofsIds.slice(0, maxValues)
     similar.weights = similar.weights.slice(0, maxValues)
   }
   return ({
@@ -310,12 +310,12 @@ function restoreActions (widgets, search, selectedFolderIds) {
     actions.push(similar({
       field: search.filter.hamming.field,
       values: search.filter.hamming.hashes,
-      assetIds: search.filter.hamming.assetIds,
+      ofsIds: search.filter.hamming.ofsIds,
       weights: search.filter.hamming.weights,
       minScore: search.filter.hamming.minScore
     }))
-    const fields = [search.filter.hamming.field, 'image.width', 'image.height', 'video.width', 'video.height', 'proxies*']
-    actions.push(similarAssets(search.filter.hamming.assetIds, fields))
+    // const fields = [search.filter.hamming.field, 'proxies*']
+    // actions.push(similarAssets(search.filter.hamming.assetIds, fields))
   }
 
   // Reset the racetrack to the new widget

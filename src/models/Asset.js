@@ -40,6 +40,10 @@ export default class Asset {
   backgroundURL (origin) {
     const id = this.rawValue('video.background')
     if (!id) return
+    return Asset.ofsURL(id, origin)
+  }
+
+  static ofsURL (id, origin) {
     return `${origin}/api/v1/ofs/${id}`
   }
 

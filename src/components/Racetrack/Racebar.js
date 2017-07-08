@@ -29,7 +29,7 @@ class Racebar extends Component {
     similar: PropTypes.shape({
       field: PropTypes.string,
       values: PropTypes.arrayOf(PropTypes.string),
-      assetIds: PropTypes.arrayOf(PropTypes.string)
+      ofsIds: PropTypes.arrayOf(PropTypes.string)
     }),
     user: PropTypes.instanceOf(User).isRequired,
     actions: PropTypes.object.isRequired
