@@ -3,8 +3,9 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
+import Processor from '../../models/Processor'
 import { humanFileSize, makePromiseQueue } from '../../services/jsUtil'
-import { queueFileEntrysUpload, dequeueUploadFileEntrys, uploadFiles, analyzeFileEntries } from '../../actions/jobActions'
+import { queueFileEntrysUpload, dequeueUploadFileEntrys, uploadFiles, analyzeFileEntries, getProcessors } from '../../actions/jobActions'
 
 const initialState = {
   isDroppable: false,     // true when file over drop target
@@ -24,6 +25,7 @@ class LocalChooser extends Component {
     onBack: PropTypes.func,
     onDone: PropTypes.func,
     fileEntries: PropTypes.instanceOf(Map),
+    processors: PropTypes.arrayOf(PropTypes.instanceOf(Processor)),
     actions: PropTypes.object
   }
 
@@ -33,6 +35,7 @@ class LocalChooser extends Component {
   selectedFilesCount = 0
 
   componentDidMount () {
+    this.props.actions.getProcessors()
     this.collectFiles(this.props.fileEntries, this.state.selectedFiles)
   }
 
@@ -209,7 +212,14 @@ class LocalChooser extends Component {
 
   configureAnalyzeFileImport = (uploadFiles, progress) => {
     if (!uploadFiles || !uploadFiles.length) return {}
-    const pipeline = []
+    const proxyIngestor = this.props.processors.find(p => (p.name === 'com.zorroa.core.processor.ProxyIngestor'))
+    const proxyIngestorRef = proxyIngestor && proxyIngestor.ref({
+      force: true,
+      proxies: [{ size: 384, format: 'jpg', quality: 1 }]   // Matches default so hashes match
+    })
+    const tensorFlowHash = this.props.processors.find(p => (p.name === 'zorroa_py_core.tflow.TensorFlowHash'))
+    const tensorFlowHashRef = tensorFlowHash && tensorFlowHash.ref()
+    const pipeline = [ proxyIngestorRef, tensorFlowHashRef ]
     const args = {}
     this.props.actions.analyzeFileEntries(uploadFiles, pipeline, args, progress)
   }
@@ -454,12 +464,14 @@ class LocalChooser extends Component {
 }
 
 export default connect(state => ({
-  fileEntries: state.jobs.fileEntries
+  fileEntries: state.jobs.fileEntries,
+  processors: state.jobs.processors
 }), dispatch => ({
   actions: bindActionCreators({
     queueFileEntrysUpload,
     dequeueUploadFileEntrys,
     uploadFiles,
-    analyzeFileEntries
+    analyzeFileEntries,
+    getProcessors
   }, dispatch)
 }))(LocalChooser)
