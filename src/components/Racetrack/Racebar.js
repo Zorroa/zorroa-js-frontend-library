@@ -110,7 +110,8 @@ class Racebar extends Component {
         search.postFilter = undefined
         search.order = []
       }
-      const folder = new Folder({ name, acl, parentId, search })
+      const attrs = { widgets, similar, order }
+      const folder = new Folder({ name, acl, parentId, search, attrs })
       this.props.actions.createFolder(folder)
       this.props.actions.toggleCollapsible('home', true)
     }

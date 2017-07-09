@@ -6,7 +6,7 @@ import {
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import AssetSearch from '../models/AssetSearch'
-import { restoreSearch } from './racetrackAction'
+import { restoreFolders } from './racetrackAction'
 import { archivistGet, archivistPut, archivistPost, archivistRequest } from './authAction'
 import { selectId, equalSets } from '../services/jsUtil'
 
@@ -51,12 +51,16 @@ export function selectFolderIds (ids, curIds, folders) {
   if (curIds && folders && !equalSets(ids, curIds)) {
     const search = new AssetSearch()
     const iter = ids.keys()
+    const restoredFolders = []
     for (let i = iter.next(); !i.done; i = iter.next()) {
       const folder = folders.get(i.value)
-      if (folder && folder.search && !folder.isDyhi()) search.merge(folder.search)
+      if (folder && folder.search && !folder.isDyhi()) {
+        search.merge(folder.search)
+        restoredFolders.push(folder)
+      }
     }
     if (JSON.stringify(search) !== JSON.stringify(new AssetSearch())) {
-      const restoreActions = restoreSearch(search, true /* avoid infinite folder selection recursion */)
+      const restoreActions = restoreFolders(restoredFolders, true /* avoid infinite folder selection recursion */)
       restoreActions.forEach(action => actions.push(action))
     }
   }

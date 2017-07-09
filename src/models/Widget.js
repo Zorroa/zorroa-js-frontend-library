@@ -7,8 +7,17 @@ import AssetFilter from '../models/AssetFilter'
 import { HSL2HSV } from '../services/color'
 
 export default class Widget {
+
+  // Return increasing unique ids for newly created widgets
+  static guid(id) {
+    // Handle the case where we load widgets from a folder with a larger id
+    if (id && (!Widget._guid || id > Widget._guid)) Widget._guid = id + 1
+    if (!Widget._guid) Widget._guid = 0 // First time
+    return ++Widget._guid
+  }
+
   constructor ({id, type, sliver, isEnabled, isPinned}) {
-    this.id = id || uniqueId()
+    this.id = Widget.guid(id)
     this.type = type
     this.sliver = sliver
     this.isEnabled = (isEnabled !== undefined) ? isEnabled : true
@@ -24,6 +33,19 @@ export default class Widget {
   field () {
     const raw = this.rawField()
     if (raw) return raw.replace(/\.raw$/, '')
+  }
+
+  mergable (rhs) {
+    return this.type === rhs.type && this.field() === rhs.field()
+  }
+
+  merge (rhs) {
+    if (!this.mergable(rhs)) return false
+    this.sliver = this.sliver.merge(rhs.sliver)
+    this.isEnabled |= rhs.isEnabled
+    this.isPinned |= rhs.isPinned
+    // FIXME: No attrs merging!
+    return true
   }
 }
 
@@ -220,9 +242,3 @@ export function fieldUsedInWidget (field, widget) {
   }
   return false
 }
-
-// Acts like a static variable, returning increasing unique ids
-var uniqueId = (function () {
-  var id = 0                          // Private persistent value
-  return function () { return ++id }  // Return and increment
-})()                                  // Invoke to increment

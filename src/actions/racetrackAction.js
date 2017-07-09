@@ -1,7 +1,7 @@
 import { MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS,
   SIMILAR_VALUES } from '../constants/actionTypes'
 import Widget, { createFacetWidget, createExistsWidget, createMapWidget,
-  createDateRangeWidget, createRangeWidget,
+  createDateRangeWidget, createRangeWidget, uniqueId,
   createFiletypeWidget, createColorWidget, createSortOrderWidget } from '../models/Widget'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
@@ -55,6 +55,83 @@ export function similar (similar) {
     type: SIMILAR_VALUES,
     payload: similar
   })
+}
+
+// Merge widgets from multiple folders and restore search and related state
+export function restoreFolders (folders, doNotRestoreSelectedFolders) {
+  if (!folders || !folders.length) return
+
+  let mergedSimilar, order
+  const widgets = []
+  const search = new AssetSearch()
+  let missingWidgets = false
+  for (let i = 0; i < folders.length; ++i) {
+    const folder = folders[i]
+    search.merge(folder.search)
+    if (!folder.attrs) {
+      missingWidgets = true
+      continue
+    }
+    const attrs = folder.attrs
+    if (mergedSimilar && attrs.similar) {
+      // Duplicated code from AssetFilter.merge()
+      for (let key in attrs.similar) {
+        if (key === 'field') continue   // FIXME: breaks for mixed similarity fields!
+        if (key in attrs.similar) {
+          if (key in mergedSimilar) {
+            const union = (arr) => ([ ...new Set([].concat(...arr)) ])
+            mergedSimilar[key] = union([mergedSimilar[key], attrs.similar[key]])
+          } else {
+            mergedSimilar[key] = [ ...attrs.similar[key] ]
+          }
+        }
+      }
+    } else if (!mergedSimilar) {
+      mergedSimilar = attrs.similar
+    }
+    if (!order) order = folder.attrs && folder.attrs.order
+    if (!folder.attrs || !folder.attrs.widgets) {
+      missingWidgets = true
+      continue
+    }
+    for (let j = 0; j < folder.attrs.widgets.length; ++j) {
+      const widget = new Widget(folder.attrs.widgets[j])
+      let merged = false
+      for (let k = 0; k < widgets.length; ++k) {
+        const src = widgets[k]
+        if (src.merge(widget)) {
+          merged = true
+          break
+        }
+      }
+      if (!merged) widgets.push(widget)
+    }
+  }
+
+  // Backwards compatibility -- a folder is missing widgets
+  if (missingWidgets) return restoreSearch(search, doNotRestoreSelectedFolders)
+
+  // Return actions to update the racetrack for the new search
+  const actions = [resetRacetrackWidgets(widgets)]
+  const selectedFolderIds = new Set(folders.map(folder => folder.id))
+  if (!doNotRestoreSelectedFolders) actions.push(selectFolderIds(selectedFolderIds))
+
+  // Set the global order to match the search
+  if (search.order) {
+    actions.push(orderAssets(search.order))
+  }
+
+  // Create a SimilarHash widget if there's a hash query
+  if (mergedSimilar) {
+    assert.ok(mergedSimilar.values.length === mergedSimilar.weights.length)
+    assert.ok(mergedSimilar.values.length === mergedSimilar.assetIds.length)
+    actions.push(similar(mergedSimilar))
+    const fields = [mergedSimilar.field, 'proxies*']
+    actions.push(similarAssets(search.filter.hamming.assetIds, fields))
+  }
+
+  // Reset the racetrack to the new widget
+  return actions
 }
 
 // Reconstruct Racetrack widgets from a search.
