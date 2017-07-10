@@ -19,7 +19,10 @@
   @include flexAlignItemsCenter;
   min-height: 25px;
   &:nth-child(odd) { background-color: $zorroa-nearwhite; }
-  &.selected { background-color: $zorroa-selected; }
+  &.selected {
+    background-color: $zorroa-selected;
+    .dark & { background-color: $zorroa-dark-selected; }
+  }
 }
 
 .Finder-file-name {

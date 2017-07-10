@@ -12,8 +12,6 @@
   }
 
   .Range-body {
-    background-color: white;
-    color: $zorroa-gray;
     display: flex;
     flex-direction: column;
     padding: 10px;
@@ -28,8 +26,10 @@
       font-weight: 500;
       line-height: 2em;
       padding-left: 8px;
+      padding-right: 8px;
       width: 100%;
       min-width: 0;
+      .dark & { color: white; }
     }
   }
 

@@ -73,7 +73,7 @@
   @include flexRow;
   @include flexAlignItemsCenter;
   color: $zorroa-greyish-brown;
-  .dark & { color: black; }
+  .dark & { color: $zorroa-nearwhite; }
   border-radius: 4px;
   text-transform: uppercase;
   padding-left: 5px;

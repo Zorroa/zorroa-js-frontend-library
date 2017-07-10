@@ -101,7 +101,10 @@
   }
 
   &:hover:not(.isSelected) { background-color: $zorroa-hover; }
-  &.isSelected { background-color: $zorroa-selected; }
+  &.isSelected {
+    background-color: $zorroa-selected;
+    .dark & { background-color: $zorroa-dark-selected; }
+  }
 }
 
 .Metadata-item-pad {
@@ -163,7 +166,10 @@ $FolderItemHeight : 25px;
 
   cursor: pointer;
 
-  .FolderItem.isSelected & { background-color: $zorroa-selected; }
+  .FolderItem.isSelected & {
+    background-color: $zorroa-selected;
+    .dark & { background-color: $zorroa-dark-selected; }
+  }
   .FolderItem.isSelected &.hasChildren:not(.isSelected):hover { color: white; background-color: $zorroa-darkgray; }
   .FolderItem.isDropTarget.dragHover & { color: white; background-color: $zorroa-sickly-green; }
   .FolderItem.isSelected.isDropTarget.dragHover & { color: white; background-color: darken($zorroa-sickly-green, 15%); }

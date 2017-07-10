@@ -59,14 +59,19 @@
 
     .Facet-value-table-row:nth-child(odd) {
       background-color: $zorroa-nearwhite;
+      .dark & { background-color: $zorroa-dimgray; }
     }
 
     .Facet-value-table-row {
       padding-right: 10px;
       color: $zorroa-greyish-brown;
+      .dark & { color: $zorroa-lightgray; }
       cursor: pointer;
       &:not(.selected):hover { background-color: $zorroa-hover; }
-      &.selected { background-color: $zorroa-selected; }
+      &.selected {
+        background-color: $zorroa-selected;
+        .dark & { background-color: $zorroa-dark-selected; }
+      }
     }
 
     .Facet-value-table-key {
@@ -81,7 +86,7 @@
       top: 0;
       left: 0;
       height: 100%;
-      background-color: rgba(161, 29, 119, 0.2);
+      .dark & { background-color: rgba(161, 29, 119, 0.25); }
     }
 
     .Facet-value-key {
@@ -168,7 +173,6 @@
     font-size: 12px;
     text-transform: uppercase;
     color: $zorroa-gray;
-    background-color: white;
     text-align: left;
     font-family: "Roboto Condensed";
     font-weight: 300;

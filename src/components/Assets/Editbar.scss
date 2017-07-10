@@ -12,7 +12,7 @@
   color: $zorroa-gray;
   background-color: transparent;
 
-  .dark & { color: black; }
+  .dark & { color: $zorroa-nearwhite; }
   span[class*="icon-"] {
     margin-right: 6px;
   }

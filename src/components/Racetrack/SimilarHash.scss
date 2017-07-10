@@ -21,22 +21,6 @@
   }
 }
 
-.SimilarHash-table {
-
-  .SimilarHash-value-table-row:nth-child(odd) {
-    background-color: $zorroa-nearwhite;
-  }
-
-  .SimilarHash-value-table-row {
-    height: 25px;
-    cursor: pointer;
-    color: $zorroa-greyish-brown;
-    &:not(.selected):hover { background-color: $zorroa-hover; }
-    &.selected { background-color: $zorroa-selected; }
-    &.disabled { color: $zorroa-lightgray; }
-  }
-}
-
 .SimilarHash-body {
   max-width: 35vw;
   padding: 10px;
@@ -146,6 +130,7 @@
   input[type=range] {
     padding: 0;
     margin: 0;
+    background-color: transparent;
   }
 }
 
@@ -166,6 +151,7 @@
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
   border-bottom: 5px solid $zorroa-nearwhite;
+  .dark & { border-bottom: 5px solid $zorroa-nearblack; }
 }
 
 .SimilarHash-snap-selected {
