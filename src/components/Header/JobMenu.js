@@ -202,11 +202,13 @@ class JobMenu extends Component {
     const maxJobs = 5
     const filteredJobs = allJobs.slice(0, maxJobs)
     const items = filteredJobs.map(job => this.renderJob(job))
-    if (allJobs.length > filteredJobs.length) items.push (
-      <div onClick={this.viewAllJobs} className="JobMenu-jobs-view-all">
-        View all {lcJobType} packages
-      </div>
-    )
+    if (allJobs.length > filteredJobs.length) {
+      items.push(
+        <div onClick={this.viewAllJobs} className="JobMenu-jobs-view-all">
+          View all {lcJobType} packages
+        </div>
+      )
+    }
     return items
   }
 
