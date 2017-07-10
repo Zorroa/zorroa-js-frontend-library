@@ -54,7 +54,7 @@ class Map extends Component {
     let locationField, searchField
     if (widget && widget.sliver) {
       if (widget.sliver.filter && widget.sliver.filter.terms) {
-        const fieldRaw = widget.sliver.filter.terms.keys()[0]
+        const fieldRaw = widget.field
         searchField = fieldRaw && fieldRaw.endsWith('.raw') ? fieldRaw.slice(0, fieldRaw.length - 4) : fieldRaw
       }
       if (widget.sliver.aggs) {

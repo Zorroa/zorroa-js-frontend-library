@@ -60,7 +60,7 @@ class Searcher extends Component {
     if (oldJobs && newJobs) {
       const oldFieldCount = this.props.fieldTypes && Object.keys(this.props.fieldTypes).length
       const newFieldCount = nextProps.fieldTypes && Object.keys(nextProps.fieldTypes).length
-      let importFinished = oldJobs.length !== newJobs.length || oldFieldCount !== newFieldCount
+      let importFinished = oldJobs.length && (oldJobs.length !== newJobs.length || oldFieldCount !== newFieldCount)
       oldJobs.forEach(oldJob => {
         if (oldJob.state === Job.Active) {
           const newJob = newJobs.find(job => job.id === oldJob.id)

@@ -9,38 +9,26 @@ import { HSL2HSV } from '../services/color'
 export default class Widget {
 
   // Return increasing unique ids for newly created widgets
-  static guid(id) {
+  static guid (id) {
     // Handle the case where we load widgets from a folder with a larger id
     if (id && (!Widget._guid || id > Widget._guid)) Widget._guid = id + 1
     if (!Widget._guid) Widget._guid = 0 // First time
     return ++Widget._guid
   }
 
-  constructor ({id, type, sliver, isEnabled, isPinned}) {
+  constructor ({id, type, field, sliver, isEnabled, isPinned}) {
     this.id = Widget.guid(id)
     this.type = type
-    this.sliver = sliver
+    this.field = field
+    this.sliver = new AssetSearch(sliver)
     this.isEnabled = (isEnabled !== undefined) ? isEnabled : true
     this.isPinned = (isPinned !== undefined) ? isPinned : false
   }
 
-  rawField () {
-    switch (this.type) {
-      case FacetWidgetInfo.type: return this.sliver && this.sliver.aggs.facet.terms.field
-    }
-  }
-
-  field () {
-    const raw = this.rawField()
-    if (raw) return raw.replace(/\.raw$/, '')
-  }
-
-  mergable (rhs) {
-    return this.type === rhs.type && this.field() === rhs.field()
-  }
-
   merge (rhs) {
-    if (!this.mergable(rhs)) return false
+    if (this.type !== rhs.type) return false
+    const noraw = (str) => (str.replace(/\.raw$/, ''))
+    if (noraw(this.field) !== noraw(rhs.field)) return false
     this.sliver = this.sliver.merge(rhs.sliver)
     this.isEnabled |= rhs.isEnabled
     this.isPinned |= rhs.isPinned
@@ -105,7 +93,7 @@ export function createFacetWidget (field, fieldType, terms, order, isEnabled, is
   const aggs = { facet: { terms: { field: rawField, order, size: 1000 } } }
   const filter = terms && terms.length ? new AssetFilter({terms: {[rawField]: terms}}) : null
   const sliver = new AssetSearch({filter, aggs})
-  return new Widget({type, sliver, isEnabled, isPinned})
+  return new Widget({type, field: rawField, sliver, isEnabled, isPinned})
 }
 
 export function createMapWidget (field, fieldType, term, isEnabled, isPinned) {
@@ -118,18 +106,17 @@ export function createMapWidget (field, fieldType, term, isEnabled, isPinned) {
     sliver.filter = new AssetFilter({terms, geo_bounding_box: bounds})
     // Add this.bounds and set agg precision
   }
-  return new Widget({type, sliver, isEnabled, isPinned})
+  return new Widget({type, field, sliver, isEnabled, isPinned})
 }
 
 export function createDateRangeWidget (field, fieldType, minStr, maxStr, isEnabled, isPinned) {
   const type = DateRangeWidgetInfo.type
-  const aggs = { dateRange: { stats: { field } } }     // Just for restore, refactor for Folder data
-  let sliver = new AssetSearch({ aggs })
+  let sliver
   if (field && minStr !== undefined && minStr !== null && maxStr !== undefined && maxStr !== null) {
     const range = { [field]: { 'gte': minStr, 'lte': maxStr } }
-    sliver.filter = new AssetFilter({ range })
+    sliver = new AssetSearch({filter: {range}})
   }
-  return new Widget({ type, sliver, isEnabled, isPinned })
+  return new Widget({ type, field, sliver, isEnabled, isPinned })
 }
 
 export function createRangeWidget (field, fieldType, min, max, isEnabled, isPinned) {
@@ -142,12 +129,12 @@ export function createRangeWidget (field, fieldType, min, max, isEnabled, isPinn
     const range = { [field]: { 'gte': min, 'lte': max } }
     sliver.filter = new AssetFilter({ range })
   }
-  return new Widget({ type, sliver, isEnabled, isPinned })
+  return new Widget({ type, field, sliver, isEnabled, isPinned })
 }
 
 export function createSimilarityWidget (field, fieldType, isEnabled, isPinned) {
   const type = SimilarHashWidgetInfo.type
-  return new Widget({type, isEnabled, isPinned})
+  return new Widget({type, field, isEnabled, isPinned})
 }
 
 export function createFiletypeWidget (field, fieldType, exts, isEnabled, isPinned) {
@@ -159,20 +146,18 @@ export function createFiletypeWidget (field, fieldType, exts, isEnabled, isPinne
   if (exts && exts.length) {
     sliver.filter = new AssetFilter({terms: {[field]: exts}})
   }
-  return new Widget({type, sliver, isEnabled, isPinned})
+  return new Widget({type, field, sliver, isEnabled, isPinned})
 }
 
 export function createColorWidget (field, fieldType, colors, isServerHSL, isEnabled, isPinned) {
   const type = ColorWidgetInfo.type
-  const aggs = { colors: { stats: { field: 'source.fileSize' } } }     // Just for restore, refactor for Folder data
-  const sliver = new AssetSearch({ aggs })
+  let sliver
   const RATIO_MAX_FACTOR = 1.5  // maxRatio in query is this factor times user ratio
   const RATIO_MIN_FACTOR = 0.25 // minRatio in query is this factor times user ratio
 
   if (colors && colors.length) {
-    sliver.filter = new AssetFilter({colors: {colors: colors.map(color => {
+    const filter = new AssetFilter({colors: {colors: colors.map(color => {
       const hsv = (isServerHSL) ? color.hsl : HSL2HSV(color.hsl) // see toggleServerHSL
-
       return {
         hue: Math.floor(hsv[0]),
         saturation: Math.floor(hsv[1]),
@@ -189,56 +174,20 @@ export function createColorWidget (field, fieldType, colors, isServerHSL, isEnab
         key: color.key
       }
     })}})
+    sliver = new AssetSearch({filter})
   }
 
-  return new Widget({type, sliver, isEnabled, isPinned})
+  return new Widget({type, field, sliver, isEnabled, isPinned})
 }
 
 // Bare ctor used by AddWidget, values come directly from app state
 export function createCollectionsWidget (field, fieldType, isEnabled, isPinned) {
-  field = 'source.filename'
-  const aggs = { collections: { stats: { field: 'source.fileSize' } } }     // Just for restore, refactor for Folder data
-  const sliver = new AssetSearch({aggs})
-  return new Widget({type: CollectionsWidgetInfo.type, sliver, isEnabled, isPinned})
+  field = '_collections'
+  return new Widget({type: CollectionsWidgetInfo.type, field, isEnabled, isPinned})
 }
 
 // Bare ctor used by AddWidget, values come directly from app state
 export function createSortOrderWidget (field, filedType, isEnabled, isPinned) {
-  field = 'source.filename'
-  const aggs = { sortOrder: { stats: { field: 'source.fileSize' } } }     // Just for restore, refactor for Folder data
-  const sliver = new AssetSearch({aggs})
-  return new Widget({type: SortOrderWidgetInfo.type, sliver, isEnabled, isPinned})
-}
-
-export function fieldUsedInWidget (field, widget) {
-  switch (widget.type) {
-    case FacetWidgetInfo.type:
-      if (widget.sliver &&
-        (widget.sliver.aggs.facet.terms.field === field ||
-        widget.sliver.aggs.facet.terms.field === `${field}.raw`)) return true
-      break
-    case MapWidgetInfo.type:
-      if (widget.sliver && widget.sliver.aggs &&
-        widget.sliver.aggs.map.geohash_grid.field === field) return true
-      break
-    case FiletypeWidgetInfo.type:
-      if (field === 'source.extension') return true
-      break
-    case ColorWidgetInfo.type:
-      if (field === 'colors') return true
-      break
-    case DateRangeWidgetInfo.type:
-      if (widget.sliver && widget.sliver.filter && widget.sliver.filter.range &&
-        Object.keys(widget.sliver.filter.range)[0] === field) return true
-      break
-    case SimilarHashWidgetInfo.type:
-      if (widget.sliver && widget.sliver.filter && widget.sliver.filter.hamming &&
-        widget.sliver.filter.hamming.field === field) return true
-      break
-    case RangeWidgetInfo.type:
-      if (widget.sliver && widget.sliver.filter && widget.sliver.filter.range &&
-        Object.keys(widget.sliver.filter.range)[0] === field) return true
-      break
-  }
-  return false
+  field = '_order'
+  return new Widget({type: SortOrderWidgetInfo.type, field, isEnabled, isPinned})
 }

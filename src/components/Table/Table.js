@@ -9,7 +9,7 @@ import AssetSearch from '../../models/AssetSearch'
 import User from '../../models/User'
 import { unCamelCase } from '../../services/jsUtil'
 import { setTableFieldWidth, iconifyRightSidebar } from '../../actions/appActions'
-import { createFacetWidget, fieldUsedInWidget } from '../../models/Widget'
+import { createFacetWidget } from '../../models/Widget'
 import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import { sortAssets, unorderAssets, isolateAssetId } from '../../actions/assetsAction'
 import { saveUserSettings } from '../../actions/authAction'
@@ -231,7 +231,7 @@ class Table extends Component {
   createTagFacet = (term, field, event) => {
     const fieldType = this.props.fieldTypes[field]
     field = field && field.endsWith('.raw') ? field : field + '.raw'
-    const index = this.props.widgets.findIndex(widget => fieldUsedInWidget(field, widget))
+    const index = this.props.widgets.findIndex(widget => (widget.field === field))
     let terms = [term]
     if (index >= 0 && event.shiftKey) {       // Add to terms for shift
       const widget = this.props.widgets[index]

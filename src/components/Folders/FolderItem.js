@@ -136,8 +136,8 @@ class FolderItem extends Component {
 
   restoreFolder = (event) => {
     event.preventDefault()
-    const { folder } = this.props
-    restoreFolders([folder])
+    const { folder, actions } = this.props
+    actions.restoreFolders([folder])
     this.dismissContextMenu(event)
   }
 
@@ -541,6 +541,7 @@ export default connect(state => ({
     hideModal,
     deleteFolderIds,
     updateFolder,
+    restoreFolders,
     setAssetPermissions
   }, dispatch)
 }))(FolderItem)

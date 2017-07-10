@@ -50,7 +50,7 @@ class Facet extends Component {
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
     if (widget && widget.sliver) {
-      const f = widget.sliver.aggs.facet.terms.field
+      const f = widget.field
       const fraw = f && f.length && f.replace(/\.raw/, '')
       const fieldType = fraw && this.props.fieldTypes && this.props.fieldTypes[fraw]
       const field = aggField(f, fieldType)

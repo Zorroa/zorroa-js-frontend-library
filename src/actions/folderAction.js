@@ -5,7 +5,6 @@ import {
   FOLDER_COUNTS, QUEUE_FOLDER_COUNTS, CLEAR_FOLDER_COUNT_QUEUE
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
-import AssetSearch from '../models/AssetSearch'
 import { restoreFolders } from './racetrackAction'
 import { archivistGet, archivistPut, archivistPost, archivistRequest } from './authAction'
 import { selectId, equalSets } from '../services/jsUtil'
@@ -49,18 +48,16 @@ export function selectFolderIds (ids, curIds, folders) {
   // If a new folder is added to the current selection,
   // restore the merged search from all selected folders
   if (curIds && folders && !equalSets(ids, curIds)) {
-    const search = new AssetSearch()
     const iter = ids.keys()
     const restoredFolders = []
     for (let i = iter.next(); !i.done; i = iter.next()) {
       const folder = folders.get(i.value)
       if (folder && folder.search && !folder.isDyhi()) {
-        search.merge(folder.search)
         restoredFolders.push(folder)
       }
     }
-    if (JSON.stringify(search) !== JSON.stringify(new AssetSearch())) {
-      const restoreActions = restoreFolders(restoredFolders, true /* avoid infinite folder selection recursion */)
+    if (restoredFolders.length) {
+      const restoreActions = restoreFolders(restoredFolders)
       restoreActions.forEach(action => actions.push(action))
     }
   }

@@ -78,7 +78,7 @@ class Racebar extends Component {
     const dyhiLevels = []
     widgets.forEach(widget => {
       if (widget.type === WidgetInfo.FacetWidgetInfo.type) {
-        const field = widget.sliver.aggs.facet.terms.field
+        const field = widget.field
         dyhiLevels.push({ field, type: 'Attr' })
       }
     })
@@ -152,7 +152,7 @@ class Racebar extends Component {
           </div>
           { widgets && widgets.length > 0 && widgets.filter(w => (blacklist.indexOf(w.type) < 0)).map((widget, i) => (
             <div key={widget.id}
-                 className={classnames('Racebar-widget', {hoverField: hoverFields.has(widget.field())})} >
+                 className={classnames('Racebar-widget', {hoverField: hoverFields.has(widget.field)})} >
               { this.renderWidget(widget, false) }
             </div>
           ))}
