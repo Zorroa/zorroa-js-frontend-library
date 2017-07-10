@@ -7,7 +7,7 @@ import {
   SHOW_MULTIPAGE, SHOW_PAGES, VIDEO_VOLUME,
   HOVER_FIELD, CLEAR_HOVER_FIELD,
   USER_SETTINGS, UNAUTH_USER,
-  THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE,
+  THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE, ASSETS_FIELD_TEMPLATE,
   UX_LEVEL, MONOCHROME
 } from '../constants/actionTypes'
 import { DEFAULT_THUMBSIZE } from '../actions/appActions'
@@ -17,6 +17,7 @@ export const defaultTableFieldWidth = 100
 export const defaultMetadataFields = [ 'source.filename', 'source.date', 'source.fileSize' ]
 export const defaultLightbarFields = [ 'source.type', 'source.filename', 'source.date', 'image.width', 'image.height', 'video.width', 'video.height' ]
 export const defaultThumbFields = [ 'source.type', 'image.width', 'image.height', 'video.width', 'video.height' ]
+export const defaultAssetsFields = [ 'source.filename' ]
 const initialState = {
   modal: null,
   uxLevel: 0,
@@ -38,6 +39,7 @@ const initialState = {
   metadataFields: [ ...defaultMetadataFields ],
   lightbarFields: [ ...defaultLightbarFields ],
   thumbFields: [ ...defaultThumbFields ],
+  assetsFields: [ ...defaultAssetsFields ],
   lightboxMetadata: { show: false, left: 20, top: 80, width: 300, height: 500 },
   tableFieldWidth: Object.assign({},
     ...defaultMetadataFields.map(field => ({ [field]: defaultTableFieldWidth }))),
@@ -52,6 +54,7 @@ const initialState = {
   hoverFields: new Set(),
   thumbFieldTemplate: '${image.width|video.width}x${image.height|video.height} ${source.type}',
   lightbarFieldTemplate: '${source.type} ${source.filename} ${image.width|video.width}x${image.height|video.height} ${source.date}',
+  assetsFieldTemplate: '${source.filename}',
   userSettings: {
     metadataFields: [ ...defaultMetadataFields ],
     showTable: false,
@@ -134,6 +137,11 @@ export default function app (state = initialState, action) {
       const lightbarFieldTemplate = action.payload
       const lightbarFields = fieldsForVariables(parseVariables(lightbarFieldTemplate))
       return { ...state, lightbarFieldTemplate, lightbarFields }
+    }
+    case ASSETS_FIELD_TEMPLATE: {
+      const assetsFieldTemplate = action.payload
+      const assetsFields = fieldsForVariables(parseVariables(assetsFieldTemplate))
+      return { ...state, assetsFieldTemplate, assetsFields }
     }
     case UX_LEVEL: {
       return { ...state, uxLevel: action.payload }

@@ -71,10 +71,14 @@ export function DragSource (type, {dragStart, dragEnd}) {
         const {hocActions} = props
         const dragParams = {
           onDragStart: (event) => {
-            // Required to be called by firefox
-            event.dataTransfer.setData('text/plain', 'anything')
             // Get the dragging object to add to app.state.dragInfo
             const data = dragStart(props, type, event)
+            if (type === 'ASSET' && data && data.assetExtIds) {
+              event.dataTransfer.setData('text/plain', JSON.stringify([...data.assetExtIds]))
+            } else {
+              // dataTransfer.setData is required to always be called by firefox
+              event.dataTransfer.setData('text/plain', '')
+            }
             // Magic! Delay state update one frame to workaround Chrome
             // drag-and-drop issues when changing the DOM in onDragStart.
             requestAnimationFrame(() => hocActions.startDragging(type, data))

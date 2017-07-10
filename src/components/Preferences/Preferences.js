@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import JSONTree from 'react-json-tree'
 
-import { hideModal, lightbarFieldTemplate, thumbFieldTemplate, uxLevel, monochrome } from '../../actions/appActions'
+import { hideModal, lightbarFieldTemplate, thumbFieldTemplate, assetsFieldTemplate, uxLevel, monochrome } from '../../actions/appActions'
 import { saveUserSettings, changePassword } from '../../actions/authAction'
 import { archivistInfo, archivistHealth, archivistMetrics } from '../../actions/archivistAction'
 import User from '../../models/User'
@@ -44,7 +44,8 @@ class Preferences extends Component {
     monochrome: PropTypes.bool,
     userSettings: PropTypes.object.isRequired,
     lightbarFieldTemplate: PropTypes.string,
-    thumbFieldTemplate: PropTypes.string
+    thumbFieldTemplate: PropTypes.string,
+    assetsFieldTemplate: PropTypes.string
   }
 
   componentDidMount () {
@@ -80,6 +81,12 @@ class Preferences extends Component {
     this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, lightbarFieldTemplate })
   }
 
+  changeAssetsFieldTemplate = (event) => {
+    const assetsFieldTemplate = event.target.value
+    this.props.actions.assetsFieldTemplate(assetsFieldTemplate)
+    this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, assetsFieldTemplate })
+  }
+
   logoutDropbox = (event) => {
     DropboxAuthenticator.deauthorize()
     this.dismiss()
@@ -108,7 +115,7 @@ class Preferences extends Component {
   }
 
   render () {
-    const { user, info, health, metrics, lightbarFieldTemplate, thumbFieldTemplate, uxLevel, monochrome } = this.props
+    const { user, info, health, metrics, lightbarFieldTemplate, thumbFieldTemplate, assetsFieldTemplate, uxLevel, monochrome } = this.props
     return (
       <div className="Preferences">
         <div className="Preferences-header">
@@ -145,6 +152,10 @@ class Preferences extends Component {
               <input type="text" className="Preferences-field-template-input" value={thumbFieldTemplate} onChange={this.changeThumbFieldTemplate}/>
               <div className="Preferences-field-template-label">Thumbnail Label</div>
             </div>
+            <div className="Preferences-field-template">
+              <input type="text" className="Preferences-field-template-input" value={assetsFieldTemplate} onChange={this.changeAssetsFieldTemplate}/>
+              <div className="Preferences-field-template-label">Assets Template</div>
+            </div>
             { DropboxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutDropbox}>Logout Dropbox</button> }
             { BoxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutBox}>Logout Box</button> }
             { GDriveAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutGDrive}>Logout Google Drive</button> }
@@ -179,7 +190,8 @@ export default connect(state => ({
   monochrome: state.app.monochrome,
   userSettings: state.app.userSettings,
   lightbarFieldTemplate: state.app.lightbarFieldTemplate,
-  thumbFieldTemplate: state.app.thumbFieldTemplate
+  thumbFieldTemplate: state.app.thumbFieldTemplate,
+  assetsFieldTemplate: state.app.assetsFieldTemplate
 }), dispatch => ({
   actions: bindActionCreators({
     saveUserSettings,
@@ -190,6 +202,7 @@ export default connect(state => ({
     hideModal,
     lightbarFieldTemplate,
     thumbFieldTemplate,
+    assetsFieldTemplate,
     uxLevel,
     monochrome
   }, dispatch)
