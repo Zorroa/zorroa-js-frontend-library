@@ -30,7 +30,6 @@ class SimilarHash extends Component {
     }).isRequired,
     similarAssets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     selectedAssetIds: PropTypes.instanceOf(Set),
-    widgets: PropTypes.arrayOf(PropTypes.object),
     origin: PropTypes.string,
     actions: PropTypes.object.isRequired,
 
@@ -200,7 +199,6 @@ export default connect(
     similar: state.racetrack.similar,
     similarAssets: state.assets.similar,
     selectedAssetIds: state.assets.selectedIds,
-    widgets: state.racetrack && state.racetrack.widgets,
     origin: state.auth.origin
   }), dispatch => ({
     actions: bindActionCreators({

@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Text, Sector } from 'recharts'
 
-import { createFacetWidget, aggField } from '../../models/Widget'
+import { createFacetWidget, aggField, removeRaw } from '../../models/Widget'
 import Asset from '../../models/Asset'
 import { FacetWidgetInfo } from './WidgetInfo'
 import { modifyRacetrackWidget } from '../../actions/racetrackAction'
@@ -50,10 +50,9 @@ class Facet extends Component {
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
     if (widget && widget.sliver) {
-      const f = widget.sliver.aggs.facet.terms.field
-      const fraw = f && f.length && f.replace(/\.raw/, '')
+      const fraw = widget.field && removeRaw(widget.field)
       const fieldType = fraw && this.props.fieldTypes && this.props.fieldTypes[fraw]
-      const field = aggField(f, fieldType)
+      const field = aggField(widget.field, fieldType)
       if (field !== this.state.field) {
         this.setState({field})
       }
@@ -97,7 +96,7 @@ class Facet extends Component {
       isEnabled = oldWidget.isEnabled
       isPinned = oldWidget.isPinned
     }
-    const fieldType = this.props.fieldTypes[field.replace(/\.raw$/, '')]
+    const fieldType = this.props.fieldTypes[removeRaw(field)]
     const widget = createFacetWidget(field, fieldType, terms, order, isEnabled, isPinned)
     widget.id = this.props.id
     this.props.actions.modifyRacetrackWidget(widget)
@@ -354,7 +353,7 @@ class Facet extends Component {
 
   renderBucketKey = (key) => {
     if (key === OTHER_BUCKET) return key
-    const field = this.state.field && this.state.field.replace(/\.raw$/, '')
+    const field = this.state.field && removeRaw(this.state.field)
     const fieldType = this.props.fieldTypes && this.props.fieldTypes[field]
     if (fieldType === 'boolean') return key ? 'true' : 'false'
     if (!key) return '(none)'

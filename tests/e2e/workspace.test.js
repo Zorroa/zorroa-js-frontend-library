@@ -177,15 +177,12 @@ describe('Workspace', function () {
   })
 
   it('log out', () => {
-    let url
-
     return driver
     .then(_ => { DEBUG && console.log('log out') })
-    .then(_ => driver.getCurrentUrl().then(u => { url = u }))
     .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.header-menu-user')))
     .then(_ => selenium.clickSelector(By.css('.header-menu-user')))
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.header-menu-logout')))
     .then(_ => selenium.clickSelector(By.css('.header-menu-logout')))
-    .then(_ => selenium.waitForUrl(`${url}signin`, 15000))
+    .then(_ => selenium.waitForUrl(`${selenium.BASE_URL}/signin`, 15000))
   })
 })

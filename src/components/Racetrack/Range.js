@@ -60,7 +60,7 @@ class Range extends Component {
     const widget = widgets && widgets[index]
 
     if (widget && widget.sliver) {
-      const field = Object.keys(widget.sliver.aggs)[0]
+      const field = widget.field
       let min, max
       if (widget.sliver.filter && widget.sliver.filter.range) {
         const range = widget.sliver.filter.range
