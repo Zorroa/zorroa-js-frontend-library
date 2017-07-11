@@ -21,6 +21,7 @@ $tableResizeRightPadding: 20px;
   // height is defined in JSX
   min-width: 100%;
   background-color: #fff;
+  .dark & { background-color: $zorroa-nearblack; }
 
   padding-right: $tableResizeRightPadding;
 
@@ -32,10 +33,12 @@ $tableResizeRightPadding: 20px;
 
   &.ordered {
     background-color: $zorroa-selected;
+    .dark & { background-color: $zorroa-dark-selected; }
   }
 
   &.hovered {
     background-color: $zorroa-nearwhite;
+    .dark & { background-color: $zorroa-darkgray; }
   }
 }
 
@@ -50,6 +53,8 @@ $tableResizeRightPadding: 20px;
   border-radius: 3px;
   color: $zorroa-lightgray;
 
+  .dark & { color: $zorroa-dimgray; }
+
   &.icon-sort {
     color: $zorroa-nearwhite;
   }
@@ -62,6 +67,7 @@ $tableResizeRightPadding: 20px;
 
 .Table-header-sort-order-0 {
   color: $zorroa-darkgray;
+  .dark & { color: $zorroa-lightgray; }
 }
 
 .Table-header-sort-order-1 {
@@ -80,10 +86,11 @@ $tableResizeRightPadding: 20px;
 }
 
 .Table-header-resizer-handle {
-  width: 0;
+  width: 7px;
   height: 100%;
   color: #f1f1f1;
   border-right: 1px solid $zorroa-nearwhite;
+  .dark & { border-right: 1px solid $zorroa-dimgray; }
 }
 
 .Table-scroll-clip {
@@ -129,9 +136,14 @@ $tableResizeRightPadding: 20px;
   color: $zorroa-greyish-brown;
   border: 2px solid transparent;
 
-  &.even { background-color: #fff; }
+  .dark & { background-color: $zorroa-darkgray; }
+  &.even {
+    background-color: #fff;
+    .dark & { background-color: $zorroa-nearblack; }
+  }
   &.isSelected {
     background-color: $zorroa-selected;
+    .dark & { background-color: $zorroa-dark-selected; }
   }
 }
 
@@ -154,7 +166,7 @@ $tableResizeRightPadding: 20px;
   font-family: Roboto Condensed;
   cursor: default;
 
-  &.dark { color: $zorroa-lightgray; }
+  .dark & { color: $zorroa-lightgray; }
   &:not(.isOpen) { @include clampText; }
 }
 
@@ -182,6 +194,7 @@ $tableResizeRightPadding: 20px;
   font-size: 12px;
   font-family: Roboto Condensed;
   color: $zorroa-gray;
+  .dark & { color: $zorroa-nearwhite; }
 }
 
 .Table-title-tail {
