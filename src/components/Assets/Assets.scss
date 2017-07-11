@@ -124,7 +124,7 @@
   padding-right: 8px;
   border-left: 1px solid $zorroa-gray;
   border-right: 1px solid $zorroa-gray;
-  &.dark {
+  .dark & {
     border-left: 1px solid $zorroa-darkgray;
     border-right: 1px solid $zorroa-darkgray;
   }
