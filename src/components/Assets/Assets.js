@@ -565,7 +565,7 @@ class Assets extends Component {
                   const parentId = asset.parentId()
                   const indexes = parentId && multipage[parentId]
                   const badgeHeight = thumbSize < 100 ? 15 : 25
-                  const badge = showMultipage ? multipageBadges(asset, origin, indexes && indexes.length, thumbFieldTemplate) : monopageBadges(asset)
+                  const badge = showMultipage ? multipageBadges(asset, origin, indexes && indexes.length) : monopageBadges(asset)
                   const iconBadge = <div className="Thumb-field"><FieldTemplate asset={asset} template={thumbFieldTemplate} extensionOnLeft={false}/></div>
 
                   const pages = indexes && indexes.slice(0, 3).map(index => (
