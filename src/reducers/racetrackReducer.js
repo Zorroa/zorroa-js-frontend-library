@@ -1,8 +1,8 @@
 import {
   MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS,
-  SIMILAR_VALUES, ASSET_ORDER, ASSET_SORT, ASSET_FIELDS, UNAUTH_USER } from '../constants/actionTypes'
+  SIMILAR_VALUES, ASSET_ORDER, ASSET_SORT, ASSET_FIELDS, SELECT_FOLDERS, UNAUTH_USER } from '../constants/actionTypes'
 import Widget from '../models/Widget'
-import { SimilarHashWidgetInfo } from '../components/Racetrack/WidgetInfo'
+import { SimilarHashWidgetInfo, CollectionsWidgetInfo, SortOrderWidgetInfo } from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
 
 const initialState = {
@@ -18,6 +18,50 @@ function extractSimilar (similar, widget) {
   const field = hamming.field && hamming.field.endsWith('.raw') ? hamming.field.slice(0, -4) : hamming.field
   if (!field || field === similar.field) return similar
   return { ...similar, field }
+}
+
+function fieldExists (field, fieldTypes) {
+  const types = Object.keys(fieldTypes)
+  for (let i = 0; i < types.length; ++i) {
+    const type = types[i]
+    const fields = fieldTypes[type]
+    for (let j = 0; j < fields.length; ++j) {
+      if (fields[j] === field) return true
+    }
+  }
+  return false
+}
+
+function bestSimilarityField (curField, fieldTypes) {
+  if (curField && fieldExists(curField, fieldTypes)) return curField
+  const defaultFields = [
+    'similarity.mxnet.byte',
+    'similarity.tensorflow.byte',
+    'similarity.Tensorflow.byte',
+    'similarity.TensorFlow.byte',
+    'Similarity.Tensorflow.byte',
+    'Similarity.TensorFlow.byte',
+    'Similarity.tensorflow.byte',
+    'similarity.hsv.byte'
+  ]
+  for (let i = 0; i < defaultFields.length; ++i) {
+    if (fieldExists(defaultFields[i], fieldTypes)) return defaultFields[i]
+  }
+  const types = Object.keys(fieldTypes)
+  for (let i = 0; i < types.length; ++i) {
+    const type = types[i]
+    const fields = fieldTypes[type]
+    for (let j = 0; j < fields.length; ++j) {
+      if (fields[j].startsWith('similarity')) return fields[j]
+    }
+  }
+  for (let i = 0; i < types.length; ++i) {
+    const type = types[i]
+    const fields = fieldTypes[type]
+    for (let j = 0; j < fields.length; ++j) {
+      if (fields[j].toLowerCase().startsWith('similarity')) return fields[j]
+    }
+  }
 }
 
 export default function (state = initialState, action) {
@@ -53,61 +97,56 @@ export default function (state = initialState, action) {
       return { ...state, widgets }
     }
     case SIMILAR_VALUES: {
-      const similar = { ...state.similar, ...action.payload }
+      const similar = action.payload ? { ...state.similar, ...action.payload } : { ...state.similar, values: [], assetIds: [], weights: [] }
       assert.ok(Array.isArray(similar.values))
       assert.ok(Array.isArray(similar.assetIds))
+      // Backwards compatibility for saved searches prior to weights
+      if (similar.values && (!similar.weights || similar.weights.length !== similar.values.length)) similar.weights = similar.values.map(_ => (1))
       assert.ok(Array.isArray(similar.weights))
       assert.ok(similar.values.length === similar.assetIds.length)
       assert.ok(similar.values.length === similar.weights.length)
       assert.ok(similar.values.length <= 10)
-      let widgets = state.widgets
-      const index = widgets.findIndex(widget => (widget.type === SimilarHashWidgetInfo.type))
+      const index = state.widgets.findIndex(widget => (widget.type === SimilarHashWidgetInfo.type))
       if (index < 0) {
+        let widgets = [...state.widgets]
         const widget = new Widget({ type: SimilarHashWidgetInfo.type })
-        widgets.unshift(widget)
+        widgets.push(widget)
+        return { ...state, similar, widgets }
       }
-      return { ...state, similar, widgets }
+      return { ...state, similar }
     }
     case ASSET_ORDER:
     case ASSET_SORT: {
-      let widgets = state.widgets
-      const index = widgets.findIndex(widget => (widget.type === SimilarHashWidgetInfo.type))
-      if (index >= 0) {
-        widgets.splice(index, 1)
+      const widgets = [...state.widgets]
+      const similar = {...state.similar}
+      if (action.type === ASSET_SORT || (action.payload && action.payload.length > 0)) {
+        // Actively sorting by another field, remove all similar assets, add a sort widget if needed
+        similar.values = []
+        similar.assetIds = []
+        const index = state.widgets.findIndex(widget => (widget.type === SortOrderWidgetInfo.type))
+        if (index < 0) {
+          const widget = new Widget({type: SortOrderWidgetInfo.type})
+          widgets.push(widget)
+        }
       }
-      return { ...state, widgets, similar: { ...state.similar, values: [], assetIds: [] } }
+      return { ...state, widgets, similar }
     }
     case ASSET_FIELDS: {
       // Scan available asset fields for the preferred or a valid field
-      let field = state.similar.field || 'Similarity.Tensorflow.byte'
-      let found = false
-      const types = Object.keys(action.payload)
-      for (let i = 0; !found && i < types.length; ++i) {
-        const type = types[i]
-        const fields = action.payload[type]
-        for (let j = 0; !found && j < fields.length; ++j) {
-          if (fields[j].toLowerCase() === field.toLowerCase()) {
-            field = fields[j]  // In case toLowerCase masked the field
-            found = true
-          }
-        }
-      }
-      if (!found) {
-        field = null
-      }
-      if (!field) {
-        const types = Object.keys(action.payload)
-        for (let i = 0; !field && i < types.length; ++i) {
-          const type = types[i]
-          const fields = action.payload[type]
-          for (let j = 0; !field && j < fields.length; ++j) {
-            if (fields[j].toLowerCase().startsWith('similarity')) {
-              field = fields[j]
-            }
-          }
-        }
-      }
+      const field = bestSimilarityField(state.similar.field, action.payload)
       return { ...state, similar: { ...state.similar, field } }
+    }
+    case SELECT_FOLDERS: {
+      const selectedFolderIds = action.payload
+      if (selectedFolderIds.size) {
+        const index = state.widgets.findIndex(widget => (widget.type === CollectionsWidgetInfo.type))
+        if (index < 0) {
+          const widget = new Widget({ type: CollectionsWidgetInfo.type })
+          const widgets = [...state.widgets, widget]
+          return { ...state, widgets }
+        }
+      }
+      return state
     }
     case UNAUTH_USER:
       return initialState

@@ -1,6 +1,8 @@
 @import '../../styles/core-mixins.scss';
 
 .Preferences {
+  overflow: auto;
+  max-height: 95vh;
   .Preferences-header {
     text-transform: uppercase;
     color: white;
@@ -83,10 +85,6 @@
   padding: 10px 20px;
 }
 
-.Preferences-user-fuzzy .Toggle {
-  margin: 10px;
-}
-
 .Preferences-curator {
   border-bottom: 1px solid $zorroa-lightgray;
   padding: 10px 20px;
@@ -139,4 +137,43 @@
   max-height: 300px;
   overflow: auto;
   margin: 10px 20px;
+}
+
+.Preferences-field-template {
+  @include flexRowCenter;
+}
+
+.Preferences-field-template-input {
+  margin-top: 10px;
+  width: 300px;
+  color: $zorroa-gray;
+  padding: 4px;
+}
+
+.Preferences-field-template-label {
+  width: 120px;
+  margin-left: 8px;
+  color: $zorroa-gray;
+}
+
+.Preferences-uxlevel {
+  @include flexRowCenter;
+  margin-top: 20px;
+  margin-bottom: 5px;
+}
+
+.Preferences-uxlevel-label {
+  margin-left: 4px;
+  color: $zorroa-gray;
+}
+
+.Preferences-monochrome {
+  @include flexRowCenter;
+  margin-top: 5px;
+  margin-bottom: 20px;
+}
+
+.Preferences-monochrome-label {
+  margin-left: 4px;
+  color: $zorroa-gray;
 }

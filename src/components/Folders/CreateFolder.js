@@ -20,11 +20,17 @@ class CreateFolder extends Component {
     onDelete: PropTypes.func,             // optional delete button
     onLink: PropTypes.func,               // optional link button
     includeAssets: PropTypes.bool,        // optionally include selected assets
+    dyhiLevels: PropTypes.arrayOf(PropTypes.shape({
+      field: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired   // [Attr, Year, Month, Day, Path]
+    })),
 
     // App State
     user: PropTypes.instanceOf(User),
     isolatedId: PropTypes.string,
     selectedAssetIds: PropTypes.instanceOf(Set),
+    isManager: PropTypes.bool,
+    uxLevel: PropTypes.number,
     actions: PropTypes.object.isRequired
   }
 
@@ -32,7 +38,8 @@ class CreateFolder extends Component {
     name: this.props.name || '',
     isShared: false,
     acl: null,
-    includeSelectedAssets: this.props.includeAssets
+    includeSelectedAssets: this.props.includeAssets,
+    mode: 'Search'                        // 'Search', 'Hierarchy'
   }
 
   changeName = (event) => {
@@ -61,10 +68,10 @@ class CreateFolder extends Component {
   }
 
   saveFolder = (event) => {
-    const { user, isolatedId, selectedAssetIds } = this.props
-    const { name, isShared, includeSelectedAssets } = this.state
+    const { user, isolatedId, selectedAssetIds, dyhiLevels } = this.props
+    const { name, isShared, includeSelectedAssets, mode } = this.state
     let acl = null
-    if (isShared && acl) {
+    if (isShared && this.state.acl) {
       acl = this.state.acl
     } else if (user && user.permissions) {
       // Look through this user's permissions for the one with 'user' type
@@ -74,7 +81,8 @@ class CreateFolder extends Component {
     }
     if (acl) {
       const assetIds = includeSelectedAssets && (isolatedId ? new Set(isolatedId) : selectedAssetIds)
-      this.props.onCreate(name, acl, assetIds)
+      const assetsOrDyhis = includeSelectedAssets ? assetIds : (mode === 'Hierarchy' ? dyhiLevels : mode)
+      this.props.onCreate(name, acl, assetsOrDyhis)
       this.props.actions.hideModal()
     } else {
       console.error('Cannot determine permissions to create folder ' + name)
@@ -93,8 +101,58 @@ class CreateFolder extends Component {
     this.setState({acl})
   }
 
+  changeMode = (mode) => {
+    this.setState({mode})
+  }
+
+  renderModes () {
+    const { isManager } = this.props
+    if (!isManager) return
+    const { dyhiLevels } = this.props
+    const { name, mode } = this.state
+    const modes = ['Search']
+    if (dyhiLevels && dyhiLevels.length) modes.push('Hierarchy')
+    const cleanField = (field) => (field.endsWith('.raw') ? field.slice(0, -4) : field)
+    return (
+      <div>
+        { modes.length > 1 && (
+          <div className="CreateFolder-modes">
+            {modes.map(m => (
+              <div key={m} className={classnames('CreateFolder-mode', {selected: m === mode})}
+                   onClick={_ => this.changeMode(m)}>{m}</div>
+            ))}
+          </div>
+        )}
+        { modes.length > 1 && mode === 'Search' && (
+          <div className="CreateFolder-mode-info">
+            Save the current search as a smart folder.
+            Select the folder to restore the search.
+          </div>
+        )}
+        { mode === 'Hierarchy' && (
+          <div className="CreateFolder-mode-info">
+            Save the current search as a folder hierarchy of the facet widgets from the current search:
+            <div className="CreateFolder-dyhis">
+              <div className="CreateFolder-dyhi">
+                <div className="CreateFolder-dyhi-icon icon-foldercog"/>
+                <div className="CreateFolder-dyhi-root">{name}</div>
+              </div>
+              { dyhiLevels.map((dyhi, i) => (
+                <div key={`${dyhi.field}-${dyhi.type}`} className="CreateFolder-dyhi" style={{marginLeft: (i + 1) * 12}}>
+                  <div className="CreateFolder-dyhi-indent">↳</div>
+                  <div className="CreateFolder-dyhi-icon icon-folder-subfolders"/>
+                  <div className="CreateFolder-dyhi-field">{cleanField(dyhi.field)}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
   render () {
-    const { title, onLink, onDelete, user, date, selectedAssetIds, includeAssets } = this.props
+    const { title, onLink, onDelete, user, date, selectedAssetIds, includeAssets, isManager, uxLevel } = this.props
     const { isShared, name, includeSelectedAssets } = this.state
     const disableIncludeSelected = !selectedAssetIds || !selectedAssetIds.size
     return (
@@ -109,7 +167,10 @@ class CreateFolder extends Component {
           </div>
           <div className="CreateFolder-body">
             <div className="CreateFolder-input-title">Title</div>
-            <input className="CreateFolder-input-title-input" autoFocus={true} type="text" placeholder="Name" onKeyDown={this.checkForSubmit} value={name} onChange={this.changeName} />
+            <input className="CreateFolder-input-title-input" autoFocus={true} type="text"
+                   placeholder="Collection Name" onKeyDown={this.checkForSubmit}
+                   value={name} onChange={this.changeName} />
+            { this.renderModes() }
             { includeAssets && (
               <div className={classnames('CreateFolder-include-selected-assets', {disabled: disableIncludeSelected})}>
                 <input type="checkbox" checked={includeSelectedAssets} disabled={disableIncludeSelected}
@@ -117,13 +178,17 @@ class CreateFolder extends Component {
                 <div onClick={this.toggleShareSelected}>Include Selected Assets</div>
               </div>
             )}
-            <div className="CreateFolder-public-private flexRow flexAlignItemsCenter">
-              <div>Collection is</div>
-              <div className={classnames('CreateFolder-public-private', {disabled: isShared})}>Private</div>
-              <Toggle checked={isShared} onChange={this.togglePublic}/>
-              <div className={classnames('CreateFolder-public-private', {disabled: !isShared})}>Public</div>
-            </div>
-            { isShared && <AclEditor onChange={this.changeAcl} title="Folder Asset Permissions"/> }
+            { isManager && uxLevel > 0 && !includeAssets && this.props.name && this.props.name.length && (
+              <div className="CreateFolder-permissions">
+                <div className="CreateFolder-public-private flexRow flexAlignItemsCenter">
+                  <div>Collection is</div>
+                  <div className={classnames('CreateFolder-public-private', {disabled: isShared})}>Private</div>
+                  <Toggle checked={isShared} onChange={this.togglePublic}/>
+                  <div className={classnames('CreateFolder-public-private', {disabled: !isShared})}>Public</div>
+                </div>
+                { isShared && <AclEditor onChange={this.changeAcl} title="Folder Asset Permissions"/> }
+              </div>
+            )}
           </div>
           <div className="CreateFolder-footer flexRow flexJustifyCenter">
             <button className={classnames('CreateFolder-save default', {disabled: (!name || !name.length)})} onClick={this.saveFolder}>Save</button>
@@ -151,7 +216,9 @@ class CreateFolder extends Component {
 export default connect(state => ({
   user: state.auth && state.auth.user,
   isolatedId: state.assets.isolatedId,
-  selectedAssetIds: state.assets.selectedIds
+  selectedAssetIds: state.assets.selectedIds,
+  isManager: state.auth.isManager,
+  uxLevel: state.app.uxLevel
 }), dispatch => ({
   actions: bindActionCreators({ hideModal }, dispatch)
 }))(CreateFolder)

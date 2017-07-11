@@ -1,11 +1,13 @@
 import {
   GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, UPDATE_FOLDER,
   DELETE_FOLDER, TOGGLE_FOLDER, ADD_ASSETS_TO_FOLDER,
-  REMOVE_ASSETS_FROM_FOLDER, FOLDER_COUNTS, QUEUE_FOLDER_COUNTS, CLEAR_FOLDER_COUNT_QUEUE
+  REMOVE_ASSETS_FROM_FOLDER, DROP_FOLDER_ID,
+  FOLDER_COUNTS, QUEUE_FOLDER_COUNTS, CLEAR_FOLDER_COUNT_QUEUE
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
+import { restoreFolders } from './racetrackAction'
 import { archivistGet, archivistPut, archivistPost, archivistRequest } from './authAction'
-import { selectId } from '../services/jsUtil'
+import { selectId, equalSets } from '../services/jsUtil'
 
 const rootEndpoint = '/api/v1/folders'
 
@@ -40,22 +42,40 @@ export function getFolderChildren (parentId, optOnDoneFn) {
   }
 }
 
-export function selectFolderIds (ids) {
+export function selectFolderIds (ids, curIds, folders) {
   if (!(ids instanceof Set)) ids = new Set(ids)
-  return {
+  let actions = []
+  // If a new folder is added to the current selection,
+  // restore the merged search from all selected folders
+  if (curIds && folders && !equalSets(ids, curIds)) {
+    const iter = ids.keys()
+    const restoredFolders = []
+    for (let i = iter.next(); !i.done; i = iter.next()) {
+      const folder = folders.get(i.value)
+      if (folder && folder.search && !folder.isDyhi()) {
+        restoredFolders.push(folder)
+      }
+    }
+    if (restoredFolders.length) {
+      const restoreActions = restoreFolders(restoredFolders)
+      restoreActions.forEach(action => actions.push(action))
+    }
+  }
+  actions.push({
     type: SELECT_FOLDERS,
     payload: ids
-  }
+  })
+  return actions
 }
 
 // Works when folders is an array of either Folder or TrashedFolder so that
 // we can share this logic without duplicating the TrashedFolder array into
 // a Folder array each time we do selection, which would require dup+find.
 // TrashedFolder.folderId is used instead of Folder.id rather than instanceof.
-export function selectFolderId (id, shiftKey, metaKey, folders, selectedIds) {
+export function selectFolderId (id, shiftKey, metaKey, folders, selectedIds, all) {
   console.log('selectFolder')
   let selectedFolderIds = selectId(id, shiftKey, metaKey, folders, selectedIds)
-  return selectFolderIds(selectedFolderIds)
+  return selectFolderIds(selectedFolderIds, selectedIds, all)
 }
 
 export function createFolder (folder, assetIds) {
@@ -202,5 +222,44 @@ export function countAssetsInFolderIds (ids, search) {
       .catch(error => {
         console.error('Error counting query assets in folders ' + JSON.stringify(ids) + ': ' + error)
       })
+  }
+}
+
+function createDyHiProm (dispatch, folder, levels) {
+  const folderId = folder.id
+  console.log('Create dyhi inside folder id ' + folderId, ' with ' + JSON.stringify(levels))
+  return archivistPost(dispatch, '/api/v1/dyhi', { folderId, levels })
+    .then(response => {
+      folder.dyhiId = response.data.id
+      folder.childCount = 1  // Force loadChildren
+      dispatch({
+        type: CREATE_FOLDER,
+        payload: folder
+      })
+    })
+    .catch(error => {
+      console.error('Error creating dyhi for ' + folder.id + ' with ' + JSON.stringify(levels) + ': ' + error)
+    })
+}
+
+export function createDyHiFolder (folder, dyhiLevels) {
+  return dispatch => {
+    console.log('Create dyhi for ' + folder.name + ' with ' + JSON.stringify(dyhiLevels))
+    archivistPost(dispatch, `${rootEndpoint}`, folder)
+      .then(response => {
+        const dyhi = new Folder(response.data)
+        console.log('Created DyHi folder: ' + JSON.stringify(dyhi))
+        createDyHiProm(dispatch, dyhi, dyhiLevels)
+      })
+      .catch(error => {
+        console.error('Error creating folder ' + folder.name + ': ' + error)
+      })
+  }
+}
+
+export function dropFolderId (id) {
+  return {
+    type: DROP_FOLDER_ID,
+    payload: id
   }
 }

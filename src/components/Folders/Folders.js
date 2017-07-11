@@ -14,24 +14,33 @@ import Trash from './Trash'
 import FolderItem from './FolderItem'
 import CreateFolder from './CreateFolder'
 import { equalSets } from '../../services/jsUtil'
+import { DropTarget } from '../../services/DragDrop'
 
 const SORT_ALPHABETICAL = 'alpha'
 const SORT_TIME = 'time'
 
 const FOLDER_HEIGHT_PX = 25
+const FOLDER_EMPTY_HEIGHT_PX = 60
 const MAX_FOLDER_SCROLL_HEIGHT_PX = 400
 
 const FOLDER_COUNT_SCROLL_IDLE_THRESH_MS = 250 // ms to wait after scrolling stops before requesting folder counts
 
 const NUMTRUE = {numeric: true}
 
+const target = { drop (props, se) { /* only needed for highlighting -- drop happens on FolderItem */ } }
+
 // Display all folders, starting with the root.
 // Later this will be broken into Collections and Smart Folders.
+@DropTarget(target)
 class Folders extends Component {
   static propTypes = {
     // input props
+    rootId: PropTypes.number,
+    rootName: PropTypes.string,
     filter: PropTypes.func,
     onSelect: PropTypes.func,
+
+    dragInfo: PropTypes.object,
 
     // connect props
     actions: PropTypes.object.isRequired,
@@ -47,6 +56,7 @@ class Folders extends Component {
     super(props)
 
     this.state = {
+      rootId: undefined,
       filterString: '',
       foldersScrollTop: 0,
       foldersScrollHeight: 0
@@ -84,7 +94,8 @@ class Folders extends Component {
 
   componentWillMount () {
     const all = this.props.folders.all
-    const rootFolder = all.get(Folder.ROOT_ID)
+    const { rootId } = this.props
+    const rootFolder = all.get(rootId === undefined ? Folder.ROOT_ID : rootId)
     if (!rootFolder.childIds || !rootFolder.childIds.size) {
       this.loadChildren(rootFolder)
     }
@@ -92,9 +103,8 @@ class Folders extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    // Force load the User folder's children so that we can open the
-    // full ancestor path when creating new folders in the user's folder.
-    const all = this.props.folders.all
+    // Force load the User folder's children so we can find the home folder
+    const all = nextProps.folders.all
     const rootFolder = all.get(Folder.ROOT_ID)
     if (rootFolder && rootFolder.childIds) {
       const rootChildIds = [...rootFolder.childIds]
@@ -103,6 +113,20 @@ class Folders extends Component {
         const userFolder = all.get(rootChildIds[index])
         if (!userFolder.childIds) this.loadChildren(userFolder)
       }
+    }
+
+    // Search through the root folder to find the named root, if needed
+    if (this.state.rootId === undefined && nextProps.rootName) {
+      // Find the folder in the root node that matches the requested prop root name
+      const all = nextProps.folders.all
+      const rootFolder = all.get(Folder.ROOT_ID)
+      if (rootFolder && rootFolder.childIds) {
+        const rootChildIds = [...rootFolder.childIds]
+        const index = rootChildIds.findIndex(id => all.get(id).name === nextProps.rootName)
+        if (index >= 0) this.setState({ rootId: rootChildIds[index] })
+      }
+    } else if (this.state.rootId === undefined && nextProps.rootId !== undefined) {
+      this.setState({ rootId: nextProps.rootId })
     }
   }
 
@@ -115,9 +139,11 @@ class Folders extends Component {
     this.props.actions.getFolderChildren(folder.id)
   }
 
+  isOpen = (folderId) => (folderId === this.state.rootId || this.props.folders.openFolderIds.has(folderId))
+
   toggleFolder = (folder) => {
     const { folders } = this.props
-    const isOpen = folders.openFolderIds.has(folder.id)
+    const isOpen = this.isOpen(folder.id)
     const hasChildren = folder.childCount > 0
 
     // If any descendants of the current folder are currently selected,
@@ -156,8 +182,8 @@ class Folders extends Component {
 
   scrollToFolder = (folderId) => {
     const { folders } = this.props
-    const { foldersScrollTop, foldersScrollHeight } = this.state
-    const folderList = this.folderList(folders.all.get(Folder.ROOT_ID))
+    const { foldersScrollTop, foldersScrollHeight, rootId } = this.state
+    const folderList = this.folderList(folders.all.get(rootId))
     const folderPosition = folderList.findIndex(folder => folder.id === folderId)
     if (folderPosition < 0) return
 
@@ -175,10 +201,10 @@ class Folders extends Component {
   selectFolder (folder, event) {
     const { folders, onSelect } = this.props
     if (onSelect) return onSelect(folder, event)
-    const rootFolder = folders.all.get(Folder.ROOT_ID)
+    const rootFolder = folders.all.get(this.state.rootId)
     const folderList = this.folderList(rootFolder)
     this.props.actions.selectFolderId(folder.id, event.shiftKey, event.metaKey,
-      folderList, this.props.folders.selectedFolderIds)
+      folderList, this.props.folders.selectedFolderIds, this.props.folders.all)
   }
 
   filterFolders = (event) => {
@@ -225,16 +251,9 @@ class Folders extends Component {
   }
 
   createFolder = (name, acl, assetIds) => {
-    const parentId = this.selectedParentId()
+    const parentId = this.state.rootId
     const folder = new Folder({ name, parentId, acl })
     this.props.actions.createFolder(folder, assetIds)
-  }
-
-  selectedParentId () {
-    const { folders, user } = this.props
-    const selectedFolderIds = folders.selectedFolderIds
-    if (selectedFolderIds && selectedFolderIds.size === 1) return selectedFolderIds.values().next().value
-    return user ? user.homeFolderId : Folder.ROOT_ID
   }
 
   cannotAddFolderReason () {
@@ -287,12 +306,12 @@ class Folders extends Component {
 
   folderList (folder) {
     const { folders, filter } = this.props
-    const { filterString } = this.state
-    const isOpen = folders.openFolderIds.has(folder.id)
+    const { filterString, rootId } = this.state
+    const isOpen = this.isOpen(folder.id)
     const childIds = folder.childIds
 
     // Show this folder, except for root, we don't need to see root
-    let folderList = (folder.id !== Folder.ROOT_ID) ? [folder] : []
+    let folderList = (folder.id !== rootId) ? [folder] : []
 
     let grandkids = []
     if (childIds && isOpen) {
@@ -336,10 +355,20 @@ class Folders extends Component {
   }
 
   depth (folder) {
-    if (folder.id === Folder.ROOT_ID) return 0
     const { folders } = this.props
+    if (folder.id === this.state.rootId) return 0
     const parent = folders.all.get(folder.parentId)
     return this.depth(parent) + 1
+  }
+
+  isDropTarget () {
+    const { dragInfo, folders, user } = this.props
+    if (!dragInfo) return false
+    const root = folders.all.get(this.state.rootId)
+    if (root && dragInfo.type === 'FOLDER' && dragInfo.folderIds) {
+      return root.canAddChildFolderIds(dragInfo.folderIds, folders.all, user)
+    }
+    return false
   }
 
   renderFolderList = (folderList, foldersScrollHeight) => {
@@ -361,7 +390,7 @@ class Folders extends Component {
       const key = folder.id
       const { folders, onSelect } = this.props
       const depth = this.depth(folder)
-      const isOpen = folders.openFolderIds.has(folder.id)
+      const isOpen = this.isOpen(folder.id)
       const isSelected = !onSelect && folders.selectedFolderIds.has(folder.id)
       const hasChildren = folder.childCount > 0
 
@@ -399,9 +428,9 @@ class Folders extends Component {
   }
 
   render () {
-    const { folders } = this.props
-    const { filterString } = this.state
-    const rootLoaded = folders.all.has(Folder.ROOT_ID)
+    const { folders, user } = this.props
+    const { filterString, rootId } = this.state
+    const rootLoaded = folders.all.has(rootId)
     if (!rootLoaded) return null
 
     if (this.props.assetsCounter !== this.assetsCounter) {
@@ -411,9 +440,9 @@ class Folders extends Component {
       this.queueFolderCounts()
     }
 
-    const folderList = this.folderList(folders.all.get(Folder.ROOT_ID))
+    const folderList = this.folderList(folders.all.get(rootId))
     const numOpenFolders = folderList.length
-    const foldersBodyHeight = numOpenFolders * FOLDER_HEIGHT_PX
+    const foldersBodyHeight = numOpenFolders * FOLDER_HEIGHT_PX || FOLDER_EMPTY_HEIGHT_PX
     const foldersScrollHeight = Math.min(foldersBodyHeight, MAX_FOLDER_SCROLL_HEIGHT_PX)
     const folderComponentList = this.renderFolderList(folderList, foldersScrollHeight)
 
@@ -429,9 +458,13 @@ class Folders extends Component {
       }
     })
 
+    const dragHover = folders.dropFolderId === rootId
+    const isDropTarget = this.isDropTarget()
+    const root = folders.all.get(rootId)
+    const canAddFolder = root && root.id === user.homeFolderId
     const cannotAddError = this.cannotAddFolderReason()
     return (
-      <div className='Folders'>
+      <div className={classnames('Folders', {isDropTarget, dragHover})}>
         <div className="Folders-controls">
           <div className="Folders-filter-add">
             <div className="Folders-filter">
@@ -442,11 +475,11 @@ class Folders extends Component {
               <div className="icon-search"/>
 
             </div>
-            <div className={classnames('Folders-controls-add', {disabled: cannotAddError})}
-                 title={cannotAddError || 'Create a new folder'}
-                 onClick={!cannotAddError && this.addFolder}>
+            { canAddFolder && <div className={classnames('Folders-controls-add', {disabled: cannotAddError})}
+                                   title={cannotAddError || 'Create a new folder'}
+                                   onClick={!cannotAddError && this.addFolder}>
               <span className='icon-collections-add'/>
-            </div>
+            </div> }
           </div>
           <div className="Folders-sort-selected">
             <div className="Folders-sort">
@@ -464,7 +497,14 @@ class Folders extends Component {
           <div className='Folders-body'
                style={{ height: `${foldersBodyHeight}px` }}>
             {folderComponentList}
+            {(!folderComponentList || !folderComponentList.length) && (
+              <div className="Folders-empty">
+                <div className="Folders-empty-icon icon-emptybox"/>
+                <div className="Folders-empty-label">No Folders</div>
+              </div>
+            )}
           </div>
+          <div className="Folders-drop-target"/>
         </div>
       </div>
     )

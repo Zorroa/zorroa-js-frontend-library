@@ -39,21 +39,21 @@ describe('Collections', function () {
   // ----------------------------------------------------------------------
 
   var emptyTrash = function () {
-    return selenium.getSelectorVisible(By.css('.Collections-collapsible .Trash'))
+    return selenium.getSelectorVisible(By.css('.Home-collapsible .Trash'))
     .then(trashVisible => {
       if (!trashVisible) return driver.then(_ => { DEBUG && console.log('no trash to empty 1') })
       return selenium.getSelectorVisible(By.css('.Trash-body'))
       .then(trashBodyVisible => {
         if (!trashBodyVisible) return selenium.clickSelector(By.css('.Trash-toggle'))
       })
-      .then(_ => selenium.getSelectorVisible(By.css('.Collections-collapsible .Trash-empty')))
+      .then(_ => selenium.getSelectorVisible(By.css('.Home-collapsible .Trash-empty')))
       .then(trashEmptyVisible => {
         if (!trashEmptyVisible) return driver.then(_ => { DEBUG && console.log('no trash to empty 2') })
         return driver.then(_ => { DEBUG && console.log('emptying trash') })
-        .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Collections-collapsible .Trash-empty'), 5000))
-        .then(_ => selenium.clickSelector(By.css('.Collections-collapsible .Trash-empty')))
+        .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Home-collapsible .Trash-empty'), 5000))
+        .then(_ => selenium.clickSelector(By.css('.Home-collapsible .Trash-empty')))
         .then(_ => selenium.waitForIdle(15000))
-        .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Collections-collapsible .Trash'), 5000))
+        .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Home-collapsible .Trash'), 5000))
       })
     })
   }
@@ -62,11 +62,11 @@ describe('Collections', function () {
   var openCollectionsPanel = function () {
     return driver
     .then(_ => { DEBUG && console.log('open the collections panel') })
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Collections-collapsible'), 5000))
-    .then(_ => selenium.doesSelectorHaveClass(By.css('.Collections-collapsible'), 'isOpen'))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Home-collapsible'), 5000))
+    .then(_ => selenium.doesSelectorHaveClass(By.css('.Home-collapsible'), 'isOpen'))
       .then(isOpen => {
         if (!isOpen) {
-          driver.then(_ => selenium.clickSelector(By.css('.Collections-collapsible')))
+          driver.then(_ => selenium.clickSelector(By.css('.Home-collapsible')))
           driver.then(_ => selenium.waitForIdle())
         }
         // wait until some folders appear
@@ -134,17 +134,8 @@ describe('Collections', function () {
 
     let folder
     let folderXpath = `//*[contains(text(), '${searchStr}')]` // http://stackoverflow.com/a/30648604/1424242
-    let allUsersFolder
 
     return driver.then(_ => openCollectionsPanel())
-
-    .then(_ => { DEBUG && console.log('find & toggle the Users folder ' + Date.now()) })
-    .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
-    .then(_ => selenium.getFolderNamed('Users').then(ele => { allUsersFolder = ele }))
-    // Toggle open the users folder
-    .then(_ => { DEBUG && console.log('toggle the Users folder') })
-    .then(_ => allUsersFolder.findElement(By.css('.FolderItem-toggle')).click())
-    .then(_ => selenium.waitForIdle())
 
     .then(_ => { DEBUG && console.log('Search for something we know exists') })
     .then(_ => driver.findElement(By.css('.Suggestions-search')).then(ele => { searchBar = ele }))
@@ -152,12 +143,9 @@ describe('Collections', function () {
     .then(_ => searchBar.sendKeys('dumbo', Key.ENTER))
     .then(_ => selenium.waitForIdle())
 
-    .then(_ => { DEBUG && console.log('Open the racetrack') })
-    .then(_ => selenium.clickSelector(By.css('.Sidebar-open-close-button.isRightEdge')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack')))
-
     .then(_ => { DEBUG && console.log('Save the search') })
-    .then(_ => selenium.clickSelector(By.css('.Racetrack-footer-save')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racebar')))
+    .then(_ => selenium.clickSelector(By.css('.Racebar-save')))
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.modal .CreateFolder')))
     .then(_ => driver.findElement(By.css('.CreateFolder-input-title-input')).then(ele => ele.sendKeys(searchStr)))
     .then(_ => selenium.clickSelector(By.css('.CreateFolder-save')))
@@ -165,8 +153,8 @@ describe('Collections', function () {
     .then(_ => driver.wait(until.elementLocated(By.xpath(`//*[contains(text(), '${searchStr}')]`))))
 
     .then(_ => { DEBUG && console.log('Clear the racetrack') })
-    .then(_ => selenium.clickSelector(By.css('.Racetrack-footer-clear')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack-empty')))
+    .then(_ => selenium.clickSelector(By.css('.Racebar-clear')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Widget')))
 
     .then(_ => { DEBUG && console.log('Rename the saved search') })
     .then(_ => driver.findElement(By.xpath(folderXpath)).then(ele => { folder = ele }))
@@ -180,6 +168,8 @@ describe('Collections', function () {
     .then(_ => selenium.clickSelector(By.css('.CreateFolder-save')))
     .then(_ => selenium.waitForIdle())
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.xpath(`//*[contains(text(), '${searchStr}-renamed')]`)))
+    .then(_ => selenium.clickSelector(By.css('.Racebar-clear')))
+    .then(_ => expect(searchBar.value === ''))
 
     .then(_ => { DEBUG && console.log('Restore the saved search') })
     .then(_ => { folderXpath = `//*[contains(text(), '${searchStr}-renamed')]` }) // http://stackoverflow.com/a/30648604/1424242
@@ -187,15 +177,14 @@ describe('Collections', function () {
     .then(_ => driver.actions().click(folder, 2).perform()) // right-click
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.FolderItem-context-menu')))
     .then(_ => selenium.clickSelector(By.css('.FolderItem-context-restore-widgets')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Racetrack-empty')))
-    .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Racetrack-filters')))
+    .then(_ => expect(searchBar.value === 'dumbo'))
 
     .then(_ => { DEBUG && console.log('Delete the saved search') })
     .then(_ => driver.actions().click(folder, 2).perform()) // right-click
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.FolderItem-context-remove-folder')))
     .then(_ => selenium.clickSelector(By.css('.FolderItem-context-remove-folder')))
     .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.FolderItem-context-menu'), 5000))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Collections-collapsible .Trash'), 15000))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Home-collapsible .Trash'), 15000))
 
     .then(_ => emptyTrash())
   })

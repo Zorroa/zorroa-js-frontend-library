@@ -201,16 +201,15 @@ class JobMenu extends Component {
     this.monitorJobs()
     const maxJobs = 5
     const filteredJobs = allJobs.slice(0, maxJobs)
-    return (
-      <div className="JobMenu-jobs">
-        { filteredJobs.map(job => this.renderJob(job)) }
-        { allJobs.length > filteredJobs.length ? (
-          <div onClick={this.viewAllJobs} className="JobMenu-jobs-view-all">
-            View all {lcJobType} packages
-          </div>
-        ) : null }
-      </div>
-    )
+    const items = filteredJobs.map(job => this.renderJob(job))
+    if (allJobs.length > filteredJobs.length) {
+      items.push(
+        <div onClick={this.viewAllJobs} className="JobMenu-jobs-view-all">
+          View all {lcJobType} packages
+        </div>
+      )
+    }
+    return items
   }
 
   renderJobBadge () {
@@ -236,13 +235,13 @@ class JobMenu extends Component {
     return (
       <div className={classnames('header-menu', 'header-menu-jobs', `header-menu-${jobType}`)}>
         { this.renderJobBadge() }
-        <DropdownMenu label={`${jobType}s`} onChange={this.refreshJobs} show={this.show}>
-          { jobType === Job.Import ? (
-            <div onClick={this.createImport} className="JobMenu-jobs-create-import">
-              <div className="icon-import"/>
-              <div>Import assets</div>
-            </div>
-          ) : null }
+        { jobType === Job.Import && (
+          <div onClick={this.createImport} className="JobMenu-jobs-create-import">
+            <div className="icon-import"/>
+            <div>Import</div>
+          </div>
+        )}
+        <DropdownMenu onChange={this.refreshJobs} show={this.show}>
           { this.renderJobs() }
         </DropdownMenu>
       </div>

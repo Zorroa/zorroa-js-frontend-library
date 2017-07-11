@@ -19,10 +19,10 @@ export default class AssetSearch {
       this.fields = json.fields   // [string]:         Fields to return for each asset
       this.filter = json.filter && new AssetFilter(json.filter) // pre-agg (fast)
       this.postFilter = json.postFilter && new AssetFilter(json.postFilter) // post-agg (slow)
-      this.order = json.order     // {string field, bool ascending}
+      this.order = json.order     // [string field, bool ascending]
       this.size = json.size       // int:              Number of assets to return
       this.from = json.from       // int:              First asset index to return
-      this.fuzzy = json.fuzzy     // bool:             Enable fuzzy search
+      this.fuzzy = json.fuzzy || false    // bool:             Enable fuzzy search
       this.aggs = json.aggs       // {string, {string, object}}
     }
   }
@@ -32,6 +32,13 @@ export default class AssetSearch {
       return
     }
     // FIXME: How should we merge order, scroll, from & size?
+    if (assetSearch.order) {
+      if (this.order) {
+        this.order = [...this.order, ...assetSearch.order]
+      } else {
+        this.order = [...assetSearch.order]
+      }
+    }
     if (assetSearch.query) {
       this.query = this.query ? `(${this.query}) AND (${assetSearch.query})` : assetSearch.query
     }
@@ -80,9 +87,9 @@ export default class AssetSearch {
   }
 
   empty () {
+    if (!this.emptyFilters()) return false
+    if (this.order && this.order.length) return false
     if (this.query && this.query.length) return false
-    if (this.filter && !this.filter.empty()) return false
-    if (this.postFilter && !this.postFilter.empty()) return false
     return true
   }
 

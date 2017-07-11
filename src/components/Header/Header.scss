@@ -5,8 +5,10 @@
 // the menu right justified
 .header {
   padding: 0;
-  height: 60px;
+  height: 42px;
   position: relative;
+  background-color: $zorroa-nearwhite;
+  .dark & { background-color: $zorroa-gray; }
 }
 
 // Box to left-justify the logo and search
@@ -20,12 +22,11 @@
 
 // Adjust the logo size so search starts at expanded sidebar
 .header-logo {
-  padding-top: 6px;
-  padding-left: 22px;
-
-  // This matches the folder sidebar width
-  width: 25%;
-  max-width: $zorroa-Sidebar-width;
+  height: 28px;
+  //padding-top: 6px;
+  //padding-left: 22px;
+  margin-right: 20px;
+  margin-left: 10px;
 }
 
 // Simple menu text for now
@@ -34,7 +35,9 @@
 }
 
 .header-menu {
-  margin-left: 20px;
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  margin-right: 20px;
   position: relative;
 
   .job {
@@ -54,8 +57,6 @@
   }
 
   &.header-menu-user {
-    @include flexRow;
-    @include flexAlignItemsCenter;
 
     .DropdownMenu-button {
       text-transform: none;
@@ -118,5 +119,68 @@
     &:focus {
       outline: none;
     }
+  }
+}
+
+.header-buttons {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.header-button {
+  @include flexRowCenter;
+
+  color: $zorroa-greyish-brown;
+  margin: 4px;
+  font-size: 20px;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 3px;
+
+  &.disabled { color: $zorroa-lightgray; }
+
+  &:hover:not(.disabled) { background-color: $zorroa-nearwhite; }
+
+  &.selected {
+    color: white;
+    background-color: $zorroa-water-blue;
+    &:hover { background-color: darken($zorroa-water-blue, 15%); }
+  }
+}
+
+.header-table-spacer {
+  width: 40px;
+}
+
+.Header-loading {
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  cursor: pointer;
+  opacity: 1;
+
+  &.sync {
+    opacity: 0;
+  }
+  &:hover {
+    visibility: visible;
+    opacity: 1;
+    background-color: $zorroa-nearwhite;
+  }
+}
+
+.header-asset-counter {
+  @include flexRowCenter;
+  @include fullHeight;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-left: 1px solid $zorroa-lightgray;
+  border-right: 1px solid $zorroa-lightgray;
+  .dark & {
+    border-left: 1px solid $zorroa-dimgray;
+    border-right: 1px solid $zorroa-dimgray;
   }
 }

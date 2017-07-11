@@ -5,11 +5,16 @@ import Controlbar from './Controlbar'
 
 export default class PanZoom extends Component {
   static propTypes = {
-    title: PropTypes.string,
+    title: PropTypes.node,
+    titleWidth: PropTypes.number,
     showControls: PropTypes.bool,
     onNextPage: PropTypes.func,
     onPrevPage: PropTypes.func,
     onMultipage: PropTypes.func,
+    onVideo: PropTypes.func,
+    playing: PropTypes.bool,
+    onVolume: PropTypes.func,
+    volume: PropTypes.number,
     actions: PropTypes.object,
     children: PropTypes.node.isRequired
   }
@@ -86,7 +91,9 @@ export default class PanZoom extends Component {
     const scalePct = 1 + Math.abs(event.deltaY) * 0.005
     const scaleMult = (event.deltaY > 0 ? scalePct : 1 / scalePct)
     const zoomFactor = Math.min(PanZoom.maxZoom, Math.max(PanZoom.minZoom, scale * scaleMult))
-    this.panner.zoom(zoomFactor, {x: event.pageX, y: event.pageY})
+    const topPadding = 50
+    const leftPadding = 8
+    this.panner.zoom(zoomFactor, {x: event.pageX - leftPadding, y: event.pageY - topPadding})
     this.setStateToPanner()
     this.startMoving()
   }
@@ -115,7 +122,7 @@ export default class PanZoom extends Component {
   }
 
   render () {
-    const { title, showControls, onPrevPage, onNextPage, onMultipage } = this.props
+    const { title, titleWidth, showControls, onPrevPage, onNextPage, onMultipage, onVolume, volume, onVideo, playing } = this.props
     const { moving } = this.state
     const epsilon = 0.01
     const zoomOutDisabled = this.panner.scale <= PanZoom.minZoom + epsilon
@@ -136,13 +143,15 @@ export default class PanZoom extends Component {
                 { this.props.children }
               </div>
               { showControls && (
-                  <Controlbar title={title}
+                  <Controlbar title={title} titleWidth={titleWidth}
                               onZoomOut={!zoomOutDisabled && this.zoomOut || null}
                               onZoomIn={!zoomInDisabled && this.zoomIn || null}
                               onFit={!zoomToFitDisabled && this.zoomToFit || null}
                               onMultipage={onMultipage}
                               onNextPage={onNextPage}
-                              onPrevPage={onPrevPage} />)
+                              onPrevPage={onPrevPage}
+                              onVolume={onVolume} volume={volume}
+                              onVideo={onVideo} playing={playing} />)
               }
             </div>
           )

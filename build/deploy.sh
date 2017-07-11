@@ -18,4 +18,4 @@ deployDate=$(date +"%m-%d-%Y_%Hh%Mm%Ss")
 deployVersion=$(cat bin/version.html | tr -d '\n')
 deployName="curator_v${deployVersion}_${deployDate}"
 
-ln -s bin "${deployName}" && tar chvzf - "${deployName}" | ssh computeruser@${server} "cd archivist/web && tar xfvz - && ln -s -f ${deployName} curator"
+ln -s bin "${deployName}" && tar chvzf - "${deployName}" | ssh computeruser@${server} "cd /var/tmp && tar xfvz - && ln -s -f ${deployName} curator"

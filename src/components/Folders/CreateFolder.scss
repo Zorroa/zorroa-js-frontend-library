@@ -3,7 +3,7 @@
 .CreateFolder {
 
   .CreateFolder-form {
-    width: 300px;
+    width: 400px;
 
     /* WARNING: Crud ahead. refactor CreateFolder into Workspace?
      *   Position CreateFolder "below" relative position of parent, but
@@ -54,7 +54,7 @@
         border-radius: 3px;
         height: 40px;
         width: 100%;
-        margin-bottom: 30px;
+        margin-bottom: 20px;
       }
 
       .CreateFolder-public-private {
@@ -143,4 +143,68 @@
   color: $zorroa-gray;
   &.disabled { color: $zorroa-lightgray; }
   div { margin-left: 4px; }
+}
+
+.CreateFolder-dyhis {
+  @include flexCol;
+  margin-top: 10px;
+}
+
+.CreateFolder-dyhi {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.CreateFolder-dyhi-toggle {
+  @include flexRowCenter;
+}
+
+.CreateFolder-dyhi-icon {
+  color: $zorroa-gray;
+  margin-right: 4px;
+}
+
+.CreateFolder-dyhi-root {
+  color: $zorroa-gray;
+}
+
+.CreateFolder-dyhi-field {
+  color: $zorroa-gray;
+}
+
+.CreateFolder-dyhi-type {
+  margin-left: 10px;
+  color: $zorroa-lightgray;
+}
+
+.CreateFolder-modes {
+  @include flexRowCenter;
+  margin-bottom: 8px;
+}
+
+.CreateFolder-mode {
+  padding: 4px 8px;
+  border: 1px solid $zorroa-lightgray;
+
+  &:first-child {
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+  }
+  &:last-child {
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+  }
+  &.selected {
+    border: 1px solid $zorroa-gray;
+    background-color: $zorroa-gray;
+    color: white;
+  }
+}
+
+.CreateFolder-mode-info {
+  color: $zorroa-gray;
+  margin-left: 20px;
+  margin-right: 20px;
 }

@@ -14,6 +14,13 @@
 
   background-color: $zorroa-nearwhite;
 
+  .dark & { background-color: $zorroa-gray; }
+
+  &.isIconified {
+    cursor: e-resize;
+    &.isRightEdge { cursor: w-resize; }
+  }
+
   &.isOpen {
     min-width: $zorroa-Sidebar-width;
     max-width: 3 * $zorroa-Sidebar-width;
@@ -37,39 +44,6 @@
   }
 }
 
-.Sidebar-open-close-button {
-  font-size: 12px;
-  width: 32px;
-  height: 24px;
-  color: $zorroa-lightgray;
-  padding-left: 10px;
-  padding-right: 10px;
-  cursor: pointer;
-
-  @include flexRow;
-  @include flexAlignItemsCenter;
-  @include flexJustifyCenter;
-  @include flexOff;
-  align-self: flex-end;
-
-  &.isIconified {
-    transform: rotate(180deg);
-  }
-
-  &.isRightEdge {
-    @include flexJustifyStart;
-    transform: rotate(180deg);
-    align-self: flex-start;
-    &.isIconified {
-      transform: none;
-    }
-  }
-
-  &:hover {
-    color: $zorroa-gray;
-  }
-}
-
 .Sidebar-resize-thumb {
   position: absolute;
   top: 24px;
@@ -78,6 +52,7 @@
   height: 100%;
   cursor: col-resize;
   background: none;
+  z-index: 1;
 
   &.isRightEdge {
     // place right sidebar resizer in the sidebar's left side padding

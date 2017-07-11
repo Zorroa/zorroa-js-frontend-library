@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import JSONTree from 'react-json-tree'
 
-import { hideModal } from '../../actions/appActions'
+import { hideModal, lightbarFieldTemplate, thumbFieldTemplate, uxLevel, monochrome } from '../../actions/appActions'
 import { saveUserSettings, changePassword } from '../../actions/authAction'
 import { archivistInfo, archivistHealth, archivistMetrics } from '../../actions/archivistAction'
 import User from '../../models/User'
@@ -40,7 +40,11 @@ class Preferences extends Component {
     health: PropTypes.object,
     metrics: PropTypes.object,
     actions: PropTypes.object,
-    userSettings: PropTypes.object.isRequired
+    uxLevel: PropTypes.number,
+    monochrome: PropTypes.bool,
+    userSettings: PropTypes.object.isRequired,
+    lightbarFieldTemplate: PropTypes.string,
+    thumbFieldTemplate: PropTypes.string
   }
 
   componentDidMount () {
@@ -64,6 +68,18 @@ class Preferences extends Component {
     this.dismiss()
   }
 
+  changeThumbFieldTemplate = (event) => {
+    const thumbFieldTemplate = event.target.value
+    this.props.actions.thumbFieldTemplate(thumbFieldTemplate)
+    this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, thumbFieldTemplate })
+  }
+
+  changeLightbarFieldTemplate = (event) => {
+    const lightbarFieldTemplate = event.target.value
+    this.props.actions.lightbarFieldTemplate(lightbarFieldTemplate)
+    this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, lightbarFieldTemplate })
+  }
+
   logoutDropbox = (event) => {
     DropboxAuthenticator.deauthorize()
     this.dismiss()
@@ -79,8 +95,20 @@ class Preferences extends Component {
     this.dismiss()
   }
 
+  toggleUXLevel = (event) => {
+    const uxLevel = this.props.uxLevel === 0 ? 1 : 0
+    this.props.actions.uxLevel(uxLevel)
+    this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, uxLevel })
+  }
+
+  toggleMonochrome = (event) => {
+    const monochrome = !this.props.monochrome
+    this.props.actions.monochrome(monochrome)
+    this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, monochrome })
+  }
+
   render () {
-    const { user, info, health, metrics } = this.props
+    const { user, info, health, metrics, lightbarFieldTemplate, thumbFieldTemplate, uxLevel, monochrome } = this.props
     return (
       <div className="Preferences">
         <div className="Preferences-header">
@@ -99,8 +127,24 @@ class Preferences extends Component {
             </div>
           </div>
           <div className="Preferences-curator flexCol">
-            <button className="Preferences-reset" onClick={this.reset}>Reset Default Settings</button>
+            <button className="Preferences-reset" onClick={this.reset}>Reset Default User Settings</button>
             <button className="Preferences-reset" onClick={this.changePassword}>Change Password</button>
+            <div className="Preferences-uxlevel">
+              <input type="checkbox" className="Preferences-uxlevel-input" checked={uxLevel > 0} onClick={this.toggleUXLevel}/>
+              <div className="Preferences-uxlevel-label">Advanced Controls</div>
+            </div>
+            <div className="Preferences-monochrome">
+              <input type="checkbox" className="Preferences-monochrome-input" checked={monochrome} onClick={this.toggleMonochrome}/>
+              <div className="Preferences-monochrome-label">Monochrome</div>
+            </div>
+            <div className="Preferences-field-template">
+              <input type="text" className="Preferences-field-template-input" value={lightbarFieldTemplate} onChange={this.changeLightbarFieldTemplate}/>
+              <div className="Preferences-field-template-label">Lightbar Label</div>
+            </div>
+            <div className="Preferences-field-template">
+              <input type="text" className="Preferences-field-template-input" value={thumbFieldTemplate} onChange={this.changeThumbFieldTemplate}/>
+              <div className="Preferences-field-template-label">Thumbnail Label</div>
+            </div>
             { DropboxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutDropbox}>Logout Dropbox</button> }
             { BoxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutBox}>Logout Box</button> }
             { GDriveAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutGDrive}>Logout Google Drive</button> }
@@ -131,7 +175,11 @@ export default connect(state => ({
   info: state.archivist.info,
   health: state.archivist.health,
   metrics: state.archivist.metrics,
-  userSettings: state.app.userSettings
+  uxLevel: state.app.uxLevel,
+  monochrome: state.app.monochrome,
+  userSettings: state.app.userSettings,
+  lightbarFieldTemplate: state.app.lightbarFieldTemplate,
+  thumbFieldTemplate: state.app.thumbFieldTemplate
 }), dispatch => ({
   actions: bindActionCreators({
     saveUserSettings,
@@ -139,6 +187,10 @@ export default connect(state => ({
     archivistInfo,
     archivistHealth,
     archivistMetrics,
-    hideModal
+    hideModal,
+    lightbarFieldTemplate,
+    thumbFieldTemplate,
+    uxLevel,
+    monochrome
   }, dispatch)
 }))(Preferences)

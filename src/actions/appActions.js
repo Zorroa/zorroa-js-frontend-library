@@ -1,14 +1,16 @@
 import {
   SHOW_MODAL, HIDE_MODAL, SORT_FOLDERS,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
-  METADATA_FIELDS, LIGHTBAR_FIELDS, LIGHTBOX_METADATA,
+  METADATA_FIELDS, LIGHTBOX_METADATA,
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
   SHOW_MULTIPAGE, SHOW_PAGES, VIDEO_VOLUME,
-  HOVER_FIELD, CLEAR_HOVER_FIELD, SET_FUZZY,
+  HOVER_FIELD, CLEAR_HOVER_FIELD,
   SHOW_DIALOG_ALERT, HIDE_DIALOG_ALERT,
   SHOW_DIALOG_CONFIRM, HIDE_DIALOG_CONFIRM,
-  SHOW_DIALOG_PROMPT, HIDE_DIALOG_PROMPT
+  SHOW_DIALOG_PROMPT, HIDE_DIALOG_PROMPT,
+  THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE,
+  UX_LEVEL, MONOCHROME
 } from '../constants/actionTypes'
 
 export const MIN_THUMBSIZE = 48
@@ -142,13 +144,6 @@ export function updateMetadataFields (fields) {
   })
 }
 
-export function updateLightbarFields (fields) {
-  return ({
-    type: LIGHTBAR_FIELDS,
-    payload: fields
-  })
-}
-
 export function lightboxMetadata ({show, left, top, width, height}) {
   return ({
     type: LIGHTBOX_METADATA,
@@ -248,9 +243,30 @@ export function clearHoverField (field) {
   })
 }
 
-export function setFuzzy (fuzzy) {
+export function thumbFieldTemplate (template) {
   return ({
-    type: SET_FUZZY,
-    payload: fuzzy
+    type: THUMB_FIELD_TEMPLATE,
+    payload: template
+  })
+}
+
+export function lightbarFieldTemplate (template) {
+  return ({
+    type: LIGHTBAR_FIELD_TEMPLATE,
+    payload: template
+  })
+}
+
+export function uxLevel (level) {
+  return ({
+    type: UX_LEVEL,
+    payload: level
+  })
+}
+
+export function monochrome (state) {
+  return ({
+    type: MONOCHROME,
+    payload: state
   })
 }

@@ -3,7 +3,8 @@ import * as assert from 'assert'
 import {
   UNAUTH_USER, ASSET_SEARCH, ASSET_AGGS, ASSET_SEARCH_ERROR,
   ASSET_SORT, ASSET_ORDER, ASSET_FIELDS,
-  ASSET_PERMISSIONS, UPDATE_COMMAND, GET_COMMANDS,
+  ASSET_PERMISSIONS, ASSET_SEARCHING,
+  UPDATE_COMMAND, GET_COMMANDS,
   ISOLATE_ASSET, SELECT_ASSETS,
   SELECT_PAGES,
   SUGGEST_COMPLETIONS, SEARCH_DOCUMENT,
@@ -21,7 +22,7 @@ export function requiredFields (fields, fieldTypes) {
     'id',
     'source.filename', 'source.mediaType', 'source.extension',
     'image.width', 'image.height', 'image.pages',
-    'video.width', 'video.height', 'video.pages', 'video.frameRate', 'video.frames'
+    'video.width', 'video.height', 'video.pages', 'video.frameRate', 'video.frames', 'video.background'
   ]
   const prefix = [
     'links', 'clip', 'source.clip', 'pages', 'proxies'
@@ -132,6 +133,7 @@ export function searchAssets (query, lastQuery, force) {
       } else if (query.postFilter) {
         mainQuery.filter = query.postFilter
       }
+      if (!query.from) requestAnimationFrame(_ => { dispatch({ type: ASSET_SEARCHING, payload: true }) })
       promises.push(searchAssetsRequestProm(dispatch, mainQuery))
     }
     const aggsChanged = !lastQuery || !lastQuery.aggs || JSON.stringify(query.aggs) !== JSON.stringify(lastQuery.aggs)
@@ -145,6 +147,7 @@ export function searchAssets (query, lastQuery, force) {
     return Promise.all(promises)
     .then(responses => {
       responses.forEach(response => {
+        dispatch({ type: ASSET_SEARCHING, payload: false })
         if (response.data.aggregations) {
           const aggs = response.data.aggregations
           dispatch({
@@ -162,6 +165,7 @@ export function searchAssets (query, lastQuery, force) {
       })
     })
     .catch(error => {
+      dispatch({ type: ASSET_SEARCHING, payload: false })
       if (error.response && error.response.status === 401) {
         dispatch({
           type: UNAUTH_USER,

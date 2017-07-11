@@ -1,0 +1,100 @@
+@import '../../styles/core-mixins.scss';
+
+.Racebar {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include fullWidth;
+  z-index: 1;
+  box-shadow: 0 0 6px $zorroa-gray;
+  padding-left: 8px;
+  padding-right: 8px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+
+  .dark & {
+    background-color: black;
+    box-shadow: 0 0 6px black;
+  }
+}
+
+.Racebar-wrap {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include flexWrap;
+  @include flexOn;
+}
+
+.Racebar-right {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include fullHeight;
+  padding-left: 8px;
+  border-left: 1px solid $zorroa-nearwhite;
+  .dark & { border-left: 1px solid $zorroa-nearblack; }
+}
+
+.Racebar-widget {
+  margin: 2px 4px;
+}
+
+.Racebar-clear {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+
+  border-radius: 3px;
+  padding: 3px 7px;
+  margin: 2px 4px;
+  color: $zorroa-greyish-brown;
+  text-transform: uppercase;
+  background-color: $zorroa-lightgray;
+  border: 1px solid transparent;
+  cursor: pointer;
+
+  &:hover:not(.disabled) {
+    background-color: $zorroa-nearwhite;
+    border: 1px solid $zorroa-gray;
+    .dark & { background-color: $zorroa-darkgray; border: 1px solid $zorroa-darkgray; }
+  }
+  &.disabled { color: $zorroa-lightgray; background-color: transparent; cursor: default; }
+
+  .dark & { color: $zorroa-lightgray; background-color: $zorroa-gray; }
+  div { margin-left: 8px; }
+}
+
+.Racebar-save {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+
+  border-radius: 3px;
+  padding: 4px 8px;
+  margin: 5px 4px;
+  color: white;
+  background-color: $zorroa-water-blue;
+  text-transform: uppercase;
+  cursor: pointer;
+
+  &:hover:not(.disabled) { background-color: lighten($zorroa-water-blue, 15%); }
+  &.disabled {
+    cursor: default;
+    background-color: $zorroa-lightgray;
+
+    .dark & { color: $zorroa-gray; background-color: $zorroa-darkgray; }
+  }
+
+  div { margin-left: 8px; }
+}
+
+.Racebar-searchbar {
+  height: 30px;
+  margin-right: 8px;
+  width: 300px;
+}
+
+.Racebar-clear-icon {
+  width: 16px;
+  height: 16px;
+  margin-left: 8px;
+
+  // Won't work until we make the home button a font icon
+  .Racebar-clear.disabled & { color: $zorroa-lightgray; }
+}

@@ -13,12 +13,12 @@ import Header from '../Header'
 import Sidebar from '../Sidebar'
 import Assets from '../Assets'
 import Folders from '../Folders'
-import Racetrack from '../Racetrack'
 import Metadata from '../Metadata'
 import Metadata2 from '../Metadata2'
 import Collapsible from '../Collapsible'
-import { iconifyLeftSidebar, iconifyRightSidebar, toggleCollapsible, showModal, hideModal,
-  dialogAlertPromise, dialogConfirmPromise, dialogPromptPromise } from '../../actions/appActions'
+import ProgressBar from '../ProgressBar'
+import Racebar from '../Racetrack/Racebar'
+import { iconifyLeftSidebar, toggleCollapsible, showModal, hideModal, dialogAlertPromise, dialogConfirmPromise, dialogPromptPromise } from '../../actions/appActions'
 import { getUserPermissions, updatePassword, changePassword } from '../../actions/authAction'
 import { queueFileEntrysUpload } from '../../actions/jobActions'
 import { updateCommand, getAllCommands } from '../../actions/assetsAction'
@@ -26,6 +26,7 @@ import ChangePassword from '../auth/ChangePassword'
 import User from '../../models/User'
 import Job, { countOfJobsOfType } from '../../models/Job'
 import Asset from '../../models/Asset'
+import Folder from '../../models/Folder'
 import CommandProgress from '../Workspace/CommandProgress'
 import Lightbox from '../Lightbox'
 import Feedback from '../Feedback'
@@ -49,12 +50,15 @@ class Workspace extends Component {
     user: PropTypes.instanceOf(User),
     isolatedId: PropTypes.string,
     changePassword: PropTypes.bool,
+    searching: PropTypes.bool.isRequired,
     onboarding: PropTypes.bool,
     jobs: PropTypes.object,
     location: PropTypes.object,
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     selectedAssetIds: PropTypes.instanceOf(Set),
-    commands: PropTypes.instanceOf(Map)
+    commands: PropTypes.instanceOf(Map),
+    isAdministrator: PropTypes.bool,
+    monochrome: PropTypes.bool
   }
 
   state = {
@@ -164,12 +168,7 @@ class Workspace extends Component {
     actions.iconifyLeftSidebar(!app.leftSidebarIsIconified)
   }
 
-  toggleRightSidebar = () => {
-    const { actions, app } = this.props
-    actions.iconifyRightSidebar(!app.rightSidebarIsIconified)
-  }
-
-  static collapsibleNames = new Set(['browsing', 'collection', 'simple', 'smart', 'metadata', 'metadata2'])
+  static collapsibleNames = new Set(['library', 'home', 'simple', 'smart', 'metadata', 'metadata2'])
   toggleCollapsible = (name) => {
     const { actions, app } = this.props
     // If the Sidebar is iconified, ignore the click, the sidebar will open itself instead
@@ -276,15 +275,23 @@ class Workspace extends Component {
   }
 
   render () {
-    const { app, isolatedId, selectedAssetIds } = this.props
+    const { app, isolatedId, selectedAssetIds, user, isAdministrator, searching, monochrome } = this.props
 
-    const CollectionParams = () => ({
-      header: (<span>Collections</span>),
-      isOpen: app.collapsibleOpen.collection,
+    const LibraryParams = () => ({
+      header: (<span>Library</span>),
+      isOpen: app.collapsibleOpen.library,
       isIconified: app.leftSidebarIsIconified,
-      onOpen: this.toggleCollapsible.bind(this, 'collection'),
+      onOpen: this.toggleCollapsible.bind(this, 'library'),
+      closeIcon: 'icon-collections-smart',
+      className: 'Library-collapsible Collections-library'
+    })
+    const HomeParams = () => ({
+      header: (<span>Home</span>),
+      isOpen: app.collapsibleOpen.home,
+      isIconified: app.leftSidebarIsIconified,
+      onOpen: this.toggleCollapsible.bind(this, 'home'),
       closeIcon: 'icon-collections-simple',
-      className: 'Collections-collapsible'
+      className: 'Home-collapsible Collections-home'
     })
     const MetadataParams = () => ({
       header: (<span>Explore</span>),
@@ -311,8 +318,7 @@ class Workspace extends Component {
 
     const { isDroppable, showReloader } = this.state
     return (
-
-      <div onDragEnter={this.dragEnter} className={classnames('App', 'flexCol', 'fullHeight', {isDragging: app.dragInfo})}>
+      <div onDragEnter={this.dragEnter} className={classnames('App', 'flexCol', 'fullHeight', {isDragging: app.dragInfo, dark: monochrome})}>
         { this.renderModalTest() }
         { this.renderModal() }
         { showReloader && (
@@ -331,35 +337,36 @@ class Workspace extends Component {
 
         { command && <CommandProgress successPct={commandSuccessPct} errorPct={commandErrorPct}/>}
 
+        <Racebar/>
+        <div className="Assets-searching">
+          { searching && <ProgressBar successPct={0} errorPct={0}/> }
+        </div>
+
         <div className="Workspace flexOn flexRow fullWidth fullHeight">
 
           {/*  left panel - folders */}
           <Sidebar onToggle={this.toggleLeftSidebar}
                    isIconified={app.leftSidebarIsIconified}>
-            <Collapsible {...CollectionParams()}>
-              <Folders/>
+            <Collapsible {...LibraryParams()}>
+              <Folders rootName={isAdministrator ? undefined : 'Library'}
+                       rootId={isAdministrator ? Folder.ROOT_ID : undefined}
+                       filter={isAdministrator ? undefined : folder => (folder.name !== 'Users')}/>
+            </Collapsible>
+            <Collapsible {...HomeParams()}>
+              <Folders rootId={user.homeFolderId}/>
             </Collapsible>
             <Collapsible {...MetadataParams()}>
               <Metadata/>
             </Collapsible>
             <Collapsible {...Metadata2Params()}>
-              <Metadata2 assetIds={selectedAssetIds} height="60vh" />
+              <Metadata2 assetIds={selectedAssetIds} height="60vh" dark={monochrome} />
             </Collapsible>
           </Sidebar>
 
           <div className="Workspace-vertical-separator flexOff"/>
 
-          {/*  center panel - thumbnails */}
+          {/*  right panel - thumbnails */}
           <Assets/>
-
-          <div className="Workspace-vertical-separator flexOff"/>
-
-          {/*  right panel - racetrack (search filters) */}
-          <Sidebar onToggle={this.toggleRightSidebar}
-                   isRightEdge={true}
-                   isIconified={app.rightSidebarIsIconified}>
-            <Racetrack isIconified={app.rightSidebarIsIconified}/>
-          </Sidebar>
 
         </div>
         <div className={classnames('App-dropzone', {isDroppable})}
@@ -380,15 +387,17 @@ export default connect(state => ({
   user: state.auth.user,
   isolatedId: state.assets.isolatedId,
   changePassword: state.auth.changePassword,
+  searching: state.assets.searching,
   onboarding: state.auth.onboarding,
   assets: state.assets.all,
   selectedAssetIds: state.assets.selectedIds,
   jobs: state.jobs.all,
-  commands: state.assets.commands
+  commands: state.assets.commands,
+  isAdministrator: state.auth.isAdministrator,
+  monochrome: state.app.monochrome
 }), dispatch => ({
   actions: bindActionCreators({
     iconifyLeftSidebar,
-    iconifyRightSidebar,
     toggleCollapsible,
     getUserPermissions,
     updatePassword,

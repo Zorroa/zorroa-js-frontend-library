@@ -132,20 +132,19 @@ class QuickAddWidget extends Component {
     const { selectedWidgetInfo } = this.state
     const widgetInfos = this.widgetInfos()
     return (
-      <div className="QuickAddWidget">
-        <div className="QuickAddWidget-input-container">
+      <div className="QuickAddWidget Racebar-add-widget">
+        <div className="QuickAddWidget-input-container icon-plus">
           <input value={this.state.filterText} onChange={this.changeFilterText}
                  onKeyDown={this.keyDown} onFocus={this.focus} onBlur={this.blur}
                  className="QuickAddWidget-input"
                  placeholder="Quick Add - Widget"/>
-          <div className="icon-search"/>
         </div>
         { widgetInfos.length ? (
           <div className="QuickAddWidget-list">
             { widgetInfos.map(widgetInfo => (
               <div onMouseDown={e => this.addWidget(widgetInfo, e)}
                    style={{backgroundColor: widgetInfo.color}}
-                   className={classnames('QuickAddWidget-item', `QuickAddWidget-item-${widgetInfo.type}`,
+                   className={classnames('QuickAddWidget-item', `widget-${widgetInfo.type}`,
                      {selected: selectedWidgetInfo && widgetInfo.type === selectedWidgetInfo.type})}
                    key={widgetInfo.type}>
                 <span className={`QuickAddWidget-item-icon ${widgetInfo.icon}`}></span>

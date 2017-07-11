@@ -1,28 +1,35 @@
 import {
   SHOW_MODAL, HIDE_MODAL, SORT_FOLDERS,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
-  METADATA_FIELDS, LIGHTBAR_FIELDS, LIGHTBOX_METADATA, ASSET_FIELDS,
+  METADATA_FIELDS, LIGHTBOX_METADATA, ASSET_FIELDS,
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
   SHOW_MULTIPAGE, SHOW_PAGES, VIDEO_VOLUME,
   HOVER_FIELD, CLEAR_HOVER_FIELD,
-  USER_SETTINGS, UNAUTH_USER, SET_FUZZY,
+  USER_SETTINGS, UNAUTH_USER,
   SHOW_DIALOG_ALERT, HIDE_DIALOG_ALERT,
   SHOW_DIALOG_CONFIRM, HIDE_DIALOG_CONFIRM,
-  SHOW_DIALOG_PROMPT, HIDE_DIALOG_PROMPT
+  SHOW_DIALOG_PROMPT, HIDE_DIALOG_PROMPT,
+  THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE,
+  UX_LEVEL, MONOCHROME
 } from '../constants/actionTypes'
 import { DEFAULT_THUMBSIZE } from '../actions/appActions'
+import { parseVariables, fieldsForVariables } from '../services/jsUtil'
 
 export const defaultTableFieldWidth = 100
 export const defaultMetadataFields = [ 'source.filename', 'source.date', 'source.fileSize' ]
-export const defaultLightbarFields = [ 'source.filename', 'source.date' ]
+export const defaultLightbarFields = [ 'source.type', 'source.filename', 'source.date', 'image.width', 'image.height', 'video.width', 'video.height' ]
+export const defaultThumbFields = [ 'source.type', 'image.width', 'image.height', 'video.width', 'video.height' ]
 const initialState = {
   modal: null,
+  uxLevel: 0,
+  monochrome: false,
   leftSidebarIsIconified: false,
   rightSidebarIsIconified: true,
   collapsibleOpen: {
     browsing: false,
-    collection: false,
+    library: true,
+    home: false,
     smart: false,
     simple: false,
     metadata: false,
@@ -33,6 +40,7 @@ const initialState = {
   },
   metadataFields: [ ...defaultMetadataFields ],
   lightbarFields: [ ...defaultLightbarFields ],
+  thumbFields: [ ...defaultThumbFields ],
   lightboxMetadata: { show: false, left: 20, top: 80, width: 300, height: 500 },
   tableFieldWidth: Object.assign({},
     ...defaultMetadataFields.map(field => ({ [field]: defaultTableFieldWidth }))),
@@ -45,14 +53,15 @@ const initialState = {
   showPages: false,
   sortFolders: 'alpha-asc',
   hoverFields: new Set(),
+  thumbFieldTemplate: '${image.width|video.width}x${image.height|video.height} ${source.type}',
+  lightbarFieldTemplate: '${source.type} ${source.filename} ${image.width|video.width}x${image.height|video.height} ${source.date}',
   userSettings: {
     metadataFields: [ ...defaultMetadataFields ],
     showTable: false,
     tableHeight: 300,
     thumbSize: DEFAULT_THUMBSIZE,
     thumbLayout: 'masonry',
-    videoVolume: 0.8,
-    fuzzy: false
+    videoVolume: 0.8
   }
 }
 
@@ -99,8 +108,6 @@ export default function app (state = initialState, action) {
         ...state.tableFieldWidth
       }
       return { ...state, metadataFields: action.payload, tableFieldWidth }
-    case LIGHTBAR_FIELDS:
-      return { ...state, lightbarFields: action.payload }
     case LIGHTBOX_METADATA:
       return { ...state, lightboxMetadata: action.payload }
     case SET_DRAGGING:
@@ -133,8 +140,22 @@ export default function app (state = initialState, action) {
       hoverFields.delete(action.payload)
       return { ...state, hoverFields }
     }
-    case SET_FUZZY:
-      return { ...state, fuzzy: action.payload }
+    case THUMB_FIELD_TEMPLATE: {
+      const thumbFieldTemplate = action.payload
+      const thumbFields = fieldsForVariables(parseVariables(thumbFieldTemplate))
+      return { ...state, thumbFieldTemplate, thumbFields }
+    }
+    case LIGHTBAR_FIELD_TEMPLATE: {
+      const lightbarFieldTemplate = action.payload
+      const lightbarFields = fieldsForVariables(parseVariables(lightbarFieldTemplate))
+      return { ...state, lightbarFieldTemplate, lightbarFields }
+    }
+    case UX_LEVEL: {
+      return { ...state, uxLevel: action.payload }
+    }
+    case MONOCHROME: {
+      return { ...state, monochrome: action.payload }
+    }
     case USER_SETTINGS:
       return { ...state, userSettings: action.payload.metadata }
     case UNAUTH_USER:

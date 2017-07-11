@@ -1,14 +1,13 @@
 import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import * as assert from 'assert'
 import classnames from 'classnames'
 
 import { createRangeWidget } from '../../models/Widget'
 import Asset from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
 import { RangeWidgetInfo } from './WidgetInfo'
-import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
+import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import Widget from './Widget'
 import { unCamelCase } from '../../services/jsUtil'
 import Resizer from '../../services/Resizer'
@@ -38,84 +37,65 @@ class Range extends Component {
     actions: PropTypes.object.isRequired,
     id: PropTypes.number.isRequired,
     isIconified: PropTypes.bool.isRequired,
+    isOpen: PropTypes.bool.isRequired,
+    onOpen: PropTypes.func,
+    floatBody: PropTypes.bool.isRequired,
     widgets: PropTypes.arrayOf(PropTypes.object)
   }
 
   resizer = null
 
   state = {
-    isEnabled: true,
     field: '',
-    min: null, // min threshold (greater than)
-    max: null, // max threshold (less than)
-    minStr: null,
-    maxStr: null,
-    autoMin: null,
-    autoMax: null,
-    prevAutoMin: null,
-    prevAutoMax: null,
-    usePrefix: 'none', // whether to show large numbers in prefix form  none / decimal / binary
-    syncRangeWithAutoRange: false
-  }
-
-  setStatePromise = (newState) => {
-    return new Promise(resolve => this.setState(newState, resolve))
+    min: undefined, // min threshold (greater than)
+    max: undefined, // max threshold (less than)
+    usePrefix: 'none' // whether to show large numbers in prefix form  none / decimal / binary
   }
 
   // If the query is changed elsewhere, e.g. from the Searchbar,
   // capture the new props and update our local state to match.
   syncWithAppState (nextProps) {
-    if (!this.state.isEnabled) return
     const { id, widgets } = nextProps
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
+
     if (widget && widget.sliver) {
+      const field = widget.field
+      let min, max
       if (widget.sliver.filter && widget.sliver.filter.range) {
         const range = widget.sliver.filter.range
-        const keys = Object.keys(range)
-        assert.ok(keys.length === 1) // there should only be one entry here
-        const field = keys[0]
-        let min = range[field].gte
-        let max = range[field].lte
-        let reQuery = (field !== this.state.field || min !== this.state.min || max !== this.state.max)
-
-        // search for our auto range
-        if (nextProps.aggs) {
-          const agg = nextProps.aggs[id]
-          if (agg && agg[field]) {
-            let autoMin = Math.min(agg[field].min, this.state.min)
-            let autoMax = Math.max(agg[field].max, this.state.max)
-
-            if (isNumeric(autoMin) && isNumeric(autoMax)) {
-              if (autoMin === autoMax) {
-                autoMin -= 0.001
-                autoMax += 0.001
-              }
-              this.setState({ autoMin, autoMax })
-              if (this.state.syncRangeWithAutoRange) {
-                min = autoMin
-                max = autoMax
-                reQuery = true
-                this.setState({ syncRangeWithAutoRange: false })
-              }
-            }
-          }
-        } else if (!this.state.syncRangeWithAutoRange) {
-          min = Number.MAX_SAFE_INTEGER
-          max = -Number.MAX_SAFE_INTEGER
-          this.setStatePromise({ min, max, syncRangeWithAutoRange: true })
-            .then(() => { this.modifySliver() })
-        }
-
+        min = range[field].gte
+        max = range[field].lte
         const usePrefix = field && field.length && field === 'source.fileSize' ? 'bin' : null
-        const minStr = min !== undefined ? this.valToString(min) : null
-        const maxStr = max !== undefined ? this.valToString(max) : null
-        this.setStatePromise({ field, min, max, minStr, maxStr, usePrefix })
-          .then(() => { if (reQuery) this.modifySliver() })
+        this.setState({field, min, max, usePrefix})
+      } else {
+        this.setState({field})
       }
-    } else {
-      this.removeFilter()
+    } else if (nextProps.aggs) {
+      const field = this.aggField(nextProps)
+      if (field && (!this.state.field || field !== this.state.field)) {
+        const range = this.aggRange(field)
+        if (range) this.setState({field, min: range.min, max: range.max})
+      }
     }
+  }
+
+  aggField = (props) => {
+    const { aggs, id } = props
+    if (!aggs) return
+    const agg = aggs[id]
+    if (!agg) return
+    const keys = Object.keys(agg)
+    const idx = keys.findIndex(key => typeof agg[key] === 'object')
+    return keys[idx]
+  }
+
+  aggRange = (field) => {
+    const { aggs, id } = this.props
+    if (!aggs) return
+    const agg = aggs[id]
+    if (!agg) return
+    return agg[field]
   }
 
   componentWillReceiveProps (nextProps) {
@@ -131,22 +111,19 @@ class Range extends Component {
     this.resizer.release()
   }
 
-  // Remove our sliver if the close button in our header is clicked
-  removeFilter = () => {
-    this.props.actions.removeRacetrackWidgetIds([this.props.id])
-  }
-
-  toggleEnabled = () => {
-    this.setStatePromise({isEnabled: !this.state.isEnabled})
-    .then(this.modifySliver)
-  }
-
   modifySliver = () => {
-    const { field, min, max, isEnabled } = this.state
-    if (!field) return
-    const widget = createRangeWidget(field, 'double', min, max)
+    const { id, widgets } = this.props
+    const index = widgets && widgets.findIndex(widget => (id === widget.id))
+    const oldWidget = widgets && widgets[index]
+    let isEnabled, isPinned
+    if (oldWidget) {
+      isEnabled = oldWidget.isEnabled
+      isPinned = oldWidget.isPinned
+    }
+    const { field, min, max } = this.state
+    if (!field || min === undefined || min === null || max === undefined || max === null) return
+    const widget = createRangeWidget(field, 'double', min, max, isEnabled, isPinned)
     widget.id = this.props.id
-    widget.isEnabled = isEnabled
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
@@ -190,7 +167,7 @@ class Range extends Component {
   }
 
   valToString = (val) => {
-    if (val === null) return null
+    if (val === null || val === undefined) return null
     const { usePrefix } = this.state
     let str
     if (usePrefix in prefixes) {
@@ -211,29 +188,41 @@ class Range extends Component {
   }
 
   minStart = (event) => {
-    this.resizer.capture(this.minUpdate, this.minStop,
-      this.state.min, 0,
-      (this.state.autoMax - this.state.autoMin) / this.refs.rangeSliderBox.clientWidth, 0)
+    const range = this.aggRange(this.aggField(this.props))
+    if (range) {
+      const min = this.state.min === undefined ? range.min : this.state.min
+      this.resizer.capture(this.minUpdate, this.minStop,
+        min, 0,
+        (range.max - range.min) / this.refs.rangeSliderBox.clientWidth, 0)
+    }
   }
   minUpdate = (x, y) => {
-    const min = Math.min(this.state.autoMax, Math.max(this.state.autoMin, x))
-    const max = Math.max(this.state.max, min) // let this handle push the other one around
-    this.setState({ min, minStr: this.valToString(min), max, maxStr: this.valToString(max) })
+    const range = this.aggRange(this.aggField(this.props))
+    const min = Math.min(range.max, Math.max(range.min, x))
+    const max = Math.max(this.state.max === undefined ? range.max : this.state.max, min) // let this handle push the other one around
+    this.setState({ min, max })
   }
   minStop = (event) => {
     this.modifySliver()
   }
 
   maxStart = (event) => {
-    this.resizer.capture(this.maxUpdate, this.maxStop,
-      this.state.max, 0,
-      (this.state.autoMax - this.state.autoMin) / this.refs.rangeSliderBox.clientWidth, 0)
+    const range = this.aggRange(this.aggField(this.props))
+    if (range) {
+      const max = this.state.max === undefined ? range.max : this.state.max
+      this.resizer.capture(this.maxUpdate, this.maxStop,
+        max, 0,
+        (range.max - range.min) / this.refs.rangeSliderBox.clientWidth, 0)
+    }
   }
+
   maxUpdate = (x, y) => {
-    const max = Math.min(this.state.autoMax, Math.max(this.state.autoMin, x))
-    const min = Math.min(this.state.min, max) // let this handle push the other one around
-    this.setState({ min, minStr: this.valToString(min), max, maxStr: this.valToString(max) })
+    const range = this.aggRange(this.aggField(this.props))
+    const max = Math.min(range.max, Math.max(range.min, x))
+    const min = Math.min(this.state.min === undefined ? range.min : this.state.min, max) // let this handle push the other one around
+    this.setState({ min, max })
   }
+
   maxStop = (event) => {
     this.modifySliver()
   }
@@ -241,26 +230,25 @@ class Range extends Component {
   resetAutoRange = (event) => {
     const { field } = this.state
     window.getSelection().removeAllRanges()
-    this.setStatePromise({
-      field,
-      min: null,
-      max: null,
-      minStr: null,
-      maxStr: null,
-      autoMin: null,
-      autoMax: null,
-      syncRangeWithAutoRange: true
-    })
-    .then(this.modifySliver)
+    const range = this.aggRange(field)
+    if (range) {
+      const min = range.min
+      const max = range.max
+      this.setState({ min, max })
+    }
   }
 
   render () {
-    const { isIconified, id } = this.props
-    const { isEnabled, field } = this.state
-    const title = Asset.lastNamespace(unCamelCase(field))
+    const { isIconified, id, floatBody, isOpen, onOpen } = this.props
+    const { field } = this.state
 
-    const { min, max, minStr, maxStr, autoMin, autoMax, prevAutoMin, prevAutoMax } = this.state
-
+    const range = this.aggRange(field)
+    const min = this.state.min === undefined ? range && range.min : this.state.min
+    const max = this.state.max === undefined ? range && range.max : this.state.max
+    const minStr = this.valToString(min)
+    const maxStr = this.valToString(max)
+    const autoMin = range && range.min
+    const autoMax = range && range.max
     let renderSlider = isNumeric(min) && isNumeric(max) &&
       isNumeric(autoMin) && isNumeric(autoMax) &&
       (autoMax > autoMin) && (max >= min)
@@ -269,27 +257,26 @@ class Range extends Component {
     const ltPct = w > 0 ? (max - autoMin) / w : 0
     const gtPct = w > 0 ? (min - autoMin) / w : 0
 
-    const autoMinChanged = (prevAutoMin !== autoMin)
-    const autoMaxChanged = (prevAutoMax !== autoMax)
-    if (autoMinChanged || autoMaxChanged) {
-      requestAnimationFrame(() => { this.setState({ prevAutoMin: autoMin, prevAutoMax: autoMax }) })
-    }
-
+    const active = min !== undefined && min !== null && max !== undefined && max !== null
+    const lastName = Asset.lastNamespace(unCamelCase(field))
+    const title = active ? (isOpen ? lastName : undefined) : undefined
+    const label = active ? (isOpen ? undefined : `${this.valToString(min)} → ${this.valToString(max)}`) : lastName
     return (
       <Widget className='Range'
-              title={RangeWidgetInfo.title}
-              field={title}
+              id={id}
+              isOpen={isOpen}
+              onOpen={onOpen}
+              floatBody={floatBody}
+              title={title}
+              field={label}
               backgroundColor={RangeWidgetInfo.color}
-              isEnabled={isEnabled}
-              enableToggleFn={this.toggleEnabled}
               isIconified={isIconified}
-              icon={RangeWidgetInfo.icon}
-              onClose={this.removeFilter.bind(this)}>
+              icon={RangeWidgetInfo.icon}>
         <div className="Range-body">
 
           <div className="Range-row flexRowCenter">
             <div className="flexRowCenter flexOn">
-              <span className="Range-label">min</span>
+              <div className="Range-label">min</div>
               <input id={`Range-min-${id}`}
                      className='flexOn'
                      placeholder={'min'}
@@ -303,7 +290,7 @@ class Range extends Component {
             <div style={{width: '20px'}}/>
 
             <div className="flexRowCenter flexOn">
-              <span className="Range-label">max</span>
+              <div className="Range-label">max</div>
               <input id={`Range-min-${id}`}
                      className='flexOn'
                      placeholder={'max'}
@@ -342,18 +329,18 @@ class Range extends Component {
 
           <div className="Range-auto-box">
             <div className="Range-auto-label-box Range-auto-label-box-min">
-            <div className={classnames('Range-auto-label', 'Range-auto-min', { changed: autoMinChanged })}>
+            <div className={classnames('Range-auto-label', 'Range-auto-min', { changed: false })}>
               {this.valToString(autoMin)}
             </div>
             </div>
             { (min !== autoMin || max !== autoMax) && (
               <div className="Range-auto-reset" onClick={this.resetAutoRange}>
-                <span>Reset range</span>
+                <div>Reset range</div>
                 <div className="Range-auto-reset-button icon-cancel-circle"/>
               </div>
             )}
             <div className="Range-auto-label-box Range-auto-label-box-max">
-            <div className={classnames('Range-auto-label', 'Range-auto-max', { changed: autoMaxChanged })}>
+            <div className={classnames('Range-auto-label', 'Range-auto-max', { changed: false })}>
               {this.valToString(autoMax)}
             </div>
             </div>
@@ -366,7 +353,7 @@ class Range extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({ modifyRacetrackWidget, removeRacetrackWidgetIds }, dispatch)
+  actions: bindActionCreators({ modifyRacetrackWidget }, dispatch)
 })
 
 const mapStateToProps = state => ({

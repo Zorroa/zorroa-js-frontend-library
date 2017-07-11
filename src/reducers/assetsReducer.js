@@ -2,7 +2,8 @@ import {
   ASSET_SEARCH, ASSET_AGGS, ASSET_SEARCH_ERROR,
   ASSET_SORT, ASSET_ORDER, ASSET_FIELDS,
   SIMILAR_VALUES, SIMILAR_ASSETS,
-  ASSET_PERMISSIONS, UPDATE_COMMAND, GET_COMMANDS,
+  ASSET_PERMISSIONS, ASSET_SEARCHING,
+  UPDATE_COMMAND, GET_COMMANDS,
   ISOLATE_ASSET, SELECT_ASSETS, SELECT_PAGES,
   ADD_ASSETS_TO_FOLDER, REMOVE_ASSETS_FROM_FOLDER,
   SUGGEST_COMPLETIONS, SEARCH_DOCUMENT, UNAUTH_USER
@@ -16,6 +17,7 @@ const initialState = {
   // These "counters" increment whenever the query or selection changes.
   // The value itself has no meaning, these are used to respond to query
   // or selection changes. (See Assets & Table for examples)
+  searching: false,
   assetsCounter: 0,
   selectionCounter: 0,
   commands: new Map(),
@@ -95,8 +97,10 @@ export default function (state = initialState, action) {
       return { ...state, order: action.payload, similar: [] }
 
     case SIMILAR_VALUES:
-      const hashes = action.payload
-      if (hashes.length) return { ...state, order: null }
+      if (action.payload) {
+        const hashes = action.payload.values
+        if (hashes.length) return { ...state, order: null }
+      }
       break
 
     case SIMILAR_ASSETS:
@@ -108,6 +112,9 @@ export default function (state = initialState, action) {
       Object.keys(fields).forEach(type => { fields[type].forEach(field => { types[field] = type }) })
       return { ...state, fields, types }
     }
+
+    case ASSET_SEARCHING:
+      return { ...state, searching: action.payload }
 
     case ISOLATE_ASSET:
       return { ...state, isolatedId: action.payload, pages: action.payload ? state.pages : null }

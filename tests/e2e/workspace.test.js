@@ -48,9 +48,7 @@ describe('Workspace', function () {
 
   it('check basic workspace layout', function () {
     var leftSidebar
-    var leftSidebarToggle
-    var rightSidebar
-    var rightSidebarToggle
+    var racebar
 
     return driver
     .then(_ => { DEBUG && console.log('------ check basic workspace layout') })
@@ -68,45 +66,21 @@ describe('Workspace', function () {
     .then(_ => { DEBUG && console.log('Snag the sidebar elements, make sure theyre visible') })
     .then(_ => driver.findElement(By.css('.Sidebar:not(.isRightEdge)')))
       .then(e => { leftSidebar = e })
-    .then(_ => leftSidebar.findElement(By.css('.Sidebar-open-close-button')))
-      .then(e => { leftSidebarToggle = e })
 
-    .then(_ => driver.findElement(By.css('.Sidebar.isRightEdge')))
-      .then(e => { rightSidebar = e })
-    .then(_ => rightSidebar.findElement(By.css('.Sidebar-open-close-button')))
-      .then(e => { rightSidebarToggle = e })
+    .then(_ => driver.findElement(By.css('.Racebar')))
+      .then(e => { racebar = e })
     .then(_ => {
       var proms = []
       proms.push(selenium.expectElementVisibleToBe(true, leftSidebar, 'leftSidebar'))
-      proms.push(selenium.expectElementVisibleToBe(true, leftSidebarToggle, 'leftSidebarToggle'))
-      proms.push(selenium.expectElementVisibleToBe(true, rightSidebar, 'rightSidebarToggle'))
-      proms.push(selenium.expectElementVisibleToBe(true, rightSidebarToggle, 'rightSidebarToggle'))
+      proms.push(selenium.expectElementVisibleToBe(true, racebar, 'rightSidebarToggle'))
       return Promise.all(proms)
     })
 
     .then(_ => { DEBUG && console.log('Make sure left sidebar is open, right sidebar is closed') })
     .then(_ => leftSidebar.getSize())
       .then(({width, height}) => { expect(width).toBeGreaterThan(100) })
-    .then(_ => rightSidebar.getSize())
-      .then(({width, height}) => { expect(width).toBeLessThan(100) })
-
-    .then(_ => { DEBUG && console.log('toggle both sidebars') })
-    .then(_ => {
-      leftSidebarToggle.click()
-      rightSidebarToggle.click()
-    })
-
-    .then(_ => { DEBUG && console.log('Make sure left sidebar is closed, right sidebar is open') })
-    .then(_ => leftSidebar.getSize())
-      .then(({width, height}) => { expect(width).toBeLessThan(100) })
-    .then(_ => rightSidebar.getSize())
-      .then(({width, height}) => { expect(width).toBeGreaterThan(100) })
-
-    .then(_ => { DEBUG && console.log('toggle both sidebars again, return to default state') })
-    .then(_ => {
-      leftSidebarToggle.click()
-      rightSidebarToggle.click()
-    })
+    .then(_ => racebar.getSize())
+      .then(({width, height}) => { expect(width).toBeGreaterThan(100); expect(height).toBeLessThan(50) })
   })
 
   it('test the Searchbar', function () {
@@ -182,8 +156,8 @@ describe('Workspace', function () {
   it('command progress', () => {
     return driver
       .then(_ => { DEBUG && console.log('command progress') })
-      .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.header-menu-Import')))
-      .then(_ => selenium.clickSelector(By.css('.header-menu-Import')))
+      .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.header-menu-Import .DropdownMenu')))
+      .then(_ => selenium.clickSelector(By.css('.header-menu-Import .DropdownMenu')))
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.JobMenu-permissions')))
       .then(_ => selenium.clickSelector(By.css('.JobMenu-permissions')))
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.AssetPermissions')))
@@ -195,21 +169,20 @@ describe('Workspace', function () {
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.AssetPermissions-apply')))
       .then(_ => selenium.clickSelector(By.css('.AssetPermissions-apply')))
       .then(_ => { DEBUG && console.log('command progress - started command') })
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.CommandProgress-progress-bar')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.ProgressBar')))
       .then(_ => driver.sleep(5000)) // progress bar is supposed to be visible for 5 seconds
-      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.CommandProgress-progress-bar')))
+      .then(_ => { DEBUG && console.log('command progress - woke up') })
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.ProgressBar')))
+      .then(_ => { DEBUG && console.log('command progress - finished') })
   })
 
   it('log out', () => {
-    let url
-
     return driver
     .then(_ => { DEBUG && console.log('log out') })
-    .then(_ => driver.getCurrentUrl().then(u => { url = u }))
     .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.header-menu-user')))
     .then(_ => selenium.clickSelector(By.css('.header-menu-user')))
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.header-menu-logout')))
     .then(_ => selenium.clickSelector(By.css('.header-menu-logout')))
-    .then(_ => selenium.waitForUrl(`${url}signin`, 15000))
+    .then(_ => selenium.waitForUrl(`${selenium.BASE_URL}/signin`, 15000))
   })
 })

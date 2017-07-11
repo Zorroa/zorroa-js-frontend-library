@@ -1,5 +1,4 @@
 import React from 'react'
-import SimpleSearch from './SimpleSearch'
 import Facet from './Facet'
 import Map from './Map'
 import Color from './Color'
@@ -8,9 +7,13 @@ import Range from './Range'
 import Filetype from './Filetype'
 import DateRange from './DateRange'
 import SimilarHash from './SimilarHash'
+import Collections from './Collections'
+import SortOrder from './SortOrder'
 import { createFacetWidget, createMapWidget, createColorWidget,
   createDateRangeWidget, createRangeWidget, createSimilarityWidget,
-  createFiletypeWidget, createExistsWidget, createSearchWidget } from '../../models/Widget'
+  createFiletypeWidget, createExistsWidget, createSearchWidget,
+  createCollectionsWidget, createSortOrderWidget
+} from '../../models/Widget'
 
 // Pick colors from the style guide
 // https://projects.invisionapp.com/d/main#/console/8609824/184395417/preview
@@ -20,10 +23,9 @@ export const SimpleSearchWidgetInfo = {
   icon: 'icon-search',
   title: 'Search',
   description: 'Fuzzy text search on keywords or specific fields',
-  element: <SimpleSearch/>,
   create: createSearchWidget,
-  fieldTypes: [ 'string' ],
-  color: '#73b61c' // $zorroa-sickly-green
+  fieldTypes: [ 'string', 'keywords-auto' ],
+  color: '#77804d'
 }
 
 export const FacetWidgetInfo = {
@@ -33,8 +35,8 @@ export const FacetWidgetInfo = {
   description: 'Match keywords and specific values for specific fields',
   element: <Facet/>,
   create: createFacetWidget,
-  fieldTypes: [ 'string', 'long', 'double', 'integer', 'date', 'boolean' ],
-  color: '#a11d77' // zorroa-darkish-purple
+  fieldTypes: [ 'string', 'keywords-auto', 'long', 'double', 'integer', 'date', 'boolean' ],
+  color: '#824196'
 }
 
 export const MapWidgetInfo = {
@@ -45,18 +47,18 @@ export const MapWidgetInfo = {
   element: <Map/>,
   create: createMapWidget,
   fieldTypes: [ 'point' ],
-  color: '#785549'
+  color: '#744E19'
 }
 
 export const ColorWidgetInfo = {
   type: 'COLOR',
   icon: 'icon-eyedropper',
-  title: 'Color Search',
+  title: 'Colors',
   description: 'Search by color',
   fieldTypes: [ 'nested' ],
   element: <Color/>,
   create: createColorWidget,
-  color: '#fc6c2c' // $zorroa-orangish
+  color: '#EE7F29'
 }
 
 export const ExistsWidgetInfo = {
@@ -67,7 +69,7 @@ export const ExistsWidgetInfo = {
   element: <Exists/>,
   create: createExistsWidget,
   fieldTypes: null,
-  color: '#a11e77' // $zorroa-darkish-purple
+  color: '#579760'
 }
 
 export const RangeWidgetInfo = {
@@ -78,7 +80,7 @@ export const RangeWidgetInfo = {
   element: <Range/>,
   create: createRangeWidget,
   fieldTypes: [ 'long', 'integer', 'double' ],
-  color: '#1875d1' // $zorroa-water-blue
+  color: '#D63D41'
 }
 
 export const FiletypeWidgetInfo = {
@@ -89,7 +91,7 @@ export const FiletypeWidgetInfo = {
   element: <Filetype/>,
   create: createFiletypeWidget,
   fieldTypes: [],
-  color: '#ef4487'
+  color: '#A672B6'
 }
 
 export const DateRangeWidgetInfo = {
@@ -100,7 +102,7 @@ export const DateRangeWidgetInfo = {
   element: <DateRange/>,
   create: createDateRangeWidget,
   fieldTypes: [ 'date' ],
-  color: '#1875d1' // $zorroa-water-blue
+  color: '#387CA3'
 }
 
 export const SimilarHashWidgetInfo = {
@@ -111,6 +113,28 @@ export const SimilarHashWidgetInfo = {
   element: <SimilarHash/>,
   create: createSimilarityWidget,
   fieldTypes: [],
-  fieldRegex: /^Similarity\..+/,
-  color: '#a11e77' // $zorroa-darkish-purple
+  fieldRegex: /^similarity\..+/i,
+  color: '#39897E'
+}
+
+export const CollectionsWidgetInfo = {
+  type: 'COLLECTIONS',
+  icon: 'icon-folder-subfolders',
+  title: 'Collections',
+  description: 'Search within a folder',
+  element: <Collections/>,
+  create: createCollectionsWidget,
+  fieldTypes: [],
+  color: '#445FAA'
+}
+
+export const SortOrderWidgetInfo = {
+  type: 'SORTORDER',
+  icon: 'icon-sort',
+  title: 'Sort Order',
+  description: 'Sort matching assets',
+  element: <SortOrder/>,
+  create: createSortOrderWidget,
+  fieldTypes: [],
+  color: '#DCBA22'
 }

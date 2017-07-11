@@ -77,18 +77,6 @@ describe('Tags', function () {
     return driver
   }
 
-  // open the racetrack panel if needed
-  var openRacetrack = function () {
-    return driver
-    .then(_ => { DEBUG && console.log('open the racetrack sidebar', Date.now()) })
-    .then(_ => selenium.doesSelectorHaveClass(By.css('.Sidebar .isRightEdge'), 'isOpen'))
-      .then(isOpen => {
-        if (isOpen) return driver
-        return selenium.clickSelector(By.css('.Sidebar .isRightEdge'))
-        .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack-empty')))
-      })
-  }
-
   it('user logs in', function () {
     return driver
     .then(_ => { DEBUG && console.log('--- user logs in') })
@@ -170,7 +158,6 @@ describe('Tags', function () {
     return driver
     .then(_ => { DEBUG && console.log('--- check tag widget buttons') })
     .then(_ => openAllTags())
-    .then(_ => openRacetrack())
     .then(_ => selenium.waitForIdle(5000))
 
     .then(_ => { DEBUG && console.log('make sure colors tag bring up color widget') })
@@ -179,8 +166,8 @@ describe('Tags', function () {
       .then(ele => ele.click())
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Color')), 5000)
     // .then(_ => selenium.expectSelectorHasClassToBe(true, By.css('.Metadata-item-colors'), '.isSelected'))
-    .then(_ => selenium.clickSelector(By.css('.Metadata-item-colors')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack-empty')), 5000)
+    .then(_ => selenium.clickSelector(By.css('.Metadata-item-colors .Metadata-left')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Racebar-widget .Widget')))
 
     .then(_ => { DEBUG && console.log('open source tag folder') })
     .then(_ => selenium.getTagNamed('Source').then(ele => ele.click()))
@@ -198,14 +185,16 @@ describe('Tags', function () {
     // .then(_ => driver.findElement(By.css('.Metadata-item-source-basename.isLeaf')))
     //   .then(ele => ele.getLocation())
     //   .then(loc => driver.actions().mouseMove(loc).perform())
-    .then(_ => selenium.waitForSelectorHasClassToBe(true, By.css('.Racetrack-widget'), 'hoverField', 10000))
-    .then(_ => driver.findElement(By.css('.Metadata-item-source.isOpen')))
-      .then(ele => ele.getLocation())
-      .then(loc => driver.actions().mouseMove(loc).perform())
-    .then(_ => selenium.waitForSelectorHasClassToBe(false, By.css('.Racetrack-widget'), 'hoverField', 10000))
+    .then(_ => selenium.waitForSelectorHasClassToBe(true, By.css('.Racebar-widget'), 'hoverField', 10000))
+    // .then(_ => driver.findElement(By.css('.Metadata-item-source.isOpen')))
+    //   .then(ele => ele.getLocation())
+    //   .then(loc => driver.actions().mouseMove(loc).perform())
+    // .then(_ => { DEBUG && console.log('make sure hovering disappears') })
+    // .then(_ => selenium.waitForSelectorHasClassToBe(false, By.css('.Racebar-widget'), 'hoverField', 10000))
     .then(_ => { DEBUG && console.log('delete facet widget') })
-    .then(_ => selenium.clickSelector(By.css('.Widget.Facet .WidgetHeader-close')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack-empty')))
+    .then(_ => driver.findElement(By.css('.Widget.Facet .WidgetHeader-close')))
+      .then(ele => ele.click())
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Racebar-widget .Widget')))
 
     .then(_ => { DEBUG && console.log('favorite the source tag') })
     .then(_ => selenium.clickSelector(By.css('.Metadata-item-source.isOpen .Metadata-item-favorite:not(.isSelected)')))
@@ -222,8 +211,9 @@ describe('Tags', function () {
     .then(_ => selenium.clickSelector(By.css('.Metadata-item-source-date .Metadata-item-widget')))
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.DateRange')))
     .then(_ => { DEBUG && console.log('delete daterange widget') })
-    .then(_ => selenium.clickSelector(By.css('.Widget.DateRange .WidgetHeader-close')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack-empty')))
+    .then(_ => driver.findElement(By.css('.Widget.DateRange .WidgetHeader-close')))
+      .then(ele => ele.click())
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Racebar-widget .Widget')))
 
     .then(_ => { DEBUG && console.log('make sure source.fileSize tag brings up range widget') })
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Metadata-item-source-fileSize')))
@@ -231,8 +221,9 @@ describe('Tags', function () {
     .then(_ => selenium.clickSelector(By.css('.Metadata-item-source-fileSize .Metadata-item-widget')))
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Range')))
     .then(_ => { DEBUG && console.log('delete Range widget') })
-    .then(_ => selenium.clickSelector(By.css('.Widget.Range .WidgetHeader-close')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack-empty')))
+    .then(_ => driver.findElement(By.css('.WidgetHeader-close')))
+      .then(ele => ele.click())
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Racebar-widget .Widget')))
 
     .then(_ => { DEBUG && console.log('make sure source.extension tag brings up range widget') })
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Metadata-item-source-extension')))
@@ -240,8 +231,9 @@ describe('Tags', function () {
     .then(_ => selenium.clickSelector(By.css('.Metadata-item-source-extension .Metadata-item-widget')))
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Filetype')))
     .then(_ => { DEBUG && console.log('delete Filetype widget') })
-    .then(_ => selenium.clickSelector(By.css('.Widget.Filetype .WidgetHeader-close')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racetrack-empty')))
+    .then(_ => driver.findElement(By.css('.Widget.Filetype .WidgetHeader-close')))
+      .then(ele => ele.click())
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Racebar-widget .Widget')))
 
     .then(_ => { DEBUG && console.log('unfavorite the source tag') })
     .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Metadata-item-source.isOpen .Metadata-item-favorite.isSelected')))

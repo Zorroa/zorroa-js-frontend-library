@@ -6,7 +6,8 @@ import {
   AUTH_USER, UNAUTH_USER, AUTH_ORIGIN, AUTH_ERROR, USER_SETTINGS,
   AUTH_PERMISSIONS, AUTH_SYNC, METADATA_FIELDS, AUTH_ONBOARDING, AUTH_HMAC,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT, SET_TABLE_FIELD_WIDTH,
-  SHOW_MULTIPAGE, VIDEO_VOLUME, AUTH_CHANGE_PASSWORD, AUTH_DEFAULTS, LIGHTBAR_FIELDS
+  SHOW_MULTIPAGE, VIDEO_VOLUME, AUTH_CHANGE_PASSWORD, AUTH_DEFAULTS,
+  UX_LEVEL, MONOCHROME, THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE
 } from '../constants/actionTypes'
 import { USER_ITEM, ORIGIN_ITEM } from '../constants/localStorageItems'
 import User from '../models/User'
@@ -160,26 +161,35 @@ function authorize (dispatch, json, source) {
     if (metadata.thumbSize) {
       dispatch({type: THUMB_SIZE, payload: metadata.thumbSize})
     }
-    if (metadata.thumbLayout) {
+    if (metadata.thumbLayout !== undefined) {
       dispatch({type: THUMB_LAYOUT, payload: metadata.thumbLayout})
     }
-    if (metadata.showTable) {
+    if (metadata.showTable !== undefined) {
       dispatch({type: SHOW_TABLE, payload: metadata.showTable})
     }
     if (metadata.tableHeight) {
       dispatch({type: TABLE_HEIGHT, payload: metadata.tableHeight})
     }
-    if (metadata.showMultipage) {
+    if (metadata.showMultipage !== undefined) {
       dispatch({type: SHOW_MULTIPAGE, payload: metadata.showMultipage})
     }
-    if (metadata.videoVolume) {
+    if (metadata.videoVolume !== undefined) {
       dispatch({type: VIDEO_VOLUME, payload: metadata.videoVolume})
     }
     if (metadata.tableFieldWidths) {
       dispatch({type: SET_TABLE_FIELD_WIDTH, payload: metadata.tableFieldWidths})
     }
-    if (metadata.lightbarFields) {
-      dispatch({type: LIGHTBAR_FIELDS, payload: metadata.lightbarFields})
+    if (metadata.uxLevel !== undefined) {
+      dispatch({type: UX_LEVEL, payload: metadata.uxLevel})
+    }
+    if (metadata.monochrome !== undefined) {
+      dispatch({type: MONOCHROME, payload: metadata.monochrome})
+    }
+    if (metadata.thumbFieldTemplate !== undefined) {
+      dispatch({type: THUMB_FIELD_TEMPLATE, payload: metadata.thumbFieldTemplate})
+    }
+    if (metadata.lightbarFieldTemplate !== undefined) {
+      dispatch({type: LIGHTBAR_FIELD_TEMPLATE, payload: metadata.lightbarFieldTemplate})
     }
   }
   const url = source && source.length ? '?source=' + source : ''

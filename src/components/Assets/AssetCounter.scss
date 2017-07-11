@@ -11,15 +11,19 @@
   }
 
   .asset-counter-of {
+    .dark & { color: $zorroa-dimgray; }
     &:after {
       content: ' of ';
+      font-size: 12px;
       @media screen and (max-width: 1300px) { content: ' / '; }
     }
   }
 
   .asset-counter-results {
+    .dark & { color: $zorroa-dimgray; }
     &:after {
       content: ' RESULTS';
+      font-size: 12px;
       @media screen and (max-width: 1300px) { content: ''; }
     }
   }
@@ -29,6 +33,7 @@
     margin-left: 8px;
     font-family: "Roboto Condensed";
     color: $zorroa-lightgray;
+    .dark & { color: $zorroa-dimgray; }
 
     &:hover {
       color: $zorroa-sickly-green;

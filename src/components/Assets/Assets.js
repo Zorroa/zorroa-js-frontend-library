@@ -3,27 +3,29 @@ import Measure from 'react-measure'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import keydown from 'react-keydown'
-import classnames from 'classnames'
 import * as assert from 'assert'
 
 import Thumb, { page, monopageBadges, multipageBadges } from '../Thumb'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
-import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, similarAssets } from '../../actions/assetsAction'
-import { resetRacetrackWidgets, similar, restoreSearch } from '../../actions/racetrackAction'
+import Widget from '../../models/Widget'
+import Folder from '../../models/Folder'
+import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, similarAssets, unorderAssets } from '../../actions/assetsAction'
+import { resetRacetrackWidgets, restoreFolders, similar } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
-import { setThumbSize, setThumbLayout, showTable, setTableHeight, showMultipage, showModal, hideModal } from '../../actions/appActions'
+import { setThumbSize, setThumbLayout, showTable, setTableHeight, showMultipage, showModal, hideModal, iconifyRightSidebar } from '../../actions/appActions'
 import Pager from './Pager'
 import Footer from './Footer'
 import Table from '../Table'
-import Editbar from './Editbar'
+import Sidebar from '../Sidebar'
+import Racetrack from '../Racetrack'
+import FieldTemplate from '../FieldTemplate'
 import * as ComputeLayout from './ComputeLayout.js'
 import AssetSearch from '../../models/AssetSearch'
 import Resizer from '../../services/Resizer'
 import TrashedFolder from '../../models/TrashedFolder'
-import { weights } from '../Racetrack/SimilarHash'
-import { addSiblings, equalSets, unCamelCase } from '../../services/jsUtil'
+import { addSiblings, equalSets } from '../../services/jsUtil'
 import * as api from '../../globals/api.js'
 
 const assetsScrollPadding = 8
@@ -43,6 +45,8 @@ class Assets extends Component {
     showTable: PropTypes.bool.isRequired,
     tableHeight: PropTypes.number.isRequired,
     showMultipage: PropTypes.bool.isRequired,
+    thumbFieldTemplate: PropTypes.string.isRequired,
+    rightSidebarIsIconified: PropTypes.bool,
     folders: PropTypes.instanceOf(Map),
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
     similar: PropTypes.shape({
@@ -50,8 +54,8 @@ class Assets extends Component {
       values: PropTypes.arrayOf(PropTypes.string).isRequired,
       assetIds: PropTypes.arrayOf(PropTypes.string).isRequired
     }).isRequired,
-    similarAssets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
-    sync: PropTypes.bool.isRequired,
+    widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
+    uxLevel: PropTypes.number,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     origin: PropTypes.string,
@@ -169,10 +173,6 @@ class Assets extends Component {
     this.props.actions.isolateAssetId(asset.id)
   }
 
-  deselectAll = () => {
-    this.props.actions.selectAssetIds(null)
-  }
-
   toggleShowTable = () => {
     const { showTable, user, userSettings, actions } = this.props
     actions.showTable(!showTable)
@@ -215,6 +215,8 @@ class Assets extends Component {
   clearSearch = () => {
     this.props.actions.resetRacetrackWidgets()
     this.props.actions.selectFolderIds()
+    this.props.actions.similar()
+    this.props.actions.unorderAssets()
   }
 
   tableResizeStart = (event) => {
@@ -300,9 +302,9 @@ class Assets extends Component {
     this.startHistoryNav()
 
     // close lightbox, restore search
-    const query = historyVal.query
+    const folder = historyVal.folder
     this.props.actions.isolateAssetId()
-    this.props.actions.restoreSearch(query)
+    this.props.actions.restoreFolders([folder])
   }
 
   // We need to detect when the search changes because of navigation (fwd/back buttons)
@@ -323,15 +325,14 @@ class Assets extends Component {
 
   saveHistory = (optFirstTimeHistoryKey) => {
     if (this.historyNav && !optFirstTimeHistoryKey) return
+    const { query, similar, order, widgets } = this.props
     this.stopHistoryNav()
 
     const path = location.pathname + location.search
     const historyKey = optFirstTimeHistoryKey || Date.now().toString()
-    const query = this.props.query
-    this.history[historyKey] = { query }
-
-    // Trying to keep the URL clean by hiding our key in the previous entry,
-    // and having the current entry w/o a hash
+    const attrs = { similar, widgets, order }
+    const folder = new Folder({ search: query, attrs })
+    this.history[historyKey] = { folder }
 
     requestAnimationFrame(_ => {
       if (location.hash) {
@@ -339,7 +340,6 @@ class Assets extends Component {
       } else {
         history.replaceState({}, 'title', `${path}#${historyKey}`)
       }
-      history.pushState({}, 'title', `${path}`)
     })
   }
 
@@ -486,74 +486,13 @@ class Assets extends Component {
     this.props.actions.sortAssets(field, ascending)
   }
 
-  sortSimilar = () => {
-    const { similarAssets } = this.props
-    const values = similarAssets.map(asset => asset.rawValue(this.props.similar.field))
-    const assetIds = similarAssets.map(asset => asset.id)
-    const similar = { values, assetIds, weights: weights(assetIds) }
-    this.props.actions.similar(similar)
-    console.log('Sort by similar: ' + JSON.stringify(similar))
-  }
-
-  renderEditbar () {
-    const { order, selectedIds, similar, similarAssets, query, sync } = this.props
-
-    const similarHashes = similarAssets.map(asset => asset.rawValue(this.props.similar.field))
-    const similarActive = similar.field && similar.field.length > 0 && similar.values && similar.values.length > 0
-    const similarValuesSelected = similar.values && similarHashes && equalSets(new Set([...similar.values]), new Set([...similarHashes]))
-
-    // Only enable similar button if selected assets have the right hash
-    const canSortSimilar = selectedIds && selectedIds.size > 0 && similar.field && similar.field.length > 0 && !similarValuesSelected && similarHashes && similarHashes.length > 0
-    const sortSimilar = canSortSimilar ? this.sortSimilar : null
-
-    const columnName = order && order.length && order[0].field !== 'source.filename' ? unCamelCase(Asset.lastNamespace(order[0].field)) : 'Field'
-
-    const loader = require('./loader-rolling.svg')
-    const syncer = sync ? <div className="Assets-loading sync"/> : <img className="Assets-loading" src={loader}/>
-
-    return (
-      <Editbar selectedAssetIds={selectedIds}
-               onDeselectAll={this.deselectAll}>
-        { syncer }
-        <div className="SortingSelector">
-          <div className="SortingSelector-title">Sort By</div>
-          <div onClick={this.sortAssets}
-               className={classnames('SortingSelector-sort',
-                 {'SortingSelector-selected': !similarActive &&
-                 (!order || !order.length)})}>
-            { !query || query.empty() ? 'Latest' : 'Rank' }
-          </div>
-          { similar.field && similar.field.length > 0 &&
-          <div onClick={sortSimilar} className="SortingSelector-similar">
-            { sortSimilar && similarActive && !similarValuesSelected && selectedIds && selectedIds.size > 0 &&
-            <div onClick={sortSimilar}
-                 className="SortingSelector-icon icon-settings_backup_restore">&thinsp;</div> }
-            <div className={classnames('SortingSelector-sort',
-              { 'SortingSelector-selected': similarActive, 'SortingSelector-disabled': !canSortSimilar })}>
-              Similar
-            </div>
-          </div>
-          }
-          { !similar.field || !similar.field.length &&
-          <div onClick={_ => { this.sortAssets('source.filename', true) }}
-               className={classnames('SortingSelector-sort',
-                 {'SortingSelector-enabled': order && order.length >= 1 &&
-                 order[0].field === 'source.filename'})}>
-            Alphabetical {order && order.length >= 1 && order[0].field === 'source.filename' && !order[0].ascending ? '(Z-A)' : '(A-Z)'}
-          </div>
-          }
-          <div className={classnames('SortingSelector-sort',
-            {'SortingSelector-selected': order && order.length && order[0].field !== 'source.filename'},
-            {'SortingSelector-disabled': !order || !order.length || order[0].field === 'source.filename'})}>
-            {columnName}
-          </div>
-        </div>
-      </Editbar>
-    )
+  toggleRightSidebar = () => {
+    const { actions, rightSidebarIsIconified } = this.props
+    actions.iconifyRightSidebar(!rightSidebarIsIconified)
   }
 
   renderAssets () {
-    const { assets, selectedIds, totalCount, layout, showMultipage, origin, thumbSize, query } = this.props
+    const { assets, selectedIds, totalCount, layout, showMultipage, origin, thumbSize, query, thumbFieldTemplate } = this.props
     const { positions, multipage, tableIsResizing } = this.state
     api.setTableIsResizing(tableIsResizing)
 
@@ -627,6 +566,8 @@ class Assets extends Component {
                   const indexes = parentId && multipage[parentId]
                   const badgeHeight = thumbSize < 100 ? 15 : 25
                   const badge = showMultipage ? multipageBadges(asset, origin, indexes && indexes.length) : monopageBadges(asset)
+                  const iconBadge = <div className="Thumb-field"><FieldTemplate asset={asset} template={thumbFieldTemplate} extensionOnLeft={false}/></div>
+
                   const pages = indexes && indexes.slice(0, 3).map(index => (
                       page(assets[index], width, height, origin, indexes))) ||
                     [page(asset, width, height, origin)]
@@ -637,6 +578,7 @@ class Assets extends Component {
                            assetId={asset.id}
                            pages={pages}
                            badgeHeight={badgeHeight}
+                           iconBadge={iconBadge}
                            { ...badge }
                            onClick={event => {
                              // don't scroll assets when we select thumbs. (table selection will scroll)
@@ -660,7 +602,8 @@ class Assets extends Component {
   }
 
   render () {
-    const { assets, query, totalCount, tableHeight, showTable, showMultipage, layout, thumbSize, assetsCounter } = this.props
+    const { assets, query, totalCount, tableHeight, showTable, showMultipage,
+      layout, thumbSize, assetsCounter, rightSidebarIsIconified, widgets, uxLevel } = this.props
     const { collapsed, tableIsResizing } = this.state
 
     // Trigger layout if assets change.
@@ -672,9 +615,8 @@ class Assets extends Component {
       if (!query.from) {
         this.loaded = 0
         this.scrollToSelection()
+        this.saveHistory()
       }
-
-      this.saveHistory()
     }
     this.assetsCounter = assetsCounter
     if (this.historyNav) this.startHistoryNav()
@@ -688,34 +630,47 @@ class Assets extends Component {
       this.skipNextSelectionScroll = false
     }
 
+    const pinnedWidget = uxLevel > 0 && widgets && widgets.findIndex(widget => widget.isPinned) >= 0
+
     return (
       <div className="Assets" ref="Assets">
-        {this.renderEditbar()}
-        {this.renderAssets()}
-        { showTable && (
-          <div className='Assets-tableResize'
-               onMouseDown={this.tableResizeStart}/>
-        )}
-        { totalCount > 0 && showTable && (
-          <Table height={this.clampTableHeight(tableHeight)}
-                 tableIsResizing={tableIsResizing}
-                 selectFn={this.select}/>
-        )}
-        { totalCount > 0 &&
-        <Footer
-          total={totalCount}
-          collapsed={collapsed}
-          loaded={assets.length}
-          onUncollapse={this.uncollapse}
-          showMultipage={showMultipage}
-          toggleShowMultipage={this.toggleShowMultipage}
-          showTable={showTable}
-          toggleShowTable={this.toggleShowTable}
-          layout={layout}
-          handleLayout={this.changeLayout.bind(this)}
-          thumbSize={thumbSize}
-          handleThumbSize={this.changeThumbSize.bind(this)}
-        /> }
+        <div className="Assets-workspace">
+          <div className="Assets-body">
+            {this.renderAssets()}
+            { showTable && (
+              <div className='Assets-tableResize'
+                   onMouseDown={this.tableResizeStart}/>
+            )}
+            { totalCount > 0 &&
+            <Footer
+              total={totalCount}
+              collapsed={collapsed}
+              loaded={assets.length}
+              onUncollapse={this.uncollapse}
+              showMultipage={showMultipage}
+              toggleShowMultipage={this.toggleShowMultipage}
+              showTable={showTable}
+              toggleShowTable={uxLevel > 0 ? this.toggleShowTable : null}
+              layout={layout}
+              handleLayout={this.changeLayout.bind(this)}
+              thumbSize={thumbSize}
+              handleThumbSize={this.changeThumbSize.bind(this)}
+            /> }
+            { totalCount > 0 && showTable && uxLevel > 0 && (
+              <Table height={this.clampTableHeight(tableHeight)}
+                     tableIsResizing={tableIsResizing}
+                     selectFn={this.select}/>
+            )}
+          </div>
+          { pinnedWidget && <div className="Workspace-vertical-separator flexOff"/> }
+          { pinnedWidget && (
+            <Sidebar onToggle={this.toggleRightSidebar}
+                     isRightEdge={true}
+                     isIconified={rightSidebarIsIconified}>
+              <Racetrack isIconified={rightSidebarIsIconified}/>
+            </Sidebar>
+          )}
+        </div>
       </div>
     )
   }
@@ -729,9 +684,10 @@ export default connect(state => ({
   selectedIds: state.assets.selectedIds,
   selectionCounter: state.assets.selectionCounter,
   totalCount: state.assets.totalCount,
+  rightSidebarIsIconified: state.app.rightSidebarIsIconified,
   folders: state.folders.all,
   trashedFolders: state.folders.trashedFolders,
-  sync: state.auth.sync,
+  uxLevel: state.app.uxLevel,
   user: state.auth.user,
   userSettings: state.app.userSettings,
   thumbSize: state.app.thumbSize,
@@ -739,8 +695,9 @@ export default connect(state => ({
   showTable: state.app.showTable,
   tableHeight: state.app.tableHeight,
   showMultipage: state.app.showMultipage,
+  thumbFieldTemplate: state.app.thumbFieldTemplate,
   similar: state.racetrack.similar,
-  similarAssets: state.assets.similar,
+  widgets: state.racetrack.widgets,
   origin: state.auth.origin
 }), dispatch => ({
   actions: bindActionCreators({
@@ -749,9 +706,10 @@ export default connect(state => ({
     sortAssets,
     searchAssets,
     similarAssets,
-    resetRacetrackWidgets,
+    unorderAssets,
     similar,
-    restoreSearch,
+    resetRacetrackWidgets,
+    restoreFolders,
     selectFolderIds,
     setThumbSize,
     setThumbLayout,
@@ -760,6 +718,7 @@ export default connect(state => ({
     showMultipage,
     showModal,
     hideModal,
+    iconifyRightSidebar,
     saveUserSettings
   }, dispatch)
 }))(Assets)

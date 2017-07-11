@@ -5,21 +5,29 @@ import { Link } from 'react-router'
 
 import Job from '../../models/Job'
 import User from '../../models/User'
+import Asset from '../../models/Asset'
 import JobMenu from './JobMenu'
 import Logo from '../../components/Logo'
-import Searchbar from '../../components/Searchbar'
 import DropdownMenu from '../../components/DropdownMenu'
 import Preferences from '../../components/Preferences'
 import Feedback from '../../components/Feedback'
 import Developer from '../../components/Developer'
+import Editbar from '../Assets/Editbar'
+import AssetCounter from '../Assets/AssetCounter'
 import { showModal } from '../../actions/appActions'
-import { archivistBaseURL } from '../../actions/authAction'
+import { archivistBaseURL, saveUserSettings } from '../../actions/authAction'
+import { selectAssetIds } from '../../actions/assetsAction'
 
 class Header extends Component {
   static propTypes = {
+    sync: PropTypes.bool.isRequired,
     user: PropTypes.instanceOf(User).isRequired,
     isDeveloper: PropTypes.bool,
     isAdministrator: PropTypes.bool,
+    assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+    selectedIds: PropTypes.object,
+    totalCount: PropTypes.number,
+    userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired
   }
 
@@ -43,19 +51,29 @@ class Header extends Component {
     this.props.actions.showModal({body, width})
   }
 
+  deselectAll = () => {
+    this.props.actions.selectAssetIds(null)
+  }
+
   render () {
-    const { user, isDeveloper, isAdministrator } = this.props
+    const { sync, user, isDeveloper, isAdministrator, assets, totalCount, selectedIds } = this.props
     const baseURL = archivistBaseURL()
+
+    const loader = require('./loader-rolling.svg')
+    const syncer = isDeveloper && sync ? <div className="Header-loading sync"/> : <img className="Header-loading" src={loader}/>
+
     return (
       <nav className="header flexOff flexCenter fullWidth">
         <Link to="/" className='header-logo'><Logo/></Link>
-        <div className='header-searchbar flexOn'>
-          <Searchbar/>
+        { syncer }
+        <div className="header-asset-counter">
+          <AssetCounter total={totalCount} collapsed={0} loaded={assets && assets.length || 0}/>
         </div>
         <div className="flexOn"></div>
         <div className="header-menu-bar fullHeight flexCenter">
-          <JobMenu jobType={Job.Import}/>
+          <Editbar selectedAssetIds={selectedIds} onDeselectAll={this.deselectAll} />
           <JobMenu jobType={Job.Export}/>
+          <JobMenu jobType={Job.Import}/>
           <div className="header-menu">
             <DropdownMenu label="Help">
               <a href="https://zorroa.com/help-center/" target="_blank" className="header-menu-item" >Tutorials</a>
@@ -94,9 +112,18 @@ class Header extends Component {
 }
 
 export default connect(state => ({
+  sync: state.auth.sync,
   user: state.auth.user,
   isDeveloper: state.auth.isDeveloper,
-  isAdministrator: state.auth.isAdministrator
+  isAdministrator: state.auth.isAdministrator,
+  assets: state.assets.all,
+  selectedIds: state.assets.selectedIds,
+  totalCount: state.assets.totalCount,
+  userSettings: state.app.userSettings
 }), dispatch => ({
-  actions: bindActionCreators({ showModal }, dispatch)
+  actions: bindActionCreators({
+    showModal,
+    selectAssetIds,
+    saveUserSettings
+  }, dispatch)
 }))(Header)

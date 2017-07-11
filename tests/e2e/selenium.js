@@ -31,6 +31,7 @@ global.jest = global.jest || ({ autoMockOff: _ => {} })
 global.expect = global.expect || (x => {
   return {
     toBe: y => { if (!(x == y)) console.error(`${x} is not ${y}`, new Error().stack) },
+    toMatch: y => { if (!x.match(y)) console.error(`${x} does not match ${y}`, new Error().stack) },
     toBeGreaterThan: y => { if (!(x > y)) console.error(`${x} is not greater than ${y}`, new Error().stack) },
     toBeLessThan: y => { if (!(x < y)) console.error(`${x} is not less than ${y}`, new Error().stack) }
   }
@@ -288,7 +289,7 @@ export function waitForUrl (expectedURL, optTimeout) {
     driver.wait(_ => {
       return driver.getCurrentUrl().then(url => {
         // console.log('waiting', url, expectedURL)
-        if (url === expectedURL) return true
+        if (url.match(expectedURL)) return true
         return new Promise(r => setTimeout(_ => r(false), 100)) // if urls dont match, slow down
       })
     }, optTimeout, `waitForUrl timeout ${expectedURL}`)
@@ -428,11 +429,11 @@ export function login () {
   .then(_ => driver.findElement(By.css('input[name="eula"]')).isSelected())
   .then(isSelected => !isSelected && driver.findElement(By.css('input[name="eula"]')).click())
   .then(_ => driver.findElement(By.css('.auth-button-primary')).click())
-  .then(_ => waitForUrl(`${BASE_URL}/`, 15000))
-  .then(_ => driver.getCurrentUrl())
-  .then(url => { expect(url).toBe(`${BASE_URL}/`) })
+  .then(_ => waitForSelectorVisibleToBe(true, By.css('.Workspace'), 15000))
+  .then(_ => expectSelectorVisibleToBe(true, By.css('.Workspace')))
   .then(_ => { console.log('logged in') })
   .then(_ => expectNoJSErrors())
+  .then(_ => waitForIdle())
 
   // // If there's a saved search from last session, then clear it
   // // [Started but temporarily disabled until we figure out

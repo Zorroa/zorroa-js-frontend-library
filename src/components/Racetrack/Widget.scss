@@ -1,7 +1,26 @@
 @import '../../styles/core-mixins.scss';
 
+.Widget {
+  position: relative;
+}
+
 .Widget-body {
   filter: grayscale(100%) opacity(50%);
+  min-width: 100%;
+  .dark & { color: $zorroa-lightgray; background-color: $zorroa-darkgray; }
+
+  &.floatBody {
+    z-index: 10000;
+    background-color: white;
+    .dark & { color: $zorroa-lightgray; background-color: $zorroa-darkgray; }
+    position: absolute;
+    top: 100%;
+    right: 0;
+    box-shadow: 0 20px 30px 0 $zorroa-darkgray;
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    border-top-left-radius: 3px;
+  }
 }
 
 .Widget.isEnabled .Widget-body {

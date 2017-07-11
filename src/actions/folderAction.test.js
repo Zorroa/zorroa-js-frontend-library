@@ -42,10 +42,10 @@ describe('folderActions', () => {
   it('should select folder', () => {
     const id = 3
     const ids = new Set([id])
-    const expectedAction = {
+    const expectedAction = [{
       type: SELECT_FOLDERS,
       payload: ids
-    }
+    }]
     expect(selectFolderIds(ids)).toEqual(expectedAction)
   })
 })

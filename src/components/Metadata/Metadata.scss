@@ -3,6 +3,7 @@
 .Metadata {
 
   background-color: white;
+  .dark & { background-color: $zorroa-nearblack; }
   max-height: 40vh;
   @include flexCol;
 
@@ -58,18 +59,21 @@
   @include flexAlignItemsCenter;
   margin-left: 4px;
   border-bottom: 1px solid $zorroa-nearwhite;
+  .dark & { border-bottom: 1px solid $zorroa-darkgray; }
 }
 
 .Metadata-middle {
   @include flexOn;
-  height: 25px;
+  height: 26px;
   border-bottom: 1px solid $zorroa-nearwhite;
+  .dark & { border-bottom: 1px solid $zorroa-darkgray; }
 }
 
 .Metadata-right {
   @include flexRow;
   @include flexAlignItemsCenter;
   border-bottom: 1px solid $zorroa-nearwhite;
+  .dark & { border-bottom: 1px solid $zorroa-darkgray; }
 }
 
 .Metadata-item {
@@ -85,6 +89,7 @@
   .Metadata-item-label {
     @include flexRow;
     color: $zorroa-greyish-brown;
+    .dark & { color: $zorroa-lightgray; }
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -96,13 +101,17 @@
   }
 
   &:hover:not(.isSelected) { background-color: $zorroa-hover; }
-  &.isSelected { background-color: $zorroa-selected; }
+  &.isSelected {
+    background-color: $zorroa-selected;
+    .dark & { background-color: $zorroa-dark-selected; }
+  }
 }
 
 .Metadata-item-pad {
   width: 14px;
   height: 25px;
   border-right: 1px solid $zorroa-lightgray;
+  .dark & { border-right: 1px solid $zorroa-darkgray; }
 }
 
 .Metadata-cancel-filter {
@@ -138,6 +147,7 @@
   &:hover:not(.isSelected) {
     background-color: $zorroa-nearwhite;
     color: $zorroa-golden-yellow;
+    .dark & { background-color: $zorroa-darkgray; }
   }
 
   &.isSelected {
@@ -156,7 +166,10 @@ $FolderItemHeight : 25px;
 
   cursor: pointer;
 
-  .FolderItem.isSelected & { background-color: $zorroa-selected; }
+  .FolderItem.isSelected & {
+    background-color: $zorroa-selected;
+    .dark & { background-color: $zorroa-dark-selected; }
+  }
   .FolderItem.isSelected &.hasChildren:not(.isSelected):hover { color: white; background-color: $zorroa-darkgray; }
   .FolderItem.isDropTarget.dragHover & { color: white; background-color: $zorroa-sickly-green; }
   .FolderItem.isSelected.isDropTarget.dragHover & { color: white; background-color: darken($zorroa-sickly-green, 15%); }
@@ -175,10 +188,11 @@ $FolderItemHeight : 25px;
   color: $zorroa-gray;
   background-color: $zorroa-nearwhite;
   width: 26px;
-  height: 26px;
+  height: 25px;
   cursor: pointer;
   border: none;
 
+  .dark & { background-color: $zorroa-nearblack; }
   &.isSelected { color: $zorroa-golden-yellow; }
 
   &:hover:not(.isSelected) {

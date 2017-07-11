@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
-// import FileIcon from '../FileIcon'
 import Duration from '../Duration'
 import { DragSource } from '../../services/DragDrop'
 import Asset from '../../models/Asset'
@@ -33,7 +32,7 @@ export function monopageBadges (asset) {
 }
 
 export function multipageBadges (asset, origin, stackCount) {
-  let pageBadge, iconBadge, parentURL
+  let pageBadge, parentURL
 
   const pageCount = asset.pageCount() || stackCount
   const startPage = asset.startPage()
@@ -54,12 +53,10 @@ export function multipageBadges (asset, origin, stackCount) {
 
   // Show the icon & inset if we have any page badging
   if (pageBadge) {
-    // Disable file type badges and only show in Table
-    // iconBadge = <FileIcon ext={asset.value('source.extension')}/>
     parentURL = asset.smallestParentProxyURL(origin)
   }
 
-  return { pageBadge, iconBadge, parentURL }
+  return { pageBadge, parentURL }
 }
 
 // Called when dragging an asset to assign assetIds to drop info
@@ -147,7 +144,6 @@ class Thumb extends Component {
   renderOverlays = () => {
     return (
       <div className='Thumb-selection'>
-        <div className='Thumb-selection-overlay'/>
         <div className='Thumb-selection-check icon-check'/>
       </div>
     )
@@ -183,7 +179,7 @@ class Thumb extends Component {
             <div key={`${url}-${index}`}
                  className={classnames('Thumb-stack', `Thumb-stack-${index}`)}>
               <ImageThumb url={url} backgroundColor={backgroundColor}/>
-              { this.renderBadges() }
+              { rindex === pages.length - 1 && this.renderBadges() }
             </div>
           )
         })}

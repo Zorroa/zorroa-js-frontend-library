@@ -3,18 +3,15 @@
 .WidgetHeader {
   @include nowrap;
   width: 100%;
-  height: 40px;
-  text-transform: uppercase;
+  height: 30px;
   font-weight: 100;
-  overflow: hidden;
   filter: grayscale(100%) opacity(50%);
   cursor: pointer;
-
   color: $zorroa-gray;
   background-color: $zorroa-darkwhite;
-  & .WidgetHeader-enable {
-    filter: none;
-  }
+
+  position: relative;
+  & .WidgetHeader-enable { filter: none; }
 
   border-radius: 3px;
   .Widget.isOpen & { border-radius: 3px 3px 0 0; }
@@ -33,10 +30,8 @@
   height: 100%;
 
   background-color: transparent;
-  &:hover { background-color: rgba(0,0,0,0.2); }
-  .hoverField & {
-    background-color: rgba(255,255,255,0.5);
-  }
+  &:hover { background-color: rgba(0,0,0,0.1); }
+  .hoverField & { background-color: rgba(255,255,255,0.5); }
 }
 
 .WidgetHeader-toggle {
@@ -46,9 +41,11 @@
 }
 
 .WidgetHeader-icon {
-  @include zorroa-square-icon(40px);
-  font-size: 24px;
+  @include zorroa-square-icon(20px);
+  font-size: 16px;
   opacity: 0.5;
+  margin-left: 4px;
+  margin-right: 4px;
 }
 
 .WidgetHeader-label {
@@ -59,15 +56,15 @@
 .WidgetHeader-enable {
   @include flexOff;
   @include flexRowCenter;
-  width: 40px;
-  height: 40px;
+  width: 20px;
+  height: 20px;
   cursor: pointer;
   filter: none;
-  font-size: 24px;
+  font-size: 16px;
 
   &:hover {
     // showing green is the intent, but the color is currently not visible due to parent's filter when disabled
-    background-color: $zorroa-sickly-green;
+    background-color: $zorroa-gray;
   }
   &.isEnabled:hover {
     background-color: $zorroa-faded-red;
@@ -75,14 +72,10 @@
 }
 
 .WidgetHeader-close {
-  @include zorroa-square-btn-darken(40px);
-}
-
-.WidgetHeader-caret {
-  font-size: 15px;
-  width: 16px;
-  min-width: 16px;
-  max-width: 16px;
+  @include zorroa-square-btn-darken(20px);
+  margin-right: 2px;
+  margin-left: 4px;
+  font-size: 9px;
 }
 
 .WidgetHeader-header {
@@ -94,7 +87,6 @@
 
   max-width: 100%;
   @include clampText;
-
   flex-shrink: 1;
 }
 
@@ -102,17 +94,38 @@
   @include flexRow;
   @include flexOn;
   @include flexAlignItemsCenter;
+  max-width: 100%;
 }
 
 .WidgetHeader-header-title {
   @include flexOff;
+  text-transform: uppercase;
   font-weight: 100;
+  font-size: 12px;
   margin-right: 4px;
   cursor: pointer;
+  max-width: 100%;
+  @include clampText;
 }
 
 .WidgetHeader-header-field {
   @include flexOn;
+  font-family: "Roboto Condensed";
   font-weight: 400;
   cursor: pointer;
+  max-width: 100%;
+  text-transform: capitalize;
+  @include clampText;
+}
+
+.WidgetHeader-pin {
+  @include zorroa-square-btn-darken(20px);
+  margin-left: 10px;
+}
+
+.WidgetHeader-pin-img {
+  width: 16px;
+  height: 16px;
+
+  &.isPinned { transform: rotate(-45deg); }
 }

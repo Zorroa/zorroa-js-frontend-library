@@ -1,9 +1,8 @@
 @import '../../styles/core-mixins.scss';
 
 .ThumbSizeSlider {
-  color: #000;
-  background-color: #fff;
-  padding: 5px 8px;
+  color: white;
+  padding: 0 8px;
   border-radius: 3px;
 }
 
@@ -20,7 +19,8 @@
   height: 30px;
   border-radius: 3px;
   cursor: pointer;
-  &:hover { background-color: $zorroa-lightgray; }
+  &:hover { color: $zorroa-sickly-green; }
+  &:active { color: $zorroa-sickly-green; }
 }
 
 .ThumbSizeSlider-bigger {
@@ -28,11 +28,24 @@
   height: 30px;
   border-radius: 3px;
   cursor: pointer;
-  &:hover { background-color: $zorroa-lightgray; }
+  &:hover { color: $zorroa-sickly-green; }
+  &:active { color: $zorroa-sickly-green; }
+  [class*='icon-'] {
+    font-size: 12px;
+  }
 }
-
 .ThumbSizeSlider-box {
   position: relative;
+  input::-webkit-slider-thumb {
+    border: none;
+    background: $zorroa-lightgray;
+    &:active { background-color: $zorroa-sickly-green; }
+  }
+  input::-moz-range-thumb {
+    border: none;
+    background: $zorroa-lightgray;
+    &:active { background-color: $zorroa-sickly-green; }
+  }
 }
 .ThumbSizeSlider-line-box {
   position: absolute;
@@ -45,5 +58,6 @@
 .ThumbSizeSlider-line {
   width: 120px;
   height: 1px;
-  background-color: $zorroa-sickly-green;
+  background-color: $zorroa-gray;
+  &:active { background-color: $zorroa-sickly-green; }
 }

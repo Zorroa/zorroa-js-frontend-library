@@ -15,14 +15,15 @@ import CreateFolder from './CreateFolder'
 import AssetPermissions from '../AssetPermissions'
 import {
   createFolder,
-  selectFolderIds,
   addAssetIdsToFolderId,
   removeAssetIdsFromFolderId,
   deleteFolderIds,
-  updateFolder } from '../../actions/folderAction'
+  updateFolder,
+  dropFolderId
+} from '../../actions/folderAction'
 import { showModal, hideModal } from '../../actions/appActions'
 import { exportAssets } from '../../actions/jobActions'
-import { restoreSearch } from '../../actions/racetrackAction'
+import { restoreFolders } from '../../actions/racetrackAction'
 import { setAssetPermissions } from '../../actions/assetsAction'
 import { isolateSelectId } from '../../services/jsUtil'
 
@@ -35,6 +36,17 @@ const folderSource = {
   }
 }
 
+function dropTarget (props) {
+  const { folder, dragInfo, assets, folders, user } = props
+  if (!dragInfo) return false
+  if (dragInfo.type === 'ASSET' && dragInfo.assetIds) {
+    return folder.canAddAssetIds(dragInfo.assetIds, assets, user)
+  } else if (dragInfo.type === 'FOLDER' && dragInfo.folderIds) {
+    return folder.canAddChildFolderIds(dragInfo.folderIds, folders, user)
+  }
+  return false
+}
+
 const target = {
   drop (props, se) {
     const { dragInfo, folder, folders, user } = props
@@ -45,11 +57,13 @@ const target = {
         props.actions.addAssetIdsToFolderId(dragInfo.assetIds, props.folder.id)
         break
       case 'FOLDER':
+        const parentId = dropTarget(props) ? folder.id : folder.parentId
+        const parent = folders.get(parentId)
         console.log('Drop ' + JSON.stringify([...dragInfo.folderIds]) + ' on ' + props.folder.id)
         dragInfo.folderIds.forEach(folderId => {
-          if (folder.canAddChildFolderIds([folderId], folders, user)) {
+          if (parent && parent.canAddChildFolderIds([folderId], folders, user)) {
             const folder = new Folder(props.folders.get(folderId))
-            folder.parentId = props.folder.id
+            folder.parentId = parentId
             props.actions.updateFolder(folder)
           }
         })
@@ -81,6 +95,7 @@ class FolderItem extends Component {
     selectedAssetIds: PropTypes.object,
     folders: PropTypes.instanceOf(Map),
     counts: PropTypes.instanceOf(Map),
+    dropFolderId: PropTypes.number,
     filteredCounts: PropTypes.instanceOf(Map),
     user: PropTypes.instanceOf(User),
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
@@ -92,6 +107,18 @@ class FolderItem extends Component {
   state = {
     isContextMenuVisible: false,
     contextMenuPos: { x: 0, y: 0 }
+  }
+
+  componentWillReceiveProps (nextProps) {
+    // Update the drop folder id if the hover status changed to
+    // avoid multiple hovered items and state change on mouse move
+    if (!this.props.dragHover && nextProps.dragHover) {
+      const id = dropTarget(nextProps) ? nextProps.folder.id : nextProps.folder.parentId
+      if (nextProps.dropFolderId !== id) {
+        this.props.actions.dropFolderId(id)
+        console.log('Set drop folder id to ' + nextProps.folder.parentId)
+      }
+    }
   }
 
   showContextMenu = (event) => {
@@ -107,16 +134,10 @@ class FolderItem extends Component {
     this.setState({ isContextMenuVisible: false })
   }
 
-  restoreSearch = (event) => {
+  restoreFolder = (event) => {
     event.preventDefault()
     const { folder, actions } = this.props
-    actions.restoreSearch(folder.search)
-    let folders = []
-    if (folder.search && folder.search.filter &&
-      folder.search.filter.links && folder.search.filter.links.folder) {
-      folders = folder.search.filter.links.folder
-    }
-    actions.selectFolderIds(folders)
+    actions.restoreFolders([folder])
     this.dismissContextMenu(event)
   }
 
@@ -287,17 +308,6 @@ class FolderItem extends Component {
     return count
   }
 
-  isDropTarget () {
-    const { folder, dragInfo, assets, folders, user } = this.props
-    if (!dragInfo) return false
-    if (dragInfo.type === 'ASSET' && dragInfo.assetIds) {
-      return folder.canAddAssetIds(dragInfo.assetIds, assets, user)
-    } else if (dragInfo.type === 'FOLDER' && dragInfo.folderIds) {
-      return folder.canAddChildFolderIds(dragInfo.folderIds, folders, user)
-    }
-    return false
-  }
-
   // Keep the context menu from running off the bottom of the screen
   constrainContextMenu = (ctxMenu) => {
     if (!ctxMenu) return
@@ -380,7 +390,7 @@ class FolderItem extends Component {
               </div>
             ))}
           { singleFolderSelected && !folder.isDyhi() && folder.search &&
-          <div onClick={this.restoreSearch}
+          <div onClick={this.restoreFolder}
                className="FolderItem-context-item FolderItem-context-restore-widgets"
                onContextMenu={this.dismissContextMenu}>
             <div className="icon-settings_backup_restore"/><div>Restore Widgets</div></div> }
@@ -474,13 +484,14 @@ class FolderItem extends Component {
   }
 
   render () {
-    const { folder, depth, isOpen, hasChildren, isSelected, onToggle, onSelect, dropparams, dragHover, top } = this.props
+    const { folder, depth, isOpen, hasChildren, isSelected, onToggle, onSelect, dropparams, dropFolderId, top } = this.props
+    const dragHover = this.props.dragHover || dropFolderId === folder.id
     const icon = folder.isDyhi() ? 'icon-foldercog' : (folder.search ? 'icon-collections-smart' : 'icon-collections-simple')
     const draggable = !folder.isDyhi()
-    const isDropTarget = this.isDropTarget()
+    const isDropTarget = dropTarget(this.props)
     const dragparams = { ...this.props.dragparams, draggable }  // disable drag
     return (
-      <div className={classnames('FolderItem', { isOpen, hasChildren, isSelected, isDropTarget, dragHover })}
+      <div className={classnames('FolderItem', { isOpen, hasChildren, isSelected, isDropTarget: dropTarget(this.props), dragHover })}
            style={{ paddingLeft: `${(depth - 1) * 10}px`, top }}>
         { this.renderContextMenu() }
         <div className={classnames('FolderItem-toggle', {hasChildren})}
@@ -514,6 +525,7 @@ export default connect(state => ({
   filteredCounts: state.folders.filteredCounts,
   selectedFolderIds: state.folders.selectedFolderIds,
   selectedAssetIds: state.assets.selectedIds,
+  dropFolderId: state.folders.dropFolderId,
   user: state.auth.user,
   dragInfo: state.app.dragInfo,
   metadataFields: state.app.metadataFields,
@@ -521,15 +533,15 @@ export default connect(state => ({
 }), dispatch => ({
   actions: bindActionCreators({
     createFolder,
-    selectFolderIds,
     addAssetIdsToFolderId,
     removeAssetIdsFromFolderId,
+    dropFolderId,
     exportAssets,
     showModal,
     hideModal,
     deleteFolderIds,
     updateFolder,
-    restoreSearch,
+    restoreFolders,
     setAssetPermissions
   }, dispatch)
 }))(FolderItem)

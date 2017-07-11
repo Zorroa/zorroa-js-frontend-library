@@ -1,7 +1,7 @@
 import {
   GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, UPDATE_FOLDER,
   DELETE_FOLDER, ADD_ASSETS_TO_FOLDER, REMOVE_ASSETS_FROM_FOLDER,
-  TOGGLE_FOLDER, UNAUTH_USER, FOLDER_COUNTS,
+  TOGGLE_FOLDER, UNAUTH_USER, FOLDER_COUNTS, DROP_FOLDER_ID,
   TRASHED_FOLDERS, EMPTY_FOLDER_TRASH, COUNT_TRASHED_FOLDERS,
   RESTORE_TRASHED_FOLDERS, DELETE_TRASHED_FOLDERS,
   QUEUE_FOLDER_COUNTS, CLEAR_FOLDER_COUNT_QUEUE, ASSET_SEARCH
@@ -30,7 +30,10 @@ export var createInitialState = () => ({
   trashedFolders: null,
 
   // Modified folder ids and ancestors since last clearModifiedFolders
-  modifiedIds: new Set()
+  modifiedIds: new Set(),
+
+  // Id of active drop target, set by FolderItem for display in Folders of active section
+  dropFolderId: -1
 })
 export const initialState = createInitialState()
 
@@ -74,8 +77,9 @@ export default function (state = initialState, action) {
       }
       break
 
-    case SELECT_FOLDERS:
+    case SELECT_FOLDERS: {
       return { ...state, selectedFolderIds: action.payload }
+    }
 
     case CREATE_FOLDER: {
       const folder = action.payload
@@ -261,6 +265,9 @@ export default function (state = initialState, action) {
 
     case COUNT_TRASHED_FOLDERS:
       return { ...state }
+
+    case DROP_FOLDER_ID:
+      return { ...state, dropFolderId: action.payload }
 
     case UNAUTH_USER:
       return initialState

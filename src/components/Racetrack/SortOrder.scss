@@ -1,0 +1,57 @@
+@import '../../styles/core-mixins.scss';
+
+.SortOrder-body {
+  @include flexColCenter;
+}
+
+.SortOrder-empty {
+  @include flexColCenter;
+  color: $zorroa-lightgray;
+  padding: 8px;
+  font-size: 12px;
+
+  .icon-emptybox {
+    font-size: 24px;
+    color: $zorroa-lightgray;
+  }
+}
+
+.SortOrder-clear-all {
+  @include flexRowCenter;
+  color: $zorroa-lightgray;
+  padding: 10px;
+}
+
+.SortOrder-clear-all-icon {
+  color: $zorroa-lightgray;
+  @include zorroa-square-btn-darken(20px)
+}
+
+.SortOrder-orders {
+  @include flexColCenter;
+  padding: 10px;
+}
+
+.SortOrder-title {
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.SortOrder-label {
+  color: $zorroa-gray;
+  margin: 4px;
+  &:hover { color: $zorroa-sickly-green; }
+}
+
+.SortOrder-suggestions {
+  width: 70%;
+  min-width: 150px;
+  max-width: 400px;
+  border-radius: 3px;
+  padding-left: 4px;
+  padding-right: 4px;
+  margin-bottom: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
+  border: 1px solid $zorroa-lightgray;
+}

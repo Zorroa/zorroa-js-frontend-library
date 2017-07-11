@@ -10,11 +10,13 @@ import { setVideoVolume } from '../../actions/appActions'
 import { saveUserSettings } from '../../actions/authAction'
 import { formatDuration, clamp } from '../../services/jsUtil'
 import PanZoom from './PanZoom'
+import VideoRange from './VideoRange'
 import User from '../../models/User'
 
 class Video extends Component {
   static propTypes = {
     url: PropTypes.string.isRequired,
+    backgroundURL: PropTypes.string,
     frames: PropTypes.number,
     frameRate: PropTypes.number,
     startFrame: PropTypes.number,
@@ -34,7 +36,10 @@ class Video extends Component {
     playing: true,
     volume: this.props.videoVolume,
     played: 0,
-    loaded: 0
+    loaded: 0,
+    startFrame: this.props.startFrame,
+    stopFrame: this.props.stopFrame,
+    error: null
   }
 
   @keydown('space')
@@ -55,7 +60,7 @@ class Video extends Component {
   }
 
   onSeekChange = e => {
-    const { startFrame, stopFrame } = this.props
+    const { startFrame, stopFrame } = this.state
     const v = parseFloat(e.target.value)
     const frame = startFrame + v * (stopFrame - startFrame)
     this.scrub(frame)
@@ -69,7 +74,8 @@ class Video extends Component {
     // We only want to update time slider if we are not currently seeking
     if (!this.state.seeking) {
       this.setState(state)
-      const { stopFrame, frames } = this.props
+      const { frames } = this.props
+      const { stopFrame } = this.state
       if (state.played >= stopFrame / frames) {
         this.setState({ playing: false })
         this.rewind()
@@ -78,11 +84,11 @@ class Video extends Component {
   }
 
   rewind = () => {
-    this.scrub(this.props.startFrame)
+    this.scrub(this.state.startFrame)
   }
 
   fastForward = () => {
-    this.scrub(this.props.stopFrame)
+    this.scrub(this.state.stopFrame)
   }
 
   frameBack = () => {
@@ -91,40 +97,59 @@ class Video extends Component {
   }
 
   frameForward = () => {
-    const frame = Math.min(this.state.played * this.props.frames + 1, this.props.stopFrame)
+    const frame = Math.min(this.state.played * this.props.frames + 1, this.props.frames - 1)
     this.scrub(frame)
   }
 
-  scrub (frame) {
+  shuttle = (action) => {
+    switch (action) {
+      case 'rewind': return this.rewind()
+      case 'frameBack': return this.frameBack()
+      case 'play': return this.playPause()
+      case 'frameForward': return this.frameForward()
+      case 'fastForward': return this.fastForward()
+    }
+  }
+
+  scrub = (frame) => {
     const played = frame / this.props.frames
     this.setState({ played })
     this.player.seekTo(played)
   }
 
   clipTime (t) {
-    const { frames, startFrame, stopFrame } = this.props
+    const { frames } = this.props
+    const { startFrame, stopFrame } = this.state
     return clamp((t * frames - startFrame) / (stopFrame - startFrame), 0, 1)
   }
 
+  clipRange = (startFrame, stopFrame) => {
+    this.setState({ startFrame, stopFrame })
+  }
+
   init () {
-    const { url, startFrame } = this.props
+    const { url } = this.props
+    const { startFrame } = this.state
     const initialized = `${url}@${startFrame}`
     if (this.initialized === initialized) return
-    this.scrub(this.props.startFrame)
+    this.scrub(startFrame)
     this.initialized = initialized
   }
 
   render () {
-    const { url, frameRate, frames, startFrame, stopFrame, onMultipage } = this.props
-    const { playing, volume, played, loaded } = this.state
-    const volumeX = 130 * volume
-    const volumeY = 30 - (5 + 20 * volume)
+    const { url, frameRate, frames, onMultipage, backgroundURL } = this.props
+    const { playing, volume, played, startFrame, stopFrame, error } = this.state
     const seconds = played ? (played * frames - startFrame) / frameRate : 0
     const duration = (stopFrame - startFrame) / frameRate
+    const title = <div className="Video-time"><Duration className='Video-remaining' seconds={seconds} frameRate={frameRate} />/<Duration seconds={duration} frameRate={frameRate}/></div>
+    const total = frames * 10
     return (
       <div className='Video'>
         <div className="Video-pan-zoom">
-          <PanZoom showControls={false} onMultipage={onMultipage}>
+          { error && <div className="Video-error">{error.message}</div> }
+          <PanZoom title={title} titleWidth={300} onMultipage={onMultipage}
+                   onVideo={this.shuttle} playing={playing}
+                   onVolume={this.setVolume} volume={volume}>
             <ReactPlayer
               ref={player => { this.player = player }}
               className='Video-player'
@@ -137,53 +162,14 @@ class Video extends Component {
               onPlay={() => this.setState({ playing: true })}
               onPause={() => this.setState({ playing: false })}
               onEnded={() => this.setState({ playing: false, played: 1 })}
-              onError={e => console.log('Video playback error: ', e)}
+              onError={error => this.setState({ error })}
               onProgress={this.onProgress}
-              progressFrequency={100}
-            />
+              progressFrequency={100} />
           </PanZoom>
         </div>
-        <div className="Video-progress-bar">
-          <input className="Video-scrub"
-                 type='range' min={0} max={1} step='any'
-                 value={this.clipTime(played)}
-                 onMouseDown={this.onSeekMouseDown}
-                 onInput={this.onSeekChange}
-                 onMouseUp={this.onSeekMouseUp}
-          />
-          <svg className="Video-progress-progress" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <rect width={`${(this.clipTime(loaded) || 0) * 100}`} height="100" style={{fill: '#808080', stroke: 'none'}}></rect>
-            <rect width={`${(this.clipTime(played) || 0) * 100}`} height="100" style={{fill: '#73b61c', stroke: 'none'}}></rect>
-          </svg>
-        </div>
-        <div className="Video-control-bar">
-          <div className="Video-time">
-            <Duration className='Video-remaining' seconds={seconds} frameRate={frameRate} />/<Duration seconds={duration} frameRate={frameRate}/>
-          </div>
-          <div className="Video-controls">
-            <div onClick={this.rewind} className="icon-prev-clip"/>
-            <div onClick={this.frameBack} className="icon-frame-back"/>
-            <div onClick={this.playPause.bind(this)} className="Video-play">
-              <div className={playing ? 'icon-pause' : 'icon-play3'} />
-            </div>
-            <div onClick={this.frameForward} className="icon-frame-forward"/>
-            <div onClick={this.fastForward} className="icon-next-clip"/>
-          </div>
-          <div className="Video-misc">
-            <div className="icon-mute"/>
-            <div className="Video-volume">
-              <div className="Video-volume-background">
-                <svg width="100%" height="100%">
-                  <path d="M0 25 L130 25 L130 5 Z" fill="#787a77" />
-                  <path d={`M0 25 L${volumeX} 25 L${volumeX} ${volumeY} Z`} fill="#73b61c"/>
-                </svg>
-              </div>
-              <input type='range' min={0} max={1} step='any' value={volume} onChange={this.setVolume} />
-            </div>
-            <div className="icon-volume-high"/>
-            <button className="Video-multipage icon-icons2" onClick={onMultipage} />
-          </div>
-        </div>
+        <VideoRange played={played} frames={frames} frameRate={frameRate}
+                    startFrame={startFrame} stopFrame={stopFrame} total={total}
+                    onScrub={this.scrub} onClipRange={this.clipRange} backgroundURL={backgroundURL}/>
       </div>
     )
   }
@@ -191,6 +177,7 @@ class Video extends Component {
 
 export default connect(state => ({
   videoVolume: state.app.videoVolume,
+  user: state.auth.user,
   userSettings: state.app.userSettings
 }), dispatch => ({
   actions: bindActionCreators({

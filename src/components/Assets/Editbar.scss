@@ -3,18 +3,17 @@
 .Editbar {
   @include flexOff;
   @include flexRow;
-  @include fullWidth;
-  @include flexJustifySpaceBetween;
   @include flexAlignItemsCenter;
   @include clampText;
 
-  height: 48px;
+  @include fullHeight;
+  //height: 48px;
 
   color: $zorroa-gray;
   background-color: transparent;
 
+  .dark & { color: $zorroa-nearwhite; }
   span[class*="icon-"] {
-    margin-left: 6px;
     margin-right: 6px;
   }
 
@@ -23,12 +22,6 @@
     text-transform: uppercase;
     @include noSelect;
     @include clampText;
-  }
-
-  .Editbar-right-side {
-    @include flexRow;
-    @include clampText;
-    margin-right: 12px;
   }
 
   .Editbar-selected {
@@ -60,20 +53,44 @@
     }
   }
 
-  .Editbar-export {
-    margin-left: 12px;
-    margin-right: 12px;
+  .Editbar-similar {
+    margin-right: 8px;
     text-transform: uppercase;
+    border-radius: 3px;
+    padding: 5px;
     @include flexRow;
     @include flexAlignItemsCenter;
     @include clampText;
 
     &.disabled {
       color: $zorroa-lightgray;
+      .dark & { color: $zorroa-dimgray; }
     }
 
     &:not(.disabled):hover {
-      color: $zorroa-sickly-green;
+      background-color: white;
+      .dark & { background-color: $zorroa-dimgray; }
+      cursor:pointer;
+    }
+  }
+
+  .Editbar-export {
+    margin-left: 12px;
+    text-transform: uppercase;
+    border-radius: 3px;
+    padding: 5px;
+    @include flexRow;
+    @include flexAlignItemsCenter;
+    @include clampText;
+
+    &.disabled {
+      color: $zorroa-lightgray;
+      .dark & { color: $zorroa-dimgray; }
+    }
+
+    &:not(.disabled):hover {
+      background-color: white;
+      .dark & { background-color: $zorroa-dimgray; }
       cursor:pointer;
     }
   }
@@ -96,59 +113,15 @@
   }
 }
 
-.SortingSelector {
-  @include flexRow;
-  @include flexAlignItemsCenter;
-  @include flexShrinkOnly;
-  @include clampText;
-
-  text-transform: uppercase;
-  font-size: 12px;
-  font-family: "Roboto Condensed";
-  margin-left: 10px;
-  color: $zorroa-lightgray;
-
-  .SortingSelector-title {
-    @include clampText;
-    margin-right: 10px;
-  }
-
-  .SortingSelector-sort {
-    @include clampText;
-
-    margin-right: 10px;
-    color: $zorroa-gray;
-
-    &:not(.SortingSelector-disabled):hover {
-      cursor: pointer;
-      color: $zorroa-darkgray;
-      text-decoration: underline;
-    }
-
-    &.SortingSelector-selected {
-      cursor: default;
-      color: $zorroa-sickly-green;
-      text-decoration: underline;
-    }
-
-    &.SortingSelector-disabled:not(.SortingSelector-selected) {
-      cursor: not-allowed;
-      color: $zorroa-lightgray;
-      text-decoration: none;
-    }
-  }
-
-  .SortingSelector-similar {
-    @include flexRowCenter;
-    @include clampText;
-    color: $zorroa-darkgray;
-    &:hover {
-      color: $zorroa-sickly-green;
-    }
-  }
-
-  .SortingSelector-icon {
-    &:hover { color: $zorroa-sickly-green; }
-    .SortingSelector-selected:hover & { color: $zorroa-sickly-green; }
+.Editbar-similar-section {
+  @include flexRowCenter;
+  @include fullHeight;
+  padding-left: 20px;
+  padding-right: 20px;
+  border-left: 1px solid $zorroa-lightgray;
+  border-right: 1px solid $zorroa-lightgray;
+  .dark & {
+    border-left: 1px solid $zorroa-dimgray;
+    border-right: 1px solid $zorroa-dimgray;
   }
 }

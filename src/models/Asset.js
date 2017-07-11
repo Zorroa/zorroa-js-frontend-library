@@ -37,6 +37,12 @@ export default class Asset {
     return this.endpoint(origin, parentId) + '/proxies/smallest'
   }
 
+  backgroundURL (origin) {
+    const id = this.rawValue('video.background')
+    if (!id) return
+    return `${origin}/api/v1/ofs/${id}`
+  }
+
   mediaType () { return (this.document.source && this.document.source.mediaType) || 'unknown' }
   tinyProxy () { return (this.document.proxies && (this.document.proxies ? this.document.proxies.tinyProxy : null)) }
 

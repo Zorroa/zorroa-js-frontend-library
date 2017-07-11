@@ -7,13 +7,14 @@ const Duration = (props) => (
       <div className="Duration-arrow-right" />
     </div>
     <div className="Duration-duration">
-      { formatDuration(parseFormattedFloat(props.duration)) }
+      { formatDuration(parseFormattedFloat(props.duration), props.fps) }
     </div>
   </div>
 )
 
 Duration.propTypes = {
-  duration: PropTypes.number.isRequired
+  duration: PropTypes.number.isRequired,
+  fps: PropTypes.number
 }
 
 export default Duration

@@ -7,14 +7,16 @@
     color: $zorroa-nearwhite;
   }
 
+  .WidgetHeader-header-field {
+    //min-width: 70px;
+  }
+
   .Range-body {
-    background-color: white;
-    color: $zorroa-gray;
     display: flex;
     flex-direction: column;
     padding: 10px;
     overflow: hidden;
-
+    min-width: 200px;
     input {
       outline: none;
       background: none;
@@ -24,8 +26,10 @@
       font-weight: 500;
       line-height: 2em;
       padding-left: 8px;
+      padding-right: 8px;
       width: 100%;
       min-width: 0;
+      .dark & { color: white; }
     }
   }
 
@@ -130,6 +134,7 @@
     @include flexOn;
     @include flexRowCenter;
     @include zorroa-darken;
+    @include nowrap;
     cursor: pointer;
     width: 100%;
     padding: 3px;
