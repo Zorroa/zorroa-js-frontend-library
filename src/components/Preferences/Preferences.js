@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import JSONTree from 'react-json-tree'
 
-import { hideModal, lightbarFieldTemplate, thumbFieldTemplate, assetsFieldTemplate, uxLevel, monochrome } from '../../actions/appActions'
+import { hideModal, lightbarFieldTemplate, thumbFieldTemplate, dragFieldTemplate, uxLevel, monochrome } from '../../actions/appActions'
 import { saveUserSettings, changePassword } from '../../actions/authAction'
 import { archivistInfo, archivistHealth, archivistMetrics } from '../../actions/archivistAction'
 import User from '../../models/User'
@@ -45,7 +45,7 @@ class Preferences extends Component {
     userSettings: PropTypes.object.isRequired,
     lightbarFieldTemplate: PropTypes.string,
     thumbFieldTemplate: PropTypes.string,
-    assetsFieldTemplate: PropTypes.string
+    dragFieldTemplate: PropTypes.string
   }
 
   componentDidMount () {
@@ -81,10 +81,10 @@ class Preferences extends Component {
     this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, lightbarFieldTemplate })
   }
 
-  changeAssetsFieldTemplate = (event) => {
-    const assetsFieldTemplate = event.target.value
-    this.props.actions.assetsFieldTemplate(assetsFieldTemplate)
-    this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, assetsFieldTemplate })
+  changeDragFieldTemplate = (event) => {
+    const dragFieldTemplate = event.target.value
+    this.props.actions.dragFieldTemplate(dragFieldTemplate)
+    this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, dragFieldTemplate })
   }
 
   logoutDropbox = (event) => {
@@ -115,7 +115,7 @@ class Preferences extends Component {
   }
 
   render () {
-    const { user, info, health, metrics, lightbarFieldTemplate, thumbFieldTemplate, assetsFieldTemplate, uxLevel, monochrome } = this.props
+    const { user, info, health, metrics, lightbarFieldTemplate, thumbFieldTemplate, dragFieldTemplate, uxLevel, monochrome } = this.props
     return (
       <div className="Preferences">
         <div className="Preferences-header">
@@ -153,7 +153,7 @@ class Preferences extends Component {
               <div className="Preferences-field-template-label">Thumbnail Label</div>
             </div>
             <div className="Preferences-field-template">
-              <input type="text" className="Preferences-field-template-input" value={assetsFieldTemplate} onChange={this.changeAssetsFieldTemplate}/>
+              <input type="text" className="Preferences-field-template-input" value={dragFieldTemplate} onChange={this.changeDragFieldTemplate}/>
               <div className="Preferences-field-template-label">Assets Template</div>
             </div>
             { DropboxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutDropbox}>Logout Dropbox</button> }
@@ -191,7 +191,7 @@ export default connect(state => ({
   userSettings: state.app.userSettings,
   lightbarFieldTemplate: state.app.lightbarFieldTemplate,
   thumbFieldTemplate: state.app.thumbFieldTemplate,
-  assetsFieldTemplate: state.app.assetsFieldTemplate
+  dragFieldTemplate: state.app.dragFieldTemplate
 }), dispatch => ({
   actions: bindActionCreators({
     saveUserSettings,
@@ -202,7 +202,7 @@ export default connect(state => ({
     hideModal,
     lightbarFieldTemplate,
     thumbFieldTemplate,
-    assetsFieldTemplate,
+    dragFieldTemplate,
     uxLevel,
     monochrome
   }, dispatch)

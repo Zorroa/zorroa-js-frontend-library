@@ -62,7 +62,7 @@ export function multipageBadges (asset, origin, stackCount) {
 // Called when dragging an asset to assign assetIds to drop info
 const source = {
   dragStart (props, type, se) {
-    const { assetId, selectedAssetIds, allAssets, showMultipage, assetsFieldTemplate } = props
+    const { assetId, selectedAssetIds, allAssets, showMultipage, dragFieldTemplate } = props
     let assetIds = isolateSelectId(assetId, selectedAssetIds)
     if (showMultipage) {
       assetIds = new Set(assetIds)      // Don't change app state
@@ -76,11 +76,11 @@ const source = {
       const index = allAssets.findIndex(asset => (asset.id === id))
       if (index >= 0) assets.push(allAssets[index])
     })
-    const vars = parseVariables(assetsFieldTemplate)
+    const vars = parseVariables(dragFieldTemplate)
     let assetExtIds = []
     assets.forEach(asset => {
       const values = valuesForFields(vars, asset)
-      const assetExtId = replaceVariables(assetsFieldTemplate, values)
+      const assetExtId = replaceVariables(dragFieldTemplate, values)
       assetExtIds.push(assetExtId)
     })
 
@@ -210,8 +210,7 @@ class Thumb extends Component {
 
 export default connect(state => ({
   showMultipage: state.app.showMultipage,
-  assetsFields: state.app.assetFields,
-  assetsFieldTemplate: state.app.assetsFieldTemplate,
+  dragFieldTemplate: state.app.dragFieldTemplate,
   allAssets: state.assets.all,
   selectedAssetIds: state.assets.selectedIds
 }))(Thumb)

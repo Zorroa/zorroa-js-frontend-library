@@ -34,7 +34,7 @@ class Searcher extends Component {
     metadataFields: PropTypes.arrayOf(PropTypes.string),
     lightbarFields: PropTypes.arrayOf(PropTypes.string),
     thumbFields: PropTypes.arrayOf(PropTypes.string),
-    assetsFields: PropTypes.arrayOf(PropTypes.string),
+    dragFields: PropTypes.arrayOf(PropTypes.string),
     jobs: PropTypes.object,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
@@ -219,7 +219,7 @@ class Searcher extends Component {
       widgets, actions, selectedFolderIds, query,
       modifiedFolderIds, trashedFolders, order,
       similar,
-      metadataFields, lightbarFields, thumbFields, assetsFields, fieldTypes
+      metadataFields, lightbarFields, thumbFields, dragFields, fieldTypes
     } = this.props
     if (!fieldTypes) return null
 
@@ -229,7 +229,7 @@ class Searcher extends Component {
 
     // Limit results to favorited fields, since we only display values
     // in those fields in the Table and Lightbar
-    const fields = requiredFields([...metadataFields, ...lightbarFields, ...thumbFields, ...assetsFields], fieldTypes)
+    const fields = requiredFields([...metadataFields, ...lightbarFields, ...thumbFields, ...dragFields], fieldTypes)
     assetSearch.fields = [...fields]
 
     // Do not send the query unless it is different than the last returned query
@@ -285,7 +285,7 @@ const mapStateToProps = state => ({
   metadataFields: state.app.metadataFields,
   lightbarFields: state.app.lightbarFields,
   thumbFields: state.app.thumbFields,
-  assetsFields: state.app.assetsFields,
+  dragFields: state.app.dragFields,
   jobs: state.jobs.all,
   user: state.auth.user,
   userSettings: state.app.userSettings

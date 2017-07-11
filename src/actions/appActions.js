@@ -6,7 +6,7 @@ import {
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
   SHOW_MULTIPAGE, SHOW_PAGES, VIDEO_VOLUME,
   HOVER_FIELD, CLEAR_HOVER_FIELD,
-  THUMB_FIELD_TEMPLATE, ASSETS_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE,
+  THUMB_FIELD_TEMPLATE, DRAG_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE,
   UX_LEVEL, MONOCHROME
 } from '../constants/actionTypes'
 
@@ -170,9 +170,9 @@ export function lightbarFieldTemplate (template) {
   })
 }
 
-export function assetsFieldTemplate (template) {
+export function dragFieldTemplate (template) {
   return ({
-    type: ASSETS_FIELD_TEMPLATE,
+    type: DRAG_FIELD_TEMPLATE,
     payload: template
   })
 }
