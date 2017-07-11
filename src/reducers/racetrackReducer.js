@@ -20,7 +20,7 @@ function extractSimilar (similar, widget) {
   return { ...similar, field }
 }
 
-function fieldExists(field, fieldTypes) {
+function fieldExists (field, fieldTypes) {
   const types = Object.keys(fieldTypes)
   for (let i = 0; i < types.length; ++i) {
     const type = types[i]
