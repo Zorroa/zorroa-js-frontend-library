@@ -52,9 +52,9 @@ const initialState = {
   showPages: false,
   sortFolders: 'alpha-asc',
   hoverFields: new Set(),
-  thumbFieldTemplate: '${image.width|video.width}x${image.height|video.height} ${source.type}',
-  lightbarFieldTemplate: '${source.type} ${source.filename} ${image.width|video.width}x${image.height|video.height} ${source.date}',
-  dragFieldTemplate: '${source.filename}',
+  thumbFieldTemplate: '%{image.width|video.width}x%{image.height|video.height} %{source.type}',
+  lightbarFieldTemplate: '%{source.type} %{source.filename} %{image.width|video.width}x%{image.height|video.height} %{source.date}',
+  dragFieldTemplate: '%{source.filename}',
   userSettings: {
     metadataFields: [ ...defaultMetadataFields ],
     showTable: false,
