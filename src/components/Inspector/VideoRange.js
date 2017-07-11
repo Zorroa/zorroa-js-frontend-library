@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import classnames from 'classnames'
 
-import { formatDuration } from '../../services/jsUtil'
 import Resizer from '../../services/Resizer'
 import { TimeAxis } from 'react-axis'
 

@@ -70,7 +70,7 @@ describe('Table', function () {
   it('test the Table', function () {
     var TableToggle
     var assetsScrollHeight
-    var expectedMinAssetsScrollHeight = '175.438px' // see Assets.js:footerEditbarAndPaddingHeight
+    var expectedMinAssetsScrollHeight = '174.797px' // see Assets.js:footerEditbarAndPaddingHeight
     var expectedMinTableHeight = '26px' // see Assets.js:minTableHeight
     var elements
 

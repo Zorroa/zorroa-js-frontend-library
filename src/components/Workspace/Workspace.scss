@@ -12,6 +12,8 @@
   left: 0;
   right: 0;
   bottom: 0;
+
+  &.dark { background-color: $zorroa-gray; }
 }
 
 .App-dropzone {
@@ -39,6 +41,8 @@
 .Workspace {
   background-color: $zorroa-nearwhite;
   overflow: hidden;
+
+  .dark & { background-color: $zorroa-gray; }
 
   & .Workspace-vertical-separator {
     height: 100%;

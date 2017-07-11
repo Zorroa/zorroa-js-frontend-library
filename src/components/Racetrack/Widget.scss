@@ -7,10 +7,12 @@
 .Widget-body {
   filter: grayscale(100%) opacity(50%);
   min-width: 100%;
+  .dark & { color: $zorroa-lightgray; background-color: $zorroa-darkgray; }
 
   &.floatBody {
     z-index: 10000;
     background-color: white;
+    .dark & { color: $zorroa-lightgray; background-color: $zorroa-darkgray; }
     position: absolute;
     top: 100%;
     right: 0;
