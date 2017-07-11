@@ -27,8 +27,7 @@ export default class Widget {
 
   merge (rhs) {
     if (this.type !== rhs.type) return false
-    const noraw = (str) => (str.replace(/\.raw$/, ''))
-    if (noraw(this.field) !== noraw(rhs.field)) return false
+    if (removeRaw(this.field) !== noraw(rhs.field)) return false
     this.sliver = this.sliver.merge(rhs.sliver)
     this.isEnabled |= rhs.isEnabled
     this.isPinned |= rhs.isPinned
@@ -37,8 +36,10 @@ export default class Widget {
   }
 }
 
+export function removeRaw (field) { return field && field.replace(/\.raw$/, '')}
+
 export function aggField (field, fieldType) {
-  field = field && field.replace(/\.raw/, '')
+  field = field && removeRaw(field)
   if (!field || !field.length || !fieldType || !fieldType.length) return
   const numericFieldTypes = new Set(['double', 'integer', 'long', 'date', 'boolean'])
   const isNumeric = numericFieldTypes.has(fieldType)
@@ -190,4 +191,8 @@ export function createCollectionsWidget (field, fieldType, isEnabled, isPinned) 
 export function createSortOrderWidget (field, filedType, isEnabled, isPinned) {
   field = '_order'
   return new Widget({type: SortOrderWidgetInfo.type, field, isEnabled, isPinned})
+}
+
+export function fieldUsedInWidget (field, widget) {
+  return removeRaw(widget.field) === removeRaw(field)
 }

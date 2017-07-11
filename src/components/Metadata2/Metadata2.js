@@ -11,7 +11,7 @@ import { minimalUniqueFieldTitle } from '../../models/Asset'
 import { unCamelCase, equalSets } from '../../services/jsUtil'
 import { getAssetFields, assetsForIds } from '../../actions/assetsAction'
 import { saveUserSettings } from '../../actions/authAction'
-import { widgetTypeForField, createFacetWidget } from '../../models/Widget'
+import { fieldUsedInWidget, widgetTypeForField, createFacetWidget } from '../../models/Widget'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
 import { iconifyRightSidebar, updateMetadataFields,
   toggleCollapsible, hoverField, clearHoverField } from '../../actions/appActions'
@@ -141,7 +141,7 @@ class Metadata2 extends Component {
   toggleWidget = (field, event) => {
     const { widgets, dark } = this.props
     if (dark) return
-    const index = widgets.findIndex(widget => (widget.field === field))
+    const index = widgets.findIndex(widget => fieldUsedInWidget(field, widget))
     if (index >= 0) {
       this.props.actions.removeRacetrackWidgetIds([widgets[index].id])
     } else {
@@ -158,7 +158,7 @@ class Metadata2 extends Component {
     if (this.props.dark) return
     const fieldType = this.props.fieldTypes[field]
     field = field && field.endsWith('.raw') ? field : field + '.raw'
-    const index = this.props.widgets.findIndex(widget => (widget.field === field))
+    const index = this.props.widgets.findIndex(widget => fieldUsedInWidget(field, widget))
     let terms = [term]
     if (index >= 0 && event.shiftKey) {       // Add to terms for shift
       const widget = this.props.widgets[index]
@@ -275,7 +275,7 @@ class Metadata2 extends Component {
       const isLeaf = this.isLeaf(field, namespace)
       const hasChildren = false
       const isFavorite = this.isFavorite(fieldTypes, hasChildren, namespace, metadataFields)
-      const isSearched = !dark && widgets.findIndex(widget => (widget.field === field)) >= 0
+      const isSearched = !dark && widgets.findIndex(widget => fieldUsedInWidget(field, widget)) >= 0
       const widgetType = widgetTypeForField(field, fieldTypes[field])
       const widgetIcon = this.widgetTypeIcon(widgetType)
       const leaf = this.renderLeaf(field, namespace, fields, isSearched, isFavorite, widgetIcon)

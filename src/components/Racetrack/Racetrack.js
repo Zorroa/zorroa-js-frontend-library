@@ -2,7 +2,7 @@ import React, { Component, PropTypes, cloneElement } from 'react'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
-import Widget from '../../models/Widget'
+import Widget, { removeRaw } from '../../models/Widget'
 import * as WidgetInfo from './WidgetInfo'
 
 class Racetrack extends Component {
@@ -32,7 +32,7 @@ class Racetrack extends Component {
       <div className="Racetrack">
         {openedWidgets.map((widget, i) => (
           <div key={widget.id}
-               className={classnames('Racetrack-widget', {hoverField: hoverFields.has(widget.field)})} >
+               className={classnames('Racetrack-widget', {hoverField: hoverFields.has(removeRaw(widget.field))})} >
             { this.renderWidget(widget, isIconified) }
           </div>
         ))}

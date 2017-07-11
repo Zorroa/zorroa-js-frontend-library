@@ -10,7 +10,7 @@ import { saveUserSettings } from '../../actions/authAction'
 import { getAssetFields, sortAssets, unorderAssets } from '../../actions/assetsAction'
 import { unCamelCase } from '../../services/jsUtil'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
-import { widgetTypeForField } from '../../models/Widget'
+import { fieldUsedInWidget, widgetTypeForField } from '../../models/Widget'
 import * as WidgetInfo from '../Racetrack/WidgetInfo'
 
 class Metadata extends Component {
@@ -140,7 +140,7 @@ class Metadata extends Component {
 
   toggleWidget = (field, event) => {
     const { widgets } = this.props
-    const index = widgets.findIndex(widget => (widget.field === field))
+    const index = widgets.findIndex(widget => fieldUsedInWidget(field, widget))
     if (index >= 0) {
       this.props.actions.removeRacetrackWidgetIds([widgets[index].id])
     } else {
@@ -172,7 +172,7 @@ class Metadata extends Component {
     const modifiedFavorites = JSON.stringify(metadataFields) !== JSON.stringify(this.state.metadataFields)
     let modifiedWidgets = false
     this.state.searchedFields && this.state.searchedFields.forEach(field => {
-      if (widgets.findIndex(widget => (widget.field === field)) < 0) modifiedWidgets = true
+      if (widgets.findIndex(widget => fieldUsedInWidget(field, widget)) < 0) modifiedWidgets = true
     })
     let searchedFields = null
     // Filter all fields by string and sort
@@ -198,7 +198,7 @@ class Metadata extends Component {
             const hasChildren = i < parents.length - 1
             const isFavorite = this.isFavorite(fieldTypes, hasChildren, namespace, metadataFields)
             const isLeaf = this.isLeaf(field, namespace)
-            const isSearched = isLeaf && widgets.findIndex(widget => (widget.field === field)) >= 0
+            const isSearched = isLeaf && widgets.findIndex(widget => fieldUsedInWidget(field, widget)) >= 0
             if (isSearched) searchedFields.push(field)
             const widgetType = !hasChildren && widgetTypeForField(field, fieldTypes[field])
             const widgetIcon = this.widgetTypeIcon(widgetType)
