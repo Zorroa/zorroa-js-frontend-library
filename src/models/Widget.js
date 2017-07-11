@@ -54,13 +54,14 @@ export function widgetTypeForField (field, type) {
   if (type === 'nested' && parents[0] === 'colors' && parents.length === 1) {
     return ColorWidgetInfo.type
   }
-  if (type === 'string' && parents[0] === 'source' && parents.length === 2 && parents[1] === 'extension') {
+  if ((type === 'string' || type === 'keywords-auto') && parents[0] === 'source' && parents.length === 2 && parents[1] === 'extension') {
     return FiletypeWidgetInfo.type
   }
   switch (type) {
     case 'date': return DateRangeWidgetInfo.type
     case 'point': return MapWidgetInfo.type
     case 'boolean':
+    case 'keywords-auto':
     case 'string': return FacetWidgetInfo.type
     case 'integer':
     case 'double':
