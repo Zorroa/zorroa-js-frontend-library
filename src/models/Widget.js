@@ -27,7 +27,7 @@ export default class Widget {
 
   merge (rhs) {
     if (this.type !== rhs.type) return false
-    if (removeRaw(this.field) !== noraw(rhs.field)) return false
+    if (removeRaw(this.field) !== removeRaw(rhs.field)) return false
     this.sliver = this.sliver.merge(rhs.sliver)
     this.isEnabled |= rhs.isEnabled
     this.isPinned |= rhs.isPinned
@@ -36,7 +36,7 @@ export default class Widget {
   }
 }
 
-export function removeRaw (field) { return field && field.replace(/\.raw$/, '')}
+export function removeRaw (field) { return field && field.replace(/\.raw$/, '') }
 
 export function aggField (field, fieldType) {
   field = field && removeRaw(field)
