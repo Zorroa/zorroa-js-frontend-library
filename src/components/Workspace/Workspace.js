@@ -54,7 +54,8 @@ class Workspace extends Component {
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     selectedAssetIds: PropTypes.instanceOf(Set),
     commands: PropTypes.instanceOf(Map),
-    isAdministrator: PropTypes.bool
+    isAdministrator: PropTypes.bool,
+    monochrome: PropTypes.bool
   }
 
   state = {
@@ -213,7 +214,7 @@ class Workspace extends Component {
   }
 
   render () {
-    const { app, isolatedId, selectedAssetIds, user, isAdministrator, searching } = this.props
+    const { app, isolatedId, selectedAssetIds, user, isAdministrator, searching, monochrome } = this.props
 
     const LibraryParams = () => ({
       header: (<span>Library</span>),
@@ -256,7 +257,7 @@ class Workspace extends Component {
 
     const { isDroppable, showReloader } = this.state
     return (
-      <div onDragEnter={this.dragEnter} className={classnames('App', 'flexCol', 'fullHeight', {isDragging: app.dragInfo})}>
+      <div onDragEnter={this.dragEnter} className={classnames('App', 'flexCol', 'fullHeight', {isDragging: app.dragInfo, dark: monochrome})}>
         { app.modal && <Modal {...app.modal} /> }
         { showReloader && (
           <div className="Workspace-reloader">
@@ -296,7 +297,7 @@ class Workspace extends Component {
               <Metadata/>
             </Collapsible>
             <Collapsible {...Metadata2Params()}>
-              <Metadata2 assetIds={selectedAssetIds} height="60vh" />
+              <Metadata2 assetIds={selectedAssetIds} height="60vh" dark={monochrome} />
             </Collapsible>
           </Sidebar>
 
@@ -330,7 +331,8 @@ export default connect(state => ({
   selectedAssetIds: state.assets.selectedIds,
   jobs: state.jobs.all,
   commands: state.assets.commands,
-  isAdministrator: state.auth.isAdministrator
+  isAdministrator: state.auth.isAdministrator,
+  monochrome: state.app.monochrome
 }), dispatch => ({
   actions: bindActionCreators({
     iconifyLeftSidebar,

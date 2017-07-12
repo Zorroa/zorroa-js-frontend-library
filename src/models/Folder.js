@@ -26,6 +26,7 @@ export default class Folder {
       this.acl = json.acl && json.acl.map(entry => (new AclEntry(entry)))
       this.search = json.search && new AssetSearch(json.search)
       this.childCount = json.childCount   // server-managed
+      this.attrs = json.attrs
 
       this.childIds = null // client-created set of childIds in reducer
     }

@@ -9,8 +9,9 @@ import Thumb, { page, monopageBadges, multipageBadges } from '../Thumb'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
 import Widget from '../../models/Widget'
+import Folder from '../../models/Folder'
 import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, similarAssets, unorderAssets } from '../../actions/assetsAction'
-import { resetRacetrackWidgets, restoreSearch, similar } from '../../actions/racetrackAction'
+import { resetRacetrackWidgets, restoreFolders, similar } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
 import { setThumbSize, setThumbLayout, showTable, setTableHeight, showMultipage, showModal, hideModal, iconifyRightSidebar } from '../../actions/appActions'
@@ -301,9 +302,9 @@ class Assets extends Component {
     this.startHistoryNav()
 
     // close lightbox, restore search
-    const query = historyVal.query
+    const folder = historyVal.folder
     this.props.actions.isolateAssetId()
-    this.props.actions.restoreSearch(query)
+    this.props.actions.restoreFolders([folder])
   }
 
   // We need to detect when the search changes because of navigation (fwd/back buttons)
@@ -324,16 +325,14 @@ class Assets extends Component {
 
   saveHistory = (optFirstTimeHistoryKey) => {
     if (this.historyNav && !optFirstTimeHistoryKey) return
-    const query = this.props.query
-    if (query && query.from) return
+    const { query, similar, order, widgets } = this.props
     this.stopHistoryNav()
 
     const path = location.pathname + location.search
     const historyKey = optFirstTimeHistoryKey || Date.now().toString()
-    this.history[historyKey] = { query }
-
-    // Trying to keep the URL clean by hiding our key in the previous entry,
-    // and having the current entry w/o a hash
+    const attrs = { similar, widgets, order }
+    const folder = new Folder({ search: query, attrs })
+    this.history[historyKey] = { folder }
 
     requestAnimationFrame(_ => {
       if (location.hash) {
@@ -341,7 +340,6 @@ class Assets extends Component {
       } else {
         history.replaceState({}, 'title', `${path}#${historyKey}`)
       }
-      history.pushState({}, 'title', `${path}`)
     })
   }
 
@@ -567,7 +565,7 @@ class Assets extends Component {
                   const parentId = asset.parentId()
                   const indexes = parentId && multipage[parentId]
                   const badgeHeight = thumbSize < 100 ? 15 : 25
-                  const badge = showMultipage ? multipageBadges(asset, origin, indexes && indexes.length, thumbFieldTemplate) : monopageBadges(asset)
+                  const badge = showMultipage ? multipageBadges(asset, origin, indexes && indexes.length) : monopageBadges(asset)
                   const iconBadge = <div className="Thumb-field"><FieldTemplate asset={asset} template={thumbFieldTemplate} extensionOnLeft={false}/></div>
 
                   const pages = indexes && indexes.slice(0, 3).map(index => (
@@ -617,9 +615,8 @@ class Assets extends Component {
       if (!query.from) {
         this.loaded = 0
         this.scrollToSelection()
+        this.saveHistory()
       }
-
-      this.saveHistory()
     }
     this.assetsCounter = assetsCounter
     if (this.historyNav) this.startHistoryNav()
@@ -712,7 +709,7 @@ export default connect(state => ({
     unorderAssets,
     similar,
     resetRacetrackWidgets,
-    restoreSearch,
+    restoreFolders,
     selectFolderIds,
     setThumbSize,
     setThumbLayout,

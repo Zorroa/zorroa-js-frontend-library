@@ -96,6 +96,7 @@
   box-shadow: 0 2px 4px 4px rgba(128,128,128,.25);
   color: white;
   background-color: rgba(128,128,128,0.75);
+  .dark & { background-color: rgba(0,0,0,0.75) }
   padding: 0 10px;
 
   width: auto;
@@ -123,7 +124,7 @@
   padding-right: 8px;
   border-left: 1px solid $zorroa-gray;
   border-right: 1px solid $zorroa-gray;
-  &.dark {
+  .dark & {
     border-left: 1px solid $zorroa-darkgray;
     border-right: 1px solid $zorroa-darkgray;
   }

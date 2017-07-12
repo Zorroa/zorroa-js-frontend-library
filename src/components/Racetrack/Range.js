@@ -60,7 +60,7 @@ class Range extends Component {
     const widget = widgets && widgets[index]
 
     if (widget && widget.sliver) {
-      const field = Object.keys(widget.sliver.aggs)[0]
+      const field = widget.field
       let min, max
       if (widget.sliver.filter && widget.sliver.filter.range) {
         const range = widget.sliver.filter.range
@@ -276,7 +276,7 @@ class Range extends Component {
 
           <div className="Range-row flexRowCenter">
             <div className="flexRowCenter flexOn">
-              <span className="Range-label">min</span>
+              <div className="Range-label">min</div>
               <input id={`Range-min-${id}`}
                      className='flexOn'
                      placeholder={'min'}
@@ -290,7 +290,7 @@ class Range extends Component {
             <div style={{width: '20px'}}/>
 
             <div className="flexRowCenter flexOn">
-              <span className="Range-label">max</span>
+              <div className="Range-label">max</div>
               <input id={`Range-min-${id}`}
                      className='flexOn'
                      placeholder={'max'}
@@ -335,7 +335,7 @@ class Range extends Component {
             </div>
             { (min !== autoMin || max !== autoMax) && (
               <div className="Range-auto-reset" onClick={this.resetAutoRange}>
-                <span>Reset range</span>
+                <div>Reset range</div>
                 <div className="Range-auto-reset-button icon-cancel-circle"/>
               </div>
             )}

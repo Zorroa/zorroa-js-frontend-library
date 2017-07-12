@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 import User from '../../models/User'
-import Widget from '../../models/Widget'
+import Widget, { removeRaw } from '../../models/Widget'
 import Folder from '../../models/Folder'
 import TrashedFolder from '../../models/TrashedFolder'
 import * as WidgetInfo from './WidgetInfo'
@@ -78,7 +78,7 @@ class Racebar extends Component {
     const dyhiLevels = []
     widgets.forEach(widget => {
       if (widget.type === WidgetInfo.FacetWidgetInfo.type) {
-        const field = widget.sliver.aggs.facet.terms.field
+        const field = widget.field
         dyhiLevels.push({ field, type: 'Attr' })
       }
     })
@@ -110,7 +110,8 @@ class Racebar extends Component {
         search.postFilter = undefined
         search.order = []
       }
-      const folder = new Folder({ name, acl, parentId, search })
+      const attrs = { widgets, similar, order }
+      const folder = new Folder({ name, acl, parentId, search, attrs })
       this.props.actions.createFolder(folder)
       this.props.actions.toggleCollapsible('home', true)
     }
@@ -151,7 +152,7 @@ class Racebar extends Component {
           </div>
           { widgets && widgets.length > 0 && widgets.filter(w => (blacklist.indexOf(w.type) < 0)).map((widget, i) => (
             <div key={widget.id}
-                 className={classnames('Racebar-widget', {hoverField: hoverFields.has(widget.field())})} >
+                 className={classnames('Racebar-widget', {hoverField: hoverFields.has(removeRaw(widget.field))})} >
               { this.renderWidget(widget, false) }
             </div>
           ))}

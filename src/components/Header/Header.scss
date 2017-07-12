@@ -8,6 +8,7 @@
   height: 42px;
   position: relative;
   background-color: $zorroa-nearwhite;
+  .dark & { background-color: $zorroa-gray; }
 }
 
 // Box to left-justify the logo and search
@@ -178,4 +179,8 @@
   padding-right: 10px;
   border-left: 1px solid $zorroa-lightgray;
   border-right: 1px solid $zorroa-lightgray;
+  .dark & {
+    border-left: 1px solid $zorroa-dimgray;
+    border-right: 1px solid $zorroa-dimgray;
+  }
 }

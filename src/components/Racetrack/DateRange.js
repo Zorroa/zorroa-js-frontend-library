@@ -51,9 +51,18 @@ class DateRange extends Component {
     const { id, widgets } = nextProps
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
-    if (widget && widget.sliver) {
-      const field = widget.sliver.aggs && widget.sliver.aggs.dateRange && widget.sliver.aggs.dateRange.stats.field
-      if (!this.state.field || this.state.field !== field) {
+    if (widget) {
+      const field = widget.field
+      if (field && widget.sliver && widget.sliver.filter && widget.sliver.filter.range) {
+        const range = widget.sliver.filter.range[field]
+        if (range) {
+          const minStr = range.gte
+          const maxStr = range.lte
+          const min = moment(minStr, format).toDate()
+          const max = moment(maxStr, format).toDate()
+          this.setState({field, min, max, minStr, maxStr})
+        }
+      } else if (!this.state.field || this.state.field !== field) {
         this.setState({field, min: null, max: null, minStr: null, maxStr: null})
       }
     } else if (nextProps.aggs) {

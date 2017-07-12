@@ -23,7 +23,7 @@ import {
 } from '../../actions/folderAction'
 import { showModal, hideModal } from '../../actions/appActions'
 import { exportAssets } from '../../actions/jobActions'
-import { restoreSearch } from '../../actions/racetrackAction'
+import { restoreFolders } from '../../actions/racetrackAction'
 import { setAssetPermissions } from '../../actions/assetsAction'
 import { isolateSelectId } from '../../services/jsUtil'
 
@@ -134,10 +134,10 @@ class FolderItem extends Component {
     this.setState({ isContextMenuVisible: false })
   }
 
-  restoreSearch = (event) => {
+  restoreFolder = (event) => {
     event.preventDefault()
     const { folder, actions } = this.props
-    actions.restoreSearch(folder.search)
+    actions.restoreFolders([folder])
     this.dismissContextMenu(event)
   }
 
@@ -390,7 +390,7 @@ class FolderItem extends Component {
               </div>
             ))}
           { singleFolderSelected && !folder.isDyhi() && folder.search &&
-          <div onClick={this.restoreSearch}
+          <div onClick={this.restoreFolder}
                className="FolderItem-context-item FolderItem-context-restore-widgets"
                onContextMenu={this.dismissContextMenu}>
             <div className="icon-settings_backup_restore"/><div>Restore Widgets</div></div> }
@@ -541,7 +541,7 @@ export default connect(state => ({
     hideModal,
     deleteFolderIds,
     updateFolder,
-    restoreSearch,
+    restoreFolders,
     setAssetPermissions
   }, dispatch)
 }))(FolderItem)
