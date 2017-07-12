@@ -25,7 +25,7 @@ import * as ComputeLayout from './ComputeLayout.js'
 import AssetSearch from '../../models/AssetSearch'
 import Resizer from '../../services/Resizer'
 import TrashedFolder from '../../models/TrashedFolder'
-import { addSiblings, equalSets } from '../../services/jsUtil'
+import { equalSets } from '../../services/jsUtil'
 import * as api from '../../globals/api.js'
 
 const assetsScrollPadding = 8
@@ -37,6 +37,8 @@ class Assets extends Component {
     assetsCounter: PropTypes.number.isRequired,
     query: PropTypes.instanceOf(AssetSearch),
     order: PropTypes.arrayOf(PropTypes.object),
+    parentIds: PropTypes.instanceOf(Set),
+    parentCounts: PropTypes.instanceOf(Map),
     selectedIds: PropTypes.object,
     selectionCounter: PropTypes.number.isRequired,
     totalCount: PropTypes.number,
@@ -99,7 +101,7 @@ class Assets extends Component {
   // toggle entries. We keep the anchor point for shift-select
   // in local state and must update it when the search changes.
   select = (asset, event) => {
-    const { assets, selectedIds, showMultipage, actions } = this.props
+    const { assets, selectedIds, actions } = this.props
     const { lastSelectedId } = this.state
     let ids
     if (event.shiftKey) {
@@ -116,23 +118,18 @@ class Assets extends Component {
             for (var i = min; i <= max; ++i) {
               ids.add(assets[i].id)
             }
-            if (showMultipage) {
-              addSiblings(ids, assets)
-            }
           }
         }
       }
       if (!ids) {
         // Nothing in the extended selection set, treat as new selection
         ids = new Set([asset.id])
-        if (showMultipage) addSiblings(ids, assets)
         this.setState({lastSelectedId: asset.id})
       }
     } else if (event.metaKey) {
       // Toggle the current asset on or off
       ids = new Set([...selectedIds])
       const siblings = new Set([asset.id])
-      if (showMultipage) addSiblings(siblings, assets)
       siblings.forEach(id => {
         if (ids.has(id)) {
           ids.delete(id)
@@ -144,7 +141,6 @@ class Assets extends Component {
       this.setState({lastSelectedId})
     } else {
       ids = new Set([asset.id])
-      if (showMultipage) addSiblings(ids, assets)
       if (selectedIds && equalSets(ids, selectedIds)) {
         // single click of a single selected asset should deselect
         ids = new Set()
@@ -170,6 +166,9 @@ class Assets extends Component {
   }
 
   isolateToLightbox (asset) {
+    // Select the isolated asset, which is DE-selected on the second click
+    this.skipNextSelectionScroll = true
+    this.select(asset, event)
     this.props.actions.isolateAssetId(asset.id)
   }
 
@@ -493,7 +492,7 @@ class Assets extends Component {
   }
 
   renderAssets () {
-    const { assets, selectedIds, totalCount, layout, showMultipage, origin, thumbSize, query, thumbFieldTemplate } = this.props
+    const { assets, selectedIds, totalCount, layout, showMultipage, parentIds, parentCounts, origin, thumbSize, query, thumbFieldTemplate } = this.props
     const { positions, multipage, tableIsResizing } = this.state
     api.setTableIsResizing(tableIsResizing)
 
@@ -560,13 +559,14 @@ class Assets extends Component {
                     nextPageQuery.from = assets.length
                     nextPageQuery.size = AssetSearch.autoPageSize
                     console.log('Loading ' + nextPageQuery.size + ' from ' + nextPageQuery.from)
-                    this.props.actions.searchAssets(nextPageQuery)
+                    this.props.actions.searchAssets(nextPageQuery, null, false, showMultipage && parentIds)
                   }
                   if (!dim || width <= 0 || height <= 0) return null
                   const parentId = asset.parentId()
                   const indexes = parentId && multipage[parentId]
+                  const stackCount = parentId && parentCounts && parentCounts.get(parentId)
                   const badgeHeight = thumbSize < 100 ? 15 : 25
-                  const badge = showMultipage ? multipageBadges(asset, origin, indexes && indexes.length) : monopageBadges(asset)
+                  const badge = showMultipage ? multipageBadges(asset, origin, stackCount) : monopageBadges(asset)
                   const iconBadge = <div className="Thumb-field"><FieldTemplate asset={asset} template={thumbFieldTemplate} extensionOnLeft={false}/></div>
 
                   const pages = indexes && indexes.slice(0, 3).map(index => (
@@ -682,6 +682,8 @@ export default connect(state => ({
   assetsCounter: state.assets.assetsCounter,
   query: state.assets.query,
   order: state.assets.order,
+  parentIds: state.assets.parentIds,
+  parentCounts: state.assets.parentCounts,
   selectedIds: state.assets.selectedIds,
   selectionCounter: state.assets.selectionCounter,
   totalCount: state.assets.totalCount,

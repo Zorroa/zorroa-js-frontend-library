@@ -61,14 +61,21 @@ export default function (state = initialState, action) {
     case ASSET_SEARCH: {
       const { query, assets, page } = action.payload
       const all = state.all && page && page.from ? inject(state.all, page.from, assets) : assets
+      const parentIds = page && page.from ? state.parentIds : new Set()
+      assets.forEach(asset => { if (asset.parentId()) parentIds.add(asset.parentId()) })
       const totalCount = page && page.totalCount ? page.totalCount : 0
       const assetsCounter = state.assetsCounter + 1
       api.setAssetsCounter(assetsCounter)
-      return { ...state, all, query, totalCount, suggestions: null, assetsCounter, error: null }
+      return { ...state, all, query, totalCount, parentIds, suggestions: null, assetsCounter, error: null }
     }
 
     case ASSET_AGGS: {
       const { aggs } = action.payload
+      if (aggs.parentCounts) {
+        const parentCounts = new Map()
+        aggs.parentCounts.parentCounts.buckets.forEach(bucket => parentCounts.set(bucket.key, bucket.doc_count))
+        return { ...state, aggs, parentCounts }
+      }
       return { ...state, aggs }
     }
 

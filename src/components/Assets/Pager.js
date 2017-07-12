@@ -3,7 +3,6 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import AssetSearch from '../../models/AssetSearch'
-import { searchAssets } from '../../actions/assetsAction'
 
 class Pager extends Component {
   static propTypes = {
@@ -30,7 +29,6 @@ class Pager extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({ searchAssets }, dispatch)
 })
 
 const mapStateToProps = state => ({
