@@ -131,7 +131,7 @@ export function searchAssets (query, lastQuery, force, parentIds) {
       if (query.filter && query.postFilter) {
         mainQuery.filter.merge(query.postFilter)
       } else if (query.postFilter) {
-        mainQuery.filter = query.postFilter
+        mainQuery.filter = new AssetFilter(query.postFilter)
       }
 
       // Filter out any child assets that have already been loaded after the first page
