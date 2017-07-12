@@ -6,7 +6,7 @@ import Duration from '../Duration'
 import { DragSource } from '../../services/DragDrop'
 import Asset from '../../models/Asset'
 
-import { addSiblings, isolateSelectId } from '../../services/jsUtil'
+import { addSiblings, isolateSelectId, replaceVariables, valuesForFields, parseVariables } from '../../services/jsUtil'
 
 // Extract thumb page info from an asset
 export function page (asset, width, height, origin) {
@@ -62,13 +62,29 @@ export function multipageBadges (asset, origin, stackCount) {
 // Called when dragging an asset to assign assetIds to drop info
 const source = {
   dragStart (props, type, se) {
-    const { assetId, selectedAssetIds, allAssets, showMultipage } = props
+    const { assetId, selectedAssetIds, allAssets, showMultipage, dragFieldTemplate } = props
     let assetIds = isolateSelectId(assetId, selectedAssetIds)
     if (showMultipage) {
       assetIds = new Set(assetIds)      // Don't change app state
       addSiblings(assetIds, allAssets)  // Modifies assetIds
     }
-    return {assetIds}
+
+    // gather "external" asset ids, for drag and drop assets over to external apps,
+    // created by evaluating the asset fields template.
+    let assets = []
+    assetIds.forEach(id => {
+      const index = allAssets.findIndex(asset => (asset.id === id))
+      if (index >= 0) assets.push(allAssets[index])
+    })
+    const vars = parseVariables(dragFieldTemplate)
+    let assetExtIds = []
+    assets.forEach(asset => {
+      const values = valuesForFields(vars, asset)
+      const assetExtId = replaceVariables(dragFieldTemplate, values)
+      assetExtIds.push(assetExtId)
+    })
+
+    return {assetIds, assetExtIds}
   }
 }
 
@@ -194,6 +210,7 @@ class Thumb extends Component {
 
 export default connect(state => ({
   showMultipage: state.app.showMultipage,
+  dragFieldTemplate: state.app.dragFieldTemplate,
   allAssets: state.assets.all,
   selectedAssetIds: state.assets.selectedIds
 }))(Thumb)

@@ -89,8 +89,8 @@ class Lightbox extends Component {
                   onMetadata={this.toggleMetadata}/>
         <div className="lightbox-body flexOn fullWidth fullHeight">
           <Inspector asset={asset}
-                     onNext={hasNext ? (_ => this.isolateIndexOffset(1)) : null}
-                     onPrev={hasPrev ? (_ => this.isolateIndexOffset(-1)) : null} />
+                     onNext={hasNext ? _ => this.isolateIndexOffset(1) : null}
+                     onPrev={hasPrev ? _ => this.isolateIndexOffset(-1) : null} />
         </div>
         { lightboxMetadata.show && (
           <ResizableWindow onClose={this.closeMetadata} onMove={this.moveMetadata}
