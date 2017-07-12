@@ -1,6 +1,7 @@
 import assetsReducer from './assetsReducer'
 import { ASSET_SEARCH, ASSET_SEARCH_ERROR, ASSET_FIELDS, ISOLATE_ASSET, SELECT_ASSETS } from '../constants/actionTypes'
 import Page from '../models/Page'
+import Asset from '../models/Asset'
 
 // These are defined by webpack
 // TODO: figure out how to have the webpack config define these for tests
@@ -10,7 +11,7 @@ window.PROD = true
 
 describe('assetsReducer', () => {
   const query = 'foo'
-  const assets = [{id: 'a'}]
+  const assets = [new Asset({id: 'a'})]
   const page = new Page({size: 1, totalCount: 1})
 
   it('ASSET_SEARCH returns asset list', () => {
