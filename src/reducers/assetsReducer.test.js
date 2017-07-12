@@ -11,7 +11,7 @@ window.PROD = true
 
 describe('assetsReducer', () => {
   const query = 'foo'
-  const assets = [new Asset({id: 'a'})]
+  const assets = [new Asset({id: 'a', document: {}})]
   const page = new Page({size: 1, totalCount: 1})
 
   it('ASSET_SEARCH returns asset list', () => {
@@ -22,7 +22,8 @@ describe('assetsReducer', () => {
       totalCount: 1,
       suggestions: null,
       error: null,
-      assetsCounter: 1
+      assetsCounter: 1,
+      parentIds: new Set()
     }
     expect(assetsReducer({assetsCounter: 0}, { type: ASSET_SEARCH, payload }))
       .toEqual(result)
@@ -34,7 +35,7 @@ describe('assetsReducer', () => {
     const state1 = assetsReducer({assetsCounter: 0}, { type: ASSET_SEARCH, payload: payload1 })
 
     // Reduce the second page of assets
-    const assets2 = [{id: 'b'}]
+    const assets2 = [new Asset({id: 'b', document: {}})]
     const page2 = new Page({ from: 1, size: 1, totalCount: 2 })
     const payload2 = { query, assets: assets2, page: page2 }
 
@@ -46,7 +47,8 @@ describe('assetsReducer', () => {
       totalCount: 2,
       suggestions: null,
       error: null,
-      assetsCounter: 2
+      assetsCounter: 2,
+      parentIds: new Set()
     }
     expect(assetsReducer(state1, { type: ASSET_SEARCH, payload: payload2 }))
       .toEqual(result)
