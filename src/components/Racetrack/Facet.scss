@@ -25,6 +25,7 @@
 
   .Facet-clear-selection {
     @include flexRowCenter;
+    @include nowrap;
     font-size: 13px;
     color: $zorroa-lightgray;
     height: 14px;
@@ -59,15 +60,18 @@
 
     .Facet-value-table-row:nth-child(odd) {
       background-color: $zorroa-nearwhite;
-      .dark & { background-color: $zorroa-dimgray; }
+      .dark & { background-color: $zorroa-lightblack; }
     }
 
     .Facet-value-table-row {
       padding-right: 10px;
       color: $zorroa-greyish-brown;
-      .dark & { color: $zorroa-lightgray; }
+      .dark & { color: $zorroa-whitegray; }
       cursor: pointer;
-      &:not(.selected):hover { background-color: $zorroa-hover; }
+      &:not(.selected):hover {
+        background-color: $zorroa-hover;
+        .dark & { background-color: $zorroa-dark-hover; }
+      }
       &.selected {
         background-color: $zorroa-selected;
         .dark & { background-color: $zorroa-dark-selected; }

@@ -12,7 +12,7 @@
   color: $zorroa-gray;
   background-color: transparent;
 
-  .dark & { color: $zorroa-nearwhite; }
+  .dark & { color: $zorroa-whitegray; }
   span[class*="icon-"] {
     margin-right: 6px;
   }
@@ -64,7 +64,7 @@
 
     &.disabled {
       color: $zorroa-lightgray;
-      .dark & { color: $zorroa-dimgray; }
+      .dark & { color: $zorroa-gray; }
     }
 
     &:not(.disabled):hover {
@@ -85,7 +85,7 @@
 
     &.disabled {
       color: $zorroa-lightgray;
-      .dark & { color: $zorroa-dimgray; }
+      .dark & { color: $zorroa-gray; }
     }
 
     &:not(.disabled):hover {

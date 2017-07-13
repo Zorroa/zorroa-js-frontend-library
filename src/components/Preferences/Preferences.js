@@ -142,7 +142,7 @@ class Preferences extends Component {
             </div>
             <div className="Preferences-monochrome">
               <input type="checkbox" className="Preferences-monochrome-input" checked={monochrome} onClick={this.toggleMonochrome}/>
-              <div className="Preferences-monochrome-label">Monochrome</div>
+              <div className="Preferences-monochrome-label">Dark Theme</div>
             </div>
             <div className="Preferences-field-template">
               <input type="text" className="Preferences-field-template-input" value={lightbarFieldTemplate} onChange={this.changeLightbarFieldTemplate}/>

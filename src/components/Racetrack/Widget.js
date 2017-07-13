@@ -76,7 +76,7 @@ class Widget extends Component {
       icon,
       title,
       field,
-      backgroundColor: monochrome ? '#666' : backgroundColor,
+      backgroundColor: backgroundColor,
       isEnabled,
       isPinned,
       maxWidth,

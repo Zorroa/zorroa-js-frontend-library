@@ -14,7 +14,7 @@
 
   background-color: $zorroa-nearwhite;
 
-  .dark & { background-color: $zorroa-gray; }
+  .dark & { background-color: $zorroa-nearblack; }
 
   &.isIconified {
     cursor: e-resize;

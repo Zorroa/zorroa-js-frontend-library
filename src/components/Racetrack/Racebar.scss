@@ -13,7 +13,7 @@
 
   .dark & {
     background-color: black;
-    box-shadow: 0 0 6px black;
+    box-shadow: none;
   }
 }
 
@@ -30,7 +30,7 @@
   @include fullHeight;
   padding-left: 8px;
   border-left: 1px solid $zorroa-nearwhite;
-  .dark & { border-left: 1px solid $zorroa-nearblack; }
+  .dark & { border-left: 1px solid $zorroa-dimgray; }
 }
 
 .Racebar-widget {
@@ -53,11 +53,16 @@
   &:hover:not(.disabled) {
     background-color: $zorroa-nearwhite;
     border: 1px solid $zorroa-gray;
-    .dark & { background-color: $zorroa-darkgray; border: 1px solid $zorroa-darkgray; }
+    .dark & { background-color: $zorroa-darkgray; border: 1px solid $zorroa-dimgray; border: 1px solid transparent; }
   }
-  &.disabled { color: $zorroa-lightgray; background-color: transparent; cursor: default; }
+  &.disabled {
+    color: $zorroa-lightgray;
+    background-color: transparent;
+    cursor: default;
+    .dark & { color: $zorroa-dimgray; }
+  }
 
-  .dark & { color: $zorroa-lightgray; background-color: $zorroa-gray; }
+  .dark & { color: $zorroa-whitegray; background-color: transparent; }
   div { margin-left: 8px; }
 }
 
@@ -68,7 +73,7 @@
   border-radius: 3px;
   padding: 4px 8px;
   margin: 5px 4px;
-  color: white;
+  color: $zorroa-nearwhite;
   background-color: $zorroa-water-blue;
   text-transform: uppercase;
   cursor: pointer;

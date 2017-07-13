@@ -15,7 +15,7 @@
   color: $zorroa-greyish-brown;
   background-color: $zorroa-darkwhite;
 
-  .dark & { background-color: $zorroa-greyish-brown; color: $zorroa-lightgray; }
+  .dark & { background-color: $zorroa-greyish-brown; color: $zorroa-whitegray; }
   &.isOpen {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;

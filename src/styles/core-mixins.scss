@@ -40,19 +40,21 @@ $zorroa-orange-taupe   : #7d6358;
 
 // A few extra useful colors Amber didn't specify
 
-$zorroa-nearblack  : #303030;
+$zorroa-nearblack  : #2e2e2e;
+$zorroa-lightblack : #373737;
 $zorroa-darkgray   : #4a4a4a;
 $zorroa-dimgray    : #606060;
 $zorroa-gray       : #808080;
 $zorroa-whitegray  : #b3b3b3;
 $zorroa-lightgray  : #c3c3c3;
 $zorroa-darkwhite  : #d8d8d8;
-$zorroa-nearwhite  : #ededed;
+$zorroa-nearwhite  : #e7e7e7;
 $zorroa-transparent: transparent;
 
 $zorroa-selected       : #D1E3F6;
-$zorroa-dark-selected  : $zorroa-water-blue;
+$zorroa-dark-selected  : rgba(114,181,28, 0.5);
 $zorroa-hover          : rgba(0,0,0,0.1);
+$zorroa-dark-hover     : rgba(255,255,255,0.3);
 $zorroa-dropzone       : rgba(115, 182, 28, 0.75);
 
 /* shared metrics */

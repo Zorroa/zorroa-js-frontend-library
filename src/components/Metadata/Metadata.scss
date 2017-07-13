@@ -3,7 +3,7 @@
 .Metadata {
 
   background-color: white;
-  .dark & { background-color: $zorroa-nearblack; }
+  .dark & { background-color: black; }
   max-height: 40vh;
   @include flexCol;
 
@@ -31,17 +31,23 @@
         bottom: 0;
         height: 16px;
         color: $zorroa-lightgray;
+        .dark & { color: $zorroa-greyish-brown; }
       }
     }
 
     input {
       @include flexOn;
-      height: 26px;
+      height: 30px;
       border-radius: 3px;
       background: none;
       border: 1px solid $zorroa-lightgray;
       padding-left: 8px;
       padding-right: 42px;
+      .dark & {
+        background-color: $zorroa-whitegray;
+        color: $zorroa-greyish-brown;
+        border: 1px solid $zorroa-greyish-brown;
+      }
     }
   }
 
@@ -59,21 +65,21 @@
   @include flexAlignItemsCenter;
   margin-left: 4px;
   border-bottom: 1px solid $zorroa-nearwhite;
-  .dark & { border-bottom: 1px solid $zorroa-darkgray; }
+  .dark & { border-bottom: 1px solid $zorroa-dimgray; }
 }
 
 .Metadata-middle {
   @include flexOn;
   height: 26px;
   border-bottom: 1px solid $zorroa-nearwhite;
-  .dark & { border-bottom: 1px solid $zorroa-darkgray; }
+  .dark & { border-bottom: 1px solid $zorroa-dimgray; }
 }
 
 .Metadata-right {
   @include flexRow;
   @include flexAlignItemsCenter;
   border-bottom: 1px solid $zorroa-nearwhite;
-  .dark & { border-bottom: 1px solid $zorroa-darkgray; }
+  .dark & { border-bottom: 1px solid $zorroa-dimgray; }
 }
 
 .Metadata-item {
@@ -89,7 +95,7 @@
   .Metadata-item-label {
     @include flexRow;
     color: $zorroa-greyish-brown;
-    .dark & { color: $zorroa-lightgray; }
+    .dark & { color: $zorroa-whitegray; }
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -100,7 +106,10 @@
     @include flexRow;
   }
 
-  &:hover:not(.isSelected) { background-color: $zorroa-hover; }
+  &:hover:not(.isSelected) {
+    background-color: $zorroa-hover;
+    .dark & { background-color: $zorroa-dark-hover; }
+  }
   &.isSelected {
     background-color: $zorroa-selected;
     .dark & { background-color: $zorroa-dark-selected; }

@@ -24,6 +24,7 @@ class Header extends Component {
     user: PropTypes.instanceOf(User).isRequired,
     isDeveloper: PropTypes.bool,
     isAdministrator: PropTypes.bool,
+    monochrome: PropTypes.bool,
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     selectedIds: PropTypes.object,
     totalCount: PropTypes.number,
@@ -56,7 +57,7 @@ class Header extends Component {
   }
 
   render () {
-    const { sync, user, isDeveloper, isAdministrator, assets, totalCount, selectedIds } = this.props
+    const { sync, user, isDeveloper, isAdministrator, assets, totalCount, selectedIds, monochrome } = this.props
     const baseURL = archivistBaseURL()
 
     const loader = require('./loader-rolling.svg')
@@ -64,7 +65,7 @@ class Header extends Component {
 
     return (
       <nav className="header flexOff flexCenter fullWidth">
-        <Link to="/" className='header-logo'><Logo/></Link>
+        <Link to="/" className='header-logo'><Logo dark={monochrome}/></Link>
         { syncer }
         <div className="header-asset-counter">
           <AssetCounter total={totalCount} collapsed={0} loaded={assets && assets.length || 0}/>
@@ -116,6 +117,7 @@ export default connect(state => ({
   user: state.auth.user,
   isDeveloper: state.auth.isDeveloper,
   isAdministrator: state.auth.isAdministrator,
+  monochrome: state.app.monochrome,
   assets: state.assets.all,
   selectedIds: state.assets.selectedIds,
   totalCount: state.assets.totalCount,

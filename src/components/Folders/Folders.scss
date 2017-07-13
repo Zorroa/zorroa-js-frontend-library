@@ -11,7 +11,7 @@
   @include flexCol;
   height: auto;
   background-color: white;
-  .dark & { background-color: $zorroa-nearblack; color: $zorroa-lightgray; }
+  .dark & { background-color: black; color: $zorroa-whitegray; }
 }
 
 .Folders-scroll {
@@ -74,7 +74,7 @@
   border-radius: 3px;
   background: none;
   border: 1px solid $zorroa-lightgray;
-  .dark & { border: 1px solid $zorroa-dimgray; }
+  .dark & { background: $zorroa-whitegray; color: $zorroa-greyish-brown; border: 1px solid $zorroa-dimgray; }
   padding: 8px;
   padding-right: 42px;
   font-size: 12px;
@@ -131,7 +131,6 @@
   &.enabled {
     color: $zorroa-gray;
     background-color: $zorroa-nearwhite;
-
     .dark & { background-color: $zorroa-gray; color: $zorroa-nearwhite; }
   }
 }
@@ -174,13 +173,17 @@
 .Folders-empty {
   @include flexColCenter;
   background-color: white;
+  .dark & { background-color: black; }
 }
 
 .Folders-empty-icon {
   font-size: 40px;
   color: $zorroa-lightgray;
+  .dark & { color: $zorroa-gray; }
 }
 
 .Folders-empty-label {
+  margin-bottom: 10px;
   color: $zorroa-lightgray;
+  .dark & { color: $zorroa-gray; }
 }
