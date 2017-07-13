@@ -449,8 +449,12 @@ class Folders extends Component {
     const folderComponentList = this.renderFolderList(folderList, foldersScrollHeight)
 
     requestAnimationFrame(_ => {
+      // ignore this code if the user just closed the panel
+      if (!this.refs.foldersScroll) return
+
       const foldersScrollTop = this.refs.foldersScroll.scrollTop
       const foldersScrollHeight = this.refs.foldersScroll.clientHeight
+
       if (foldersScrollTop !== this.state.foldersScrollTop ||
         foldersScrollHeight !== this.state.foldersScrollHeight) {
         this.setState({
