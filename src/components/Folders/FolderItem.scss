@@ -20,17 +20,20 @@ $FolderItemHeight : 25px;
   }
 
   background-color: #f1f1f1;
-  .dark & { background-color: #555; }
+  .dark & { background-color: $zorroa-lightblack; }
   &:nth-child(even) {
     background-color: white;
     &.isSelected {
       background-color: $zorroa-selected;
       .dark & { background-color: $zorroa-dark-selected; }
     }
-    .dark & { background-color: $zorroa-darkgray; }
+    .dark & { background-color: black; }
   }
 
-  &:hover:not(.isSelected) { background-color: $zorroa-hover; }
+  &:hover:not(.isSelected) {
+    background-color: $zorroa-hover;
+    .dark & { background-color: $zorroa-dark-hover; }
+  }
 
   &.isSelected {
     background-color: $zorroa-selected;
@@ -82,7 +85,7 @@ $FolderItemHeight : 25px;
 .FolderItem-icon {
   font-size: 18px;
   color: $zorroa-greyish-brown;
-  .dark & { color: $zorroa-lightgray; }
+  .dark & { color: $zorroa-whitegray; }
 }
 
 .FolderItem-text {
@@ -90,7 +93,7 @@ $FolderItemHeight : 25px;
   @include noSelect;
   margin-left: 10px;
   color: $zorroa-greyish-brown;
-  .dark & { color: $zorroa-lightgray; }
+  .dark & { color: $zorroa-whitegray; }
   cursor: pointer;
 }
 

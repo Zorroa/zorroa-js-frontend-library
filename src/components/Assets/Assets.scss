@@ -125,8 +125,8 @@
   border-left: 1px solid $zorroa-gray;
   border-right: 1px solid $zorroa-gray;
   .dark & {
-    border-left: 1px solid $zorroa-darkgray;
-    border-right: 1px solid $zorroa-darkgray;
+    border-left: 1px solid $zorroa-dimgray;
+    border-right: 1px solid $zorroa-dimgray;
   }
   @include flexRowCenter;
 

@@ -20,7 +20,7 @@ const SORT_ALPHABETICAL = 'alpha'
 const SORT_TIME = 'time'
 
 const FOLDER_HEIGHT_PX = 25
-const FOLDER_EMPTY_HEIGHT_PX = 60
+const FOLDER_EMPTY_HEIGHT_PX = 70
 const MAX_FOLDER_SCROLL_HEIGHT_PX = 400
 
 const FOLDER_COUNT_SCROLL_IDLE_THRESH_MS = 250 // ms to wait after scrolling stops before requesting folder counts

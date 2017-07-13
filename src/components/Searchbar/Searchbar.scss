@@ -7,10 +7,12 @@
   }
 
   border-radius: 3px;
-  border: 1px solid $zorroa-darkgray;
+  border: 1px solid $zorroa-greyish-brown;
   position: relative;
   padding-left: 4px;
   height: 100%;
+
+  .dark & { color: $zorroa-greyish-brown; background-color: $zorroa-nearwhite; border: 1px solid $zorroa-darkgray; }
 }
 
 .Searchbar-body {

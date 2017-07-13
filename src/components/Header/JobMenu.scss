@@ -50,8 +50,9 @@
   -moz-background-clip: text;
   background-clip: text;
   .dark & {
-    background-color: rgba(64,64,64,1);
-    text-shadow: 0px 2px 3px rgba(32,32,32,0.5);
+    color: $zorroa-whitegray;
+    background-color: $zorroa-greyish-brown;
+    //text-shadow: 0px 2px 3px rgba(32,32,32,0.5);
   }
 }
 
@@ -65,6 +66,7 @@
 
 .JobMenu-jobs-empty-line-2 {
   color: $zorroa-greyish-brown;
+  .dark & { color: $zorroa-whitegray; }
   font-size: 12px;
   text-transform: none;
 }
@@ -73,7 +75,7 @@
   @include flexRow;
   @include flexAlignItemsCenter;
   color: $zorroa-greyish-brown;
-  .dark & { color: $zorroa-nearwhite; }
+  .dark & { color: $zorroa-whitegray; }
   border-radius: 4px;
   text-transform: uppercase;
   padding-left: 5px;
@@ -86,7 +88,7 @@
 
   &:hover {
     background-color: white;
-    .dark & { background-color: $zorroa-dimgray; }
+    .dark & { background-color: $zorroa-greyish-brown; }
   }
 }
 
@@ -123,6 +125,7 @@
   @include flexOn;
   text-transform: none;
   color: $zorroa-greyish-brown;
+  .dark & { color: $zorroa-whitegray; }
   margin-right: 20px;
 }
 
