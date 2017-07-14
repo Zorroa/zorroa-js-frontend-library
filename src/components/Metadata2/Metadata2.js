@@ -22,6 +22,7 @@ class Metadata2 extends Component {
     dark: PropTypes.bool,
     height: PropTypes.string.isRequired,
     assetIds: PropTypes.instanceOf(Set),
+    isolatedId: PropTypes.string,
     metadataFields: PropTypes.arrayOf(PropTypes.string),
     widgets: PropTypes.arrayOf(PropTypes.object),
     collapsibleOpen: PropTypes.object,
@@ -139,8 +140,8 @@ class Metadata2 extends Component {
   }
 
   toggleWidget = (field, event) => {
-    const { widgets, dark } = this.props
-    if (dark) return
+    const { widgets, isolatedId } = this.props
+    if (isolatedId) return
     const index = widgets.findIndex(widget => fieldUsedInWidget(field, widget))
     if (index >= 0) {
       this.props.actions.removeRacetrackWidgetIds([widgets[index].id])
@@ -155,7 +156,6 @@ class Metadata2 extends Component {
   }
 
   createTagFacet = (term, field, event) => {
-    if (this.props.dark) return
     const fieldType = this.props.fieldTypes[field]
     field = field && field.endsWith('.raw') ? field : field + '.raw'
     const index = this.props.widgets.findIndex(widget => fieldUsedInWidget(field, widget))
@@ -174,12 +174,12 @@ class Metadata2 extends Component {
   }
 
   hover = (field) => {
-    if (this.props.dark) return
+    if (this.props.isolatedId) return
     this.props.actions.hoverField(field)
   }
 
   clearHover = (field) => {
-    if (this.props.dark) return
+    if (this.props.isolatedId) return
     this.props.actions.clearHoverField(field)
   }
 
@@ -209,7 +209,7 @@ class Metadata2 extends Component {
     } else if (asset) {
       return (
         <div className="Metadata2-value">
-          <TableField asset={asset} field={field} isOpen={true} dark={this.props.dark} onTag={this.createTagFacet}/>
+          <TableField asset={asset} field={field} isOpen={true} dark={this.props.dark} onTag={!this.props.isolatedId && this.createTagFacet}/>
         </div>
       )
     }
@@ -262,7 +262,7 @@ class Metadata2 extends Component {
       )
       return [empty]
     }
-    const { fieldTypes, metadataFields, collapsibleOpen, widgets, dark } = this.props
+    const { fieldTypes, metadataFields, collapsibleOpen, widgets, isolatedId } = this.props
     const fields = this.state.showFavorites ? metadataFields : Object.keys(fieldTypes)
     const lcFilterString = this.state.filterString.toLowerCase()
     const filteredFields = fields.filter(field => (field.toLowerCase().includes(lcFilterString))).sort((a, b) => a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'}))
@@ -275,7 +275,7 @@ class Metadata2 extends Component {
       const isLeaf = this.isLeaf(field, namespace)
       const hasChildren = false
       const isFavorite = this.isFavorite(fieldTypes, hasChildren, namespace, metadataFields)
-      const isSearched = !dark && widgets.findIndex(widget => fieldUsedInWidget(field, widget)) >= 0
+      const isSearched = !isolatedId && widgets.findIndex(widget => fieldUsedInWidget(field, widget)) >= 0
       const widgetType = widgetTypeForField(field, fieldTypes[field])
       const widgetIcon = this.widgetTypeIcon(widgetType)
       const leaf = this.renderLeaf(field, namespace, fields, isSearched, isFavorite, widgetIcon)
@@ -322,6 +322,7 @@ class Metadata2 extends Component {
 
 export default connect(state => ({
   assets: state.assets.all,
+  isolatedId: state.assets.isolatedId,
   metadataFields: state.app.metadataFields,
   widgets: state.racetrack.widgets,
   collapsibleOpen: state.app.collapsibleOpen,

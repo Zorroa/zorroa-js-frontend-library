@@ -61,7 +61,7 @@ class Header extends Component {
     const baseURL = archivistBaseURL()
 
     const loader = require('./loader-rolling.svg')
-    const syncer = isDeveloper && sync ? <div className="Header-loading sync"/> : <img className="Header-loading" src={loader}/>
+    const syncer = !isDeveloper || sync ? <div className="Header-loading sync"/> : <img className="Header-loading" src={loader}/>
 
     return (
       <nav className="header flexOff flexCenter fullWidth">

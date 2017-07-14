@@ -57,7 +57,10 @@ export default class TableField extends Component {
           </div>
         }
         { vals.map((val, i) => (
-          <div onClick={e => onTag(val, field, e)} className='TableField-tag' key={i}>{val}</div>
+          <div key={i} onClick={e => onTag(val, field, e)}
+               className={classnames('TableField-tag', {disabled: !onTag})}>
+            {val}
+          </div>
         ))}
       </div>
     )

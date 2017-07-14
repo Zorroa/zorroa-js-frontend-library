@@ -139,7 +139,7 @@ $tableResizeRightPadding: 20px;
   .dark & { background-color: black; }
   &.even {
     background-color: #fff;
-    .dark & { background-color: $zorroa-lightblack; }
+    .dark & { background-color: $zorroa-mattblack; }
   }
   &.isSelected {
     background-color: $zorroa-selected;
@@ -167,7 +167,7 @@ $tableResizeRightPadding: 20px;
   font-family: Roboto Condensed;
   cursor: default;
 
-  .dark & { color: $zorroa-whitegray; }
+  &.dark { color: $zorroa-whitegray; }
   &:not(.isOpen) { @include clampText; }
 }
 

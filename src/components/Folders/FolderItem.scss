@@ -20,7 +20,7 @@ $FolderItemHeight : 25px;
   }
 
   background-color: #f1f1f1;
-  .dark & { background-color: $zorroa-lightblack; }
+  .dark & { background-color: $zorroa-mattblack; }
   &:nth-child(even) {
     background-color: white;
     &.isSelected {
