@@ -167,7 +167,7 @@ $tableResizeRightPadding: 20px;
   font-family: Roboto Condensed;
   cursor: default;
 
-  .dark & { color: $zorroa-whitegray; }
+  &.dark { color: $zorroa-whitegray; }
   &:not(.isOpen) { @include clampText; }
 }
 
