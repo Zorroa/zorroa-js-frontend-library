@@ -139,7 +139,7 @@ $tableResizeRightPadding: 20px;
   .dark & { background-color: black; }
   &.even {
     background-color: #fff;
-    .dark & { background-color: $zorroa-lightblack; }
+    .dark & { background-color: $zorroa-mattblack; }
   }
   &.isSelected {
     background-color: $zorroa-selected;
