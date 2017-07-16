@@ -7,7 +7,6 @@ class Pager extends Component {
   static propTypes = {
     loaded: PropTypes.number.isRequired,
     total: PropTypes.number.isRequired,
-    actions: PropTypes.object.isRequired,
     top: PropTypes.number.isRequired,
     query: PropTypes.instanceOf(AssetSearch).isRequired
   }

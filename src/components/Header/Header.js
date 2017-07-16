@@ -28,6 +28,7 @@ class Header extends Component {
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     selectedIds: PropTypes.object,
     totalCount: PropTypes.number,
+    loadedCount: PropTypes.number,
     userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired
   }
@@ -57,7 +58,7 @@ class Header extends Component {
   }
 
   render () {
-    const { sync, user, isDeveloper, isAdministrator, assets, totalCount, selectedIds, monochrome } = this.props
+    const { sync, user, isDeveloper, isAdministrator, assets, totalCount, loadedCount, selectedIds, monochrome } = this.props
     const baseURL = archivistBaseURL()
 
     const loader = require('./loader-rolling.svg')
@@ -68,7 +69,7 @@ class Header extends Component {
         <Link to="/" className='header-logo'><Logo dark={monochrome}/></Link>
         { syncer }
         <div className="header-asset-counter">
-          <AssetCounter total={totalCount} collapsed={0} loaded={assets && assets.length || 0}/>
+          <AssetCounter total={totalCount} collapsed={0} loaded={loadedCount || 0}/>
         </div>
         <div className="flexOn"></div>
         <div className="header-menu-bar fullHeight flexCenter">
@@ -121,6 +122,7 @@ export default connect(state => ({
   assets: state.assets.all,
   selectedIds: state.assets.selectedIds,
   totalCount: state.assets.totalCount,
+  loadedCount: state.assets.loadedCount,
   userSettings: state.app.userSettings
 }), dispatch => ({
   actions: bindActionCreators({

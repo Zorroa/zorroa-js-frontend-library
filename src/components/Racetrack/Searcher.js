@@ -31,6 +31,7 @@ class Searcher extends Component {
       assetIds: PropTypes.arrayOf(PropTypes.string)
     }),
     fieldTypes: PropTypes.object,
+    showMultipage: PropTypes.bool,
     metadataFields: PropTypes.arrayOf(PropTypes.string),
     lightbarFields: PropTypes.arrayOf(PropTypes.string),
     thumbFields: PropTypes.arrayOf(PropTypes.string),
@@ -218,7 +219,7 @@ class Searcher extends Component {
     const {
       widgets, actions, selectedFolderIds, query,
       modifiedFolderIds, trashedFolders, order,
-      similar,
+      similar, showMultipage,
       metadataFields, lightbarFields, thumbFields, dragFields, fieldTypes
     } = this.props
     if (!fieldTypes) return null
@@ -238,9 +239,11 @@ class Searcher extends Component {
     const skip = new Set(['fields', 'from', 'size', 'scroll'])
     const missingField = this.inflightQuery ? this.inflightQuery.missingField(assetSearch.fields) : (!query || query.missingField(assetSearch.fields))
     const searchModified = this.inflightQuery ? !this.inflightQuery.equals(assetSearch, skip) : (!query || !assetSearch.equals(query, skip))
-    if (searchModified || missingField || this.state.importFinished) {
+    const switchedMultipage = this.showMultipage !== showMultipage
+    this.showMultipage = showMultipage
+    if (searchModified || missingField || this.state.importFinished || switchedMultipage) {
       assetSearch.size = AssetSearch.autoPageSize
-      actions.searchAssets(assetSearch, query, this.state.importFinished)
+      actions.searchAssets(assetSearch, query, this.state.importFinished || switchedMultipage, showMultipage && [])
       this.inflightQuery = assetSearch
       if (query) {
         // FIXME: Disable saving search to user settings to avoid conflicts
@@ -282,6 +285,7 @@ const mapStateToProps = state => ({
   trashedFolders: state.folders.trashedFolders,
   similar: state.racetrack.similar,
   fieldTypes: state.assets.types,
+  showMultipage: state.app.showMultipage,
   metadataFields: state.app.metadataFields,
   lightbarFields: state.app.lightbarFields,
   thumbFields: state.app.thumbFields,

@@ -37,11 +37,12 @@ class Assets extends Component {
     assetsCounter: PropTypes.number.isRequired,
     query: PropTypes.instanceOf(AssetSearch),
     order: PropTypes.arrayOf(PropTypes.object),
-    parentIds: PropTypes.instanceOf(Set),
-    parentCounts: PropTypes.instanceOf(Map),
+    parents: PropTypes.instanceOf(Map),
     selectedIds: PropTypes.object,
     selectionCounter: PropTypes.number.isRequired,
     totalCount: PropTypes.number,
+    loadedCount: PropTypes.number,
+    filteredCount: PropTypes.number,
     thumbSize: PropTypes.number.isRequired,
     layout: PropTypes.string.isRequired,
     showTable: PropTypes.bool.isRequired,
@@ -492,7 +493,8 @@ class Assets extends Component {
   }
 
   renderAssets () {
-    const { assets, selectedIds, totalCount, layout, showMultipage, parentIds, parentCounts, origin, thumbSize, query, thumbFieldTemplate } = this.props
+    const { assets, selectedIds, totalCount, loadedCount, filteredCount, layout, showMultipage,
+      parents, origin, thumbSize, query, thumbFieldTemplate } = this.props
     const { positions, multipage, tableIsResizing } = this.state
     api.setTableIsResizing(tableIsResizing)
 
@@ -552,19 +554,21 @@ class Assets extends Component {
                       (assetsScrollPadding + dim.y + height < this.state.assetsScrollTop)) {
                     return null
                   }
-                  if (index < positions.length && index === assets.length - 1 && assets.length < totalCount &&
-                    this.loaded !== assets.length) {
-                    this.loaded = assets.length
+                  // Multipage agg optimization -- skip over children of parents with full stacks
+                  const parentIds = showMultipage && parents && [...parents.keys()].filter(id => parents.get(id).count >= 3)
+                  if (index < positions.length && index === assets.length - 1 && loadedCount < filteredCount &&
+                    (this.loaded !== loadedCount || (parentIds && parentIds.length !== this.parentCount))) {
+                    this.loaded = loadedCount
+                    this.parentCount = parentIds && parentIds.length || 0  // re-search if we add new multipage filters
                     var nextPageQuery = new AssetSearch(query)
-                    nextPageQuery.from = assets.length
+                    nextPageQuery.from = loadedCount
                     nextPageQuery.size = AssetSearch.autoPageSize
-                    console.log('Loading ' + nextPageQuery.size + ' from ' + nextPageQuery.from)
-                    this.props.actions.searchAssets(nextPageQuery, null, false, showMultipage && parentIds)
+                    this.props.actions.searchAssets(nextPageQuery, null, false, parentIds)
                   }
                   if (!dim || width <= 0 || height <= 0) return null
                   const parentId = asset.parentId()
                   const indexes = parentId && multipage[parentId]
-                  const stackCount = parentId && parentCounts && parentCounts.get(parentId)
+                  const stackCount = parentId && parents && parents.get(parentId) && parents.get(parentId).total
                   const badgeHeight = thumbSize < 100 ? 15 : 25
                   const badge = showMultipage ? multipageBadges(asset, origin, stackCount) : monopageBadges(asset)
                   const iconBadge = <div className="Thumb-field"><FieldTemplate asset={asset} template={thumbFieldTemplate} extensionOnLeft={false}/></div>
@@ -590,8 +594,8 @@ class Assets extends Component {
                     />
                   )
                 })}
-                <Pager total={totalCount}
-                       loaded={assets.length}
+                <Pager total={filteredCount}
+                       loaded={loadedCount}
                        top={layoutHeight + 12 /* 12 px padding */ }
                        />
               </div>
@@ -603,9 +607,9 @@ class Assets extends Component {
   }
 
   render () {
-    const { assets, query, totalCount, tableHeight, showTable, showMultipage,
+    const { query, totalCount, tableHeight, showTable, showMultipage,
       layout, thumbSize, assetsCounter, rightSidebarIsIconified, widgets, uxLevel } = this.props
-    const { collapsed, tableIsResizing } = this.state
+    const { tableIsResizing } = this.state
 
     // Trigger layout if assets change.
     if (assetsCounter !== this.assetsCounter) {
@@ -613,8 +617,9 @@ class Assets extends Component {
 
       // Only scroll to selection if we haven't already loaded the selection.
       // Invalidate the auto-load cache each time we have a new bare search.
-      if (!query.from) {
+      if (query.from === undefined) {
         this.loaded = 0
+        this.parentCount = 0
         this.scrollToSelection()
         this.saveHistory()
       }
@@ -644,10 +649,6 @@ class Assets extends Component {
             )}
             { totalCount > 0 &&
             <Footer
-              total={totalCount}
-              collapsed={collapsed}
-              loaded={assets.length}
-              onUncollapse={this.uncollapse}
               showMultipage={showMultipage}
               toggleShowMultipage={this.toggleShowMultipage}
               showTable={showTable}
@@ -682,11 +683,12 @@ export default connect(state => ({
   assetsCounter: state.assets.assetsCounter,
   query: state.assets.query,
   order: state.assets.order,
-  parentIds: state.assets.parentIds,
-  parentCounts: state.assets.parentCounts,
+  parents: state.assets.parents,
   selectedIds: state.assets.selectedIds,
   selectionCounter: state.assets.selectionCounter,
   totalCount: state.assets.totalCount,
+  loadedCount: state.assets.loadedCount,
+  filteredCount: state.assets.filteredCount,
   rightSidebarIsIconified: state.app.rightSidebarIsIconified,
   folders: state.folders.all,
   trashedFolders: state.folders.trashedFolders,
