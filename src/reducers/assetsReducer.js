@@ -126,7 +126,6 @@ export default function (state = initialState, action) {
       const loadedCount = page && page.from + assets.length - collapsedCount
       const filteredCount = page && page.totalCount || 0
       const totalCount = page && page.totalCount && !page.from ? page.totalCount : state.totalCount
-      console.log('loadedCount=' + loadedCount + ', collapsed=' + collapsedCount + ', filtered=' + filteredCount + ', totalCount=' + totalCount)
       const assetsCounter = state.assetsCounter + 1
       api.setAssetsCounter(assetsCounter)
       return { ...state, all, query, totalCount, filteredCount, loadedCount, parents, suggestions: null, assetsCounter, error: null }

@@ -12,18 +12,19 @@ window.PROD = true
 describe('assetsReducer', () => {
   const query = 'foo'
   const assets = [new Asset({id: 'a', document: {}})]
-  const page = new Page({size: 1, totalCount: 1})
 
   it('ASSET_SEARCH returns asset list', () => {
+    const page = new Page({size: 1, totalCount: 1})
     const payload = { query, assets, page }
     const result = {
       query,
       all: assets,
       totalCount: 1,
+      loadedCount: 1,
+      assetsCounter: 1,
       suggestions: null,
       error: null,
-      assetsCounter: 1,
-      parentIds: new Set()
+      filteredCount: 1
     }
     expect(assetsReducer({assetsCounter: 0}, { type: ASSET_SEARCH, payload }))
       .toEqual(result)
@@ -31,6 +32,7 @@ describe('assetsReducer', () => {
 
   it('ASSET_SEARCH for second page concats assets DEBUG', () => {
     // Reduce the first page of assets
+    const page = new Page({size: 1, totalCount: 2})
     const payload1 = { query, assets, page }
     const state1 = assetsReducer({assetsCounter: 0}, { type: ASSET_SEARCH, payload: payload1 })
 
@@ -45,10 +47,12 @@ describe('assetsReducer', () => {
       query,
       all: concatAssets,
       totalCount: 2,
+      filteredCount: 2,
+      loadedCount: 2,
+      parents: undefined,
       suggestions: null,
       error: null,
-      assetsCounter: 2,
-      parentIds: new Set()
+      assetsCounter: 2
     }
     expect(assetsReducer(state1, { type: ASSET_SEARCH, payload: payload2 }))
       .toEqual(result)
