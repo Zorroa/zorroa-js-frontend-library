@@ -37,7 +37,8 @@ class Assets extends Component {
     assetsCounter: PropTypes.number.isRequired,
     query: PropTypes.instanceOf(AssetSearch),
     order: PropTypes.arrayOf(PropTypes.object),
-    parents: PropTypes.instanceOf(Map),
+    parentCounts: PropTypes.instanceOf(Map),
+    parentTotals: PropTypes.instanceOf(Map),
     selectedIds: PropTypes.object,
     selectionCounter: PropTypes.number.isRequired,
     totalCount: PropTypes.number,
@@ -493,8 +494,8 @@ class Assets extends Component {
   }
 
   renderAssets () {
-    const { assets, selectedIds, totalCount, loadedCount, filteredCount, layout, showMultipage,
-      parents, origin, thumbSize, query, thumbFieldTemplate } = this.props
+    const { assets, selectedIds, loadedCount, filteredCount, layout, showMultipage,
+      parentCounts, parentTotals, origin, thumbSize, query, thumbFieldTemplate } = this.props
     const { positions, multipage, tableIsResizing } = this.state
     api.setTableIsResizing(tableIsResizing)
 
@@ -555,7 +556,7 @@ class Assets extends Component {
                     return null
                   }
                   // Multipage agg optimization -- skip over children of parents with full stacks
-                  const parentIds = showMultipage && parents && [...parents.keys()].filter(id => parents.get(id).count >= 3)
+                  const parentIds = showMultipage && parentCounts && [...parentCounts.keys()].filter(id => parentCounts.get(id) >= 3)
                   if (index < positions.length && index === assets.length - 1 && loadedCount < filteredCount &&
                     (this.loaded !== loadedCount || (parentIds && parentIds.length !== this.parentCount))) {
                     this.loaded = loadedCount
@@ -563,12 +564,14 @@ class Assets extends Component {
                     var nextPageQuery = new AssetSearch(query)
                     nextPageQuery.from = loadedCount
                     nextPageQuery.size = AssetSearch.autoPageSize
-                    this.props.actions.searchAssets(nextPageQuery, null, false, parentIds)
+                    const force = false
+                    const isFirstPage = false
+                    this.props.actions.searchAssets(nextPageQuery, null, force, isFirstPage, parentIds)
                   }
                   if (!dim || width <= 0 || height <= 0) return null
                   const parentId = asset.parentId()
                   const indexes = parentId && multipage[parentId]
-                  const stackCount = parentId && parents && parents.get(parentId) && parents.get(parentId).total
+                  const stackCount = parentId && parentTotals && parentTotals.get(parentId)
                   const badgeHeight = thumbSize < 100 ? 15 : 25
                   const badge = showMultipage ? multipageBadges(asset, origin, stackCount) : monopageBadges(asset)
                   const iconBadge = <div className="Thumb-field"><FieldTemplate asset={asset} template={thumbFieldTemplate} extensionOnLeft={false}/></div>
@@ -683,7 +686,8 @@ export default connect(state => ({
   assetsCounter: state.assets.assetsCounter,
   query: state.assets.query,
   order: state.assets.order,
-  parents: state.assets.parents,
+  parentCounts: state.assets.parentCounts,
+  parentTotals: state.assets.parentTotals,
   selectedIds: state.assets.selectedIds,
   selectionCounter: state.assets.selectionCounter,
   totalCount: state.assets.totalCount,

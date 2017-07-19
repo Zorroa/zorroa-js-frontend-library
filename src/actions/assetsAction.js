@@ -115,7 +115,7 @@ export function similarAssets (assetIds, fields) {
   }
 }
 
-export function searchAssets (query, lastQuery, force, parentIds) {
+export function searchAssets (query, lastQuery, force, isFirstPage, parentIds) {
   return dispatch => {
     const promises = []
     const skip = new Set(['from', 'size', 'scroll', 'postFilter', 'aggs'])
@@ -135,16 +135,16 @@ export function searchAssets (query, lastQuery, force, parentIds) {
       }
 
       // Filter out any child assets that have already been loaded after the first page
-      if (query.from && parentIds && parentIds.length) {
+      if (!isFirstPage && parentIds && parentIds.length) {
         const filter = new AssetFilter({terms: { 'source.clip.parent.raw': parentIds }})
         mainQuery.merge(new AssetSearch({filter: new AssetFilter({must_not: [filter]})}))
       }
 
-      if (!query.from) requestAnimationFrame(_ => { dispatch({ type: ASSET_SEARCHING, payload: true }) })
+      if (isFirstPage) requestAnimationFrame(_ => { dispatch({ type: ASSET_SEARCHING, payload: true }) })
       promises.push(searchAssetsRequestProm(dispatch, mainQuery))
     }
     const aggsChanged = !lastQuery || !lastQuery.aggs || JSON.stringify(query.aggs) !== JSON.stringify(lastQuery.aggs)
-    if (query.from === undefined /* first page only */ && (mainQueryChanged || aggsChanged)) {
+    if (isFirstPage && (mainQueryChanged || aggsChanged || parentIds)) {
       const aggQuery = new AssetSearch(query)
 
       // Add an agg for all parents
@@ -172,7 +172,7 @@ export function searchAssets (query, lastQuery, force, parentIds) {
           const assets = response.data.list.map(asset => (new Asset(asset)))
           dispatch({
             type: ASSET_SEARCH,
-            payload: { query, assets, page, multipage: !!parentIds }
+            payload: { query, assets, page, multipage: !!parentIds, isFirstPage }
           })
         }
       })

@@ -89,26 +89,18 @@ export default function (state = initialState, action) {
       // In multipage mode, we only store the first N children of a parent,
       // so they can be displayed in the thumb stack.
       //
-      const { query, assets, page, multipage } = action.payload
+      const { query, assets, page, multipage, isFirstPage } = action.payload
       let collapsedCount = 0
       const maxStackCount = 3
-      const parents = multipage ? (page && page.from ? new Map(state.parents) : new Map()) : undefined
+      const parentCounts = multipage ? (isFirstPage ? new Map() : new Map(state.parentCounts)) : undefined
       const collapsedAssets = multipage ? [] : assets
       if (multipage) {
         assets.forEach(asset => {
           if (asset.parentId()) {
-            const parent = parents.get(asset.parentId())
-            if (parent) {
-              if (parent.count === undefined) {
-                parent.count = 0
-              }
-              if (parent.count < maxStackCount) {
-                collapsedAssets.push(asset)
-              }
-              parent.count++
-            } else {
+            const count = parentCounts.get(asset.parentId()) || 0
+            parentCounts.set(asset.parentId(), count + 1)
+            if (count < maxStackCount) {
               collapsedAssets.push(asset)
-              parents.set(asset.parentId(), {count: 1})
             }
           } else {
             collapsedAssets.push(asset)
@@ -117,33 +109,28 @@ export default function (state = initialState, action) {
         // FIXME: No need for second pass, compute differences of parent.count, requires deep copy?
         assets.forEach(asset => {
           if (asset.parentId()) {
-            const parent = parents.get(asset.parentId())
-            if (parent && parent.count >= maxStackCount) collapsedCount++
+            const count = parentCounts.get(asset.parentId())
+            if (count >= maxStackCount) collapsedCount++
           }
         })
       }
-      const all = state.all && page && page.from ? state.all.concat(collapsedAssets) : collapsedAssets
-      const loadedCount = page && page.from + assets.length - collapsedCount
+      const all = state.all && !isFirstPage ? state.all.concat(collapsedAssets) : collapsedAssets
+      const loadedCount = isFirstPage ? 0 : page.from + assets.length - collapsedCount
       const filteredCount = page && page.totalCount || 0
-      const totalCount = page && page.totalCount && !page.from ? page.totalCount : state.totalCount
+      const totalCount = page && page.totalCount && isFirstPage ? page.totalCount : state.totalCount
       const assetsCounter = state.assetsCounter + 1
       api.setAssetsCounter(assetsCounter)
-      return { ...state, all, query, totalCount, filteredCount, loadedCount, parents, suggestions: null, assetsCounter, error: null }
+      return { ...state, all, query, totalCount, filteredCount, loadedCount, parentCounts, suggestions: null, assetsCounter, error: null }
     }
 
     case ASSET_AGGS: {
       const { aggs } = action.payload
       if (aggs.parentCounts) {
-        const parents = new Map(state.parents)
+        const parentTotals = new Map()
         aggs.parentCounts.parentCounts.buckets.forEach(bucket => {
-          const parent = parents.get(bucket.key)
-          if (parent) {
-            parent.total = bucket.doc_count
-          } else {
-            parents.set(bucket.key, {total: bucket.doc_count})
-          }
+          parentTotals.set(bucket.key, bucket.doc_count)
         })
-        return { ...state, aggs, parents }
+        return { ...state, aggs, parentTotals }
       }
       return { ...state, aggs }
     }

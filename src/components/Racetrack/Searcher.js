@@ -243,7 +243,9 @@ class Searcher extends Component {
     this.showMultipage = showMultipage
     if (searchModified || missingField || this.state.importFinished || switchedMultipage) {
       assetSearch.size = AssetSearch.autoPageSize
-      actions.searchAssets(assetSearch, query, this.state.importFinished || switchedMultipage, showMultipage && [])
+      const force = this.state.importFinished || switchedMultipage
+      const isFirstPage = true
+      actions.searchAssets(assetSearch, query, force, isFirstPage, showMultipage && [])
       this.inflightQuery = assetSearch
       if (query) {
         // FIXME: Disable saving search to user settings to avoid conflicts

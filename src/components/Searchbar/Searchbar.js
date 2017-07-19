@@ -75,7 +75,8 @@ class Searchbar extends Component {
   forceSearch = () => {
     const { query, actions } = this.props
     const force = true
-    actions.searchAssets(query, query, force)
+    const isFirstPage = true
+    actions.searchAssets(query, query, force, isFirstPage)
   }
 
   render () {
