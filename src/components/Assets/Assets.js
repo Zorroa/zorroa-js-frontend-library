@@ -359,8 +359,9 @@ class Assets extends Component {
   updateSelectedHashes = (similarField, selectedIds) => {
     if (similarField && similarField.length && selectedIds && selectedIds.size) {
       const ids = new Set([...this.props.similar.assetIds, ...selectedIds])
-      if (this.similarIds && equalSets(ids, this.similarIds)) return
+      if (this.similarIds && equalSets(ids, this.similarIds) && this.similarField && this.similarField === similarField) return
       this.similarIds = ids
+      this.similarField = similarField
       const assetIds = [...ids]
       const fields = [similarField, 'image.width', 'image.height', 'video.width', 'video.height', 'proxies*']
       this.props.actions.similarAssets(assetIds, fields)

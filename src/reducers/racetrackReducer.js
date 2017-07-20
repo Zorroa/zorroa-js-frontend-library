@@ -12,11 +12,12 @@ const initialState = {
 
 function extractSimilar (similar, widget) {
   assert.ok(widget.type === SimilarHashWidgetInfo.type)
+  assert.ok(widget.field && widget.field.length)
+  const field = widget.field.replace(/\.raw$/, '')
   const hamming = widget && widget.sliver && widget.sliver.filter && widget.sliver.filter.hamming
-  if (!hamming) return similar
-  if (!hamming.hashes || !hamming.hashes.length) widget.sliver.filter = null  // Remove invalid empty filter
-  const field = hamming.field && hamming.field.endsWith('.raw') ? hamming.field.slice(0, -4) : hamming.field
-  if (!field || field === similar.field) return similar
+  if (hamming) {
+    if (!hamming.hashes || !hamming.hashes.length) widget.sliver.filter = null  // Remove invalid empty filter
+  }
   return { ...similar, field }
 }
 
