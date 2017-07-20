@@ -1,15 +1,12 @@
 import React, { Component, PropTypes } from 'react'
-import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import AssetSearch from '../../models/AssetSearch'
-import { searchAssets } from '../../actions/assetsAction'
 
 class Pager extends Component {
   static propTypes = {
     loaded: PropTypes.number.isRequired,
     total: PropTypes.number.isRequired,
-    actions: PropTypes.object.isRequired,
     top: PropTypes.number.isRequired,
     query: PropTypes.instanceOf(AssetSearch).isRequired
   }
@@ -30,7 +27,6 @@ class Pager extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({ searchAssets }, dispatch)
 })
 
 const mapStateToProps = state => ({

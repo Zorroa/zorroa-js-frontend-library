@@ -7,6 +7,7 @@ import LRUCache from 'lru-cache'
 import User from '../../models/User'
 import Folder from '../../models/Folder'
 import AclEntry from '../../models/Acl'
+import AssetSearch from '../../models/AssetSearch'
 import { getFolderChildren, createFolder, selectFolderIds, selectFolderId,
   toggleFolder, queueFolderCounts } from '../../actions/folderAction'
 import { showModal, sortFolders } from '../../actions/appActions'
@@ -44,6 +45,7 @@ class Folders extends Component {
 
     // connect props
     actions: PropTypes.object.isRequired,
+    query: PropTypes.instanceOf(AssetSearch),
     assetsCounter: PropTypes.number.isRequired,
 
     // state props
@@ -428,12 +430,12 @@ class Folders extends Component {
   }
 
   render () {
-    const { folders, user } = this.props
+    const { folders, user, query } = this.props
     const { filterString, rootId } = this.state
     const rootLoaded = folders.all.has(rootId)
     if (!rootLoaded) return null
 
-    if (this.props.assetsCounter !== this.assetsCounter) {
+    if (this.props.assetsCounter !== this.assetsCounter && !query.from) {
       this.assetsCounter = this.props.assetsCounter
       // evict all folders from counted list; will start refreshing everyone
       this.folderCountRequested = new Map()
@@ -514,6 +516,7 @@ class Folders extends Component {
 export default connect(state => ({
   folders: state.folders,
   sortFolders: state.app.sortFolders,
+  query: state.assets.query,
   assetsCounter: state.assets.assetsCounter,
   user: state.auth.user
 }), dispatch => ({
