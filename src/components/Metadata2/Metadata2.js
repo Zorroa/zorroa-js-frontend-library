@@ -9,11 +9,11 @@ import TableField from '../Table/TableField'
 import Resizer from '../../services/Resizer'
 import { minimalUniqueFieldTitle } from '../../models/Asset'
 import { unCamelCase, equalSets } from '../../services/jsUtil'
-import { getAssetFields, assetsForIds } from '../../actions/assetsAction'
+import { assetsForIds } from '../../actions/assetsAction'
 import { saveUserSettings } from '../../actions/authAction'
 import { fieldUsedInWidget, widgetTypeForField, createFacetWidget } from '../../models/Widget'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
-import { iconifyRightSidebar, updateMetadataFields,
+import { iconifyRightSidebar,
   toggleCollapsible, hoverField, clearHoverField } from '../../actions/appActions'
 import * as WidgetInfo from '../Racetrack/WidgetInfo'
 
@@ -332,8 +332,6 @@ export default connect(state => ({
 }), dispatch => ({
   actions: bindActionCreators({
     iconifyRightSidebar,
-    updateMetadataFields,
-    getAssetFields,
     saveUserSettings,
     toggleCollapsible,
     modifyRacetrackWidget,
