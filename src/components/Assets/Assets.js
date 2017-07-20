@@ -557,10 +557,10 @@ class Assets extends Component {
                   }
                   // Multipage agg optimization -- skip over children of parents with full stacks
                   const parentIds = showMultipage && parentCounts && [...parentCounts.keys()].filter(id => parentCounts.get(id) >= 3)
-                  if (index < positions.length && index === assets.length - 1 && loadedCount < filteredCount &&
-                    (this.loaded !== loadedCount || (parentIds && parentIds.length !== this.parentCount))) {
-                    this.loaded = loadedCount
-                    this.parentCount = parentIds && parentIds.length || 0  // re-search if we add new multipage filters
+                  if (index === assets.length - 1 && index < positions.length &&
+                    loadedCount < filteredCount && parentIds &&
+                    this.loaded !== assets.length) {
+                    this.loaded = assets.length
                     var nextPageQuery = new AssetSearch(query)
                     nextPageQuery.from = loadedCount
                     nextPageQuery.size = AssetSearch.autoPageSize
@@ -622,7 +622,6 @@ class Assets extends Component {
       // Invalidate the auto-load cache each time we have a new bare search.
       if (query.from === undefined) {
         this.loaded = 0
-        this.parentCount = 0
         this.scrollToSelection()
         this.saveHistory()
       }

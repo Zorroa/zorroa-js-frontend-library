@@ -15,13 +15,14 @@ describe('assetsReducer', () => {
 
   it('ASSET_SEARCH returns asset list', () => {
     const page = new Page({size: 1, totalCount: 1})
-    const payload = { query, assets, page }
+    const payload = { query, assets, page, isFirstPage: true }
     const result = {
       query,
       all: assets,
       totalCount: 1,
       loadedCount: 1,
       assetsCounter: 1,
+      parentCounts: undefined,
       suggestions: null,
       error: null,
       filteredCount: 1
@@ -33,13 +34,13 @@ describe('assetsReducer', () => {
   it('ASSET_SEARCH for second page concats assets DEBUG', () => {
     // Reduce the first page of assets
     const page = new Page({size: 1, totalCount: 2})
-    const payload1 = { query, assets, page }
+    const payload1 = { query, assets, page, isFirstPage: true }
     const state1 = assetsReducer({assetsCounter: 0}, { type: ASSET_SEARCH, payload: payload1 })
 
     // Reduce the second page of assets
     const assets2 = [new Asset({id: 'b', document: {}})]
     const page2 = new Page({ from: 1, size: 1, totalCount: 2 })
-    const payload2 = { query, assets: assets2, page: page2 }
+    const payload2 = { query, assets: assets2, page: page2, isFirstPage: false }
 
     // Construct the expected result -- concateated arrays
     const concatAssets = assets.concat(assets2)
@@ -49,7 +50,7 @@ describe('assetsReducer', () => {
       totalCount: 2,
       filteredCount: 2,
       loadedCount: 2,
-      parents: undefined,
+      parentCounts: undefined,
       suggestions: null,
       error: null,
       assetsCounter: 2

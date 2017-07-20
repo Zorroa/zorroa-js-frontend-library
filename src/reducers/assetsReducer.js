@@ -115,7 +115,7 @@ export default function (state = initialState, action) {
         })
       }
       const all = state.all && !isFirstPage ? state.all.concat(collapsedAssets) : collapsedAssets
-      const loadedCount = isFirstPage ? 0 : page.from + assets.length - collapsedCount
+      const loadedCount = page ? page.from + assets.length - collapsedCount : 0
       const filteredCount = page && page.totalCount || 0
       const totalCount = page && page.totalCount && isFirstPage ? page.totalCount : state.totalCount
       const assetsCounter = state.assetsCounter + 1
