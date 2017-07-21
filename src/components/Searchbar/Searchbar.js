@@ -1,13 +1,17 @@
 import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import copy from 'copy-to-clipboard'
 
-import { suggestQueryStrings, searchAssets } from '../../actions/assetsAction'
-import { resetRacetrackWidgets } from '../../actions/racetrackAction'
+import { isolateAssetId, suggestQueryStrings, searchAssets } from '../../actions/assetsAction'
+import { resetRacetrackWidgets, restoreFolders } from '../../actions/racetrackAction'
+import { saveSharedLink } from '../../actions/sharedLinkAction'
+import { dialogAlertPromise } from '../../actions/appActions'
 import { SimpleSearchWidgetInfo } from '../Racetrack/WidgetInfo'
 import Widget from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
 import Suggestions from '../Suggestions'
+import { LOAD_SEARCH_ITEM } from '../../constants/localStorageItems'
 
 class Searchbar extends Component {
   static propTypes = {
@@ -17,7 +21,13 @@ class Searchbar extends Component {
     totalCount: PropTypes.number,
     suggestions: PropTypes.arrayOf(PropTypes.object),
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
-    userSettings: PropTypes.object.isRequired
+    userSettings: PropTypes.object.isRequired,
+    similar: PropTypes.shape({
+      field: PropTypes.string,
+      values: PropTypes.arrayOf(PropTypes.string).isRequired,
+      assetIds: PropTypes.arrayOf(PropTypes.string).isRequired
+    }).isRequired,
+    order: PropTypes.arrayOf(PropTypes.object)
   }
 
   showSuggestions = true
@@ -79,6 +89,20 @@ class Searchbar extends Component {
     actions.searchAssets(query, query, force, isFirstPage)
   }
 
+  saveSearch = () => {
+    const { query, similar, order, widgets, actions } = this.props
+    const attrs = { similar, widgets, order }
+
+    actions.saveSharedLink({folder: { search: query, attrs }})
+    .then(id => {
+      copy(`${location.origin}/?${LOAD_SEARCH_ITEM}=${id}`)
+    })
+    .catch(err => {
+      actions.dialogAlertPromise('Save Search Error', 'Something went wrong saving this search. Check console for errors.')
+      return Promise.reject(err)
+    })
+  }
+
   render () {
     const { query, suggestions, error } = this.props
     const { queryString } = this.state
@@ -94,6 +118,7 @@ class Searchbar extends Component {
                        value={value}
                        onChange={this.suggest}
                        onSelect={this.search.bind(this)} />
+          <div className="icon-public Searchbar-share" title="Share search link" onClick={this.saveSearch}></div>
         </div>
         { error && <div className="Searchbar-error">Search syntax error</div> }
       </div>
@@ -102,7 +127,16 @@ class Searchbar extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({ resetRacetrackWidgets, suggestQueryStrings, searchAssets }, dispatch)
+  actions: bindActionCreators({
+    resetRacetrackWidgets,
+    suggestQueryStrings,
+    searchAssets,
+    saveSharedLink,
+    dialogAlertPromise,
+    isolateAssetId,
+    restoreFolders
+  },
+  dispatch)
 })
 
 const mapStateToProps = state => ({
