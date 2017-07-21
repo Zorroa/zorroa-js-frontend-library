@@ -47,6 +47,19 @@ export function similar (similar) {
   })
 }
 
+// Extract similar values from search
+function extractSimilar (search) {
+  if (search.filter && search.filter.hamming) {
+    return ({
+      field: search.filter.hamming.field,
+      values: search.filter.hamming.hashes,
+      ofsIds: search.filter.hamming.assetIds,
+      weights: search.filter.hamming.weights,
+      minScore: search.filter.hamming.minScore
+    })
+  }
+}
+
 // Merge widgets from multiple folders and restore search and related state
 export function restoreFolders (folders) {
   if (!folders || !folders.length) return
@@ -108,7 +121,7 @@ export function restoreFolders (folders) {
 
   // Do not restore selected folders to avoid infinite recursion
   const selectedFolderIds = restoreWidgetSlivers(widgets, search)
-  return restoreActions(widgets, search, selectedFolderIds)
+  return restoreActions(widgets, search, selectedFolderIds, mergedSimilar)
 }
 
 // Reconstruct Racetrack widgets from a search.
@@ -177,8 +190,9 @@ function restoreSearch (search) {
     })
   }
 
+  const mergedSimilar = extractSimilar(search)
   const selectedFolderIds = restoreWidgetSlivers(widgets, search)
-  return restoreActions(widgets, search, selectedFolderIds)
+  return restoreActions(widgets, search, selectedFolderIds, mergedSimilar)
 }
 
 // Helper function to extract widget slivers from the search,
@@ -294,7 +308,7 @@ function restoreWidgetSlivers (widgets, search) {
 
 // Helper function to return an array of actions needed to restore
 // app state to match the widgets, search, and selected folders.
-function restoreActions (widgets, search, selectedFolderIds) {
+function restoreActions (widgets, search, selectedFolderIds, mergedSimilar) {
   // Return actions to update the racetrack for the new search
   const actions = [resetRacetrackWidgets(widgets)]
   actions.push(selectFolderIds(selectedFolderIds))
@@ -304,18 +318,8 @@ function restoreActions (widgets, search, selectedFolderIds) {
     actions.push(orderAssets(search.order))
   }
 
-  // Create a SimilarHash widget if there's a hash query
-  // FIXME: Should look in postFilter for completeness?
-  if (search.filter && search.filter.hamming) {
-    actions.push(similar({
-      field: search.filter.hamming.field,
-      values: search.filter.hamming.hashes,
-      ofsIds: search.filter.hamming.ofsIds,
-      weights: search.filter.hamming.weights,
-      minScore: search.filter.hamming.minScore
-    }))
-    // const fields = [search.filter.hamming.field, 'proxies*']
-    // actions.push(similarAssets(search.filter.hamming.assetIds, fields))
+  if (similar) {
+    actions.push(similar(mergedSimilar))
   }
 
   // Reset the racetrack to the new widget
