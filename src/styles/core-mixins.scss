@@ -262,6 +262,7 @@ $zorroa-Sidebar-width : 340px;
 @mixin flexJustifyEnd    { -webkit-justify-content: flex-end   ; -moz-justify-content: flex-end   ; -ms-flex-pack: flex-end   ; justify-content: flex-end   ; }
 @mixin flexJustifyCenter { -webkit-justify-content: center     ; -moz-justify-content: center     ; -ms-flex-pack: center     ; justify-content: center     ; }
 @mixin flexJustifySpaceBetween { -webkit-justify-content: space-between ; -moz-justify-content: space-between ; -ms-flex-pack: space-between ; justify-content: space-between ; }
+@mixin flexJustifySpaceAround  { -webkit-justify-content: space-around  ; -moz-justify-content: space-around  ; -ms-flex-pack: space-around  ; justify-content: space-around  ; }
 
 @mixin flexAlignItemsCenter { -webkit-align-items: center     ; -moz-align-items: center     ; -ms-align-items: center     ; align-items: center     ; }
 @mixin flexAlignItemsStart  { -webkit-align-items: flex-start ; -moz-align-items: flex-start ; -ms-align-items: flex-start ; align-items: flex-start ; }

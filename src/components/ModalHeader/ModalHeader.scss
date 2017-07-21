@@ -1,0 +1,21 @@
+@import '../../styles/core-mixins.scss';
+
+.ModalHeader {
+  text-transform: uppercase;
+  color: white;
+  background-color: black;
+  height: 40px;
+
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include flexJustifySpaceBetween;
+}
+
+.ModalHeader-title {
+  margin: 0 10px;
+}
+
+.ModalHeader-close {
+  @include zorroa-square-btn-lighten(40px);
+  color: white;
+}

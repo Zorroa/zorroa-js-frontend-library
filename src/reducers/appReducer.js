@@ -7,6 +7,9 @@ import {
   SHOW_MULTIPAGE, SHOW_PAGES, VIDEO_VOLUME,
   HOVER_FIELD, CLEAR_HOVER_FIELD,
   USER_SETTINGS, UNAUTH_USER,
+  SHOW_DIALOG_ALERT, HIDE_DIALOG_ALERT,
+  SHOW_DIALOG_CONFIRM, HIDE_DIALOG_CONFIRM,
+  SHOW_DIALOG_PROMPT, HIDE_DIALOG_PROMPT,
   THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE, DRAG_FIELD_TEMPLATE,
   UX_LEVEL, MONOCHROME
 } from '../constants/actionTypes'
@@ -71,6 +74,18 @@ export default function app (state = initialState, action) {
       return { ...state, modal: action.payload }
     case HIDE_MODAL:
       return { ...state, modal: null }
+    case SHOW_DIALOG_ALERT:
+      return { ...state, dialogAlert: action.payload }
+    case HIDE_DIALOG_ALERT:
+      return { ...state, dialogAlert: null }
+    case SHOW_DIALOG_CONFIRM:
+      return { ...state, dialogConfirm: action.payload }
+    case HIDE_DIALOG_CONFIRM:
+      return { ...state, dialogConfirm: null }
+    case SHOW_DIALOG_PROMPT:
+      return { ...state, dialogPrompt: action.payload }
+    case HIDE_DIALOG_PROMPT:
+      return { ...state, dialogPrompt: null }
     case ICONIFY_LEFT_SIDEBAR:
       return { ...state, leftSidebarIsIconified: action.payload }
     case ICONIFY_RIGHT_SIDEBAR:

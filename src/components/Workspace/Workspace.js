@@ -6,6 +6,9 @@ import classnames from 'classnames'
 import axios from 'axios'
 
 import Modal from '../Modal'
+import DialogAlert from '../DialogAlert'
+import DialogConfirm from '../DialogConfirm'
+import DialogPrompt from '../DialogPrompt'
 import Header from '../Header'
 import Sidebar from '../Sidebar'
 import Assets from '../Assets'
@@ -15,7 +18,7 @@ import Metadata2 from '../Metadata2'
 import Collapsible from '../Collapsible'
 import ProgressBar from '../ProgressBar'
 import Racebar from '../Racetrack/Racebar'
-import { iconifyLeftSidebar, toggleCollapsible, showModal, hideModal } from '../../actions/appActions'
+import { iconifyLeftSidebar, toggleCollapsible, showModal, hideModal, dialogAlertPromise, dialogConfirmPromise, dialogPromptPromise } from '../../actions/appActions'
 import { getUserPermissions, updatePassword, changePassword } from '../../actions/authAction'
 import { queueFileEntrysUpload } from '../../actions/jobActions'
 import { updateCommand, getAllCommands } from '../../actions/assetsAction'
@@ -213,6 +216,64 @@ class Workspace extends Component {
     event.preventDefault()
   }
 
+  // This is an example of how to use DialogAlert. Remove anytime
+  alert = (message) => {
+    const { dialogAlertPromise } = this.props.actions
+    message = message || 'Hey, you should know something'
+    // message = message + ' lsjd flks jdlfkj sdljf lskdj flkjs dlfj lskdj flkjsd flkj sdlkjf lskdj flkjsd lkfj sldjf lskjd lksjd flkjsd this is a message lsjd flks jdlfkj sdljf lskdj flkjs dlfj lskdj flkjsd flkj sdlkjf lskdj flkjsd lkfj sldjf lskjd lksjd flkjsd this is a message lsjd flks jdlfkj sdljf lskdj flkjs dlfj lskdj flkjsd flkj sdlkjf lskdj flkjsd lkfj sldjf lskjd lksjd flkjsd this is a message lsjd flks jdlfkj sdljf lskdj flkjs dlfj lskdj flkjsd flkj sdlkjf lskdj flkjsd lkfj sldjf lskjd lksjd flkjsd '
+    return dialogAlertPromise('alert dialog', message)
+  }
+
+  // This is an example of how to use DialogConfirm. Remove anytime
+  confirm = (message) => {
+    const { dialogConfirmPromise } = this.props.actions
+    message = message || 'Confirm that you want to do something really dangerous.'
+    return dialogConfirmPromise('confirm dialog', message)
+    // NB: this is supposed to throw an unhandled rejection when you hit cancel
+  }
+
+  // This is an example of how to use DialogPrompt. Remove anytime
+  // Also demonstrates chaining actions after dialogs & chaining multiple dialogs
+  prompt = () => {
+    const { dialogPromptPromise } = this.props.actions
+    const message = 'Enter your value, pretty please:'
+    return dialogPromptPromise('prompt dialog', message)
+    .then(value => {
+      return this.confirm(`Do you want to do something with "${value}"?`)
+      .then(_ => 'accepted', _ => 'rejected')
+      .then(action => this.alert(`I have ${action} ${value}`))
+      .then(_ => value)
+    })
+    .catch(_ => this.alert('I bailed out'))
+  }
+
+  // This is example code for alert & confirm dialogs. Remove anytime.
+  renderModalTest = () => {
+    const test = false
+    if (test) {
+      return (
+        <div className='flexRowCenter'>
+          <button onClick={event => this.alert()}>alert</button>
+          <button onClick={event => this.confirm()}>confirm</button>
+          <button onClick={event => this.prompt()}>prompt</button>
+        </div>
+      )
+    } else {
+      return null
+    }
+  }
+
+  renderModal = () => {
+    // TODO: look into portals; they might simplify modals & make wrapping them in promises easier
+    // https://stackoverflow.com/a/39828187/1424242
+    // Or Popper https://github.com/souporserious/react-popper (esp. for tooltips & tutorials!)
+    const { app } = this.props
+    if (app.dialogAlert) return <Modal width='' body={<DialogAlert {...app.dialogAlert}/>}/>
+    if (app.dialogConfirm) return <Modal width='' body={<DialogConfirm {...app.dialogConfirm}/>}/>
+    if (app.dialogPrompt) return <Modal width='' body={<DialogPrompt {...app.dialogPrompt}/>}/>
+    if (app.modal) return <Modal {...app.modal} />
+  }
+
   render () {
     const { app, isolatedId, selectedAssetIds, user, isAdministrator, searching, monochrome } = this.props
 
@@ -258,7 +319,8 @@ class Workspace extends Component {
     const { isDroppable, showReloader } = this.state
     return (
       <div onDragEnter={this.dragEnter} className={classnames('App', 'flexCol', 'fullHeight', {isDragging: app.dragInfo, dark: monochrome})}>
-        { app.modal && <Modal {...app.modal} /> }
+        { this.renderModalTest() }
+        { this.renderModal() }
         { showReloader && (
           <div className="Workspace-reloader">
             <div className="flexRowCenter">
@@ -342,6 +404,9 @@ export default connect(state => ({
     changePassword,
     showModal,
     hideModal,
+    dialogAlertPromise,
+    dialogConfirmPromise,
+    dialogPromptPromise,
     queueFileEntrysUpload,
     getAllCommands,
     updateCommand

@@ -1,0 +1,21 @@
+@import '../../styles/core-mixins.scss';
+
+.DialogConfirm-body {
+  padding: 40px;
+}
+
+.DialogConfirm-footer {
+  @include flexRowCenter;
+  @include fullWidth;
+  @include flexJustifySpaceAround;
+  padding: 10px;
+}
+
+.DialogConfirm-confirm {
+  color: white;
+  @include zorroa-btn(6em, 40px, $zorroa-sickly-green, darken($zorroa-sickly-green, 15%));
+}
+.DialogConfirm-cancel {
+  color: $zorroa-darkgray;
+  @include zorroa-btn(6em, 40px, $zorroa-lightgray, darken($zorroa-lightgray, 15%));
+}
