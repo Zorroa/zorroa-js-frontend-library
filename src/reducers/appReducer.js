@@ -11,7 +11,7 @@ import {
   SHOW_DIALOG_CONFIRM, HIDE_DIALOG_CONFIRM,
   SHOW_DIALOG_PROMPT, HIDE_DIALOG_PROMPT,
   THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE, DRAG_FIELD_TEMPLATE,
-  UX_LEVEL, MONOCHROME
+  UX_LEVEL, EMBEDMODE_ENABLED, MONOCHROME
 } from '../constants/actionTypes'
 import { DEFAULT_THUMBSIZE } from '../actions/appActions'
 import { parseVariables, fieldsForVariables } from '../services/jsUtil'
@@ -24,6 +24,7 @@ export const defaultDragFields = [ 'source.filename' ]
 const initialState = {
   modal: null,
   uxLevel: 0,
+  embedModeEnabled: false,
   monochrome: false,
   leftSidebarIsIconified: false,
   rightSidebarIsIconified: true,
@@ -161,6 +162,8 @@ export default function app (state = initialState, action) {
     case UX_LEVEL: {
       return { ...state, uxLevel: action.payload }
     }
+    case EMBEDMODE_ENABLED:
+      return { ...state, embedModeEnabled: action.payload }
     case MONOCHROME: {
       return { ...state, monochrome: action.payload }
     }

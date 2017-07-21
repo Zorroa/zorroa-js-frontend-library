@@ -10,7 +10,7 @@ import {
   SHOW_DIALOG_CONFIRM, HIDE_DIALOG_CONFIRM,
   SHOW_DIALOG_PROMPT, HIDE_DIALOG_PROMPT,
   THUMB_FIELD_TEMPLATE, DRAG_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE,
-  UX_LEVEL, MONOCHROME
+  UX_LEVEL, EMBEDMODE_ENABLED, MONOCHROME
 } from '../constants/actionTypes'
 
 export const MIN_THUMBSIZE = 48
@@ -271,6 +271,12 @@ export function uxLevel (level) {
   })
 }
 
+export function setEmbedModeEnabled (isEnabled) {
+  return ({
+    type: EMBEDMODE_ENABLED,
+    payload: isEnabled
+  })
+}
 export function monochrome (state) {
   return ({
     type: MONOCHROME,

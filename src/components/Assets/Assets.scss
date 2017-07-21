@@ -116,7 +116,9 @@
       color: $zorroa-darkgray;
     }
   }
-
+}
+.Workspace.embedMode .assets-footer {
+  display: none;
 }
 
 .thumb-layout {

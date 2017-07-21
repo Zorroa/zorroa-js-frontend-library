@@ -18,7 +18,7 @@ import Metadata2 from '../Metadata2'
 import Collapsible from '../Collapsible'
 import ProgressBar from '../ProgressBar'
 import Racebar from '../Racetrack/Racebar'
-import { iconifyLeftSidebar, toggleCollapsible, showModal, hideModal, dialogAlertPromise, dialogConfirmPromise, dialogPromptPromise } from '../../actions/appActions'
+import { iconifyLeftSidebar, toggleCollapsible, showModal, hideModal, dialogAlertPromise, dialogConfirmPromise, dialogPromptPromise, setEmbedModeEnabled } from '../../actions/appActions'
 import { getUserPermissions, updatePassword, changePassword } from '../../actions/authAction'
 import { queueFileEntrysUpload } from '../../actions/jobActions'
 import { updateCommand, getAllCommands } from '../../actions/assetsAction'
@@ -32,6 +32,7 @@ import Lightbox from '../Lightbox'
 import Feedback from '../Feedback'
 import Import from '../Import'
 import { LOCAL_IMPORT, CLOUD_IMPORT, SERVER_IMPORT } from '../Import/ImportConstants'
+import { EMBEDMODE_ITEM } from '../../constants/localStorageItems'
 
 class Workspace extends Component {
   static displayName () {
@@ -73,10 +74,18 @@ class Workspace extends Component {
   tipShown = false
 
   componentWillMount () {
-    const { actions, user } = this.props
+    const { actions, user, app } = this.props
     actions.getUserPermissions(user)
     actions.getAllCommands()
     Feedback.loadEmailJs()
+
+    const embedMode = localStorage.getItem(EMBEDMODE_ITEM)
+    const { embedModeEnabled } = app
+    const newEmbedModeEnabled = (embedMode === 'true')
+    if (newEmbedModeEnabled && newEmbedModeEnabled !== embedModeEnabled) {
+      actions.setEmbedModeEnabled(true)
+      actions.iconifyLeftSidebar(true)
+    }
   }
 
   componentDidMount () {
@@ -318,7 +327,8 @@ class Workspace extends Component {
 
     const { isDroppable, showReloader } = this.state
     return (
-      <div onDragEnter={this.dragEnter} className={classnames('App', 'flexCol', 'fullHeight', {isDragging: app.dragInfo, dark: monochrome})}>
+
+      <div onDragEnter={this.dragEnter} className={classnames('App', 'Workspace', 'flexCol', 'fullHeight', {isDragging: app.dragInfo, dark: monochrome, embedMode: app.embedModeEnabled})}>
         { this.renderModalTest() }
         { this.renderModal() }
         { showReloader && (
@@ -333,7 +343,7 @@ class Workspace extends Component {
                  onClick={e => this.setState({ showReloader: false })}/>
           </div>
         )}
-        <Header/>
+        { !app.embedModeEnabled && <Header/> }
 
         { command && <CommandProgress successPct={commandSuccessPct} errorPct={commandErrorPct}/>}
 
@@ -409,6 +419,7 @@ export default connect(state => ({
     dialogPromptPromise,
     queueFileEntrysUpload,
     getAllCommands,
-    updateCommand
+    updateCommand,
+    setEmbedModeEnabled
   }, dispatch)
 }))(Workspace)

@@ -160,7 +160,7 @@ describe('Folder dnd', function () {
 
     .then(_ => { DEBUG && console.log('find the new "selenium" user folder') })
 
-    // wait til folder count says 0
+    .then(_ => { DEBUG && console.log('wait til folder count says 0') })
     .then(_ => driver.wait(_ => {
       return driver.then(_ => selenium.getFolderNamed(myUserName).then(e => { myUserFolder = e }))
       .then(_ => myUserFolder.findElement(By.css('.FolderItem-count')))
@@ -183,16 +183,17 @@ describe('Folder dnd', function () {
     .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.FolderItem-context-add-assets'), 5000))
     .then(_ => selenium.waitForIdle())
 
-    // wait til folder count says 1
+    .then(_ => { DEBUG && console.log('wait til folder count says > 1') })
     .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
     .then(_ => driver.wait(_ => {
       return driver.then(_ => selenium.getFolderNamed(myUserName).then(e => { myUserFolder = e }))
       .then(_ => myUserFolder.findElement(By.css('.FolderItem-count')))
       .then(ele => ele.getText())
-      .then(t => t === '1')
+      .then(t => parseInt(t, 10) > 0)
     }, 15000))
 
     // remove the asset from the new folder (asset should still be selected) // TODO: remove not working
+    .then(_ => { DEBUG && console.log('remove the asset from the new folder') })
     .then(_ => myUserFolder.click())
     .then(_ => selenium.waitForIdle())
     .then(_ => driver.actions().click(myUserFolder, 2).perform()) // right-click
@@ -202,7 +203,7 @@ describe('Folder dnd', function () {
     // .then(_ => selenium.waitForBusy())
     .then(_ => selenium.waitForIdle())
 
-    // wait til folder count says 0
+    .then(_ => { DEBUG && console.log('wait til folder count says 0') })
     .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
     .then(_ => driver.wait(_ => {
       return driver.then(_ => selenium.getFolderNamed(myUserName))
