@@ -8,10 +8,11 @@
   .asset-counter-count {
     font-weight: 700;
     color: $zorroa-greyish-brown;
+    .dark & { color: $zorroa-whitegray; }
   }
 
   .asset-counter-of {
-    .dark & { color: $zorroa-dimgray; }
+    .dark & { color: $zorroa-gray; }
     &:after {
       content: ' of ';
       font-size: 12px;
@@ -20,7 +21,7 @@
   }
 
   .asset-counter-results {
-    .dark & { color: $zorroa-dimgray; }
+    .dark & { color: $zorroa-gray; }
     &:after {
       content: ' RESULTS';
       font-size: 12px;
@@ -33,7 +34,7 @@
     margin-left: 8px;
     font-family: "Roboto Condensed";
     color: $zorroa-lightgray;
-    .dark & { color: $zorroa-dimgray; }
+    .dark & { color: $zorroa-whitegray; }
 
     &:hover {
       color: $zorroa-sickly-green;

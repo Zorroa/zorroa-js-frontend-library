@@ -9,7 +9,7 @@ import {
   SHOW_DIALOG_ALERT, HIDE_DIALOG_ALERT,
   SHOW_DIALOG_CONFIRM, HIDE_DIALOG_CONFIRM,
   SHOW_DIALOG_PROMPT, HIDE_DIALOG_PROMPT,
-  THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE,
+  THUMB_FIELD_TEMPLATE, DRAG_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE,
   UX_LEVEL, MONOCHROME
 } from '../constants/actionTypes'
 
@@ -253,6 +253,13 @@ export function thumbFieldTemplate (template) {
 export function lightbarFieldTemplate (template) {
   return ({
     type: LIGHTBAR_FIELD_TEMPLATE,
+    payload: template
+  })
+}
+
+export function dragFieldTemplate (template) {
+  return ({
+    type: DRAG_FIELD_TEMPLATE,
     payload: template
   })
 }

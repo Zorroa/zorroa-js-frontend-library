@@ -50,13 +50,13 @@ input,input:focus,button,button:focus,.form-control,.form-control:focus {
   width: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: $zorroa-lightgray;
-  // box-shadow: inset 0px 1px 3px 0px rgba(0,0,0,0.50);
+  background: $zorroa-greyish-brown;
+  box-shadow: inset 0 1px 3px 0 rgba(0,0,0,0.50);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb {
   background: $zorroa-gray;
-  .dark & { background: $zorroa-dimgray; }
+  .dark & { background: $zorroa-gray; }
   border-radius: 3px;
   &:hover {
     background: $zorroa-sickly-green;

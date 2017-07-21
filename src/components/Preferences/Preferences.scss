@@ -141,10 +141,10 @@
 
 .Preferences-field-template {
   @include flexRowCenter;
+  margin-top: 10px;
 }
 
 .Preferences-field-template-input {
-  margin-top: 10px;
   width: 300px;
   color: $zorroa-gray;
   padding: 4px;

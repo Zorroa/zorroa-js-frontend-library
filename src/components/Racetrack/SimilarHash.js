@@ -42,7 +42,7 @@ class SimilarHash extends Component {
   }
 
   state = {
-    minScore: this.props.similar.minScore
+    minScore: this.props.similar.minScore || 75
   }
 
   adjustTimout = null

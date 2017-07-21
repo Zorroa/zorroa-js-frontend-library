@@ -98,6 +98,7 @@
   width: 82%;
   height: 82%;
   box-shadow: 1px 0 3px 0 $zorroa-gray;
+  .dark & { box-shadow: 1px 0 3px 0 black; }
 }
 
 .Thumb-stack-0 {

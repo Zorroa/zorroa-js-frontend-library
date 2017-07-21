@@ -104,6 +104,30 @@ Tips for making testing quicker & easier:
 - `npm test <name>`
   - Runs all tests matching `<name>`. For example: "`npm test home`" will run only homePage.test.js
 
+### Setting up a new dev.zorroa.com
+
+* provision new archivist
+** ssh ansible@cm.zorroa.com
+** cd ansible
+** ansible-playbook provision-zorroa-archivist
+* change SSL to use dev.zorroa.com not pool in config/application.properties
+** server.ssl.key-store = /opt/zorroa/zorroa-archivist/config/zorroa.p12
+** server.ssl.key-alias = zorroa.com
+* restart server for update
+** sudo systemctl restart zorroa-archivist
+* update password for admin
+* add selenium user
+** selenium@zorroa.com
+** Add developer permissions
+* import /zorroa-data/imageTests/pdf with regular
+** Do this FIRST so those files are at the end of the default sort
+* add Disney pipeline
+* import /zorroa-data/disney/Database
+* Create a dyhi in /Film (not in /Library) with the following fields:
+** Disney.films
+** Disney.characterName
+** Disney.documentType
+
 ### Resources for writing tests:
 
 - Test runner: [Jest](https://facebook.github.io/jest)

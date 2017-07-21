@@ -42,7 +42,7 @@
 
 
     .Table-cell.dark & {
-      background-color: $zorroa-lightgray;
+      background-color: $zorroa-whitegray;
     }
   }
 }
@@ -59,19 +59,14 @@
   cursor: pointer;
 
   .Table-cell.dark & {
-    color: $zorroa-lightgray;
-    background-color: rgba(255,255,255,0.1);
+    color: $zorroa-whitegray;
+    background-color: $zorroa-darkgray;
     cursor: default;
   }
 
-  &:not(.Table-cell.dark):hover {
+  &:not(.disabled):hover {
     color: #fff;
     background-color: $zorroa-sickly-green;
-
-    .Table-cell.dark & {
-      color: $zorroa-darkgray;
-      background-color: rgba(255,255,255,0.1);
-    }
   }
 }
 

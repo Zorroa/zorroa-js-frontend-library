@@ -27,6 +27,7 @@ class Table extends Component {
     assetsCounter: PropTypes.number.isRequired,
     selectedAssetIds: PropTypes.instanceOf(Set),
     selectionCounter: PropTypes.number.isRequired,
+    monochrome: PropTypes.bool,
     fields: PropTypes.arrayOf(PropTypes.string).isRequired,
     fieldWidth: PropTypes.objectOf(PropTypes.number).isRequired,
     fieldTypes: PropTypes.object,
@@ -103,13 +104,13 @@ class Table extends Component {
   }
 
   columnAutoResize = (event, field) => {
-    const { assets } = this.props
+    const { assets, monochrome } = this.props
     var test = document.getElementById('Table-cell-test')
     var maxWidth = 0
 
     // measure the largest cell in this column
     assets.forEach(asset => {
-      test.innerHTML = ReactDOMServer.renderToString(<TableField {...{ asset, field, isOpen: false }}/>)
+      test.innerHTML = ReactDOMServer.renderToString(<TableField dark={monochrome} {...{ asset, field, isOpen: false }}/>)
       maxWidth = Math.max(maxWidth, test.clientWidth)
     })
     // include the header!
@@ -272,7 +273,7 @@ class Table extends Component {
   }
 
   render () {
-    const { assets, fieldWidth, height, tableIsResizing, selectedAssetIds } = this.props
+    const { assets, fieldWidth, height, tableIsResizing, selectedAssetIds, monochrome } = this.props
     if (!assets) return
 
     const fields = this.props.fields && this.props.fields.length ? this.props.fields : defaultMetadataFields
@@ -383,7 +384,7 @@ class Table extends Component {
                       const field = fields[fieldIndex]
                       const width = fieldWidth[field]
                       return (
-                        <TableField {...{ asset, field, key: field, width, left: `${fieldLeft[fieldIndex]}px`, top: `0px` }}
+                        <TableField dark={monochrome} {...{ asset, field, key: field, width, left: `${fieldLeft[fieldIndex]}px`, top: `0px` }}
                           onTag={this.createTagFacet} />
                       )
                     })}
@@ -404,6 +405,7 @@ export default connect(state => ({
   selectionCounter: state.assets.selectionCounter,
   query: state.assets.query,
   order: state.assets.order,
+  monochrome: state.app.monochrome,
   fields: state.app.metadataFields,
   fieldWidth: state.app.tableFieldWidth,
   fieldTypes: state.assets.types,

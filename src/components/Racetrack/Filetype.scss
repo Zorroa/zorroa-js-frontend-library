@@ -29,6 +29,7 @@
   @include flexRow;
   @include flexWrap;
   border-bottom: 1px solid $zorroa-lightgray;
+  .dark & { border-bottom: 1px solid $zorroa-dimgray; }
   margin-top: 10px;
   margin-bottom: 10px;
   padding-left: 10px;
@@ -45,11 +46,16 @@
   text-transform: uppercase;
   background-color: $zorroa-lightgray;
   color: $zorroa-greyish-brown;
+  .dark & {
+    color: $zorroa-whitegray;
+    background-color: $zorroa-dimgray;
+  }
 }
 
 .Filetype-remove-ext {
   font-size: 10px;
   color: $zorroa-gray;
+  .dark & { color: $zorroa-whitegray; }
   margin-left: 6px;
   cursor: pointer;
   &:hover {
@@ -75,6 +81,7 @@
   font-family: "Roboto Condensed";
   text-transform: uppercase;
   color: $zorroa-gray;
+  .dark & { color: $zorroa-whitegray; }
   margin-top: 4px;
   margin-bottom: 8px;
 }
@@ -95,7 +102,7 @@
 .Filetype-group-icon {
   margin-right: 4px;
   color: $zorroa-gray;
-
+  .dark & { color: $zorroa-whitegray; }
 }
 
 .Filetype-group-label {
@@ -104,11 +111,13 @@
   min-height: 12px;
   font-size: 12px;
   color: $zorroa-gray;
+  .dark & { color: $zorroa-whitegray; }
   margin-right: 10px;
   @include nowrap;
 
   .Filetype-group.disabled & {
     color: $zorroa-lightgray;
+    .dark & { color: $zorroa-dimgray; }
   }
 }
 
@@ -117,6 +126,7 @@
   font-family: "Roboto Condensed";
   font-size: 12px;
   color: $zorroa-lightgray;
+  .dark & { color: $zorroa-whitegray; }
   text-align: right;
 }
 
@@ -142,10 +152,12 @@
   text-transform: uppercase;
   font-size: 12px;
   color: $zorroa-gray;
+  .dark & { color: $zorroa-whitegray; }
   min-height: 12px;
 
   .Filetype-type.disabled & {
     color: $zorroa-lightgray;
+    .dark & { color: $zorroa-dimgray; }
   }
 }
 
@@ -155,11 +167,13 @@
   min-height: 12px;
   font-size: 12px;
   color: $zorroa-gray;
+  .dark & { color: $zorroa-whitegray; }
   margin-right: 10px;
   @include nowrap;
 
   .Filetype-type.disabled & {
     color: $zorroa-lightgray;
+    .dark & { color: $zorroa-dimgray; }
   }
 }
 
@@ -168,6 +182,7 @@
   font-family: "Roboto Condensed";
   font-size: 12px;
   color: $zorroa-lightgray;
+  .dark & { color: $zorroa-whitegray; }
   text-align: right;
 }
 
@@ -181,7 +196,8 @@
   padding-left: 4px;
   @include flexRow;
   @include flexAlignItemsCenter;
-  border: 1px solid$zorroa-nearwhite;
+  border: 1px solid $zorroa-nearwhite;
+  .dark & { border: 1px solid $zorroa-dimgray; }
 }
 
 .Filetype-suggestions-body {
@@ -190,6 +206,7 @@
 
 .Filetype-suggestions-search-icon {
   color: $zorroa-gray;
+  .dark & { color: $zorroa-whitegray; }
   width: 14px;
   height: 14px;
   margin-right: 2px;

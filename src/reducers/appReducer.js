@@ -10,7 +10,7 @@ import {
   SHOW_DIALOG_ALERT, HIDE_DIALOG_ALERT,
   SHOW_DIALOG_CONFIRM, HIDE_DIALOG_CONFIRM,
   SHOW_DIALOG_PROMPT, HIDE_DIALOG_PROMPT,
-  THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE,
+  THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE, DRAG_FIELD_TEMPLATE,
   UX_LEVEL, MONOCHROME
 } from '../constants/actionTypes'
 import { DEFAULT_THUMBSIZE } from '../actions/appActions'
@@ -20,6 +20,7 @@ export const defaultTableFieldWidth = 100
 export const defaultMetadataFields = [ 'source.filename', 'source.date', 'source.fileSize' ]
 export const defaultLightbarFields = [ 'source.type', 'source.filename', 'source.date', 'image.width', 'image.height', 'video.width', 'video.height' ]
 export const defaultThumbFields = [ 'source.type', 'image.width', 'image.height', 'video.width', 'video.height' ]
+export const defaultDragFields = [ 'source.filename' ]
 const initialState = {
   modal: null,
   uxLevel: 0,
@@ -41,6 +42,7 @@ const initialState = {
   metadataFields: [ ...defaultMetadataFields ],
   lightbarFields: [ ...defaultLightbarFields ],
   thumbFields: [ ...defaultThumbFields ],
+  dragFields: [ ...defaultDragFields ],
   lightboxMetadata: { show: false, left: 20, top: 80, width: 300, height: 500 },
   tableFieldWidth: Object.assign({},
     ...defaultMetadataFields.map(field => ({ [field]: defaultTableFieldWidth }))),
@@ -53,8 +55,9 @@ const initialState = {
   showPages: false,
   sortFolders: 'alpha-asc',
   hoverFields: new Set(),
-  thumbFieldTemplate: '${image.width|video.width}x${image.height|video.height} ${source.type}',
-  lightbarFieldTemplate: '${source.type} ${source.filename} ${image.width|video.width}x${image.height|video.height} ${source.date}',
+  thumbFieldTemplate: '%{image.width|video.width}x%{image.height|video.height} %{source.type}',
+  lightbarFieldTemplate: '%{source.type} %{source.filename} %{image.width|video.width}x%{image.height|video.height} %{source.date}',
+  dragFieldTemplate: '%{source.filename}',
   userSettings: {
     metadataFields: [ ...defaultMetadataFields ],
     showTable: false,
@@ -149,6 +152,11 @@ export default function app (state = initialState, action) {
       const lightbarFieldTemplate = action.payload
       const lightbarFields = fieldsForVariables(parseVariables(lightbarFieldTemplate))
       return { ...state, lightbarFieldTemplate, lightbarFields }
+    }
+    case DRAG_FIELD_TEMPLATE: {
+      const dragFieldTemplate = action.payload
+      const dragFields = fieldsForVariables(parseVariables(dragFieldTemplate))
+      return { ...state, dragFieldTemplate, dragFields }
     }
     case UX_LEVEL: {
       return { ...state, uxLevel: action.payload }

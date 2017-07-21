@@ -66,7 +66,7 @@ class Widget extends Component {
   }
 
   render () {
-    const { children, icon, title, field, backgroundColor, isIconified, floatBody, isOpen, onOpen, uxLevel, monochrome } = this.props
+    const { children, icon, title, field, backgroundColor, isIconified, floatBody, isOpen, onOpen, uxLevel } = this.props
     const widget = this.widget()
     const advanced = uxLevel > 0
     const isEnabled = !advanced || (widget && widget.isEnabled)
@@ -76,7 +76,7 @@ class Widget extends Component {
       icon,
       title,
       field,
-      backgroundColor: monochrome ? '#666' : backgroundColor,
+      backgroundColor: backgroundColor,
       isEnabled,
       isPinned,
       maxWidth,

@@ -101,7 +101,7 @@
 
   &:not(.isSelected):hover {
     background-color: $zorroa-hover;
-    .Metadata2.dark & { background-color: rgba(255,255,255, 0.1); }
+    .Metadata2.dark & { background-color: $zorroa-dark-hover; }
   }
 }
 
@@ -125,7 +125,7 @@
 
   &:not(.isSelected):hover {
     background-color: $zorroa-hover;
-    .Metadata2.dark & { background-color: rgba(255,255,255, 0.1); }
+    .Metadata2.dark & { background-color: $zorroa-nearblack; }
   }
   &.isSelected {
     background-color: $zorroa-selected;

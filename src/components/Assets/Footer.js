@@ -15,10 +15,6 @@ const Footer = (props) => (
 )
 
 Footer.propTypes = {
-  loaded: PropTypes.number.isRequired,
-  collapsed: PropTypes.number.isRequired,
-  total: PropTypes.number.isRequired,
-  onUncollapse: PropTypes.func.isRequired,
   showTable: PropTypes.bool.isRequired,
   toggleShowTable: PropTypes.func,
   layout: PropTypes.string.isRequired,

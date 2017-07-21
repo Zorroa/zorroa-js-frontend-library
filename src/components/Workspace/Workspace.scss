@@ -13,7 +13,8 @@
   right: 0;
   bottom: 0;
 
-  &.dark { background-color: $zorroa-gray; }
+  background-color: $zorroa-nearwhite;
+  &.dark { background-color: $zorroa-nearblack; }
 }
 
 .App-dropzone {
@@ -42,13 +43,13 @@
   background-color: $zorroa-nearwhite;
   overflow: hidden;
 
-  .dark & { background-color: $zorroa-gray; }
+  .dark & { background-color: $zorroa-nearblack; }
 
   & .Workspace-vertical-separator {
     height: 100%;
     width: 1px;
     border-right: 1px solid $zorroa-lightgray;
-    .dark & { border-right: 1px solid $zorroa-darkgray; }
+    .dark & { border-right: 1px solid $zorroa-dimgray; }
   }
 
   .Metadata-icon {

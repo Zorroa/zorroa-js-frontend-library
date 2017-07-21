@@ -70,7 +70,7 @@ describe('Lightbox', function () {
     .then(_ => { DEBUG && console.log('open the lightbox') })
     .then(_ => driver.findElement(By.css('.Assets-layout')))
       .then(e => e.findElements(By.css('.Thumb')))
-      .then(es => { expect(es.length).toBeGreaterThan(5); driver.actions().doubleClick(es[2]).perform() })
+      .then(es => { expect(es.length).toBeGreaterThan(5); driver.actions().doubleClick(es[3]).perform() })
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.lightbox')))
     .then(_ => selenium.waitForIdle(15000))
 
