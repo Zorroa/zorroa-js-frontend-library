@@ -17,7 +17,7 @@ import { iconifyRightSidebar,
   toggleCollapsible, hoverField, clearHoverField } from '../../actions/appActions'
 import * as WidgetInfo from '../Racetrack/WidgetInfo'
 
-class Metadata2 extends Component {
+class Metadata extends Component {
   static propTypes = {
     dark: PropTypes.bool,
     height: PropTypes.string.isRequired,
@@ -192,28 +192,28 @@ class Metadata2 extends Component {
     return (
       <div key={itemClass}
            onClick={e => this.toggleCollapsible(`meta2-${namespace}`, e)}
-           className={classnames('Metadata2-namespace', 'Metadata2-namespace-' + itemClass, {isOpen})}>
-        <div className="Metadata2-namespace-title">
+           className={classnames('Metadata-namespace', 'Metadata-namespace-' + itemClass, {isOpen})}>
+        <div className="Metadata-namespace-title">
           {unCamelCase(namespace)}
         </div>
-        <div className={classnames('Metadata2-namespace-toggle', 'icon-chevron-down', {isOpen})}/>
+        <div className={classnames('Metadata-namespace-toggle', 'icon-chevron-down', {isOpen})}/>
       </div>
     )
   }
 
   renderValue (field, namespace, asset, isFavorite) {
     if (asset === null) {
-      return <div className="Metadata2-value-various">Various</div>
+      return <div className="Metadata-value-various">Various</div>
     } else if (asset.rawValue(field) === undefined) {
-      return <div className="Metadata2-value-null">null</div>
+      return <div className="Metadata-value-null">null</div>
     } else if (asset) {
       return (
-        <div className="Metadata2-value">
+        <div className="Metadata-value">
           <TableField asset={asset} field={field} isOpen={true} dark={this.props.dark} onTag={!this.props.isolatedId && this.createTagFacet}/>
         </div>
       )
     }
-    return <div className="Metadata2-value-null">null</div>
+    return <div className="Metadata-value-null">null</div>
   }
 
   renderLeaf (field, namespace, fields, isSelected, isFavorite, widgetIcon) {
@@ -236,15 +236,15 @@ class Metadata2 extends Component {
     const { head, tails } = minimalUniqueFieldTitle(field, fields, 1)
     const tail = tails && '\u2039 ' + tails.join(' \u2039 ')
     return (
-      <div key={itemClass} className={classnames('Metadata2-leaf', {isSelected})}
+      <div key={itemClass} className={classnames('Metadata-leaf', {isSelected})}
            title={field}
            onMouseOver={e => this.hover(namespace)} onMouseOut={e => this.clearHover(namespace)}
            onClick={e => this.toggleWidget(field, e)}>
-        <div className="Metadata2-leaf-title" style={{minWidth: titleWidth, maxWidth: titleWidth}}>
-          <div className="Metadata2-leaf-title-head">
+        <div className="Metadata-leaf-title" style={{minWidth: titleWidth, maxWidth: titleWidth}}>
+          <div className="Metadata-leaf-title-head">
             {unCamelCase(head)}
           </div>
-          { tail && <div className="Metadata2-leaf-title-tail">{tail}</div> }
+          { tail && <div className="Metadata-leaf-title-tail">{tail}</div> }
         </div>
         { this.renderValue(field, namespace, asset, isFavorite) }
       </div>
@@ -255,8 +255,8 @@ class Metadata2 extends Component {
     const { selectedAssets } = this.state
     if (!selectedAssets || !selectedAssets.length) {
       const empty = (
-        <div key="no-assets" className="Metadata2-no-assets">
-          <div className="Metadata2-no-assets-icon icon-emptybox"/>
+        <div key="no-assets" className="Metadata-no-assets">
+          <div className="Metadata-no-assets-icon icon-emptybox"/>
           No Assets Selected
         </div>
       )
@@ -294,24 +294,24 @@ class Metadata2 extends Component {
     const { dark, height } = this.props
     const { filterString, showFavorites, titleWidth, showNull } = this.state
     return (
-      <div className={classnames('Metadata2', {dark})} style={{height: height, maxHeight: height}}>
-        <div className="Metadata2-header">
+      <div className={classnames('Metadata', {dark})} style={{height: height, maxHeight: height}}>
+        <div className="Metadata-header">
           <Filter className="box" value={filterString} dark={dark}
                   placeholder="Filter Metadata Fields"
                   onClear={_ => this.setState({filterString: ''})}
                   onChange={e => this.setState({filterString: e.target.value})}/>
           <div onClick={this.toggleNull} title="Filter to remove null-valued fields"
-               className={classnames('Metadata2-nulls', 'icon-blocked',
+               className={classnames('Metadata-nulls', 'icon-blocked',
                  {isSelected: !showNull})}/>
           <div onClick={this.toggleFavorites} title="Filter to show only favorite fields"
-               className={classnames('Metadata2-favorites',
+               className={classnames('Metadata-favorites',
                  `icon-star-${showFavorites ? 'filled' : 'empty'}`,
                  {isSelected: showFavorites})}/>
         </div>
-        <div className="Metadata2-body">
-          <div className="Metadata2-scroll">
+        <div className="Metadata-body">
+          <div className="Metadata-scroll">
             { this.renderFields() }
-            <div className={classnames('Metadata2-resizer', {active: this.resizer.active})}
+            <div className={classnames('Metadata-resizer', {active: this.resizer.active})}
                  style={{left: 6 + titleWidth}} onMouseDown={this.resizeStart}/>
           </div>
         </div>
@@ -339,4 +339,4 @@ export default connect(state => ({
     hoverField,
     clearHoverField
   }, dispatch)
-}))(Metadata2)
+}))(Metadata)

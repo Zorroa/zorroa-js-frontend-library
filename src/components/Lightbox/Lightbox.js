@@ -6,7 +6,7 @@ import keydown from 'react-keydown'
 import Asset from '../../models/Asset'
 import Lightbar from './Lightbar'
 import Inspector from '../Inspector'
-import Metadata2 from '../Metadata2'
+import Metadata from '../Metadata'
 import ResizableWindow from '../ResizableWindow'
 import { isolateAssetId } from '../../actions/assetsAction'
 import { lightboxMetadata } from '../../actions/appActions'
@@ -96,7 +96,7 @@ class Lightbox extends Component {
           <ResizableWindow onClose={this.closeMetadata} onMove={this.moveMetadata}
                            {...lightboxMetadata}
                            title={<div className="Lightbox-metadata-title"><div className="icon-register"/><div>Metadata</div></div>}>
-            <Metadata2 assetIds={new Set([isolatedId])} dark={true} height="100%"/>
+            <Metadata assetIds={new Set([isolatedId])} dark={true} height="100%"/>
           </ResizableWindow>
           )
         }

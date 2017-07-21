@@ -14,7 +14,7 @@ import Sidebar from '../Sidebar'
 import Assets from '../Assets'
 import Folders from '../Folders'
 import Explorer from '../Explorer'
-import Metadata2 from '../Metadata2'
+import Metadata from '../Metadata'
 import Collapsible from '../Collapsible'
 import ProgressBar from '../ProgressBar'
 import Racebar from '../Racetrack/Racebar'
@@ -316,7 +316,7 @@ class Workspace extends Component {
       isIconified: app.leftSidebarIsIconified,
       onOpen: this.toggleCollapsible.bind(this, 'metadata2'),
       closeIcon: 'icon-register',
-      className: 'Metadata2-collapsible'
+      className: 'Metadata-collapsible'
     })
 
     // Only show the command progress if Active, skipping super quick commands
@@ -369,7 +369,7 @@ class Workspace extends Component {
               <Explorer/>
             </Collapsible>
             <Collapsible {...Metadata2Params()}>
-              <Metadata2 assetIds={selectedAssetIds} height="60vh" dark={monochrome} />
+              <Metadata assetIds={selectedAssetIds} height="60vh" dark={monochrome} />
             </Collapsible>
           </Sidebar>
 
