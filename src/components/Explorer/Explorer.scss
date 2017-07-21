@@ -1,13 +1,13 @@
 @import '../../styles/core-mixins.scss';
 
-.Metadata {
+.Explorer {
 
   background-color: white;
   .dark & { background-color: black; }
   max-height: 40vh;
   @include flexCol;
 
-  .Metadata-header {
+  .Explorer-header {
     @include flexRow;
     @include flexJustifySpaceBetween;
     @include flexAlignItemsCenter;
@@ -15,7 +15,7 @@
     min-height: 44px;
     border-bottom: 1px solid $zorroa-nearwhite;
 
-    .Metadata-filter {
+    .Explorer-filter {
       @include flexOn;
       @include flexRow;
       position: relative;
@@ -51,7 +51,7 @@
     }
   }
 
-  .Metadata-body {
+  .Explorer-body {
     @include flexOn;
     margin-bottom: 10px;
     position: relative;
@@ -60,7 +60,7 @@
   }
 }
 
-.Metadata-left {
+.Explorer-left {
   @include flexRow;
   @include flexAlignItemsCenter;
   margin-left: 4px;
@@ -68,21 +68,21 @@
   .dark & { border-bottom: 1px solid $zorroa-dimgray; }
 }
 
-.Metadata-middle {
+.Explorer-middle {
   @include flexOn;
   height: 26px;
   border-bottom: 1px solid $zorroa-nearwhite;
   .dark & { border-bottom: 1px solid $zorroa-dimgray; }
 }
 
-.Metadata-right {
+.Explorer-right {
   @include flexRow;
   @include flexAlignItemsCenter;
   border-bottom: 1px solid $zorroa-nearwhite;
   .dark & { border-bottom: 1px solid $zorroa-dimgray; }
 }
 
-.Metadata-item {
+.Explorer-item {
   margin-left: 8px;
   margin-right: 8px;
   margin-bottom: -1px;  // Forces borders together
@@ -92,7 +92,7 @@
   @include flexRow;
   @include flexAlignItemsCenter;
 
-  .Metadata-item-label {
+  .Explorer-item-label {
     @include flexRow;
     color: $zorroa-greyish-brown;
     .dark & { color: $zorroa-whitegray; }
@@ -102,7 +102,7 @@
     &.hasChildren { font-weight: 500; }
   }
 
-  .Metadata-item-right {
+  .Explorer-item-right {
     @include flexRow;
   }
 
@@ -116,14 +116,14 @@
   }
 }
 
-.Metadata-item-pad {
+.Explorer-item-pad {
   width: 14px;
   height: 25px;
   border-right: 1px solid $zorroa-lightgray;
   .dark & { border-right: 1px solid $zorroa-darkgray; }
 }
 
-.Metadata-cancel-filter {
+.Explorer-cancel-filter {
   @include flexRowCenter;
   font-size: 10px;
   color: $zorroa-lightgray;
@@ -139,7 +139,7 @@
   &:hover { color: $zorroa-gray; }
 }
 
-.Metadata-item-favorite {
+.Explorer-item-favorite {
   @include flexOff;
   @include flexRowCenter;
   width: 20px;
@@ -166,7 +166,7 @@
 
 $FolderItemHeight : 25px;
 
-.Metadata-item-toggle {
+.Explorer-item-toggle {
   @include flexOff;
   @include flexRowCenter;
 
@@ -184,12 +184,12 @@ $FolderItemHeight : 25px;
   .FolderItem.isSelected.isDropTarget.dragHover & { color: white; background-color: darken($zorroa-sickly-green, 15%); }
 }
 
-.Metadata-toggle-open {
+.Explorer-toggle-open {
   margin-left: -7px;
   color: $zorroa-gray;
 }
 
-.Metadata-favorites {
+.Explorer-favorites {
   @include flexRowCenter;
   margin-left: 4px;
   margin-right: 8px;
@@ -210,7 +210,7 @@ $FolderItemHeight : 25px;
   }
 }
 
-.Metadata-item-widget {
+.Explorer-item-widget {
   @include flexRowCenter;
   font-size: 12px;
   color: $zorroa-lightgray;
@@ -218,7 +218,7 @@ $FolderItemHeight : 25px;
   height: 25px;
 }
 
-.Metadata-sort {
+.Explorer-sort {
   @include flexRowCenter;
   @include flexOff;
   height: 24px;

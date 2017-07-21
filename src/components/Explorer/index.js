@@ -1,12 +1,12 @@
-import Metadata from './Metadata'
-import './Metadata.scss'
-export default Metadata
+import Explorer from './Explorer'
+import './Explorer.scss'
+export default Explorer
 
 /*
-Metadata displays detailed information about the selected assets.
+Explorer displays detailed information about the selected assets.
 DisplayProperties are used to define which fields in the metadata
 are visible, their order, and their editable widgets, if any.
-Metadata is displayed using a recursive Collapsible outline view
+Explorer is displayed using a recursive Collapsible outline view
 that unfolds the JSON-structured document metadata.
 
 The DisplayProperties that define the metadata layout can be

@@ -13,7 +13,7 @@ import Header from '../Header'
 import Sidebar from '../Sidebar'
 import Assets from '../Assets'
 import Folders from '../Folders'
-import Metadata from '../Metadata'
+import Explorer from '../Explorer'
 import Metadata2 from '../Metadata2'
 import Collapsible from '../Collapsible'
 import ProgressBar from '../ProgressBar'
@@ -308,7 +308,7 @@ class Workspace extends Component {
       isIconified: app.leftSidebarIsIconified,
       onOpen: this.toggleCollapsible.bind(this, 'metadata'),
       closeIcon: 'icon-binoculars',
-      className: 'Metadata-collapsible'
+      className: 'Explorer-collapsible'
     })
     const Metadata2Params = () => ({
       header: (<span>Metadata</span>),
@@ -366,7 +366,7 @@ class Workspace extends Component {
               <Folders rootId={user.homeFolderId}/>
             </Collapsible>
             <Collapsible {...MetadataParams()}>
-              <Metadata/>
+              <Explorer/>
             </Collapsible>
             <Collapsible {...Metadata2Params()}>
               <Metadata2 assetIds={selectedAssetIds} height="60vh" dark={monochrome} />

@@ -13,7 +13,7 @@ import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/r
 import { fieldUsedInWidget, widgetTypeForField } from '../../models/Widget'
 import * as WidgetInfo from '../Racetrack/WidgetInfo'
 
-class Metadata extends Component {
+class Explorer extends Component {
   static propTypes = {
     // state props
     metadataFields: PropTypes.arrayOf(PropTypes.string),
@@ -250,13 +250,13 @@ class Metadata extends Component {
   sortOrderClassnames = (field, order) => {
     const index = order && order.findIndex(order => (order.field === field))
     const icon = !order || index !== 0 ? 'icon-sort' : (order[index].ascending ? 'icon-sort-asc' : 'icon-sort-desc')
-    return `Metadata-sort ${icon}`
+    return `Explorer-sort ${icon}`
   }
 
   renderPads (depth) {
     if (depth <= 0) return null
     let pads = []
-    for (let i = 0; i < depth; ++i) pads.push(<div key={i} className="Metadata-item-pad"/>)
+    for (let i = 0; i < depth; ++i) pads.push(<div key={i} className="Explorer-item-pad"/>)
     return pads
   }
 
@@ -268,26 +268,26 @@ class Metadata extends Component {
     const isSortable = isLeaf && sortableTypes.findIndex(type => (type === fieldType)) >= 0
     const itemClass = namespace.replace('.', '-')
     return (
-      <div className={classnames('Metadata-item', 'Metadata-item-' + itemClass, {isSelected, isLeaf, isOpen})}
+      <div className={classnames('Explorer-item', 'Explorer-item-' + itemClass, {isSelected, isLeaf, isOpen})}
            key={namespace} title={field}
            onClick={e => hasChildren ? this.toggleCollapsible(namespace, e) : this.toggleWidget(field, e)}
            onMouseOver={e => this.hover(namespace)} onMouseOut={e => this.clearHover(namespace)} >
         { this.renderPads(depth) }
-        <div className="Metadata-left">
-          <div className={classnames('Metadata-item-toggle', {hasChildren})}
+        <div className="Explorer-left">
+          <div className={classnames('Explorer-item-toggle', {hasChildren})}
                onClick={e => this.toggleCollapsible(namespace, e)}>
-            { hasChildren && <div className={classnames('Metadata-toggle-open', `icon-square-${isOpen ? 'minus' : 'plus'}`)}/> }
+            { hasChildren && <div className={classnames('Explorer-toggle-open', `icon-square-${isOpen ? 'minus' : 'plus'}`)}/> }
           </div>
-          <div className={classnames('Metadata-item-label', {hasChildren})}>
+          <div className={classnames('Explorer-item-label', {hasChildren})}>
             {unCamelCase(name)}
           </div>
         </div>
-        <div className="Metadata-middle"/>
-        <div className="Metadata-right">
-          <div className={classnames('Metadata-item-widget', widgetIcon)} />
+        <div className="Explorer-middle"/>
+        <div className="Explorer-right">
+          <div className={classnames('Explorer-item-widget', widgetIcon)} />
           { isSortable && <i onClick={e => this.sortByField(field, e)} className={this.sortOrderClassnames(field, order)}/> }
           <div onClick={e => this.favorite(field, namespace, e)}
-               className={classnames('Metadata-item-favorite', 'icon-star-filled', {isSelected: isFavorite})}/>
+               className={classnames('Explorer-item-favorite', 'icon-star-filled', {isSelected: isFavorite})}/>
         </div>
       </div>
     )
@@ -296,21 +296,21 @@ class Metadata extends Component {
   render () {
     const { filterString, filteredComponents, showFavorites } = this.state
     return (
-      <div className="Metadata">
-        <div className="Metadata-header">
-          <div className="Metadata-filter">
+      <div className="Explorer">
+        <div className="Explorer-header">
+          <div className="Explorer-filter">
             <input type="text" onChange={this.changeFilterString}
                    value={filterString} placeholder="Filter Tags" />
-            { filterString && filterString.length && <div onClick={this.cancelFilter} className="Metadata-cancel-filter icon-cancel-circle"/> }
+            { filterString && filterString.length && <div onClick={this.cancelFilter} className="Explorer-cancel-filter icon-cancel-circle"/> }
             <div className="icon-search"/>
           </div>
           <div onClick={this.toggleFavorites} title="Filter to show only favorite fields"
-               className={classnames('Metadata-favorites',
+               className={classnames('Explorer-favorites',
                  `icon-star-${showFavorites ? 'filled' : 'empty'}`,
                  {isSelected: showFavorites})}/>
         </div>
-        <div className="Metadata-body">
-          <div className="Metadata-scroll">
+        <div className="Explorer-body">
+          <div className="Explorer-scroll">
             {filteredComponents}
           </div>
         </div>
@@ -342,4 +342,4 @@ export default connect(state => ({
     hoverField,
     clearHoverField
   }, dispatch)
-}))(Metadata)
+}))(Explorer)
