@@ -4,63 +4,84 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 import User from '../../models/User'
-import { iconifyRightSidebar, updateMetadataFields,
-  toggleCollapsible, hoverField, clearHoverField } from '../../actions/appActions'
+import Filter from '../Filter'
+import TableField from '../Table/TableField'
+import Resizer from '../../services/Resizer'
+import { minimalUniqueFieldTitle } from '../../models/Asset'
+import { unCamelCase, equalSets } from '../../services/jsUtil'
+import { assetsForIds } from '../../actions/assetsAction'
 import { saveUserSettings } from '../../actions/authAction'
-import { getAssetFields, sortAssets, unorderAssets } from '../../actions/assetsAction'
-import { unCamelCase } from '../../services/jsUtil'
+import { fieldUsedInWidget, widgetTypeForField, createFacetWidget } from '../../models/Widget'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
-import { fieldUsedInWidget, widgetTypeForField } from '../../models/Widget'
+import { iconifyRightSidebar,
+  toggleCollapsible, hoverField, clearHoverField } from '../../actions/appActions'
 import * as WidgetInfo from '../Racetrack/WidgetInfo'
 
 class Metadata extends Component {
   static propTypes = {
-    // state props
+    dark: PropTypes.bool,
+    height: PropTypes.string.isRequired,
+    assetIds: PropTypes.instanceOf(Set),
+    isolatedId: PropTypes.string,
     metadataFields: PropTypes.arrayOf(PropTypes.string),
     widgets: PropTypes.arrayOf(PropTypes.object),
     collapsibleOpen: PropTypes.object,
     fieldTypes: PropTypes.object,
-    aggs: PropTypes.object,
-    order: PropTypes.arrayOf(PropTypes.object),
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object,
     actions: PropTypes.object
   }
 
   state = {
+    selectedAssets: [],
     filterString: '',
-    filteredFields: [],
+    showNull: false,
     showFavorites: this.props.userSettings.showFavorites,
-    filteredComponents: [],
-    collapsibleOpen: {},
-    aggs: {},
-    aggFields: [],
-    order: null,
-    metadataFields: this.props.metadataFields,
-    searchedFields: null
+    titleWidth: 100
   }
 
+  cachedAssetIds = new Set()
+
   componentWillMount () {
-    this.updateFilteredFields(this.props)
-    this.props.actions.getAssetFields()
+    this.resizer = new Resizer()
+    this.componentWillReceiveProps(this.props)
+  }
+
+  componentWillUnmount () {
+    this.resizer.release()
   }
 
   componentWillReceiveProps (nextProps) {
-    this.updateFilteredFields(nextProps)
+    if (!nextProps.assetIds || !nextProps.assetIds.size) {
+      if (this.state.selectedAssets.length) this.setState({selectedAssets: []})
+      this.cachedAssetIds = new Set()
+    } else if (!equalSets(this.cachedAssetIds, nextProps.assetIds)) {
+      this.cachedAssetIds = new Set([...nextProps.assetIds])
+      assetsForIds(nextProps.assetIds)
+        .then(selectedAssets => this.setState({selectedAssets}))
+        .catch(error => {
+          console.log('Error getting selected assets: ' + error)
+        })
+    }
   }
 
-  setStatePromise = (newState) => {
-    return new Promise(resolve => this.setState(newState, resolve))
+  resizeStart = () => {
+    this.resizer.capture(
+      this.resize,                      /* onMove    */
+      this.resizeDone,                  /* onRelease */
+      this.state.titleWidth,            /* startX    */
+      0,                                /* startY    */
+      1,                                /* optScaleX */
+      0)                                /* optScaleY */
   }
 
-  changeFilterString = (event) => {
-    this.setStatePromise({ filterString: event.target.value })
-      .then(() => this.updateFilteredFields(this.props))
+  resize = (w) => {
+    const titleWidth = Math.min(500, Math.max(40, w))
+    this.setState({titleWidth})
   }
 
-  cancelFilter = (event) => {
-    this.setStatePromise({ filterString: '' })
-      .then(() => this.updateFilteredFields(this.props))
+  resizeDone = () => {
+    this.forceUpdate()
   }
 
   isFavorite (fieldTypes, hasChildren, namespace, metadataFields) {
@@ -81,36 +102,16 @@ class Metadata extends Component {
     return isFavorite
   }
 
-  favorite = (field, namespace, event) => {
-    const { metadataFields, fieldTypes, user, userSettings } = this.props
-    const hasChildren = field.length !== namespace.length
-    const isFavorite = this.isFavorite(fieldTypes, hasChildren, namespace, metadataFields)
-    const all = Object.keys(this.props.fieldTypes)
-    let fields
-    if (isFavorite) {
-      fields = metadataFields.filter(f => !f.startsWith(namespace))
-    } else {
-      const children = all.filter(f => (f.startsWith(namespace) && f.charAt(namespace.length) === '.'))
-      const union = new Set([...metadataFields, ...children, field])
-      fields = [...union]
-    }
-    this.props.actions.updateMetadataFields(fields)
-    const settings = {
-      ...userSettings,
-      metadataFields: fields,
-      tableFields: []   // Remove deprecated setting
-    }
-    this.props.actions.saveUserSettings(user, settings)
-    event.stopPropagation()
-  }
-
   toggleFavorites = () => {
     const { user, userSettings } = this.props
     const showFavorites = !this.state.showFavorites
+    this.setState({showFavorites})
     const settings = { ...userSettings, showFavorites }
     this.props.actions.saveUserSettings(user, settings)
-    this.setStatePromise({showFavorites})
-      .then(() => this.updateFilteredFields(this.props))
+  }
+
+  toggleNull = () => {
+    this.setState({showNull: !this.state.showNull})
   }
 
   toggleCollapsible = (key, event) => {
@@ -139,7 +140,8 @@ class Metadata extends Component {
   }
 
   toggleWidget = (field, event) => {
-    const { widgets } = this.props
+    const { widgets, isolatedId } = this.props
+    if (isolatedId) return
     const index = widgets.findIndex(widget => fieldUsedInWidget(field, widget))
     if (index >= 0) {
       this.props.actions.removeRacetrackWidgetIds([widgets[index].id])
@@ -153,11 +155,31 @@ class Metadata extends Component {
     event.stopPropagation()
   }
 
+  createTagFacet = (term, field, event) => {
+    const fieldType = this.props.fieldTypes[field]
+    field = field && field.endsWith('.raw') ? field : field + '.raw'
+    const index = this.props.widgets.findIndex(widget => fieldUsedInWidget(field, widget))
+    let terms = [term]
+    if (index >= 0 && event.shiftKey) {       // Add to terms for shift
+      const widget = this.props.widgets[index]
+      if (widget.sliver && widget.sliver.filter && widget.sliver.filter.terms) {
+        terms = [...widget.sliver.filter.terms[field], term]
+      }
+    }
+    const widget = createFacetWidget(field, fieldType, terms)
+    if (index >= 0) widget.id = this.props.widgets[index].id
+    this.props.actions.modifyRacetrackWidget(widget)
+    this.props.actions.iconifyRightSidebar(false)
+    event.stopPropagation()
+  }
+
   hover = (field) => {
+    if (this.props.isolatedId) return
     this.props.actions.hoverField(field)
   }
 
   clearHover = (field) => {
+    if (this.props.isolatedId) return
     this.props.actions.clearHoverField(field)
   }
 
@@ -165,145 +187,122 @@ class Metadata extends Component {
     return field === namespace || field === `${namespace}.raw`
   }
 
-  // Update the filteredFields component list, caching heavily based on all
-  // the factors that affect the components: fields, open collapsibles, and aggs.
-  updateFilteredFields (props) {
-    const {fieldTypes, collapsibleOpen, aggs, metadataFields, widgets, order} = props
-    const modifiedFavorites = JSON.stringify(metadataFields) !== JSON.stringify(this.state.metadataFields)
-    let modifiedWidgets = false
-    this.state.searchedFields && this.state.searchedFields.forEach(field => {
-      if (widgets.findIndex(widget => fieldUsedInWidget(field, widget)) < 0) modifiedWidgets = true
-    })
-    let searchedFields = null
-    // Filter all fields by string and sort
-    const fields = this.state.showFavorites ? metadataFields : Object.keys(fieldTypes)
-    const lcFilterString = this.state.filterString.toLowerCase()
-    const filteredFields = fields.filter(field => (field.toLowerCase().includes(lcFilterString))).sort((a, b) => a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'}))
-    if (JSON.stringify(filteredFields) !== JSON.stringify(this.state.filteredFields) ||
-        JSON.stringify(collapsibleOpen) !== JSON.stringify(this.state.collapsibleOpen) ||
-        JSON.stringify(order) !== JSON.stringify(this.state.order) ||
-        JSON.stringify(aggs) !== JSON.stringify(this.state.aggs) || modifiedFavorites || modifiedWidgets) {
-      // Unroll the fields iteratively into an item element array
-      const filteredComponents = []
-      const aggFields = []
-      let ancestors = []
-      searchedFields = []
-      const addFields = (ancestors, field) => {
-        const parents = field.split('.')
-        for (let i = 0; i < parents.length; ++i) {
-          const namespace = parents.slice(0, i + 1).join('.')
-          const index = ancestors.findIndex(ancestor => (ancestor.namespace === namespace))
-          const isOpen = collapsibleOpen[namespace]
-          if (index < 0) {
-            const hasChildren = i < parents.length - 1
-            const isFavorite = this.isFavorite(fieldTypes, hasChildren, namespace, metadataFields)
-            const isLeaf = this.isLeaf(field, namespace)
-            const isSearched = isLeaf && widgets.findIndex(widget => fieldUsedInWidget(field, widget)) >= 0
-            if (isSearched) searchedFields.push(field)
-            const widgetType = !hasChildren && widgetTypeForField(field, fieldTypes[field])
-            const widgetIcon = this.widgetTypeIcon(widgetType)
-            filteredComponents.push(this.renderField(field, namespace, parents[i],
-              i, hasChildren, isOpen, isSearched, isFavorite, widgetIcon, order))
-            ancestors.splice(i)
-            ancestors.push({field, namespace})
-            aggFields.push(namespace)
-          } else if (collapsibleOpen[ancestors[index].namespace]) {
-            continue
-          }
-          if (!isOpen) break
-        }
-      }
-
-      // Create an array of child components and save changes to the Racetrack aggs
-      filteredFields.forEach(field => {
-        addFields(ancestors, field)
-      })
-      const modifiedAggFields = JSON.stringify(aggFields) !== JSON.stringify(this.state.aggFields)
-      if (modifiedAggFields || modifiedFavorites || modifiedWidgets ||
-        JSON.stringify(order) !== JSON.stringify(this.state.order) ||
-        JSON.stringify(aggs) !== JSON.stringify(this.state.aggs)) {
-        this.setState({filteredComponents})
-      }
-
-      this.setState({filteredFields, collapsibleOpen, aggs, aggFields, metadataFields, searchedFields, order})
-    }
-  }
-
-  sortByField = (field, event) => {
-    console.log('Sort by ' + field)
-    const { order } = this.props
-    let ascending = true
-    if (order) {
-      const index = order && order.findIndex(order => (order.field === field))
-      if (index >= 0) {
-        ascending = order[index].ascending ? false : undefined
-      }
-    }
-    if (ascending === undefined) {
-      this.props.actions.unorderAssets()
-    } else {
-      this.props.actions.sortAssets(field, ascending)
-    }
-    event.stopPropagation()
-  }
-
-  sortOrderClassnames = (field, order) => {
-    const index = order && order.findIndex(order => (order.field === field))
-    const icon = !order || index !== 0 ? 'icon-sort' : (order[index].ascending ? 'icon-sort-asc' : 'icon-sort-desc')
-    return `Metadata-sort ${icon}`
-  }
-
-  renderPads (depth) {
-    if (depth <= 0) return null
-    let pads = []
-    for (let i = 0; i < depth; ++i) pads.push(<div key={i} className="Metadata-item-pad"/>)
-    return pads
-  }
-
-  renderField (field, namespace, name, depth, hasChildren, isOpen, isSelected, isFavorite, widgetIcon, order) {
-    const { fieldTypes } = this.props
-    const fieldType = fieldTypes[field]
-    const sortableTypes = [ 'string', 'keywords-auto', 'long', 'double', 'integer', 'date' ]
-    const isLeaf = this.isLeaf(field, namespace)
-    const isSortable = isLeaf && sortableTypes.findIndex(type => (type === fieldType)) >= 0
+  renderNamespace (namespace, isOpen) {
     const itemClass = namespace.replace('.', '-')
     return (
-      <div className={classnames('Metadata-item', 'Metadata-item-' + itemClass, {isSelected, isLeaf, isOpen})}
-           key={namespace} title={field}
-           onClick={e => hasChildren ? this.toggleCollapsible(namespace, e) : this.toggleWidget(field, e)}
-           onMouseOver={e => this.hover(namespace)} onMouseOut={e => this.clearHover(namespace)} >
-        { this.renderPads(depth) }
-        <div className="Metadata-left">
-          <div className={classnames('Metadata-item-toggle', {hasChildren})}
-               onClick={e => this.toggleCollapsible(namespace, e)}>
-            { hasChildren && <div className={classnames('Metadata-toggle-open', `icon-square-${isOpen ? 'minus' : 'plus'}`)}/> }
-          </div>
-          <div className={classnames('Metadata-item-label', {hasChildren})}>
-            {unCamelCase(name)}
-          </div>
+      <div key={itemClass}
+           onClick={e => this.toggleCollapsible(`meta2-${namespace}`, e)}
+           className={classnames('Metadata-namespace', 'Metadata-namespace-' + itemClass, {isOpen})}>
+        <div className="Metadata-namespace-title">
+          {unCamelCase(namespace)}
         </div>
-        <div className="Metadata-middle"/>
-        <div className="Metadata-right">
-          <div className={classnames('Metadata-item-widget', widgetIcon)} />
-          { isSortable && <i onClick={e => this.sortByField(field, e)} className={this.sortOrderClassnames(field, order)}/> }
-          <div onClick={e => this.favorite(field, namespace, e)}
-               className={classnames('Metadata-item-favorite', 'icon-star-filled', {isSelected: isFavorite})}/>
-        </div>
+        <div className={classnames('Metadata-namespace-toggle', 'icon-chevron-down', {isOpen})}/>
       </div>
     )
   }
 
-  render () {
-    const { filterString, filteredComponents, showFavorites } = this.state
+  renderValue (field, namespace, asset, isFavorite) {
+    if (asset === null) {
+      return <div className="Metadata-value-various">Various</div>
+    } else if (asset.rawValue(field) === undefined) {
+      return <div className="Metadata-value-null">null</div>
+    } else if (asset) {
+      return (
+        <div className="Metadata-value">
+          <TableField asset={asset} field={field} isOpen={true} dark={this.props.dark} onTag={!this.props.isolatedId && this.createTagFacet}/>
+        </div>
+      )
+    }
+    return <div className="Metadata-value-null">null</div>
+  }
+
+  renderLeaf (field, namespace, fields, isSelected, isFavorite, widgetIcon) {
+    const { selectedAssets, titleWidth, showNull } = this.state
+    const itemClass = field.replace('.', '-')
+    let asset
+    if (selectedAssets && selectedAssets.length) {
+      asset = selectedAssets[0]
+      const value = selectedAssets[0].rawValue(field)
+      for (let i = 1; i < selectedAssets.length; ++i) {
+        const v = selectedAssets[i].rawValue(field)
+        if (v !== value) {
+          asset = null
+          break
+        }
+      }
+    }
+    if (asset === undefined) return
+    if (!showNull && asset && asset.rawValue(field) === undefined) return
+    const { head, tails } = minimalUniqueFieldTitle(field, fields, 1)
+    const tail = tails && '\u2039 ' + tails.join(' \u2039 ')
     return (
-      <div className="Metadata">
-        <div className="Metadata-header">
-          <div className="Metadata-filter">
-            <input type="text" onChange={this.changeFilterString}
-                   value={filterString} placeholder="Filter Tags" />
-            { filterString && filterString.length && <div onClick={this.cancelFilter} className="Metadata-cancel-filter icon-cancel-circle"/> }
-            <div className="icon-search"/>
+      <div key={itemClass} className={classnames('Metadata-leaf', {isSelected})}
+           title={field}
+           onMouseOver={e => this.hover(namespace)} onMouseOut={e => this.clearHover(namespace)}
+           onClick={e => this.toggleWidget(field, e)}>
+        <div className="Metadata-leaf-title" style={{minWidth: titleWidth, maxWidth: titleWidth}}>
+          <div className="Metadata-leaf-title-head">
+            {unCamelCase(head)}
           </div>
+          { tail && <div className="Metadata-leaf-title-tail">{tail}</div> }
+        </div>
+        { this.renderValue(field, namespace, asset, isFavorite) }
+      </div>
+    )
+  }
+
+  renderFields () {
+    const { selectedAssets } = this.state
+    if (!selectedAssets || !selectedAssets.length) {
+      const empty = (
+        <div key="no-assets" className="Metadata-no-assets">
+          <div className="Metadata-no-assets-icon icon-emptybox"/>
+          No Assets Selected
+        </div>
+      )
+      return [empty]
+    }
+    const { fieldTypes, metadataFields, collapsibleOpen, widgets, isolatedId } = this.props
+    const fields = this.state.showFavorites ? metadataFields : Object.keys(fieldTypes)
+    const lcFilterString = this.state.filterString.toLowerCase()
+    const filteredFields = fields.filter(field => (field.toLowerCase().includes(lcFilterString))).sort((a, b) => a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'}))
+    const namespaces = []
+    const components = []
+    const addField = (field) => {
+      const parents = field.split('.')
+      const namespace = parents[0]
+      const isOpen = collapsibleOpen[`meta2-${namespace}`]
+      const isLeaf = this.isLeaf(field, namespace)
+      const hasChildren = false
+      const isFavorite = this.isFavorite(fieldTypes, hasChildren, namespace, metadataFields)
+      const isSearched = !isolatedId && widgets.findIndex(widget => fieldUsedInWidget(field, widget)) >= 0
+      const widgetType = widgetTypeForField(field, fieldTypes[field])
+      const widgetIcon = this.widgetTypeIcon(widgetType)
+      const leaf = this.renderLeaf(field, namespace, fields, isSearched, isFavorite, widgetIcon)
+      const index = namespaces.findIndex(n => (n === namespace))
+      if (leaf && !isLeaf && index < 0) {
+        components.push(this.renderNamespace(namespace, isOpen))
+        namespaces.push(namespace)  // Only render each namespace once
+      }
+      if (leaf && (isLeaf || isOpen)) components.push(leaf) // Wait until we know it is not null
+    }
+    filteredFields.forEach(field => addField(field))
+    return components
+  }
+
+  render () {
+    const { dark, height } = this.props
+    const { filterString, showFavorites, titleWidth, showNull } = this.state
+    return (
+      <div className={classnames('Metadata', {dark})} style={{height: height, maxHeight: height}}>
+        <div className="Metadata-header">
+          <Filter className="box" value={filterString} dark={dark}
+                  placeholder="Filter Metadata Fields"
+                  onClear={_ => this.setState({filterString: ''})}
+                  onChange={e => this.setState({filterString: e.target.value})}/>
+          <div onClick={this.toggleNull} title="Filter to remove null-valued fields"
+               className={classnames('Metadata-nulls', 'icon-blocked',
+                 {isSelected: !showNull})}/>
           <div onClick={this.toggleFavorites} title="Filter to show only favorite fields"
                className={classnames('Metadata-favorites',
                  `icon-star-${showFavorites ? 'filled' : 'empty'}`,
@@ -311,7 +310,9 @@ class Metadata extends Component {
         </div>
         <div className="Metadata-body">
           <div className="Metadata-scroll">
-            {filteredComponents}
+            { this.renderFields() }
+            <div className={classnames('Metadata-resizer', {active: this.resizer.active})}
+                 style={{left: 6 + titleWidth}} onMouseDown={this.resizeStart}/>
           </div>
         </div>
       </div>
@@ -320,25 +321,21 @@ class Metadata extends Component {
 }
 
 export default connect(state => ({
+  assets: state.assets.all,
+  isolatedId: state.assets.isolatedId,
   metadataFields: state.app.metadataFields,
   widgets: state.racetrack.widgets,
   collapsibleOpen: state.app.collapsibleOpen,
   fieldTypes: state.assets.types,
-  aggs: state.assets.aggs,
-  order: state.assets.order,
   user: state.auth.user,
   userSettings: state.app.userSettings
 }), dispatch => ({
   actions: bindActionCreators({
     iconifyRightSidebar,
-    updateMetadataFields,
-    getAssetFields,
     saveUserSettings,
     toggleCollapsible,
     modifyRacetrackWidget,
     removeRacetrackWidgetIds,
-    sortAssets,
-    unorderAssets,
     hoverField,
     clearHoverField
   }, dispatch)

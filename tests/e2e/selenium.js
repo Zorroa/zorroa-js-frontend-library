@@ -640,9 +640,9 @@ export function getFolderNamed (folderName) {
 // ----------------------------------------------------------------------
 // TODO: have this check the open state; allow explicit open or close
 export function getTagNamed (tagName) {
-  // Find the Metadata-item-toggle attached to a Metadata-item with a descendant matching the given text
+  // Find the Explorer-item-toggle attached to a Explorer-item with a descendant matching the given text
   // http://stackoverflow.com/a/1390680/1424242
-  const xpath = `//div[contains(concat(" ", @class, " "), " Metadata-item ") and descendant::*[contains(text(), "${tagName}")]]`
+  const xpath = `//div[contains(concat(" ", @class, " "), " Explorer-item ") and descendant::*[contains(text(), "${tagName}")]]`
   return driver.then(_ => { DEBUG && (console.log(`getTagNamed ${tagName}`)) })
   .then(_ => driver.findElement(By.xpath(xpath)))
 }

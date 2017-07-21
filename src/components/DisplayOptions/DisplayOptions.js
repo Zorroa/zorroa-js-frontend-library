@@ -13,7 +13,7 @@ class DisplayOptions extends Component {
     onDismiss: PropTypes.func,
     onUpdate: PropTypes.func.isRequired,
     singleSelection: PropTypes.bool,                  // true forces radio mode
-    title: PropTypes.string.isRequired,               // E.g. 'Metadata Display Options'
+    title: PropTypes.string.isRequired,               // E.g. 'Explorer Display Options'
     fieldTypes: PropTypes.arrayOf(PropTypes.string),  // Optional list of types, e.g. ['point']
     fieldRegex: PropTypes.object,                     // Optional regex for matched fields
     fields: PropTypes.object,                         // state.assets.fields
