@@ -58,7 +58,7 @@ class Header extends Component {
   }
 
   render () {
-    const { sync, user, isDeveloper, isAdministrator, assets, totalCount, loadedCount, selectedIds, monochrome } = this.props
+    const { sync, user, isDeveloper, isAdministrator, totalCount, loadedCount, selectedIds, monochrome } = this.props
     const baseURL = archivistBaseURL()
 
     const loader = require('./loader-rolling.svg')

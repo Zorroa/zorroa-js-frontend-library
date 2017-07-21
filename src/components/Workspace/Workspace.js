@@ -30,7 +30,7 @@ import Folder from '../../models/Folder'
 import CommandProgress from '../Workspace/CommandProgress'
 import Lightbox from '../Lightbox'
 import Feedback from '../Feedback'
-import { LocalChooser } from '../Import'
+import Import, { LocalChooser } from '../Import'
 import { LOCAL_IMPORT, CLOUD_IMPORT, SERVER_IMPORT } from '../Import/ImportConstants'
 import { EMBEDMODE_ITEM } from '../../constants/localStorageItems'
 

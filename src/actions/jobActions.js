@@ -5,7 +5,7 @@ import Asset from '../models/Asset'
 import Pipeline from '../models/Pipeline'
 import AssetSearch from '../models/AssetSearch'
 import {
-  EXPORT_ASSETS, IMPORT_ASSETS, ANALYZE_SIMILAR,
+  EXPORT_ASSETS, IMPORT_ASSETS,
   GET_PIPELINES, GET_JOBS,
   QUEUE_UPLOAD_FILE_ENTRIES, DEQUEUE_UPLOADED_FILE_ENTRIES,
   MARK_JOB_DOWNLOADED, GET_PROCESSORS,
