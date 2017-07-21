@@ -327,17 +327,10 @@ class Workspace extends Component {
 
     const { isDroppable, showReloader } = this.state
     return (
-<<<<<<< HEAD
-      <div onDragEnter={this.dragEnter} className={classnames('App', 'flexCol', 'fullHeight', {isDragging: app.dragInfo, dark: monochrome})}>
+
+      <div onDragEnter={this.dragEnter} className={classnames('App', 'Workspace', 'flexCol', 'fullHeight', {isDragging: app.dragInfo, dark: monochrome, embedMode: app.embedModeEnabled})}>
         { this.renderModalTest() }
         { this.renderModal() }
-||||||| merged common ancestors
-      <div onDragEnter={this.dragEnter} className={classnames('App', 'flexCol', 'fullHeight', {isDragging: app.dragInfo, dark: monochrome})}>
-        { app.modal && <Modal {...app.modal} /> }
-=======
-      <div onDragEnter={this.dragEnter} className={classnames('App', 'Workspace', 'flexCol', 'fullHeight', {isDragging: app.dragInfo, dark: monochrome, embedMode: app.embedModeEnabled})}>
-        { app.modal && <Modal {...app.modal} /> }
->>>>>>> Embed mode; a way to hide things then curator is embedded via iframe
         { showReloader && (
           <div className="Workspace-reloader">
             <div className="flexRowCenter">
