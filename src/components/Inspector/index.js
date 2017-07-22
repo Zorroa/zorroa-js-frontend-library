@@ -1,7 +1,6 @@
 import Inspector from './Inspector'
 import './Inspector.scss'
 import './Thumbs.scss'
-import './Multipage.scss'
 import './Controlbar.scss'
 import './PanZoom.scss'
 import './Image.scss'

@@ -1,10 +1,11 @@
 import {
   MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS,
-  SIMILAR_VALUES, ASSET_ORDER, ASSET_SORT, ASSET_FIELDS,
-  SELECT_FOLDERS, SELECT_JOBS, ANALYZE_SIMILAR, UNAUTH_USER } from '../constants/actionTypes'
+  SIMILAR_VALUES, ASSET_ORDER, ASSET_SORT, ASSET_FIELDS, SELECT_FOLDERS,
+  SELECT_JOBS, ANALYZE_SIMILAR, UNAUTH_USER, ISOLATE_PARENT } from '../constants/actionTypes'
 import Widget, { createImportSetWidget } from '../models/Widget'
-import { SimilarHashWidgetInfo, CollectionsWidgetInfo,
-  SortOrderWidgetInfo, ImportSetWidgetInfo } from '../components/Racetrack/WidgetInfo'
+import {
+  SimilarHashWidgetInfo, CollectionsWidgetInfo, SortOrderWidgetInfo,
+  MultipageWidgetInfo, ImportSetWidgetInfo } from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
 
 const initialState = {
@@ -79,7 +80,9 @@ function updateSimilarity (similar, state) {
   const index = state.widgets.findIndex(widget => (widget.type === SimilarHashWidgetInfo.type))
   if (index < 0) {
     let widgets = [...state.widgets]
-    const widget = new Widget({ type: SimilarHashWidgetInfo.type })
+    const isEnabled = true
+    const isPinned = false
+    const widget = SimilarHashWidgetInfo.create(undefined, undefined, isEnabled, isPinned)
     widgets.push(widget)
     return { ...state, similar, widgets }
   }
@@ -171,10 +174,29 @@ export default function (state = initialState, action) {
           const isPinned = false
           const widget = createImportSetWidget(undefined, undefined, isEnabled, isPinned)
           const widgets = [...state.widgets, widget]
-          return { ...state, widgets }
+          return {...state, widgets}
         }
       }
       return state
+    }
+    case ISOLATE_PARENT: {
+      const widgets = [...state.widgets]
+      const parentId = action.payload
+      const sortByPage = false
+      const isEnabled = true
+      const isPinned = false
+      const widget = MultipageWidgetInfo.create(undefined, undefined, parentId, sortByPage, isEnabled, isPinned)
+      const index = state.widgets.findIndex(widget => (widget.type === MultipageWidgetInfo.type))
+      if (index < 0) {
+        if (parentId) widgets.push(widget)
+      } else {
+        if (parentId) {
+          widgets[index] = widget
+        } else {
+          widgets.splice(index, 1)
+        }
+      }
+      return { ...state, widgets }
     }
     case UNAUTH_USER:
       return initialState

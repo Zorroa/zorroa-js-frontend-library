@@ -10,7 +10,7 @@ import User from '../../models/User'
 import Asset from '../../models/Asset'
 import Widget from '../../models/Widget'
 import Folder from '../../models/Folder'
-import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, similarAssets, unorderAssets } from '../../actions/assetsAction'
+import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, similarAssets, unorderAssets, isolateParentId } from '../../actions/assetsAction'
 import { resetRacetrackWidgets, restoreFolders, similar } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
@@ -40,6 +40,7 @@ class Assets extends Component {
     order: PropTypes.arrayOf(PropTypes.object),
     parentCounts: PropTypes.instanceOf(Map),
     parentTotals: PropTypes.instanceOf(Map),
+    isolatedParentId: PropTypes.string,
     selectedIds: PropTypes.object,
     selectionCounter: PropTypes.number.isRequired,
     totalCount: PropTypes.number,
@@ -169,10 +170,17 @@ class Assets extends Component {
   }
 
   isolateToLightbox (asset) {
-    // Select the isolated asset, which is DE-selected on the second click
-    this.skipNextSelectionScroll = true
-    this.select(asset, event)
-    this.props.actions.isolateAssetId(asset.id)
+    const { showMultipage, parentTotals, isolatedParentId } = this.props
+    const parentId = showMultipage && asset.parentId()
+    const stackCount = parentId && parentId !== isolatedParentId && parentTotals && parentTotals.get(parentId)
+    if (stackCount > 1) {
+      this.props.actions.isolateParentId(parentId)
+    } else {
+      // Select the isolated asset, which is DE-selected on the second click
+      this.skipNextSelectionScroll = true
+      this.select(asset, event)
+      this.props.actions.isolateAssetId(asset.id)
+    }
   }
 
   toggleShowTable = () => {
@@ -386,7 +394,7 @@ class Assets extends Component {
     const width = this.state.assetsScrollWidth - 2 * assetsScrollPadding
     if (!width) return
 
-    const { assets, layout, thumbSize, showMultipage } = this.props
+    const { assets, layout, thumbSize, showMultipage, isolatedParentId } = this.props
     if (!assets) return
 
     const assetSizes = assets.map(asset => {
@@ -397,8 +405,8 @@ class Assets extends Component {
 
     var { positions, multipage, collapsed } = (_ => {
       switch (layout) {
-        case 'grid': return ComputeLayout.grid(assetSizes, width, thumbSize, showMultipage)
-        case 'masonry': return ComputeLayout.masonry(assetSizes, width, thumbSize, showMultipage)
+        case 'grid': return ComputeLayout.grid(assetSizes, width, thumbSize, showMultipage, isolatedParentId)
+        case 'masonry': return ComputeLayout.masonry(assetSizes, width, thumbSize, showMultipage, isolatedParentId)
       }
     })()
 
@@ -503,7 +511,7 @@ class Assets extends Component {
 
   renderAssets () {
     const { assets, selectedIds, loadedCount, filteredCount, layout, showMultipage,
-      parentCounts, parentTotals, origin, thumbSize, query, thumbFieldTemplate } = this.props
+      parentCounts, parentTotals, origin, thumbSize, query, thumbFieldTemplate, isolatedParentId } = this.props
     const { positions, multipage, tableIsResizing } = this.state
     api.setTableIsResizing(tableIsResizing)
 
@@ -564,7 +572,7 @@ class Assets extends Component {
                     return null
                   }
                   // Multipage agg optimization -- skip over children of parents with full stacks
-                  const parentIds = showMultipage && parentCounts && [...parentCounts.keys()].filter(id => parentCounts.get(id) >= 3)
+                  const parentIds = showMultipage && parentCounts && [...parentCounts.keys()].filter(id => id !== isolatedParentId && parentCounts.get(id) >= 3)
                   if (index === assets.length - 1 && index < positions.length &&
                     loadedCount < filteredCount && (!showMultipage || parentIds) &&
                     this.loaded !== assets.length) {
@@ -581,7 +589,7 @@ class Assets extends Component {
                   const indexes = parentId && multipage[parentId]
                   const stackCount = parentId && parentTotals && parentTotals.get(parentId)
                   const badgeHeight = thumbSize < 100 ? 15 : 25
-                  const badge = showMultipage ? multipageBadges(asset, origin, stackCount) : monopageBadges(asset)
+                  const badge = showMultipage && parentId !== isolatedParentId ? multipageBadges(asset, origin, stackCount) : monopageBadges(asset)
                   const iconBadge = <div className="Thumb-field"><FieldTemplate asset={asset} template={thumbFieldTemplate} extensionOnLeft={false}/></div>
 
                   const pages = indexes && indexes.slice(0, 3).map(index => (
@@ -695,6 +703,7 @@ export default connect(state => ({
   order: state.assets.order,
   parentCounts: state.assets.parentCounts,
   parentTotals: state.assets.parentTotals,
+  isolatedParentId: state.assets.isolatedParentId,
   selectedIds: state.assets.selectedIds,
   selectionCounter: state.assets.selectionCounter,
   totalCount: state.assets.totalCount,
@@ -718,6 +727,7 @@ export default connect(state => ({
 }), dispatch => ({
   actions: bindActionCreators({
     isolateAssetId,
+    isolateParentId,
     selectAssetIds,
     sortAssets,
     searchAssets,

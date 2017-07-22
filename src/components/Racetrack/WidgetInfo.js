@@ -10,10 +10,12 @@ import SimilarHash from './SimilarHash'
 import Collections from './Collections'
 import SortOrder from './SortOrder'
 import ImportSet from './ImportSet'
+import Multipage from './Multipage'
 import { createFacetWidget, createMapWidget, createColorWidget,
   createDateRangeWidget, createRangeWidget, createSimilarityWidget,
   createFiletypeWidget, createExistsWidget, createSearchWidget,
-  createCollectionsWidget, createSortOrderWidget, createImportSetWidget
+  createCollectionsWidget, createSortOrderWidget,
+  createMultipageWidget, createImportSetWidget
 } from '../../models/Widget'
 
 // Pick colors from the style guide
@@ -149,4 +151,15 @@ export const ImportSetWidgetInfo = {
   create: createImportSetWidget,
   fieldTypes: [],
   color: '#744E19'
+}
+
+export const MultipageWidgetInfo = {
+  type: 'MULTIPAGE',
+  icon: 'icon-stack-empty',
+  title: 'Multipage',
+  description: 'Restrict to a single document',
+  element: <Multipage/>,
+  create: createMultipageWidget,
+  fieldTypes: [],
+  color: '#DCBA22'
 }

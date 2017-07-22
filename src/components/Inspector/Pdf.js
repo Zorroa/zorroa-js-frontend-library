@@ -16,8 +16,7 @@ export default class Pdf extends Component {
     documentInitParameters: PropTypes.shape({
       url: PropTypes.string
     }),
-    page: PropTypes.number,
-    onMultipage: PropTypes.func
+    page: PropTypes.number
   }
 
   static defaultProps = { page: 1 }
@@ -230,11 +229,6 @@ export default class Pdf extends Component {
                       onClick={this.zoomIn}/>
               <button className="icon-zoom-out" disabled={isZoomOutDisabled}
                       onClick={this.zoomOut}/>
-            </div>
-            <div className="Pdf-controls-group">
-              <button className="icon-checkbox-empty" disabled={true} />
-              <button className="icon-icons2" disabled={!this.props.onMultipage}
-                      onClick={this.props.onMultipage}/>
             </div>
           </div>
         )}

@@ -19,4 +19,5 @@ import './SimilarHash.scss'
 import './Collections.scss'
 import './SortOrder.scss'
 import './ImportSet.scss'
+import './Multipage.scss'
 export default Racetrack

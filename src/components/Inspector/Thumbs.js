@@ -12,7 +12,6 @@ class Thumbs extends Component {
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     thumbSize: PropTypes.number.isRequired,
     selectedIds: PropTypes.instanceOf(Set),
-    onMonopage: PropTypes.func.isRequired,
     origin: PropTypes.string,
     actions: PropTypes.object.isRequired
   }
@@ -147,8 +146,7 @@ class Thumbs extends Component {
                           dim={dim}
                           pageBadge={pageBadge}
                           isSelected={selectedIds && selectedIds.has(asset.id)}
-                          onClick={e => this.select(asset, e)}
-                          onDoubleClick={e => this.props.onMonopage(asset, e)}/>
+                          onClick={e => this.select(asset, e)}/>
           })}
         </div>
       </div>

@@ -9,7 +9,6 @@ class MultiImage extends Component {
     id: PropTypes.string.isRequired,
     parentId: PropTypes.string,
     pages: PropTypes.arrayOf(PropTypes.instanceOf(Asset)).isRequired,
-    onMultipage: PropTypes.func.isRequired,
     origin: PropTypes.string,
     actions: PropTypes.object
   }
@@ -42,12 +41,12 @@ class MultiImage extends Component {
   }
 
   render () {
-    const { pages, onMultipage, origin } = this.props
+    const { pages, origin } = this.props
     const { pageIndex } = this.state
     const title = pages && pageIndex < pages.length && `Page ${pageIndex + 1} / ${pages.length}`
     const page = pages && pages[pageIndex]
     const url = page.biggestProxy().url(origin)
-    return <Image title={title} url={url} onMultipage={onMultipage}
+    return <Image title={title} url={url}
                   onNextPage={pages && pageIndex < pages.length - 1 ? this.nextPage : null}
                   onPrevPage={pages && pageIndex > 0 && pages.length ? this.prevPage : null}/>
   }

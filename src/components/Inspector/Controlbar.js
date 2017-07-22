@@ -5,10 +5,8 @@ import VolumeBar from './VolumeBar'
 // Helpers to compute width because we use {left:0, right:0, margin-left:auto, margin-right:auto}
 const showVideo = (props) => (!!props.onVideo)
 const showVolume = (props) => (!!props.onVolume)
-const showPages = (props) => (props.onNextPage || props.onPrevPage)
 const showZoom = (props) => (props.onZoomIn || props.onZoomOut || props.onFit)
-const showMultipage = (props) => (props.onMonopage || props.onMultipage)
-const iconCount = (props) => ((showVideo(props) ? 5 : 0) + (showZoom(props) ? 3 : 0) + (showMultipage(props) ? 2 : 0) + (showPages(props) ? 2 : 0))
+const iconCount = (props) => ((showVideo(props) ? 5 : 0) + (showZoom(props) ? 3 : 0))
 const titleWidth = (props) => (props.titleWidth || (props.title ? props.title.length * 10 : 0))
 const width = (props) => (32 * iconCount(props) + 20 + titleWidth(props) + 120 * showVolume(props))
 
@@ -33,13 +31,7 @@ const Controlbar = (props) => (
         <VolumeBar volume={props.volume} onVolume={props.onVolume}/>
       </div>
     )}
-    { showPages(props) && (
-        <div className="Controlbar-section">
-          <button disabled={!props.onPrevPage} className="icon-frame-back" onClick={props.onPrevPage} />
-          <button disabled={!props.onNextPage} className="icon-frame-forward" onClick={props.onNextPage} />
-        </div>
-    )}
-    { (props.title || showPages(props)) && (showZoom(props) || showMultipage(props)) && <div className="Controlbar-separator" /> }
+    { (props.title) && showZoom(props) && <div className="Controlbar-separator" /> }
     { showZoom(props) && (
         <div className="Controlbar-section">
           <button disabled={!props.onZoomOut} className="Controlbar-zoom-out icon-zoom-out" onClick={props.onZoomOut} />
@@ -47,13 +39,7 @@ const Controlbar = (props) => (
           <button disabled={!props.onZoomIn} className="Controlbar-zoom-in icon-zoom-in" onClick={props.onZoomIn} />
         </div>
       ) }
-    { showZoom(props) && showMultipage(props) && <div className="Controlbar-separator" /> }
-    { showMultipage(props) && (
-        <div className="Controlbar-section">
-          <button disabled={!props.onMonopage} className="icon-checkbox-empty" onClick={props.onMonopage} />
-          <button disabled={!props.onMultipage} className="icon-icons2" onClick={props.onMultipage} />
-        </div>
-      ) }
+    { showZoom(props) && <div className="Controlbar-separator" /> }
   </div>
 )
 
@@ -65,8 +51,6 @@ Controlbar.propTypes = {
   onFit: PropTypes.func,
   onNextPage: PropTypes.func,
   onPrevPage: PropTypes.func,
-  onMonopage: PropTypes.func,
-  onMultipage: PropTypes.func,
   onVideo: PropTypes.func,
   playing: PropTypes.bool,
   onVolume: PropTypes.func,

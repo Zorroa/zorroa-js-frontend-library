@@ -10,7 +10,6 @@ export default class PanZoom extends Component {
     showControls: PropTypes.bool,
     onNextPage: PropTypes.func,
     onPrevPage: PropTypes.func,
-    onMultipage: PropTypes.func,
     onVideo: PropTypes.func,
     playing: PropTypes.bool,
     onVolume: PropTypes.func,
@@ -122,7 +121,7 @@ export default class PanZoom extends Component {
   }
 
   render () {
-    const { title, titleWidth, showControls, onPrevPage, onNextPage, onMultipage, onVolume, volume, onVideo, playing } = this.props
+    const { title, titleWidth, showControls, onPrevPage, onNextPage, onVolume, volume, onVideo, playing } = this.props
     const { moving } = this.state
     const epsilon = 0.01
     const zoomOutDisabled = this.panner.scale <= PanZoom.minZoom + epsilon
@@ -147,7 +146,6 @@ export default class PanZoom extends Component {
                               onZoomOut={!zoomOutDisabled && this.zoomOut || null}
                               onZoomIn={!zoomInDisabled && this.zoomIn || null}
                               onFit={!zoomToFitDisabled && this.zoomToFit || null}
-                              onMultipage={onMultipage}
                               onNextPage={onNextPage}
                               onPrevPage={onPrevPage}
                               onVolume={onVolume} volume={volume}

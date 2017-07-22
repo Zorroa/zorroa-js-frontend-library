@@ -1,7 +1,7 @@
 import { SimpleSearchWidgetInfo, ExistsWidgetInfo, FacetWidgetInfo,
   MapWidgetInfo, DateRangeWidgetInfo, RangeWidgetInfo, SimilarHashWidgetInfo,
   FiletypeWidgetInfo, ColorWidgetInfo, CollectionsWidgetInfo,
-  SortOrderWidgetInfo, ImportSetWidgetInfo
+  SortOrderWidgetInfo, MultipageWidgetInfo, ImportSetWidgetInfo
 } from '../components/Racetrack/WidgetInfo'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
@@ -202,4 +202,12 @@ export function createImportSetWidget (field, fieldType, isEnabled, isPinned) {
 
 export function fieldUsedInWidget (field, widget) {
   return removeRaw(widget.field) === removeRaw(field)
+}
+
+export function createMultipageWidget (field, fieldType, parentId, sortByPage, isEnabled, isPinned) {
+  field = 'source.clip.parent'
+  const filter = new AssetFilter({terms: {'source.clip.parent.raw': [parentId]}})
+  const order = sortByPage ? [{ field: 'source.clip.page.start', ascending: true }] : undefined
+  const sliver = new AssetSearch({filter, order})
+  return new Widget({type: MultipageWidgetInfo.type, field, sliver, isEnabled, isPinned})
 }

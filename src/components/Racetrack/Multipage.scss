@@ -1,0 +1,12 @@
+@import '../../styles/core-mixins.scss';
+
+.Multipage-body {
+  @include flexColCenter;
+  @include nowrap;
+  color: $zorroa-gray;
+}
+
+.Multipage-sort {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+}
