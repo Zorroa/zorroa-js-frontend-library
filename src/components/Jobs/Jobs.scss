@@ -1,0 +1,208 @@
+@import '../../styles/core-mixins.scss';
+
+.Jobs {
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+  margin-bottom: 9px;
+}
+
+.Jobs-controls {
+  @include flexCol;
+  height: auto;
+  background-color: white;
+  .dark & { background-color: black; color: $zorroa-whitegray; }
+}
+
+.Jobs-scroll {
+  position: relative;
+  // max-height: 50vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.Jobs-body {
+  @include flexCol;
+}
+
+.Jobs-filter-add {
+  @include flexRow;
+  @include flexJustifySpaceBetween;
+  @include flexAlignItemsCenter;
+}
+
+.Jobs-sort-selected {
+  @include flexRow;
+  @include flexJustifySpaceBetween;
+  @include flexAlignItemsCenter;
+}
+
+.Jobs-filter {
+  position: relative;
+  margin: 8px 12px 8px 4px;
+  @include flexOn;
+  @include flexRow;
+
+}
+
+.Jobs-filter-icon {
+  position: absolute;
+  right: 8px;
+  font-size: 16px;
+  margin-top: auto;
+  margin-bottom: auto;
+  top: 0;
+  bottom: 0;
+  height: 16px;
+  color: $zorroa-lightgray;
+  .dark & { color: $zorroa-dimgray; }
+}
+
+.Jobs-filter-input {
+  @include flexOn;
+  height: 30px;
+  border-radius: 3px;
+  background: none;
+  border: 1px solid $zorroa-lightgray;
+  .dark & { background: $zorroa-whitegray; color: $zorroa-greyish-brown; border: 1px solid $zorroa-dimgray; }
+  padding: 8px;
+  padding-right: 42px;
+  font-size: 12px;
+}
+
+.Jobs-controls-add {
+  @include flexRowCenter;
+  color: white;
+  background-color: $zorroa-sickly-green;
+  border: none;
+  border-radius: 15px;
+  width: 30px;
+  height: 30px;
+  font-size: 14px;
+  margin: 4px;
+  cursor: pointer;
+
+  &.disabled {
+    cursor: not-allowed;
+    background-color: $zorroa-lightgray;
+    .dark & { background-color: $zorroa-darkgray; }
+  }
+
+  &:not(.disabled) {
+    &:hover {
+      border: 1px solid $zorroa-gray;
+      background-color: darken($zorroa-sickly-green, 15%);
+    }
+    &:active {
+      color: $zorroa-nearwhite;
+      background-color: darken($zorroa-sickly-green, 15%);
+    }
+  }
+}
+
+.Jobs-sort {
+  @include flexRow;
+  @include flexJustifySpaceBetween;
+  @include flexAlignItemsCenter;
+}
+
+.Jobs-sort-button {
+  @include zorroa-square-btn-darken(20px);
+  font-size: 12px;
+  border-radius: 3px;
+  margin-bottom: 8px;
+  margin-left: 4px;
+  color: $zorroa-lightgray;
+
+  &:hover {
+    color: white;
+  }
+
+  &.enabled {
+    color: $zorroa-gray;
+    background-color: $zorroa-nearwhite;
+    .dark & { background-color: $zorroa-gray; color: $zorroa-nearwhite; }
+  }
+}
+
+.Jobs-selected {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  color: $zorroa-lightgray;
+  font-size: 12px;
+  margin-right: 8px;
+  text-transform: lowercase;
+}
+
+.Jobs-deselect-all {
+  font-size: 10px;
+  margin-left: 2px;
+  border-radius: 3px;
+  @include zorroa-square-btn(20px);
+  &:hover {
+    background-color: $zorroa-nearwhite;
+    color: $zorroa-sickly-green;
+  }
+}
+
+.Jobs-cancel-filter {
+  @include flexRowCenter;
+  font-size: 10px;
+  color: $zorroa-lightgray;
+  position: absolute;
+  right: 30px;
+  margin-top: auto;
+  margin-bottom: auto;
+  top: 0;
+  bottom: 0;
+  height: 16px;
+  cursor: pointer;
+
+  &:hover { color: $zorroa-gray; }
+}
+
+.Jobs-empty {
+  @include flexColCenter;
+  background-color: white;
+  .dark & { background-color: black; }
+}
+
+.Jobs-empty-icon {
+  font-size: 40px;
+  color: $zorroa-lightgray;
+  .dark & { color: $zorroa-gray; }
+}
+
+.Jobs-empty-label {
+  margin-bottom: 10px;
+  color: $zorroa-lightgray;
+  .dark & { color: $zorroa-gray; }
+}
+
+.Jobs-job {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  color: $zorroa-whitegray;
+  padding: 4px;
+  cursor: pointer;
+  background-color: #f1f1f1;
+
+  .dark & { background-color: $zorroa-mattblack; }
+  &:nth-child(even) {
+    background-color: white;
+    &.isSelected {
+      background-color: $zorroa-selected;
+      .dark & { background-color: $zorroa-dark-selected; }
+    }
+    .dark & { background-color: black; }
+  }
+
+  &:hover:not(.isSelected) {
+    background-color: $zorroa-hover;
+    .dark & { background-color: $zorroa-dark-hover; }
+  }
+
+  &.isSelected {
+    background-color: $zorroa-selected;
+    .dark & { background-color: $zorroa-dark-selected; }
+  }
+}

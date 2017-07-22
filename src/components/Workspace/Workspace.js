@@ -33,6 +33,8 @@ import CommandProgress from '../Workspace/CommandProgress'
 import Lightbox from '../Lightbox'
 import Feedback from '../Feedback'
 import Import, { LocalChooser } from '../Import'
+import Importer from '../Importer'
+import { ImportJobs, ExportJobs } from '../Jobs'
 import { LOCAL_IMPORT, CLOUD_IMPORT, SERVER_IMPORT } from '../Import/ImportConstants'
 import { EMBEDMODE_ITEM, LOAD_SEARCH_ITEM, SESSION_STATE_ITEM } from '../../constants/localStorageItems'
 
@@ -52,6 +54,7 @@ class Workspace extends Component {
     app: PropTypes.object.isRequired,
     user: PropTypes.instanceOf(User),
     isolatedId: PropTypes.string,
+    isolatedJob: PropTypes.instanceOf(Job),
     changePassword: PropTypes.bool,
     searching: PropTypes.bool.isRequired,
     onboarding: PropTypes.bool,
@@ -61,6 +64,9 @@ class Workspace extends Component {
     selectedAssetIds: PropTypes.instanceOf(Set),
     commands: PropTypes.instanceOf(Map),
     isAdministrator: PropTypes.bool,
+    isManager: PropTypes.bool,
+    isDeveloper: PropTypes.bool,
+    isSharer: PropTypes.bool,
     monochrome: PropTypes.bool
   }
 
@@ -214,7 +220,7 @@ class Workspace extends Component {
     actions.iconifyLeftSidebar(!app.leftSidebarIsIconified)
   }
 
-  static collapsibleNames = new Set(['library', 'home', 'simple', 'smart', 'metadata', 'metadata2'])
+  static collapsibleNames = new Set(['library', 'home', 'simple', 'smart', 'explorer', 'metadata', 'importJobs', 'exportJobs'])
   toggleCollapsible = (name) => {
     const { actions, app } = this.props
     // If the Sidebar is iconified, ignore the click, the sidebar will open itself instead
@@ -320,7 +326,9 @@ class Workspace extends Component {
   }
 
   render () {
-    const { app, isolatedId, selectedAssetIds, user, isAdministrator, searching, monochrome } = this.props
+    const { app, isolatedId, selectedAssetIds, user,
+      isAdministrator, isManager, isDeveloper, isSharer,
+      searching, monochrome, isolatedJob } = this.props
 
     const LibraryParams = () => ({
       header: (<span>Library</span>),
@@ -338,21 +346,37 @@ class Workspace extends Component {
       closeIcon: 'icon-collections-simple',
       className: 'Home-collapsible Collections-home'
     })
-    const MetadataParams = () => ({
+    const ExplorerParams = () => ({
       header: (<span>Explore</span>),
-      isOpen: app.collapsibleOpen.metadata,
+      isOpen: app.collapsibleOpen.explorer,
       isIconified: app.leftSidebarIsIconified,
-      onOpen: this.toggleCollapsible.bind(this, 'metadata'),
+      onOpen: this.toggleCollapsible.bind(this, 'explorer'),
       closeIcon: 'icon-binoculars',
       className: 'Explorer-collapsible'
     })
-    const Metadata2Params = () => ({
+    const MetadataParams = () => ({
       header: (<span>Metadata</span>),
-      isOpen: app.collapsibleOpen.metadata2,
+      isOpen: app.collapsibleOpen.metadata,
       isIconified: app.leftSidebarIsIconified,
-      onOpen: this.toggleCollapsible.bind(this, 'metadata2'),
+      onOpen: this.toggleCollapsible.bind(this, 'metadata'),
       closeIcon: 'icon-register',
       className: 'Metadata-collapsible'
+    })
+    const ImportJobsParams = () => ({
+      header: (<span>Imports</span>),
+      isOpen: app.collapsibleOpen.importJobs,
+      isIconified: app.leftSidebarIsIconified,
+      onOpen: this.toggleCollapsible.bind(this, 'importJobs'),
+      closeIcon: 'icon-import',
+      className: 'ImportJobs-collapsible'
+    })
+    const ExportJobsParams = () => ({
+      header: (<span>Exports</span>),
+      isOpen: app.collapsibleOpen.exportJobs,
+      isIconified: app.leftSidebarIsIconified,
+      onOpen: this.toggleCollapsible.bind(this, 'exportJobs'),
+      closeIcon: 'icon-export',
+      className: 'ExportJobs-collapsible'
     })
 
     // Only show the command progress if Active, skipping super quick commands
@@ -401,12 +425,22 @@ class Workspace extends Component {
             <Collapsible {...HomeParams()}>
               <Folders rootId={user.homeFolderId}/>
             </Collapsible>
-            <Collapsible {...MetadataParams()}>
+            <Collapsible {...ExplorerParams()}>
               <Explorer/>
             </Collapsible>
-            <Collapsible {...Metadata2Params()}>
+            <Collapsible {...MetadataParams()}>
               <Metadata assetIds={selectedAssetIds} height="60vh" dark={monochrome} />
             </Collapsible>
+            { (isAdministrator || isManager || isDeveloper) && (
+              <Collapsible {...ImportJobsParams()}>
+                <ImportJobs/>
+              </Collapsible>
+            )}
+            { (isAdministrator || isManager || isDeveloper || isSharer) && (
+              <Collapsible {...ExportJobsParams()}>
+                <ExportJobs/>
+              </Collapsible>
+            )}
           </Sidebar>
 
           <div className="Workspace-vertical-separator flexOff"/>
@@ -422,6 +456,7 @@ class Workspace extends Component {
           Drop Assets to Import
         </div>
         { isolatedId && <Lightbox/> }
+        { isolatedJob && <Importer/> }
         <div id='Table-cell-test' className='Table-cell'/>
       </div>
     )
@@ -432,6 +467,7 @@ export default connect(state => ({
   app: state.app,
   user: state.auth.user,
   isolatedId: state.assets.isolatedId,
+  isolatedJob: state.jobs.isolated,
   changePassword: state.auth.changePassword,
   searching: state.assets.searching,
   onboarding: state.auth.onboarding,
@@ -440,6 +476,9 @@ export default connect(state => ({
   jobs: state.jobs.all,
   commands: state.assets.commands,
   isAdministrator: state.auth.isAdministrator,
+  isManager: state.auth.isManager,
+  isDeveloper: state.auth.isDeveloper,
+  isSharer: state.auth.isSharer,
   monochrome: state.app.monochrome
 }), dispatch => ({
   actions: bindActionCreators({

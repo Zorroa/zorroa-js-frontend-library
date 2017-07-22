@@ -494,7 +494,7 @@ class Folders extends Component {
               { this.renderSortButton(SORT_TIME) }
             </div>
             { this.renderFolderDeselector(folderList) }
-            </div>
+          </div>
         </div>
         {folderComponentList ? <Trash/> : null }
         <div ref='foldersScroll'

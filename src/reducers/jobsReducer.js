@@ -1,6 +1,6 @@
 import {
   EXPORT_ASSETS, IMPORT_ASSETS,
-  GET_JOBS, GET_PIPELINES,
+  GET_JOBS, GET_PIPELINES, ISOLATE_JOB,
   QUEUE_UPLOAD_FILE_ENTRIES, DEQUEUE_UPLOADED_FILE_ENTRIES,
   MARK_JOB_DOWNLOADED, GET_PROCESSORS,
   RESTART_JOB, CANCEL_JOB, UNAUTH_USER } from '../constants/actionTypes'
@@ -92,6 +92,10 @@ export default function (state = initialState, action) {
       const fileEntries = new Map(state.fileEntries)
       action.payload.forEach(entry => fileEntries.delete(entry.fullPath))
       return { ...state, fileEntries }
+    }
+
+    case ISOLATE_JOB: {
+      return { ...state, isolated: action.payload }
     }
 
     case UNAUTH_USER: {

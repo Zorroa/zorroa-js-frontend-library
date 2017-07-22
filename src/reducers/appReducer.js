@@ -34,11 +34,16 @@ const initialState = {
     home: false,
     smart: false,
     simple: false,
+    explorer: false,
     metadata: false,
-    metadata2: false,
+    imports: false,
+    exports: false,
     source: false,
     proxies: false,
-    'proxies.proxies': false
+    'proxies.proxies': false,
+    jobErrors: false,
+    jobPipelines: true,
+    jobTasks: false
   },
   metadataFields: [ ...defaultMetadataFields ],
   lightbarFields: [ ...defaultLightbarFields ],

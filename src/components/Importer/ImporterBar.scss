@@ -1,0 +1,68 @@
+@import '../../styles/core-mixins.scss';
+
+.ImporterBar {
+  @include flexOff;
+  @include flexRow;
+  @include flexJustifySpaceBetween;
+
+  position: relative;
+  color: white;
+  background-color: black;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 42px;
+}
+
+.ImporterBar-job-info {
+  margin-left: 20px;
+}
+
+.ImporterBar-actions {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  align-content: flex-start;
+  position: relative;
+}
+
+.ImporterBar-job {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+}
+
+.ImporterBar-action {
+  @include flexRowCenter;
+  @include noSelect;
+  color: $zorroa-nearwhite;
+  margin: 10px;
+  border: none;
+  background: none;
+  outline: none;
+  position: relative;
+  text-decoration: none;
+
+  [class*="icon-"] {
+    margin-right: 6px;
+  }
+
+  &:active:not(.isDisabled) { color: chartreuse; }
+  &.isDisabled { color: $zorroa-gray;  }
+  &:hover:not(.isDisabled)  {
+    color: $zorroa-sickly-green;
+    cursor: pointer;
+  }
+}
+
+.ImporterBar-action-text {
+  text-transform: uppercase;
+  @media screen and (max-width: 1000px) { display: none; }
+}
+
+.ImporterBar-close {
+  @include zorroa-square-btn-lighten(42px);
+  @include flexCenter;
+  font-size: 16px;
+  border: none;
+  outline: none;
+  color: white;
+  background-color: black;
+}

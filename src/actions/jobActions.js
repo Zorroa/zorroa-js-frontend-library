@@ -6,7 +6,7 @@ import Pipeline from '../models/Pipeline'
 import AssetSearch from '../models/AssetSearch'
 import {
   EXPORT_ASSETS, IMPORT_ASSETS,
-  GET_PIPELINES, GET_JOBS,
+  GET_PIPELINES, GET_JOBS, ISOLATE_JOB,
   QUEUE_UPLOAD_FILE_ENTRIES, DEQUEUE_UPLOADED_FILE_ENTRIES,
   MARK_JOB_DOWNLOADED, GET_PROCESSORS,
   CANCEL_JOB, RESTART_JOB } from '../constants/actionTypes'
@@ -196,7 +196,7 @@ export function dequeueUploadFileEntrys (fileEntries) {
 
 export function analyzeFileEntries (actionType, files, pipeline, args, onUploadProgress) {
   return dispatch => {
-    const body = { pipeline }
+    const body = {pipeline}
     const formData = new FormData()
     formData.append('body', JSON.stringify(body))
     formData.append('args', JSON.stringify(args))
@@ -204,7 +204,7 @@ export function analyzeFileEntries (actionType, files, pipeline, args, onUploadP
     const request = {
       method: 'post',
       url: '/api/v1/analyze/_files',
-      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      headers: {'X-Requested-With': 'XMLHttpRequest'},
       onUploadProgress,
       data: formData
     }
@@ -221,4 +221,11 @@ export function analyzeFileEntries (actionType, files, pipeline, args, onUploadP
         console.error('Error uploading ' + files.length + ' files: ' + error)
       })
   }
+}
+
+export function isolateJob (job) {
+  return ({
+    type: ISOLATE_JOB,
+    payload: job
+  })
 }

@@ -24,12 +24,14 @@ export default function (state = initialState, action) {
       let isAdministrator = false
       let isDeveloper = false
       let isManager = false
+      let isSharer = false
       user.permissions && user.permissions.forEach(permission => {
         if (permission.equals(Permission.Administrator, Permission.GroupType)) isAdministrator = true
         if (permission.equals(Permission.Developer, Permission.GroupType)) isDeveloper = true
         if (permission.equals(Permission.Manager, Permission.GroupType)) isManager = true
+        if (permission.equals(Permission.Share, Permission.GroupType)) isSharer = true
       })
-      return { ...state, user, isAdministrator, isManager, isDeveloper }
+      return { ...state, user, isAdministrator, isManager, isDeveloper, isSharer }
     }
     case AUTH_SYNC:
       return { ...state, sync: action.payload }
