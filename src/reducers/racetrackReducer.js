@@ -183,18 +183,15 @@ export default function (state = initialState, action) {
       const widgets = [...state.widgets]
       const parentId = action.payload
       const sortByPage = false
+      const filterMultipage = false
       const isEnabled = true
       const isPinned = false
-      const widget = MultipageWidgetInfo.create(undefined, undefined, parentId, sortByPage, isEnabled, isPinned)
+      const widget = MultipageWidgetInfo.create(undefined, undefined, parentId, sortByPage, filterMultipage, isEnabled, isPinned)
       const index = state.widgets.findIndex(widget => (widget.type === MultipageWidgetInfo.type))
       if (index < 0) {
-        if (parentId) widgets.push(widget)
+        widgets.push(widget)
       } else {
-        if (parentId) {
-          widgets[index] = widget
-        } else {
-          widgets.splice(index, 1)
-        }
+        widgets[index] = widget
       }
       return { ...state, widgets }
     }

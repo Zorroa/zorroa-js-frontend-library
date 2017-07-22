@@ -204,9 +204,11 @@ export function fieldUsedInWidget (field, widget) {
   return removeRaw(widget.field) === removeRaw(field)
 }
 
-export function createMultipageWidget (field, fieldType, parentId, sortByPage, isEnabled, isPinned) {
+export function createMultipageWidget (field, fieldType, parentId, sortByPage, filterMultipage, isEnabled, isPinned) {
   field = 'source.clip.parent'
-  const filter = new AssetFilter({terms: {'source.clip.parent.raw': [parentId]}})
+  if (filterMultipage !== 'exists' && filterMultipage !== 'missing') filterMultipage = 'exists'
+  const existsFilter = (filterMultipage === 'exists' || filterMultipage === 'missing') && new AssetFilter({ [filterMultipage]: ['source.clip.parent'] })
+  const filter = parentId && parentId.length ? new AssetFilter({terms: {'source.clip.parent.raw': [parentId]}}) : existsFilter
   const order = sortByPage ? [{ field: 'source.clip.page.start', ascending: true }] : undefined
   const sliver = new AssetSearch({filter, order})
   return new Widget({type: MultipageWidgetInfo.type, field, sliver, isEnabled, isPinned})

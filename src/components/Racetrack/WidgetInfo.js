@@ -161,5 +161,5 @@ export const MultipageWidgetInfo = {
   element: <Multipage/>,
   create: createMultipageWidget,
   fieldTypes: [],
-  color: '#DCBA22'
+  color: '#579760'
 }
