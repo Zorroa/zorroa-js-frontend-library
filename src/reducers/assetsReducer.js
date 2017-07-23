@@ -4,7 +4,7 @@ import {
   SIMILAR_VALUES, SIMILAR_ASSETS,
   ASSET_PERMISSIONS, ASSET_SEARCHING,
   UPDATE_COMMAND, GET_COMMANDS,
-  ISOLATE_ASSET, SELECT_ASSETS, SELECT_PAGES,
+  ISOLATE_ASSET, SELECT_ASSETS,
   ADD_ASSETS_TO_FOLDER, REMOVE_ASSETS_FROM_FOLDER,
   SUGGEST_COMPLETIONS, UNAUTH_USER, ISOLATE_PARENT
 } from '../constants/actionTypes'
@@ -152,9 +152,6 @@ export default function (state = initialState, action) {
       api.setSelectionCounter(selectionCounter)
       return { ...state, selectedIds: action.payload, selectionCounter }
     }
-
-    case SELECT_PAGES:
-      return { ...state, selectedPageIds: action.payload }
 
     case SUGGEST_COMPLETIONS:
       return { ...state, suggestions: action.payload }

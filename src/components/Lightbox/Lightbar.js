@@ -20,8 +20,6 @@ class Lightbar extends Component {
     onMetadata: PropTypes.func.isRequired,
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     isolatedId: PropTypes.string,
-    selectedPageIds: PropTypes.instanceOf(Set),
-    showPages: PropTypes.bool,
     lightbarFieldTemplate: PropTypes.string,
     origin: PropTypes.string,
     user: PropTypes.instanceOf(User),
@@ -69,8 +67,8 @@ class Lightbar extends Component {
 
   addToCollection = (folder, event) => {
     this.setState({ showFolders: false })
-    const { showPages, isolatedId, selectedPageIds, actions } = this.props
-    const ids = showPages ? selectedPageIds : new Set([isolatedId])
+    const { isolatedId, actions } = this.props
+    const ids = new Set([isolatedId])
     actions.addAssetIdsToFolderId(ids, folder.id)
     this.setState({ addingToCollection: `Added ${ids.size} to ${folder.name}` })
     if (this.addingTimeout) clearTimeout(this.addingTimout)
@@ -81,11 +79,9 @@ class Lightbar extends Component {
   }
 
   render () {
-    const { assets, isolatedId, showPages, selectedPageIds, user, showMetadata, onMetadata, lightbarFieldTemplate } = this.props
+    const { assets, isolatedId, user, showMetadata, onMetadata, lightbarFieldTemplate } = this.props
     const { actionWidth, lightbarHeight, copyingLink, showFolders, addingToCollection } = this.state
     const asset = assets.find(asset => (asset.id === isolatedId))
-    const nselected = selectedPageIds && selectedPageIds.size
-    const isAddToCollectionDisabled = showPages && !nselected
     return (
       <div className="Lightbar" style={{height: lightbarHeight}}>
         <div className="Lightbar-metadata">
@@ -102,14 +98,13 @@ class Lightbar extends Component {
             <i className='Lightbar-btn-icon icon-link2'/>
             { copyingLink && <div className="Lightbar-performed-action">Copied URL to clipboard</div> }
           </div>
-          <div onClick={!isAddToCollectionDisabled && this.showFolders}
-               className={classnames('Lightbar-action', {isDisabled: isAddToCollectionDisabled})}>
+          <div onClick={this.showFolders} className='Lightbar-action'>
             <span className='Lightbar-action-text'>Add to Collection</span>
             <i className='Lightbar-btn-icon icon-chevron-down'/>
             { showFolders && (
               <div className="Lightbar-folders" onClick={e => { e.stopPropagation() }}>
                 <Folders filterName="simple" onSelect={this.addToCollection}
-                         filter={f => (!f.isDyhi() && !f.search && (f.childCount || f.canAddAssetIds(showPages ? selectedPageIds : new Set([isolatedId]), assets, user)))} />
+                         filter={f => (!f.isDyhi() && !f.search && (f.childCount || f.canAddAssetIds(new Set([isolatedId]), assets, user)))} />
               </div>
             )}
             { addingToCollection && <div className="Lightbar-performed-action">{addingToCollection}</div> }
@@ -124,8 +119,6 @@ class Lightbar extends Component {
 export default connect(state => ({
   assets: state.assets.all,
   isolatedId: state.assets.isolatedId,
-  showPages: state.app.showPages,
-  selectedPageIds: state.assets.selectedPageIds,
   lightbarFieldTemplate: state.app.lightbarFieldTemplate,
   origin: state.auth.origin,
   user: state.auth.user,

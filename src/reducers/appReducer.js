@@ -4,7 +4,7 @@ import {
   METADATA_FIELDS, LIGHTBOX_METADATA, ASSET_FIELDS,
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
-  SHOW_MULTIPAGE, SHOW_PAGES, VIDEO_VOLUME,
+  SHOW_MULTIPAGE, VIDEO_VOLUME,
   HOVER_FIELD, CLEAR_HOVER_FIELD,
   USER_SETTINGS, UNAUTH_USER,
   SHOW_DIALOG_ALERT, HIDE_DIALOG_ALERT,
@@ -58,7 +58,6 @@ const initialState = {
   showTable: false,
   videoVolume: 0.8,
   showMultipage: true,
-  showPages: false,
   sortFolders: 'alpha-asc',
   hoverFields: new Set(),
   thumbFieldTemplate: '%{image.width|video.width}x%{image.height|video.height} %{source.type}',
@@ -134,9 +133,7 @@ export default function app (state = initialState, action) {
     case VIDEO_VOLUME:
       return { ...state, videoVolume: action.payload }
     case SHOW_MULTIPAGE:
-      return { ...state, showMultipage: action.payload, showPages: action.payload }
-    case SHOW_PAGES:
-      return { ...state, showPages: action.payload }
+      return { ...state, showMultipage: action.payload }
     case SORT_FOLDERS:
       return { ...state, sortFolders: action.payload }
     case HOVER_FIELD: {
