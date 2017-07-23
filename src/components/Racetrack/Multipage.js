@@ -34,8 +34,8 @@ class Multipage extends Component {
 
   title = (parentId) => ('Multipage')
 
-  sortPages = () => {
-    this.setStatePromise({sortByPage: !this.state.sortByPage})
+  sortPages = (sortByPage) => {
+    this.setStatePromise({sortByPage})
       .then(_ => this.modifySliver())
   }
 
@@ -92,8 +92,9 @@ class Multipage extends Component {
                 <div className="Multipage-parent-close icon-cancel-circle" onClick={this.closeParent}/>
               </div>
               <div className="Multipage-sort">
-                <input type="checkbox" checked={sortByPage} onChange={this.sortPages}/>
-                <div>Sort by page</div>
+                <div className="Multipage-label" onClick={_ => this.sortPages(false)}>Search Order</div>
+                <Toggle checked={sortByPage} onChange={_ => this.sortPages(!sortByPage)} />
+                <div className="Multipage-label" onClick={_ => this.sortPages(true)}>Page Order</div>
               </div>
             </div>
           ) : (
