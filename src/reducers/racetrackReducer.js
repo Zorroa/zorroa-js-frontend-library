@@ -181,12 +181,12 @@ export default function (state = initialState, action) {
     }
     case ISOLATE_PARENT: {
       const widgets = [...state.widgets]
-      const parentId = action.payload
+      const isolatedParent = action.payload
       const sortByPage = false
       const filterMultipage = false
       const isEnabled = true
       const isPinned = false
-      const widget = MultipageWidgetInfo.create(undefined, undefined, parentId, sortByPage, filterMultipage, isEnabled, isPinned)
+      const widget = MultipageWidgetInfo.create(undefined, undefined, isolatedParent, sortByPage, filterMultipage, isEnabled, isPinned)
       const index = state.widgets.findIndex(widget => (widget.type === MultipageWidgetInfo.type))
       if (index < 0) {
         widgets.push(widget)

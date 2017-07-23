@@ -8,11 +8,11 @@ import Toggle from '../Toggle'
 import { MultipageWidgetInfo } from './WidgetInfo'
 import { createMultipageWidget } from '../../models/Widget'
 import { modifyRacetrackWidget } from '../../actions/racetrackAction'
-import { isolateParentId } from '../../actions/assetsAction'
+import { isolateParent } from '../../actions/assetsAction'
 
 class Multipage extends Component {
   static propTypes = {
-    isolatedParentId: PropTypes.string,
+    isolatedParent: PropTypes.instanceOf(Asset),
     id: PropTypes.number.isRequired,
     isIconified: PropTypes.bool.isRequired,
     isOpen: PropTypes.bool.isRequired,
@@ -50,25 +50,26 @@ class Multipage extends Component {
   }
 
   closeParent = () => {
-    this.props.actions.isolateParentId()
+    this.props.actions.isolateParent()
   }
 
   modifySliver = () => {
-    const { isolatedParentId, id, widgets } = this.props
+    const { isolatedParent, id, widgets } = this.props
     const { sortByPage, filterMultipage } = this.state
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
-    const w = createMultipageWidget(undefined, undefined, isolatedParentId, sortByPage, filterMultipage, widget.isEnabled, widget.isPrototypeOf())
+    const w = createMultipageWidget(undefined, undefined, isolatedParent, sortByPage, filterMultipage, widget.isEnabled, widget.isPrototypeOf())
     w.id = id
     this.props.actions.modifyRacetrackWidget(w)
   }
 
   render () {
-    const { isolatedParentId, id, isOpen, onOpen, isIconified, floatBody } = this.props
+    const { isolatedParent, id, isOpen, onOpen, isIconified, floatBody } = this.props
     const { sortByPage, filterMultipage } = this.state
     const active = true
     const title = active ? (isOpen ? MultipageWidgetInfo.title : undefined) : MultipageWidgetInfo.title
-    const field = active ? (isOpen ? undefined : this.title(isolatedParentId)) : undefined
+    const field = active ? (isOpen ? undefined : this.title(isolatedParent)) : undefined
+    const isolatedParentId = isolatedParent && isolatedParent.parentId()
     const asset = new Asset({id: isolatedParentId})
     const width = 120
     const height = 120
@@ -108,12 +109,12 @@ class Multipage extends Component {
 }
 
 export default connect(state => ({
-  isolatedParentId: state.assets.isolatedParentId,
+  isolatedParent: state.assets.isolatedParent,
   widgets: state.racetrack.widgets,
   origin: state.auth.origin
 }), dispatch => ({
   actions: bindActionCreators({
     modifyRacetrackWidget,
-    isolateParentId
+    isolateParent
   }, dispatch)
 }))(Multipage)

@@ -119,10 +119,10 @@ export function similarAssets (assetIds, fields) {
   }
 }
 
-export function isolateParentId (parentId) {
+export function isolateParent (asset) {
   return ({
     type: ISOLATE_PARENT,
-    payload: parentId
+    payload: asset
   })
 }
 
@@ -249,13 +249,6 @@ export function isolateAssetId (id) {
 export function selectAssetIds (ids) {
   return ({
     type: SELECT_ASSETS,
-    payload: ids
-  })
-}
-
-export function selectPageAssetIds (ids) {
-  return ({
-    type: SELECT_PAGES,
     payload: ids
   })
 }

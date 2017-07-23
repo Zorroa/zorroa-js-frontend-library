@@ -5,7 +5,6 @@ import { connect } from 'react-redux'
 import Pdf from './Pdf'
 import Video from './Video'
 import Image from './Image'
-import MultiImage from './MultiImage'
 import Asset from '../../models/Asset'
 
 class Inspector extends Component {
@@ -30,8 +29,6 @@ class Inspector extends Component {
       imageFormats.findIndex(format => (mediaType.endsWith(format))) >= 0) {
       inspector = <Image url={url}
                          onNextPage={onNext} onPrevPage={onPrev} />
-    } else if (mediaType.startsWith('image') && pages && pages.length) {
-      inspector = <MultiImage id={asset.id} parentId={asset.parentId()} />
     } else if (mediaType.startsWith('video')) {
       inspector = <Video url={url} backgroundURL={asset.backgroundURL(origin)}
                          frames={asset.frames()} frameRate={asset.frameRate()}

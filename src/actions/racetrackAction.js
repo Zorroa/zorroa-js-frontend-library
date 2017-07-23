@@ -1,5 +1,5 @@
 import { MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS,
-  SIMILAR_VALUES, ISOLATE_PARENT } from '../constants/actionTypes'
+  SIMILAR_VALUES } from '../constants/actionTypes'
 import Widget, { createFacetWidget, createExistsWidget, createMapWidget,
   createDateRangeWidget, createRangeWidget, createCollectionsWidget,
   createFiletypeWidget, createColorWidget, createSortOrderWidget } from '../models/Widget'

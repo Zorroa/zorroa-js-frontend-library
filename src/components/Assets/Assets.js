@@ -10,7 +10,7 @@ import User from '../../models/User'
 import Asset from '../../models/Asset'
 import Widget from '../../models/Widget'
 import Folder from '../../models/Folder'
-import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, similarAssets, unorderAssets, isolateParentId } from '../../actions/assetsAction'
+import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, similarAssets, unorderAssets, isolateParent } from '../../actions/assetsAction'
 import { resetRacetrackWidgets, restoreFolders, similar } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
@@ -40,7 +40,7 @@ class Assets extends Component {
     order: PropTypes.arrayOf(PropTypes.object),
     parentCounts: PropTypes.instanceOf(Map),
     parentTotals: PropTypes.instanceOf(Map),
-    isolatedParentId: PropTypes.string,
+    isolatedParent: PropTypes.instanceOf(Asset),
     selectedIds: PropTypes.object,
     selectionCounter: PropTypes.number.isRequired,
     totalCount: PropTypes.number,
@@ -170,11 +170,12 @@ class Assets extends Component {
   }
 
   isolateToLightbox (asset) {
-    const { showMultipage, parentTotals, isolatedParentId } = this.props
+    const { showMultipage, parentTotals, isolatedParent } = this.props
     const parentId = showMultipage && asset.parentId()
+    const isolatedParentId = isolatedParent && isolatedParent.parentId()
     const stackCount = parentId && parentId !== isolatedParentId && parentTotals && parentTotals.get(parentId)
     if (stackCount > 1) {
-      this.props.actions.isolateParentId(parentId)
+      this.props.actions.isolateParent(asset)
     } else {
       // Select the isolated asset, which is DE-selected on the second click
       this.skipNextSelectionScroll = true
@@ -394,7 +395,7 @@ class Assets extends Component {
     const width = this.state.assetsScrollWidth - 2 * assetsScrollPadding
     if (!width) return
 
-    const { assets, layout, thumbSize, showMultipage, isolatedParentId } = this.props
+    const { assets, layout, thumbSize, showMultipage, isolatedParent } = this.props
     if (!assets) return
 
     const assetSizes = assets.map(asset => {
@@ -404,6 +405,7 @@ class Assets extends Component {
     })
 
     var { positions, multipage, collapsed } = (_ => {
+      const isolatedParentId = isolatedParent && isolatedParent.parentId()
       switch (layout) {
         case 'grid': return ComputeLayout.grid(assetSizes, width, thumbSize, showMultipage, isolatedParentId)
         case 'masonry': return ComputeLayout.masonry(assetSizes, width, thumbSize, showMultipage, isolatedParentId)
@@ -511,7 +513,7 @@ class Assets extends Component {
 
   renderAssets () {
     const { assets, selectedIds, loadedCount, filteredCount, layout, showMultipage,
-      parentCounts, parentTotals, origin, thumbSize, query, thumbFieldTemplate, isolatedParentId } = this.props
+      parentCounts, parentTotals, origin, thumbSize, query, thumbFieldTemplate, isolatedParent } = this.props
     const { positions, multipage, tableIsResizing } = this.state
     api.setTableIsResizing(tableIsResizing)
 
@@ -572,6 +574,7 @@ class Assets extends Component {
                     return null
                   }
                   // Multipage agg optimization -- skip over children of parents with full stacks
+                  const isolatedParentId = isolatedParent && isolatedParent.parentId()
                   const parentIds = showMultipage && parentCounts && [...parentCounts.keys()].filter(id => id !== isolatedParentId && parentCounts.get(id) >= 3)
                   if (index === assets.length - 1 && index < positions.length &&
                     loadedCount < filteredCount && (!showMultipage || parentIds) &&
@@ -703,7 +706,7 @@ export default connect(state => ({
   order: state.assets.order,
   parentCounts: state.assets.parentCounts,
   parentTotals: state.assets.parentTotals,
-  isolatedParentId: state.assets.isolatedParentId,
+  isolatedParent: state.assets.isolatedParent,
   selectedIds: state.assets.selectedIds,
   selectionCounter: state.assets.selectionCounter,
   totalCount: state.assets.totalCount,
@@ -727,7 +730,7 @@ export default connect(state => ({
 }), dispatch => ({
   actions: bindActionCreators({
     isolateAssetId,
-    isolateParentId,
+    isolateParent,
     selectAssetIds,
     sortAssets,
     searchAssets,

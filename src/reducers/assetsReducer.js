@@ -63,8 +63,9 @@ export default function (state = initialState, action) {
       const parentCounts = multipage ? (isFirstPage ? new Map() : new Map(state.parentCounts)) : undefined
       const collapsedAssets = multipage ? [] : assets
       if (multipage) {
+        const isolatedParentId = state.isolatedParent && state.isolatedParent.parentId()
         assets.forEach(asset => {
-          if (asset.parentId() && asset.parentId() !== state.isolatedParentId) {
+          if (asset.parentId() && asset.parentId() !== isolatedParentId) {
             const count = parentCounts.get(asset.parentId()) || 0
             parentCounts.set(asset.parentId(), count + 1)
             if (count < maxStackCount) {
@@ -144,7 +145,7 @@ export default function (state = initialState, action) {
       return { ...state, searching: action.payload }
 
     case ISOLATE_ASSET:
-      return { ...state, isolatedId: action.payload, pages: action.payload ? state.pages : null }
+      return { ...state, isolatedId: action.payload }
 
     case SELECT_ASSETS: {
       const selectionCounter = state.selectionCounter + 1
@@ -224,7 +225,7 @@ export default function (state = initialState, action) {
     }
 
     case ISOLATE_PARENT: {
-      return { ...state, isolatedParentId: action.payload }
+      return { ...state, isolatedParent: action.payload }
     }
 
     case UNAUTH_USER:
