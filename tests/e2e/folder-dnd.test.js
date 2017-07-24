@@ -44,10 +44,10 @@ describe('Folder dnd', function () {
     .then(_ => selenium.getSelectorVisible(By.css('.Home-collapsible .Trash')))
     .then(trashVisible => {
       if (!trashVisible) return driver.then(_ => { DEBUG && console.log('no trash to empty 1') })
-      return selenium.getSelectorVisible(By.css('.Trash-body'))
+      return selenium.getSelectorVisible(By.css('.Home-collapsible .Trash-body'))
       .then(trashBodyVisible => {
         DEBUG && console.log('trashBodyVisible = ' + trashBodyVisible)
-        if (!trashBodyVisible) return selenium.clickSelector(By.css('.Trash-toggle'))
+        if (!trashBodyVisible) return selenium.clickSelector(By.css('.Home-collapsible .Trash-toggle'))
       })
       .then(_ => { DEBUG && console.log('opened trash') })
       .then(_ => selenium.getSelectorVisible(By.css('.Home-collapsible .Trash-empty')))
@@ -63,10 +63,11 @@ describe('Folder dnd', function () {
     })
   }
 
-  // open the collections panel if not already open
-  var openCollectionsPanel = function () {
+  // open the home panel if not already open
+  var openHomePanel = function () {
     return driver.then(_ => { DEBUG && console.log('open the home panel') })
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Home-collapsible'), 5000))
+    .then(_ => selenium.waitForIdle())
     .then(_ => selenium.doesSelectorHaveClass(By.css('.Home-collapsible'), 'isOpen'))
       .then(isOpen => {
         if (!isOpen) {
@@ -119,7 +120,13 @@ describe('Folder dnd', function () {
     .then(_ => driver.sleep(100))
   }
 
-  it('add & remove assets + dnd', function () {
+  it ('empty trash', function() {
+    return driver.then(_ => openHomePanel())
+    .then(_ => selenium.waitForIdle())
+    .then(_ => emptyTrash())
+  })
+
+  xit('add & remove assets + dnd', function () {
     let myUserFolder
     const myUserName = `selenium-${Date.now()}`
 
@@ -127,7 +134,7 @@ describe('Folder dnd', function () {
     let sub2Folder
     let sub3Folder
 
-    return driver.then(_ => openCollectionsPanel())
+    return driver.then(_ => openHomePanel())
 
     // The Film folder is a DyHi created manualy on the first dev instance
     // To create, go to the admin gui, create a folder named Film, and give it these attrs:
@@ -338,6 +345,6 @@ describe('Folder dnd', function () {
     .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.FolderItem-context-remove-folder'), 5000))
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Home-collapsible .Trash'), 15000))
 
-    // .then(emptyTrash)
+    .then(emptyTrash)
   })
 })
