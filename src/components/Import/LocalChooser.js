@@ -7,6 +7,7 @@ import Processor from '../../models/Processor'
 import { ANALYZE_SIMILAR } from '../../constants/actionTypes'
 import { humanFileSize, makePromiseQueue } from '../../services/jsUtil'
 import { queueFileEntrysUpload, dequeueUploadFileEntrys, uploadFiles, analyzeFileEntries, getProcessors } from '../../actions/jobActions'
+import { hideModal } from '../../actions/appActions'
 
 const initialState = {
   isDroppable: false,     // true when file over drop target
@@ -192,7 +193,14 @@ class LocalChooser extends Component {
       const uploadedSize = this.state.uploadedSize + progressEvent.loaded
       this.setState({uploadedSize})
       if (uploadedSize >= this.state.totalSize) {
-        setTimeout(() => { this.clear(); if (this.props.onDone) this.props.onDone() }, 1500)
+        setTimeout(() => {
+          this.clear()
+          if (this.props.onDone) {
+            this.props.onDone()
+          } else {
+            this.props.actions.hideModal()
+          }
+        }, 1500)
       }
       console.log('Finished upload batch')
       resolve()      // Move on to the next batch of uploads
@@ -213,7 +221,6 @@ class LocalChooser extends Component {
   }
 
   similar = (event) => {
-    console.log('Upload and find similar')
     this.upload(event, this.configureAnalyzeFileImport)
   }
 
@@ -481,6 +488,7 @@ export default connect(state => ({
     dequeueUploadFileEntrys,
     uploadFiles,
     analyzeFileEntries,
-    getProcessors
+    getProcessors,
+    hideModal
   }, dispatch)
 }))(LocalChooser)

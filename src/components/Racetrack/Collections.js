@@ -72,7 +72,7 @@ class Collections extends Component {
     const selectedFolderNames = selectedFolders.map(folder => folder.name)
     const title = selectedFolderNames.length ? (isOpen ? CollectionsWidgetInfo.title : undefined) : CollectionsWidgetInfo.title
     const field = selectedFolderNames.length ? (isOpen ? undefined : selectedFolderNames.join(',')) : undefined
-    const placeholder = selectedFolders.size ? '' : 'Search folders'
+    const placeholder = selectedFolders.length ? '' : 'Search folders'
 
     return (
       <Widget className='Collections'

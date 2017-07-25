@@ -504,7 +504,7 @@ class Assets extends Component {
 
     if (!assets || !assets.length) {
       return (
-        <div className="assets-layout-empty flexCol flexJustifyCenter flexAlignItemsCenter">
+        <div className="assets-layout-empty">
           <div className="assets-layout-icon icon-search"/>
           { query && !query.empty() && <div>No results</div> }
           { query && !query.empty() && <button onClick={this.clearSearch}>Clear Search</button> }
