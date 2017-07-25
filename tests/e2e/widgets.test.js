@@ -243,12 +243,11 @@ describe('search widget', function () {
       .then(_ => driver.findElement(By.css('.asset-counter-total')))
       .then(ele => ele.getText())
       .then(text => text3 = text)
+      // FIXME: Removing this console.log breaks the test??
       .then(_ => { DEBUG && console.log('Count with two selected facets ' + text3) })
       .then(selenium.waitForIdle)
 
-      .then(_ => { DEBUG && console.log('Validating counts ' + text3) })
       .then(_ => { expect(Number(text3)).toBe(103) })
-      .then(_ => { DEBUG && console.log('Validating counts 2') })
       .then(_ => { expect(Number(text2)).toBeGreaterThan(Number(text3)) })
 
       .then(_ => { DEBUG && console.log('Closing both facet widgets') })
@@ -256,7 +255,6 @@ describe('search widget', function () {
       .then(ele => ele.click())
       .then(selenium.waitForIdle)
 
-      .then(_ => { DEBUG && console.log('Closing second facet widgets') })
       .then(_ => driver.findElement(By.css('.WidgetHeader-close')))
       .then(ele => ele.click())
       .then(selenium.waitForIdle)
@@ -267,11 +265,8 @@ describe('search widget', function () {
       .then(ele => ele.getText())
       .then(text => text4 = text)
 
-      .then(_ => { DEBUG && console.log('Double checking original count 2') })
       .then(_ => { expect(Number(text4)).toBeGreaterThan(Number(text2)) })
-      .then(_ => { DEBUG && console.log('Double checking original count 3') })
       .then(_ => { expect(text4).toMatch(text1) })
-      .then(_ => { DEBUG && console.log('Double checking original count 4') })
   })
 
   // NB no map widget -- no geo data on dev

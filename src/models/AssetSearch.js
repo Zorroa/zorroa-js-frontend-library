@@ -31,7 +31,6 @@ export default class AssetSearch {
     if (!assetSearch) {
       return
     }
-    assetSearch = new AssetSearch(assetSearch)
     // FIXME: How should we merge order, scroll, from & size?
     if (assetSearch.order) {
       if (this.order) {
