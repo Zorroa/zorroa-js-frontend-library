@@ -36,6 +36,8 @@ export default class AssetFilter {
   }
 
   merge (filter) {
+    filter = new AssetFilter(filter)
+
     // Combine each array, removing duplicates and merging terms.
     if (!filter) {
       return
@@ -145,50 +147,52 @@ export default class AssetFilter {
   }
 
   convertToBool () {
+    const filter = new AssetFilter(this)
+
     // convert to elasticSearch schema:
     // multiple terms in the aggs fields need to be boolean queries
     const count =
-      (this.terms ? Object.keys(this.terms).length : 0) +
-      (this.range ? Object.keys(this.range).length : 0) +
-      (this.exists ? this.exists.length : 0) +
-      (this.missing ? this.missing.length : 0) +
-      (this.scripts ? this.scripts.length : 0) +
-      (this.hamming ? 1 : 0)
+      (filter.terms ? Object.keys(filter.terms).length : 0) +
+      (filter.range ? Object.keys(filter.range).length : 0) +
+      (filter.exists ? filter.exists.length : 0) +
+      (filter.missing ? filter.missing.length : 0) +
+      (filter.scripts ? filter.scripts.length : 0) +
+      (filter.hamming ? 1 : 0)
 
     if (count > 1) {
       const must = []
-      if (this.terms) {
-        let terms = this.terms
-        delete this.terms
+      if (filter.terms) {
+        let terms = filter.terms
+        delete filter.terms
         for (let termKey in terms) {
           must.push({terms: {[termKey]: terms[termKey]}})
         }
       }
-      if (this.range) {
-        let range = this.range
-        delete this.range
+      if (filter.range) {
+        let range = filter.range
+        delete filter.range
         for (let rangeKey in range) {
           must.push({range: {[rangeKey]: range[rangeKey]}})
         }
       }
-      if (this.exists) {
-        let exists = this.exists
-        delete this.exists
+      if (filter.exists) {
+        let exists = filter.exists
+        delete filter.exists
         must.push({exists})
       }
-      if (this.missing) {
-        let missing = this.missing
-        delete this.missing
+      if (filter.missing) {
+        let missing = filter.missing
+        delete filter.missing
         must.push({missing})
       }
-      if (this.scripts) {
-        let scripts = this.scripts
-        delete this.scripts
+      if (filter.scripts) {
+        let scripts = filter.scripts
+        delete filter.scripts
         must.push({scripts})
       }
-      this.bool = { must }
+      filter.bool = { must }
     }
-    return this   // Allow chaining
+    return filter   // Allow chaining
   }
 }
 
