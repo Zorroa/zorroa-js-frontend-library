@@ -30,7 +30,7 @@ import Folder from '../../models/Folder'
 import CommandProgress from '../Workspace/CommandProgress'
 import Lightbox from '../Lightbox'
 import Feedback from '../Feedback'
-import Import from '../Import'
+import Import, { LocalChooser } from '../Import'
 import { LOCAL_IMPORT, CLOUD_IMPORT, SERVER_IMPORT } from '../Import/ImportConstants'
 import { EMBEDMODE_ITEM } from '../../constants/localStorageItems'
 
@@ -190,23 +190,22 @@ class Workspace extends Component {
     const isFile = event.dataTransfer.types.findIndex(type => (type === 'Files')) >= 0
     const { app } = this.props
     if (isFile && app && !app.modal) {
-      console.log('Drag enter app')
       this.setState({isDroppable: true})
     }
   }
 
   dragOver = (event) => {
-    if (this.state.isDroppable) {
-      console.log('Drag over app')
-    }
     event.preventDefault()
   }
 
   dragLeave = (event) => {
     if (this.state.isDroppable) {
-      console.log('Drag leave app')
       this.setState({isDroppable: false})
     }
+  }
+
+  cancelLocalImport = (event) => {
+    this.props.actions.hideModal()
   }
 
   createLocalImport = (event) => {
@@ -219,7 +218,7 @@ class Workspace extends Component {
     this.props.actions.queueFileEntrysUpload(entries)
 
     const width = '65vw'
-    const body = <Import source={source} step={2}/>
+    const body = <div className="Workspace-local-chooser"><div onClick={this.cancelLocalImport} className="Workspace-local-chooser-cancel icon-cross2"/><LocalChooser/></div>
     this.props.actions.showModal({body, width})
     this.setState({isDroppable: false})
     event.preventDefault()

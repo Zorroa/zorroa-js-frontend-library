@@ -103,6 +103,12 @@ export function assetsForIds (assetIds, fields) {
 }
 
 export function similarAssets (assetIds, fields) {
+  if (!assetIds || !assetIds.length) {
+    return ({
+      type: SIMILAR_ASSETS,
+      payload: []
+    })
+  }
   return dispatch => {
     assetsForIds(assetIds, fields)
       .then(assets => dispatch({

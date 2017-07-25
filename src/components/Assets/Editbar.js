@@ -21,7 +21,7 @@ class Editbar extends Component {
     similar: PropTypes.shape({
       field: PropTypes.string,
       values: PropTypes.arrayOf(PropTypes.string).isRequired,
-      assetIds: PropTypes.arrayOf(PropTypes.string).isRequired
+      ofsIds: PropTypes.arrayOf(PropTypes.string).isRequired
     }).isRequired,
     similarAssets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     isolatedId: PropTypes.string,
@@ -55,8 +55,8 @@ class Editbar extends Component {
     if (!selectedAssetIds || !selectedAssetIds.size) return
     const selectedAssets = [...selectedAssetIds].map(id => (similarAssets.find(asset => (asset.id === id)))).filter(asset => asset)
     const values = selectedAssets.map(asset => asset.rawValue(this.props.similar.field))
-    const assetIds = selectedAssets.map(asset => asset.id)
-    const similar = { values, assetIds, weights: weights(assetIds) }
+    const ofsIds = selectedAssets.map(asset => asset.closestProxy(256, 256).id)
+    const similar = { values, ofsIds, weights: weights(ofsIds) }
     actions.similar(similar)
   }
 
