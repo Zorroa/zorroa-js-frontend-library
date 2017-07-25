@@ -3,25 +3,43 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
+import { selectJobId, selectJobIds } from '../../actions/jobActions'
+
 const SORT_ALPHABETICAL = 'alpha'
 const SORT_TIME = 'time'
 
 class Jobs extends Component {
   static propTypes = {
     jobs: PropTypes.object,
+    selectedJobIds: PropTypes.instanceOf(Set),
     jobType: PropTypes.string.isRequired,
     addJob: PropTypes.func,
     addJobEnabled: PropTypes.bool,
     isolateJob: PropTypes.func,
     actions: PropTypes.object
   }
+
   state = {
     filterString: '',
     sort: 'alpha-asc'
   }
 
-  searchJob = (job) => {
+  filterJobs = (event) => {
+    const filterString = event.target.value
+    this.setState({filterString})
+  }
+
+  cancelFilter = () => {
+    this.setState({ filterString: '' })
+  }
+
+  searchJob = (job, event) => {
+    const { jobType, selectedJobIds } = this.props
     console.log('Search job ' + job.name)
+    const jobs = Object.keys(this.props.jobs).map(jobId => this.props.jobs[jobId])
+      .filter(job => job.type === jobType)
+      .sort((a, b) => (a.timeUpdated < b.timeUpdated ? 1 : (a.timeUpdated === b.timeUpdated ? 0 : -1)))
+    this.props.actions.selectJobId(job.id, event.shiftKey, event.metaKey, jobs, selectedJobIds, this.props.jobs)
   }
 
   sortJobs = (field) => {
@@ -60,17 +78,17 @@ class Jobs extends Component {
     return (
       <div className="Jobs-selected">
         { `${count} ${this.props.jobType} selected` }
-        <div onClick={this.deselectAll} className="Jobs-deselect-all icon-cancel-circle"/>
+        <div onClick={_ => this.props.actions.selectJobIds()} className="Jobs-deselect-all icon-cancel-circle"/>
       </div>
     )
   }
 
   render () {
-    const { jobType, addJob, addJobEnabled, isolateJob } = this.props
+    const { jobType, addJob, addJobEnabled, isolateJob, selectedJobIds } = this.props
     const { filterString } = this.state
-    const selectedJobs = new Set([1])
+    const lcFilterString = filterString.toLowerCase()
     const jobs = Object.keys(this.props.jobs).map(jobId => this.props.jobs[jobId])
-      .filter(job => job.type === jobType)
+      .filter(job => job.type === jobType && job.name.toLowerCase().includes(lcFilterString))
       .sort((a, b) => (a.timeUpdated < b.timeUpdated ? 1 : (a.timeUpdated === b.timeUpdated ? 0 : -1)))
     return (
       <div className="Jobs">
@@ -96,15 +114,19 @@ class Jobs extends Component {
               { this.renderSortButton(SORT_ALPHABETICAL) }
               { this.renderSortButton(SORT_TIME) }
             </div>
-            { this.renderJobsDeselector(selectedJobs.size) }
+            { this.renderJobsDeselector(selectedJobIds.size) }
           </div>
         </div>
         <div className="Jobs-scroll">
           <div className="Jobs-body">
             { jobs.map(job => (
-              <div className="Jobs-job" key={job.id} onClick={_ => this.searchJob(job)}
+              <div className={classnames('Jobs-job', {isSelected: selectedJobIds.has(job.id)})} key={job.id} onClick={e => this.searchJob(job, e)}
                    onDoubleClick={_ => isolateJob && isolateJob(job)}>
                 <div className="Jobs-job-name">{job.name}</div>
+                <div className="Jobs-status">
+                  { job.warningCount() ? <div className="Jobs-warning">{job.warningCount()}</div> : null }
+                  { job.errorCount() ? <div className="Jobs-error">{job.errorCount()}</div> : null }
+                </div>
               </div>
             )) }
             { !jobs.length && (
@@ -121,9 +143,11 @@ class Jobs extends Component {
 }
 
 export default connect(state => ({
-  jobs: state.jobs.all
+  jobs: state.jobs.all,
+  selectedJobIds: state.jobs.selectedIds
 }), dispatch => ({
   actions: bindActionCreators({
-
+    selectJobId,
+    selectJobIds
   }, dispatch)
 }))(Jobs)

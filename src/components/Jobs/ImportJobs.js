@@ -4,14 +4,21 @@ import { connect } from 'react-redux'
 
 import Job from '../../models/Job'
 import Jobs from './Jobs'
+import Import from '../Import'
 import { isolateJob } from '../../actions/jobActions'
+import { showModal } from '../../actions/appActions'
 
 class ImportJobs extends Component {
-  static propTypes = {}
+  static propTypes = {
+    actions: PropTypes.object
+  }
+
   state = {}
 
   createImport = () => {
-    console.log('Create import')
+    const width = '65vw'
+    const body = <Import/>
+    this.props.actions.showModal({body, width})
   }
 
   isolateImport = (job) => {
@@ -32,5 +39,6 @@ export default connect(state => ({
 }), dispatch => ({
   actions: bindActionCreators({
     isolateJob,
+    showModal
   }, dispatch)
 }))(ImportJobs)

@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Text, Sector } from 'recharts'
 
 import { createFacetWidget, aggField, removeRaw } from '../../models/Widget'
 import Asset from '../../models/Asset'
@@ -10,6 +9,7 @@ import { FacetWidgetInfo } from './WidgetInfo'
 import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import Widget from './Widget'
 import { unCamelCase } from '../../services/jsUtil'
+import PieChart from '../PieChart'
 
 const BAR_CHART = 'icon-list'
 const PIE_CHART = 'icon-pie-chart'
@@ -209,101 +209,6 @@ class Facet extends Component {
     return buckets
   }
 
-  renderPieLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name, fill }) => {
-    const { terms, otherIsSelected } = this.state
-    const RADIAN = Math.PI / 180
-    const sin = Math.sin(-RADIAN * midAngle)
-    const cos = Math.cos(-RADIAN * midAngle)
-    const r0 = 15
-    const r1 = 10
-    const r2 = 20
-    const x0 = cx + (innerRadius + r0) * cos
-    const y0 = cy + (innerRadius + r0) * sin
-    const sx = cx + (outerRadius + r1) * cos
-    const sy = cy + (outerRadius + r1) * sin
-    const mx = cx + (outerRadius + r2) * cos
-    const my = cy + (outerRadius + r2) * sin
-    const ox = 5
-    const ex = mx + (cos >= 0 ? 1 : -1) * ox
-    const ey = my
-    const textAnchor = cos >= 0 ? 'start' : 'end'
-
-    return (
-      <svg>
-        <svg>
-          {
-            percent > 0.05 &&
-            <text x={x0} y={y0}
-                  textAnchor="middle"
-                  className="Facet-pie-pct" dominantBaseline="central">
-              {`${(percent * 100).toFixed(0)}%`}
-            </text>
-          }
-          {
-            percent > 0.025 && terms.indexOf(name) < 0 && !(name === OTHER_BUCKET && otherIsSelected) &&
-            <svg>
-              <text x={ex} y={ey}
-                    textAnchor={textAnchor}
-                    className="Facet-pie-label" dominantBaseline="central">
-                { this.renderBucketKey(name) }
-              </text>
-              <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none"/>
-            </svg>
-          }
-        </svg>
-      </svg>
-    )
-  }
-
-  renderActivePieSectionShape = ({ cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle,
-    fill, payload, percent, value, name }) => {
-    const RADIAN = Math.PI / 180
-    const sin = Math.sin(-RADIAN * midAngle)
-    const cos = Math.cos(-RADIAN * midAngle)
-    const r0 = 10
-    const r1 = 20
-    const ox = 5
-    const sx = cx + (outerRadius + r0) * cos
-    const sy = cy + (outerRadius + r0) * sin
-    const mx = cx + (outerRadius + r1) * cos
-    const my = cy + (outerRadius + r1) * sin
-    const ex = mx + (cos >= 0 ? 1 : -1) * ox
-    const ey = my
-    const textAnchor = cos >= 0 ? 'start' : 'end'
-
-    return (
-      <g>
-        <Sector
-          cx={cx}
-          cy={cy}
-          innerRadius={innerRadius}
-          outerRadius={outerRadius}
-          startAngle={startAngle}
-          endAngle={endAngle}
-          fill={fill}
-        />
-        <Sector
-          cx={cx}
-          cy={cy}
-          startAngle={startAngle}
-          endAngle={endAngle}
-          innerRadius={outerRadius + 6}
-          outerRadius={outerRadius + 10}
-          fill={fill}
-        />
-        <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none"/>
-        <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none"/>
-        <text x={ex + (cos >= 0 ? 1 : -1) * 12}
-              y={ey}
-              textAnchor={textAnchor}
-              className="Facet-pie-label active"
-              dominantBaseline="central">
-          {this.renderBucketKey(name)}
-        </text>
-      </g>
-    )
-  }
-
   renderHeaderCell (column) {
     const { order } = this.state
     const sortField = { 'keyword': '_term', 'count': '_count' }
@@ -363,7 +268,7 @@ class Facet extends Component {
 
   renderChart () {
     const { uxLevel, id, widgets } = this.props
-    const { field, terms, chartType } = this.state
+    const { field, terms, otherIsSelected, chartType } = this.state
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const isPinned = widgets && widgets[index] && widgets[index].isPinned
     let maxCount = 0
@@ -437,25 +342,10 @@ class Facet extends Component {
       case PIE_CHART:
         const data = buckets.map(bucket => ({name: bucket.key, value: bucket.doc_count}))
         const activeIndex = mergedTerms.map((term, index) => (buckets.findIndex(bucket => (bucket.key === term))))
-        return (
-          <div className="Facet-pie-chart">
-            <ResponsiveContainer>
-              <PieChart width={300} height={300}>
-                <Pie innerRadius={30} outerRadius={60} paddingAngle={0}
-                     isAnimationActive={animate}
-                     animationBegin={100}
-                     animationDuration={500}
-                     activeIndex={activeIndex} activeShape={this.renderActivePieSectionShape}
-                     label={this.renderPieLabel} labelLine={false}
-                     data={data} onClick={this.selectPieSection}>
-                  { data.map((entry, index) => <Cell key={index} fill={COLORS[index % COLORS.length]}/>) }
-                  <Tooltip/>
-                </Pie>
-                <Text>{field}</Text>
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        )
+        return <PieChart field={field} data={data} terms={terms} otherIsSelected={otherIsSelected}
+                         activeIndex={activeIndex} COLORS={COLORS}
+                         animate={animate} bucketKey={this.renderBucketKey}
+                         onSelectPieSection={this.selectPieSection} />
     }
   }
 

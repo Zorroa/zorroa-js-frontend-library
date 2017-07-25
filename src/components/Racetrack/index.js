@@ -18,4 +18,5 @@ import './Widget.scss'
 import './SimilarHash.scss'
 import './Collections.scss'
 import './SortOrder.scss'
+import './ImportSet.scss'
 export default Racetrack

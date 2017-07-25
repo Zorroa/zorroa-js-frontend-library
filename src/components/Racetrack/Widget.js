@@ -4,11 +4,13 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 import WidgetHeader from './WidgetHeader'
-import { SimilarHashWidgetInfo, CollectionsWidgetInfo, SortOrderWidgetInfo } from './WidgetInfo'
+import { SimilarHashWidgetInfo, CollectionsWidgetInfo,
+  SortOrderWidgetInfo, ImportSetWidgetInfo } from './WidgetInfo'
 import { iconifyRightSidebar } from '../../actions/appActions'
 import { sortAssets } from '../../actions/assetsAction'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds, similar } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
+import { selectJobIds } from '../../actions/jobActions'
 
 class Widget extends Component {
   static displayName = 'Widget'
@@ -62,6 +64,7 @@ class Widget extends Component {
     if (widget && widget.type === SimilarHashWidgetInfo.type) this.props.actions.similar()
     if (widget && widget.type === SortOrderWidgetInfo.type) this.props.actions.sortAssets()
     if (widget && widget.type === CollectionsWidgetInfo.type) this.props.actions.selectFolderIds()
+    if (widget && widget.type === ImportSetWidgetInfo.type) this.props.actions.selectJobIds()
     this.props.actions.removeRacetrackWidgetIds([this.props.id])
   }
 
@@ -114,6 +117,7 @@ export default connect(
       similar,
       sortAssets,
       selectFolderIds,
+      selectJobIds,
       modifyRacetrackWidget,
       removeRacetrackWidgetIds
     }, dispatch)

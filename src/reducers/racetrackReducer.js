@@ -1,9 +1,10 @@
 import {
   MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS,
-  SIMILAR_VALUES, ASSET_ORDER, ASSET_SORT, ASSET_FIELDS, SELECT_FOLDERS,
-  ANALYZE_SIMILAR, UNAUTH_USER } from '../constants/actionTypes'
-import Widget from '../models/Widget'
-import { SimilarHashWidgetInfo, CollectionsWidgetInfo, SortOrderWidgetInfo } from '../components/Racetrack/WidgetInfo'
+  SIMILAR_VALUES, ASSET_ORDER, ASSET_SORT, ASSET_FIELDS,
+  SELECT_FOLDERS, SELECT_JOBS, ANALYZE_SIMILAR, UNAUTH_USER } from '../constants/actionTypes'
+import Widget, { createImportSetWidget } from '../models/Widget'
+import { SimilarHashWidgetInfo, CollectionsWidgetInfo,
+  SortOrderWidgetInfo, ImportSetWidgetInfo } from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
 
 const initialState = {
@@ -155,6 +156,20 @@ export default function (state = initialState, action) {
         const index = state.widgets.findIndex(widget => (widget.type === CollectionsWidgetInfo.type))
         if (index < 0) {
           const widget = CollectionsWidgetInfo.create()
+          const widgets = [...state.widgets, widget]
+          return { ...state, widgets }
+        }
+      }
+      return state
+    }
+    case SELECT_JOBS: {
+      const selectedJobIds = action.payload
+      if (selectedJobIds.size) {
+        const index = state.widgets.findIndex(widget => (widget.type === ImportSetWidgetInfo.type))
+        if (index < 0) {
+          const isEnabled = true
+          const isPinned = false
+          const widget = createImportSetWidget(undefined, undefined, isEnabled, isPinned)
           const widgets = [...state.widgets, widget]
           return { ...state, widgets }
         }

@@ -9,9 +9,10 @@ import {
   GET_PIPELINES, GET_JOBS, ISOLATE_JOB,
   QUEUE_UPLOAD_FILE_ENTRIES, DEQUEUE_UPLOADED_FILE_ENTRIES,
   MARK_JOB_DOWNLOADED, GET_PROCESSORS,
-  CANCEL_JOB, RESTART_JOB } from '../constants/actionTypes'
+  CANCEL_JOB, RESTART_JOB, SELECT_JOBS } from '../constants/actionTypes'
 import { archivistGet, archivistPost, archivistRequest } from './authAction'
 import Processor from '../models/Processor'
+import { selectId, equalSets } from '../services/jsUtil'
 
 const jobEndpoint = '/api/v1/jobs'
 const importEndpoint = '/api/v1/imports'
@@ -228,4 +229,17 @@ export function isolateJob (job) {
     type: ISOLATE_JOB,
     payload: job
   })
+}
+
+export function selectJobIds (ids, curIds, jobs) {
+  if (!(ids instanceof Set)) ids = new Set(ids)
+  return ({
+    type: SELECT_JOBS,
+    payload: ids
+  })
+}
+
+export function selectJobId (id, shiftKey, metaKey, jobs, selectedIds, all) {
+  let selectedJobIds = selectId(id, shiftKey, metaKey, jobs, selectedIds)
+  return selectJobIds(selectedJobIds, selectedIds, all)
 }

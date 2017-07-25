@@ -4,14 +4,14 @@
   background-color: black;
   border-radius: 3px;
   border: 1px solid $zorroa-dimgray;
-  max-height: 20vh;
   min-height: 30px;
   @include fullWidth;
   position: relative;
-
-  &.collapsed {
-    max-height: 30px;
-  }
+  margin-top: 5px;
+  margin-bottom: 5px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  &.collapsed { max-height: 30px; }
 }
 
 .ImporterSection-collapser {

@@ -181,6 +181,7 @@
 .Jobs-job {
   @include flexRow;
   @include flexAlignItemsCenter;
+  @include flexJustifySpaceBetween;
   color: $zorroa-whitegray;
   padding: 4px;
   cursor: pointer;
@@ -205,4 +206,23 @@
     background-color: $zorroa-selected;
     .dark & { background-color: $zorroa-dark-selected; }
   }
+}
+
+.Jobs-warning {
+  color: $zorroa-gray;
+  background-color: yellow;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.Jobs-error {
+  color: white;
+  background-color: $zorroa-faded-red;
+  padding: 2px;
+  border-radius: 7.5px;
+  font-size: 10px;
+  min-width: 15px;
+  text-align: center;
+  margin-left: 8px;
+  margin-right: 8px;
 }

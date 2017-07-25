@@ -1,6 +1,7 @@
 import { SimpleSearchWidgetInfo, ExistsWidgetInfo, FacetWidgetInfo,
   MapWidgetInfo, DateRangeWidgetInfo, RangeWidgetInfo, SimilarHashWidgetInfo,
-  FiletypeWidgetInfo, ColorWidgetInfo, CollectionsWidgetInfo, SortOrderWidgetInfo
+  FiletypeWidgetInfo, ColorWidgetInfo, CollectionsWidgetInfo,
+  SortOrderWidgetInfo, ImportSetWidgetInfo
 } from '../components/Racetrack/WidgetInfo'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
@@ -192,6 +193,11 @@ export function createCollectionsWidget (field, fieldType, isEnabled, isPinned) 
 export function createSortOrderWidget (field, filedType, isEnabled, isPinned) {
   field = '_order'
   return new Widget({type: SortOrderWidgetInfo.type, field, isEnabled, isPinned})
+}
+
+export function createImportSetWidget (field, fieldType, isEnabled, isPinned) {
+  field = 'links.import'
+  return new Widget({type: ImportSetWidgetInfo.type, field, isEnabled, isPinned})
 }
 
 export function fieldUsedInWidget (field, widget) {

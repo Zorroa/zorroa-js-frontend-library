@@ -1,6 +1,6 @@
 import {
   EXPORT_ASSETS, IMPORT_ASSETS,
-  GET_JOBS, GET_PIPELINES, ISOLATE_JOB,
+  GET_JOBS, GET_PIPELINES, ISOLATE_JOB, SELECT_JOBS,
   QUEUE_UPLOAD_FILE_ENTRIES, DEQUEUE_UPLOADED_FILE_ENTRIES,
   MARK_JOB_DOWNLOADED, GET_PROCESSORS,
   RESTART_JOB, CANCEL_JOB, UNAUTH_USER } from '../constants/actionTypes'
@@ -9,7 +9,8 @@ import Job from '../models/Job'
 export const initialState = {
   all: {},
   processors: [],
-  fileEntries: new Map()
+  fileEntries: new Map(),
+  selectedIds: new Set()
 }
 
 export default function (state = initialState, action) {
@@ -96,6 +97,10 @@ export default function (state = initialState, action) {
 
     case ISOLATE_JOB: {
       return { ...state, isolated: action.payload }
+    }
+
+    case SELECT_JOBS: {
+      return { ...state, selectedIds: action.payload }
     }
 
     case UNAUTH_USER: {

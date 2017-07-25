@@ -29,6 +29,7 @@ class Racebar extends Component {
     folderCounts: PropTypes.instanceOf(Map),
     selectedFolderIds: PropTypes.object,
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
+    selectedJobIds: PropTypes.instanceOf(Set),
     order: PropTypes.arrayOf(PropTypes.object),
     similar: PropTypes.shape({
       field: PropTypes.string,
@@ -98,10 +99,10 @@ class Racebar extends Component {
   }
 
   saveSearch = (name, acl, dyhiLevels) => {
-    const { widgets, selectedFolderIds, trashedFolders, order, similar, user } = this.props
+    const { widgets, selectedFolderIds, trashedFolders, selectedJobIds, order, similar, user } = this.props
     const parentId = user && user.homeFolderId
     const nonTrashedFolderIds = Searcher.nonTrashedFolderIds(selectedFolderIds, trashedFolders)
-    const search = Searcher.build(widgets, nonTrashedFolderIds, order, similar)
+    const search = Searcher.build(widgets, nonTrashedFolderIds, selectedJobIds, order, similar)
     const saveSearch = dyhiLevels && typeof dyhiLevels === 'string' && dyhiLevels === 'Search'
     const saveLayout = dyhiLevels && typeof dyhiLevels === 'string' && dyhiLevels === 'Layout'
     if (!saveLayout && !saveSearch && dyhiLevels && dyhiLevels.length) {
@@ -219,6 +220,7 @@ export default connect(state => ({
   isolatedId: state.assets.isolatedId,
   order: state.assets.order,
   query: state.assets.query,
+  selectedJobIds: state.jobs.selectedIds,
   selectedFolderIds: state.folders.selectedFolderIds,
   trashedFolders: state.folders.trashedFolders,
   similar: state.racetrack.similar,

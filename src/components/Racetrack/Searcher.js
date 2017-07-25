@@ -11,7 +11,7 @@ import TrashedFolder from '../../models/TrashedFolder'
 import { searchAssets, getAssetFields, requiredFields } from '../../actions/assetsAction'
 import { countAssetsInFolderIds, clearFolderCountQueue } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
-import { MapWidgetInfo, CollectionsWidgetInfo, SortOrderWidgetInfo, SimilarHashWidgetInfo } from './WidgetInfo'
+import { MapWidgetInfo, CollectionsWidgetInfo, SortOrderWidgetInfo, SimilarHashWidgetInfo, ImportSetWidgetInfo } from './WidgetInfo'
 
 // Searcher is a singleton. It combines AssetSearches from the Racetrack
 // and Folders and submits a new query to the Archivist server.
@@ -24,6 +24,7 @@ class Searcher extends Component {
     folderCounts: PropTypes.instanceOf(Map),
     filteredFolderCounts: PropTypes.instanceOf(Map),
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
+    selectedJobIds: PropTypes.instanceOf(Set),
     order: PropTypes.arrayOf(PropTypes.object),
     similar: PropTypes.shape({
       field: PropTypes.string,
@@ -129,8 +130,9 @@ class Searcher extends Component {
   // facet are placed in a filter-bucket with the allOtherFilter so
   // they show the results that do not include their own filter.
   // Note that post-filter is less efficient than a standard filter.
-  static build = (widgets, nonTrashedFolderIds, order, similar) => {
+  static build = (widgets, nonTrashedFolderIds, selectedJobIds, order, similar) => {
     let foldersDisabled = false
+    let importsDisabled = false
     let orderDisabled = false
     let similarDisabled = false
     let assetSearch = new AssetSearch()
@@ -141,6 +143,7 @@ class Searcher extends Component {
         if (widget.type === CollectionsWidgetInfo.type) foldersDisabled = !widget.isEnabled
         if (widget.type === SortOrderWidgetInfo.type) orderDisabled = !widget.isEnabled
         if (widget.type === SimilarHashWidgetInfo.type) similarDisabled = !widget.isEnabled
+        if (widget.type === ImportSetWidgetInfo.type) importsDisabled = !widget.isEnabled
         if (!widget.sliver) continue
         let sliver = widget.sliver
         if (sliver.aggs) {
@@ -172,6 +175,12 @@ class Searcher extends Component {
     // Add a filter for selected folders
     if (!foldersDisabled && nonTrashedFolderIds && nonTrashedFolderIds.length) {
       const filter = new AssetFilter({links: {folder: nonTrashedFolderIds}})
+      assetSearch.merge(new AssetSearch({filter}))
+    }
+
+    // Add a filter for the selected imports
+    if (!importsDisabled && selectedJobIds.size) {
+      const filter = new AssetFilter({links: {import: [...selectedJobIds]}})
       assetSearch.merge(new AssetSearch({filter}))
     }
 
@@ -219,14 +228,14 @@ class Searcher extends Component {
     const {
       widgets, actions, selectedFolderIds, query,
       modifiedFolderIds, trashedFolders, order,
-      similar, showMultipage,
+      similar, showMultipage, selectedJobIds,
       metadataFields, lightbarFields, thumbFields, dragFields, fieldTypes
     } = this.props
     if (!fieldTypes) return null
 
     // Server does not support searching of trashed folders
     const nonTrashedFolderIds = Searcher.nonTrashedFolderIds(selectedFolderIds, trashedFolders)
-    const assetSearch = Searcher.build(widgets, nonTrashedFolderIds, order, similar)
+    const assetSearch = Searcher.build(widgets, nonTrashedFolderIds, selectedJobIds, order, similar)
 
     // Limit results to favorited fields, since we only display values
     // in those fields in the Table and Lightbar
@@ -293,6 +302,7 @@ const mapStateToProps = state => ({
   thumbFields: state.app.thumbFields,
   dragFields: state.app.dragFields,
   jobs: state.jobs.all,
+  selectedJobIds: state.jobs.selectedIds,
   user: state.auth.user,
   userSettings: state.app.userSettings
 })
