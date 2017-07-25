@@ -558,7 +558,7 @@ class Assets extends Component {
                   // Multipage agg optimization -- skip over children of parents with full stacks
                   const parentIds = showMultipage && parentCounts && [...parentCounts.keys()].filter(id => parentCounts.get(id) >= 3)
                   if (index === assets.length - 1 && index < positions.length &&
-                    loadedCount < filteredCount && parentIds &&
+                    loadedCount < filteredCount && (!showMultipage || parentIds) &&
                     this.loaded !== assets.length) {
                     this.loaded = assets.length
                     var nextPageQuery = new AssetSearch(query)
