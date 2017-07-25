@@ -8,7 +8,7 @@ import AssetFilter from '../models/AssetFilter'
 import { SimpleSearchWidgetInfo } from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
 import { selectFolderIds } from './folderAction'
-import { similarAssets, orderAssets } from './assetsAction'
+import { orderAssets } from './assetsAction'
 
 export function modifyRacetrackWidget (widget) {
   assert.ok(widget instanceof Widget)

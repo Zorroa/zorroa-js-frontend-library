@@ -44,14 +44,15 @@
   cursor: pointer;
   border: none;
 
-  .Metadata.dark & {
-    color: $zorroa-gray;
-    background-color: $zorroa-darkgray;
+  &:hover:not(.isSelected) {
+    background-color: transparent;
+    border: 1px solid $zorroa-nearwhite;
   }
 
+  .Metadata.dark & { background-color: $zorroa-nearblack; }
   &.isSelected { color: $zorroa-golden-yellow; }
 
-  &:hover {
+  &:hover:not(.isSelected) {
     background-color: transparent;
     border: 1px solid $zorroa-nearwhite;
   }
