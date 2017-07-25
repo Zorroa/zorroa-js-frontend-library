@@ -156,7 +156,7 @@
     border-radius: 3px;
     @include flexRowCenter;
 
-    &:not(.thumb-layout-enabled):hover { color: lighten($zorroa-sickly-green, 15%); }
+    &:not(.thumb-layout-enabled):hover { color: $zorroa-hover-green; }
   }
 
   .thumb-layout-enabled {
@@ -188,7 +188,7 @@
     cursor: pointer;
     border-radius: 3px;
     @include flexRowCenter;
-    &:hover { color: lighten($zorroa-sickly-green, 15%); }
+    &:hover { color: $zorroa-hover-green; }
   }
 
   .TableToggle-enabled {
@@ -219,7 +219,7 @@
 
   &.MultipageToggle-enabled {
     color: $zorroa-sickly-green;
-    &:hover { color: lighten($zorroa-sickly-green, 15%); }
+    &:hover { color: $zorroa-hover-green; }
     &:not(.dark) { background-color: rgba(96,96,96,0.75)}
   }
 }
