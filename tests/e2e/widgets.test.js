@@ -166,6 +166,109 @@ describe('search widget', function () {
     .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Widget'), 5000))
   })
 
+  it('double facet', function () {
+    let text1, text2, text3, text4
+
+    return driver
+      .then(_ => { DEBUG && console.log('------ check two facet widgets') })
+
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racebar-add-widget')))
+      .then(_ => selenium.clickSelector(By.css('.Racebar-add-widget')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.widget-FACET')))
+      .then(_ => selenium.clickSelector(By.css('.widget-FACET')))
+
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.modal .DisplayOptions'), 5000))
+      .then(_ => selenium.expectSelectorHasClassToBe(true, By.css('.DisplayOptions-update'), 'disabled'))
+      .then(_ => selenium.clickSelector(By.css('.DisplayOptions-namespace-Disney')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.DisplayOptions-namespace-Disney-animators'), 5000))
+      .then(_ => selenium.clickSelector(By.css('.DisplayOptions-namespace-Disney-animators input')))
+      .then(_ => selenium.waitForSelectorHasClassToBe(false, By.css('.DisplayOptions-update'), 'disabled', 5000))
+      .then(_ => selenium.waitForSelectorEnabledToBe(true, By.css('.DisplayOptions-update')))
+      .then(_ => selenium.clickSelector(By.css('.DisplayOptions-update')))
+      .then(selenium.waitForIdle)
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Facet'), 5000))
+
+      .then(_ => selenium.expectSelectorHasClassToBe(true, By.css('.Facet'), 'isEnabled'))
+      .then(_ => driver.findElement(By.css('.asset-counter-total')))
+      .then(ele => ele.getText())
+      .then(text => text1 = text)
+      .then(_ => { DEBUG && console.log('Count with no selected facets ' + text1) })
+
+      .then(_ => { DEBUG && console.log('Expect animator names') })
+      // click on the first row
+
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Facet-value-table-row')))
+      .then(_ => selenium.clickSelector(By.css('.Facet-value-table-row')))
+      .then(selenium.waitForIdle)
+
+      .then(_ => driver.findElement(By.css('.Facet-value-key')))
+      .then(ele => ele.getText())
+      .then(text => expect(text).toBe('Vladimir Tytla'))
+
+      .then(_ => driver.findElement(By.css('.asset-counter-total')))
+      .then(ele => ele.getText())
+      .then(text => text2 = text)
+      .then(_ => { DEBUG && console.log('Count with one selected facets ' + text2) })
+      .then(_ => { expect(Number(text2)).toBeLessThan(Number(text1)) })
+
+      // Open a second facet
+      .then(_ => { DEBUG && console.log('Open a second facet on document type') })
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racebar-add-widget')))
+      .then(_ => selenium.clickSelector(By.css('.Racebar-add-widget')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.widget-FACET')))
+      .then(_ => selenium.clickSelector(By.css('.widget-FACET')))
+
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.modal .DisplayOptions'), 5000))
+      .then(_ => selenium.expectSelectorHasClassToBe(true, By.css('.DisplayOptions-update'), 'disabled'))
+      .then(_ => selenium.clickSelector(By.css('.DisplayOptions-namespace-Disney')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.DisplayOptions-namespace-Disney-documentType'), 5000))
+      .then(_ => selenium.clickSelector(By.css('.DisplayOptions-namespace-Disney-documentType input')))
+      .then(_ => selenium.waitForSelectorHasClassToBe(false, By.css('.DisplayOptions-update'), 'disabled', 5000))
+      .then(_ => selenium.waitForSelectorEnabledToBe(true, By.css('.DisplayOptions-update')))
+      .then(_ => selenium.clickSelector(By.css('.DisplayOptions-update')))
+      .then(selenium.waitForIdle)
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Facet'), 5000))
+
+      .then(_ => { DEBUG && console.log('Expect document types') })
+      // click on the first row
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Facet-value-table-row')))
+      .then(_ => selenium.clickSelector(By.css('.Facet-value-table-row')))
+      .then(selenium.waitForIdle)
+
+      .then(_ => driver.findElement(By.css('.Facet-value-key')))
+      .then(ele => ele.getText())
+      .then(text => expect(text).toBe('Final Frame'))
+
+      .then(_ => selenium.expectSelectorHasClassToBe(true, By.css('.Facet'), 'isEnabled'))
+      .then(_ => driver.findElement(By.css('.asset-counter-total')))
+      .then(ele => ele.getText())
+      .then(text => text3 = text)
+      // FIXME: Removing this console.log breaks the test??
+      .then(_ => { DEBUG && console.log('Count with two selected facets ' + text3) })
+      .then(selenium.waitForIdle)
+
+      .then(_ => { expect(Number(text3)).toBe(103) })
+      .then(_ => { expect(Number(text2)).toBeGreaterThan(Number(text3)) })
+
+      .then(_ => { DEBUG && console.log('Closing both facet widgets') })
+      .then(_ => driver.findElement(By.css('.WidgetHeader-close')))
+      .then(ele => ele.click())
+      .then(selenium.waitForIdle)
+
+      .then(_ => driver.findElement(By.css('.WidgetHeader-close')))
+      .then(ele => ele.click())
+      .then(selenium.waitForIdle)
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Widget'), 5000))
+
+      .then(_ => { DEBUG && console.log('Double checking original count') })
+      .then(_ => driver.findElement(By.css('.asset-counter-total')))
+      .then(ele => ele.getText())
+      .then(text => text4 = text)
+
+      .then(_ => { expect(Number(text4)).toBeGreaterThan(Number(text2)) })
+      .then(_ => { expect(text4).toMatch(text1) })
+  })
+
   // NB no map widget -- no geo data on dev
 
   it('check color widget', function () {
@@ -406,5 +509,4 @@ describe('search widget', function () {
       .then(selenium.waitForIdle)
       .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Widget'), 5000))
   })
-
 })

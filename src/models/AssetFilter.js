@@ -156,39 +156,41 @@ export default class AssetFilter {
       (this.hamming ? 1 : 0)
 
     if (count > 1) {
+      const filter = new AssetFilter(this)
       const must = []
-      if (this.terms) {
-        let terms = this.terms
-        delete this.terms
+      if (filter.terms) {
+        let terms = filter.terms
+        delete filter.terms
         for (let termKey in terms) {
           must.push({terms: {[termKey]: terms[termKey]}})
         }
       }
-      if (this.range) {
-        let range = this.range
-        delete this.range
+      if (filter.range) {
+        let range = filter.range
+        delete filter.range
         for (let rangeKey in range) {
           must.push({range: {[rangeKey]: range[rangeKey]}})
         }
       }
-      if (this.exists) {
-        let exists = this.exists
-        delete this.exists
+      if (filter.exists) {
+        let exists = filter.exists
+        delete filter.exists
         must.push({exists})
       }
-      if (this.missing) {
-        let missing = this.missing
-        delete this.missing
+      if (filter.missing) {
+        let missing = filter.missing
+        delete filter.missing
         must.push({missing})
       }
-      if (this.scripts) {
-        let scripts = this.scripts
-        delete this.scripts
+      if (filter.scripts) {
+        let scripts = filter.scripts
+        delete filter.scripts
         must.push({scripts})
       }
-      this.bool = { must }
+      filter.bool = { must }
+      return filter   // Allow chaining
     }
-    return this   // Allow chaining
+    return this
   }
 }
 
