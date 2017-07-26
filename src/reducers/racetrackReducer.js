@@ -138,7 +138,7 @@ export default function (state = initialState, action) {
         similar.ofsIds = []
         const index = state.widgets.findIndex(widget => (widget.type === SortOrderWidgetInfo.type))
         if (index < 0) {
-          const widget = new Widget({type: SortOrderWidgetInfo.type})
+          const widget = SortOrderWidgetInfo.create()
           widgets.push(widget)
         }
       }
@@ -154,7 +154,7 @@ export default function (state = initialState, action) {
       if (selectedFolderIds.size) {
         const index = state.widgets.findIndex(widget => (widget.type === CollectionsWidgetInfo.type))
         if (index < 0) {
-          const widget = new Widget({ type: CollectionsWidgetInfo.type })
+          const widget = CollectionsWidgetInfo.create()
           const widgets = [...state.widgets, widget]
           return { ...state, widgets }
         }

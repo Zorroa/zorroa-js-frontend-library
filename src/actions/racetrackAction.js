@@ -5,7 +5,7 @@ import Widget, { createFacetWidget, createExistsWidget, createMapWidget,
   createFiletypeWidget, createColorWidget, createSortOrderWidget } from '../models/Widget'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
-import { SimpleSearchWidgetInfo } from '../components/Racetrack/WidgetInfo'
+import { CollectionsWidgetInfo, SimpleSearchWidgetInfo, SortOrderWidgetInfo } from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
 import { selectFolderIds } from './folderAction'
 import { orderAssets } from './assetsAction'
@@ -203,7 +203,7 @@ function restoreWidgetSlivers (widgets, search) {
   const isEnabled = true
   const isPinned = false
 
-  const findWidget = (field) => widgets.find(widget => (widget.field === field))
+  const findWidget = (field, type) => widgets.find(widget => (widget.field === field || widget.type === type))
 
   // Create a facet for each term.
   // FIXME: Maps create a term facet too!
@@ -282,7 +282,7 @@ function restoreWidgetSlivers (widgets, search) {
 
   // Set the sort order
   if (search.order) {
-    const order = findWidget('_order')
+    const order = findWidget('_order', SortOrderWidgetInfo.type)
     if (order) {
       order.sliver = new AssetSearch({order: search.order})
     } else {
@@ -295,7 +295,7 @@ function restoreWidgetSlivers (widgets, search) {
   // FIXME: Should look in postFilter for completeness?
   let selectedFolderIds
   if (search.filter && search.filter.links && search.filter.links.folder && search.filter.links.folder.length) {
-    const collections = findWidget('_collections')
+    const collections = findWidget('_collections', CollectionsWidgetInfo.type)
     if (!collections) {
       selectedFolderIds = new Set([...search.filter.links.folder])
       const w = createCollectionsWidget('_collections', undefined, isEnabled, isPinned)
@@ -318,7 +318,7 @@ function restoreActions (widgets, search, selectedFolderIds, mergedSimilar) {
     actions.push(orderAssets(search.order))
   }
 
-  if (similar) {
+  if (mergedSimilar) {
     actions.push(similar(mergedSimilar))
   }
 

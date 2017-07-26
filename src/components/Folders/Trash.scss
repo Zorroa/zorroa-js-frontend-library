@@ -49,6 +49,8 @@ $TrashHeight : 25px;
   padding-right: 10px;
   background-color: white;
   font-size: 12px;
+
+  .dark & { background-color: black; }
 }
 
 .Trash-count {
@@ -72,6 +74,8 @@ $TrashHeight : 25px;
   margin-top: 7px;
   margin-bottom: 7px;
   cursor: pointer;
+
+  &:hover { background-color: darken($zorroa-faded-red, 15%); }
 }
 
 .Trash-items {
@@ -80,6 +84,8 @@ $TrashHeight : 25px;
 
   &:nth-child(odd) {
     background-color: white;
+
+    .dark & { background-color: black; }
   }
 }
 
