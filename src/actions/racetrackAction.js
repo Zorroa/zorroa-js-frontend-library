@@ -5,10 +5,10 @@ import Widget, { createFacetWidget, createExistsWidget, createMapWidget,
   createFiletypeWidget, createColorWidget, createSortOrderWidget } from '../models/Widget'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
-import { SimpleSearchWidgetInfo } from '../components/Racetrack/WidgetInfo'
+import { CollectionsWidgetInfo, SimpleSearchWidgetInfo, SortOrderWidgetInfo } from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
 import { selectFolderIds } from './folderAction'
-import { similarAssets, orderAssets } from './assetsAction'
+import { orderAssets } from './assetsAction'
 
 export function modifyRacetrackWidget (widget) {
   assert.ok(widget instanceof Widget)
@@ -35,16 +35,29 @@ export function resetRacetrackWidgets (widgets) {
 export function similar (similar) {
   const maxValues = 10
   if (similar && similar.values && similar.values.length > maxValues) {
-    assert.ok(similar.assetIds.length === similar.values.length)
+    assert.ok(similar.ofsIds.length === similar.values.length)
     assert.ok(similar.weights.length === similar.values.length)
     similar.values = similar.values.slice(0, maxValues)
-    similar.assetIds = similar.assetIds.slice(0, maxValues)
+    similar.ofsIds = similar.ofsIds.slice(0, maxValues)
     similar.weights = similar.weights.slice(0, maxValues)
   }
   return ({
     type: SIMILAR_VALUES,
     payload: similar
   })
+}
+
+// Extract similar values from search
+function extractSimilar (search) {
+  if (search.filter && search.filter.hamming) {
+    return ({
+      field: search.filter.hamming.field,
+      values: search.filter.hamming.hashes,
+      ofsIds: search.filter.hamming.assetIds,
+      weights: search.filter.hamming.weights,
+      minScore: search.filter.hamming.minScore
+    })
+  }
 }
 
 // Merge widgets from multiple folders and restore search and related state
@@ -108,7 +121,7 @@ export function restoreFolders (folders) {
 
   // Do not restore selected folders to avoid infinite recursion
   const selectedFolderIds = restoreWidgetSlivers(widgets, search)
-  return restoreActions(widgets, search, selectedFolderIds)
+  return restoreActions(widgets, search, selectedFolderIds, mergedSimilar)
 }
 
 // Reconstruct Racetrack widgets from a search.
@@ -177,8 +190,9 @@ function restoreSearch (search) {
     })
   }
 
+  const mergedSimilar = extractSimilar(search)
   const selectedFolderIds = restoreWidgetSlivers(widgets, search)
-  return restoreActions(widgets, search, selectedFolderIds)
+  return restoreActions(widgets, search, selectedFolderIds, mergedSimilar)
 }
 
 // Helper function to extract widget slivers from the search,
@@ -189,7 +203,7 @@ function restoreWidgetSlivers (widgets, search) {
   const isEnabled = true
   const isPinned = false
 
-  const findWidget = (field) => widgets.find(widget => (widget.field === field))
+  const findWidget = (field, type) => widgets.find(widget => (widget.field === field || widget.type === type))
 
   // Create a facet for each term.
   // FIXME: Maps create a term facet too!
@@ -268,7 +282,7 @@ function restoreWidgetSlivers (widgets, search) {
 
   // Set the sort order
   if (search.order) {
-    const order = findWidget('_order')
+    const order = findWidget('_order', SortOrderWidgetInfo.type)
     if (order) {
       order.sliver = new AssetSearch({order: search.order})
     } else {
@@ -281,7 +295,7 @@ function restoreWidgetSlivers (widgets, search) {
   // FIXME: Should look in postFilter for completeness?
   let selectedFolderIds
   if (search.filter && search.filter.links && search.filter.links.folder && search.filter.links.folder.length) {
-    const collections = findWidget('_collections')
+    const collections = findWidget('_collections', CollectionsWidgetInfo.type)
     if (!collections) {
       selectedFolderIds = new Set([...search.filter.links.folder])
       const w = createCollectionsWidget('_collections', undefined, isEnabled, isPinned)
@@ -294,7 +308,7 @@ function restoreWidgetSlivers (widgets, search) {
 
 // Helper function to return an array of actions needed to restore
 // app state to match the widgets, search, and selected folders.
-function restoreActions (widgets, search, selectedFolderIds) {
+function restoreActions (widgets, search, selectedFolderIds, mergedSimilar) {
   // Return actions to update the racetrack for the new search
   const actions = [resetRacetrackWidgets(widgets)]
   actions.push(selectFolderIds(selectedFolderIds))
@@ -304,18 +318,8 @@ function restoreActions (widgets, search, selectedFolderIds) {
     actions.push(orderAssets(search.order))
   }
 
-  // Create a SimilarHash widget if there's a hash query
-  // FIXME: Should look in postFilter for completeness?
-  if (search.filter && search.filter.hamming) {
-    actions.push(similar({
-      field: search.filter.hamming.field,
-      values: search.filter.hamming.hashes,
-      assetIds: search.filter.hamming.assetIds,
-      weights: search.filter.hamming.weights,
-      minScore: search.filter.hamming.minScore
-    }))
-    const fields = [search.filter.hamming.field, 'image.width', 'image.height', 'video.width', 'video.height', 'proxies*']
-    actions.push(similarAssets(search.filter.hamming.assetIds, fields))
+  if (mergedSimilar) {
+    actions.push(similar(mergedSimilar))
   }
 
   // Reset the racetrack to the new widget

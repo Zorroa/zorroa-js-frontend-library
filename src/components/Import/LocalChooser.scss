@@ -10,6 +10,7 @@
 }
 
 .LocalChooser-start {
+  @include flexRowCenter;
   margin-top: 40px;
   margin-bottom: 40px;
 }
@@ -228,4 +229,18 @@ $dropcolor: rgba(115, 182, 28, 0.1);
 .LocalChooser-upload-type {
   width: 1px;
   @include nowrap;
+}
+
+.LocalChooser-similar {
+  @include flexRowCenter;
+}
+
+.LocalChooser-similar-label {
+  margin-left: 4px;
+  color: $zorroa-gray;
+}
+
+.LocalChooser-button {
+  width: 240px;
+  @include flexRowCenter;
 }

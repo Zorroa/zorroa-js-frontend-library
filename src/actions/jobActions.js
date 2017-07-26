@@ -1,6 +1,7 @@
 import * as assert from 'assert'
 
 import Job from '../models/Job'
+import Asset from '../models/Asset'
 import Pipeline from '../models/Pipeline'
 import AssetSearch from '../models/AssetSearch'
 import {
@@ -191,4 +192,33 @@ export function dequeueUploadFileEntrys (fileEntries) {
     type: DEQUEUE_UPLOADED_FILE_ENTRIES,
     payload: fileEntries
   })
+}
+
+export function analyzeFileEntries (actionType, files, pipeline, args, onUploadProgress) {
+  return dispatch => {
+    const body = { pipeline }
+    const formData = new FormData()
+    formData.append('body', JSON.stringify(body))
+    formData.append('args', JSON.stringify(args))
+    files.forEach(file => { formData.append('files', file, file.name) })
+    const request = {
+      method: 'post',
+      url: '/api/v1/analyze/_files',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      onUploadProgress,
+      data: formData
+    }
+    archivistRequest(dispatch, request)
+      .then(response => {
+        console.log('Analyze assets: ' + JSON.stringify(response.data))
+        const assets = response.data.list.map(asset => (new Asset(asset)))
+        dispatch({
+          type: actionType,
+          payload: assets
+        })
+      })
+      .catch(error => {
+        console.error('Error uploading ' + files.length + ' files: ' + error)
+      })
+  }
 }

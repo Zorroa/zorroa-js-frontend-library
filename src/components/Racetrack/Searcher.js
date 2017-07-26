@@ -28,7 +28,7 @@ class Searcher extends Component {
     similar: PropTypes.shape({
       field: PropTypes.string,
       values: PropTypes.arrayOf(PropTypes.string),
-      assetIds: PropTypes.arrayOf(PropTypes.string)
+      ofsIds: PropTypes.arrayOf(PropTypes.string)
     }),
     fieldTypes: PropTypes.object,
     showMultipage: PropTypes.bool,
@@ -190,7 +190,7 @@ class Searcher extends Component {
         hamming: {
           field: similar.field,
           hashes: similar.values,
-          assetIds: similar.assetIds,
+          ofsIds: similar.ofsIds,
           weights: similar.weights,
           minScore: avgWeight * (similar.minScore || 75)
         }

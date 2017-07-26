@@ -103,6 +103,12 @@ export function assetsForIds (assetIds, fields) {
 }
 
 export function similarAssets (assetIds, fields) {
+  if (!assetIds || !assetIds.length) {
+    return ({
+      type: SIMILAR_ASSETS,
+      payload: []
+    })
+  }
   return dispatch => {
     assetsForIds(assetIds, fields)
       .then(assets => dispatch({
@@ -148,8 +154,11 @@ export function searchAssets (query, lastQuery, force, isFirstPage, parentIds) {
       const aggQuery = new AssetSearch(query)
 
       // Add an agg for all parents
-      const parentAggs = { parentCounts: {filter: query.postFilter || {}, aggs: {parentCounts: {terms: {field: 'source.clip.parent.raw', size: 1000}}}} }
-      aggQuery.merge(new AssetSearch({ aggs: parentAggs }))
+      if (parentIds) {
+        const filter = query.postFilter ? query.postFilter.convertToBool() : {}
+        const parentAggs = { parentCounts: {filter, aggs: {parentCounts: {terms: {field: 'source.clip.parent.raw', size: 1000}}}} }
+        aggQuery.merge(new AssetSearch({ aggs: parentAggs }))
+      }
 
       aggQuery.postFilter = null
       aggQuery.from = 0

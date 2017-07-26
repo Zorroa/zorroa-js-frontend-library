@@ -1,4 +1,5 @@
 import Import, { CLOUD_IMPORT, SERVER_IMPORT, LOCAL_IMPORT } from './Import'
+import LocalChooser from './LocalChooser'
 import './Import.scss'
 import './ImportSource.scss'
 import './ImportCloud.scss'
@@ -12,3 +13,4 @@ import './CloudproxyInstructions.scss'
 import './TutorialVideos.scss'
 export default Import
 export { CLOUD_IMPORT, SERVER_IMPORT, LOCAL_IMPORT }
+export { LocalChooser }

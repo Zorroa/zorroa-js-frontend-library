@@ -57,7 +57,7 @@ class Assets extends Component {
     similar: PropTypes.shape({
       field: PropTypes.string,
       values: PropTypes.arrayOf(PropTypes.string).isRequired,
-      assetIds: PropTypes.arrayOf(PropTypes.string).isRequired
+      ofsIds: PropTypes.arrayOf(PropTypes.string).isRequired
     }).isRequired,
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
     uxLevel: PropTypes.number,
@@ -364,13 +364,16 @@ class Assets extends Component {
 
   updateSelectedHashes = (similarField, selectedIds) => {
     if (similarField && similarField.length && selectedIds && selectedIds.size) {
-      const ids = new Set([...this.props.similar.assetIds, ...selectedIds])
+      const ids = new Set([...selectedIds])
       if (this.similarIds && equalSets(ids, this.similarIds) && this.similarField && this.similarField === similarField) return
       this.similarIds = ids
       this.similarField = similarField
       const assetIds = [...ids]
-      const fields = [similarField, 'image.width', 'image.height', 'video.width', 'video.height', 'proxies*']
+      const fields = [similarField, 'proxies*']
       this.props.actions.similarAssets(assetIds, fields)
+    } else {
+      this.similarIds = null
+      this.props.actions.similarAssets()
     }
   }
 
@@ -506,7 +509,7 @@ class Assets extends Component {
 
     if (!assets || !assets.length) {
       return (
-        <div className="assets-layout-empty flexCol flexJustifyCenter flexAlignItemsCenter">
+        <div className="assets-layout-empty">
           <div className="assets-layout-icon icon-search"/>
           { query && !query.empty() && <div>No results</div> }
           { query && !query.empty() && <button onClick={this.clearSearch}>Clear Search</button> }
@@ -563,7 +566,7 @@ class Assets extends Component {
                   // Multipage agg optimization -- skip over children of parents with full stacks
                   const parentIds = showMultipage && parentCounts && [...parentCounts.keys()].filter(id => parentCounts.get(id) >= 3)
                   if (index === assets.length - 1 && index < positions.length &&
-                    loadedCount < filteredCount && parentIds &&
+                    loadedCount < filteredCount && (!showMultipage || parentIds) &&
                     this.loaded !== assets.length) {
                     this.loaded = assets.length
                     var nextPageQuery = new AssetSearch(query)

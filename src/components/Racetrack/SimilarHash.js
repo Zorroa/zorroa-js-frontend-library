@@ -14,8 +14,8 @@ const DEFAULT_WEIGHT = 1
 
 const similarityCache = new LRUCache({ max: 1000 })
 
-export function weights (assetIds) {
-  return assetIds.map(id => similarityCache.has(id) ? parseFloat(similarityCache.get(id)) : DEFAULT_WEIGHT)
+export function weights (ofsIds) {
+  return ofsIds.map(id => similarityCache.has(id) ? parseFloat(similarityCache.get(id)) : DEFAULT_WEIGHT)
 }
 
 class SimilarHash extends Component {
@@ -25,7 +25,7 @@ class SimilarHash extends Component {
     similar: PropTypes.shape({
       field: PropTypes.string,
       values: PropTypes.arrayOf(PropTypes.string).isRequired,
-      assetIds: PropTypes.arrayOf(PropTypes.string).isRequired,
+      ofsIds: PropTypes.arrayOf(PropTypes.string).isRequired,
       minScore: PropTypes.number
     }).isRequired,
     similarAssets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
@@ -53,23 +53,10 @@ class SimilarHash extends Component {
 
   componentWillReceiveProps = (nextProps) => {
     // initialize hashTypes first time through -- or maybe (TODO) later as well
-    const assetIds = nextProps.similar.assetIds
-    assetIds && assetIds.forEach(id => {
+    const ofsIds = nextProps.similar.ofsIds
+    ofsIds && ofsIds.forEach(id => {
       if (!similarityCache.has(id)) similarityCache.set(id, DEFAULT_WEIGHT)
     })
-  }
-
-  selectedValues = () => {
-    const { similarAssets } = this.props
-    if (!similarAssets) return
-    return similarAssets.map(asset => asset.rawValue(this.props.similar.field))
-  }
-
-  static canSortSimilar = (selectedAssetIds, field, values, curHashes) => {
-    if (!curHashes.length && selectedAssetIds.size) return true
-    // Only enable similar button if selected assets have a different hash
-    const similarValuesSelected = values && curHashes && equalSets(new Set([...values]), new Set([...curHashes]))
-    return selectedAssetIds && selectedAssetIds.size && field && field.length && !similarValuesSelected && curHashes && curHashes.length > 0
   }
 
   changeMinScore = (event) => {
@@ -87,45 +74,53 @@ class SimilarHash extends Component {
   adjustSimilarity = () => {
     const similar = {
       ...this.props.similar,
-      weights: weights(this.props.similar.assetIds),
+      weights: weights(this.props.similar.ofsIds),
       minScore: this.state.minScore
     }
     this.props.actions.similar(similar)
   }
 
+  selectedSimilar = () => {
+    const ofsIds = [...this.props.similar.ofsIds]
+    const values = [...this.props.similar.values]
+    for (var i = 0; i < this.props.similarAssets.length; ++i) {
+      const asset = this.props.similarAssets[i]
+      const ofsId = asset.closestProxy(256, 256).id
+      const exists = ofsIds.findIndex(id => (id === ofsId)) >= 0
+      if (!exists) {
+        ofsIds.push(ofsId)
+        values.push(asset.rawValue(this.props.similar.field))
+      }
+    }
+    return { values, ofsIds, weights: weights(ofsIds) }
+  }
+
   addSelected = () => {
-    const assetIds = this.props.similarAssets.map(asset => asset.id)
-    const values = this.selectedValues()
-    const similar = { values, assetIds, weights: weights(assetIds) }
+    const similar = this.selectedSimilar()
     this.props.actions.similar(similar)
   }
 
-  removeAssetId = (id) => {
-    const assetIds = [...this.props.similar.assetIds]
-    const index = assetIds.findIndex(i => i === id)
+  removeOfsId = (id) => {
+    const ofsIds = [...this.props.similar.ofsIds]
+    const index = ofsIds.findIndex(i => i === id)
     if (index >= 0) {
-      assetIds.splice(index, 1)
+      ofsIds.splice(index, 1)
       const values = [...this.props.similar.values]
       values.splice(index, 1)
-      const similar = { values, assetIds, weights: weights(assetIds) }
+      const similar = { values, ofsIds, weights: weights(ofsIds) }
       this.props.actions.similar(similar)
     }
   }
 
   renderThumb (id) {
-    const { similarAssets } = this.props
-    const asset = similarAssets.find(asset => asset.id === id)
-    let style
-    if (asset) {
-      const height = 120
-      const aspect = asset.aspect() || asset.proxyAspect() || 1
-      const width = aspect * height
-      const url = asset.closestProxyURL(this.props.origin, width, height)
-      style = { backgroundImage: `url(${url})`, minWidth: width, minHeight: height }
-    }
+    const { origin } = this.props
+    const url = Asset.ofsURL(id, origin)
+    const width = 120
+    const height = 90
+    const style = { backgroundImage: `url(${url})`, minWidth: width, minHeight: height }
     return (
       <div className="SimilarHash-thumb" key={id} style={style}>
-        <div className="SimilarHash-thumb-cancel icon-cancel-circle" onClick={_ => this.removeAssetId(id)}/>
+        <div className="SimilarHash-thumb-cancel icon-cancel-circle" onClick={_ => this.removeOfsId(id)}/>
         <div className={classnames('SimilarHash-thumb-thumbs-up', 'icon-thumbs-up', {selected: similarityCache.get(id) > 0})}
              onClick={_ => this.changeSimilarity(id, 1)}/>
         <div className={classnames('SimilarHash-thumb-thumbs-down', 'icon-thumbs-up', {selected: similarityCache.get(id) < 0})}
@@ -135,14 +130,13 @@ class SimilarHash extends Component {
   }
 
   render () {
-    const { id, floatBody, isOpen, onOpen, isIconified, similar, selectedAssetIds } = this.props
+    const { id, floatBody, isOpen, onOpen, isIconified, similar } = this.props
     const { minScore } = this.state
-    const adjustable = similar && similar.assetIds
-    const disabled = !selectedAssetIds || !selectedAssetIds.size ||
-        (similar.values && similar.values.length >= 10) ||
+    const adjustable = similar && similar.ofsIds
+    const selectedSimilar = this.selectedSimilar()
+    const disabled = !selectedSimilar.values || !selectedSimilar.values.length || selectedSimilar.values.length > 10 ||
         !similar.field || !similar.field.length ||
-        !SimilarHash.canSortSimilar(selectedAssetIds, similar.field,
-          this.selectedValues(), similar.values)
+        equalSets(new Set([...similar.values]), new Set([...selectedSimilar.values]))
     const field = similar.field.replace(/^similarity\./, '').replace(/^Similarity\./, '').replace(/\.raw$/, '')
     return (
       <Widget className="SimilarHash"
@@ -157,8 +151,8 @@ class SimilarHash extends Component {
               icon={SimilarHashWidgetInfo.icon}>
         <div className="SimilarHash-body">
           <div className="SimilarHash-carousel">
-            { similar.assetIds.map(id => this.renderThumb(id)) }
-            { !similar.assetIds.length && (
+            { similar.ofsIds.map(id => this.renderThumb(id)) }
+            { !similar.ofsIds.length && (
               <div className="SimilarHash-carousel-empty">
                 <div className="SimilarHash-carousel-empty-icon icon-emptybox"/>
                 <div className="SimilarHash-carousel-empty-label">

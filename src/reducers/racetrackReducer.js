@@ -1,13 +1,14 @@
 import {
   MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS,
-  SIMILAR_VALUES, ASSET_ORDER, ASSET_SORT, ASSET_FIELDS, SELECT_FOLDERS, UNAUTH_USER } from '../constants/actionTypes'
+  SIMILAR_VALUES, ASSET_ORDER, ASSET_SORT, ASSET_FIELDS, SELECT_FOLDERS,
+  ANALYZE_SIMILAR, UNAUTH_USER } from '../constants/actionTypes'
 import Widget from '../models/Widget'
 import { SimilarHashWidgetInfo, CollectionsWidgetInfo, SortOrderWidgetInfo } from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
 
 const initialState = {
   widgets: [],
-  similar: { field: null, values: [], assetIds: [] }
+  similar: { field: null, values: [], ofsIds: [] }
 }
 
 function extractSimilar (similar, widget) {
@@ -65,6 +66,25 @@ function bestSimilarityField (curField, fieldTypes) {
   }
 }
 
+function updateSimilarity (similar, state) {
+  assert.ok(Array.isArray(similar.values))
+  assert.ok(Array.isArray(similar.ofsIds))
+  // Backwards compatibility for saved searches prior to weights
+  if (similar.values && (!similar.weights || similar.weights.length !== similar.values.length)) similar.weights = similar.values.map(_ => (1))
+  assert.ok(Array.isArray(similar.weights))
+  assert.ok(similar.values.length === similar.ofsIds.length)
+  assert.ok(similar.values.length === similar.weights.length)
+  assert.ok(similar.values.length <= 10)
+  const index = state.widgets.findIndex(widget => (widget.type === SimilarHashWidgetInfo.type))
+  if (index < 0) {
+    let widgets = [...state.widgets]
+    const widget = new Widget({ type: SimilarHashWidgetInfo.type })
+    widgets.push(widget)
+    return { ...state, similar, widgets }
+  }
+  return { ...state, similar }
+}
+
 export default function (state = initialState, action) {
   switch (action.type) {
     case MODIFY_RACETRACK_WIDGET: {
@@ -98,23 +118,15 @@ export default function (state = initialState, action) {
       return { ...state, widgets }
     }
     case SIMILAR_VALUES: {
-      const similar = action.payload ? { ...state.similar, ...action.payload } : { ...state.similar, values: [], assetIds: [], weights: [] }
-      assert.ok(Array.isArray(similar.values))
-      assert.ok(Array.isArray(similar.assetIds))
-      // Backwards compatibility for saved searches prior to weights
-      if (similar.values && (!similar.weights || similar.weights.length !== similar.values.length)) similar.weights = similar.values.map(_ => (1))
-      assert.ok(Array.isArray(similar.weights))
-      assert.ok(similar.values.length === similar.assetIds.length)
-      assert.ok(similar.values.length === similar.weights.length)
-      assert.ok(similar.values.length <= 10)
-      const index = state.widgets.findIndex(widget => (widget.type === SimilarHashWidgetInfo.type))
-      if (index < 0) {
-        let widgets = [...state.widgets]
-        const widget = new Widget({ type: SimilarHashWidgetInfo.type })
-        widgets.push(widget)
-        return { ...state, similar, widgets }
-      }
-      return { ...state, similar }
+      const similar = action.payload ? { ...state.similar, ...action.payload } : { ...state.similar, values: [], ofsIds: [], weights: [] }
+      return updateSimilarity(similar, state)
+    }
+    case ANALYZE_SIMILAR: {
+      const assets = action.payload
+      const values = assets.map(asset => asset.rawValue(state.similar.field))
+      const ofsIds = assets.map(asset => asset.closestProxy(256, 256).id)
+      const similar = { ...state.similar, values, ofsIds }
+      return updateSimilarity(similar, state)
     }
     case ASSET_ORDER:
     case ASSET_SORT: {
@@ -123,10 +135,10 @@ export default function (state = initialState, action) {
       if (action.type === ASSET_SORT || (action.payload && action.payload.length > 0)) {
         // Actively sorting by another field, remove all similar assets, add a sort widget if needed
         similar.values = []
-        similar.assetIds = []
+        similar.ofsIds = []
         const index = state.widgets.findIndex(widget => (widget.type === SortOrderWidgetInfo.type))
         if (index < 0) {
-          const widget = new Widget({type: SortOrderWidgetInfo.type})
+          const widget = SortOrderWidgetInfo.create()
           widgets.push(widget)
         }
       }
@@ -142,7 +154,7 @@ export default function (state = initialState, action) {
       if (selectedFolderIds.size) {
         const index = state.widgets.findIndex(widget => (widget.type === CollectionsWidgetInfo.type))
         if (index < 0) {
-          const widget = new Widget({ type: CollectionsWidgetInfo.type })
+          const widget = CollectionsWidgetInfo.create()
           const widgets = [...state.widgets, widget]
           return { ...state, widgets }
         }

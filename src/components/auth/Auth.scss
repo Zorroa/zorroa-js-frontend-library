@@ -62,7 +62,7 @@
   background-color: $zorroa-sickly-green;
   text-transform: uppercase;
   &.disabled { background-color: $zorroa-lightgray; }
-  &:hover:not(.disabled) { background-color: lighten($zorroa-sickly-green, 15%); }
+  &:hover:not(.disabled) { background-color: $zorroa-hover-green; }
   &:active:not(.disabled) { background-color: $zorroa-water-blue; }
 }
 
