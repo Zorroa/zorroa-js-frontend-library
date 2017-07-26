@@ -419,7 +419,7 @@ export function logout () {
 export function login () {
   return logout()
   .then(_ => { DEBUG && console.log('loggin in') })
-  .then(_ => driver.get(`${BASE_URL}`))
+  .then(_ => driver.get(`${BASE_URL}/?ClearSessionState=1`))
   .then(_ => driver.executeScript('window.zorroa.setSeleniumTesting(true)'))
   .then(_ => driver.findElement(By.css('input[name="username"]')).sendKeys('selenium'))
   .then(_ => driver.findElement(By.css('input[name="password"]')).sendKeys('z0rr0@12'))
