@@ -87,7 +87,7 @@ class ImportSet extends Component {
             { selectedJobs.map(job => (
               <div className="ImportSet-import" key={job.id}>
                 <div className="ImportSet-import-name">{job.name}</div>
-                <div className="ImportSet-import-close icon-cross2" onClick={e => this.closeJob(job, e)}/>
+                <div className="ImportSet-import-close icon-cross" onClick={e => this.closeJob(job, e)}/>
               </div>
             ))}
           </div>

@@ -105,7 +105,8 @@ class Jobs extends Component {
             { addJob && (
               <div className={classnames('Jobs-controls-add', {disabled: !addJobEnabled})}
                    title={`Create a new ${jobType}`} onClick={addJobEnabled && addJob}>
-                <div className="icon-plus2"/>
+                <div className="icon-import2"/>
+                <div className="Jobs-controls-add-label">NEW</div>
               </div>
             )}
           </div>

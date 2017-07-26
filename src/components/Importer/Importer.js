@@ -149,7 +149,7 @@ class Importer extends Component {
                   <div className="Importer-filter-icon icon-search"/>
                 </div>
                 <div className="Importer-add-processor" onClick={this.addProcessor}>
-                  <div className="Importer-add-processor-icon icon-plus2"/>
+                  <div className="Importer-add-processor-icon icon-plus"/>
                 </div>
               </div>
               { filteredPipeline.map(processor => (

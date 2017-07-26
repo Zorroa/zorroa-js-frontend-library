@@ -45,7 +45,7 @@ class ImporterBar extends Component {
             <div className="icon-envelope"/>
             <div>Email</div>
           </div>
-          <div className="ImporterBar-close icon-cross2" onClick={this.close} />
+          <div className="ImporterBar-close icon-cross" onClick={this.close} />
         </div>
       </div>
     )

@@ -367,7 +367,7 @@ class Workspace extends Component {
       isOpen: app.collapsibleOpen.importJobs,
       isIconified: app.leftSidebarIsIconified,
       onOpen: this.toggleCollapsible.bind(this, 'importJobs'),
-      closeIcon: 'icon-import',
+      closeIcon: 'icon-import2',
       className: 'ImportJobs-collapsible'
     })
     const ExportJobsParams = () => ({

@@ -142,7 +142,7 @@ export const SortOrderWidgetInfo = {
 
 export const ImportSetWidgetInfo = {
   type: 'IMPORTSET',
-  icon: 'icon-import',
+  icon: 'icon-import2',
   title: 'Import',
   description: 'Filter by import',
   element: <ImportSet/>,
