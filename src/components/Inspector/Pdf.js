@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 
-import Progress from '../Progress'
+import ProgressCircle from '../ProgressCircle'
 
 // Orignal Code: https://github.com/mikecousins/react-pdf-js
 // Core library is Pdf.js, which we now call directly.
@@ -204,7 +204,7 @@ export default class Pdf extends Component {
     }
     if (progress && progress.loaded < progress.total) {
       const percentage = Math.round(100 * progress.loaded / progress.total)
-      return (<div className="Pdf"><Progress percentage={percentage} /></div>)
+      return (<div className="Pdf"><ProgressCircle percentage={percentage} /></div>)
     }
 
     const isPreviousDisabled = pageNumber <= 1

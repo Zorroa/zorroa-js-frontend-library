@@ -34,7 +34,7 @@ export default class AssetPermissions extends Component {
       <div className="AssetPermissions">
         <div className="AssetPermissions-header">
           <div className="AssetPermissions-title">{title}</div>
-          <div className="icon-cross2" onClick={this.cancel}/>
+          <div className="icon-cross" onClick={this.cancel}/>
         </div>
         <div className="AssetPermissions-body">
           <AclEditor onChange={this.changeAcl}/>

@@ -83,13 +83,10 @@
 .Folders-controls-add {
   @include flexRowCenter;
   color: white;
-  background-color: $zorroa-sickly-green;
+  background-color: $zorroa-water-blue;
   border: none;
-  border-radius: 15px;
-  width: 30px;
-  height: 30px;
-  font-size: 14px;
-  margin: 4px;
+  border-radius: 3px;
+  padding: 4px 8px;
   cursor: pointer;
 
   &.disabled {
@@ -101,11 +98,11 @@
   &:not(.disabled) {
     &:hover {
       border: 1px solid $zorroa-gray;
-      background-color: darken($zorroa-sickly-green, 15%);
+      background-color: darken($zorroa-water-blue, 15%);
     }
     &:active {
       color: $zorroa-nearwhite;
-      background-color: darken($zorroa-sickly-green, 15%);
+      background-color: darken($zorroa-water-blue, 15%);
     }
   }
 }

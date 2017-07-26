@@ -90,7 +90,7 @@ class Lightbar extends Component {
     return (
       <div className="Lightbar" style={{height: lightbarHeight}}>
         <div className="Lightbar-metadata">
-          <div onClick={onMetadata} className={classnames('Lightbar-settings', 'icon-chevron-down', {isOpen: showMetadata})} />
+          <div onClick={onMetadata} className={classnames('Lightbar-settings', 'icon-arrow-down', {isOpen: showMetadata})} />
           <FieldTemplate asset={asset} template={lightbarFieldTemplate} extensionOnLeft={true}/>
         </div>
         <div className="Lightbar-actions" style={{width: actionWidth, minWidth: actionWidth}}>
@@ -106,7 +106,7 @@ class Lightbar extends Component {
           <div onClick={!isAddToCollectionDisabled && this.showFolders}
                className={classnames('Lightbar-action', {isDisabled: isAddToCollectionDisabled})}>
             <span className='Lightbar-action-text'>Add to Collection</span>
-            <i className='Lightbar-btn-icon icon-chevron-down'/>
+            <i className='Lightbar-btn-icon icon-arrow-down'/>
             { showFolders && (
               <div className="Lightbar-folders" onClick={e => { e.stopPropagation() }}>
                 <Folders filterName="simple" onSelect={this.addToCollection}
@@ -115,7 +115,7 @@ class Lightbar extends Component {
             )}
             { addingToCollection && <div className="Lightbar-performed-action">{addingToCollection}</div> }
           </div>
-          <div className="Lightbar-close icon-cross2" onClick={this.closeLightbox.bind(this)} />
+          <div className="Lightbar-close icon-cross" onClick={this.closeLightbox.bind(this)} />
         </div>
       </div>
     )

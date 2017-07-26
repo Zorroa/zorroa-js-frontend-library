@@ -49,7 +49,7 @@ export default class ChangePassword extends Component {
             <div className="ChangePassword-settings icon-cog"/>
             <div className="ChangePassword-title">{title}</div>
             <div className="flexOn"/>
-            <div className="ChangePassword-close icon-cross2" onClick={this.cancel}/>
+            <div className="ChangePassword-close icon-cross" onClick={this.cancel}/>
           </div>
         )}
         <div className="ChangePassword-body">

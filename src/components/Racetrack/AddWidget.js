@@ -100,7 +100,7 @@ class AddWidget extends Component {
             <div className="AddWidget-icon icon-search"/>
             <div>Add Search Widget</div>
           </div>
-          <div className='AddWidget-close icon-cross2' onClick={this.dismiss}/>
+          <div className='AddWidget-close icon-cross' onClick={this.dismiss}/>
         </div>
         <div className="controls">
           <div className="filter">

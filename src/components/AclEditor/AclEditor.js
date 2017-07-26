@@ -131,7 +131,7 @@ class AclEditor extends Component {
           <progress className="AclEditor-perm-progress" min={0} max={2} value={this.permissionValue(access) - 1} />
           <input className="AclEditor-perms-input" type="range" min="1" max="3" step="1" value={this.permissionValue(access)} onChange={this.changePermission.bind(this, permissionId)} />
         </div>
-        <div onClick={this.removePermission.bind(this, permissionId)} className="icon-cross2"/>
+        <div onClick={this.removePermission.bind(this, permissionId)} className="icon-cross"/>
       </div>
     )
   }
@@ -178,7 +178,7 @@ class AclEditor extends Component {
               <div className="AclEditor-shared-with-title">
                 <div>Shared With</div>
                 <div className="AclEditor-shared-with-perm-icons">
-                  <div className="icon-eye" onClick={this.setAccess.bind(this, this.permissionsForValue(1))} />
+                  <div className="icon-eye2" onClick={this.setAccess.bind(this, this.permissionsForValue(1))} />
                   <div className="icon-pen" onClick={this.setAccess.bind(this, this.permissionsForValue(2))} />
                   <div className="icon-export" onClick={this.setAccess.bind(this, this.permissionsForValue(3))} />
                 </div>

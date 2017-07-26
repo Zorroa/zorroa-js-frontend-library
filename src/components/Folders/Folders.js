@@ -485,6 +485,7 @@ class Folders extends Component {
                                    title={cannotAddError || 'Create a new folder'}
                                    onClick={!cannotAddError && this.addFolder}>
               <span className='icon-collections-add'/>
+              <div>NEW</div>
             </div> }
           </div>
           <div className="Folders-sort-selected">

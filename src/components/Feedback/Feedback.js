@@ -130,7 +130,7 @@ class Feedback extends Component {
             <div className="Feedback-icon icon-question"/>
             <div>Feedback</div>
           </div>
-          <div onClick={this.dismiss} className="Feedback-close icon-cross2"/>
+          <div onClick={this.dismiss} className="Feedback-close icon-cross"/>
         </div>
         { (sendState === EDITING) && (
           <div className="Feedback-body">

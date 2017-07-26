@@ -16,7 +16,7 @@ const CollapsibleHeader = ({ isOpen, isParent, isIconified, isSelected, header, 
       {
         isParent && !isIconified && (
           <div className='CollapsibleHeader-open flexOff flexCenter fullHeight' onClick={onOpen}>
-            <div className={classnames('CollapsibleHeader-caret', 'icon-chevron-down', { isOpen, isSelected })}/>
+            <div className={classnames('CollapsibleHeader-caret', 'icon-arrow-down', { isOpen, isSelected })}/>
           </div>
         )
       }
