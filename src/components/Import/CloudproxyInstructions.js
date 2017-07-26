@@ -57,7 +57,7 @@ export default class CloudproxyInstructions extends Component {
     return (
       <div className="CloudproxyInstructions">
         <div className="Import-back" onClick={onBack}>
-          <div className="icon-chevron-right" style={{transform: 'rotate(180deg)'}}/>
+          <div className="icon-arrow-down" style={{transform: 'rotate(90deg)'}}/>
           Back
         </div>
         <div className="Import-title">

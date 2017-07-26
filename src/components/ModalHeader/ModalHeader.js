@@ -9,7 +9,7 @@ const ModalHeader = (props) => {
         { children }
       </div>
       <div className='ModalHeader-close' onClick={_ => closeFn && closeFn()}>
-        <div className='icon-cross2'/>
+        <div className='icon-cross'/>
       </div>
     </div>
   )

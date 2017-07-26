@@ -91,7 +91,7 @@ export default class ResizableWindow extends Component {
           <div className="ResizableWindow-title">
             {title}
           </div>
-          <div onClick={onClose} className="ResizableWindow-close icon-cross2"/>
+          <div onClick={onClose} className="ResizableWindow-close icon-cross"/>
         </div>
         <div className="ResizableWindow-body">
           { children }

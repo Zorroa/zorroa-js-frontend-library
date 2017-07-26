@@ -246,7 +246,7 @@ class Import extends Component {
         <Logo/>
         <div className="Import-header-right">
           <StepCounter step={this.state.step} onStep={this.setStep}/>
-          { !this.props.onboarding && <div onClick={this.dismiss} className="Import-cancel icon-cross2"/> }
+          { !this.props.onboarding && <div onClick={this.dismiss} className="Import-cancel icon-cross"/> }
         </div>
       </div>
     )

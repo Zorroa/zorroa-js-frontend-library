@@ -429,7 +429,7 @@ class FolderItem extends Component {
           <div onClick={addableAssets && this.addAssetsToFolders}
                title={addableAssetTitle}
                className={classnames('FolderItem-context-item FolderItem-context-add-assets', {disabled: !addableAssets})}>
-            <div className="icon-plus2"/>
+            <div className="icon-plus"/>
             <div>Add Assets</div>
           </div>
           <div onClick={removableAssets && this.removeAssetsFromFolders}

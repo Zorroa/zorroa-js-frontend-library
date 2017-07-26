@@ -139,7 +139,7 @@ class Developer extends Component {
             <div className="Developer-title-icon icon-script"/>
             <div className="Developer-title-text">Developer</div>
           </div>
-          <div onClick={this.dismiss} className="Developer-title-close icon-cross2"/>
+          <div onClick={this.dismiss} className="Developer-title-close icon-cross"/>
         </div>
         { this.renderQuery() }
         { this.renderSelectedAssets() }

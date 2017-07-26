@@ -218,7 +218,7 @@ class Workspace extends Component {
     this.props.actions.queueFileEntrysUpload(entries)
 
     const width = '65vw'
-    const body = <div className="Workspace-local-chooser"><div onClick={this.cancelLocalImport} className="Workspace-local-chooser-cancel icon-cross2"/><LocalChooser/></div>
+    const body = <div className="Workspace-local-chooser"><div onClick={this.cancelLocalImport} className="Workspace-local-chooser-cancel icon-cross"/><LocalChooser/></div>
     this.props.actions.showModal({body, width})
     this.setState({isDroppable: false})
     event.preventDefault()
@@ -338,7 +338,7 @@ class Workspace extends Component {
                 Reload now
               </button>
             </div>
-            <div className="Workspace-reloader-close icon-cross2"
+            <div className="Workspace-reloader-close icon-cross"
                  onClick={e => this.setState({ showReloader: false })}/>
           </div>
         )}

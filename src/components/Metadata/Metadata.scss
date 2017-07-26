@@ -110,7 +110,7 @@
   font-size: 10px;
   font-weight: 100;
 
-  // icon-chevron-down doesn't line up exactly when rotated, so adjust
+  // icon-arrow-down doesn't line up exactly when rotated, so adjust
   &.isOpen {
     transform: rotate(180deg);
     transform-origin: 44% 50%;

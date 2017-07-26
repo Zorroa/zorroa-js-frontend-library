@@ -123,7 +123,7 @@ class Preferences extends Component {
             <div className="Preferences-icon icon-cog"/>
             <div>Preferences</div>
           </div>
-          <div onClick={this.dismiss} className="Preferences-close icon-cross2"/>
+          <div onClick={this.dismiss} className="Preferences-close icon-cross"/>
         </div>
         <div className="body">
           <div className="Preferences-user">

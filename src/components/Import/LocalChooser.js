@@ -450,7 +450,7 @@ class LocalChooser extends Component {
       <div className="LocalChooser">
         { onBack && (
           <div className="Import-back" onClick={this.back}>
-            <div className="icon-chevron-right" style={{transform: 'rotate(180deg)'}}/>
+            <div className="icon-arrow-down" style={{transform: 'rotate(90deg)'}}/>
             Back
           </div>
         )}

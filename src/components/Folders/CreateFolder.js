@@ -163,7 +163,7 @@ class CreateFolder extends Component {
               <div className="CreateFolder-header-icon icon-cube"/>
               <div>{title}</div>
             </div>
-            <div onClick={this.dismiss} className="CreateFolder-header-close icon-cross2" />
+            <div onClick={this.dismiss} className="CreateFolder-header-close icon-cross" />
           </div>
           <div className="CreateFolder-body">
             <div className="CreateFolder-input-title">Title</div>
