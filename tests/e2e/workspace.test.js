@@ -178,17 +178,23 @@ describe('Workspace', function () {
 
   it ('make sure embed mode works', () => {
     return driver
-      .then(_ => driver.get(`${selenium.BASE_URL}?EmbedMode=true`))
+      .then(_ => { DEBUG && console.log('make sure embed mode works 1') })
+      .then(_ => driver.get(`${selenium.BASE_URL}?EmbedMode=true&ClearSessionState=1`))
+      .then(_ => selenium.waitForIdle())
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Workspace')))
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Assets')))
       .then(_ => selenium.waitForIdle())
       .then(_ => selenium.expectSelectorVisibleToBe(false, By.css('.header')))
 
-      .then(_ => driver.get(`${selenium.BASE_URL}?EmbedMode=false`))
+      .then(_ => { DEBUG && console.log('make sure embed mode works 2') })
+      .then(_ => driver.get(`${selenium.BASE_URL}?EmbedMode=false&ClearSessionState=1`))
+      .then(_ => selenium.waitForIdle())
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Workspace')))
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Assets')))
       .then(_ => selenium.waitForIdle())
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.header')))
+
+      .then(_ => { DEBUG && console.log('make sure embed mode works 3') })
   })
 
   it('log out', () => {
