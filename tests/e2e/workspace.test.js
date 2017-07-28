@@ -228,6 +228,44 @@ describe('Workspace', function () {
     .then(_ => { DEBUG && console.log('make sure shared link copy works 3') })
   })
 
+  it ('make sure undo works', () => {
+    return driver
+      .then(_ => { DEBUG && console.log('make sure undo works 1') })
+      .then(_ => driver.get(`${selenium.BASE_URL}?ClearSessionState=1`))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Workspace')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Assets')))
+      .then(_ => selenium.waitForIdle())
+
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Widget.Color')))
+
+      .then(_ => { DEBUG && console.log('add a color widget') })
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racebar-add-widget')))
+      .then(_ => selenium.clickSelector(By.css('.Racebar-add-widget')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.widget-COLOR')))
+      .then(_ => selenium.clickSelector(By.css('.widget-COLOR')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Racetrack'), 5000))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Color')))
+      .then(_ => selenium.waitForIdle())
+      .then(_ => selenium.clickSelector(By.css('.Color-swatch-row:nth-of-type(8) .Color-swatch:nth-of-type(8)')))
+      .then(_ => selenium.waitForIdle())
+
+      .then(_ => { DEBUG && console.log('make sure undo works 2') })
+      .then(_ => driver.navigate().back())
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Workspace')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Assets')))
+      .then(_ => selenium.waitForIdle())
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Widget.Color')))
+
+      .then(_ => { DEBUG && console.log('make sure undo works 3') })
+      .then(_ => driver.navigate().forward())
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Workspace')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Assets')))
+      .then(_ => selenium.waitForIdle())
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Color')))
+
+      .then(_ => { DEBUG && console.log('make sure undo works 4') })
+  })
+
   it ('make sure session restore works', () => {
     return driver
     .then(_ => { DEBUG && console.log('make sure session restore works 1') })
