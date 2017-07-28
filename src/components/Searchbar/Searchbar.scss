@@ -26,3 +26,16 @@
   font-style: italic;
   color: $zorroa-orangish;
 }
+
+.Searchbar-share {
+  &:hover { background-color: $zorroa-sickly-green; }
+  padding: 0 5px;
+  cursor: pointer;
+  height: 28px;
+  @include flexCenter;
+}
+.Searchbar-load {
+  &:hover { background-color: $zorroa-sickly-green; }
+  padding: 0 5px;
+  cursor: pointer;
+}

@@ -176,19 +176,55 @@ describe('Workspace', function () {
       .then(_ => { DEBUG && console.log('command progress - finished') })
   })
 
+  it ('make sure session restore works', () => {
+    return driver
+      .then(_ => { DEBUG && console.log('make sure session restore works 1') })
+      .then(_ => driver.get(`${selenium.BASE_URL}?ClearSessionState=1`))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Workspace')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Assets')))
+      .then(_ => selenium.waitForIdle())
+
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Widget.Color')))
+
+      .then(_ => { DEBUG && console.log('add a color widget') })
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racebar-add-widget')))
+      .then(_ => selenium.clickSelector(By.css('.Racebar-add-widget')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.widget-COLOR')))
+      .then(_ => selenium.clickSelector(By.css('.widget-COLOR')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Racetrack'), 5000))
+      .then(_ => selenium.waitForIdle())
+      .then(_ => selenium.clickSelector(By.css('.Color-swatch-row:nth-of-type(8) .Color-swatch:nth-of-type(8)')))
+      .then(_ => selenium.waitForIdle())
+
+      .then(_ => { DEBUG && console.log('make sure session restore works 2') })
+      .then(_ => driver.get(`${selenium.BASE_URL}`))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Workspace')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Assets')))
+      .then(_ => selenium.waitForIdle())
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Color')))
+
+      .then(_ => { DEBUG && console.log('make sure session restore works 3') })
+  })
+
   it ('make sure embed mode works', () => {
     return driver
-      .then(_ => driver.get(`${selenium.BASE_URL}?EmbedMode=true`))
+      .then(_ => { DEBUG && console.log('make sure embed mode works 1') })
+      .then(_ => driver.get(`${selenium.BASE_URL}?EmbedMode=true&ClearSessionState=1`))
+      .then(_ => selenium.waitForIdle())
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Workspace')))
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Assets')))
       .then(_ => selenium.waitForIdle())
       .then(_ => selenium.expectSelectorVisibleToBe(false, By.css('.header')))
 
-      .then(_ => driver.get(`${selenium.BASE_URL}?EmbedMode=false`))
+      .then(_ => { DEBUG && console.log('make sure embed mode works 2') })
+      .then(_ => driver.get(`${selenium.BASE_URL}?EmbedMode=false&ClearSessionState=1`))
+      .then(_ => selenium.waitForIdle())
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Workspace')))
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Assets')))
       .then(_ => selenium.waitForIdle())
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.header')))
+
+      .then(_ => { DEBUG && console.log('make sure embed mode works 3') })
   })
 
   it('log out', () => {

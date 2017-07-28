@@ -27,6 +27,7 @@ import Resizer from '../../services/Resizer'
 import TrashedFolder from '../../models/TrashedFolder'
 import { equalSets } from '../../services/jsUtil'
 import * as api from '../../globals/api.js'
+import { SESSION_STATE_ITEM } from '../../constants/localStorageItems'
 
 const assetsScrollPadding = 8
 const defaultTableHeight = 300
@@ -332,8 +333,12 @@ class Assets extends Component {
     const path = location.pathname + location.search
     const historyKey = optFirstTimeHistoryKey || Date.now().toString()
     const attrs = { similar, widgets, order }
-    const folder = new Folder({ search: query, attrs })
+    const folderObj = { search: query, attrs }
+    const folder = new Folder(folderObj)
     this.history[historyKey] = { folder }
+
+    // save the search in local storage - for restoring session state on reload
+    localStorage.setItem(SESSION_STATE_ITEM, JSON.stringify(folderObj))
 
     requestAnimationFrame(_ => {
       if (location.hash) {

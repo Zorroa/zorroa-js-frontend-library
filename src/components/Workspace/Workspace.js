@@ -21,7 +21,9 @@ import Racebar from '../Racetrack/Racebar'
 import { iconifyLeftSidebar, toggleCollapsible, showModal, hideModal, dialogAlertPromise, dialogConfirmPromise, dialogPromptPromise, setEmbedModeEnabled } from '../../actions/appActions'
 import { getUserPermissions, updatePassword, changePassword } from '../../actions/authAction'
 import { queueFileEntrysUpload } from '../../actions/jobActions'
-import { updateCommand, getAllCommands } from '../../actions/assetsAction'
+import { updateCommand, getAllCommands, isolateAssetId } from '../../actions/assetsAction'
+import { restoreFolders } from '../../actions/racetrackAction'
+import { loadSharedLink } from '../../actions/sharedLinkAction'
 import ChangePassword from '../auth/ChangePassword'
 import User from '../../models/User'
 import Job, { countOfJobsOfType } from '../../models/Job'
@@ -32,7 +34,7 @@ import Lightbox from '../Lightbox'
 import Feedback from '../Feedback'
 import Import, { LocalChooser } from '../Import'
 import { LOCAL_IMPORT, CLOUD_IMPORT, SERVER_IMPORT } from '../Import/ImportConstants'
-import { EMBEDMODE_ITEM } from '../../constants/localStorageItems'
+import { EMBEDMODE_ITEM, LOAD_SEARCH_ITEM, SESSION_STATE_ITEM } from '../../constants/localStorageItems'
 
 class Workspace extends Component {
   static displayName () {
@@ -73,6 +75,25 @@ class Workspace extends Component {
   repoContainsAssets = false
   tipShown = false
 
+  loadSharedLinkData = (folderObj) => {
+    const { actions } = this.props
+    const folder = new Folder(folderObj)
+    actions.isolateAssetId()
+    actions.restoreFolders([folder])
+  }
+
+  loadSharedLinkId = (id) => {
+    const { actions } = this.props
+    actions.loadSharedLink(id)
+    .then(response => {
+      this.loadSharedLinkData(response.folder)
+    })
+    .catch(err => {
+      actions.dialogAlertPromise('Load Search Error', 'Something went wrong loading this search. Check console for errors.')
+      return Promise.reject(err)
+    })
+  }
+
   componentWillMount () {
     const { actions, user, app } = this.props
     actions.getUserPermissions(user)
@@ -85,6 +106,22 @@ class Workspace extends Component {
     if (newEmbedModeEnabled && newEmbedModeEnabled !== embedModeEnabled) {
       actions.setEmbedModeEnabled(true)
       actions.iconifyLeftSidebar(true)
+    }
+
+    // See if we need to restore a saved search or session state
+    // Saved search wins if they're both there
+    const sessionState = localStorage.getItem(SESSION_STATE_ITEM)
+    const searchId = localStorage.getItem(LOAD_SEARCH_ITEM)
+
+    if (searchId) {
+      localStorage.removeItem(LOAD_SEARCH_ITEM)
+      requestAnimationFrame(_ => {
+        this.loadSharedLinkId(searchId)
+      })
+    } else if (sessionState) {
+      requestAnimationFrame(_ => {
+        this.loadSharedLinkData(JSON.parse(sessionState))
+      })
     }
   }
 
@@ -417,6 +454,9 @@ export default connect(state => ({
     dialogConfirmPromise,
     dialogPromptPromise,
     queueFileEntrysUpload,
+    isolateAssetId,
+    restoreFolders,
+    loadSharedLink,
     getAllCommands,
     updateCommand,
     setEmbedModeEnabled
