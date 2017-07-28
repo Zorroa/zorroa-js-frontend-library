@@ -34,7 +34,7 @@
   font-size: 16px;
   cursor: pointer;
 
-  &.flip { transform: scaleX(-1); }
+  &.flip { transform: rotate(90deg); }
   &:hover { background-color: $zorroa-gray; }
   &.disabled { background-color: $zorroa-lightgray; }
 }

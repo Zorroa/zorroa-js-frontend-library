@@ -91,7 +91,7 @@ class Collections extends Component {
             { selectedFolders.map(folder => (
               <div className="Collections-folder" key={folder.id}>
                 <div className="Collections-folder-name">{folder.name}</div>
-                <div className="Collections-folder-close icon-cross2" onClick={e => this.closeFolder(folder, e)}/>
+                <div className="Collections-folder-close icon-cross" onClick={e => this.closeFolder(folder, e)}/>
               </div>
             ))}
           </div>

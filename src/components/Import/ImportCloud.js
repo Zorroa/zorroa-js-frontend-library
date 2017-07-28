@@ -40,7 +40,7 @@ const ImportCloud = (props) => {
   return (
     <div className="ImportCloud">
       <div className="Import-back" onClick={props.onBack}>
-        <div className="icon-chevron-right" style={{transform: 'rotate(180deg)'}}/>
+        <div className="icon-arrow-down" style={{transform: 'rotate(90deg)'}}/>
         Back
       </div>
       <div className="Import-title">

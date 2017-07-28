@@ -196,7 +196,7 @@ class Metadata extends Component {
         <div className="Metadata-namespace-title">
           {unCamelCase(namespace)}
         </div>
-        <div className={classnames('Metadata-namespace-toggle', 'icon-chevron-down', {isOpen})}/>
+        <div className={classnames('Metadata-namespace-toggle', 'icon-arrow-down', {isOpen})}/>
       </div>
     )
   }

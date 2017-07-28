@@ -33,16 +33,25 @@
   100% { background-position: 100% 0; }
 }
 
-.ProgressBar-progress {
+.ProgressBar-pct {
   @include fullHeight;
-  background-color: cornflowerblue;
   border-radius: 2.5px;
-  &.hasErrors { border-radius: 0; }
+  &.squared { border-radius: 0; }
+  opacity: 0.75;
+}
+
+.ProgressBar-progress {
+  background-color: cornflowerblue;
 }
 
 .ProgressBar-errors {
-  @include fullHeight;
   background-color: $zorroa-faded-red;
-  border-top-right-radius: 2.5px;
-  border-bottom-right-radius: 2.5px;
+}
+
+.ProgressBar-warnings {
+  background-color: $zorroa-golden-yellow;
+}
+
+.ProgressBar-pending {
+  background-color: $zorroa-gray;
 }

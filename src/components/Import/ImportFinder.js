@@ -87,7 +87,7 @@ export default class ImportFinder extends Component {
     return (
       <div className="ImportFinder">
         <div className="Import-back" onClick={onBack}>
-          <div className="icon-chevron-right" style={{transform: 'rotate(180deg)'}}/>
+          <div className="icon-arrow-down" style={{transform: 'rotate(-90deg)'}}/>
           Back
         </div>
         <div className="Import-title">
@@ -100,11 +100,11 @@ export default class ImportFinder extends Component {
           </div>
           <div className="ImportFinder-shifters">
             <div className={classnames('ImportFinder-shifter',
-              'icon-chevron-right', {disabled: !selectedFiles.size})}
-                 onClick={this.addSelected}/>
+              'icon-arrow-down', {disabled: !selectedFiles.size})}
+                 onClick={this.addSelected} style={{transform: 'rotate(-90deg)'}}/>
             <div className={classnames('ImportFinder-shifter',
-              'icon-chevron-right', 'flip', {disabled: !selectedAddedFiles.size})}
-                 onClick={this.removeSelected}/>
+              'icon-arrow-down', 'flip', {disabled: !selectedAddedFiles.size})}
+                 onClick={this.removeSelected} style={{transform: 'rotate(-90deg)'}}/>
           </div>
           <div className="ImportFinder-added">
             <div className="ImportFinder-added-filter">
@@ -125,7 +125,7 @@ export default class ImportFinder extends Component {
               { !addedFiles.size && (
                 <div className="ImportFinder-added-empty">
                   Select files and
-                  <div className="ImportFinder-added-empty-icon icon-chevron-right"/>
+                  <div className="ImportFinder-added-empty-icon icon-arrow-down" style={{transform: 'rotate(-90deg)'}}/>
                   add to import
                 </div>
               )}

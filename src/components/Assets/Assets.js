@@ -286,7 +286,7 @@ class Assets extends Component {
             <div className="Assets-history-header">
               <div className="Assets-history-title">History Warning</div>
               <div className="flexOn"/>
-              <div className="Assets-history-close icon-cross2" onClick={dismissFn}/>
+              <div className="Assets-history-close icon-cross" onClick={dismissFn}/>
             </div>
             <div className="Assets-history-msg">Going back any further will lose your history.</div>
             <button className="Assets-history-dismiss" onClick={dismissFn}>Okay</button>

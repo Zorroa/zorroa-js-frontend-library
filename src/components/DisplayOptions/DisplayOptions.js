@@ -202,7 +202,7 @@ class DisplayOptions extends Component {
           }
           <label htmlFor={key}><span/>{unCamelCase(name)}</label>
         </div>
-        { hasChildren && <div className={classnames('DisplayOptions-namespace', 'childArrow', 'icon-arrow-down2', { selected: selected })} /> }
+        { hasChildren && <div className={classnames('DisplayOptions-namespace', 'childArrow', 'icon-arrow-down8', { selected: selected })} /> }
       </div>
     )
   }
@@ -221,7 +221,7 @@ class DisplayOptions extends Component {
             <div className="DisplayOptions-settings icon-cog"/>
             <div className="DisplayOptions-title">{title}</div>
             <div className="flexOn"/>
-            <div className="DisplayOptions-close icon-cross2" onClick={this.cancel.bind(this)}/>
+            <div className="DisplayOptions-close icon-cross" onClick={this.cancel.bind(this)}/>
           </div>
           <div className="DisplayOptions-subheader flexRow flexAlignItemsEnd">
             <input type="text" onChange={this.filter} value={fieldFilter} placeholder="Filter Fields" />

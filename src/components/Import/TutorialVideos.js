@@ -3,7 +3,7 @@ import ReactPlayer from 'react-player'
 
 const TutorialVideos = (props) => (
   <div className="TutorialVideos">
-    <div onClick={props.onDismiss} className="TutorialVideos-cancel icon-cross2"/>
+    <div onClick={props.onDismiss} className="TutorialVideos-cancel icon-cross"/>
     <div className="TutorialVideos-title">
       While we're waiting for your assets to be analyzed, let's watch some tutorials
     </div>

@@ -26,6 +26,7 @@ const allExts = {
   // video files
   mov: 'Quicktime Movie',
   mp4: 'Video File',
+  m4v: 'Quicktime Video',
   ogg: 'Ogg Vorbis',
   mpg: 'Motion Picture Group',
   mpeg: 'Motion Picture Group'
@@ -52,7 +53,7 @@ const allExts = {
 const groupExts = {
   'Image Files': ['gif', 'png', 'jpg', 'jpeg', 'tif', 'tiff', 'psd'], /*, 'geotiff' */
   'Vector Files': ['pdf', 'svg', 'ai', 'shp', 'cdr'],
-  'Video Files': ['mp4', 'mov', 'ogg', 'mpg', 'mpeg']
+  'Video Files': ['mp4', 'm4v', 'mov', 'ogg', 'mpg', 'mpeg']
   // 'Audio Files': ['aac', 'mp3'],
   // 'Design Source Files - sketch, Adobe': ['ai', 'indd', 'psd'],
   // 'Map Files': ['shp', 'kml', 'gdb', 'osm', 'geotiff'],
