@@ -40,8 +40,8 @@
   @include flexAlignItemsCenter;
 
   border-radius: 3px;
-  padding: 3px 7px;
-  margin: 2px 4px;
+  padding: 4px 7px;
+  margin: 1px 4px;
   color: $zorroa-greyish-brown;
   text-transform: uppercase;
   background-color: $zorroa-lightgray;
@@ -69,14 +69,14 @@
   @include flexAlignItemsCenter;
 
   border-radius: 3px;
-  padding: 4px 8px;
-  margin: 5px 4px;
+  padding: 5px 8px;
+  margin: 4px 4px;
   color: $zorroa-nearwhite;
-  background-color: $zorroa-water-blue;
+  background-color: $zorroa-navy-blue;
   text-transform: uppercase;
   cursor: pointer;
 
-  &:hover:not(.disabled) { background-color: lighten($zorroa-water-blue, 15%); }
+  &:hover:not(.disabled) { background-color: lighten($zorroa-navy-blue, 15%); }
   &.disabled {
     cursor: default;
     background-color: $zorroa-lightgray;
