@@ -126,7 +126,7 @@ describe('Folder dnd', function () {
     .then(_ => emptyTrash())
   })
 
-  xit('add & remove assets + dnd', function () {
+  it('add & remove assets + dnd', function () {
     let myUserFolder
     const myUserName = `selenium-${Date.now()}`
 
