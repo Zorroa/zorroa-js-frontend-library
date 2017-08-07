@@ -49,12 +49,16 @@
 
   .Exists-exists-label {
     margin-left: 12px;
-    cursor: default;
+    cursor: pointer;
+    text-transform: capitalize;
+    &:hover { color: $zorroa-sickly-green; }
   }
 
   .Exists-missing-label {
     margin-right: 12px;
-    cursor: default;
+    cursor: pointer;
+    text-transform: capitalize;
+    &:hover { color: $zorroa-sickly-green; }
   }
 
 }

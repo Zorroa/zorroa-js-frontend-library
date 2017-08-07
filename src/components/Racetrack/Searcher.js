@@ -167,7 +167,7 @@ class Searcher extends Component {
     }
 
     // Add sort order if not disabled
-    if (!orderDisabled) assetSearch.order = order
+    if (!orderDisabled && order) assetSearch.order = order
 
     // Add a filter for selected folders
     if (!foldersDisabled && nonTrashedFolderIds && nonTrashedFolderIds.length) {

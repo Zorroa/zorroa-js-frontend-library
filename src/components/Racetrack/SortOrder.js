@@ -22,8 +22,7 @@ class SortOrder extends Component {
     isIconified: PropTypes.bool.isRequired,
     isOpen: PropTypes.bool.isRequired,
     onOpen: PropTypes.func,
-    floatBody: PropTypes.bool.isRequired,
-    widgets: PropTypes.arrayOf(PropTypes.object)
+    floatBody: PropTypes.bool.isRequired
   }
 
   state = {
