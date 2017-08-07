@@ -106,7 +106,7 @@ class Lightbar extends Component {
           <div onClick={!isAddToCollectionDisabled && this.showFolders}
                className={classnames('Lightbar-action', {isDisabled: isAddToCollectionDisabled})}>
             <span className='Lightbar-action-text'>Add to Collection</span>
-            <i className='Lightbar-btn-icon icon-arrow-down'/>
+            <i className='Lightbar-btn-icon icon-chevron-down'/>
             { showFolders && (
               <div className="Lightbar-folders" onClick={e => { e.stopPropagation() }}>
                 <Folders filterName="simple" onSelect={this.addToCollection}

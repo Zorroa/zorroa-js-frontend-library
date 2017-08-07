@@ -101,3 +101,27 @@
   // Won't work until we make the home button a font icon
   .Racebar-clear.disabled & { color: $zorroa-lightgray; }
 }
+
+.Racebar-share {
+  color: $zorroa-darkgray;
+  .dark & { color: $zorroa-lightgray; }
+
+  cursor: pointer;
+  font-size: 18px;
+  margin-right: 8px;
+  padding: 4px;
+  border-radius: 3px;
+
+  &:hover:not(.disabled) {
+    background-color: $zorroa-sickly-green;
+    color: white;
+
+    .dark & { }
+  }
+  &.disabled {
+    color: $zorroa-lightgray;
+    cursor: default;
+
+    .dark & { color: $zorroa-gray; }
+  }
+}
