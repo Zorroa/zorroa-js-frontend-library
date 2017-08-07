@@ -70,7 +70,7 @@
 
 .Folders-filter-input {
   @include flexOn;
-  height: 30px;
+  height: 26px;
   border-radius: 3px;
   background: none;
   border: 1px solid $zorroa-lightgray;
@@ -83,12 +83,12 @@
 .Folders-controls-add {
   @include flexRowCenter;
   color: white;
-  background-color: $zorroa-water-blue;
+  background-color: $zorroa-navy-blue;
   border: none;
   border-radius: 3px;
-  padding: 7.5px 8px;
+  padding: 6px 8px;
   cursor: pointer;
-  margin-right: 4px;
+  margin-right: 8px;
 
   &.disabled {
     cursor: not-allowed;
@@ -99,17 +99,17 @@
   &:not(.disabled) {
     &:hover {
       border: 1px solid $zorroa-gray;
-      background-color: darken($zorroa-water-blue, 15%);
+      background-color: darken($zorroa-navy-blue, 15%);
     }
     &:active {
       color: $zorroa-nearwhite;
-      background-color: darken($zorroa-water-blue, 15%);
+      background-color: darken($zorroa-navy-blue, 15%);
     }
   }
 }
 
 .Folders-controls-add-label {
-  margin-left: 4px;
+  margin-left: 6px;
   font-size: 12px;
 }
 

@@ -28,7 +28,7 @@
 
   &.isSelected {
     color: white;
-    background-color: $zorroa-water-blue;
+    background-color: $zorroa-navy-blue;
   }
 }
 
@@ -40,7 +40,7 @@
   &.isIconified {
     @include flexJustifyCenter;
   }
-  &.isSelected { background-color: $zorroa-water-blue; }
+  &.isSelected { background-color: $zorroa-navy-blue; }
 }
 
 .CollapsibleHeader-icon {
@@ -62,7 +62,7 @@
 
 .CollapsibleHeader-open {
   width: 30px;
-  &.isSelected { background-color: $zorroa-water-blue; }
+  &.isSelected { background-color: $zorroa-navy-blue; }
 }
 
 .CollapsibleHeader-caret {

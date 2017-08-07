@@ -63,7 +63,7 @@
   text-transform: uppercase;
   &.disabled { background-color: $zorroa-lightgray; }
   &:hover:not(.disabled) { background-color: $zorroa-hover-green; }
-  &:active:not(.disabled) { background-color: $zorroa-water-blue; }
+  &:active:not(.disabled) { background-color: $zorroa-navy-blue; }
 }
 
 .auth-form {

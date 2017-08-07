@@ -4,8 +4,7 @@
   @include flexOn;
   @include flexRow;
   @include flexAlignItemsCenter;
-  height: 5px;
-  border-radius: 2.5px;
+  height: 8px;
   background-color: $zorroa-darkgray;
 
   &.indeterminate {
@@ -37,7 +36,7 @@
   @include fullHeight;
   border-radius: 2.5px;
   &.squared { border-radius: 0; }
-  opacity: 0.75;
+  opacity: 0.5;
 }
 
 .ProgressBar-progress {
