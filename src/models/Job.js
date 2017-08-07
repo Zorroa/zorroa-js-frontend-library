@@ -41,6 +41,10 @@ export default class Job {
     return (this.stats && this.stats.frameWarningCount) || (this.tasks && this.tasks.skipped)
   }
 
+  successCount () {
+    return (this.stats && this.stats.frameSuccessCount) || (this.tasks && this.tasks.success)
+  }
+
   exportStream (origin) {
     if (this.type === Job.Export && this.isFinished()) {
       return `${origin}/api/v1/exports/${this.id}/_stream`

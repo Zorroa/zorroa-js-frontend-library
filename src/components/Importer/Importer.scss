@@ -58,14 +58,14 @@
   @include flexRowCenter;
   color: white;
   cursor: pointer;
-  background-color: $zorroa-water-blue;
+  background-color: $zorroa-navy-blue;
   padding-left: 16px;
   padding-right: 16px;
   padding-top: 4px;
   padding-bottom: 4px;
   border-radius: 3px;
 
-  &:hover { background-color: lighten($zorroa-water-blue, 15%); }
+  &:hover { background-color: lighten($zorroa-navy-blue, 15%); }
 }
 
 .Importer-retry-icon {
@@ -183,7 +183,7 @@
   @include flexRowCenter;
   color: white;
   cursor: pointer;
-  background-color: $zorroa-water-blue;
+  background-color: $zorroa-navy-blue;
   padding-left: 16px;
   padding-right: 16px;
   padding-top: 4px;
@@ -191,7 +191,7 @@
   border-radius: 3px;
   margin-right: 30px;
   margin-bottom: 8px;
-  &:hover { background-color: lighten($zorroa-water-blue, 15%); }
+  &:hover { background-color: lighten($zorroa-navy-blue, 15%); }
 }
 
 .Importer-processor-args-body {

@@ -59,7 +59,7 @@
 
 .Jobs-filter-input {
   @include flexOn;
-  height: 30px;
+  height: 26px;
   border-radius: 3px;
   background: none;
   border: 1px solid $zorroa-lightgray;
@@ -72,11 +72,12 @@
 .Jobs-controls-add {
   @include flexRowCenter;
   color: white;
-  background-color: $zorroa-water-blue;
+  background-color: $zorroa-navy-blue;
   border: none;
   border-radius: 3px;
-  padding: 7.5px 8px;
+  padding: 6px 8px;
   cursor: pointer;
+  margin-right: 8px;
 
   .icon-import2 { margin-top: -4px; }   // Felt too low otherwise
 
@@ -89,17 +90,17 @@
   &:not(.disabled) {
     &:hover {
       border: 1px solid $zorroa-gray;
-      background-color: darken($zorroa-water-blue, 15%);
+      background-color: darken($zorroa-navy-blue, 15%);
     }
     &:active {
       color: $zorroa-nearwhite;
-      background-color: darken($zorroa-water-blue, 15%);
+      background-color: darken($zorroa-navy-blue, 15%);
     }
   }
 }
 
 .Jobs-controls-add-label {
-  margin-left: 4px;
+  margin-left: 6px;
   font-size: 12px;
 }
 
@@ -212,21 +213,52 @@
   }
 }
 
+.Jobs-header {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+  border-bottom: $zorroa-lightgray;
+  .dark & { border-bottom: $zorroa-darkgray; }
+}
+
+.Jobs-job-name {
+  @include nowrap;
+}
+
+.Jobs-progress {
+  min-width: 50px;
+}
+
+.Jobs-status {
+  @include flexCol;
+}
+
 .Jobs-warning {
-  color: $zorroa-gray;
-  background-color: yellow;
-  border-radius: 6px;
-  font-size: 12px;
+  @include flexRowCenter;
+  color: $zorroa-golden-yellow;
+}
+
+.Jobs-warning-icon {
+  color: $zorroa-golden-yellow;
+  margin-right: 8px;
 }
 
 .Jobs-error {
-  color: white;
-  background-color: $zorroa-faded-red;
-  padding: 2px;
-  border-radius: 7.5px;
-  font-size: 10px;
-  min-width: 15px;
-  text-align: center;
-  margin-left: 8px;
+  @include flexRowCenter;
+  color: $zorroa-faded-red;
+}
+
+.Jobs-error-icon {
+  color: $zorroa-faded-red;
+  margin-right: 8px;
+}
+
+.Jobs-success {
+  @include flexRowCenter;
+  color: $zorroa-avocado-green;
+}
+
+.Jobs-success-icon {
+  color: $zorroa-avocado-green;
   margin-right: 8px;
 }

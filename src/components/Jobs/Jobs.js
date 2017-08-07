@@ -3,6 +3,8 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
+import Job from '../../models/Job'
+import ProgressBar from '../ProgressBar'
 import { selectJobId, selectJobIds } from '../../actions/jobActions'
 
 const SORT_ALPHABETICAL = 'alpha'
@@ -83,6 +85,29 @@ class Jobs extends Component {
     )
   }
 
+  renderStatus (job) {
+    return (
+      <div className="Jobs-status" style={{width: '30%', maxWidth: '30%'}}>
+        { job.state === Job.Active && job.progress && (
+          <div className="Jobs-progress">
+            <ProgressBar forceIndeterminate={true}
+                         successPct={job.progress.success}
+                         errorPct={job.progress.failed}
+                         warningPct={job.progress.skipped}
+                         pendingPct={job.progress.waiting}/>
+          </div>
+        )}
+        { (job.state !== Job.Active || !job.progress) && (
+          <div className="Job-counts">
+            { job.warningCount() && <div className="Jobs-warning"><div className="Jobs-warning-icon icon-warning2"/>{job.warningCount()}</div> }
+            { job.errorCount() && <div className="Jobs-error"><div className="Jobs-error-icon icon-spam"/> {job.errorCount()}</div> }
+            { job.successCount() && <div className="Jobs-success"><div className="Jobs-success-icon icon-circle-check"/> {job.successCount()}</div> }
+          </div>
+        )}
+      </div>
+    )
+  }
+
   render () {
     const { jobType, addJob, addJobEnabled, isolateJob, selectedJobIds } = this.props
     const { filterString } = this.state
@@ -119,15 +144,22 @@ class Jobs extends Component {
           </div>
         </div>
         <div className="Jobs-scroll">
+          <div className="Jobs-header">
+            <div className="Jobs-header-title" style={{width: '70%', maxWidth: '70%'}}>
+              Name
+              <div className="Jobs-header-sort icon-sort" onClick={e => this.sort('title', e)}/>
+            </div>
+            <div className="Jobs-header-title" style={{width: '30%', maxWidth: '30%'}}>
+              Status
+              <div className="Jobs-header-sort icon-sort" onClick={e => this.sort('status', e)}/>
+            </div>
+          </div>
           <div className="Jobs-body">
             { jobs.map(job => (
               <div className={classnames('Jobs-job', {isSelected: selectedJobIds.has(job.id)})} key={job.id} onClick={e => this.searchJob(job, e)}
                    onDoubleClick={_ => isolateJob && isolateJob(job)}>
-                <div className="Jobs-job-name">{job.name}</div>
-                <div className="Jobs-status">
-                  { job.warningCount() ? <div className="Jobs-warning">{job.warningCount()}</div> : null }
-                  { job.errorCount() ? <div className="Jobs-error">{job.errorCount()}</div> : null }
-                </div>
+                <div className="Jobs-job-name" style={{width: '70%', maxWidth: '70^'}}>{job.name}</div>
+                { this.renderStatus(job) }
               </div>
             )) }
             { !jobs.length && (
