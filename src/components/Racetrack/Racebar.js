@@ -14,7 +14,7 @@ import Searcher from './Searcher'
 import Searchbar from '../Searchbar'
 import QuickAddWidget from './QuickAddWidget'
 import CreateFolder from '../Folders/CreateFolder'
-import { showModal, toggleCollapsible } from '../../actions/appActions'
+import { showModal, toggleCollapsible, dialogAlertPromise } from '../../actions/appActions'
 import { unorderAssets } from '../../actions/assetsAction'
 import { createFolder, selectFolderIds, createDyHiFolder } from '../../actions/folderAction'
 import { resetRacetrackWidgets, similar } from '../../actions/racetrackAction'
@@ -41,7 +41,9 @@ class Racebar extends Component {
   }
 
   state = {
-    openId: -1
+    openId: -1,
+    sharedLink: null,
+    copyingLink: false
   }
 
   lastWidgetCount = -1
@@ -136,13 +138,20 @@ class Racebar extends Component {
     const attrs = { similar, widgets, order }
 
     actions.saveSharedLink({folder: { search: query, attrs }})
-      .then(id => {
-        copy(`${location.origin}/?${LOAD_SEARCH_ITEM}=${id}`)
-      })
-      .catch(err => {
-        actions.dialogAlertPromise('Save Search Error', 'Something went wrong saving this search. Check console for errors.')
-        return Promise.reject(err)
-      })
+    .then(id => {
+      this.setState({ sharedLink: `${location.origin}/?${LOAD_SEARCH_ITEM}=${id}` })
+    })
+    .catch(err => {
+      actions.dialogAlertPromise('Save Search Error', 'Something went wrong saving this search. Check console for errors.')
+      return Promise.reject(err)
+    })
+  }
+
+  copySearch = () => {
+    copy(this.state.sharedLink)
+    this.setState({ sharedLink: null, copyingLink: true })
+    clearTimeout(this.copyTimeout)
+    this.copyTimeout = setTimeout(() => { this.setState({ copyingLink: false }) }, 2000)
   }
 
   renderWidget (widget, isIconified) {
@@ -160,6 +169,7 @@ class Racebar extends Component {
   }
 
   render () {
+    const { sharedLink, copyingLink } = this.state
     const { widgets, hoverFields, order, similar } = this.props
     const blacklist = [WidgetInfo.SimpleSearchWidgetInfo.type]
     const disabled = !(widgets && widgets.length) && !(order && order.length) &&
@@ -180,12 +190,19 @@ class Racebar extends Component {
           <QuickAddWidget/>
         </div>
         <div className="Racebar-right">
-          <div className={classnames('Racebar-share', 'icon-link2', {disabled})}
-               onClick={this.shareSearch} title="Share search link"/>
           <div className={classnames('Racebar-save', {disabled})}
                onClick={!disabled && this.saveRacetrack} title="Save the search">
             Save
           </div>
+          <div className={classnames('Racebar-share', 'icon-external', {disabled})}
+               onClick={this.shareSearch} title="Share search link"/>
+          { sharedLink && (
+            <div className='Racebar-share-copy' onClick={this.copySearch}>
+              <div className='Racebar-share-copy-anchor'/>
+              Search saved. Click to copy.
+            </div>)
+          }
+          { copyingLink && <div className="Racebar-performed-action">Copied URL to clipboard</div> }
           <div className={classnames('Racebar-clear', {disabled})}
                onClick={!disabled && this.clearRacetrack} title="Clear the search">
             Clear
@@ -216,6 +233,7 @@ export default connect(state => ({
     selectFolderIds,
     showModal,
     toggleCollapsible,
-    saveSharedLink
+    saveSharedLink,
+    dialogAlertPromise
   }, dispatch)
 }))(Racebar)
