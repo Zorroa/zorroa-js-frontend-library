@@ -70,7 +70,7 @@ describe('Table', function () {
   it('test the Table', function () {
     var TableToggle
     var assetsScrollHeight
-    var expectedMinAssetsScrollHeight = '174.938px' // see Assets.js:footerEditbarAndPaddingHeight
+    var expectedMinAssetsScrollHeightMin = 170 // see Assets.js:footerEditbarAndPaddingHeight
     var expectedMinTableHeight = '26px' // see Assets.js:minTableHeight
     var elements
 
@@ -161,8 +161,9 @@ describe('Table', function () {
     .then(_ => { DEBUG && console.log('Check that the table size changed, and that the assets scroll is at the expected minimum') })
     .then(_ => elements['.assets-scroll'].getCssValue('height'))
       .then(height => {
+        const heightVal = parseInt(height, 10)
         expect(height).not.toBe(assetsScrollHeight)
-        expect(height).toBe(expectedMinAssetsScrollHeight)
+        expect(heightVal).toBeGreaterThan(expectedMinAssetsScrollHeightMin)
       })
 
     .then(_ => { DEBUG && console.log('Shrink the Table as far as it will go') })
