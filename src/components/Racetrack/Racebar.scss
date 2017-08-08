@@ -57,8 +57,9 @@
 
 .Racebar-save {
   // height: 28px is same as .Racebar-share
-  @include zorroa-btn(60px, 28px, $zorroa-water-blue, lighten($zorroa-water-blue, 15%));
+  @include zorroa-btn(60px, 28px, $zorroa-water-blue, darken($zorroa-water-blue, 15%));
   color: $zorroa-nearwhite;
+  &:hover:not(.disabled) { color: white; }
 
   text-transform: uppercase;
 
@@ -94,9 +95,8 @@
 
 .Racebar-share {
   // height: 28px is same as .Racebar-save
-  @include zorroa-btn(28px, 28px, darken($zorroa-water-blue, 15%), $zorroa-sickly-green);
-
-  color: $zorroa-lightgray;
+  @include zorroa-btn(28px, 28px, $zorroa-water-blue, darken($zorroa-water-blue, 15%));
+  color: $zorroa-nearwhite;
 
   font-size: 18px;
   margin-right: 8px;
@@ -118,7 +118,8 @@
   top: 45px;
   left: -40px;
   background-color: black;
-  color: white;
+  color: $zorroa-nearwhite;
+  &:hover { color: $zorroa-light-green; }
   padding: 10px;
   border-radius: 5px;
   cursor: pointer;
@@ -146,7 +147,7 @@
   top: 45px;
   left: -40px;
   background-color: black;
-  color: white;
+  color: $zorroa-nearwhite;
   padding: 10px;
   border-radius: 5px;
   cursor: pointer;
