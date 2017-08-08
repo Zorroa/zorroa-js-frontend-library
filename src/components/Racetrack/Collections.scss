@@ -11,9 +11,8 @@
 }
 
 .Collections-folders {
-  @include flexRow;
-  @include flexAlignItemsCenter;
-  @include flexWrap;
+  @include flexCol;
+  width: 100%;
   max-width: 40vw;
   padding: 8px;
   min-height: 52px;
@@ -21,23 +20,26 @@
 
 .Collections-folder {
   @include flexRowCenter;
-  color: black;
-  background-color: $zorroa-lightgray;
-  border-radius: 3px;
-  padding: 4px 8px;
+  align-self: flex-start;
+  color: $zorroa-gray;
   margin: 4px;
 }
 
-.Collections-folder-close {
-  margin-left: 4px;
-  font-size: 12px;
-  @include zorroa-square-btn-darken(20px)
+.Collections-folder-selected {
+  margin-right: 8px;
+}
+
+.Collections-folder-type {
+  margin-right: 8px;
+}
+
+.Collections-folder-name {
+  @include nowrap;
 }
 
 .Collections-clear-all {
   @include flexRowCenter;
-  padding-top: 2px;
-  padding-bottom: 10px;
+  min-height: 22px;
 }
 
 .Collections-clear-all-label {
@@ -56,6 +58,7 @@
   width: 70%;
   min-width: 150px;
   max-width: 400px;
+  margin-top: 10px;
   margin-bottom: 10px;
   margin-left: 10px;
   margin-right: 10px;
