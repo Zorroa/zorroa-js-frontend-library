@@ -22,13 +22,35 @@ class Collections extends Component {
   }
 
   state = {
+    folders: [],
     suggestions: [],
     suggestion: ''
   }
 
-  closeFolder = (folder, event) => {
+  componentWillMount () {
+    this.componentWillReceiveProps(this.props)
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.selectedFolderIds && nextProps.selectedFolderIds.size) {
+      const folders = [...this.state.folders]
+      nextProps.selectedFolderIds.forEach(id => {
+        if (folders.findIndex(folder => folder.id === id) < 0) {
+          const folder = nextProps.folders.get(id)
+          if (folder) folders.push(folder)
+        }
+      })
+      this.setState({ folders })
+    }
+  }
+
+  toggleFolder = (folder, event) => {
     const selectedIds = new Set([...this.props.selectedFolderIds])
-    selectedIds.delete(folder.id)
+    if (selectedIds.has(folder.id)) {
+      selectedIds.delete(folder.id)
+    } else {
+      selectedIds.add(folder.id)
+    }
     this.props.actions.selectFolderIds(selectedIds)
     this.setState({ suggestions: [], suggestion: '' })
   }
@@ -47,7 +69,7 @@ class Collections extends Component {
       const iter = folders.values()
       for (let i = iter.next(); !i.done && suggestions.length < 5; i = iter.next()) {
         const folder = i.value
-        if (folder.name.toLowerCase().includes(key)) suggestions.push({text: folder.name, folder: folder})
+        if (folder.name.toLowerCase().includes(key) && this.state.folders.findIndex(f => f.id === folder.id) < 0) suggestions.push({text: folder.name, folder: folder})
       }
       this.setState({suggestions, suggestion})
     }
@@ -72,7 +94,6 @@ class Collections extends Component {
     const selectedFolderNames = selectedFolders.map(folder => folder.name)
     const title = selectedFolderNames.length ? (isOpen ? CollectionsWidgetInfo.title : undefined) : CollectionsWidgetInfo.title
     const field = selectedFolderNames.length ? (isOpen ? undefined : selectedFolderNames.join(',')) : undefined
-    const placeholder = selectedFolders.length ? '' : 'Search folders'
 
     return (
       <Widget className='Collections'
@@ -86,17 +107,8 @@ class Collections extends Component {
               isIconified={isIconified}
               icon={CollectionsWidgetInfo.icon}>
         <div className="Collections-body">
-          <div className="Collections-folders">
-            { !selectedFolders.length && <div className="Collections-empty"><div className="icon-emptybox"/>No Folders Selected</div> }
-            { selectedFolders.map(folder => (
-              <div className="Collections-folder" key={folder.id}>
-                <div className="Collections-folder-name">{folder.name}</div>
-                <div className="Collections-folder-close icon-cross" onClick={e => this.closeFolder(folder, e)}/>
-              </div>
-            ))}
-          </div>
           <div className="Collections-suggestions">
-            <Suggestions suggestions={suggestions} placeholder={placeholder} className="clear"
+            <Suggestions suggestions={suggestions} placeholder='Search Folders' className="clear"
                          value={suggestion} onChange={this.suggest} onSelect={this.select}/>
           </div>
           { selectedFolderNames.length > 0 && (
@@ -107,6 +119,17 @@ class Collections extends Component {
               <div className="Collections-clear-all-icon icon-cancel-circle" onClick={this.clearAll}/>
             </div>
           )}
+          { selectedFolderNames.length <= 0 && <div className="Collections-clear-all" key="clear-all" /> }
+          <div className="Collections-folders">
+            { !this.state.folders.length && <div className="Collections-empty"><div className="icon-emptybox"/>No Folders Selected</div> }
+            { this.state.folders.map(folder => (
+              <div className="Collections-folder" key={folder.id}>
+                <div className={`Collections-folder-selected icon-checkbox-${selectedFolderIds.has(folder.id) ? 'checked' : 'empty'}`} onClick={e => this.toggleFolder(folder, e)}/>
+                <div className={`Collections-folder-type ${folder.isDyhi() ? 'icon-foldercog' : (folder.search ? 'icon-collections-smart' : 'icon-collections-simple')}`}/>
+                <div className="Collections-folder-name">{folder.name}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </Widget>
     )
