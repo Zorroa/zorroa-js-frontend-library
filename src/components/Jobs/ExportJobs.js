@@ -9,6 +9,7 @@ import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import CreateExport from '../Folders/CreateExport'
 import { exportAssets } from '../../actions/jobActions'
+import { showModal } from '../../actions/appActions'
 
 class ExportJobs extends Component {
   static propTypes = {
@@ -39,7 +40,7 @@ class ExportJobs extends Component {
     const disabled = !selectedAssetIds || !selectedAssetIds.size
     const addButton = (
       <div className={classnames('Jobs-controls-add', {disabled})}
-           title={`Export selected assets`} onClick={this.createExport}>
+           title={`Export selected assets`} onClick={this.exportAssets}>
         <div className="icon-export"/>
         <div className="Jobs-controls-add-label">EXPORT</div>
       </div>
@@ -56,6 +57,7 @@ export default connect(state => ({
   metadataFields: state.app.metadataFields
 }), dispatch => ({
   actions: bindActionCreators({
+    showModal,
     exportAssets
   }, dispatch)
 }))(ExportJobs)

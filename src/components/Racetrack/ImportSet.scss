@@ -9,34 +9,31 @@
 }
 
 .ImportSet-imports {
-  @include flexColCenter;
-  margin: 10px;
+  @include flexCol;
+  width: 100%;
+  padding: 10px;
+  min-height: 52px;
 }
 
 .ImportSet-import {
   @include flexRow;
   @include flexAlignItemsCenter;
-  padding: 4px 8px;
+  align-self: flex-start;
+  color: $zorroa-gray;
   margin: 4px;
-  border-radius: 3px;
-  color: black;
-  background-color: $zorroa-lightgray;
+}
+
+.ImportSet-import-selected {
+  margin-right: 8px;
 }
 
 .ImportSet-import-name {
   @include nowrap;
 }
 
-.ImportSet-import-close {
-  margin-left: 4px;
-  font-size: 12px;
-  @include zorroa-square-btn-darken(20px)
-}
-
 .ImportSet-clear-all {
   @include flexRowCenter;
-  padding-top: 2px;
-  padding-bottom: 10px;
+  min-height: 22px;
 }
 
 .ImportSet-clear-all-label {
@@ -55,6 +52,7 @@
   width: 70%;
   min-width: 150px;
   max-width: 400px;
+  margin-top: 10px;
   margin-bottom: 10px;
   margin-left: 10px;
   margin-right: 10px;

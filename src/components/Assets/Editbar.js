@@ -4,7 +4,6 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 import Asset from '../../models/Asset'
-import { showModal } from '../../actions/appActions'
 import { similar } from '../../actions/racetrackAction'
 import { weights } from '../Racetrack/SimilarHash'
 import { equalSets } from '../../services/jsUtil'
@@ -82,7 +81,6 @@ export default connect(state => ({
   isolatedId: state.assets.isolatedId
 }), dispatch => ({
   actions: bindActionCreators({
-    showModal,
     similar
   }, dispatch)
 }))(Editbar)
