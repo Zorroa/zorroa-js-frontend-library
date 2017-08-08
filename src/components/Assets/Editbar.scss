@@ -45,6 +45,7 @@
       &:not(.disabled):hover {
         color: black;
         cursor: pointer;
+        .dark & { color: white; }
       }
 
       &.disabled {
@@ -55,27 +56,6 @@
 
   .Editbar-similar {
     margin-right: 8px;
-    text-transform: uppercase;
-    border-radius: 3px;
-    padding: 5px;
-    @include flexRow;
-    @include flexAlignItemsCenter;
-    @include clampText;
-
-    &.disabled {
-      color: $zorroa-lightgray;
-      .dark & { color: $zorroa-gray; }
-    }
-
-    &:not(.disabled):hover {
-      background-color: white;
-      .dark & { background-color: $zorroa-dimgray; }
-      cursor:pointer;
-    }
-  }
-
-  .Editbar-export {
-    margin-left: 12px;
     text-transform: uppercase;
     border-radius: 3px;
     padding: 5px;
@@ -116,6 +96,7 @@
 .Editbar-similar-section {
   @include flexRowCenter;
   @include fullHeight;
+  margin-right: 12px;
   padding-left: 20px;
   padding-right: 20px;
   border-left: 1px solid $zorroa-lightgray;

@@ -73,7 +73,6 @@
   @include flexRowCenter;
   color: white;
   background-color: $zorroa-navy-blue;
-  border: none;
   border-radius: 3px;
   padding: 6px 8px;
   cursor: pointer;
@@ -84,12 +83,11 @@
   &.disabled {
     cursor: not-allowed;
     background-color: $zorroa-lightgray;
-    .dark & { background-color: $zorroa-darkgray; }
+    .dark & { background-color: $zorroa-darkgray; color: $zorroa-gray; }
   }
 
   &:not(.disabled) {
     &:hover {
-      border: 1px solid $zorroa-gray;
       background-color: darken($zorroa-navy-blue, 15%);
     }
     &:active {
@@ -104,28 +102,31 @@
   font-size: 12px;
 }
 
-.Jobs-sort {
-  @include flexRow;
-  @include flexJustifySpaceBetween;
-  @include flexAlignItemsCenter;
-}
-
-.Jobs-sort-button {
-  @include zorroa-square-btn-darken(20px);
-  font-size: 12px;
+.Jobs-header-sort {
+  @include flexRowCenter;
+  @include flexOff;
+  height: 24px;
+  width: 16px;
+  padding-right: 4px; // This compensates for the slight offset of icon-sort*
+  font-size: 11px;
+  cursor: pointer;
   border-radius: 3px;
-  margin-bottom: 8px;
-  margin-left: 4px;
   color: $zorroa-lightgray;
+  margin-left: 4px;
 
-  &:hover {
-    color: white;
+  .dark & { color: $zorroa-gray; }
+
+  &.icon-sort {
+    color: $zorroa-nearwhite;
+    .dark & {
+      color: $zorroa-darkgray;
+      &:hover { color: white; }
+    }
   }
 
-  &.enabled {
-    color: $zorroa-gray;
-    background-color: $zorroa-nearwhite;
-    .dark & { background-color: $zorroa-gray; color: $zorroa-nearwhite; }
+  &:hover {
+    background-color: $zorroa-sickly-green;
+    color: white;
   }
 }
 
@@ -168,6 +169,7 @@
 .Jobs-empty {
   @include flexColCenter;
   background-color: white;
+  padding-top: 8px;
   .dark & { background-color: black; }
 }
 
@@ -214,15 +216,29 @@
 }
 
 .Jobs-header {
+  @include flexRow;
   padding-top: 4px;
   padding-bottom: 4px;
-  margin-bottom: 4px;
-  border-bottom: $zorroa-lightgray;
-  .dark & { border-bottom: $zorroa-darkgray; }
+  border-bottom: 1px solid $zorroa-lightgray;
+  .dark & { border-bottom: 1px solid $zorroa-darkgray; background-color: black; }
+}
+
+.Jobs-header-title {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  margin-left: 4px;
+  font-family: "Roboto Condensed";
+  .dark & { color: $zorroa-gray; }
 }
 
 .Jobs-job-name {
   @include nowrap;
+  @include clampText;
+}
+
+.Jobs-job-date {
+  @include nowrap;
+  @include clampText;
 }
 
 .Jobs-progress {

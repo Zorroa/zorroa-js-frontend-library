@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 
 import Job from '../../models/Job'
 import { isolateJob } from '../../actions/jobActions'
+import { epochUTCString } from '../../services/jsUtil'
 
 class ImporterBar extends Component {
   static propTypes = {
@@ -17,11 +18,6 @@ class ImporterBar extends Component {
     this.props.actions.isolateJob()
   }
 
-  epochUTCString (msec) {
-    const d = new Date(msec)
-    return d.toUTCString()
-  }
-
   render () {
     const { job } = this.props
     return (
@@ -29,8 +25,8 @@ class ImporterBar extends Component {
         <div className="ImporterBar-job">
           <div className="ImporterBar-job-info ImporterBar-job-name">{job.name}</div>
           <div className="ImporterBar-job-info ImporterBar-job-owner">{job.user.username}</div>
-          <div className="ImporterBar-job-info ImporterBar-job-time">{this.epochUTCString(job.timeStarted)}</div>
-          <div className="ImporterBar-job-info ImporterBar-job-time">{this.epochUTCString(job.timeUpdated)}</div>
+          <div className="ImporterBar-job-info ImporterBar-job-time">{epochUTCString(job.timeStarted)}</div>
+          <div className="ImporterBar-job-info ImporterBar-job-time">{epochUTCString(job.timeUpdated)}</div>
         </div>
         <div className="ImporterBar-actions">
           <div className="ImporterBar-action">

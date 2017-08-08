@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import classnames from 'classnames'
 
 import Job from '../../models/Job'
 import Jobs from './Jobs'
@@ -13,8 +14,6 @@ class ImportJobs extends Component {
     actions: PropTypes.object
   }
 
-  state = {}
-
   createImport = () => {
     const width = '65vw'
     const body = <Import/>
@@ -26,9 +25,16 @@ class ImportJobs extends Component {
   }
 
   render () {
+    const disabled = false
+    const addButton = (
+      <div className={classnames('Jobs-controls-add', {disabled})}
+           title={`Create a new Import`} onClick={this.createImport}>
+        <div className="icon-import2"/>
+        <div className="Jobs-controls-add-label">NEW</div>
+      </div>
+    )
     return (
-      <Jobs jobType={Job.Import}
-            addJobEnabled={true} addJob={this.createImport}
+      <Jobs jobType={Job.Import} addButton={addButton}
             isolateJob={this.isolateImport}/>
     )
   }
