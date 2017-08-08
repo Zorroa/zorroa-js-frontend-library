@@ -125,7 +125,7 @@ export const CollectionsWidgetInfo = {
   element: <Collections/>,
   create: createCollectionsWidget,
   fieldTypes: [],
-  color: '#445FAA'
+  color: '#73B61C'
 }
 
 export const SortOrderWidgetInfo = {
