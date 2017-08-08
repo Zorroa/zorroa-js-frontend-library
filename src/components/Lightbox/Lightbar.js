@@ -56,10 +56,10 @@ class Lightbar extends Component {
     if (!text) return
     copy(text)
     this.setState({ copyingLink: true })
-    if (this.copyTimeout) clearTimeout(this.copyTimout)
-    this.copyTimout = setTimeout(() => {
+    if (this.copyTimeout) clearTimeout(this.copyTimeout)
+    this.copyTimeout = setTimeout(() => {
       this.setState({ copyingLink: false })
-      this.copyTimout = null
+      this.copyTimeout = null
     }, 3000)
   }
 
