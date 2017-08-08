@@ -197,7 +197,7 @@ class Racebar extends Component {
           <div className={classnames('Racebar-share', 'icon-external', {disabled})}
                onClick={this.shareSearch} title="Share search link"/>
           { sharedLink && (
-            <div className='Racebar-share-copy' onClick={this.copySearch}>
+            <div className='Racebar-share-copy' onClick={this.copySearch} data-link={sharedLink}>
               <div className='Racebar-share-copy-anchor'/>
               Search saved. Click to copy.
             </div>)
