@@ -23,6 +23,7 @@
 }
 
 .Racebar-right {
+  position: relative; // FBO .Racebar-share-copy
   @include flexRow;
   @include flexAlignItemsCenter;
   @include fullHeight;
@@ -36,55 +37,45 @@
 }
 
 .Racebar-clear {
-  @include flexRow;
-  @include flexAlignItemsCenter;
-
-  border-radius: 3px;
-  padding: 4px 7px;
-  margin: 1px 4px;
+  @include zorroa-btn(60px, 28px, $zorroa-lightgray, $zorroa-nearwhite);
   color: $zorroa-greyish-brown;
+  margin: 1px 4px;
   text-transform: uppercase;
-  background-color: $zorroa-lightgray;
-  border: 1px solid transparent;
-  cursor: pointer;
 
-  &:hover:not(.disabled) {
-    background-color: $zorroa-nearwhite;
-    border: 1px solid $zorroa-gray;
-    .dark & { background-color: $zorroa-darkgray; border: 1px solid $zorroa-dimgray; border: 1px solid transparent; }
+  .dark & {
+    @include zorroa-btn(60px, 28px, transparent, $zorroa-darkgray);
+    color: $zorroa-whitegray;
   }
+
   &.disabled {
+    @include zorroa-btn (60px, 28px, transparent, transparent);
     color: $zorroa-lightgray;
-    background-color: transparent;
     cursor: default;
     .dark & { color: $zorroa-dimgray; }
   }
-
-  .dark & { color: $zorroa-whitegray; background-color: transparent; }
-  div { margin-left: 8px; }
 }
 
 .Racebar-save {
-  @include flexRow;
-  @include flexAlignItemsCenter;
-
-  border-radius: 3px;
-  padding: 5px 8px;
-  margin: 4px 4px;
+  // height: 28px is same as .Racebar-share
+  @include zorroa-btn(60px, 28px, $zorroa-water-blue, darken($zorroa-water-blue, 15%));
   color: $zorroa-nearwhite;
-  background-color: $zorroa-navy-blue;
+  &:hover:not(.disabled) { color: white; }
+
   text-transform: uppercase;
-  cursor: pointer;
 
-  &:hover:not(.disabled) { background-color: lighten($zorroa-navy-blue, 15%); }
+  // flush against .Racebar share
+  margin: 4px 0 4px 4px;
+  border-radius: 3px 0 0 3px !important;
+
   &.disabled {
+    @include zorroa-btn(60px, 28px, $zorroa-lightgray, $zorroa-lightgray);
     cursor: default;
-    background-color: $zorroa-lightgray;
 
-    .dark & { color: $zorroa-gray; background-color: $zorroa-darkgray; }
+    .dark & {
+      @include zorroa-btn(60px, 28px, $zorroa-darkgray, $zorroa-darkgray);
+      color: $zorroa-gray;
+    }
   }
-
-  div { margin-left: 8px; }
 }
 
 .Racebar-searchbar {
@@ -100,4 +91,64 @@
 
   // Won't work until we make the home button a font icon
   .Racebar-clear.disabled & { color: $zorroa-lightgray; }
+}
+
+.Racebar-share {
+  // height: 28px is same as .Racebar-save
+  @include zorroa-btn(28px, 28px, $zorroa-water-blue, darken($zorroa-water-blue, 15%));
+  color: $zorroa-nearwhite;
+
+  font-size: 18px;
+  margin-right: 8px;
+
+  // flush against .Racebar-save
+  border-radius: 0 3px 3px 0 !important;
+
+  &:hover:not(.disabled) { color: white; }
+  &.disabled {
+    @include zorroa-btn(28px, 28px, $zorroa-lightgray, $zorroa-lightgray);
+    color: $zorroa-nearwhite;
+    .dark & { @include zorroa-btn(28px, 28px, $zorroa-darkgray, $zorroa-darkgray); color: $zorroa-gray; }
+    cursor: default;
+  }
+}
+
+.Racebar-share-copy {
+  position: absolute;
+  top: 45px;
+  left: -40px;
+  background-color: black;
+  color: $zorroa-nearwhite;
+  &:hover { color: $zorroa-light-green; }
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.Racebar-share-copy-anchor {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: -7px;
+  left: 116px;
+  z-index: -1;
+  transform: rotate(45deg);
+  background: black; // match .Racebar-share-copy
+}
+
+.Racebar-performed-action {
+  position: absolute;
+  @keyframes rise {
+    0% { top: 50px; }
+    80% { opacity: 1; }
+    100% { top: 40px; opacity: 0; }
+  }
+  animation: rise 1s linear forwards;
+  top: 45px;
+  left: -40px;
+  background-color: black;
+  color: $zorroa-nearwhite;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
 }

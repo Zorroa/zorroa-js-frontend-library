@@ -2,20 +2,24 @@ import React, { Component, PropTypes, cloneElement } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
+import copy from 'copy-to-clipboard'
 
 import User from '../../models/User'
 import Widget, { removeRaw } from '../../models/Widget'
 import Folder from '../../models/Folder'
+import AssetSearch from '../../models/AssetSearch'
 import TrashedFolder from '../../models/TrashedFolder'
 import * as WidgetInfo from './WidgetInfo'
 import Searcher from './Searcher'
 import Searchbar from '../Searchbar'
 import QuickAddWidget from './QuickAddWidget'
 import CreateFolder from '../Folders/CreateFolder'
-import { showModal, toggleCollapsible } from '../../actions/appActions'
+import { showModal, toggleCollapsible, dialogAlertPromise } from '../../actions/appActions'
 import { unorderAssets } from '../../actions/assetsAction'
 import { createFolder, selectFolderIds, createDyHiFolder } from '../../actions/folderAction'
 import { resetRacetrackWidgets, similar } from '../../actions/racetrackAction'
+import { saveSharedLink } from '../../actions/sharedLinkAction'
+import { LOAD_SEARCH_ITEM } from '../../constants/localStorageItems'
 
 class Racebar extends Component {
   static propTypes = {
@@ -31,12 +35,15 @@ class Racebar extends Component {
       values: PropTypes.arrayOf(PropTypes.string),
       ofsIds: PropTypes.arrayOf(PropTypes.string)
     }),
+    query: PropTypes.instanceOf(AssetSearch),
     user: PropTypes.instanceOf(User).isRequired,
     actions: PropTypes.object.isRequired
   }
 
   state = {
-    openId: -1
+    openId: -1,
+    sharedLink: null,
+    copyingLink: false
   }
 
   lastWidgetCount = -1
@@ -126,6 +133,27 @@ class Racebar extends Component {
     this.props.actions.resetRacetrackWidgets()
   }
 
+  shareSearch = () => {
+    const { query, similar, order, widgets, actions } = this.props
+    const attrs = { similar, widgets, order }
+
+    actions.saveSharedLink({folder: { search: query, attrs }})
+    .then(id => {
+      this.setState({ sharedLink: `${location.origin}/?${LOAD_SEARCH_ITEM}=${id}` })
+    })
+    .catch(err => {
+      actions.dialogAlertPromise('Save Search Error', 'Something went wrong saving this search. Check console for errors.')
+      return Promise.reject(err)
+    })
+  }
+
+  copySearch = () => {
+    copy(this.state.sharedLink)
+    this.setState({ sharedLink: null, copyingLink: true })
+    clearTimeout(this.copyTimeout)
+    this.copyTimeout = setTimeout(() => { this.setState({ copyingLink: false }) }, 2000)
+  }
+
   renderWidget (widget, isIconified) {
     const widgetInfo = Object.keys(WidgetInfo)
       .map(k => WidgetInfo[k])
@@ -141,6 +169,7 @@ class Racebar extends Component {
   }
 
   render () {
+    const { sharedLink, copyingLink } = this.state
     const { widgets, hoverFields, order, similar } = this.props
     const blacklist = [WidgetInfo.SimpleSearchWidgetInfo.type]
     const disabled = !(widgets && widgets.length) && !(order && order.length) &&
@@ -165,6 +194,15 @@ class Racebar extends Component {
                onClick={!disabled && this.saveRacetrack} title="Save the search">
             Save
           </div>
+          <div className={classnames('Racebar-share', 'icon-external', {disabled})}
+               onClick={this.shareSearch} title="Share search link"/>
+          { sharedLink && (
+            <div className='Racebar-share-copy' onClick={this.copySearch} data-link={sharedLink}>
+              <div className='Racebar-share-copy-anchor'/>
+              Search saved. Click to copy.
+            </div>)
+          }
+          { copyingLink && <div className="Racebar-performed-action">Copied URL to clipboard</div> }
           <div className={classnames('Racebar-clear', {disabled})}
                onClick={!disabled && this.clearRacetrack} title="Clear the search">
             Clear
@@ -180,6 +218,7 @@ export default connect(state => ({
   hoverFields: state.app.hoverFields,
   isolatedId: state.assets.isolatedId,
   order: state.assets.order,
+  query: state.assets.query,
   selectedFolderIds: state.folders.selectedFolderIds,
   trashedFolders: state.folders.trashedFolders,
   similar: state.racetrack.similar,
@@ -193,6 +232,8 @@ export default connect(state => ({
     unorderAssets,
     selectFolderIds,
     showModal,
-    toggleCollapsible
+    toggleCollapsible,
+    saveSharedLink,
+    dialogAlertPromise
   }, dispatch)
 }))(Racebar)

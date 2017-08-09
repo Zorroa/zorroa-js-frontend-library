@@ -155,76 +155,128 @@ describe('Workspace', function () {
 
   it('command progress', () => {
     return driver
-      .then(_ => { DEBUG && console.log('command progress') })
-      .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.header-menu-Import .DropdownMenu')))
-      .then(_ => selenium.clickSelector(By.css('.header-menu-Import .DropdownMenu')))
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.JobMenu-permissions')))
-      .then(_ => selenium.clickSelector(By.css('.JobMenu-permissions')))
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.AssetPermissions')))
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.AclEditor')))
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.AclEditor-permissions')))
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.AclEditor-permission-items')))
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('input[name="user__selenium"]')))
-      .then(_ => driver.findElement(By.css('input[name="user__selenium"]')).click())
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.AssetPermissions-apply')))
-      .then(_ => selenium.clickSelector(By.css('.AssetPermissions-apply')))
-      .then(_ => { DEBUG && console.log('command progress - started command') })
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.ProgressBar')))
-      .then(_ => driver.sleep(5000)) // progress bar is supposed to be visible for 5 seconds
-      .then(_ => { DEBUG && console.log('command progress - woke up') })
-      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.ProgressBar')))
-      .then(_ => { DEBUG && console.log('command progress - finished') })
+    .then(_ => { DEBUG && console.log('command progress') })
+    .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.header-menu-Import .DropdownMenu')))
+    .then(_ => selenium.clickSelector(By.css('.header-menu-Import .DropdownMenu')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.JobMenu-permissions')))
+    .then(_ => selenium.clickSelector(By.css('.JobMenu-permissions')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.AssetPermissions')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.AclEditor')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.AclEditor-permissions')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.AclEditor-permission-items')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('input[name="user__selenium"]')))
+    .then(_ => driver.findElement(By.css('input[name="user__selenium"]')).click())
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.AssetPermissions-apply')))
+    .then(_ => selenium.clickSelector(By.css('.AssetPermissions-apply')))
+    .then(_ => { DEBUG && console.log('command progress - started command') })
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.ProgressBar')))
+    .then(_ => driver.sleep(5000)) // progress bar is supposed to be visible for 5 seconds
+    .then(_ => { DEBUG && console.log('command progress - woke up') })
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.ProgressBar')))
+    .then(_ => { DEBUG && console.log('command progress - finished') })
+  })
+
+  it ('make sure shared link copy works', () => {
+    var sharedLinkURL = null
+    return driver
+    .then(_ => { DEBUG && console.log('make sure shared link copy works') })
+
+    // start a new fresh session, clearing out saved state
+    .then(_ => driver.get(`${selenium.BASE_URL}?ClearSessionState=1`))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Workspace')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Assets')))
+    .then(_ => selenium.waitForIdle())
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Widget.Color')))
+
+    .then(_ => { DEBUG && console.log('make sure shared link copy works 1') })
+
+    .then(_ => { DEBUG && console.log('add a color widget') })
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racebar-add-widget')))
+    .then(_ => selenium.clickSelector(By.css('.Racebar-add-widget')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.widget-COLOR')))
+    .then(_ => selenium.clickSelector(By.css('.widget-COLOR')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Racetrack'), 5000))
+    .then(_ => selenium.waitForIdle())
+    .then(_ => selenium.clickSelector(By.css('.Color-swatch-row:nth-of-type(8) .Color-swatch:nth-of-type(8)')))
+    .then(_ => selenium.waitForIdle())
+
+    .then(_ => { DEBUG && console.log('make sure shared link copy works 2') })
+
+    // share a link
+    .then(_ => selenium.clickSelector(By.css('.Racebar-share')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racebar-share-copy')))
+    .then(_ => driver.findElement(By.css('.Racebar-share-copy')).getAttribute('data-link')
+      .then(dataLink => { sharedLinkURL = dataLink } ))
+    .then(_ => selenium.clickSelector(By.css('.Racebar-share-copy')))
+
+    .then(_ => { DEBUG && console.log(`sharedLinkURL=${sharedLinkURL}`) })
+
+    // clear our saved state, so we can be sure the shared link worked
+    .then(_ => driver.get(`${selenium.BASE_URL}?ClearSessionState=1`))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Workspace')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Assets')))
+    .then(_ => selenium.waitForIdle())
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Widget.Color')))
+
+    // load the shared link, make sure the color widget comes back
+    .then(_ => driver.get(sharedLinkURL))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Workspace')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Assets')))
+    .then(_ => selenium.waitForIdle())
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Color')))
+
+    .then(_ => { DEBUG && console.log('make sure shared link copy works 3') })
   })
 
   it ('make sure session restore works', () => {
     return driver
-      .then(_ => { DEBUG && console.log('make sure session restore works 1') })
-      .then(_ => driver.get(`${selenium.BASE_URL}?ClearSessionState=1`))
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Workspace')))
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Assets')))
-      .then(_ => selenium.waitForIdle())
+    .then(_ => { DEBUG && console.log('make sure session restore works 1') })
+    .then(_ => driver.get(`${selenium.BASE_URL}?ClearSessionState=1`))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Workspace')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Assets')))
+    .then(_ => selenium.waitForIdle())
 
-      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Widget.Color')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Widget.Color')))
 
-      .then(_ => { DEBUG && console.log('add a color widget') })
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racebar-add-widget')))
-      .then(_ => selenium.clickSelector(By.css('.Racebar-add-widget')))
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.widget-COLOR')))
-      .then(_ => selenium.clickSelector(By.css('.widget-COLOR')))
-      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Racetrack'), 5000))
-      .then(_ => selenium.waitForIdle())
-      .then(_ => selenium.clickSelector(By.css('.Color-swatch-row:nth-of-type(8) .Color-swatch:nth-of-type(8)')))
-      .then(_ => selenium.waitForIdle())
+    .then(_ => { DEBUG && console.log('add a color widget') })
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racebar-add-widget')))
+    .then(_ => selenium.clickSelector(By.css('.Racebar-add-widget')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.widget-COLOR')))
+    .then(_ => selenium.clickSelector(By.css('.widget-COLOR')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Racetrack'), 5000))
+    .then(_ => selenium.waitForIdle())
+    .then(_ => selenium.clickSelector(By.css('.Color-swatch-row:nth-of-type(8) .Color-swatch:nth-of-type(8)')))
+    .then(_ => selenium.waitForIdle())
 
-      .then(_ => { DEBUG && console.log('make sure session restore works 2') })
-      .then(_ => driver.get(`${selenium.BASE_URL}`))
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Workspace')))
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Assets')))
-      .then(_ => selenium.waitForIdle())
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Color')))
+    .then(_ => { DEBUG && console.log('make sure session restore works 2') })
+    .then(_ => driver.get(`${selenium.BASE_URL}`))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Workspace')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Assets')))
+    .then(_ => selenium.waitForIdle())
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Color')))
 
-      .then(_ => { DEBUG && console.log('make sure session restore works 3') })
+    .then(_ => { DEBUG && console.log('make sure session restore works 3') })
   })
 
   it ('make sure embed mode works', () => {
     return driver
-      .then(_ => { DEBUG && console.log('make sure embed mode works 1') })
-      .then(_ => driver.get(`${selenium.BASE_URL}?EmbedMode=true&ClearSessionState=1`))
-      .then(_ => selenium.waitForIdle())
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Workspace')))
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Assets')))
-      .then(_ => selenium.waitForIdle())
-      .then(_ => selenium.expectSelectorVisibleToBe(false, By.css('.header')))
+    .then(_ => { DEBUG && console.log('make sure embed mode works 1') })
+    .then(_ => driver.get(`${selenium.BASE_URL}?EmbedMode=true&ClearSessionState=1`))
+    .then(_ => selenium.waitForIdle())
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Workspace')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Assets')))
+    .then(_ => selenium.waitForIdle())
+    .then(_ => selenium.expectSelectorVisibleToBe(false, By.css('.header')))
 
-      .then(_ => { DEBUG && console.log('make sure embed mode works 2') })
-      .then(_ => driver.get(`${selenium.BASE_URL}?EmbedMode=false&ClearSessionState=1`))
-      .then(_ => selenium.waitForIdle())
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Workspace')))
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Assets')))
-      .then(_ => selenium.waitForIdle())
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.header')))
+    .then(_ => { DEBUG && console.log('make sure embed mode works 2') })
+    .then(_ => driver.get(`${selenium.BASE_URL}?EmbedMode=false&ClearSessionState=1`))
+    .then(_ => selenium.waitForIdle())
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Workspace')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Assets')))
+    .then(_ => selenium.waitForIdle())
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.header')))
 
-      .then(_ => { DEBUG && console.log('make sure embed mode works 3') })
+    .then(_ => { DEBUG && console.log('make sure embed mode works 3') })
   })
 
   it('log out', () => {

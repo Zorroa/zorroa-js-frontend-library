@@ -65,6 +65,10 @@ class Exists extends Component {
 
   toggleMissing = (event) => {
     const isMissing = !event.target.checked
+    this.setMissing(isMissing)
+  }
+
+  setMissing = (isMissing) => {
     this.setState({ isMissing })
     this.modifySliver(this.state.field, isMissing)
   }
@@ -87,9 +91,9 @@ class Exists extends Component {
               icon={ExistsWidgetInfo.icon}>
         <div className="Exists-body">
           <div className="Exists-exists">
-            <div className="Exists-missing-label">missing</div>
+            <div className="Exists-missing-label" onClick={_ => this.setMissing(true)}>missing</div>
             <Toggle checked={!this.state.isMissing} onChange={this.toggleMissing} />
-            <div className="Exists-exists-label">exists</div>
+            <div className="Exists-exists-label" onClick={_ => this.setMissing(false)}>exists</div>
           </div>
         </div>
       </Widget>
