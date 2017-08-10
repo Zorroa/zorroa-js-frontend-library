@@ -6,7 +6,7 @@ import classnames from 'classnames'
 import Job, { JobFilter } from '../../models/Job'
 import User from '../../models/User'
 import ProgressBar from '../ProgressBar'
-import { getJobs, selectJobId, selectJobIds } from '../../actions/jobActions'
+import { getJobs, markJobDownloaded } from '../../actions/jobActions'
 import { epochUTCString } from '../../services/jsUtil'
 
 const SORT_NAME = 'name'
@@ -19,8 +19,10 @@ class Jobs extends Component {
     selectedJobIds: PropTypes.instanceOf(Set),
     jobType: PropTypes.string.isRequired,
     addButton: PropTypes.node,
+    selectJob: PropTypes.func,
     isolateJob: PropTypes.func,
     user: PropTypes.instanceOf(User).isRequired,
+    origin: PropTypes.string,
     actions: PropTypes.object
   }
 
@@ -80,15 +82,6 @@ class Jobs extends Component {
     this.setState({ filterString: '' })
   }
 
-  searchJob = (job, event) => {
-    const { jobType, selectedJobIds } = this.props
-    console.log('Search job ' + job.name)
-    const jobs = Object.keys(this.props.jobs).map(jobId => this.props.jobs[jobId])
-      .filter(job => job.type === jobType)
-      .sort((a, b) => (a.timeUpdated < b.timeUpdated ? 1 : (a.timeUpdated === b.timeUpdated ? 0 : -1)))
-    this.props.actions.selectJobId(job.id, event.shiftKey, event.metaKey, jobs, selectedJobIds, this.props.jobs)
-  }
-
   sortJobs = (field) => {
     let { sortField, sortAscending } = this.state
     if (field === sortField) {
@@ -106,7 +99,12 @@ class Jobs extends Component {
     return `Jobs-header-sort ${icon}`
   }
 
+  markDownloaded = (job) => {
+    this.props.actions.markJobDownloaded(job.id)
+  }
+
   renderStatus (job) {
+    const { origin } = this.props
     return (
       <div className="Jobs-status" style={{width: '25%', maxWidth: '25%'}}>
         { job.state === Job.Active && job.progress && (
@@ -125,12 +123,18 @@ class Jobs extends Component {
             { job.successCount() && <div className="Jobs-success"><div className="Jobs-success-icon icon-circle-check"/> {job.successCount()}</div> }
           </div>
         )}
+        { (job.type === Job.Export && (
+          <a className={classnames('Jobs-download', 'icon-download2', {notDownloaded: job.notDownloaded})}
+             onClick={_ => this.markDownloaded(job)}
+             title="Download export"
+             href={job.exportStream(origin)} download={job.name} />
+        ))}
       </div>
     )
   }
 
   render () {
-    const { jobType, addButton, isolateJob, selectedJobIds } = this.props
+    const { jobType, addButton, selectJob, isolateJob, selectedJobIds } = this.props
     const { filterString, sortAscending } = this.state
     const lcFilterString = filterString.toLowerCase()
     const _compare = (a, b) => {
@@ -189,7 +193,9 @@ class Jobs extends Component {
           </div>
           <div className="Jobs-body">
             { jobs.map(job => (
-              <div className={classnames('Jobs-job', {isSelected: selectedJobIds.has(job.id)})} key={job.id} onClick={e => this.searchJob(job, e)}
+              <div key={job.id}
+                   className={classnames('Jobs-job', {isSelected: selectedJobIds.has(job.id), isSelectable: isolateJob || selectJob})}
+                   onClick={e => selectJob && selectJob(job, e)}
                    onDoubleClick={_ => isolateJob && isolateJob(job)}>
                 <div className="Jobs-job-name" style={{width: '50%', maxWidth: '50%'}}>{job.name}</div>
                 <div className="Jobs-job-date" style={{width: '25%', maxWidth: '25%'}}>{epochUTCString(job.timeStarted)}</div>
@@ -212,11 +218,11 @@ class Jobs extends Component {
 export default connect(state => ({
   jobs: state.jobs.all,
   selectedJobIds: state.jobs.selectedIds,
-  user: state.auth.user
+  user: state.auth.user,
+  origin: state.auth.origin,
 }), dispatch => ({
   actions: bindActionCreators({
     getJobs,
-    selectJobId,
-    selectJobIds
+    markJobDownloaded
   }, dispatch)
 }))(Jobs)

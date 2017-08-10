@@ -22,6 +22,8 @@
 
 .Jobs-body {
   @include flexCol;
+  max-height: 30vh;
+  overflow: auto;
 }
 
 .Jobs-filter-add {
@@ -193,6 +195,7 @@
   padding: 4px;
   cursor: pointer;
   background-color: #f1f1f1;
+  min-height: 24px;
 
   .dark & { background-color: $zorroa-mattblack; }
   &:nth-child(even) {
@@ -204,7 +207,7 @@
     .dark & { background-color: black; }
   }
 
-  &:hover:not(.isSelected) {
+  &.isSelectable:hover:not(.isSelected) {
     background-color: $zorroa-hover;
     .dark & { background-color: $zorroa-dark-hover; }
   }
@@ -277,4 +280,28 @@
 .Jobs-success-icon {
   color: $zorroa-avocado-green;
   margin-right: 8px;
+}
+
+.Jobs-download {
+  @include flexRowCenter;
+  text-decoration: none;
+  color: white;
+  background-color: $zorroa-gray;
+  border-radius: 3px;
+  width: 20px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  align-self: center;
+  font-size: 12px;
+
+  &.notDownloaded {
+    color: white;
+    background-color: $zorroa-sickly-green;
+    &:hover { background-color: darken($zorroa-sickly-green, 15%); }
+  }
+
+  &:hover:not(.notDownloaded) {
+    background-color: $zorroa-sickly-green;
+    color: white;
+  }
 }
