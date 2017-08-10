@@ -19,6 +19,7 @@ import { unorderAssets } from '../../actions/assetsAction'
 import { createFolder, selectFolderIds, createDyHiFolder } from '../../actions/folderAction'
 import { resetRacetrackWidgets, similar } from '../../actions/racetrackAction'
 import { saveSharedLink } from '../../actions/sharedLinkAction'
+import { selectJobIds } from '../../actions/jobActions'
 import { LOAD_SEARCH_ITEM } from '../../constants/localStorageItems'
 
 class Racebar extends Component {
@@ -132,6 +133,7 @@ class Racebar extends Component {
     this.props.actions.similar()
     this.props.actions.unorderAssets()
     this.props.actions.resetRacetrackWidgets()
+    this.props.actions.selectJobIds()
   }
 
   shareSearch = () => {
@@ -233,6 +235,7 @@ export default connect(state => ({
     similar,
     unorderAssets,
     selectFolderIds,
+    selectJobIds,
     showModal,
     toggleCollapsible,
     saveSharedLink,

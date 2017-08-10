@@ -219,7 +219,7 @@ export default connect(state => ({
   jobs: state.jobs.all,
   selectedJobIds: state.jobs.selectedIds,
   user: state.auth.user,
-  origin: state.auth.origin,
+  origin: state.auth.origin
 }), dispatch => ({
   actions: bindActionCreators({
     getJobs,

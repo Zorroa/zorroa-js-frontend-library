@@ -13,7 +13,7 @@ import ImportSet from './ImportSet'
 import { createFacetWidget, createMapWidget, createColorWidget,
   createDateRangeWidget, createRangeWidget, createSimilarityWidget,
   createFiletypeWidget, createExistsWidget, createSearchWidget,
-  createCollectionsWidget, createSortOrderWidget, createImportSetWidget,
+  createCollectionsWidget, createSortOrderWidget, createImportSetWidget
 } from '../../models/Widget'
 
 // Pick colors from the style guide

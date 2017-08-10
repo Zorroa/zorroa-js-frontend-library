@@ -12,7 +12,7 @@ import {
   CANCEL_JOB, RESTART_JOB, SELECT_JOBS } from '../constants/actionTypes'
 import { archivistGet, archivistPost, archivistRequest } from './authAction'
 import Processor from '../models/Processor'
-import { selectId, equalSets } from '../services/jsUtil'
+import { selectId } from '../services/jsUtil'
 
 const jobEndpoint = '/api/v1/jobs'
 const importEndpoint = '/api/v1/imports'

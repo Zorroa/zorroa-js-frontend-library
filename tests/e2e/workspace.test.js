@@ -153,7 +153,7 @@ describe('Workspace', function () {
     .then(_ => selenium.clickSelector(By.css('.Developer-done')))
   })
 
-  it('command progress', () => {
+  xit('command progress', () => {
     return driver
     .then(_ => { DEBUG && console.log('command progress') })
     .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.header-menu-Import .DropdownMenu')))

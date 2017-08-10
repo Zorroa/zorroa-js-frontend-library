@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
-import Job, { JobTasks } from '../../models/Job'
+import Job from '../../models/Job'
 import Processor from '../../models/Processor'
 import ImporterBar from './ImporterBar'
 import ImporterSection from './ImporterSection'
@@ -11,41 +11,6 @@ import PieChart from '../PieChart'
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042',
   '#ce2d3f', '#fc6c2c', ' #a11e77', '#b7df4d', '#1875d1' ]
-
-const generateTimeSlots = () => {
-  const tasks = []
-  let cur = new JobTasks({
-    total: 1000,
-    completed: 0,
-    waiting: 0,
-    queued: 0,
-    running: 0,
-    success: 0,
-    failure: 0,
-    skipped: 0
-  })
-  for (let i = 0; i < 100; ++i) {
-    const t = new JobTasks(cur)
-    const k = Math.round(t.running * Math.random())
-    const e = Math.floor((t.running - k) * Math.random())
-    const s = Math.floor((t.running - k - e) * Math.random())
-    t.success += k
-    t.failure += e
-    t.skipped += s
-    t.completed += k + e + s
-    if (t.completed < t.total) {
-      const r = Math.floor(t.queued * Math.random())
-      t.running += r
-      const n = Math.round(Math.random() * 5)
-      t.queued += n
-    }
-    tasks.push(t)
-    cur = t
-  }
-  return tasks
-}
-
-const slots = generateTimeSlots()
 
 const pipeline = [
   new Processor({id: 1, description: 'Boom bam', name: 'Fireworks'}),
