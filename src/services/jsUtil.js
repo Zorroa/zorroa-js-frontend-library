@@ -37,6 +37,11 @@ export function formatDuration (seconds, fps) {
   return `${mm}:${ss}`
 }
 
+export function epochUTCString (msec) {
+  const d = new Date(msec)
+  return d.toUTCString()
+}
+
 // SPE's time code format is hours:minutes:seconds:frames
 const timeRE = /(\d+):(\d+):(\d+):(\d+)/
 //

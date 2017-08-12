@@ -3,10 +3,8 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
 
-import Job from '../../models/Job'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
-import JobMenu from './JobMenu'
 import Logo from '../../components/Logo'
 import DropdownMenu from '../../components/DropdownMenu'
 import Preferences from '../../components/Preferences'
@@ -74,8 +72,6 @@ class Header extends Component {
         <div className="flexOn"></div>
         <div className="header-menu-bar fullHeight flexCenter">
           <Editbar selectedAssetIds={selectedIds} onDeselectAll={this.deselectAll} />
-          <JobMenu jobType={Job.Export}/>
-          <JobMenu jobType={Job.Import}/>
           <div className="header-menu">
             <DropdownMenu label="Help">
               <a href="https://zorroa.com/help-center/" target="_blank" className="header-menu-item" >Tutorials</a>

@@ -19,6 +19,7 @@ import { unorderAssets } from '../../actions/assetsAction'
 import { createFolder, selectFolderIds, createDyHiFolder } from '../../actions/folderAction'
 import { resetRacetrackWidgets, similar } from '../../actions/racetrackAction'
 import { saveSharedLink } from '../../actions/sharedLinkAction'
+import { selectJobIds } from '../../actions/jobActions'
 import { LOAD_SEARCH_ITEM } from '../../constants/localStorageItems'
 
 class Racebar extends Component {
@@ -29,6 +30,7 @@ class Racebar extends Component {
     folderCounts: PropTypes.instanceOf(Map),
     selectedFolderIds: PropTypes.object,
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
+    selectedJobIds: PropTypes.instanceOf(Set),
     order: PropTypes.arrayOf(PropTypes.object),
     similar: PropTypes.shape({
       field: PropTypes.string,
@@ -98,10 +100,10 @@ class Racebar extends Component {
   }
 
   saveSearch = (name, acl, dyhiLevels) => {
-    const { widgets, selectedFolderIds, trashedFolders, order, similar, user } = this.props
+    const { widgets, selectedFolderIds, trashedFolders, selectedJobIds, order, similar, user } = this.props
     const parentId = user && user.homeFolderId
     const nonTrashedFolderIds = Searcher.nonTrashedFolderIds(selectedFolderIds, trashedFolders)
-    const search = Searcher.build(widgets, nonTrashedFolderIds, order, similar)
+    const search = Searcher.build(widgets, nonTrashedFolderIds, selectedJobIds, order, similar)
     const saveSearch = dyhiLevels && typeof dyhiLevels === 'string' && dyhiLevels === 'Search'
     const saveLayout = dyhiLevels && typeof dyhiLevels === 'string' && dyhiLevels === 'Layout'
     if (!saveLayout && !saveSearch && dyhiLevels && dyhiLevels.length) {
@@ -131,6 +133,7 @@ class Racebar extends Component {
     this.props.actions.similar()
     this.props.actions.unorderAssets()
     this.props.actions.resetRacetrackWidgets()
+    this.props.actions.selectJobIds()
   }
 
   shareSearch = () => {
@@ -219,6 +222,7 @@ export default connect(state => ({
   isolatedId: state.assets.isolatedId,
   order: state.assets.order,
   query: state.assets.query,
+  selectedJobIds: state.jobs.selectedIds,
   selectedFolderIds: state.folders.selectedFolderIds,
   trashedFolders: state.folders.trashedFolders,
   similar: state.racetrack.similar,
@@ -231,6 +235,7 @@ export default connect(state => ({
     similar,
     unorderAssets,
     selectFolderIds,
+    selectJobIds,
     showModal,
     toggleCollapsible,
     saveSharedLink,

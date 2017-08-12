@@ -1,0 +1,31 @@
+@import '../../styles/core-mixins.scss';
+
+.PieChart {
+  @include flexOn;
+  @include fullWidth;
+  height: 240px;
+  max-height: 240px;
+}
+
+.PieChart-pct {
+  font-size: 9px;
+  fill: white;
+  @include noSelect;
+  pointer-events: none;
+
+  .dark & { color: $zorroa-whitegray; }
+}
+
+.PieChart-label {
+  font-size: 10px;
+  fill: $zorroa-lightgray;
+  font-stretch: condensed;
+
+  .dark & { color: $zorroa-whitegray; }
+
+  &.active {
+    fill: $zorroa-navy-blue;
+    font-weight: 900;
+    font-size: 11px;
+  }
+}

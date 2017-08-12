@@ -99,33 +99,6 @@
     }
   }
 
-  .Facet-pie-chart {
-    @include flexOn;
-    @include fullWidth;
-    height: 240px;
-    max-height: 240px;
-
-    .Facet-pie-pct {
-      font-size: 9px;
-      fill: white;
-      @include noSelect;
-      pointer-events: none;
-    }
-
-    .Facet-pie-label {
-      font-size: 10px;
-      fill: $zorroa-lightgray;
-      font-stretch: condensed;
-
-      &.active {
-        fill: $zorroa-water-blue;
-        font-weight: 900;
-        font-size: 11px;
-      }
-    }
-
-  }
-
   // Custom scrollbar styles from Amber
   ::-webkit-scrollbar {
     width: 5px;

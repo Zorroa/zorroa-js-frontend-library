@@ -1,0 +1,31 @@
+@import '../../styles/core-mixins.scss';
+
+.ImporterSection {
+  background-color: black;
+  border-radius: 3px;
+  border: 1px solid $zorroa-dimgray;
+  min-height: 30px;
+  @include fullWidth;
+  position: relative;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  &.collapsed { max-height: 30px; }
+}
+
+.ImporterSection-collapser {
+  position: absolute;
+  right: 8px;
+  top: 2px;
+  color: $zorroa-nearwhite;
+  @include zorroa-btn(24px, 24px, black, $zorroa-dimgray);
+  transform: scaleY(-1);
+  &.collapsed { transform: none; }
+}
+
+.ImporterSection-title {
+  color: $zorroa-whitegray;
+  text-transform: uppercase;
+  padding: 6px;
+}

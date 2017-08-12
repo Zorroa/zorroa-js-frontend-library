@@ -9,10 +9,11 @@ import DateRange from './DateRange'
 import SimilarHash from './SimilarHash'
 import Collections from './Collections'
 import SortOrder from './SortOrder'
+import ImportSet from './ImportSet'
 import { createFacetWidget, createMapWidget, createColorWidget,
   createDateRangeWidget, createRangeWidget, createSimilarityWidget,
   createFiletypeWidget, createExistsWidget, createSearchWidget,
-  createCollectionsWidget, createSortOrderWidget
+  createCollectionsWidget, createSortOrderWidget, createImportSetWidget
 } from '../../models/Widget'
 
 // Pick colors from the style guide
@@ -137,4 +138,15 @@ export const SortOrderWidgetInfo = {
   create: createSortOrderWidget,
   fieldTypes: [],
   color: '#DCBA22'
+}
+
+export const ImportSetWidgetInfo = {
+  type: 'IMPORTSET',
+  icon: 'icon-import2',
+  title: 'Import',
+  description: 'Filter by import',
+  element: <ImportSet/>,
+  create: createImportSetWidget,
+  fieldTypes: [],
+  color: '#744E19'
 }

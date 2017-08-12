@@ -41,6 +41,10 @@ export default class Job {
     return (this.stats && this.stats.frameWarningCount) || (this.tasks && this.tasks.skipped)
   }
 
+  successCount () {
+    return (this.stats && this.stats.frameSuccessCount) || (this.tasks && this.tasks.success)
+  }
+
   exportStream (origin) {
     if (this.type === Job.Export && this.isFinished()) {
       return `${origin}/api/v1/exports/${this.id}/_stream`
@@ -99,7 +103,7 @@ export class JobFilter {
   }
 }
 
-class JobProgress {
+export class JobProgress {
   constructor ({ failed, running, skipped, success, total, waiting }) {
     this.failed = failed
     this.running = running
@@ -114,7 +118,7 @@ class JobProgress {
   }
 }
 
-class JobTasks {
+export class JobTasks {
   constructor ({ total, completed, waiting, queued, running, success, failure, skipped }) {
     this.total = total
     this.completed = completed
@@ -132,7 +136,7 @@ class JobTasks {
   }
 }
 
-class JobStats {
+export class JobStats {
   constructor ({ frameSuccessCount, frameErrorCount, frameWarningCount, frameTotalCount }) {
     this.frameSuccessCount = frameSuccessCount
     this.frameErrorCount = frameErrorCount
