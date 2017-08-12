@@ -78,7 +78,7 @@ function updateSimilarity (similar, state) {
   assert.ok(similar.values.length === similar.weights.length)
   assert.ok(similar.values.length <= 10)
   const index = state.widgets.findIndex(widget => (widget.type === SimilarHashWidgetInfo.type))
-  if (index < 0) {
+  if (index < 0 && similar.values.length) {
     let widgets = [...state.widgets]
     const isEnabled = true
     const isPinned = false

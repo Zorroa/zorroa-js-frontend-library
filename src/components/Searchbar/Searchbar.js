@@ -19,11 +19,6 @@ class Searchbar extends Component {
     suggestions: PropTypes.arrayOf(PropTypes.object),
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
     userSettings: PropTypes.object.isRequired,
-    similar: PropTypes.shape({
-      field: PropTypes.string,
-      values: PropTypes.arrayOf(PropTypes.string).isRequired,
-      assetIds: PropTypes.arrayOf(PropTypes.string).isRequired
-    }).isRequired,
     order: PropTypes.arrayOf(PropTypes.object)
   }
 
