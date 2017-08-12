@@ -4,7 +4,7 @@ import {
   METADATA_FIELDS, LIGHTBOX_METADATA,
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
-  SHOW_MULTIPAGE, SHOW_PAGES, VIDEO_VOLUME,
+  SHOW_MULTIPAGE, VIDEO_VOLUME,
   HOVER_FIELD, CLEAR_HOVER_FIELD,
   SHOW_DIALOG_ALERT, HIDE_DIALOG_ALERT,
   SHOW_DIALOG_CONFIRM, HIDE_DIALOG_CONFIRM,
@@ -211,13 +211,6 @@ export function setVideoVolume (volume) {
 export function showMultipage (show) {
   return ({
     type: SHOW_MULTIPAGE,
-    payload: show
-  })
-}
-
-export function showPages (show) {
-  return ({
-    type: SHOW_PAGES,
     payload: show
   })
 }

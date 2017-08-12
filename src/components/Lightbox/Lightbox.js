@@ -13,7 +13,6 @@ import { lightboxMetadata } from '../../actions/appActions'
 
 class Lightbox extends Component {
   static propTypes = {
-    pages: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     isolatedId: PropTypes.string.isRequired,
     lightboxMetadata: PropTypes.shape({
@@ -65,17 +64,11 @@ class Lightbox extends Component {
   }
 
   render () {
-    const { assets, pages, isolatedId, lightboxMetadata } = this.props
+    const { assets, isolatedId, lightboxMetadata } = this.props
     let asset = null
     let hasNext = false
     let hasPrev = false
     if (isolatedId) {
-      if (pages) {
-        const index = pages.findIndex(asset => (asset.id === isolatedId))
-        asset = pages[index]
-        hasPrev = index > 0
-        hasNext = index < pages.length - 1
-      }
       if (!asset && assets) {
         const index = assets.findIndex(asset => (asset.id === isolatedId))
         asset = assets[index]
@@ -107,7 +100,6 @@ class Lightbox extends Component {
 
 export default connect(state => ({
   assets: state.assets.all,
-  pages: state.assets.pages,
   isolatedId: state.assets.isolatedId,
   lightboxMetadata: state.app.lightboxMetadata
 }), dispatch => ({

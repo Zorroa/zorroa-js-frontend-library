@@ -137,7 +137,7 @@ class SimilarHash extends Component {
     const disabled = !selectedSimilar.values || !selectedSimilar.values.length || selectedSimilar.values.length > 10 ||
         !similar.field || !similar.field.length ||
         equalSets(new Set([...similar.values]), new Set([...selectedSimilar.values]))
-    const field = similar.field.replace(/^similarity\./, '').replace(/^Similarity\./, '').replace(/\.raw$/, '')
+    const field = similar && similar.field && similar.field.replace(/^similarity\./, '').replace(/^Similarity\./, '').replace(/\.raw$/, '')
     return (
       <Widget className="SimilarHash"
               id={id}

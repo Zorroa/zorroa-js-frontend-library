@@ -5,10 +5,8 @@ import {
   ASSET_SORT, ASSET_ORDER, ASSET_FIELDS,
   ASSET_PERMISSIONS, ASSET_SEARCHING,
   UPDATE_COMMAND, GET_COMMANDS,
-  ISOLATE_ASSET, SELECT_ASSETS,
-  SELECT_PAGES,
-  SUGGEST_COMPLETIONS, SEARCH_DOCUMENT,
-  SIMILAR_ASSETS
+  ISOLATE_ASSET, SELECT_ASSETS, ISOLATE_PARENT,
+  SUGGEST_COMPLETIONS, SIMILAR_ASSETS
 } from '../constants/actionTypes'
 import Asset from '../models/Asset'
 import Page from '../models/Page'
@@ -121,6 +119,13 @@ export function similarAssets (assetIds, fields) {
   }
 }
 
+export function isolateParent (asset) {
+  return ({
+    type: ISOLATE_PARENT,
+    payload: asset
+  })
+}
+
 export function searchAssets (query, lastQuery, force, isFirstPage, parentIds) {
   return dispatch => {
     const promises = []
@@ -202,33 +207,6 @@ export function searchAssets (query, lastQuery, force, isFirstPage, parentIds) {
   }
 }
 
-export function searchDocument (query, parentId) {
-  assert.ok(!query || query instanceof AssetSearch)
-  return dispatch => {
-    const filter = new AssetFilter({terms: {'source.clip.parent.raw': [parentId]}})
-    if (query.filter) {
-      query.filter.merge(filter)
-    } else {
-      query.filter = filter
-    }
-    query.size = 10000
-    query.from = 0
-    console.log('Search Document: ' + JSON.stringify(query))
-    archivistPost(dispatch, '/api/v3/assets/_search', query)
-      .then(response => {
-        console.log('Query Document' + JSON.stringify(query))
-        console.log(response)
-        const assets = response.data.list.map(asset => (new Asset(asset)))
-        dispatch({
-          type: SEARCH_DOCUMENT,
-          payload: assets
-        })
-      })
-      .catch(error => {
-        console.error('Error searching for assets: ' + error)
-      })
-  }
-}
 export function suggestQueryStrings (text) {
   if (!text) {
     return ({ type: SUGGEST_COMPLETIONS, payload: null })
@@ -271,13 +249,6 @@ export function isolateAssetId (id) {
 export function selectAssetIds (ids) {
   return ({
     type: SELECT_ASSETS,
-    payload: ids
-  })
-}
-
-export function selectPageAssetIds (ids) {
-  return ({
-    type: SELECT_PAGES,
     payload: ids
   })
 }

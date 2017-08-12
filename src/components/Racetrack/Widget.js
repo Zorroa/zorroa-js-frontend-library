@@ -5,9 +5,9 @@ import classnames from 'classnames'
 
 import WidgetHeader from './WidgetHeader'
 import { SimilarHashWidgetInfo, CollectionsWidgetInfo,
-  SortOrderWidgetInfo, ImportSetWidgetInfo } from './WidgetInfo'
+  SortOrderWidgetInfo, MultipageWidgetInfo, ImportSetWidgetInfo } from './WidgetInfo'
 import { iconifyRightSidebar } from '../../actions/appActions'
-import { sortAssets } from '../../actions/assetsAction'
+import { sortAssets, isolateParent } from '../../actions/assetsAction'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds, similar } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { selectJobIds } from '../../actions/jobActions'
@@ -65,6 +65,7 @@ class Widget extends Component {
     if (widget && widget.type === SortOrderWidgetInfo.type) this.props.actions.sortAssets()
     if (widget && widget.type === CollectionsWidgetInfo.type) this.props.actions.selectFolderIds()
     if (widget && widget.type === ImportSetWidgetInfo.type) this.props.actions.selectJobIds()
+    if (widget && widget.type === MultipageWidgetInfo.type) this.props.actions.isolateParent()
     this.props.actions.removeRacetrackWidgetIds([this.props.id])
   }
 
@@ -119,7 +120,8 @@ export default connect(
       selectFolderIds,
       selectJobIds,
       modifyRacetrackWidget,
-      removeRacetrackWidgetIds
+      removeRacetrackWidgetIds,
+      isolateParent
     }, dispatch)
   })
 )(Widget)

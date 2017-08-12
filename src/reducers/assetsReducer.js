@@ -4,9 +4,9 @@ import {
   SIMILAR_VALUES, SIMILAR_ASSETS,
   ASSET_PERMISSIONS, ASSET_SEARCHING,
   UPDATE_COMMAND, GET_COMMANDS,
-  ISOLATE_ASSET, SELECT_ASSETS, SELECT_PAGES,
+  ISOLATE_ASSET, SELECT_ASSETS,
   ADD_ASSETS_TO_FOLDER, REMOVE_ASSETS_FROM_FOLDER,
-  SUGGEST_COMPLETIONS, SEARCH_DOCUMENT, UNAUTH_USER
+  SUGGEST_COMPLETIONS, UNAUTH_USER, ISOLATE_PARENT
 } from '../constants/actionTypes'
 
 import * as api from '../globals/api.js'
@@ -63,8 +63,9 @@ export default function (state = initialState, action) {
       const parentCounts = multipage ? (isFirstPage ? new Map() : new Map(state.parentCounts)) : undefined
       const collapsedAssets = multipage ? [] : assets
       if (multipage) {
+        const isolatedParentId = state.isolatedParent && state.isolatedParent.parentId()
         assets.forEach(asset => {
-          if (asset.parentId()) {
+          if (asset.parentId() && asset.parentId() !== isolatedParentId) {
             const count = parentCounts.get(asset.parentId()) || 0
             parentCounts.set(asset.parentId(), count + 1)
             if (count < maxStackCount) {
@@ -76,7 +77,7 @@ export default function (state = initialState, action) {
         })
         // FIXME: No need for second pass, compute differences of parent.count, requires deep copy?
         assets.forEach(asset => {
-          if (asset.parentId()) {
+          if (asset.parentId() && asset.parentId() !== state.isolatedParentId) {
             const count = parentCounts.get(asset.parentId())
             if (count >= maxStackCount) collapsedCount++
           }
@@ -101,10 +102,6 @@ export default function (state = initialState, action) {
         return { ...state, aggs, parentTotals }
       }
       return { ...state, aggs }
-    }
-
-    case SEARCH_DOCUMENT: {
-      return { ...state, pages: action.payload }
     }
 
     case ASSET_SEARCH_ERROR:
@@ -148,16 +145,13 @@ export default function (state = initialState, action) {
       return { ...state, searching: action.payload }
 
     case ISOLATE_ASSET:
-      return { ...state, isolatedId: action.payload, pages: action.payload ? state.pages : null }
+      return { ...state, isolatedId: action.payload }
 
     case SELECT_ASSETS: {
       const selectionCounter = state.selectionCounter + 1
       api.setSelectionCounter(selectionCounter)
       return { ...state, selectedIds: action.payload, selectionCounter }
     }
-
-    case SELECT_PAGES:
-      return { ...state, selectedPageIds: action.payload }
 
     case SUGGEST_COMPLETIONS:
       return { ...state, suggestions: action.payload }
@@ -226,6 +220,11 @@ export default function (state = initialState, action) {
       const commands = action.payload
       return { ...state, commands }
     }
+
+    case ISOLATE_PARENT: {
+      return { ...state, isolatedParent: action.payload }
+    }
+
     case UNAUTH_USER:
       return initialState
   }

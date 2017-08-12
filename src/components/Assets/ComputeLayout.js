@@ -18,7 +18,7 @@
  collapsed     - Total number of assets collapsed into multipage docs
 */
 
-export function masonry (assets, panelWidth, thumbSize, showMultipage) {
+export function masonry (assets, panelWidth, thumbSize, showMultipage, isolatedParentId) {
   let idealAspectSum = panelWidth / thumbSize
   const proposedRowHeight = panelWidth / idealAspectSum
   const margin = 5
@@ -37,7 +37,7 @@ export function masonry (assets, panelWidth, thumbSize, showMultipage) {
     const { width, height, id, parentId } = asset
 
     let collapse = false
-    if (showMultipage) {
+    if (showMultipage && parentId !== isolatedParentId) {
       // Collapse siblings by setting the aspect to zero.
       // The height and y position are retained to set the Pager top.
       if (parentId) {
@@ -104,7 +104,7 @@ export function masonry (assets, panelWidth, thumbSize, showMultipage) {
   return { positions, multipage, collapsed }
 }
 
-export function grid (assets, panelWidth, thumbSize, showMultipage) {
+export function grid (assets, panelWidth, thumbSize, showMultipage, isolatedParentId) {
   const numColumns = Math.floor(panelWidth / thumbSize)
   const numMargins = numColumns - 1
   const margin = 5
@@ -125,7 +125,7 @@ export function grid (assets, panelWidth, thumbSize, showMultipage) {
   for (var i = 0; i < assets.length; i++) {
     const asset = assets[i]
     const { id, parentId } = asset
-    if (showMultipage) {
+    if (showMultipage && parentId !== isolatedParentId) {
       if (parentId) {
         const pages = multipage[parentId]
         if (!pages) {

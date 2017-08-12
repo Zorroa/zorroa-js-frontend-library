@@ -22,7 +22,6 @@ class Video extends Component {
     startFrame: PropTypes.number,
     stopFrame: PropTypes.number,
     videoVolume: PropTypes.number,
-    onMultipage: PropTypes.func,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object
@@ -137,7 +136,7 @@ class Video extends Component {
   }
 
   render () {
-    const { url, frameRate, frames, onMultipage, backgroundURL } = this.props
+    const { url, frameRate, frames, backgroundURL } = this.props
     const { playing, volume, played, startFrame, stopFrame, error } = this.state
     const seconds = played ? (played * frames - startFrame) / frameRate : 0
     const duration = (stopFrame - startFrame) / frameRate
@@ -147,7 +146,7 @@ class Video extends Component {
       <div className='Video'>
         <div className="Video-pan-zoom">
           { error && <div className="Video-error">{error.message}</div> }
-          <PanZoom title={title} titleWidth={300} onMultipage={onMultipage}
+          <PanZoom title={title} titleWidth={300}
                    onVideo={this.shuttle} playing={playing}
                    onVolume={this.setVolume} volume={volume}>
             <ReactPlayer
