@@ -4,8 +4,10 @@ import { connect } from 'react-redux'
 
 import Widget from './Widget'
 import { ImportSetWidgetInfo } from './WidgetInfo'
-import { selectJobIds } from '../../actions/jobActions'
+import { selectJobIds, getJobs } from '../../actions/jobActions'
 import Suggestions from '../Suggestions'
+import Job, { JobFilter } from '../../models/Job'
+import User from '../../models/User'
 
 class ImportSet extends Component {
   static propTypes = {
@@ -16,6 +18,7 @@ class ImportSet extends Component {
     isOpen: PropTypes.bool.isRequired,
     onOpen: PropTypes.func,
     floatBody: PropTypes.bool.isRequired,
+    user: PropTypes.instanceOf(User).isRequired,
     actions: PropTypes.object
   }
 
@@ -26,20 +29,33 @@ class ImportSet extends Component {
   }
 
   componentWillMount () {
+    const { user } = this.props
+    const userId = user && user.id
+    const type = Job.Import
+    const filter = new JobFilter({ type, userId })
+    this.props.actions.getJobs(filter, 0, 30)
     this.componentWillReceiveProps(this.props)
   }
 
   componentWillReceiveProps (nextProps) {
+    const jobs = [...this.state.jobs]
     if (nextProps.selectedJobIds && nextProps.selectedJobIds.size) {
-      const jobs = [...this.state.jobs]
       nextProps.selectedJobIds.forEach(id => {
         if (jobs.findIndex(job => job.id === id) < 0) {
           const job = nextProps.jobs[id]
           if (job) jobs.push(job)
         }
       })
-      this.setState({ jobs })
     }
+    const MIN_JOBS = 3
+    if (jobs.length < MIN_JOBS && nextProps.jobs) {
+      const firstJobs = Object.values(nextProps.jobs)
+        .filter(job => job.type === Job.Import && jobs.findIndex(j => j.id !== job.id) < 0)
+        .sort((a, b) => (a.timeStarted < b.timeStarted ? -1 : (a.timeStarted > b.timeStarted ? 1 : 0)))
+        .slice(0, MIN_JOBS)
+      firstJobs.forEach(job => jobs.push(job))
+    }
+    if (jobs !== this.state.jobs) this.setState({ jobs })
   }
 
   toggleJob = (job, event) => {
@@ -60,14 +76,18 @@ class ImportSet extends Component {
 
   suggest = (suggestion, lastAction) => {
     const { jobs } = this.props
+    const curJobs = this.state.jobs
     console.log('Suggest ' + suggestion)
     let suggestions = []
     if (suggestion && suggestion.length && lastAction === 'type') {
       const key = suggestion.toLowerCase()
-      for (let id in jobs) {
-        const job = jobs[id]
-        if (job.name.toLowerCase().includes(key) && this.state.jobs.findIndex(j => j.id === id) < 0) suggestions.push({text: job.name, job: job})
-      }
+      Object.values(jobs).forEach(job => {
+        if (job.type === Job.Import &&
+          job.name.toLowerCase().includes(key) &&
+          curJobs.findIndex(j => j.id === job.id) < 0) {
+          suggestions.push({text: job.name, job: job})
+        }
+      })
       this.setState({suggestions, suggestion})
     }
   }
@@ -133,9 +153,11 @@ class ImportSet extends Component {
 export default connect(
   state => ({
     jobs: state.jobs.all,
-    selectedJobIds: state.jobs.selectedIds
+    selectedJobIds: state.jobs.selectedIds,
+    user: state.auth.user
   }), dispatch => ({
     actions: bindActionCreators({
+      getJobs,
       selectJobIds
     }, dispatch)
   })

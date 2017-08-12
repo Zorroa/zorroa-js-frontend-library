@@ -123,7 +123,7 @@ class Jobs extends Component {
             { job.successCount() && <div className="Jobs-success"><div className="Jobs-success-icon icon-circle-check"/> {job.successCount()}</div> }
           </div>
         )}
-        { (job.type === Job.Export && (
+        { (job.type === Job.Export && job.state !== Job.Active && (
           <a className={classnames('Jobs-download', 'icon-download2', {notDownloaded: job.notDownloaded})}
              onClick={_ => this.markDownloaded(job)}
              title="Download export"

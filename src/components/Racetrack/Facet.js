@@ -58,7 +58,7 @@ class Facet extends Component {
       }
       if (widget.sliver.filter) {
         const terms = widget.sliver.filter.terms[field]
-        if (terms !== this.state.terms) {
+        if (terms && terms !== this.state.terms) {
           // determine whether any of the current terms are in the "other" bucket
           let otherIsSelected = false
           const buckets = this.aggBuckets(this.state.terms)
@@ -372,7 +372,7 @@ class Facet extends Component {
   render () {
     const { id, floatBody, isIconified, isOpen, onOpen } = this.props
     const { field, terms } = this.state
-    const lastName = Asset.lastNamespace(unCamelCase(field)).toUpperCase()
+    const lastName = field ? Asset.lastNamespace(unCamelCase(field)).toUpperCase() : ''
     const active = terms && terms.length
     const selected = active ? (isOpen ? lastName : terms.join(', ')) : lastName
     return (
