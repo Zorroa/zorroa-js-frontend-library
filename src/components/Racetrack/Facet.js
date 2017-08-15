@@ -305,7 +305,7 @@ class Facet extends Component {
               { this.renderHeaderCell('count') }
             </div> }
             <div className="Facet-value-table" style={{minHeight: isPinned ? '300px' : undefined}}>
-              <table>
+              <table className="Facet-value-table-table">
                 <thead>
                 { uxLevel === 0 ? (
                   <tr>
@@ -324,7 +324,7 @@ class Facet extends Component {
                     { selected: mergedTerms.indexOf(bucket.key) >= 0 })}
                       title={`Click to filter for ${bucket.key}`}
                       key={bucket.key} onClick={this.selectTerm.bind(this, bucket.key)}>
-                    <td className="Facet-value-cell">
+                    <td className="Facet-value-cell" style={{maxWidth: isPinned ? '0' : '360px'}}>
                       <div className="Facet-value-table-key">
                         { uxLevel > 0 && <div className="Facet-value-pct-bar" style={{width: `${100 * bucket.doc_count / maxCount}%`}} /> }
                         <div className="Facet-value-key">{this.renderBucketKey(bucket.key)}</div>

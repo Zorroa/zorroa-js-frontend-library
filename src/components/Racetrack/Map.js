@@ -116,12 +116,12 @@ class Map extends Component {
     const geohashCircleProperties = {
       'circle-color': '#82a626',
       'circle-blur': 0.5,
-      'circle-opacity': 0.75,
+      'circle-opacity': 0.5,
       'circle-radius': 4
     }
     const locationCircleProperties = {
-      'circle-color': '#d56f74',
-      'circle-opacity': 0.5,
+      'circle-color': '#627621',
+      'circle-opacity': 0.75,
       'circle-blur': 0.95,
       'circle-radius': 6
     }
@@ -141,7 +141,7 @@ class Map extends Component {
               field={field}
               backgroundColor={MapWidgetInfo.color}
               isIconified={isIconified}>
-        <ReactMapboxGl containerStyle={{height: '500px'}}
+        <ReactMapboxGl containerStyle={{height: '500px', width: '500px'}}
                        style={mapboxStyle}
                        center={[this.center.lng, this.center.lat]}
                        zoom={[this.zoom]}
