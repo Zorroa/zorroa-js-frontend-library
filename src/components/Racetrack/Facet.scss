@@ -47,6 +47,12 @@
     flex: 1;
   }
 
+  .Facet-value-table-table {
+    width: 100%;
+    border: 0;
+    border-spacing: 0;
+  }
+
   .Facet-value-table {
     @include flexOn;
     @include flexCol;
@@ -55,7 +61,7 @@
     max-width: 100%;
     max-height: 300px;
     border-bottom: 1px solid $zorroa-nearwhite;
-    overflow: hidden;
+    overflow-x: auto;
     overflow-y: auto;
 
     .Facet-value-table-row:nth-child(odd) {
@@ -104,16 +110,8 @@
     width: 5px;
   }
 
-  table {
-    width: 100%;
-    border: 0;
-    border-spacing: 0;
-  }
-
   .Facet-value-cell {
     padding: 0;
-    max-width: 360px;
-    //max-width: 0; // This looks weird, but is important! It allows cells to chop content
     @include clampText;
   }
 

@@ -25,6 +25,7 @@
 
   &.active {
     fill: $zorroa-navy-blue;
+    .dark & { fill: $zorroa-sickly-green; }
     font-weight: 900;
     font-size: 11px;
   }

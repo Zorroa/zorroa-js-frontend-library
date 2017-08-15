@@ -92,7 +92,7 @@ const renderActivePieSectionShape = (section) => {
             textAnchor={textAnchor}
             className="PieChart-label active"
             dominantBaseline="central">
-        {this.renderBucketKey(name)}
+        {name}
       </text>
     </g>
   )
@@ -129,7 +129,7 @@ PieChartWrapper.propTypes = {
     name: PropTypes.string.isRequired,
     value: PropTypes.number.isRequired
   })).isRequired,
-  activeIndex: PropTypes.number,
+  activeIndex: PropTypes.arrayOf(PropTypes.number),
   terms: PropTypes.arrayOf(PropTypes.string),
   otherIsSelected: PropTypes.bool,
   onSelectPieSection: PropTypes.func,
