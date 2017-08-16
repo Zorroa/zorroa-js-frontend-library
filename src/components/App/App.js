@@ -1,5 +1,8 @@
 import React, { Component, PropTypes } from 'react'
-import { EMBEDMODE_ITEM, LOAD_SEARCH_ITEM, CLEAR_SESSION_STATE_ITEM, SESSION_STATE_ITEM } from '../../constants/localStorageItems'
+import {
+  EMBEDMODE_ITEM, LOAD_SEARCH_ITEM, CLEAR_SESSION_STATE_ITEM, SESSION_STATE_ITEM,
+  SHOW_IMPORT_ITEM
+} from '../../constants/localStorageItems'
 import domUtils from '../../services/domUtils'
 
 class App extends Component {
@@ -17,6 +20,9 @@ class App extends Component {
     }
     if (queryParams[CLEAR_SESSION_STATE_ITEM]) {
       localStorage.removeItem(SESSION_STATE_ITEM)
+    }
+    if (queryParams[SHOW_IMPORT_ITEM]) {
+      localStorage.setItem(SHOW_IMPORT_ITEM, queryParams[SHOW_IMPORT_ITEM])
     }
   }
 
