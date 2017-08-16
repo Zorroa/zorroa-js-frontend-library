@@ -80,10 +80,14 @@ class Assets extends Component {
       assetsScrollTop: 0,
       assetsScrollHeight: 0,
       assetsScrollWidth: 0,
+      assetsScreenX: 0,
+      assetsScreenY: 0,
       tableIsResizing: false,
       positions: [],
       multipage: {},
-      collapsed: 0
+      collapsed: 0,
+      mouseScreenX: -1,
+      mouseScreenY: -1
     }
 
     this.newTableHeight = 0
@@ -254,11 +258,14 @@ class Assets extends Component {
   updateAssetsScrollSize = () => {
     const assetsScroll = this.refs.assetsScroll
     if (!assetsScroll) return
+    const screen = this.getElementScreenPos(assetsScroll)
     if (assetsScroll.clientHeight !== this.state.assetsScrollHeight ||
       assetsScroll.clientWidth !== this.state.assetsScrollWidth) {
       this.setState({
         assetsScrollHeight: assetsScroll.clientHeight,
-        assetsScrollWidth: assetsScroll.clientWidth
+        assetsScrollWidth: assetsScroll.clientWidth,
+        assetsScreenX: screen[0],
+        assetsScreenY: screen[1]
       })
       if (!this.state.tableIsResizing) this.queueAssetsLayout()
     }
@@ -511,6 +518,15 @@ class Assets extends Component {
     actions.iconifyRightSidebar(!rightSidebarIsIconified)
   }
 
+  getElementScreenPos = (element) => {
+    var totalOffset = [ 0, 0 ]
+    do {
+      totalOffset[0] += element.offsetLeft
+      totalOffset[1] += element.offsetTop
+    } while (element = element.offsetParent)
+    return totalOffset
+  }
+
   renderAssets () {
     const { assets, selectedIds, loadedCount, filteredCount, layout, showMultipage,
       parentCounts, parentTotals, origin, thumbSize, query, thumbFieldTemplate, isolatedParent } = this.props
@@ -540,7 +556,7 @@ class Assets extends Component {
     return (
       <div {...assetsScrollParams}>
         <Measure>
-          {({width, height}) => {
+          {({width, height, bottom, left, right, top}) => {
             if (!width || !positions.length) {
               this.queueAssetsLayout()
               return (<div style={{'width': '100%'}}></div>)
@@ -562,11 +578,19 @@ class Assets extends Component {
             // the Thumbs, given the positions we've computed for all the Thumbs.
             // Note the explicit 'top' properties on Assets-layout-top and Pager.
 
+            const { mouseScreenX, mouseScreenY, assetsScreenX, assetsScreenY, assetsScrollHeight, assetsScrollTop } = this.state
+            const mouseAssetsX = mouseScreenX - assetsScreenX
+            const mouseAssetsY = mouseScreenY - assetsScreenY + assetsScrollTop
+
             return (
-              <div className={`Assets-layout ${layout}`}>
+              <div className={`Assets-layout ${layout}`}
+                onMouseMove={e => {
+                  this.setState({ mouseScreenX: e.pageX, mouseScreenY: e.pageY })
+                }}>
                 <div className='Assets-layout-top' style={{top: 0, width: 0, height: 0}}>&nbsp;</div>
                 { assets.map((asset, index) => {
-                  const dim = index < positions.length ? positions[index] : { width: 0, height: 0 }
+                  const pos = positions[index]
+                  const dim = index < positions.length ? pos : { width: 0, height: 0 }
                   const { width, height } = dim
                   // Render only the visible thumbnails
                   if ((assetsScrollPadding + dim.y > this.state.assetsScrollTop + this.state.assetsScrollHeight) ||
@@ -591,9 +615,10 @@ class Assets extends Component {
                   const parentId = asset.parentId()
                   const indexes = parentId && multipage[parentId]
                   const stackCount = parentId && parentTotals && parentTotals.get(parentId)
+                  const showBadge = (mouseAssetsX > pos.x && mouseAssetsX < pos.x + pos.width && mouseAssetsY > pos.y && mouseAssetsY < pos.y + pos.height)
                   const badgeHeight = thumbSize < 100 ? 15 : 25
-                  const badge = showMultipage && parentId !== isolatedParentId ? multipageBadges(asset, origin, stackCount) : monopageBadges(asset)
-                  const iconBadge = <div className="Thumb-field"><FieldTemplate asset={asset} template={thumbFieldTemplate} extensionOnLeft={false}/></div>
+                  const badge = showBadge && showMultipage && parentId !== isolatedParentId ? multipageBadges(asset, origin, stackCount) : monopageBadges(asset)
+                  const iconBadge = showBadge ? <div className="Thumb-field"><FieldTemplate asset={asset} template={thumbFieldTemplate} extensionOnLeft={false}/></div> : null
 
                   const pages = indexes && indexes.slice(0, 3).map(index => (
                       page(assets[index], width, height, origin, indexes))) ||
