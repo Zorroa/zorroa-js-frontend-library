@@ -11,7 +11,7 @@ import {
   SHOW_DIALOG_CONFIRM, HIDE_DIALOG_CONFIRM,
   SHOW_DIALOG_PROMPT, HIDE_DIALOG_PROMPT,
   THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE, DRAG_FIELD_TEMPLATE,
-  UX_LEVEL, EMBEDMODE_ENABLED, MONOCHROME,
+  UX_LEVEL, EMBEDMODE_ENABLED, MONOCHROME, SHOW_IMPORT,
   ARCHIVIST_SETTING
 } from '../constants/actionTypes'
 import { DEFAULT_THUMBSIZE } from '../actions/appActions'
@@ -133,6 +133,8 @@ export default function app (state = initialState, action) {
       return { ...state, thumbLayout: action.payload }
     case SHOW_TABLE:
       return { ...state, showTable: action.payload }
+    case SHOW_IMPORT:
+      return { ...state, showImport: action.payload }
     case TABLE_HEIGHT:
       return { ...state, tableHeight: action.payload }
     case VIDEO_VOLUME:

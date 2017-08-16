@@ -10,7 +10,7 @@ import {
   SHOW_DIALOG_CONFIRM, HIDE_DIALOG_CONFIRM,
   SHOW_DIALOG_PROMPT, HIDE_DIALOG_PROMPT,
   THUMB_FIELD_TEMPLATE, DRAG_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE,
-  UX_LEVEL, EMBEDMODE_ENABLED, MONOCHROME
+  UX_LEVEL, EMBEDMODE_ENABLED, MONOCHROME, SHOW_IMPORT
 } from '../constants/actionTypes'
 
 export const MIN_THUMBSIZE = 48
@@ -274,5 +274,12 @@ export function monochrome (state) {
   return ({
     type: MONOCHROME,
     payload: state
+  })
+}
+
+export function showImport (show) {
+  return ({
+    type: SHOW_IMPORT,
+    payload: show
   })
 }

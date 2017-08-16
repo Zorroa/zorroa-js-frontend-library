@@ -1,4 +1,4 @@
-import Import, { CLOUD_IMPORT, SERVER_IMPORT, LOCAL_IMPORT } from './Import'
+import Import, { CLOUD_IMPORT, SERVER_IMPORT, LOCAL_IMPORT, SERVER_PATH_IMPORT } from './Import'
 import LocalChooser from './LocalChooser'
 import './Import.scss'
 import './ImportSource.scss'
@@ -8,9 +8,10 @@ import './ImportFinder.scss'
 import './LocalChooser.scss'
 import './StepCounter.scss'
 import './DropboxChooser.scss'
+import './ServerPathChooser.scss'
 import './ImportingTip.scss'
 import './CloudproxyInstructions.scss'
 import './TutorialVideos.scss'
 export default Import
-export { CLOUD_IMPORT, SERVER_IMPORT, LOCAL_IMPORT }
+export { CLOUD_IMPORT, SERVER_IMPORT, LOCAL_IMPORT, SERVER_PATH_IMPORT }
 export { LocalChooser }

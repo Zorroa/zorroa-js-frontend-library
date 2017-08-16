@@ -7,7 +7,8 @@ import {
   AUTH_PERMISSIONS, AUTH_SYNC, METADATA_FIELDS, AUTH_ONBOARDING, AUTH_HMAC,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT, SET_TABLE_FIELD_WIDTH,
   SHOW_MULTIPAGE, VIDEO_VOLUME, AUTH_CHANGE_PASSWORD, AUTH_DEFAULTS,
-  UX_LEVEL, MONOCHROME, THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE, DRAG_FIELD_TEMPLATE
+  UX_LEVEL, MONOCHROME, THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE,
+  DRAG_FIELD_TEMPLATE, LIST_SERVER_IMPORT_FILES
 } from '../constants/actionTypes'
 import { USER_ITEM, ORIGIN_ITEM } from '../constants/localStorageItems'
 import User from '../models/User'
@@ -324,7 +325,7 @@ export function saveUserSettings (user, metadata) {
 
 export function getHMACKey () {
   return dispatch => {
-    archivistGet(dispatch, '/api/v1/api-key')
+    return archivistGet(dispatch, '/api/v1/api-key')
       .then(response => {
         dispatch({ type: AUTH_HMAC, payload: response.data })
         console.log('Got hmac key: ' + response.data)
@@ -332,5 +333,15 @@ export function getHMACKey () {
       .catch(error => {
         console.error('Cannot get HMAC key: ' + error)
       })
+  }
+}
+
+export function listServerImportFiles (path) {
+  return dispatch => {
+    return archivistPost(dispatch, 'api/v1/lfs', {path})
+    .then(response => {
+      dispatch({ type: LIST_SERVER_IMPORT_FILES, payload: response.data })
+      return response
+    })
   }
 }

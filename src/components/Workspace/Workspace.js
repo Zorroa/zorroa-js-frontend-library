@@ -35,7 +35,7 @@ import Feedback from '../Feedback'
 import Import, { LocalChooser } from '../Import'
 import Importer from '../Importer'
 import { ImportJobs, ExportJobs } from '../Jobs'
-import { LOCAL_IMPORT, CLOUD_IMPORT, SERVER_IMPORT } from '../Import/ImportConstants'
+import { LOCAL_IMPORT, CLOUD_IMPORT, SERVER_IMPORT, SERVER_PATH_IMPORT } from '../Import/ImportConstants'
 import { EMBEDMODE_ITEM, LOAD_SEARCH_ITEM, SESSION_STATE_ITEM, SHOW_IMPORT_ITEM } from '../../constants/localStorageItems'
 import AssetSearch from '../../models/AssetSearch'
 
@@ -135,7 +135,7 @@ class Workspace extends Component {
     const showImport = localStorage.getItem(SHOW_IMPORT_ITEM)
     if (showImport) {
       localStorage.removeItem(SHOW_IMPORT_ITEM)
-      const sources = { cloud: CLOUD_IMPORT, file_server: SERVER_IMPORT, my_computer: LOCAL_IMPORT }
+      const sources = { cloud: CLOUD_IMPORT, file_server: SERVER_IMPORT, my_computer: LOCAL_IMPORT, network_drive: SERVER_PATH_IMPORT }
       const source = sources[showImport]
       this.tipShown = true
       const width = '65vw'
