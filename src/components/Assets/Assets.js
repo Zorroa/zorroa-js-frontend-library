@@ -83,7 +83,8 @@ class Assets extends Component {
       tableIsResizing: false,
       positions: [],
       multipage: {},
-      collapsed: 0
+      collapsed: 0,
+      badgeId: null
     }
 
     this.newTableHeight = 0
@@ -591,15 +592,18 @@ class Assets extends Component {
                   const parentId = asset.parentId()
                   const indexes = parentId && multipage[parentId]
                   const stackCount = parentId && parentTotals && parentTotals.get(parentId)
+                  const showBadge = this.state.badgeId === asset.id
                   const badgeHeight = thumbSize < 100 ? 15 : 25
-                  const badge = showMultipage && parentId !== isolatedParentId ? multipageBadges(asset, origin, stackCount) : monopageBadges(asset)
-                  const iconBadge = <div className="Thumb-field"><FieldTemplate asset={asset} template={thumbFieldTemplate} extensionOnLeft={false}/></div>
+                  const badge = showBadge && showMultipage && parentId !== isolatedParentId ? multipageBadges(asset, origin, stackCount) : monopageBadges(asset)
+                  const iconBadge = showBadge ? <div className="Thumb-field"><FieldTemplate asset={asset} template={thumbFieldTemplate} extensionOnLeft={false}/></div> : null
 
                   const pages = indexes && indexes.slice(0, 3).map(index => (
                       page(assets[index], width, height, origin, indexes))) ||
                     [page(asset, width, height, origin)]
                   return (
                     <Thumb isSelected={selectedIds && selectedIds.has(asset.id)}
+                           onMouseEnter={e => this.setState({ badgeId: asset.id })}
+                           onMouseLeave={e => { if (this.state.badgeId === asset.id) this.setState({ badgeId: null }) }}
                            dim={dim}
                            key={asset.id}
                            assetId={asset.id}
