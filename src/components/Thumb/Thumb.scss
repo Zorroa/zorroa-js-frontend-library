@@ -57,9 +57,6 @@
   top: 4px;
 
   @include flexRow;
-
-  opacity: 0;
-  .Thumb:hover & { opacity: 1; }
 }
 
 .Thumb-field {

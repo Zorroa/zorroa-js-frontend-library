@@ -133,6 +133,8 @@ class Thumb extends Component {
 
     // Actions
     onClick: PropTypes.func.isRequired,
+    onMouseEnter: PropTypes.func.isRequired,
+    onMouseLeave: PropTypes.func.isRequired,
     onDoubleClick: PropTypes.func.isRequired,
 
     // Dragging properties
@@ -166,7 +168,7 @@ class Thumb extends Component {
   }
 
   render () {
-    const {pages, parentURL, isSelected, onClick, onDoubleClick, dragparams} = this.props
+    const {pages, parentURL, isSelected, onClick, onMouseEnter, onMouseLeave, onDoubleClick, dragparams} = this.props
     const {width, height, x, y} = this.props.dim      // Original thumb rect
     if (!width || !height) return null
 
@@ -176,7 +178,8 @@ class Thumb extends Component {
       const { url, backgroundColor } = pages[0]
       return (
         <div className={classnames('Thumb', {isSelected})} style={style}
-             onClick={onClick} onDoubleClick={onDoubleClick} {...dragparams}>
+             onClick={onClick} onDoubleClick={onDoubleClick}
+             onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} {...dragparams}>
           <ImageThumb url={url} backgroundColor={backgroundColor}>
             { this.renderOverlays() }
             { this.renderBadges() }
@@ -187,7 +190,8 @@ class Thumb extends Component {
 
     return (
       <div className={classnames('Thumb', {isSelected})} style={style}
-           onClick={onClick} onDoubleClick={onDoubleClick} {...dragparams}>
+           onClick={onClick} onDoubleClick={onDoubleClick}
+           onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} {...dragparams}>
         { pages.slice(0, 3).reverse().map((page, rindex) => {
           const { url, backgroundColor } = page
           const index = Math.min(3, pages.length) - rindex - 1
