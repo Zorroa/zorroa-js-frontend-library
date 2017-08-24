@@ -279,6 +279,29 @@ describe('Workspace', function () {
     .then(_ => { DEBUG && console.log('make sure embed mode works 3') })
   })
 
+  it ('make sure import window url param works', () => {
+    return driver
+    .then(_ => { DEBUG && console.log('make sure import window url param works') })
+
+    // open all the import windows
+    .then(_ => driver.get(`${selenium.BASE_URL}?ShowImport=1`))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.ImportSource')))
+
+    .then(_ => driver.get(`${selenium.BASE_URL}?ShowImport=cloud`))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.ImportCloud')))
+
+    .then(_ => driver.get(`${selenium.BASE_URL}?ShowImport=file_server`))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.ImportCloudproxy')))
+
+    .then(_ => driver.get(`${selenium.BASE_URL}?ShowImport=my_computer`))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.LocalChooser')))
+
+    // clean up
+    .then(_ => selenium.clickSelector(By.css('.Import-cancel')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Import')))
+    .then(_ => selenium.waitForIdle())
+  })
+
   it('log out', () => {
     return driver
     .then(_ => { DEBUG && console.log('log out') })

@@ -24,6 +24,8 @@ if [[ $USE_ZORROA_GRID == "true" ]]; then
   # wait for the ssh connection to spin up
   while ! nc -w 1 localhost 4444 </dev/null; do sleep 1; done
 
+  sleep 1 # TODO: the nc test just below isn't working without this sleep
+
   # make sure a server is running
   if ! nc -z shub.zorroa.com $ZORROA_GRID_PORT; then
     echo "I see no curator running on shub:$ZORROA_GRID_PORT; make sure to start your server"
@@ -35,7 +37,7 @@ fi
 # Run all tests
 # jest -w 8 would start 8 workers (# tests running simultaneously) TODO: above 4 seems unstable. why?
 # -b flag bails on the suite after the first failure
-$projroot/node_modules/.bin/jest -w 4 -b --debug --forceExit --logHeapUsage --verbose "$@"
+$projroot/node_modules/.bin/jest -w 3 -b --debug --forceExit --logHeapUsage --verbose "$@"
 testResultExitCode=$?
 
 if [[ $USE_ZORROA_GRID == "true" ]]; then

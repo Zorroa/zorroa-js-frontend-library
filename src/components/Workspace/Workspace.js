@@ -26,7 +26,7 @@ import { restoreFolders } from '../../actions/racetrackAction'
 import { loadSharedLink } from '../../actions/sharedLinkAction'
 import ChangePassword from '../auth/ChangePassword'
 import User from '../../models/User'
-import Job, { countOfJobsOfType } from '../../models/Job'
+import Job from '../../models/Job'
 import Asset from '../../models/Asset'
 import Folder from '../../models/Folder'
 import CommandProgress from '../Workspace/CommandProgress'
@@ -36,7 +36,7 @@ import Import, { LocalChooser } from '../Import'
 import Importer from '../Importer'
 import { ImportJobs, ExportJobs } from '../Jobs'
 import { LOCAL_IMPORT, CLOUD_IMPORT, SERVER_IMPORT } from '../Import/ImportConstants'
-import { EMBEDMODE_ITEM, LOAD_SEARCH_ITEM, SESSION_STATE_ITEM } from '../../constants/localStorageItems'
+import { EMBEDMODE_ITEM, LOAD_SEARCH_ITEM, SESSION_STATE_ITEM, SHOW_IMPORT_ITEM } from '../../constants/localStorageItems'
 
 class Workspace extends Component {
   static displayName () {
@@ -129,6 +129,18 @@ class Workspace extends Component {
         this.loadSharedLinkData(JSON.parse(sessionState))
       })
     }
+
+    // See if the import window has been requested
+    const showImport = localStorage.getItem(SHOW_IMPORT_ITEM)
+    if (showImport) {
+      localStorage.removeItem(SHOW_IMPORT_ITEM)
+      const sources = { cloud: CLOUD_IMPORT, file_server: SERVER_IMPORT, my_computer: LOCAL_IMPORT }
+      const source = sources[showImport]
+      this.tipShown = true
+      const width = '65vw'
+      const body = <Import source={source} step={source ? 2 : 1}/>
+      this.props.actions.showModal({body, width})
+    }
   }
 
   componentDidMount () {
@@ -171,19 +183,7 @@ class Workspace extends Component {
       // and that we should hide it, which is really better handled with a promise somehow?
       this.props.actions.hideModal()
     }
-    const src = this.props.location && this.props.location.query && this.props.location.query.source
-    const sources = { cloud: CLOUD_IMPORT, file_server: SERVER_IMPORT, my_computer: LOCAL_IMPORT }
-    const source = sources[src]
-    if (!nextProps.app.modal && !this.tipShown &&         // not previously displayed
-        !this.repoContainsAssets &&
-      (source ||                                          // source in URL
-      (nextProps.assets && !nextProps.assets.length &&    // no assets
-      !countOfJobsOfType(nextProps.jobs, Job.Import)))) { // no imports
-      this.tipShown = true
-      const width = '65vw'
-      const body = <Import source={source} step={source ? 2 : 1}/>
-      this.props.actions.showModal({body, width})
-    }
+
     if (nextProps.assets && nextProps.assets.length) this.repoContainsAssets = true
     const command = [...nextProps.commands.values()].find(command => (command.state === Job.Waiting || command.state === Job.Active))
     if (!this.commandInterval && command) {
