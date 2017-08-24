@@ -27,6 +27,7 @@ export default class Folder {
       this.search = json.search && new AssetSearch(json.search)
       this.childCount = json.childCount   // server-managed
       this.attrs = json.attrs
+      this.taxonomyRoot = json.taxonomyRoot
 
       this.childIds = null // client-created set of childIds in reducer
     }

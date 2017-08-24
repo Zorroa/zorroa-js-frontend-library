@@ -19,7 +19,9 @@ import {
   removeAssetIdsFromFolderId,
   deleteFolderIds,
   updateFolder,
-  dropFolderId
+  dropFolderId,
+  createTaxonomy,
+  deleteTaxonomy
 } from '../../actions/folderAction'
 import { showModal, hideModal } from '../../actions/appActions'
 import { exportAssets } from '../../actions/jobActions'
@@ -95,6 +97,7 @@ class FolderItem extends Component {
     selectedAssetIds: PropTypes.object,
     folders: PropTypes.instanceOf(Map),
     counts: PropTypes.instanceOf(Map),
+    taxonomies: PropTypes.instanceOf(Map),
     dropFolderId: PropTypes.number,
     filteredCounts: PropTypes.instanceOf(Map),
     user: PropTypes.instanceOf(User),
@@ -414,18 +417,23 @@ class FolderItem extends Component {
                    className={classnames('icon-folder-add', {disabled: !canAddChild})} />
               <div>Create Sub-folder</div>
             </div> }
-          <div onClick={this.moveTo}
-               className="FolderItem-context-item FolderItem-context-move disabled"
+          { singleFolderSelected && folder.taxonomyRoot &&
+            <div onClick={_ => this.props.actions.deleteTaxonomy(folder.id)} title="Delete taxonomy to remove folder keywords"
+                 className="FolderItem-context-item FolderItem-context-taxonomy"
+                 onContextMenu={this.dismissContextMenu}>
+              <div className="icon-site-map"/>
+              <div>Delete taxonomy</div>
+            </div>
+          }
+          { singleFolderSelected && !folder.taxonomyRoot &&
+          <div onClick={_ => this.props.actions.createTaxonomy(folder.id)}
+               title="Create taxonomy to add keywords for this folder"
+               className="FolderItem-context-item FolderItem-context-taxonomy"
                onContextMenu={this.dismissContextMenu}>
-            <div className="icon-folder-move"/>
-            <div>Move to...</div>
+            <div className="icon-site-map"/>
+            <div>Create taxonomy</div>
           </div>
-          <div onClick={this.favorite}
-               className="FolderItem-context-item FolderItem-context-favorite disabled"
-               onContextMenu={this.dismissContextMenu}>
-            <div className="icon-star-empty"/>
-            <div>Favorite</div>
-          </div>
+          }
           <div onClick={addableAssets && this.addAssetsToFolders}
                title={addableAssetTitle}
                className={classnames('FolderItem-context-item FolderItem-context-add-assets', {disabled: !addableAssets})}>
@@ -509,6 +517,7 @@ class FolderItem extends Component {
           </div>
           <div className="flexRow flexAlignItemsCenter">
             { this.renderPermission() }
+            { folder.taxonomyRoot && <div className="FolderItem-taxonomy icon-site-map" title="Taxonomy adds folder name to keywords"/> }
             { this.renderCount() }
           </div>
         </div>
@@ -523,6 +532,7 @@ export default connect(state => ({
   folders: state.folders.all,
   counts: state.folders.counts,
   filteredCounts: state.folders.filteredCounts,
+  taxonomies: state.folders.taxonomies,
   selectedFolderIds: state.folders.selectedFolderIds,
   selectedAssetIds: state.assets.selectedIds,
   dropFolderId: state.folders.dropFolderId,
@@ -542,6 +552,8 @@ export default connect(state => ({
     deleteFolderIds,
     updateFolder,
     restoreFolders,
-    setAssetPermissions
+    setAssetPermissions,
+    createTaxonomy,
+    deleteTaxonomy
   }, dispatch)
 }))(FolderItem)
