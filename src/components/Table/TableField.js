@@ -56,7 +56,7 @@ export default class TableField extends Component {
             <div className='TableField-toggle-icon'>{'\u22ef'}</div>
           </div>
         }
-        { vals.map((val, i) => val && (typeof val !== 'string' || val.match(/^[a-z0-9]+$/i)) && (
+        { vals.map((val, i) => val && (typeof val !== 'string' || val.match(/[a-z0-9]/i)) && (
           <div key={i} onClick={e => onTag(val, field, e)}
                className={classnames('TableField-tag', {disabled: !onTag})}>
             { Array.isArray(val) && val.join(' ') }
