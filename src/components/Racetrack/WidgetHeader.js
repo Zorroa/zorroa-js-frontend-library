@@ -21,7 +21,7 @@ const WidgetHeader = ({ isEnabled, isPinned, isIconified, maxWidth, title, field
           <div className='flexOn'/>
         </div>
         { !isIconified && pinnedToggleFn && (<div className="WidgetHeader-pin" onClick={pinnedToggleFn}><img className={classnames('WidgetHeader-pin-img', {isPinned})} src={pin}/></div>) }
-        { !isIconified && enableToggleFn && (<div className={classnames('WidgetHeader-enable', {'icon-eye': isEnabled, 'icon-eye-crossed': !isEnabled, isEnabled})} onClick={enableToggleFn}/>) }
+        { !isIconified && enableToggleFn && (<div className={classnames('WidgetHeader-enable', {'icon-eye2': isEnabled, 'icon-eye-crossed2': !isEnabled, isEnabled})} onClick={enableToggleFn}/>) }
         { !isIconified && (<div className='WidgetHeader-close icon-cross' onClick={onClose}/>) }
       </div>
     </div>

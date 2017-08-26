@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import { isolateAssetId, suggestQueryStrings, searchAssets } from '../../actions/assetsAction'
-import { resetRacetrackWidgets, restoreFolders } from '../../actions/racetrackAction'
+import { resetRacetrackWidgets } from '../../actions/racetrackAction'
 import { dialogAlertPromise } from '../../actions/appActions'
 import { SimpleSearchWidgetInfo } from '../Racetrack/WidgetInfo'
 import Widget from '../../models/Widget'
@@ -109,8 +109,7 @@ const mapDispatchToProps = dispatch => ({
     suggestQueryStrings,
     searchAssets,
     dialogAlertPromise,
-    isolateAssetId,
-    restoreFolders
+    isolateAssetId
   },
   dispatch)
 })

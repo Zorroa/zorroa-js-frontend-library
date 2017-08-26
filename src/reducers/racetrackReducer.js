@@ -15,7 +15,7 @@ const initialState = {
 
 function extractSimilar (similar, widget) {
   assert.ok(widget.type === SimilarHashWidgetInfo.type)
-  assert.ok(widget.field && widget.field.length)
+  if (!widget.field || !widget.field.length) return similar
   const field = widget.field.replace(/\.raw$/, '')
   const hamming = widget && widget.sliver && widget.sliver.filter && widget.sliver.filter.hamming
   if (hamming) {
