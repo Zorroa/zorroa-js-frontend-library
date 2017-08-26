@@ -24,7 +24,7 @@ if [[ $USE_ZORROA_GRID == "true" ]]; then
   # wait for the ssh connection to spin up
   while ! nc -w 1 localhost 4444 </dev/null; do sleep 1; done
 
-  sleep 1 # TODO: the nc test just below isn't working without this sleep
+  curl localhost:4444 > /dev/null # wait for ssh to finish fully connecting
 
   # make sure a server is running
   if ! nc -z shub.zorroa.com $ZORROA_GRID_PORT; then
