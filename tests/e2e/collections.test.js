@@ -188,4 +188,58 @@ describe('Collections', function () {
 
     .then(_ => emptyTrash())
   })
+
+  it('create a search and make it a taxonomy', function () {
+    let timeStr = Date.now().toString()
+    let searchStr = '_selenium_' + timeStr
+    let searchBar
+
+    let folder
+    let folderXpath = `//*[contains(text(), '${searchStr}')]` // http://stackoverflow.com/a/30648604/1424242
+    let taxonomyItem
+
+    return driver.then(_ => openCollectionsPanel())
+
+      .then(_ => { DEBUG && console.log('Search for something we know exists') })
+      .then(_ => driver.findElement(By.css('.Suggestions-search')).then(ele => { searchBar = ele }))
+      .then(_ => searchBar.clear())
+      .then(_ => searchBar.sendKeys('dumbo', Key.ENTER))
+      .then(_ => selenium.waitForIdle())
+
+      .then(_ => { DEBUG && console.log('Save the search') })
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racebar')))
+      .then(_ => selenium.clickSelector(By.css('.Racebar-save')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.modal .CreateFolder')))
+      .then(_ => driver.findElement(By.css('.CreateFolder-input-title-input')).then(ele => ele.sendKeys(searchStr)))
+      .then(_ => selenium.clickSelector(By.css('.CreateFolder-save')))
+      .then(_ => { DEBUG && console.log('wait for saved search') })
+      .then(_ => driver.wait(until.elementLocated(By.xpath(`//*[contains(text(), '${searchStr}')]`))))
+
+      .then(_ => { DEBUG && console.log('Clear the racetrack') })
+      .then(_ => selenium.clickSelector(By.css('.Racebar-clear')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Widget')))
+
+      .then(_ => { DEBUG && console.log('Make it a taxonomy') })
+      .then(_ => driver.findElement(By.xpath(folderXpath)).then(ele => { folder = ele }))
+      .then(_ => driver.actions().click(folder, 2).perform()) // right-click
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.FolderItem-context-menu')))
+      .then(_ => selenium.clickSelector(By.css('.FolderItem-context-taxonomy')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.FolderItem-context-menu')))
+
+      .then(_ => driver.actions().click(folder, 2).perform()) // right-click
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.FolderItem-context-menu')))
+      .then(_ => driver.findElement(By.css('.FolderItem-context-taxonomy')).then(ele => { taxonomyItem = ele }))
+      .then(_ => expect(taxonomyItem.value === 'Delete taxonomy'))
+      .then(_ => selenium.clickSelector(By.css('.FolderItem-context-taxonomy')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.FolderItem-context-menu')))
+
+      .then(_ => { DEBUG && console.log('Delete the saved search') })
+      .then(_ => driver.actions().click(folder, 2).perform()) // right-click
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.FolderItem-context-remove-folder')))
+      .then(_ => selenium.clickSelector(By.css('.FolderItem-context-remove-folder')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.FolderItem-context-menu'), 5000))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Home-collapsible .Trash'), 15000))
+
+      .then(_ => emptyTrash())
+  })
 })

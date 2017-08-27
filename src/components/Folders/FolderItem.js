@@ -256,6 +256,18 @@ class FolderItem extends Component {
     })
   }
 
+  createTaxonomy = (create) => {
+    const {actions, folder} = this.props
+    this.dismissContextMenu(event)
+    actions.createTaxonomy(folder.id)
+  }
+
+  deleteTaxonomy = (create) => {
+    const {actions, folder} = this.props
+    this.dismissContextMenu(event)
+    actions.deleteTaxonomy(folder.id)
+  }
+
   simpleFolderIds = () => {
     const { selectedFolderIds, folder, folders } = this.props
     const simpleFolderIds = []
@@ -418,7 +430,8 @@ class FolderItem extends Component {
               <div>Create Sub-folder</div>
             </div> }
           { singleFolderSelected && folder.taxonomyRoot &&
-            <div onClick={_ => this.props.actions.deleteTaxonomy(folder.id)} title="Delete taxonomy to remove folder keywords"
+            <div onClick={this.deleteTaxonomy}
+                 title="Delete taxonomy to remove folder keywords"
                  className="FolderItem-context-item FolderItem-context-taxonomy"
                  onContextMenu={this.dismissContextMenu}>
               <div className="icon-site-map"/>
@@ -426,7 +439,7 @@ class FolderItem extends Component {
             </div>
           }
           { singleFolderSelected && !folder.taxonomyRoot &&
-          <div onClick={_ => this.props.actions.createTaxonomy(folder.id)}
+          <div onClick={this.createTaxonomy}
                title="Create taxonomy to add keywords for this folder"
                className="FolderItem-context-item FolderItem-context-taxonomy"
                onContextMenu={this.dismissContextMenu}>

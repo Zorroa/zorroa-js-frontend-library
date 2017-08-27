@@ -298,7 +298,7 @@ export function deleteTaxonomy (folderId) {
             })
           })
           .catch(error => {
-            console.error('Error deleting taxonomy ' + id + ': ' + error)
+            console.error('Error deleting taxonomy for folder ' + folderId + ': ' + error)
           })
       })
       .catch(error => {

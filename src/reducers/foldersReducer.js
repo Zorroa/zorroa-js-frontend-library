@@ -279,6 +279,7 @@ export default function (state = initialState, action) {
         folder.taxonomyRoot = true
         return { ...state, all }
       }
+      return state
     }
 
     case DELETE_TAXONOMY: {
