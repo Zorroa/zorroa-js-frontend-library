@@ -4,7 +4,8 @@ import {
   TOGGLE_FOLDER, UNAUTH_USER, FOLDER_COUNTS, DROP_FOLDER_ID,
   TRASHED_FOLDERS, EMPTY_FOLDER_TRASH, COUNT_TRASHED_FOLDERS,
   RESTORE_TRASHED_FOLDERS, DELETE_TRASHED_FOLDERS,
-  QUEUE_FOLDER_COUNTS, CLEAR_FOLDER_COUNT_QUEUE, ASSET_SEARCH
+  QUEUE_FOLDER_COUNTS, CLEAR_FOLDER_COUNT_QUEUE, ASSET_SEARCH,
+  CREATE_TAXONOMY, DELETE_TAXONOMY
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import * as assert from 'assert'
@@ -163,7 +164,7 @@ export default function (state = initialState, action) {
       break
     }
 
-    case DELETE_FOLDER:
+    case DELETE_FOLDER: {
       const id = action.payload
       if (id) {
         let all = new Map(state.all)
@@ -186,6 +187,7 @@ export default function (state = initialState, action) {
         return { ...state, all, openFolderIds, selectedFolderIds, trashedFolders: null }
       }
       break
+    }
 
     case QUEUE_FOLDER_COUNTS: {
       // Setting folders visible means request folder counts
@@ -268,6 +270,28 @@ export default function (state = initialState, action) {
 
     case DROP_FOLDER_ID:
       return { ...state, dropFolderId: action.payload }
+
+    case CREATE_TAXONOMY: {
+      const taxonomy = action.payload
+      const folder = state.all.get(taxonomy.folderId)
+      if (folder) {
+        let all = new Map(state.all)
+        folder.taxonomyRoot = true
+        return { ...state, all }
+      }
+      return state
+    }
+
+    case DELETE_TAXONOMY: {
+      const taxonomy = action.payload
+      const folder = state.all.get(taxonomy.folderId)
+      if (folder) {
+        let all = new Map(state.all)
+        folder.taxonomyRoot = false
+        return { ...state, all }
+      }
+      return state
+    }
 
     case UNAUTH_USER:
       return initialState

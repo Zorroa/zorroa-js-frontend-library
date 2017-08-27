@@ -80,6 +80,12 @@ export function archivistPut (dispatch, ...args) {
   return finishRequest(dispatch, archivist.put.apply(this, args))
 }
 
+export function archivistDelete (dispatch, ...args) {
+  if (!archivist) return Promise.resolve()
+  startRequest(dispatch)
+  return finishRequest(dispatch, archivist.delete.apply(this, args))
+}
+
 export function archivistRequest (dispatch, ...args) {
   if (!archivist) return Promise.resolve()
   startRequest(dispatch)

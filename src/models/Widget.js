@@ -29,7 +29,7 @@ export default class Widget {
   merge (rhs) {
     if (this.type !== rhs.type) return false
     if (removeRaw(this.field) !== removeRaw(rhs.field)) return false
-    this.sliver = this.sliver.merge(rhs.sliver)
+    if (this.sliver) this.sliver = this.sliver.merge(rhs.sliver)
     this.isEnabled |= rhs.isEnabled
     this.isPinned |= rhs.isPinned
     // FIXME: No attrs merging!

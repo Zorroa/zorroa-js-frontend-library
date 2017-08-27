@@ -2,11 +2,15 @@ import {
   GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, UPDATE_FOLDER,
   DELETE_FOLDER, TOGGLE_FOLDER, ADD_ASSETS_TO_FOLDER,
   REMOVE_ASSETS_FROM_FOLDER, DROP_FOLDER_ID,
-  FOLDER_COUNTS, QUEUE_FOLDER_COUNTS, CLEAR_FOLDER_COUNT_QUEUE
+  FOLDER_COUNTS, QUEUE_FOLDER_COUNTS, CLEAR_FOLDER_COUNT_QUEUE,
+  CREATE_TAXONOMY, DELETE_TAXONOMY
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import { restoreFolders } from './racetrackAction'
-import { archivistGet, archivistPut, archivistPost, archivistRequest } from './authAction'
+import {
+  archivistGet, archivistPut, archivistPost, archivistRequest,
+  archivistDelete
+} from './authAction'
 import { selectId, equalSets } from '../services/jsUtil'
 
 const rootEndpoint = '/api/v1/folders'
@@ -261,5 +265,44 @@ export function dropFolderId (id) {
   return {
     type: DROP_FOLDER_ID,
     payload: id
+  }
+}
+
+export function createTaxonomy (folderId) {
+  return dispatch => {
+    console.log('Create taxonomy for folder id ' + folderId)
+    archivistPost(dispatch, '/api/v1/taxonomy', {folderId})
+      .then(response => {
+        dispatch({
+          type: CREATE_TAXONOMY,
+          payload: response.data
+        })
+      })
+      .catch(error => {
+        console.error('Error creating taxonomy for folder id ' + folderId + ': ' + error)
+      })
+  }
+}
+
+export function deleteTaxonomy (folderId) {
+  return dispatch => {
+    console.log('Delete taxonomy for folder id ' + folderId)
+    archivistGet(dispatch, `/api/v1/taxonomy/_folder/${folderId}`)
+      .then(response => {
+        const taxonomy = response.data
+        archivistDelete(dispatch, `/api/v1/taxonomy/${taxonomy.taxonomyId}`)
+          .then(response => {
+            dispatch({
+              type: DELETE_TAXONOMY,
+              payload: taxonomy
+            })
+          })
+          .catch(error => {
+            console.error('Error deleting taxonomy for folder ' + folderId + ': ' + error)
+          })
+      })
+      .catch(error => {
+        console.error('Error getting taxonomy for folder id ' + folderId + ': ' + error)
+      })
   }
 }

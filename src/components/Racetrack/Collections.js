@@ -90,7 +90,7 @@ class Collections extends Component {
   render () {
     const { folders, selectedFolderIds, id, floatBody, isOpen, onOpen, isIconified } = this.props
     const { suggestions, suggestion } = this.state
-    const selectedFolders = [...selectedFolderIds.values()].map(id => folders.get(id))
+    const selectedFolders = [...selectedFolderIds.values()].map(id => folders.get(id)).filter(folder => folder)
     const selectedFolderNames = selectedFolders.map(folder => folder.name)
     const title = selectedFolderNames.length ? (isOpen ? CollectionsWidgetInfo.title : undefined) : CollectionsWidgetInfo.title
     const field = selectedFolderNames.length ? (isOpen ? undefined : selectedFolderNames.join(',')) : undefined
