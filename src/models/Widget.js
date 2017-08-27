@@ -87,7 +87,7 @@ export function createExistsWidget (field, fieldType, isMissing, isEnabled, isPi
     const key = (isMissing) ? 'missing' : 'exists'
     sliver.filter = new AssetFilter({ [key]: [ field ] })
   }
-  return new Widget({ type, sliver, isEnabled, isPinned })
+  return new Widget({ type, field, sliver, isEnabled, isPinned })
 }
 
 export function createFacetWidget (field, fieldType, terms, order, isEnabled, isPinned) {

@@ -76,8 +76,7 @@ class Video extends Component {
       const { frames } = this.props
       const { stopFrame } = this.state
       if (state.played >= stopFrame / frames) {
-        this.setState({ playing: false })
-        this.rewind()
+        this.setState({ playing: false, played: stopFrame / frames })
       }
     }
   }
@@ -160,7 +159,7 @@ class Video extends Component {
               onReady={() => this.init()}
               onPlay={() => this.setState({ playing: true })}
               onPause={() => this.setState({ playing: false })}
-              onEnded={() => this.setState({ playing: false, played: 1 })}
+              onEnded={() => this.setState({ playing: false })}
               onError={error => this.setState({ error })}
               onProgress={this.onProgress}
               progressFrequency={100} />

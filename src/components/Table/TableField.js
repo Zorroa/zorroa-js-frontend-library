@@ -56,10 +56,11 @@ export default class TableField extends Component {
             <div className='TableField-toggle-icon'>{'\u22ef'}</div>
           </div>
         }
-        { vals.map((val, i) => (
+        { vals.map((val, i) => val && (typeof val !== 'string' || val.match(/[a-z0-9]/i)) && (
           <div key={i} onClick={e => onTag(val, field, e)}
                className={classnames('TableField-tag', {disabled: !onTag})}>
-            {val}
+            { Array.isArray(val) && val.join(' ') }
+            { !Array.isArray(val) && val }
           </div>
         ))}
       </div>
@@ -91,9 +92,10 @@ export default class TableField extends Component {
     if (field === 'source.type') {
       renderValFn = this.renderFileType
       padding = 1
-    } else if (Array.isArray(val) && val.length) {
-      // If this is an array of colors, render colors
-      if (val[0] && typeof val[0] === 'string' && val[0][0] === '#' &&
+    } else if (Array.isArray(val)) {
+      if (!val.length) {
+        renderValFn = _ => null
+      } else if (val[0] && typeof val[0] === 'string' && val[0][0] === '#' &&
         val.every(v => v[0] === '#' && v.length === 7 || v.length === 4)) {
         renderValFn = this.renderColorArray
       } else if (field === 'colors') {

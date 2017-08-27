@@ -102,10 +102,12 @@ export default class VideoRange extends Component {
             </div>
           )}
           { clipWidth && <div className={classnames('VideoRange-clip-playhead', {scrubbing})} style={{ left: playhead }}/> }
-          <div className="VideoRange-axis">
-            <TimeAxis format="duration" position="bottom" width={clipWidth} height={clipHeight} margin={0}
-                      beginTime={clipStartTime} endTime={clipStopTime} tickCount={tickCount} standalone={true} />
-          </div>
+          { clipWidth && clipFrames > frameRate * tickCount && (
+            <div className="VideoRange-axis">
+              <TimeAxis format="duration" position="bottom" width={clipWidth} height={clipHeight} margin={0}
+                        beginTime={clipStartTime} endTime={clipStopTime} tickCount={tickCount} standalone={true} />
+            </div>
+          )}
         </div>
         { clipWidth && clipFrames !== frames && (
           <div className="VideoRange-movie">
