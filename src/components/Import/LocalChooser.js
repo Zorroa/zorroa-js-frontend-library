@@ -444,8 +444,8 @@ class LocalChooser extends Component {
     if (importing && fileCount) title += ` ${fileCount} File${fileCount > 1 ? 's' : ''}`
     if (importing && fileCount && directoryCount) title += ' and'
     if (importing && directoryCount) title += ` ${directoryCount} Folder${directoryCount > 1 ? 's' : ''}`
-    const similarDisabled = directoryCount || fileCount > 5 || !fileCount || !similar.field || similar.field !== 'similarity.tensorflow.byte'
-    const similarTitle = similarDisabled ? (!similar.field || similar.field !== 'similarity.tensorflow.byte' ? 'Compute Similarity on Repo' : 'Similarity requires files only') : 'Analyze for Similarity'
+    const similarDisabled = directoryCount || fileCount > 5 || !fileCount || !similar.field
+    const similarTitle = similarDisabled ? (!similar.field ? 'Compute Similarity on Repo' : 'Similarity requires files only') : 'Analyze for Similarity'
     return (
       <div className="LocalChooser">
         { onBack && (
