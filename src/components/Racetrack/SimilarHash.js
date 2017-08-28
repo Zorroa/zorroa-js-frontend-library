@@ -21,7 +21,6 @@ export function weights (ofsIds) {
 class SimilarHash extends Component {
   static propTypes = {
     // state props
-    fields: PropTypes.object,                         // state.assets.fields
     similar: PropTypes.shape({
       field: PropTypes.string,
       values: PropTypes.arrayOf(PropTypes.string).isRequired,
@@ -189,7 +188,6 @@ class SimilarHash extends Component {
 
 export default connect(
   state => ({
-    fields: state.assets && state.assets.fields,
     similar: state.racetrack.similar,
     similarAssets: state.assets.similar,
     selectedAssetIds: state.assets.selectedIds,
