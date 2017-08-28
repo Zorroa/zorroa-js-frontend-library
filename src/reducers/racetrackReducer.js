@@ -180,21 +180,24 @@ export default function (state = initialState, action) {
       return state
     }
     case ISOLATE_PARENT: {
-      const widgets = [...state.widgets]
       const isolatedParent = action.payload
-      const sortByPage = false
-      const filterMultipage = false
-      const index = state.widgets.findIndex(widget => (widget.type === MultipageWidgetInfo.type))
-      const isEnabled = index >= 0 ? state.widgets[index].isEnabled : true
-      const isPinned = index >= 0 ? state.widgets[index].isPinned : false
-      const widget = MultipageWidgetInfo.create(undefined, undefined, isolatedParent, sortByPage, filterMultipage, isEnabled, isPinned)
-      if (index < 0) {
-        widgets.push(widget)
-      } else {
-        widget.id = widgets[index].id
-        widgets[index] = widget
+      if (isolatedParent) {
+        const widgets = [...state.widgets]
+        const sortByPage = false
+        const filterMultipage = false
+        const index = state.widgets.findIndex(widget => (widget.type === MultipageWidgetInfo.type))
+        const isEnabled = index >= 0 ? state.widgets[index].isEnabled : true
+        const isPinned = index >= 0 ? state.widgets[index].isPinned : false
+        const widget = MultipageWidgetInfo.create(undefined, undefined, isolatedParent, sortByPage, filterMultipage, isEnabled, isPinned)
+        if (index < 0) {
+          widgets.push(widget)
+        } else {
+          widget.id = widgets[index].id
+          widgets[index] = widget
+        }
+        return {...state, widgets}
       }
-      return { ...state, widgets }
+      return state
     }
     case UNAUTH_USER:
       return initialState
