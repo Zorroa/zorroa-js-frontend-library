@@ -78,13 +78,18 @@ class Header extends Component {
   similarFields = () => {
     const { assetFields } = this.props
     if (!assetFields) return []
-    return assetFields.string.filter(field => field.toLowerCase().startsWith('similar'))
+    let fields = []
+    if (assetFields.string) fields = fields.concat(assetFields.string.filter(field => field.toLowerCase().startsWith('similar')))
+    if (assetFields.hash) fields = fields.concat(assetFields.hash.filter(field => field.toLowerCase().startsWith('similar')))
+    return fields
   }
 
   selectSimilarField = (field) => {
-    const { similarAssets, actions } = this.props
-    const values = similarAssets && similarAssets.map(asset => asset.rawValue(field))
-    const similar = { ...this.props.similar, field, values }
+    const { actions } = this.props
+    // FIXME: Need new hashes via similarAssets action (not state!), but need asset ids
+    const values = []
+    const ofsIds = []
+    const similar = { ...this.props.similar, field, values, ofsIds }
     actions.similar(similar)
   }
 
