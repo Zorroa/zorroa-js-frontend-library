@@ -15,7 +15,7 @@ import Searchbar from '../Searchbar'
 import QuickAddWidget from './QuickAddWidget'
 import CreateFolder from '../Folders/CreateFolder'
 import { showModal, toggleCollapsible, dialogAlertPromise } from '../../actions/appActions'
-import { unorderAssets } from '../../actions/assetsAction'
+import { unorderAssets, isolateParent } from '../../actions/assetsAction'
 import { createFolder, selectFolderIds, createDyHiFolder } from '../../actions/folderAction'
 import { resetRacetrackWidgets, similar } from '../../actions/racetrackAction'
 import { saveSharedLink } from '../../actions/sharedLinkAction'
@@ -129,11 +129,12 @@ class Racebar extends Component {
   }
 
   clearRacetrack = () => {
+    this.props.actions.resetRacetrackWidgets()
     this.props.actions.selectFolderIds()
     this.props.actions.similar()
     this.props.actions.unorderAssets()
-    this.props.actions.resetRacetrackWidgets()
     this.props.actions.selectJobIds()
+    this.props.actions.isolateParent()
   }
 
   shareSearch = () => {
@@ -234,6 +235,7 @@ export default connect(state => ({
     createDyHiFolder,
     similar,
     unorderAssets,
+    isolateParent,
     selectFolderIds,
     selectJobIds,
     showModal,

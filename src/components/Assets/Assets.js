@@ -229,6 +229,8 @@ class Assets extends Component {
     this.props.actions.selectFolderIds()
     this.props.actions.similar()
     this.props.actions.unorderAssets()
+    this.props.actions.selectJobIds()
+    this.props.actions.isolateParent()
   }
 
   tableResizeStart = (event) => {

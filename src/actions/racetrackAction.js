@@ -230,6 +230,7 @@ function restoreWidgetSlivers (widgets, search) {
   const mkExistsWidget = (field, isMissing) => {
     const exists = findWidget(field)
     if (exists) {
+      if (!exists.sliver) exists.sliver = new AssetSearch()
       exists.sliver.filter = new AssetFilter({[isMissing ? 'missing' : 'exists']: [field]})
     } else {
       const w = createExistsWidget(field, null, isMissing, isEnabled, isPinned)
