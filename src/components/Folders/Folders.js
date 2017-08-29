@@ -129,6 +129,8 @@ class Folders extends Component {
       }
     } else if (this.state.rootId === undefined && nextProps.rootId !== undefined) {
       this.setState({ rootId: nextProps.rootId })
+    } else if (this.state.rootId === undefined) {
+      this.setState({ rootId: Folder.ROOT_ID })
     }
   }
 
