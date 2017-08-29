@@ -15,8 +15,7 @@
 
   width: auto;
 
-  @include flexRow;
-  @include flexAlignItemsCenter;
+  @include flexRowCenter;
   @include flexJustifySpaceBetween;
 
   button:disabled {
@@ -50,4 +49,5 @@
 
 .Controlbar-section {
   @include flexRowCenter;
+  padding: 0 10px;
 }

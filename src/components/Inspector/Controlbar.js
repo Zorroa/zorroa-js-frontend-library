@@ -39,7 +39,6 @@ const Controlbar = (props) => (
           <button disabled={!props.onZoomIn} className="Controlbar-zoom-in icon-zoom-in" onClick={props.onZoomIn} />
         </div>
       ) }
-    { showZoom(props) && <div className="Controlbar-separator" /> }
   </div>
 )
 
