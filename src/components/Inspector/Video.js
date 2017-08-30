@@ -41,6 +41,11 @@ class Video extends Component {
     error: null
   }
 
+  componentWillReceiveProps (nextProps) {
+    const { startFrame, stopFrame } = nextProps
+    this.setState({ startFrame, stopFrame, played: 0 })
+  }
+
   @keydown('space')
   playPause () {
     this.setState({ playing: !this.state.playing })
@@ -54,30 +59,12 @@ class Video extends Component {
     this.props.actions.saveUserSettings(this.props.user, settings)
   }
 
-  onSeekMouseDown = e => {
-    this.setState({ seeking: true })
-  }
-
-  onSeekChange = e => {
-    const { startFrame, stopFrame } = this.state
-    const v = parseFloat(e.target.value)
-    const frame = startFrame + v * (stopFrame - startFrame)
-    this.scrub(frame)
-  }
-
-  onSeekMouseUp = e => {
-    this.setState({ seeking: false })
-  }
-
   onProgress = state => {
-    // We only want to update time slider if we are not currently seeking
-    if (!this.state.seeking) {
-      this.setState(state)
-      const { frames } = this.props
-      const { stopFrame } = this.state
-      if (state.played >= stopFrame / frames) {
-        this.setState({ playing: false, played: stopFrame / frames })
-      }
+    this.setState(state)
+    const { frames } = this.props
+    const { stopFrame } = this.state
+    if (state.played >= stopFrame / frames) {
+      this.setState({ playing: false, played: stopFrame / frames })
     }
   }
 
