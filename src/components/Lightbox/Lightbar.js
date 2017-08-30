@@ -90,16 +90,16 @@ class Lightbar extends Component {
         </div>
         <div className="Lightbar-actions" style={{width: actionWidth, minWidth: actionWidth}}>
           <a href={this.isolatedAssetURL()} className='Lightbar-action' download={this.isolatedAssetURL()}>
-            <span className='Lightbar-action-text'>Download</span>
+            <span className='Lightbar-action-text Lightbar-action-download'>Download</span>
             <i className='Lightbar-btn-icon icon-download2'/>
           </a>
           <div onClick={!copyingLink && this.copyIsolatedAssetLink} className='Lightbar-action'>
-            <span className='Lightbar-action-text'>Get Link</span>
+            <span className='Lightbar-action-text Lightbar-action-get-link'>Get Link</span>
             <i className='Lightbar-btn-icon icon-link2'/>
             { copyingLink && <div className="Lightbar-performed-action">Copied URL to clipboard</div> }
           </div>
           <div onClick={this.showFolders} className='Lightbar-action'>
-            <span className='Lightbar-action-text'>Add to Collection</span>
+            <span className='Lightbar-action-text Lightbar-action-add-to-collection'>Add to Collection</span>
             <i className='Lightbar-btn-icon icon-chevron-down'/>
             { showFolders && (
               <div className="Lightbar-folders" onClick={e => { e.stopPropagation() }}>
