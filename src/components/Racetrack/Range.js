@@ -234,7 +234,7 @@ class Range extends Component {
     if (range) {
       const min = range.min
       const max = range.max
-      this.setState({ min, max })
+      this.setState({ min, max }, this.modifySliver)
     }
   }
 
