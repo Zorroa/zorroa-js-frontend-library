@@ -154,9 +154,8 @@ class DateRange extends Component {
     const { isIconified, id, floatBody, isOpen, onOpen } = this.props
     const { field, minStr, maxStr } = this.state
     const lastName = Asset.lastNamespace(unCamelCase(field))
-    const active = minStr && maxStr
-    const title = active ? (isOpen ? lastName : undefined) : undefined
-    const label = active ? (isOpen ? undefined : `${minStr} → ${maxStr}`) : lastName
+    const title = lastName
+    const label = undefined
     const intervals = ['day', 'week', 'month', 'year']
 
     return (
