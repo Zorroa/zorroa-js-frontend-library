@@ -30,6 +30,7 @@ class CreateFolder extends Component {
     isolatedId: PropTypes.string,
     selectedAssetIds: PropTypes.instanceOf(Set),
     isManager: PropTypes.bool,
+    isAdministrator: PropTypes.bool,
     uxLevel: PropTypes.number,
     actions: PropTypes.object.isRequired
   }
@@ -106,8 +107,8 @@ class CreateFolder extends Component {
   }
 
   renderModes () {
-    const { isManager } = this.props
-    if (!isManager) return
+    const { isManager, isAdministrator } = this.props
+    if (!isManager && !isAdministrator) return
     const { dyhiLevels } = this.props
     const { name, mode } = this.state
     const modes = ['Search']
@@ -152,7 +153,7 @@ class CreateFolder extends Component {
   }
 
   render () {
-    const { title, onLink, onDelete, user, date, selectedAssetIds, includeAssets, isManager, uxLevel } = this.props
+    const { title, onLink, onDelete, user, date, selectedAssetIds, includeAssets, isManager, isAdministrator, uxLevel } = this.props
     const { isShared, name, includeSelectedAssets } = this.state
     const disableIncludeSelected = !selectedAssetIds || !selectedAssetIds.size
     return (
@@ -178,7 +179,7 @@ class CreateFolder extends Component {
                 <div onClick={this.toggleShareSelected}>Include Selected Assets</div>
               </div>
             )}
-            { isManager && uxLevel > 0 && !includeAssets && this.props.name && this.props.name.length && (
+            { (isManager || isAdministrator) && uxLevel > 0 && !includeAssets && this.props.name && this.props.name.length && (
               <div className="CreateFolder-permissions">
                 <div className="CreateFolder-public-private flexRow flexAlignItemsCenter">
                   <div>Collection is</div>
@@ -218,6 +219,7 @@ export default connect(state => ({
   isolatedId: state.assets.isolatedId,
   selectedAssetIds: state.assets.selectedIds,
   isManager: state.auth.isManager,
+  isAdministrator: state.auth.isAdministrator,
   uxLevel: state.app.uxLevel
 }), dispatch => ({
   actions: bindActionCreators({ hideModal }, dispatch)

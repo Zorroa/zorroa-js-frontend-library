@@ -98,7 +98,6 @@
 
   &:not(.disabled) {
     &:hover {
-      border: 1px solid $zorroa-gray;
       background-color: darken($zorroa-navy-blue, 15%);
     }
     &:active {
