@@ -17,18 +17,25 @@ export default class VideoRange extends Component {
   }
 
   state = {
-    clipStartFrame: Math.max(0, this.props.startFrame - (this.props.stopFrame - this.props.startFrame)),
-    clipStopFrame: Math.min(this.props.frames - 1, this.props.stopFrame + (this.props.stopFrame - this.props.startFrame))
+    clipStartFrame: 0,
+    clipStopFrame: 0
   }
 
   resizer = null
 
   componentWillMount = () => {
     this.resizer = new Resizer()
+    this.componentWillReceiveProps(this.props)
   }
 
   componentWillUnmount = () => {
     this.resizer.release()
+  }
+
+  componentWillReceiveProps (nextProps) {
+    const clipStartFrame = Math.max(0, nextProps.startFrame - (nextProps.stopFrame - nextProps.startFrame))
+    const clipStopFrame = Math.min(nextProps.frames - 1, nextProps.stopFrame + (nextProps.stopFrame - nextProps.startFrame))
+    this.setState({ clipStartFrame, clipStopFrame })
   }
 
   resizeStart = (update, event) => {
