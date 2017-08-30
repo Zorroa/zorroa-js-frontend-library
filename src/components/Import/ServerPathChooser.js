@@ -8,7 +8,7 @@ import spin from './spin.svg'
 import { listServerImportFiles } from '../../actions/authAction'
 
 const ROOT_ID = 0
-const ROOT_PATH = '/Volumes'
+const ROOT_PATH = '/'
 
 class ServerPathChooser extends Component {
   static propTypes = {
