@@ -239,7 +239,7 @@ class Import extends Component {
       case CLOUD_IMPORT: return <ImportFinder mode={cloud} accessToken={accessToken} onImport={this.createImport} onBack={e => { this.setState({cloud: ''}); this.setStep(2) }}/>
       case SERVER_IMPORT: return <CloudproxyInstructions local={uploadOverflow} os={os} onDone={this.cloudproxyInstalled} onBack={e => this.setStep(2)}/>
       case LOCAL_IMPORT: return <LocalChooser onDone={e => this.setStep(4)} onBack={e => this.setStep(2)}/>
-      case SERVER_PATH_IMPORT: return <ImportFinder mode={SERVER_PATH_CLOUD} onImport={this.createImport} onBack={e => this.setStep(2)}/>
+      case SERVER_PATH_IMPORT: return <ImportFinder mode={SERVER_PATH_CLOUD} onImport={this.createImport} onBack={e => this.setStep(1)}/>
     }
   }
 
