@@ -41,6 +41,16 @@ class Video extends Component {
     error: null
   }
 
+  resize = () => this.forceUpdate()
+
+  componentDidMount() {
+    window.addEventListener('resize', this.resize)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.resize)
+  }
+
   componentWillReceiveProps (nextProps) {
     const { startFrame, stopFrame } = nextProps
     this.setState({ startFrame, stopFrame, played: 0 })
@@ -48,7 +58,11 @@ class Video extends Component {
 
   @keydown('space')
   playPause () {
-    this.setState({ playing: !this.state.playing })
+    const playing = !this.state.playing
+    if (playing && this.state.played >= this.state.stopFrame / this.props.frames) {
+      this.scrub(this.state.startFrame)
+    }
+    this.setState({ playing })
   }
 
   setVolume = e => {

@@ -170,7 +170,7 @@ class Assets extends Component {
     }
   }
 
-  isolateToLightbox (asset) {
+  isolateToLightbox = (asset) => {
     const { showMultipage, parentTotals, isolatedParent } = this.props
     const parentId = showMultipage && asset.parentId()
     const isolatedParentId = isolatedParent && isolatedParent.parentId()
@@ -618,7 +618,7 @@ class Assets extends Component {
                              this.skipNextSelectionScroll = true
                              this.select(asset, event)
                            }}
-                           onDoubleClick={this.isolateToLightbox.bind(this, asset)}
+                           onDoubleClick={_ => this.isolateToLightbox(asset)}
                     />
                   )
                 })}
