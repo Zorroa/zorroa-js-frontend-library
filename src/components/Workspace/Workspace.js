@@ -399,29 +399,21 @@ class Workspace extends Component {
     const { isDroppable, showReloader } = this.state
     return (
 
-      <div onDragEnter={this.dragEnter} className={classnames('App', 'Workspace', 'flexCol', 'fullHeight', {isDragging: app.dragInfo, dark: monochrome, embedMode: app.embedModeEnabled})}>
-        { this.renderModalTest() }
-        { this.renderModal() }
-        { showReloader && (
-          <div className="Workspace-reloader">
-            <div className="flexRowCenter">
-              This version of Curator has been updated.
-              <button className="Workspace-reloader-reload" onClick={e => location.reload()}>
-                Reload now
-              </button>
-            </div>
-            <div className="Workspace-reloader-close icon-cross"
-                 onClick={e => this.setState({ showReloader: false })}/>
-          </div>
-        )}
-        { !app.embedModeEnabled && <Header/> }
+      <div onDragEnter={this.dragEnter} className={classnames('App', 'Workspace', 'fullHeight', {isDragging: app.dragInfo, dark: monochrome, embedMode: app.embedModeEnabled})}>
 
-        { command && <CommandProgress successPct={commandSuccessPct} errorPct={commandErrorPct}/>}
+        {/*
+          Children are listen in reverse order so that the stacking order of drop-down
+          menus is bottom-to-top.
 
-        <Racebar/>
-        <div className="Assets-searching">
-          { searching && <ProgressBar successPct={0} errorPct={0}/> }
-        </div>
+          This renders right-side-up because .Workspace has class flexColRev
+
+          We want header drop-down menus and racebar widgets to stack on top of elements
+          that are below them on screen, for example the workspace.
+
+          This was done specifically to ensure that the Workspace Sidebar
+          resizer doesn't stack on top of Widget bodies. To do that, Racebar
+          needs to come after Workspace in the DOM.
+        */}
 
         <div className="Workspace flexOn flexRow fullWidth fullHeight">
 
@@ -458,16 +450,49 @@ class Workspace extends Component {
 
           {/*  right panel - thumbnails */}
           <Assets/>
-
         </div>
+
+        <div className="Assets-searching">
+          { searching && <ProgressBar successPct={0} errorPct={0}/> }
+        </div>
+
+        <Racebar/>
+
+        { command && <CommandProgress successPct={commandSuccessPct} errorPct={commandErrorPct}/>}
+
+        { !app.embedModeEnabled && <Header/> }
+
+        { showReloader && (
+          <div className="Workspace-reloader">
+            <div className="flexRowCenter">
+              This version of Curator has been updated.
+              <button className="Workspace-reloader-reload" onClick={e => location.reload()}>
+                Reload now
+              </button>
+            </div>
+            <div className="Workspace-reloader-close icon-cross"
+                 onClick={e => this.setState({ showReloader: false })}/>
+          </div>
+        )}
+
+        {/*
+          The following items are all position:fixed and full-screen,
+          their order may not matter in theory. Having modals last might be good though.
+        */}
+
         <div className={classnames('App-dropzone', {isDroppable})}
              onDragOver={this.dragOver}
              onDragLeave={this.dragLeave}
              onDrop={this.createLocalImport}>
           Drop Assets to Import
         </div>
+
         { isolatedId && <Lightbox/> }
         { isolatedJob && <Importer/> }
+
+        { this.renderModalTest() }
+        { this.renderModal() }
+
         <div id='Table-cell-test' className='Table-cell'/>
       </div>
     )

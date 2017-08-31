@@ -2,7 +2,7 @@
 
 // App class, containing header and workspace in columns
 .App {
-  @include flexCol;
+  @include flexColRev; // Assets are declared upside-down, so that stacking order is bottom-to-top. See comments in Workspace.render()
   overflow: hidden;
   flex: 1;
 
@@ -24,6 +24,7 @@
   right: 0;
   bottom: 0;
   display: none;
+  z-index: 1; // Make sure dropzone stacks on top of Racebar
 
   font-size: 28px;
   color: white;
