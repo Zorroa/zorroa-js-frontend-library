@@ -228,7 +228,7 @@ describe('Workspace', function () {
     .then(_ => { DEBUG && console.log('make sure shared link copy works 3') })
   })
 
-  it ('make sure undo works', () => {
+  xit ('make sure undo works', () => {
     return driver
       .then(_ => { DEBUG && console.log('make sure undo works 1') })
       .then(_ => driver.get(`${selenium.BASE_URL}?ClearSessionState=1`))
