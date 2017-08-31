@@ -37,7 +37,7 @@ fi
 # Run all tests
 # jest -w 8 would start 8 workers (# tests running simultaneously) TODO: above 4 seems unstable. why?
 # -b flag bails on the suite after the first failure
-$projroot/node_modules/.bin/jest -w 3 -b --debug --forceExit --logHeapUsage --verbose "$@"
+$projroot/node_modules/.bin/jest -w 4 -b --debug --forceExit --logHeapUsage --verbose "$@"
 testResultExitCode=$?
 
 if [[ $USE_ZORROA_GRID == "true" ]]; then

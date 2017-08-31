@@ -88,6 +88,14 @@ describe('Lightbox', function () {
     .then(_ => selenium.waitForSelectorEnabledToBe(false, By.css('.Controlbar-zoom-reset')))
     .then(_ => selenium.clickSelector(By.css('.Controlbar-zoom-out')))
     .then(_ => selenium.waitForSelectorEnabledToBe(true, By.css('.Controlbar-zoom-reset')))
+
+    .then(_ => { DEBUG && console.log('make sure add to collections is there') })
+    .then(_ => selenium.clickSelector(By.css('.Lightbar-action-add-to-collection')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Lightbar-folders')))
+    .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Lightbar-folders .Folders-controls')))
+    .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Lightbar-folders .Folders-scroll')))
+    .then(_ => selenium.clickSelector(By.css('.Lightbar-action-add-to-collection')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Lightbar-folders')))
   })
 
 })
