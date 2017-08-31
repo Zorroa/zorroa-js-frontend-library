@@ -33,7 +33,7 @@ const sizes = { 'dec': decSizes, 'bin': binSizes }
 class Range extends Component {
   static propTypes = {
     aggs: PropTypes.object,
-    query: PropTypes.instanceOf(AssetSearch).isRequired,
+    query: PropTypes.instanceOf(AssetSearch),
     actions: PropTypes.object.isRequired,
     id: PropTypes.number.isRequired,
     isIconified: PropTypes.bool.isRequired,
@@ -59,6 +59,9 @@ class Range extends Component {
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
 
+    const doSync = this.sync
+    this.sync = false
+
     if (widget && widget.sliver) {
       const field = widget.field
       let min, max
@@ -67,15 +70,15 @@ class Range extends Component {
         min = range[field].gte
         max = range[field].lte
         const usePrefix = field && field.length && field === 'source.fileSize' ? 'bin' : null
-        this.setState({field, min, max, usePrefix})
+        this.setState({field, min, max, usePrefix}, this.modifySliver)
       } else {
-        this.setState({field})
+        this.setState({field}, this.modifySliver)
       }
     } else if (nextProps.aggs) {
       const field = this.aggField(nextProps)
       if (field && (!this.state.field || field !== this.state.field)) {
         const range = this.aggRange(field)
-        if (range) this.setState({field, min: range.min, max: range.max})
+        if (range) this.setState({field, min: range.min, max: range.max}, this.modifySliver)
       }
     }
   }
@@ -111,7 +114,13 @@ class Range extends Component {
     this.resizer.release()
   }
 
+  modifyingSliver = false
   modifySliver = () => {
+    // modifying the query causes a state change, so to avoid infinite loop, only allow 1 update per frame
+    if (this.modifyingSliver) return
+    this.modifyingSliver = true
+    requestAnimationFrame(_ => { this.modifyingSliver = false })
+
     const { id, widgets } = this.props
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const oldWidget = widgets && widgets[index]
@@ -149,6 +158,7 @@ class Range extends Component {
       }
     }
     const key = input.dataset.range
+    // no modifySliver() here, we wait for Enter
     this.setState({ [key]: numericValue, [key + 'Str']: input.value, usePrefix })
   }
 
@@ -200,6 +210,7 @@ class Range extends Component {
     const range = this.aggRange(this.aggField(this.props))
     const min = Math.min(range.max, Math.max(range.min, x))
     const max = Math.max(this.state.max === undefined ? range.max : this.state.max, min) // let this handle push the other one around
+    // no modifySliver here, we wait for mouse release
     this.setState({ min, max })
   }
   minStop = (event) => {
@@ -220,6 +231,7 @@ class Range extends Component {
     const range = this.aggRange(this.aggField(this.props))
     const max = Math.min(range.max, Math.max(range.min, x))
     const min = Math.min(this.state.min === undefined ? range.min : this.state.min, max) // let this handle push the other one around
+    // no modifySliver here, we wait for mouse release
     this.setState({ min, max })
   }
 
@@ -234,7 +246,7 @@ class Range extends Component {
     if (range) {
       const min = range.min
       const max = range.max
-      this.setState({ min, max })
+      this.setState({ min, max }, this.modifySliver)
     }
   }
 
@@ -259,8 +271,8 @@ class Range extends Component {
 
     const active = min !== undefined && min !== null && max !== undefined && max !== null
     const lastName = Asset.lastNamespace(unCamelCase(field))
-    const title = active ? (isOpen ? lastName : undefined) : undefined
-    const label = active ? (isOpen ? undefined : `${this.valToString(min)} → ${this.valToString(max)}`) : lastName
+    const title = lastName
+    const label = !isOpen && active ? `${this.valToString(min)} → ${this.valToString(max)}` : ''
     return (
       <Widget className='Range'
               id={id}
