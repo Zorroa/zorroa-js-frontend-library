@@ -164,7 +164,7 @@ class SimilarHash extends Component {
             <div className="SimilarHash-slider-icon icon-dissimilar"/>
             <input className="SimilarHash-slider-input" type="range"
                    disabled={!adjustable}
-                   min="60" max="90" step="0.1" list="similarity_ticks"
+                   min="50" max="100" step="0.1" list="similarity_ticks"
                    value={minScore} onChange={this.changeMinScore}/>
             <datalist id="similarity_ticks">
               <option>-1</option>
