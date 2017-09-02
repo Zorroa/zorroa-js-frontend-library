@@ -21,7 +21,9 @@ export const defaultTableFieldWidth = 100
 export const defaultMetadataFields = [ 'source.filename', 'source.date', 'source.fileSize' ]
 export const defaultLightbarFields = [ 'source.type', 'source.filename', 'source.date', 'image.width', 'image.height', 'video.width', 'video.height' ]
 export const defaultThumbFields = [ 'source.type', 'image.width', 'image.height', 'video.width', 'video.height' ]
-export const defaultDragFields = [ 'source.filename' ]
+export const defaultDragFields = []
+export const defaultThumbFieldTemplate = '%{image.width|video.width}x%{image.height|video.height} %{source.type}'
+export const defaultLightbarFieldTemplate = '%{source.type} %{source.filename} %{image.width|video.width}x%{image.height|video.height} %{source.date}'
 const initialState = {
   modal: null,
   uxLevel: 0,
@@ -61,9 +63,9 @@ const initialState = {
   showMultipage: true,
   sortFolders: 'alpha-asc',
   hoverFields: new Set(),
-  thumbFieldTemplate: '%{image.width|video.width}x%{image.height|video.height} %{source.type}',
-  lightbarFieldTemplate: '%{source.type} %{source.filename} %{image.width|video.width}x%{image.height|video.height} %{source.date}',
-  dragFieldTemplate: '%{source.filename}',
+  thumbFieldTemplate: defaultThumbFieldTemplate,
+  lightbarFieldTemplate: defaultLightbarFieldTemplate,
+  dragFieldTemplate: undefined,
   userSettings: {
     metadataFields: [ ...defaultMetadataFields ],
     showTable: false,
@@ -159,8 +161,17 @@ export default function app (state = initialState, action) {
     }
     case DRAG_FIELD_TEMPLATE: {
       const dragFieldTemplate = action.payload
-      const dragFields = fieldsForVariables(parseVariables(dragFieldTemplate))
+      const dragFields = dragFieldTemplate && dragFieldTemplate.length && fieldsForVariables(parseVariables(dragFieldTemplate)) || defaultDragFields
       return { ...state, dragFieldTemplate, dragFields }
+    }
+    case ARCHIVIST_ALL_SETTINGS: {
+      const dragTemplateSetting = action.payload.find(setting => setting.name === 'archivist.source.dragTemplate')
+      const dragFieldTemplate = dragTemplateSetting && dragTemplateSetting.currentValue
+      if (!state.dragFieldTemplate && dragFieldTemplate) {
+        const dragFields = fieldsForVariables(parseVariables(dragFieldTemplate))
+        return { ...state, dragFieldTemplate, dragFields }
+      }
+      return state
     }
     case UX_LEVEL: {
       return { ...state, uxLevel: action.payload }

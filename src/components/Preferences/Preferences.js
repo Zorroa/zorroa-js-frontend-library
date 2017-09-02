@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import JSONTree from 'react-json-tree'
+import classnames from 'classnames'
 
 import { hideModal, lightbarFieldTemplate, thumbFieldTemplate, dragFieldTemplate, uxLevel, monochrome } from '../../actions/appActions'
 import { saveUserSettings, changePassword } from '../../actions/authAction'
@@ -10,6 +11,7 @@ import User from '../../models/User'
 import { DropboxAuthenticator } from '../Import/DropboxAuthenticator'
 import { BoxAuthenticator } from '../Import/BoxAuthenticator'
 import { GDriveAuthenticator } from '../Import/GDriveAuthenticator'
+import { defaultThumbFieldTemplate, defaultLightbarFieldTemplate } from '../../reducers/appReducer'
 
 const theme = {
   scheme: 'bright',
@@ -39,7 +41,7 @@ class Preferences extends Component {
     info: PropTypes.object,
     health: PropTypes.object,
     metrics: PropTypes.object,
-    settings: PropTypes.object,
+    settings: PropTypes.arrayOf(PropTypes.object),
     actions: PropTypes.object,
     uxLevel: PropTypes.number,
     monochrome: PropTypes.bool,
@@ -63,6 +65,9 @@ class Preferences extends Component {
   }
 
   reset = (event) => {
+    this.props.actions.thumbFieldTemplate(defaultThumbFieldTemplate)
+    this.props.actions.lightbarFieldTemplate(defaultLightbarFieldTemplate)
+    this.props.actions.dragFieldTemplate(this.defaultDragTemplate())
     this.props.actions.saveUserSettings(this.props.user, {})
   }
 
@@ -89,11 +94,15 @@ class Preferences extends Component {
     this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, dragFieldTemplate })
   }
 
-  resetDragFieldTemplate = (event) => {
-    const { settings, actions, user, userSettings } = this.props
+  defaultDragTemplate = () => {
+    const { settings } = this.props
     const dragTemplateSetting = settings && settings.find(setting => setting.name === 'archivist.search.dragTemplate')
-    const dragFieldTemplate = dragTemplateSetting && dragTemplateSetting.currentValue
-    actions.dragFieldTemplate(dragFieldTemplate)
+    return dragTemplateSetting && dragTemplateSetting.currentValue
+  }
+
+  resetDragFieldTemplate = (event) => {
+    const { actions, user, userSettings } = this.props
+    actions.dragFieldTemplate(this.defaultDragTemplate())
     actions.saveUserSettings(user, { ...userSettings, dragFieldTemplate: undefined })
   }
 
@@ -164,7 +173,7 @@ class Preferences extends Component {
             </div>
             <div className="Preferences-field-template">
               <input type="text" className="Preferences-field-template-input" style={{width: '240px'}} value={dragFieldTemplate} onChange={this.changeDragFieldTemplate}/>
-              <div className="Preferences-field-template-reset" onClick={this.resetDragFieldTemplate}>Reset</div>
+              <div className={classnames('Preferences-field-template-reset', {disabled: !this.defaultDragTemplate()})} onClick={this.resetDragFieldTemplate}>Reset</div>
               <div className="Preferences-field-template-label">Drag Template</div>
             </div>
             { DropboxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutDropbox}>Logout Dropbox</button> }
