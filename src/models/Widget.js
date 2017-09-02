@@ -152,7 +152,7 @@ export function createFiletypeWidget (field, fieldType, exts, isEnabled, isPinne
   return new Widget({type, field, sliver, isEnabled, isPinned})
 }
 
-export function createColorWidget (field, fieldType, colors, isServerHSL, isEnabled, isPinned) {
+export function createColorWidget (field, fieldType, colors, isEnabled, isPinned) {
   const type = ColorWidgetInfo.type
   let sliver
   const RATIO_MAX_FACTOR = 1.5  // maxRatio in query is this factor times user ratio
@@ -160,7 +160,7 @@ export function createColorWidget (field, fieldType, colors, isServerHSL, isEnab
 
   if (colors && colors.length) {
     const filter = new AssetFilter({colors: {colors: colors.map(color => {
-      const hsv = (isServerHSL) ? color.hsl : HSL2HSV(color.hsl) // see toggleServerHSL
+      const hsv = HSL2HSV(color.hsl) // see toggleServerHSL
       return {
         hue: Math.floor(hsv[0]),
         saturation: Math.floor(hsv[1]),

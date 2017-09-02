@@ -168,8 +168,7 @@ function restoreSearch (search) {
         widgets.push(dateRange)
       } else if (agg.aggs.colors) {
         const vals = undefined
-        const isServerHSL = true
-        const colors = createColorWidget('colors', 'color', vals, isServerHSL, isEnabled, isPinned)
+        const colors = createColorWidget('colors', 'color', vals, isEnabled, isPinned)
         widgets.push(colors)
       } else if (agg.aggs.sortOrder) {
         const field = undefined
@@ -276,7 +275,7 @@ function restoreWidgetSlivers (widgets, search) {
     if (colors) {
       colors.sliver.filter = new AssetFilter({colors: search.filter.colors})
     } else {
-      const w = createColorWidget('colors', 'color', search.filter.colors, true, isEnabled, isPinned)
+      const w = createColorWidget('colors', 'color', search.filter.colors, isEnabled, isPinned)
       widgets.push(w)
     }
   }
