@@ -11,7 +11,8 @@ import {
   SHOW_DIALOG_CONFIRM, HIDE_DIALOG_CONFIRM,
   SHOW_DIALOG_PROMPT, HIDE_DIALOG_PROMPT,
   THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE, DRAG_FIELD_TEMPLATE,
-  UX_LEVEL, EMBEDMODE_ENABLED, MONOCHROME
+  UX_LEVEL, EMBEDMODE_ENABLED, MONOCHROME,
+  ARCHIVIST_ALL_SETTINGS
 } from '../constants/actionTypes'
 import { DEFAULT_THUMBSIZE } from '../actions/appActions'
 import { parseVariables, fieldsForVariables } from '../services/jsUtil'
@@ -160,6 +161,16 @@ export default function app (state = initialState, action) {
       const dragFieldTemplate = action.payload
       const dragFields = fieldsForVariables(parseVariables(dragFieldTemplate))
       return { ...state, dragFieldTemplate, dragFields }
+    }
+    case ARCHIVIST_ALL_SETTINGS: {
+      const settings = action.payload
+      const dragTemplateSetting = settings && settings.find(setting => setting.name === 'archivist.search.dragTemplate')
+      const dragFieldTemplate = dragTemplateSetting && dragTemplateSetting.currentValue
+      if (dragFieldTemplate && !state.dragFieldTemplate) {
+        const dragFields = fieldsForVariables(parseVariables(dragFieldTemplate))
+        return { ...state, dragFieldTemplate, dragFields }
+      }
+      return state
     }
     case UX_LEVEL: {
       return { ...state, uxLevel: action.payload }

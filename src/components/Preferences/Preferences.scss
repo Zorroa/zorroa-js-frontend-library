@@ -154,6 +154,15 @@
   width: 120px;
   margin-left: 8px;
   color: $zorroa-gray;
+  @include nowrap;
+}
+
+.Preferences-field-template-reset {
+  padding: 4px 12px;
+  background-color: $zorroa-water-blue;
+  color: white;
+  border-radius: 3px;
+  margin-left: 8px;
 }
 
 .Preferences-uxlevel {

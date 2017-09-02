@@ -1,4 +1,4 @@
-import { ARCHIVIST_INFO, ARCHIVIST_HEALTH, ARCHIVIST_METRICS } from '../constants/actionTypes'
+import { ARCHIVIST_INFO, ARCHIVIST_HEALTH, ARCHIVIST_METRICS, ARCHIVIST_ALL_SETTINGS } from '../constants/actionTypes'
 
 const initialState = {
   info: null,
@@ -14,6 +14,8 @@ export default function archivist (state = initialState, action) {
       return { ...state, health: action.payload }
     case ARCHIVIST_METRICS:
       return { ...state, metrics: action.payload }
+    case ARCHIVIST_ALL_SETTINGS:
+      return { ...state, settings: action.payload }
   }
   return state
 }
