@@ -180,6 +180,7 @@ class Assets extends Component {
     } else {
       // Select the isolated asset, which is DE-selected on the second click
       this.skipNextSelectionScroll = true
+      const event = { shiftKey: false, metaKey: false }
       this.select(asset, event)
       this.props.actions.isolateAssetId(asset.id)
     }
