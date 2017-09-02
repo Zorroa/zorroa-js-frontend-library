@@ -59,7 +59,6 @@ class Range extends Component {
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
 
-    const doSync = this.sync
     this.sync = false
 
     if (widget && widget.sliver) {
