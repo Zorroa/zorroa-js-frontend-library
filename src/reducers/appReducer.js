@@ -162,16 +162,6 @@ export default function app (state = initialState, action) {
       const dragFields = fieldsForVariables(parseVariables(dragFieldTemplate))
       return { ...state, dragFieldTemplate, dragFields }
     }
-    case ARCHIVIST_ALL_SETTINGS: {
-      const settings = action.payload
-      const dragTemplateSetting = settings && settings.find(setting => setting.name === 'archivist.search.dragTemplate')
-      const dragFieldTemplate = dragTemplateSetting && dragTemplateSetting.currentValue
-      if (dragFieldTemplate && !state.dragFieldTemplate) {
-        const dragFields = fieldsForVariables(parseVariables(dragFieldTemplate))
-        return { ...state, dragFieldTemplate, dragFields }
-      }
-      return state
-    }
     case UX_LEVEL: {
       return { ...state, uxLevel: action.payload }
     }

@@ -163,9 +163,9 @@ class Preferences extends Component {
               <div className="Preferences-field-template-label">Thumbnail Label</div>
             </div>
             <div className="Preferences-field-template">
-              <input type="text" className="Preferences-field-template-input" value={dragFieldTemplate} onChange={this.changeDragFieldTemplate}/>
-              <div className="Preferences-field-template-label">Assets Template</div>
+              <input type="text" className="Preferences-field-template-input" style={{width: '240px'}} value={dragFieldTemplate} onChange={this.changeDragFieldTemplate}/>
               <div className="Preferences-field-template-reset" onClick={this.resetDragFieldTemplate}>Reset</div>
+              <div className="Preferences-field-template-label">Drag Template</div>
             </div>
             { DropboxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutDropbox}>Logout Dropbox</button> }
             { BoxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutBox}>Logout Box</button> }
