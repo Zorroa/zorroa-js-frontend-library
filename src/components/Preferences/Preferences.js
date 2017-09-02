@@ -2,14 +2,16 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import JSONTree from 'react-json-tree'
+import classnames from 'classnames'
 
 import { hideModal, lightbarFieldTemplate, thumbFieldTemplate, dragFieldTemplate, uxLevel, monochrome } from '../../actions/appActions'
 import { saveUserSettings, changePassword } from '../../actions/authAction'
-import { archivistInfo, archivistHealth, archivistMetrics } from '../../actions/archivistAction'
+import { archivistInfo, archivistHealth, archivistMetrics, archivistSettings } from '../../actions/archivistAction'
 import User from '../../models/User'
 import { DropboxAuthenticator } from '../Import/DropboxAuthenticator'
 import { BoxAuthenticator } from '../Import/BoxAuthenticator'
 import { GDriveAuthenticator } from '../Import/GDriveAuthenticator'
+import { defaultThumbFieldTemplate, defaultLightbarFieldTemplate } from '../../reducers/appReducer'
 
 const theme = {
   scheme: 'bright',
@@ -39,6 +41,7 @@ class Preferences extends Component {
     info: PropTypes.object,
     health: PropTypes.object,
     metrics: PropTypes.object,
+    settings: PropTypes.arrayOf(PropTypes.object),
     actions: PropTypes.object,
     uxLevel: PropTypes.number,
     monochrome: PropTypes.bool,
@@ -52,6 +55,7 @@ class Preferences extends Component {
     this.props.actions.archivistInfo()
     this.props.actions.archivistHealth()
     this.props.actions.archivistMetrics()
+    this.props.actions.archivistSettings()
   }
 
   dismiss = (event) => {
@@ -61,6 +65,9 @@ class Preferences extends Component {
   }
 
   reset = (event) => {
+    this.props.actions.thumbFieldTemplate(defaultThumbFieldTemplate)
+    this.props.actions.lightbarFieldTemplate(defaultLightbarFieldTemplate)
+    this.props.actions.dragFieldTemplate(this.defaultDragTemplate())
     this.props.actions.saveUserSettings(this.props.user, {})
   }
 
@@ -85,6 +92,18 @@ class Preferences extends Component {
     const dragFieldTemplate = event.target.value
     this.props.actions.dragFieldTemplate(dragFieldTemplate)
     this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, dragFieldTemplate })
+  }
+
+  defaultDragTemplate = () => {
+    const { settings } = this.props
+    const dragTemplateSetting = settings && settings.find(setting => setting.name === 'archivist.search.dragTemplate')
+    return dragTemplateSetting && dragTemplateSetting.currentValue
+  }
+
+  resetDragFieldTemplate = (event) => {
+    const { actions, user, userSettings } = this.props
+    actions.dragFieldTemplate(this.defaultDragTemplate())
+    actions.saveUserSettings(user, { ...userSettings, dragFieldTemplate: undefined })
   }
 
   logoutDropbox = (event) => {
@@ -137,11 +156,11 @@ class Preferences extends Component {
             <button className="Preferences-reset" onClick={this.reset}>Reset Default User Settings</button>
             <button className="Preferences-reset" onClick={this.changePassword}>Change Password</button>
             <div className="Preferences-uxlevel">
-              <input type="checkbox" className="Preferences-uxlevel-input" checked={uxLevel > 0} onClick={this.toggleUXLevel}/>
+              <input type="checkbox" className="Preferences-uxlevel-input" checked={uxLevel > 0} onChange={this.toggleUXLevel}/>
               <div className="Preferences-uxlevel-label">Advanced Controls</div>
             </div>
             <div className="Preferences-monochrome">
-              <input type="checkbox" className="Preferences-monochrome-input" checked={monochrome} onClick={this.toggleMonochrome}/>
+              <input type="checkbox" className="Preferences-monochrome-input" checked={monochrome} onChange={this.toggleMonochrome}/>
               <div className="Preferences-monochrome-label">Dark Theme</div>
             </div>
             <div className="Preferences-field-template">
@@ -153,8 +172,9 @@ class Preferences extends Component {
               <div className="Preferences-field-template-label">Thumbnail Label</div>
             </div>
             <div className="Preferences-field-template">
-              <input type="text" className="Preferences-field-template-input" value={dragFieldTemplate} onChange={this.changeDragFieldTemplate}/>
-              <div className="Preferences-field-template-label">Assets Template</div>
+              <input type="text" className="Preferences-field-template-input" style={{width: '240px'}} value={dragFieldTemplate} onChange={this.changeDragFieldTemplate}/>
+              <div className={classnames('Preferences-field-template-reset', {disabled: !this.defaultDragTemplate()})} onClick={this.resetDragFieldTemplate}>Reset</div>
+              <div className="Preferences-field-template-label">Drag Template</div>
             </div>
             { DropboxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutDropbox}>Logout Dropbox</button> }
             { BoxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutBox}>Logout Box</button> }
@@ -164,9 +184,11 @@ class Preferences extends Component {
             <div className='Preferences-build'>
               <div>CURATOR</div>
               <table cellSpacing={5}>
+                <tbody>
                 <tr><td className="Preferences-build-title">Version</td><td className="Preferences-build-value">{`${zvVersion}`}</td></tr>
                 <tr><td className="Preferences-build-title">Build</td><td className="Preferences-build-value">{`${zvCount} (${zvCommit} ${zvBranch})`}</td></tr>
                 <tr><td className="Preferences-build-title">Date</td><td className="Preferences-build-value">{`${zvDateStr}`}</td></tr>
+                </tbody>
               </table>
             </div>
             { info && <div className="Preferences-archivist">Archivisit Info<JSONTree data={info} theme={theme} invertTheme hideRoot/></div> }
@@ -186,6 +208,7 @@ export default connect(state => ({
   info: state.archivist.info,
   health: state.archivist.health,
   metrics: state.archivist.metrics,
+  settings: state.archivist.settings,
   uxLevel: state.app.uxLevel,
   monochrome: state.app.monochrome,
   userSettings: state.app.userSettings,
@@ -199,6 +222,7 @@ export default connect(state => ({
     archivistInfo,
     archivistHealth,
     archivistMetrics,
+    archivistSettings,
     hideModal,
     lightbarFieldTemplate,
     thumbFieldTemplate,
