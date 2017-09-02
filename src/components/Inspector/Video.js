@@ -43,11 +43,11 @@ class Video extends Component {
 
   resize = () => this.forceUpdate()
 
-  componentDidMount() {
+  componentDidMount () {
     window.addEventListener('resize', this.resize)
   }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     window.removeEventListener('resize', this.resize)
   }
 

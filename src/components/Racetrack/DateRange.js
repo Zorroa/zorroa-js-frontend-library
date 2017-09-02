@@ -152,7 +152,7 @@ class DateRange extends Component {
 
   render () {
     const { isIconified, id, floatBody, isOpen, onOpen } = this.props
-    const { field, minStr, maxStr } = this.state
+    const { field } = this.state
     const lastName = Asset.lastNamespace(unCamelCase(field))
     const title = lastName
     const label = undefined
