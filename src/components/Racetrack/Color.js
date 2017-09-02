@@ -9,7 +9,7 @@ import { ColorWidgetInfo } from './WidgetInfo'
 import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import Widget from './Widget'
 import Resizer from '../../services/Resizer'
-import { hexToRgb, rgbToHex, RGB2HSL, HSL2RGB } from '../../services/color'
+import { hexToRgb, rgbToHex, RGB2HSL, HSL2RGB, HSV2HSL } from '../../services/color'
 
 const COLOR_SLIDER_HEIGHT = 180
 const COLOR_RESIZER_HEIGHT = 5
@@ -29,12 +29,7 @@ class Color extends Component {
   }
 
   state = {
-    colors: [],
-    isServerHSL: true // see toggleServerHSL
-  }
-
-  setStatePromise = (newState) => {
-    return new Promise(resolve => this.setState(newState, resolve))
+    colors: []
   }
 
   // sync local state with existing app state
@@ -52,9 +47,11 @@ class Color extends Component {
     }
 
     this.setState({colors: colors.map(color => {
+      const colorArray = [color.hue, color.saturation, color.brightness]
+      const hsl = HSV2HSL(colorArray)
       return {
-        hsl: [color.hue, color.saturation, color.brightness],
-        key: color.key || this.getKeyForHSL([color.hue, color.saturation, color.brightness]),
+        hsl,
+        key: color.key || this.getKeyForHSL(hsl),
         ratio: color.ratio || color.maxRatio / (RATIO_MAX_FACTOR * 100),
         maxRatio: color.maxRatio,
         minRatio: color.minRatio
@@ -84,7 +81,7 @@ class Color extends Component {
       isEnabled = oldWidget.isEnabled
       isPinned = oldWidget.isPinned
     }
-    const widget = createColorWidget('colors', 'nested', colors, this.state.isServerHSL, isEnabled, isPinned)
+    const widget = createColorWidget('colors', 'nested', colors, isEnabled, isPinned)
     widget.id = this.props.id
     this.props.actions.modifyRacetrackWidget(widget)
   }
@@ -120,8 +117,8 @@ class Color extends Component {
 
     const oldN = colors.length
     if (oldN === 1) {
-      this.setStatePromise({ colors: [] })
-      .then(() => this.modifySliver([]))
+      this.setState({ colors: [] })
+      this.modifySliver([])
       return
     }
 
@@ -254,13 +251,6 @@ class Color extends Component {
     this.modifySliver(this.state.colors)
   }
 
-  // This is a DEBUG feature since the flickr server has HSL data
-  // TODO: once all server data is HSV, remove this toggle
-  toggleServerHSL = (event) => {
-    this.setState({ isServerHSL: event.target.checked })
-    this.modifySliver(this.state.colors)
-  }
-
   render () {
     const { id, floatBody, isIconified, isOpen, onOpen } = this.props
     const { colors } = this.state
@@ -299,14 +289,6 @@ class Color extends Component {
                      placeholder="Enter HEX value"
                      onInput={event => this.setColorHEX(event.target.value)}/>
             </div>
-          </div>
-
-          <div className="Color-hsl">
-            { /* TODO: remove this debug toggle (see comments on toggleServerHSL) */ }
-            <input checked={this.state.isServerHSL} type="checkbox"
-                   className='' name="color-hsl"
-                   onChange={this.toggleServerHSL}/>
-            <span>Server uses HSL</span>
           </div>
 
           <div className="Color-separator"/>
