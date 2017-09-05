@@ -6,7 +6,7 @@ import classnames from 'classnames'
 
 import { hideModal, lightbarFieldTemplate, thumbFieldTemplate, dragFieldTemplate, uxLevel, monochrome } from '../../actions/appActions'
 import { saveUserSettings, changePassword } from '../../actions/authAction'
-import { archivistInfo, archivistHealth, archivistMetrics, archivistSettings } from '../../actions/archivistAction'
+import { archivistInfo, archivistHealth, archivistMetrics, archivistSetting } from '../../actions/archivistAction'
 import User from '../../models/User'
 import { DropboxAuthenticator } from '../Import/DropboxAuthenticator'
 import { BoxAuthenticator } from '../Import/BoxAuthenticator'
@@ -41,7 +41,7 @@ class Preferences extends Component {
     info: PropTypes.object,
     health: PropTypes.object,
     metrics: PropTypes.object,
-    settings: PropTypes.arrayOf(PropTypes.object),
+    settings: PropTypes.object,
     actions: PropTypes.object,
     uxLevel: PropTypes.number,
     monochrome: PropTypes.bool,
@@ -55,7 +55,7 @@ class Preferences extends Component {
     this.props.actions.archivistInfo()
     this.props.actions.archivistHealth()
     this.props.actions.archivistMetrics()
-    this.props.actions.archivistSettings()
+    this.props.actions.archivistSetting('archivist.export.dragTemplate')
   }
 
   dismiss = (event) => {
@@ -96,7 +96,7 @@ class Preferences extends Component {
 
   defaultDragTemplate = () => {
     const { settings } = this.props
-    const dragTemplateSetting = settings && settings.find(setting => setting.name === 'archivist.search.dragTemplate')
+    const dragTemplateSetting = settings && settings['archivist.export.dragTemplate']
     return dragTemplateSetting && dragTemplateSetting.currentValue
   }
 
@@ -164,15 +164,15 @@ class Preferences extends Component {
               <div className="Preferences-monochrome-label">Dark Theme</div>
             </div>
             <div className="Preferences-field-template">
-              <input type="text" className="Preferences-field-template-input" value={lightbarFieldTemplate} onChange={this.changeLightbarFieldTemplate}/>
+              <input type="text" className="Preferences-field-template-input" value={lightbarFieldTemplate || ''} onChange={this.changeLightbarFieldTemplate}/>
               <div className="Preferences-field-template-label">Lightbar Label</div>
             </div>
             <div className="Preferences-field-template">
-              <input type="text" className="Preferences-field-template-input" value={thumbFieldTemplate} onChange={this.changeThumbFieldTemplate}/>
+              <input type="text" className="Preferences-field-template-input" value={thumbFieldTemplate || ''} onChange={this.changeThumbFieldTemplate}/>
               <div className="Preferences-field-template-label">Thumbnail Label</div>
             </div>
             <div className="Preferences-field-template">
-              <input type="text" className="Preferences-field-template-input" style={{width: '240px'}} value={dragFieldTemplate} onChange={this.changeDragFieldTemplate}/>
+              <input type="text" className="Preferences-field-template-input" style={{width: '240px'}} value={dragFieldTemplate || ''} onChange={this.changeDragFieldTemplate}/>
               <div className={classnames('Preferences-field-template-reset', {disabled: !this.defaultDragTemplate()})} onClick={this.resetDragFieldTemplate}>Reset</div>
               <div className="Preferences-field-template-label">Drag Template</div>
             </div>
@@ -222,7 +222,7 @@ export default connect(state => ({
     archivistInfo,
     archivistHealth,
     archivistMetrics,
-    archivistSettings,
+    archivistSetting,
     hideModal,
     lightbarFieldTemplate,
     thumbFieldTemplate,

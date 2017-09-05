@@ -24,7 +24,6 @@ import { queueFileEntrysUpload } from '../../actions/jobActions'
 import { updateCommand, getAllCommands, isolateAssetId } from '../../actions/assetsAction'
 import { restoreFolders } from '../../actions/racetrackAction'
 import { loadSharedLink } from '../../actions/sharedLinkAction'
-import { archivistSettings } from '../../actions/archivistAction'
 import ChangePassword from '../auth/ChangePassword'
 import User from '../../models/User'
 import Job from '../../models/Job'
@@ -103,7 +102,6 @@ class Workspace extends Component {
 
   componentWillMount () {
     const { actions, user, app } = this.props
-    actions.archivistSettings()
     actions.getUserPermissions(user)
     actions.getAllCommands()
     Feedback.loadEmailJs()
@@ -500,7 +498,6 @@ export default connect(state => ({
     loadSharedLink,
     getAllCommands,
     updateCommand,
-    setEmbedModeEnabled,
-    archivistSettings
+    setEmbedModeEnabled
   }, dispatch)
 }))(Workspace)

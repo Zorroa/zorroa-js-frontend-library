@@ -1,4 +1,4 @@
-import { ARCHIVIST_INFO, ARCHIVIST_HEALTH, ARCHIVIST_METRICS, ARCHIVIST_ALL_SETTINGS } from '../constants/actionTypes'
+import { ARCHIVIST_INFO, ARCHIVIST_HEALTH, ARCHIVIST_METRICS, ARCHIVIST_SETTING } from '../constants/actionTypes'
 import { archivistGet } from './authAction'
 
 export function archivistInfo () {
@@ -49,18 +49,18 @@ export function archivistMetrics () {
   }
 }
 
-export function archivistSettings () {
+export function archivistSetting (name) {
   return dispatch => {
-    console.log('Get all archivist settings')
-    archivistGet(dispatch, '/api/v1/settings')
+    console.log('Get archivist setting ' + name)
+    archivistGet(dispatch, `/api/v1/settings/${name}`)
       .then(response => {
         dispatch({
-          type: ARCHIVIST_ALL_SETTINGS,
+          type: ARCHIVIST_SETTING,
           payload: response.data
         })
       })
       .catch(error => {
-        console.error('Error getting all settings: ' + error)
+        console.error('Error getting setting ' + name + ': ' + error)
       })
   }
 }
