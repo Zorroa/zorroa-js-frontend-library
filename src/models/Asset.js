@@ -3,8 +3,9 @@ import * as assert from 'assert'
 import Proxy from './Proxy'
 
 export default class Asset {
-  constructor ({ id, document }) {
+  constructor ({ id, score, document }) {
     this.id = id
+    this.score = score
     this.document = document
 
     // Build the Proxy list from the ProxySchema
@@ -228,6 +229,7 @@ export default class Asset {
   // invokes _field to navigate through the JSON and then uses
   // _valueToString to get a displayable form of the value.
   rawValue (field) {
+    if (this[field]) return this[field]
     return Asset._field(this.document, field)
   }
 
