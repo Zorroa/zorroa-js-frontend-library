@@ -91,7 +91,7 @@ class Searcher extends Component {
     }
     if (query) {
       const { fuzzy } = this.props.userSettings
-      this.pendingQuery = new AssetSearch({ query, fuzzy })
+      this.pendingQuery = new AssetSearch({ ...query, fuzzy })
     }
     if (query) {
       this.pendingQueryCountIds = new Set([...this.pendingQueryCountIds, ...ids])

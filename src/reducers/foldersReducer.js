@@ -217,7 +217,7 @@ export default function (state = initialState, action) {
         // Fast path: copy the counts into the filter counts
         const newCounts = new Map(state.filteredCounts)
         for (let i = 0; i < ids.length; ++i) {
-          newCounts.set(ids[i], state.counts[ids[i]])
+          newCounts.set(ids[i], state.counts.get(ids[i]))
         }
         return { ...state, filteredCounts: newCounts }
       }
