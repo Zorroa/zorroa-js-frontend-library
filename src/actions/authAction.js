@@ -12,6 +12,7 @@ import {
 import { USER_ITEM, ORIGIN_ITEM } from '../constants/localStorageItems'
 import User from '../models/User'
 import Permission from '../models/Permission'
+import { archivistSetting } from './archivistAction'
 
 // Global variable to hold axios connection
 // FIXME: Should this be state?
@@ -199,6 +200,8 @@ function authorize (dispatch, json, source) {
     }
     if (metadata.dragFieldTemplate !== undefined) {
       dispatch({type: DRAG_FIELD_TEMPLATE, payload: metadata.dragFieldTemplate})
+    } else {
+      dispatch(archivistSetting('archivist.export.dragTemplate'))
     }
   }
   const url = source && source.length ? '?source=' + source : ''
