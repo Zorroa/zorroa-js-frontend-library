@@ -229,7 +229,7 @@ export default class Asset {
   // invokes _field to navigate through the JSON and then uses
   // _valueToString to get a displayable form of the value.
   rawValue (field) {
-    if (this[field]) return this[field]
+    if (field === 'id' || field === 'score') return this[field]
     return Asset._field(this.document, field)
   }
 
