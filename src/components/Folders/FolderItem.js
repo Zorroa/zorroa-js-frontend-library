@@ -429,7 +429,7 @@ class FolderItem extends Component {
                    className={classnames('icon-folder-add', {disabled: !canAddChild})} />
               <div>Create Sub-folder</div>
             </div> }
-          { singleFolderSelected && folder.taxonomyRoot &&
+          { singleFolderSelected && folder.taxonomyRoot && isAdministrator &&
             <div onClick={this.deleteTaxonomy}
                  title="Delete taxonomy to remove folder keywords"
                  className="FolderItem-context-item FolderItem-context-taxonomy"
@@ -438,7 +438,7 @@ class FolderItem extends Component {
               <div>Delete taxonomy</div>
             </div>
           }
-          { singleFolderSelected && !folder.taxonomyRoot &&
+          { singleFolderSelected && !folder.taxonomyRoot && isAdministrator &&
           <div onClick={this.createTaxonomy}
                title="Create taxonomy to add keywords for this folder"
                className="FolderItem-context-item FolderItem-context-taxonomy"
