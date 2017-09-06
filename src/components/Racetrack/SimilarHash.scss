@@ -164,4 +164,6 @@
   width: 50px;
   text-align: center;
   border: none;
+
+  .dark & { color: $zorroa-whitegray; background-color: transparent; }
 }
