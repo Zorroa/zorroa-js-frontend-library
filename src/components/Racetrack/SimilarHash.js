@@ -160,6 +160,9 @@ class SimilarHash extends Component {
               </div>
             ) }
           </div>
+          <input className="SimilarHash-minscore-input"
+                 disabled={!adjustable}
+                 value={minScore} onChange={this.changeMinScore}/>
           <div className="SimilarHash-slider">
             <div className="SimilarHash-slider-icon icon-dissimilar"/>
             <input className="SimilarHash-slider-input" type="range"
