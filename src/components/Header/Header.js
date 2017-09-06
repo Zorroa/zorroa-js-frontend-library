@@ -97,6 +97,13 @@ class Header extends Component {
     const { selectedIds, similar, similarAssets } = this.props
 
     const similarFields = this.similarFields()
+    const displayName = (field) => {
+      const name = field.replace(/\.(raw|byte|point|bit)$/, '').replace(/^.*\./, '')
+      const remap = { resnet: 'image (RN)', tensorflow: 'image (TF)', hsv: 'color' }
+      const rname = remap[name.toLowerCase()]
+      if (rname) return rname
+      return name
+    }
 
     const nAssetsSelected = selectedIds ? selectedIds.size : 0
     const selectedAssets = nAssetsSelected && [...selectedIds].map(id => (similarAssets.find(asset => (asset.id === id)))).filter(asset => asset)
@@ -118,9 +125,9 @@ class Header extends Component {
         { similarFields && similarFields.length > 1 && (
           <DropdownMenu>
             { similarFields.map(field => (
-              <div className="Editbar-similar-menu-item" onClick={_ => this.selectSimilarField(field) }>
+              <div className="Editbar-similar-menu-item" onClick={_ => this.selectSimilarField(field) } title={field}>
                 <div className={`Editbar-similar-menu-item-selected${similar.field === field ? ' icon-check' : ''}`}/>
-                { field.substr(field.lastIndexOf('.') + 1) }
+                { displayName(field) }
               </div>
             ))}
           </DropdownMenu>
