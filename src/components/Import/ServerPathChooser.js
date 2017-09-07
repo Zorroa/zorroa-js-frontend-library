@@ -5,10 +5,10 @@ import * as assert from 'assert'
 
 import Finder from '../Finder'
 import spin from './spin.svg'
-import { listServerImportFiles } from '../../actions/authAction'
+import { listServerImportFiles, getServerRootPath } from '../../actions/authAction'
+import { makeTimeoutPromise } from '../../services/jsUtil'
 
 const ROOT_ID = 0
-const ROOT_PATH = '/'
 
 class ServerPathChooser extends Component {
   static propTypes = {
@@ -20,24 +20,41 @@ class ServerPathChooser extends Component {
   state = {
     items: new Map(),
     rootId: ROOT_ID,
+    rootPath: null,
     cursor: '',
     loading: false
   }
 
   componentWillMount () {
-    this.loadFiles(ROOT_PATH, this.state.rootId)
+    // Set a timeout after which we suggest the user try later.
+    // If the server recovers after this timeout,
+    // the component will recover gracefully and display files.
+    // To test this scenario, uncomment the makeDelayPromise() below,
+    // and set the timeout value to be less than the delay value.
+    makeTimeoutPromise(
+      this.props.actions.getServerRootPath()
+      // .then(response => makeDelayPromise(2000, response)) // Uncomment this to test slow server response
+      .then(response => this.setStateProm({rootPath: response.defaultValue, loading: true}))
+      .then(_ => this.loadFiles(this.state.rootPath, this.state.rootId)),
+      10000, 'unavailable')
+    .catch(_ => this.setState({rootPath: 'unavailable'}))
+  }
+
+  setStateProm = (newState) => {
+    return new Promise(resolve => this.setState(newState, resolve))
   }
 
   loadFiles = (path, parentId) => {
-    if (path === '/') path = ''
+    const { rootPath } = this.state
+    assert.ok(rootPath)
+    if (rootPath === 'unavailable') return
 
-    this.setState({loading: true})
-
-    this.props.actions.listServerImportFiles(path)
+    this.setStateProm({loading: true})
+    .then(_ => this.props.actions.listServerImportFiles(path))
     .then((response) => {
-      assert.ok(response.data)
-      const dirs = response.data.dirs
-      const files = response.data.files
+      assert.ok(response)
+      const dirs = response.dirs
+      const files = response.files
       const children = dirs.concat(files)
       const childIds = new Set()
       let { items } = this.state
@@ -55,7 +72,7 @@ class ServerPathChooser extends Component {
         childIds.add(itemPath)
       })
       const parent = items.get(parentId)
-      const newParent = parent ? { ...parent } : { id: ROOT_ID, path: ROOT_PATH, name: '/' }
+      const newParent = parent ? { ...parent } : { id: ROOT_ID, path: rootPath, name: '/' }
       newParent.childIds = childIds
       items.set(parentId, newParent)
       const cursor = response.cursor
@@ -80,9 +97,24 @@ class ServerPathChooser extends Component {
   }
 
   render () {
-    const { items, loading, rootId, userAccount } = this.state
+    const { items, loading, rootId, userAccount, rootPath } = this.state
     const title = (userAccount && userAccount.name ? userAccount.name.display_name + '\'s' : 'Unknown') + ' Dropbox'
     const icon = loading ? <img className="ServerPathChooser-icon" src={spin} alt="Loading Dropbox"/> : <div className="ServerPathChooser-icon icon-folder-subfolders" title={title}/>
+
+    // Show something during slow server connections
+    if (rootPath === null) {
+      return (
+        <div className="ServerPathChooser fullWidth flexRowCenter">Contacting Server...</div>
+      )
+    }
+
+    // Display a failure message if the server connection goes down or returns errors
+    if (rootPath === 'unavailable') {
+      return (
+        <div className="ServerPathChooser fullWidth flexRowCenter" style={{padding: '20px'}}>The server is unavailable. Please try again later or contact support.</div>
+      )
+    }
+
     return (
       <div className="ServerPathChooser">
         <Finder items={items} rootId={rootId} loading={loading}
@@ -99,6 +131,7 @@ export default connect(state => ({
   app: state.app
 }), dispatch => ({
   actions: bindActionCreators({
-    listServerImportFiles
+    listServerImportFiles,
+    getServerRootPath
   }, dispatch)
 }))(ServerPathChooser)

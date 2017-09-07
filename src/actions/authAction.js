@@ -8,7 +8,7 @@ import {
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT, SET_TABLE_FIELD_WIDTH,
   SHOW_MULTIPAGE, VIDEO_VOLUME, AUTH_CHANGE_PASSWORD, AUTH_DEFAULTS,
   UX_LEVEL, MONOCHROME, THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE,
-  DRAG_FIELD_TEMPLATE, LIST_SERVER_IMPORT_FILES
+  DRAG_FIELD_TEMPLATE, LIST_SERVER_IMPORT_FILES, GET_SERVER_DEFAULT_PATH
 } from '../constants/actionTypes'
 import { USER_ITEM, ORIGIN_ITEM } from '../constants/localStorageItems'
 import User from '../models/User'
@@ -336,12 +336,30 @@ export function getHMACKey () {
   }
 }
 
+export function getServerRootPath () {
+  return dispatch => {
+    return archivistGet(dispatch, 'api/v1/settings/archivist.lfs.paths')
+    .then(response => {
+      // Note: dispatch is stubbed here
+      // for consistency, and because  archivistGet() needs a dispatcher
+      // but this action has no reducer
+      dispatch({ type: GET_SERVER_DEFAULT_PATH, payload: response.data })
+      // Return the payload, for use in promises
+      return response.data
+    })
+  }
+}
+
 export function listServerImportFiles (path) {
   return dispatch => {
     return archivistPost(dispatch, 'api/v1/lfs', {path})
     .then(response => {
+      // Note: dispatch is stubbed here
+      // for consistency, and because  archivistPose() needs a dispatcher
+      // but this action has no reducer
       dispatch({ type: LIST_SERVER_IMPORT_FILES, payload: response.data })
-      return response
+      // Return the payload, for use in promises
+      return response.data
     })
   }
 }
