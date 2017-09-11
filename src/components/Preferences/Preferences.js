@@ -134,8 +134,15 @@ class Preferences extends Component {
     this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, monochrome })
   }
 
+  toggleFilteredFolderCounts = (event) => {
+    const showFilteredFolderCounts = !this.props.userSettings.showFilteredFolderCounts
+    this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, showFilteredFolderCounts })
+  }
+
   render () {
-    const { user, info, health, metrics, lightbarFieldTemplate, thumbFieldTemplate, dragFieldTemplate, uxLevel, monochrome } = this.props
+    const { user, info, health, metrics,
+      lightbarFieldTemplate, thumbFieldTemplate, dragFieldTemplate,
+      uxLevel, monochrome, userSettings } = this.props
     return (
       <div className="Preferences">
         <div className="Preferences-header">
@@ -157,13 +164,16 @@ class Preferences extends Component {
             <div className="Preferences-checkboxes">
               <div className="Preferences-checkboxes-inner">
                 <div className="Preferences-uxlevel Preferences-checkbox">
-                  <input type="checkbox" className="Preferences-uxlevel-input" checked={uxLevel > 0} onChange={this.toggleUXLevel}/>
+              <input type="checkbox" className="Preferences-uxlevel-input" checked={uxLevel > 0} onChange={this.toggleUXLevel}/>
                   <div className="Preferences-uxlevel-label Preferences-checkbox-label">Advanced Controls</div>
-                </div>
+            </div>
                 <div className="Preferences-monochrome Preferences-checkbox">
-                  <input type="checkbox" className="Preferences-monochrome-input" checked={monochrome} onChange={this.toggleMonochrome}/>
+              <input type="checkbox" className="Preferences-monochrome-input" checked={monochrome} onChange={this.toggleMonochrome}/>
                   <div className="Preferences-monochrome-label Preferences-checkbox-label">Dark Theme</div>
                 </div>
+                <div className="Preferences-showFilteredFolderCounts Preferences-checkbox">
+                  <input type="checkbox" className="Preferences-showFilteredFolderCounts-input" checked={userSettings.showFilteredFolderCounts} onChange={this.toggleFilteredFolderCounts}/>
+                  <div className="Preferences-showFilteredFolderCounts-label Preferences-checkbox-label">Show folder search counts</div>
                 </div>
               </div>
             </div>

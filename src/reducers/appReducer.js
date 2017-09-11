@@ -72,7 +72,8 @@ const initialState = {
     tableHeight: 300,
     thumbSize: DEFAULT_THUMBSIZE,
     thumbLayout: 'masonry',
-    videoVolume: 0.8
+    videoVolume: 0.8,
+    showFilteredFolderCounts: true
   }
 }
 
@@ -183,7 +184,11 @@ export default function app (state = initialState, action) {
       return { ...state, monochrome: action.payload }
     }
     case USER_SETTINGS:
-      return { ...state, userSettings: action.payload.metadata }
+      // Override old settings with new settings.
+      // This ensures we don't erase default settings.
+      const oldUserSettings = state.userSettings
+      const newUserSettings = action.payload.metadata
+      return { ...state, userSettings: { ...oldUserSettings, ...newUserSettings } }
     case UNAUTH_USER:
       return initialState
     default:

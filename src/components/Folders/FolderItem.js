@@ -104,7 +104,8 @@ class FolderItem extends Component {
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     metadataFields: PropTypes.arrayOf(PropTypes.string),
     isAdministrator: PropTypes.bool,
-    actions: PropTypes.object
+    actions: PropTypes.object,
+    userSettings: PropTypes.object.isRequired
   }
 
   state = {
@@ -479,11 +480,12 @@ class FolderItem extends Component {
   }
 
   renderCount () {
-    const { folder, counts, filteredCounts } = this.props
+    const { folder, counts, filteredCounts, userSettings } = this.props
     const count = counts && counts.get(folder.id)
     const filteredCount = filteredCounts && filteredCounts.get(folder.id)
     if (count === undefined) return <div/>
-    if (filteredCount === undefined || count === filteredCount) {
+    const showFilteredCounts = userSettings.showFilteredFolderCounts && filteredCount !== undefined && count !== filteredCount
+    if (!showFilteredCounts) {
       return <div className="FolderItem-count">{count}</div>
     }
     const isZero = filteredCount === 0
@@ -552,7 +554,8 @@ export default connect(state => ({
   user: state.auth.user,
   dragInfo: state.app.dragInfo,
   metadataFields: state.app.metadataFields,
-  isAdministrator: state.auth.isAdministrator
+  isAdministrator: state.auth.isAdministrator,
+  userSettings: state.app.userSettings
 }), dispatch => ({
   actions: bindActionCreators({
     createFolder,

@@ -118,7 +118,8 @@ class Searcher extends Component {
   }
 
   runFolderCount = () => {
-    this.runFolderCountBatch(this.pendingQueryCountIds, this.pendingQuery)
+    const { showFilteredFolderCounts } = this.props.userSettings
+    if (showFilteredFolderCounts) this.runFolderCountBatch(this.pendingQueryCountIds, this.pendingQuery)
     this.runFolderCountBatch(this.pendingFullCountIds)
     this.resetFolderCountTimer()
   }
