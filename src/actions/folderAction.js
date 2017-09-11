@@ -6,12 +6,11 @@ import {
   CREATE_TAXONOMY, DELETE_TAXONOMY, UPDATE_FOLDER_PERMISSIONS
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
-import { restoreFolders } from './racetrackAction'
 import {
   archivistGet, archivistPut, archivistPost, archivistRequest,
   archivistDelete
 } from './authAction'
-import { selectId, equalSets } from '../services/jsUtil'
+import { selectId } from '../services/jsUtil'
 
 const rootEndpoint = '/api/v1/folders'
 
@@ -48,28 +47,10 @@ export function getFolderChildren (parentId, optOnDoneFn) {
 
 export function selectFolderIds (ids, curIds, folders) {
   if (!(ids instanceof Set)) ids = new Set(ids)
-  let actions = []
-  // If a new folder is added to the current selection,
-  // restore the merged search from all selected folders
-  if (curIds && folders && !equalSets(ids, curIds)) {
-    const iter = ids.keys()
-    const restoredFolders = []
-    for (let i = iter.next(); !i.done; i = iter.next()) {
-      const folder = folders.get(i.value)
-      if (folder && folder.search && !folder.isDyhi()) {
-        restoredFolders.push(folder)
-      }
-    }
-    if (restoredFolders.length) {
-      const restoreActions = restoreFolders(restoredFolders)
-      restoreActions.forEach(action => actions.push(action))
-    }
-  }
-  actions.push({
+  return [{
     type: SELECT_FOLDERS,
     payload: ids
-  })
-  return actions
+  }]
 }
 
 // Works when folders is an array of either Folder or TrashedFolder so that

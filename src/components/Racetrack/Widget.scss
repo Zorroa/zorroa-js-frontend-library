@@ -20,6 +20,8 @@
     border-bottom-right-radius: 3px;
     border-bottom-left-radius: 3px;
     border-top-left-radius: 3px;
+
+    .dark & { box-shadow: 0 20px 30px 0 black; }
   }
 }
 

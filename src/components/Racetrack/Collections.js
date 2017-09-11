@@ -1,12 +1,16 @@
 import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import classnames from 'classnames'
 
 import TrashedFolder from '../../models/TrashedFolder'
 import { CollectionsWidgetInfo } from './WidgetInfo'
-import { selectFolderIds } from '../../actions/folderAction'
+import { selectFolderIds, restoreFolders } from '../../actions/racetrackAction'
 import Widget from './Widget'
 import Suggestions from '../Suggestions'
+import Folder from '../../models/Folder'
+import AssetFilter from '../../models/AssetFilter'
+import AssetSearch from '../../models/AssetSearch'
 
 class Collections extends Component {
   static propTypes = {
@@ -87,6 +91,20 @@ class Collections extends Component {
     console.log('Select suggestion ' + text)
   }
 
+  restore = () => {
+    const { folders, selectedFolderIds } = this.props
+    const smartFolders = [...selectedFolderIds.values()].map(id => folders.get(id)).filter(folder => folder && folder.isSmartCollection())
+    const unrestoredFolderIds = [...selectedFolderIds.values()].map(id => folders.get(id)).filter(folder => folder && !folder.isSmartCollection()).map(folder => folder.id)
+    if (unrestoredFolderIds.length) {
+      const links = { folder: unrestoredFolderIds }
+      const filter = new AssetFilter({links})
+      const search = new AssetSearch({filter})
+      const folder = new Folder({search})
+      smartFolders.push(folder)
+    }
+    this.props.actions.restoreFolders(smartFolders)
+  }
+
   render () {
     const { folders, selectedFolderIds, id, floatBody, isOpen, onOpen, isIconified } = this.props
     const { suggestions, suggestion } = this.state
@@ -94,7 +112,7 @@ class Collections extends Component {
     const selectedFolderNames = selectedFolders.map(folder => folder.name)
     const title = selectedFolderNames.length ? (isOpen ? CollectionsWidgetInfo.title : undefined) : CollectionsWidgetInfo.title
     const field = selectedFolderNames.length ? (isOpen ? undefined : selectedFolderNames.join(',')) : undefined
-
+    const canRestore = [...selectedFolderIds.values()].map(id => folders.get(id)).filter(folder => folder && folder.isSmartCollection(folder)).length
     return (
       <Widget className='Collections'
               id={id}
@@ -130,6 +148,8 @@ class Collections extends Component {
               </div>
             ))}
           </div>
+          <div className={classnames('Collections-restore', {disabled: !canRestore})}
+               onClick={this.restore}>Restore Widgets</div>
         </div>
       </Widget>
     )
@@ -142,6 +162,7 @@ export default connect(state => ({
   trashedFolders: state.folders.trashedFolders
 }), dispatch => ({
   actions: bindActionCreators({
-    selectFolderIds
+    selectFolderIds,
+    restoreFolders
   }, dispatch)
 }))(Collections)

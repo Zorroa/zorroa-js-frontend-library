@@ -129,6 +129,12 @@ class FolderItem extends Component {
     }
   }
 
+  select = (event) => {
+    const { onSelect, folder } = this.props
+    if (!folder.isSmartCollection(folder) || event.metaKey || event.shiftKey) return onSelect(event, folder)
+    this.restoreFolder(event)
+  }
+
   showContextMenu = (event) => {
     event.preventDefault()
     this.setState({
@@ -550,7 +556,7 @@ class FolderItem extends Component {
   }
 
   render () {
-    const { folder, depth, isOpen, hasChildren, isSelected, onToggle, onSelect, dropparams, dropFolderId, top } = this.props
+    const { folder, depth, isOpen, hasChildren, isSelected, onToggle, dropparams, dropFolderId, top } = this.props
     const dragHover = this.props.dragHover || dropFolderId === folder.id
     const icon = folder.isDyhi() ? 'icon-foldercog' : (folder.isSmartCollection() ? 'icon-collections-smart' : 'icon-collections-simple')
     const draggable = !folder.isDyhi() || folder.dyhiRoot
@@ -565,7 +571,7 @@ class FolderItem extends Component {
           {hasChildren ? <i className='FolderItem-toggleArrow icon-triangle-down'/> : null}
         </div>
         <div className={classnames('FolderItem-select')} {...dragparams}
-             onClick={event => { onSelect(event, folder); return false }}
+             onClick={this.select}
              onContextMenu={this.showContextMenu}>
           <div className="flexRow flexAlignItemsCenter">
             <i className={`FolderItem-icon ${icon}`}/>
