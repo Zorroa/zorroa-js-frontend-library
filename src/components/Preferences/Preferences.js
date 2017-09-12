@@ -70,6 +70,14 @@ class Preferences extends Component {
     this.props.actions.dragFieldTemplate(this.defaultDragTemplate())
     this.props.actions.saveUserSettings(this.props.user, {})
     .then(_ => window.location.reload())
+
+    // TODO: remove the reload
+    // This reload is a hack, currently needed to update the user's preferences
+    // when the user hits "Reset User Preferences"
+    // To fix it, we need to de-dupe the properties in app & app.userSettings
+    // Some code that writes to userSettings isn't watching userSettings for updates.
+    // We should probably also ensure that all settings have an explicit default
+    // value in app.userSettings.<setting> (appReducer.js)
   }
 
   changePassword = (event) => {
