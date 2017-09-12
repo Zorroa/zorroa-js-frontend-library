@@ -311,7 +311,7 @@ export function saveUserSettings (user, metadata) {
     // FIXME: Move search to settings.search in server?
     // FIXME: Use localStore rather than server?
     const settings = { metadata }
-    archivistPut(dispatch, '/api/v1/users/' + user.id + '/_settings', settings)
+    return archivistPut(dispatch, '/api/v1/users/' + user.id + '/_settings', settings)
       .then(response => {
         dispatch({ type: USER_SETTINGS, payload: { user, metadata } })
         console.log('Save user settings')

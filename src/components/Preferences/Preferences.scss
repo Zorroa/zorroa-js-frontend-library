@@ -101,6 +101,7 @@
   cursor: pointer;
   background-color: $zorroa-water-blue;
   &:hover { background-color: darken($zorroa-water-blue, 15%); }
+  &:not(:first-child) { margin-left: 5px; }
 }
 
 .Preferences-build {
@@ -169,24 +170,32 @@
   &.disabled { background-color: $zorroa-lightgray; }
 }
 
-.Preferences-uxlevel {
-  @include flexRowCenter;
-  margin-top: 20px;
-  margin-bottom: 5px;
+.Preferences-checkboxes {
+  @include flexRow;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 
-.Preferences-uxlevel-label {
-  margin-left: 4px;
-  color: $zorroa-gray;
+.Preferences-checkboxes-inner {
+  @include flexCol;
 }
 
-.Preferences-monochrome {
-  @include flexRowCenter;
+.Preferences-checkbox {
+  @include flexRow;
   margin-top: 5px;
-  margin-bottom: 20px;
 }
 
-.Preferences-monochrome-label {
+.Preferences-checkbox-label {
   margin-left: 4px;
   color: $zorroa-gray;
+}
+
+.Preferences-account-reset {
+  @include flexRow;
+  @include fullWidth;
+}
+
+.Preferences-cloud-reset {
+  @include flexRow;
+  @include fullWidth;
 }

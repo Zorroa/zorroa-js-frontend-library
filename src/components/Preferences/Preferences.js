@@ -69,6 +69,15 @@ class Preferences extends Component {
     this.props.actions.lightbarFieldTemplate(defaultLightbarFieldTemplate)
     this.props.actions.dragFieldTemplate(this.defaultDragTemplate())
     this.props.actions.saveUserSettings(this.props.user, {})
+    .then(_ => window.location.reload())
+
+    // TODO: remove the reload
+    // This reload is a hack, currently needed to update the user's preferences
+    // when the user hits "Reset User Preferences"
+    // To fix it, we need to de-dupe the properties in app & app.userSettings
+    // Some code that writes to userSettings isn't watching userSettings for updates.
+    // We should probably also ensure that all settings have an explicit default
+    // value in app.userSettings.<setting> (appReducer.js)
   }
 
   changePassword = (event) => {
@@ -133,8 +142,15 @@ class Preferences extends Component {
     this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, monochrome })
   }
 
+  toggleFilteredFolderCounts = (event) => {
+    const showFilteredFolderCounts = !this.props.userSettings.showFilteredFolderCounts
+    this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, showFilteredFolderCounts })
+  }
+
   render () {
-    const { user, info, health, metrics, lightbarFieldTemplate, thumbFieldTemplate, dragFieldTemplate, uxLevel, monochrome } = this.props
+    const { user, info, health, metrics,
+      lightbarFieldTemplate, thumbFieldTemplate, dragFieldTemplate,
+      uxLevel, monochrome, userSettings } = this.props
     return (
       <div className="Preferences">
         <div className="Preferences-header">
@@ -153,15 +169,21 @@ class Preferences extends Component {
             </div>
           </div>
           <div className="Preferences-curator flexCol">
-            <button className="Preferences-reset" onClick={this.reset}>Reset Default User Settings</button>
-            <button className="Preferences-reset" onClick={this.changePassword}>Change Password</button>
-            <div className="Preferences-uxlevel">
+            <div className="Preferences-checkboxes">
+              <div className="Preferences-checkboxes-inner">
+                <div className="Preferences-uxlevel Preferences-checkbox">
               <input type="checkbox" className="Preferences-uxlevel-input" checked={uxLevel > 0} onChange={this.toggleUXLevel}/>
-              <div className="Preferences-uxlevel-label">Advanced Controls</div>
+                  <div className="Preferences-uxlevel-label Preferences-checkbox-label">Advanced Controls</div>
             </div>
-            <div className="Preferences-monochrome">
+                <div className="Preferences-monochrome Preferences-checkbox">
               <input type="checkbox" className="Preferences-monochrome-input" checked={monochrome} onChange={this.toggleMonochrome}/>
-              <div className="Preferences-monochrome-label">Dark Theme</div>
+                  <div className="Preferences-monochrome-label Preferences-checkbox-label">Dark Theme</div>
+                </div>
+                <div className="Preferences-showFilteredFolderCounts Preferences-checkbox">
+                  <input type="checkbox" className="Preferences-showFilteredFolderCounts-input" checked={userSettings.showFilteredFolderCounts} onChange={this.toggleFilteredFolderCounts}/>
+                  <div className="Preferences-showFilteredFolderCounts-label Preferences-checkbox-label">Show folder search counts</div>
+                </div>
+              </div>
             </div>
             <div className="Preferences-field-template">
               <input type="text" className="Preferences-field-template-input" value={lightbarFieldTemplate || ''} onChange={this.changeLightbarFieldTemplate}/>
@@ -176,9 +198,15 @@ class Preferences extends Component {
               <div className={classnames('Preferences-field-template-reset', {disabled: !this.defaultDragTemplate()})} onClick={this.resetDragFieldTemplate}>Reset</div>
               <div className="Preferences-field-template-label">Drag Template</div>
             </div>
-            { DropboxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutDropbox}>Logout Dropbox</button> }
-            { BoxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutBox}>Logout Box</button> }
-            { GDriveAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutGDrive}>Logout Google Drive</button> }
+            <div className="Preferences-cloud-reset">
+              { DropboxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutDropbox}>Logout Dropbox</button> }
+              { BoxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutBox}>Logout Box</button> }
+              { GDriveAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutGDrive}>Logout Google Drive</button> }
+            </div>
+            <div className="Preferences-account-reset">
+              <button className="Preferences-reset" onClick={this.reset}>Reset Default User Settings</button>
+              <button className="Preferences-reset" onClick={this.changePassword}>Change Password</button>
+            </div>
           </div>
           <div className="Preferences-status">
             <div className='Preferences-build'>
