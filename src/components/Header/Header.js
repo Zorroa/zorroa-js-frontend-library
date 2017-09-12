@@ -79,8 +79,8 @@ class Header extends Component {
     const { assetFields } = this.props
     if (!assetFields) return []
     let fields = []
-    if (assetFields.string) fields = fields.concat(assetFields.string.filter(field => field.toLowerCase().startsWith('similar')))
-    if (assetFields.hash) fields = fields.concat(assetFields.hash.filter(field => field.toLowerCase().startsWith('similar')))
+    if (assetFields.string) fields = fields.concat(assetFields.string.filter(field => field.toLowerCase().startsWith('similar') && !field.match(/\.(raw|byte|point|bit)$/)))
+    if (assetFields.hash) fields = fields.concat(assetFields.hash.filter(field => field.toLowerCase().startsWith('similar') && !field.match(/\.(raw|byte|point|bit)$/)))
     return fields
   }
 
@@ -105,6 +105,16 @@ class Header extends Component {
       return name
     }
 
+    const displayIcon = (field) => {
+      if (!field || !field.length) return ''
+      const name = displayName(field).toLowerCase()
+      if (name.startsWith('image')) return 'icon-picture2'
+      if (name.startsWith('color')) return 'icon-eyedropper'
+      if (name.includes('hsv') || name.includes('hsl') || name.includes('lab') || name.includes('rgb') || name.includes('color')) return 'icon-eyedropper'
+      if (name.includes('face')) return 'icon-group'
+      return 'icon-similarity'
+    }
+
     const nAssetsSelected = selectedIds ? selectedIds.size : 0
     const selectedAssets = nAssetsSelected && [...selectedIds].map(id => (similarAssets.find(asset => (asset.id === id)))).filter(asset => asset)
     const similarHashes = selectedAssets && selectedAssets.map(asset => asset.rawValue(this.props.similar.field))
@@ -119,15 +129,16 @@ class Header extends Component {
       <div className="Editbar-similar-section">
         <div className={classnames('Editbar-similar', { 'selected': similarActive, 'disabled': !canSortSimilar })}
              onClick={sortSimilar} title="Find similar assets">
-          <span className="icon-similarity"/>
+          <div className={`Editbar-similar-icon ${displayIcon(similar.field)}`}/>
           Similar
         </div>
         { similarFields && similarFields.length > 1 && (
           <DropdownMenu>
             { similarFields.map(field => (
-              <div className="Editbar-similar-menu-item" onClick={_ => this.selectSimilarField(field) } title={field}>
+              <div className="Editbar-similar-menu-item" key={field} onClick={_ => this.selectSimilarField(field) } title={field}>
                 <div className={`Editbar-similar-menu-item-selected${similar.field === field ? ' icon-check' : ''}`}/>
-                { displayName(field) }
+                <div className={`Editbar-similar-icon ${displayIcon(field)}`}/>
+                <div className="Editbar-similar-menu-item-label">{ displayName(field) }</div>
               </div>
             ))}
           </DropdownMenu>

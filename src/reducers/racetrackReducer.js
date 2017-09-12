@@ -77,6 +77,9 @@ function updateSimilarity (similar, state) {
   assert.ok(similar.values.length === similar.ofsIds.length)
   assert.ok(similar.values.length === similar.weights.length)
   assert.ok(similar.values.length <= 10)
+  const minScoreField = `minScore-${similar.field}`
+  if (state.similar.field !== similar.field && state.similar[minScoreField]) similar.minScore = parseFloat(state.similar[minScoreField])
+  similar[minScoreField] = similar.minScore   // Save min score for this field (restored from searches too)
   const index = state.widgets.findIndex(widget => (widget.type === SimilarHashWidgetInfo.type))
   if (index < 0 && similar.values.length) {
     let widgets = [...state.widgets]

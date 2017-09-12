@@ -225,9 +225,6 @@
   @include clampText;
 
   .dark & { color: $zorroa-whitegray; }
-  span[class*="icon-"] {
-    margin-right: 6px;
-  }
 
   &.disabled {
     color: $zorroa-lightgray;
@@ -243,10 +240,18 @@
 
 .Editbar-similar-menu-item {
   @include flexRow;
+  @include flexAlignItemsCenter;
 }
 
 .Editbar-similar-menu-item-selected {
   min-width: 24px;
+}
+
+.Editbar-similar-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
 }
 
 .Editbar-similar-section {

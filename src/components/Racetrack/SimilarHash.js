@@ -56,10 +56,13 @@ class SimilarHash extends Component {
     ofsIds && ofsIds.forEach(id => {
       if (!similarityCache.has(id)) similarityCache.set(id, DEFAULT_WEIGHT)
     })
+    if (nextProps.similar && nextProps.similar.minScore && this.state.minScore !== nextProps.similar.minScore) {
+      this.setState({minScore: nextProps.similar.minScore})
+    }
   }
 
   changeMinScore = (event) => {
-    this.setState({ minScore: event.target.value })
+    this.setState({ minScore: parseFloat(event.target.value) })
     if (this.adjustTimout) clearTimeout(this.adjustTimout)
     this.adjustTimout = setTimeout(this.adjustSimilarity, 500)
   }
