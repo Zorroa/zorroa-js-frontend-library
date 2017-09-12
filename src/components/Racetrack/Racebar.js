@@ -17,7 +17,7 @@ import CreateFolder from '../Folders/CreateFolder'
 import { showModal, toggleCollapsible, dialogAlertPromise } from '../../actions/appActions'
 import { unorderAssets, isolateParent } from '../../actions/assetsAction'
 import { createFolder, selectFolderIds, createDyHiFolder } from '../../actions/folderAction'
-import { resetRacetrackWidgets, similar } from '../../actions/racetrackAction'
+import { resetRacetrackWidgets, similar, isSimilarColor } from '../../actions/racetrackAction'
 import { saveSharedLink } from '../../actions/sharedLinkAction'
 import { selectJobIds } from '../../actions/jobActions'
 import { LOAD_SEARCH_ITEM } from '../../constants/localStorageItems'
@@ -119,7 +119,7 @@ class Racebar extends Component {
         search.postFilter = undefined
         search.order = []
       }
-      const hasSimilar = widgets.findIndex(widget => widget.type === WidgetInfo.SimilarHashWidgetInfo.type) >= 0
+      const hasSimilar = widgets.findIndex(widget => widget.type === WidgetInfo.SimilarHashWidgetInfo.type) >= 0 || (widgets.findIndex(widget => widget.type === WidgetInfo.ColorWidgetInfo.type) >= 0 && isSimilarColor(similar))
       const hasOrder = widgets.findIndex(widget => widget.type === WidgetInfo.SortOrderWidgetInfo.type) >= 0
       const attrs = { widgets, similar: hasSimilar ? similar : undefined, order: hasOrder ? order : undefined }
       const folder = new Folder({ name, acl, parentId, search, attrs })

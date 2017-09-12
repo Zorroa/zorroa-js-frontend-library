@@ -6,7 +6,7 @@ import classnames from 'classnames'
 
 import { createColorWidget } from '../../models/Widget'
 import { ColorWidgetInfo } from './WidgetInfo'
-import { modifyRacetrackWidget } from '../../actions/racetrackAction'
+import { modifyRacetrackWidget, similar, isSimilarColor } from '../../actions/racetrackAction'
 import Widget from './Widget'
 import Resizer from '../../services/Resizer'
 import { hexToRgb, rgbToHex, RGB2HSL, HSL2RGB, HSV2HSL } from '../../services/color'
@@ -25,20 +25,28 @@ class Color extends Component {
     onOpen: PropTypes.func,
     floatBody: PropTypes.bool.isRequired,
     isIconified: PropTypes.bool.isRequired,
-    widgets: PropTypes.arrayOf(PropTypes.object)
+    widgets: PropTypes.arrayOf(PropTypes.object),
+    similar: PropTypes.shape({
+      field: PropTypes.string,
+      values: PropTypes.arrayOf(PropTypes.string).isRequired,
+      ofsIds: PropTypes.arrayOf(PropTypes.string).isRequired,
+      minScore: PropTypes.number
+    }).isRequired
   }
 
   state = {
-    colors: []
+    colors: [],
+    useHsvHash: false
   }
 
   // sync local state with existing app state
   syncLocalColorWithAppState (nextProps) {
-    const { id, widgets } = nextProps
+    const { id, widgets, similar } = nextProps
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const widget = widgets && widgets[index]
     if (!widget || !widget.sliver) return
 
+    if (isSimilarColor(similar) !== this.state.useHsvHash) this.setState({useHsvHash: isSimilarColor(similar)})
     let colors
     try {
       colors = widget.sliver.filter.colors.colors
@@ -72,7 +80,28 @@ class Color extends Component {
     this.resizer.release()  // safe, removes listener on async redraw
   }
 
-  modifySliver (colors) {
+  colors2Hash (colors) {
+    // const [ HL, SL, VL ] = [ 12, 5, 3 ]
+    // const HEX_DIGITS = 'abcdefghijklmnop'
+
+    // def histHash(hsv, channel, size):
+    //   hist1 = cv2.calcHist([hsv],[channel],None,[size],[0,256])
+    //   hist2 = ((16 / MAX_HIST_VAL) * hist1).astype(int).clip(0, 15)
+    //   hash = ''.join(HEX_DIGITS[x[0]] for x in hist2)
+    //   return hash
+
+    // hsvFinal = histHash(hsv, 0, HL) + histHash(hsv, 1, SL) + histHash(hsv, 2, VL)
+
+    // def dist(a,b):
+    //   s=ord('a')
+    //   val = lambda c: ord(c)-s
+    //   return sum((abs(val(a[i])-val(b[i])) for i in xrange(len(a))))
+
+    return 'onjikmllnaaapmjknmpn'
+  }
+
+  modifySliver (colors, useHsvHash) {
+    const { similar } = this.props
     const { id, widgets } = this.props
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const oldWidget = widgets && widgets[index]
@@ -83,6 +112,21 @@ class Color extends Component {
     }
     const widget = createColorWidget('colors', 'nested', colors, isEnabled, isPinned)
     widget.id = this.props.id
+
+    if (useHsvHash) {
+      const similar = {
+        field: 'similarity.hsv',
+        values: [this.colors2Hash(colors)],
+        weights: [1],
+        ofsIds: [],
+        minScore: 75
+      }
+      this.props.actions.similar(similar)
+      widget.sliver.filter = null
+    } else if (isSimilarColor(similar)) {
+      this.props.actions.similar()
+    }
+
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
@@ -107,7 +151,7 @@ class Color extends Component {
     let newColors = colors.map((color, i) => { return { ...color, ratio: newRatios[i] } })
     newColors.push({ hsl, key, ratio })
     this.setState({ colors: newColors })
-    this.modifySliver(newColors)
+    this.modifySliver(newColors, this.state.useHsvHash)
   }
 
   removeColorByKey = (key) => {
@@ -118,7 +162,7 @@ class Color extends Component {
     const oldN = colors.length
     if (oldN === 1) {
       this.setState({ colors: [] })
-      this.modifySliver([])
+      this.modifySliver([], this.state.useHsvHash)
       return
     }
 
@@ -135,7 +179,7 @@ class Color extends Component {
     newColors.forEach(color => { color.ratio *= normFactor })
 
     this.setState({ colors: newColors })
-    this.modifySliver(newColors)
+    this.modifySliver(newColors, this.state.useHsvHash)
   }
 
   setColorHEX = (hexStr) => {
@@ -248,7 +292,14 @@ class Color extends Component {
 
   resizeColorStop = () => {
     this.resizeIndex = -1
-    this.modifySliver(this.state.colors)
+    this.modifySliver(this.state.colors, this.state.useHsvHash)
+  }
+
+  // This is a DEBUG feature since the flickr server has HSL data
+  // TODO: once all server data is HSV, remove this toggle
+  toggleHsvHash = (event) => {
+    this.setState({ useHsvHash: event.target.checked })
+    this.modifySliver(this.state.colors, event.target.checked)
   }
 
   render () {
@@ -289,6 +340,16 @@ class Color extends Component {
                      placeholder="Enter HEX value"
                      onInput={event => this.setColorHEX(event.target.value)}/>
             </div>
+          </div>
+
+          <div className="Color-separator"/>
+
+          <div className="Color-hsvHash">
+            { /* TODO: remove this debug toggle (see comments on toggleServerHSL) */ }
+            <input checked={this.state.useHsvHash} type="checkbox"
+                   className='' name="color-hsvHash"
+                   onChange={this.toggleHsvHash}/>
+            <span>Use HSV hash</span>
           </div>
 
           <div className="Color-separator"/>
@@ -341,8 +402,9 @@ class Color extends Component {
 
 export default connect(
   state => ({
-    widgets: state.racetrack && state.racetrack.widgets
+    widgets: state.racetrack && state.racetrack.widgets,
+    similar: state.racetrack.similar
   }), dispatch => ({
-    actions: bindActionCreators({ modifyRacetrackWidget }, dispatch)
+    actions: bindActionCreators({ modifyRacetrackWidget, similar }, dispatch)
   })
 )(Color)

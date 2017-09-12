@@ -2,7 +2,7 @@
 /*
   http://paulbourke.net/texture_colour/colourspace/
   Calculate HSL from RGB
-  Hue is in degrees
+  Hue is in degrees (0, 360)
   Lightness is between 0 and 100
   Saturation is between 0 and 100
 */
@@ -37,7 +37,7 @@ export function RGB2HSL ([c1R, c1G, c1B]) {
 /*
   http://paulbourke.net/texture_colour/colourspace/
   Calculate RGB from HSL, reverse of RGB2HSL()
-  Hue is in degrees
+  Hue is in degrees (0, 360)
   Lightness is between 0 and 100
   Saturation is between 0 and 100
 */
@@ -93,7 +93,7 @@ export function HSL2RGB ([c1H, c1S, c1L]) {
 /*
   http://paulbourke.net/texture_colour/colourspace/
   Calculate RGB from HSV, reverse of RGB2HSV()
-  Hue is in degrees
+  Hue is in degrees (0, 360)
   Lightness is between 0 and 1
   Saturation is between 0 and 1
 */
@@ -137,7 +137,7 @@ export function HSV2RGB ([c1H, c1S, c1V]) {
 /*
   http://paulbourke.net/texture_colour/colourspace/
   Calculate HSV from RGB
-  Hue is in degrees
+  Hue is in degrees (0, 360)
   Lightness is betweeen 0 and 1
   Saturation is between 0 and 1
 */
@@ -165,6 +165,12 @@ export function RGB2HSV ([c1R, c1G, c1B]) {
       c2H += (4 + (c1R - c1G) / delta)
     }
     c2H *= 60
+  }
+  while (c2H < 0) {
+    c2H += 360
+  }
+  while (c2H > 360) {
+    c2H -= 360
   }
   return [c2H, c2S * 100, c2V * 100]
 }
