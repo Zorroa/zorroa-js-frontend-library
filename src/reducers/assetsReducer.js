@@ -6,7 +6,7 @@ import {
   UPDATE_COMMAND, GET_COMMANDS,
   ISOLATE_ASSET, SELECT_ASSETS,
   ADD_ASSETS_TO_FOLDER, REMOVE_ASSETS_FROM_FOLDER,
-  SUGGEST_COMPLETIONS, UNAUTH_USER, ISOLATE_PARENT
+  SUGGEST_COMPLETIONS, UNAUTH_USER, ISOLATE_PARENT, ALL_ASSET_COUNT
 } from '../constants/actionTypes'
 
 import * as api from '../globals/api.js'
@@ -227,6 +227,9 @@ export default function (state = initialState, action) {
 
     case UNAUTH_USER:
       return initialState
+
+    case ALL_ASSET_COUNT:
+      return { ...state, allAssetCount: action.payload }
   }
 
   return state

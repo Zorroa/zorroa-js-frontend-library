@@ -102,6 +102,7 @@ class FolderItem extends Component {
     filteredCounts: PropTypes.instanceOf(Map),
     user: PropTypes.instanceOf(User),
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+    allAssetCount: PropTypes.number,
     metadataFields: PropTypes.arrayOf(PropTypes.string),
     isAdministrator: PropTypes.bool,
     actions: PropTypes.object,
@@ -480,9 +481,13 @@ class FolderItem extends Component {
   }
 
   renderCount () {
-    const { folder, counts, filteredCounts, userSettings } = this.props
-    const count = counts && counts.get(folder.id)
-    const filteredCount = filteredCounts && filteredCounts.get(folder.id)
+    const { folder, counts, allAssetCount, filteredCounts, userSettings } = this.props
+    let count = counts && counts.get(folder.id)
+    let filteredCount = filteredCounts && filteredCounts.get(folder.id)
+    if (allAssetCount) {
+      if (count === allAssetCount) count = 'all'
+      if (filteredCount === allAssetCount) filteredCount = 'all'
+    }
     if (count === undefined) return <div/>
     const showFilteredCounts = userSettings.showFilteredFolderCounts && filteredCount !== undefined && count !== filteredCount
     if (!showFilteredCounts) {
@@ -544,6 +549,7 @@ class FolderItem extends Component {
 
 export default connect(state => ({
   assets: state.assets.all,
+  allAssetCount: state.assets.allAssetCount,
   folders: state.folders.all,
   counts: state.folders.counts,
   filteredCounts: state.folders.filteredCounts,

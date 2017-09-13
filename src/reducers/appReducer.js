@@ -74,7 +74,8 @@ const initialState = {
     thumbLayout: 'masonry',
     videoVolume: 0.8,
     showFilteredFolderCounts: true
-  }
+  },
+  allAssetCount: 0
 }
 
 export default function app (state = initialState, action) {

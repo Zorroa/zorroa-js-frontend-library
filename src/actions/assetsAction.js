@@ -6,7 +6,7 @@ import {
   ASSET_PERMISSIONS, ASSET_SEARCHING,
   UPDATE_COMMAND, GET_COMMANDS,
   ISOLATE_ASSET, SELECT_ASSETS, ISOLATE_PARENT,
-  SUGGEST_COMPLETIONS, SIMILAR_ASSETS
+  SUGGEST_COMPLETIONS, SIMILAR_ASSETS, ALL_ASSET_COUNT
 } from '../constants/actionTypes'
 import Asset from '../models/Asset'
 import Page from '../models/Page'
@@ -318,4 +318,11 @@ export function getAllCommands () {
         console.error('Error getting commands: ' + error)
       })
   }
+}
+
+export function setAllAssetCount (count) {
+  return ({
+    type: ALL_ASSET_COUNT,
+    payload: count
+  })
 }
