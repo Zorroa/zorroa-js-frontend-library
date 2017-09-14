@@ -9,13 +9,22 @@ import { ColorWidgetInfo } from './WidgetInfo'
 import { modifyRacetrackWidget, similar, isSimilarColor } from '../../actions/racetrackAction'
 import Widget from './Widget'
 import Resizer from '../../services/Resizer'
-import { hexToRgb, rgbToHex, RGB2HSL, HSL2RGB, HSV2HSL } from '../../services/color'
+import { hexToRgb, HSL2HSV, HSL2RGB, HSV2HSL, RGB2HSL, rgbToHex } from '../../services/color'
+import { remap, clamp } from '../../services/jsUtil'
 
 const COLOR_SLIDER_HEIGHT = 180
 const COLOR_RESIZER_HEIGHT = 5
 
 const RATIO_MAX_FACTOR = 1.5  // maxRatio in query is this factor times user ratio
 const LUMA_OVERLAY_THRESHOLD = 0.5
+
+const HASHES = [
+  'similarity.combined',
+  'similarity.hsv',
+  'similarity.dephsv',
+  'similarity.hue',
+  'similarity.deprgb_444'
+]
 
 class Color extends Component {
   static propTypes = {
@@ -36,7 +45,8 @@ class Color extends Component {
 
   state = {
     colors: [],
-    useHsvHash: false
+    useHsvHash: false,
+    hsvHash: HASHES[0]
   }
 
   // sync local state with existing app state
@@ -80,27 +90,230 @@ class Color extends Component {
     this.resizer.release()  // safe, removes listener on async redraw
   }
 
-  colors2Hash (colors) {
-    // const [ HL, SL, VL ] = [ 12, 5, 3 ]
-    // const HEX_DIGITS = 'abcdefghijklmnop'
-
-    // def histHash(hsv, channel, size):
-    //   hist1 = cv2.calcHist([hsv],[channel],None,[size],[0,256])
-    //   hist2 = ((16 / MAX_HIST_VAL) * hist1).astype(int).clip(0, 15)
-    //   hash = ''.join(HEX_DIGITS[x[0]] for x in hist2)
-    //   return hash
-
-    // hsvFinal = histHash(hsv, 0, HL) + histHash(hsv, 1, SL) + histHash(hsv, 2, VL)
-
-    // def dist(a,b):
-    //   s=ord('a')
-    //   val = lambda c: ord(c)-s
-    //   return sum((abs(val(a[i])-val(b[i])) for i in xrange(len(a))))
-
-    return 'onjikmllnaaapmjknmpn'
+  resolveHashType = (hsvHash, colors) => {
+    let resolvedHash = hsvHash
+    if (resolvedHash === 'similarity.combined') {
+      if (colors.length <= 2) resolvedHash = 'similarity.hue'
+      else resolvedHash = 'similarity.dephsv'
+    }
+    return resolvedHash
   }
 
-  modifySliver (colors, useHsvHash) {
+  colors2Hash = (colors, hsvHash) => {
+    // This is a JS implementation of Juan's hsv hash
+    // https://github.com/Zorroa/zorroa-python-sdk/blob/master/plugins/zorroa-py-core/pylib/zorroa_py_core/image.py
+    // At rev c19668e (9/6/2017), HSVHash::process(), lines ~120-150
+
+    const [ HL, SL, VL ] = [ 12, 5, 3 ]
+    const HEX_DIGITS = 'abcdefghijklmnop' // use a hamming-friendly encoding for hex digits
+    const HSV_RANGE = [ [0, 360], [0, 100], [0, 100] ]
+    const MAX_HIST_VAL = 256 ** 2
+
+    /*
+    const box = (x, center, radius) => (x > center - radius && x < center + radius) ? 1 / (2 * radius) : 0
+
+    const hat = (x, center, radius) => {
+      if (x <= center && x > center - radius) return remap(x, center - radius, center, 0, 1 / radius)
+      if (x >= center && x < center + radius) return remap(x, center, center + radius, 1 / radius, 0)
+      return 0
+    }
+    */
+
+    const normal = (x, center, radius) => {
+      if (x < center - radius || x > center + radius) return 0
+      const r2 = radius * radius / 5
+      const xc = x - center
+      return (1 / Math.sqrt(Math.PI * r2)) * Math.exp(-xc * xc / r2)
+    }
+
+    // sample & integrate a kernel function at higher resolution than the hash
+    const makeKernel = (kernelFn, length, center, radius, wrap) => {
+      const resolutionFactor = 10
+      const dx = 1 / resolutionFactor
+      let kernel = new Array(length).fill(0)
+      for (let x = center - radius + dx / 2; x < center + radius; x += dx) {
+        const y = kernelFn(x, center, radius)
+        const bucket = wrap ? (Math.floor(x) + length) % length : clamp(Math.floor(x), 0, length - 1)
+        kernel[bucket] += dx * y
+      }
+      return kernel
+    }
+
+    // sample & integrate a kernel function at higher resolution than the hash
+    const make3dKernel = (kernelFn, lengthArray, centerArray, radiusArray, wrapArray) => {
+      const resolutionFactor = 4
+      const dr = 1 / resolutionFactor
+      const dr3 = dr * dr * dr
+      const kernelLen = lengthArray[0] * lengthArray[1] * lengthArray[2]
+      let kernel = new Array(kernelLen).fill(0)
+      for (let x = centerArray[0] - radiusArray[0] + dr / 2; x < centerArray[0] + radiusArray[0]; x += dr) {
+        const xx = kernelFn(x, centerArray[0], radiusArray[0])
+        const xbucket = wrapArray[0] ? (Math.floor(x) + lengthArray[0]) % lengthArray[0] : clamp(Math.floor(x), 0, lengthArray[0] - 1)
+        for (let y = centerArray[1] - radiusArray[1] + dr / 2; y < centerArray[1] + radiusArray[1]; y += dr) {
+          const yy = kernelFn(y, centerArray[1], radiusArray[1])
+          const ybucket = wrapArray[1] ? (Math.floor(y) + lengthArray[1]) % lengthArray[1] : clamp(Math.floor(y), 0, lengthArray[1] - 1)
+          for (let z = centerArray[2] - radiusArray[2] + dr / 2; z < centerArray[2] + radiusArray[2]; z += dr) {
+            const zz = kernelFn(z, centerArray[2], radiusArray[2])
+            const zbucket = wrapArray[2] ? (Math.floor(z) + lengthArray[2]) % lengthArray[2] : clamp(Math.floor(z), 0, lengthArray[2] - 1)
+            kernel[xbucket * lengthArray[1] * lengthArray[2] + ybucket * lengthArray[2] + zbucket] += dr3 * (xx * yy * zz)
+          }
+        }
+      }
+      return kernel
+    }
+
+    // encode an array of float values in the range [0,maxVal] into an
+    // array of float values in the range [0,16]
+    // encoding may be non-linear
+    const histogramToEncodedNormalHistogram = (hist, maxVal) => {
+      // offset linear encoding: (mostly) linear histogram, a threshold of 10 pixels makes the value non-zero
+      // return hist.map(v => remap(v, 10, maxVal, 1/16, 1))
+
+      // square root encoding
+      return hist.map(v => Math.sqrt(v) / Math.sqrt(maxVal))
+
+      // log encoding
+      // return hist.map(v => Math.log(v) / Math.log(maxVal))
+    }
+
+    // turn an array of float values in the range [0,16] into a hash string of chars 'a'-'p'
+    const encodedNormalHistogramToHashString = (hexArray) => {
+      return hexArray.map(v => HEX_DIGITS[clamp(Math.floor(16.0 * v), 0, 15)]).join('')
+    }
+
+    const histogramToHashString = (hist, maxVal) => {
+      return encodedNormalHistogramToHashString(histogramToEncodedNormalHistogram(hist, maxVal))
+    }
+
+    const subHash = (colors, kernelFn, channel, range, hashLen, radius, wrap) => {
+      assert.ok(radius > 0)
+      let hash = new Array(hashLen).fill(0)
+
+      colors.forEach(color => {
+        // build a pretend histogram for an image using the colors the user has chosen
+        const amount = color.ratio * MAX_HIST_VAL
+        const hsl = color.hsl
+        const hsv = HSL2HSV(hsl)
+
+        const center = remap(hsv[channel], range[0], range[1], 0, hashLen)
+        const kernel = makeKernel(kernelFn, hashLen, center, radius, wrap)
+
+        // sanity check - does kernel integrate to 1?
+        if (DEBUG) {
+          const tot = kernel.reduce((a, b) => a + b, 0)
+          assert.ok(Math.abs(tot - 1) < 0.1)
+        }
+
+        // do the splat!
+        for (let i = 0; i < kernel.length; i++) hash[i] += amount * kernel[i]
+      })
+
+      return histogramToHashString(hash, MAX_HIST_VAL)
+    }
+
+    const computeDepHsvHash = (colors, kernelFn, hashLenArray, radiusArray) => {
+      const hashLen = hashLenArray[0] * hashLenArray[1] * hashLenArray[2]
+      let hash = new Array(hashLen).fill(0)
+
+      colors.forEach(color => {
+        // build a pretend histogram for an image using the colors the user has chosen
+        const amount = color.ratio * MAX_HIST_VAL
+        const hsl = color.hsl
+        const hsv = HSL2HSV(hsl)
+
+        const centerArray = [
+          remap(hsv[0], HSV_RANGE[0][0], HSV_RANGE[0][1], 0, hashLenArray[0]),
+          remap(hsv[1], HSV_RANGE[1][0], HSV_RANGE[1][1], 0, hashLenArray[1]),
+          remap(hsv[2], HSV_RANGE[2][0], HSV_RANGE[2][1], 0, hashLenArray[2])
+        ]
+        const wrapArray = [true, false, false]
+        const kernel = make3dKernel(kernelFn, hashLenArray, centerArray, radiusArray, wrapArray)
+
+        // sanity check - does kernel integrate to 1?
+        if (DEBUG) {
+          const tot = kernel.reduce((a, b) => a + b, 0)
+          assert.ok(Math.abs(tot - 1) < 0.1)
+        }
+
+        // do the splat!
+        for (let i = 0; i < kernel.length; i++) hash[i] += amount * kernel[i]
+      })
+
+      return histogramToHashString(hash, MAX_HIST_VAL)
+    }
+
+    const computeDepRgbHash = (colors, kernelFn, hashLenArray, radiusArray) => {
+      const hashLen = hashLenArray[0] * hashLenArray[1] * hashLenArray[2]
+      let hash = new Array(hashLen).fill(0)
+
+      colors.forEach(color => {
+        // build a pretend histogram for an image using the colors the user has chosen
+        const amount = color.ratio * MAX_HIST_VAL
+        const hsl = color.hsl
+        const rgb = HSL2RGB(hsl)
+
+        const centerArray = [
+          remap(rgb[0], 0, 1, 0, hashLenArray[0]),
+          remap(rgb[1], 0, 1, 0, hashLenArray[1]),
+          remap(rgb[2], 0, 1, 0, hashLenArray[2])
+        ]
+        const wrapArray = [false, false, false]
+        const kernel = make3dKernel(kernelFn, hashLenArray, centerArray, radiusArray, wrapArray)
+
+        // sanity check - does kernel integrate to 1?
+        if (DEBUG) {
+          const tot = kernel.reduce((a, b) => a + b, 0)
+          assert.ok(Math.abs(tot - 1) < 0.1)
+        }
+
+        // do the splat!
+        for (let i = 0; i < kernel.length; i++) hash[i] += amount * kernel[i]
+      })
+
+      return histogramToHashString(hash, MAX_HIST_VAL)
+    }
+
+    // const radii = remap(colors.length, 1, 5, 1, 0.5)
+    const radii = [ -1, 2, 2, 2, 1, 1 ]
+    console.log('radius', radii)
+
+    switch (this.resolveHashType(hsvHash, colors)) {
+      case 'similarity.hsv':
+        const hhash = subHash(colors, normal, 0, HSV_RANGE[0], HL, radii[colors.length], true)
+        const shash = subHash(colors, normal, 1, HSV_RANGE[1], SL, colors.length > 2 ? 0.5 : 1, false)
+        const vhash = subHash(colors, normal, 2, HSV_RANGE[2], VL, colors.length > 2 ? 0.5 : 1, false)
+        console.log(hhash, shash, vhash)
+        return hhash + shash + vhash
+
+      case 'similarity.hue':
+        const hueHash = subHash(colors, normal, 0, HSV_RANGE[0], HL, remap(colors.length, 1, 5, 1, 0.5), true)
+        console.log(hueHash)
+        return hueHash
+
+      case 'similarity.dephsv': {
+        const radiusArray = [radii[colors.length], colors.length <= 2 ? 1 : 0.5, colors.length <= 2 ? 1 : 0.5]
+        const depHash = computeDepHsvHash(colors, normal, [6, 3, 3], radiusArray)
+        console.log(depHash)
+        return depHash
+      }
+
+      case 'similarity.deprgb_444': {
+        const radius = remap(colors.length, 1, 5, 2.5, 1.5)
+        const radiusArray = [radius, radius, radius]
+        // const rgbHash = computeDepRgbHash(colors)
+        const rgbHash = computeDepRgbHash(colors, normal, [4, 4, 4], radiusArray)
+        console.log(rgbHash)
+        return rgbHash
+      }
+
+      case 'similarity.combined': {
+        assert.ok(false)
+        return 'bad hash'
+      }
+    }
+  }
+
+  modifySliver (colors, useHsvHash, hsvHash) {
     const { similar } = this.props
     const { id, widgets } = this.props
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
@@ -115,11 +328,11 @@ class Color extends Component {
 
     if (useHsvHash) {
       const similar = {
-        field: 'similarity.hsv',
-        values: [this.colors2Hash(colors)],
+        field: this.resolveHashType(hsvHash, colors),
+        values: [this.colors2Hash(colors, hsvHash)],
         weights: [1],
         ofsIds: [],
-        minScore: 75
+        minScore: 25
       }
       this.props.actions.similar(similar)
       widget.sliver.filter = null
@@ -151,7 +364,7 @@ class Color extends Component {
     let newColors = colors.map((color, i) => { return { ...color, ratio: newRatios[i] } })
     newColors.push({ hsl, key, ratio })
     this.setState({ colors: newColors })
-    this.modifySliver(newColors, this.state.useHsvHash)
+    this.modifySliver(newColors, this.state.useHsvHash, this.state.hsvHash)
   }
 
   removeColorByKey = (key) => {
@@ -162,7 +375,7 @@ class Color extends Component {
     const oldN = colors.length
     if (oldN === 1) {
       this.setState({ colors: [] })
-      this.modifySliver([], this.state.useHsvHash)
+      this.modifySliver([], this.state.useHsvHash, this.state.hsvHash)
       return
     }
 
@@ -179,7 +392,7 @@ class Color extends Component {
     newColors.forEach(color => { color.ratio *= normFactor })
 
     this.setState({ colors: newColors })
-    this.modifySliver(newColors, this.state.useHsvHash)
+    this.modifySliver(newColors, this.state.useHsvHash, this.state.hsvHash)
   }
 
   setColorHEX = (hexStr) => {
@@ -292,14 +505,19 @@ class Color extends Component {
 
   resizeColorStop = () => {
     this.resizeIndex = -1
-    this.modifySliver(this.state.colors, this.state.useHsvHash)
+    this.modifySliver(this.state.colors, this.state.useHsvHash, this.state.hsvHash)
   }
 
   // This is a DEBUG feature since the flickr server has HSL data
-  // TODO: once all server data is HSV, remove this toggle
   toggleHsvHash = (event) => {
     this.setState({ useHsvHash: event.target.checked })
-    this.modifySliver(this.state.colors, event.target.checked)
+    this.modifySliver(this.state.colors, event.target.checked, this.state.hsvHash)
+  }
+
+  // This is a DEBUG feature
+  selectHsvHash = (event) => {
+    this.setState({ hsvHash: event.target.value })
+    this.modifySliver(this.state.colors, this.state.useHsvHash, event.target.value)
   }
 
   render () {
@@ -350,6 +568,12 @@ class Color extends Component {
                    className='' name="color-hsvHash"
                    onChange={this.toggleHsvHash}/>
             <span>Use HSV hash</span>
+            <br/>
+            <select className='Color-hsvHash-select' onChange={this.selectHsvHash}>
+              { HASHES.map(hash => (<option value={`${hash}`}>{hash}</option>)) }
+            </select>
+            <br/>
+            <span className='Color-hsvHash-hash'>{this.colors2Hash(colors, this.state.hsvHash)}</span>
           </div>
 
           <div className="Color-separator"/>
