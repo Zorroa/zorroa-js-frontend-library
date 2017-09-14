@@ -20,6 +20,7 @@ class CreateFolder extends Component {
     onDelete: PropTypes.func,             // optional delete button
     onLink: PropTypes.func,               // optional link button
     includeAssets: PropTypes.bool,        // optionally include selected assets
+    includePermissions: PropTypes.bool,   // optionally include permissions
     dyhiLevels: PropTypes.arrayOf(PropTypes.shape({
       field: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired   // [Attr, Year, Month, Day, Path]
@@ -36,9 +37,8 @@ class CreateFolder extends Component {
   }
 
   state = {
-    name: this.props.name || '',
-    isShared: false,
-    acl: null,
+    name: this.props.name,
+    acl: this.props.acl,
     includeSelectedAssets: this.props.includeAssets,
     mode: 'Search'                        // 'Search', 'Hierarchy'
   }
@@ -70,9 +70,9 @@ class CreateFolder extends Component {
 
   saveFolder = (event) => {
     const { user, isolatedId, selectedAssetIds, dyhiLevels } = this.props
-    const { name, isShared, includeSelectedAssets, mode } = this.state
+    const { name, includeSelectedAssets, mode } = this.state
     let acl = null
-    if (isShared && this.state.acl) {
+    if (this.state.acl) {
       acl = this.state.acl
     } else if (user && user.permissions) {
       // Look through this user's permissions for the one with 'user' type
@@ -88,10 +88,6 @@ class CreateFolder extends Component {
     } else {
       console.error('Cannot determine permissions to create folder ' + name)
     }
-  }
-
-  togglePublic = (event) => {
-    this.setState({ isShared: event.target.checked })
   }
 
   toggleShareSelected = (event) => {
@@ -153,8 +149,8 @@ class CreateFolder extends Component {
   }
 
   render () {
-    const { title, onLink, onDelete, user, date, selectedAssetIds, includeAssets, isManager, isAdministrator, uxLevel } = this.props
-    const { isShared, name, includeSelectedAssets } = this.state
+    const { title, onLink, onDelete, user, date, selectedAssetIds, includeAssets, includePermissions, uxLevel } = this.props
+    const { name, includeSelectedAssets } = this.state
     const disableIncludeSelected = !selectedAssetIds || !selectedAssetIds.size
     return (
       <div className="CreateFolder flexRow flexAlignItemsCenter">
@@ -167,10 +163,11 @@ class CreateFolder extends Component {
             <div onClick={this.dismiss} className="CreateFolder-header-close icon-cross" />
           </div>
           <div className="CreateFolder-body">
-            <div className="CreateFolder-input-title">Title</div>
-            <input className="CreateFolder-input-title-input" autoFocus={true} type="text"
+            { name !== null && name !== undefined && (
+              <input className="CreateFolder-input-title-input" autoFocus={true} type="text"
                    placeholder="Collection Name" onKeyDown={this.checkForSubmit}
                    value={name} onChange={this.changeName} />
+            )}
             { this.renderModes() }
             { includeAssets && (
               <div className={classnames('CreateFolder-include-selected-assets', {disabled: disableIncludeSelected})}>
@@ -179,20 +176,14 @@ class CreateFolder extends Component {
                 <div onClick={this.toggleShareSelected}>Include Selected Assets</div>
               </div>
             )}
-            { (isManager || isAdministrator) && uxLevel > 0 && !includeAssets && this.props.name && this.props.name.length && (
+            { uxLevel > 0 && includePermissions && (
               <div className="CreateFolder-permissions">
-                <div className="CreateFolder-public-private flexRow flexAlignItemsCenter">
-                  <div>Collection is</div>
-                  <div className={classnames('CreateFolder-public-private', {disabled: isShared})}>Private</div>
-                  <Toggle checked={isShared} onChange={this.togglePublic}/>
-                  <div className={classnames('CreateFolder-public-private', {disabled: !isShared})}>Public</div>
-                </div>
-                { isShared && <AclEditor onChange={this.changeAcl} title="Folder Asset Permissions"/> }
+                <AclEditor onChange={this.changeAcl} title="Folder Asset Permissions" acl={this.state.acl}/>
               </div>
             )}
           </div>
           <div className="CreateFolder-footer flexRow flexJustifyCenter">
-            <button className={classnames('CreateFolder-save default', {disabled: (!name || !name.length)})} onClick={this.saveFolder}>Save</button>
+            <button className={classnames('CreateFolder-save default', {disabled: !includePermissions && (!name || !name.length)})} onClick={this.saveFolder}>Save</button>
             <button onClick={this.dismiss}>Cancel</button>
           </div>
           { (onLink || onDelete) && (
@@ -215,7 +206,7 @@ class CreateFolder extends Component {
 }
 
 export default connect(state => ({
-  user: state.auth && state.auth.user,
+  user: state.auth.user,
   isolatedId: state.assets.isolatedId,
   selectedAssetIds: state.assets.selectedIds,
   isManager: state.auth.isManager,

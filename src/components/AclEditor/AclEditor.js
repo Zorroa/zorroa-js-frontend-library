@@ -36,15 +36,14 @@ class AclEditor extends Component {
   }
 
   updatePermissions (props) {
-    const { user, permissions, acl } = props
+    const { permissions, acl } = props
     const { name } = this.state
     let selectedPermissionIds = new Map()
     acl.forEach(aclEntry => {
       const permission = permissions.find(permission => (aclEntry.permissionId === permission.id))
       if (permission) selectedPermissionIds.set(permission.id, aclEntry.access)
     })
-    const isShared = isPublic(acl, user, permissions)
-    this.setState({ selectedPermissionIds, isShared, name })
+    this.setState({ selectedPermissionIds, name })
   }
 
   togglePermission (permission, event) {
@@ -213,7 +212,7 @@ class AclEditor extends Component {
 }
 
 export default connect(state => ({
-  permissions: state.permissions && state.permissions.all
+  permissions: state.permissions.all
 }), dispatch => ({
   actions: bindActionCreators({ getAllPermissions }, dispatch)
 }))(AclEditor)

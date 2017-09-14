@@ -19,6 +19,7 @@ import {
   removeAssetIdsFromFolderId,
   deleteFolderIds,
   updateFolder,
+  updateFolderPermissions,
   dropFolderId,
   createTaxonomy,
   deleteTaxonomy
@@ -104,7 +105,9 @@ class FolderItem extends Component {
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     allAssetCount: PropTypes.number,
     metadataFields: PropTypes.arrayOf(PropTypes.string),
+    isManager: PropTypes.bool,
     isAdministrator: PropTypes.bool,
+    uxLevel: PropTypes.number,
     actions: PropTypes.object,
     userSettings: PropTypes.object.isRequired
   }
@@ -146,17 +149,17 @@ class FolderItem extends Component {
     this.dismissContextMenu(event)
   }
 
-  setAssetPermissions = (event) => {
+  assetPermissions = (event) => {
     event.preventDefault()
     this.dismissContextMenu(event)
     const width = '300px'
     const body = <AssetPermissions title="Folder Asset Permissions"
-                                   onApply={this.setPermissions}
+                                   onApply={this.setAssetPermissions}
                                    onCancel={this.props.actions.hideModal}/>
     this.props.actions.showModal({body, width})
   }
 
-  setPermissions = (acl) => {
+  setAssetPermissions = (acl) => {
     this.props.actions.hideModal()
     const { folder } = this.props
     const filter = new AssetFilter({links: {folder: [folder.id]}})
@@ -168,7 +171,9 @@ class FolderItem extends Component {
     this.dismissContextMenu(event)
     const width = '300px'
     const body = <CreateFolder title='Create Collection'
-                               acl={[]} includeAssets={true}
+                               name=""
+                               acl={this.props.folder.acl} includeAssets={true}
+                               includePermissions={false}
                                onCreate={this.createChildFolder}/>
     this.props.actions.showModal({body, width})
   }
@@ -204,26 +209,50 @@ class FolderItem extends Component {
   editFolder = (name, acl) => {
     const folder = new Folder(this.props.folder)
     folder.name = name
-    folder.acl = acl
     this.props.actions.updateFolder(folder)
+    if (acl && (!folder.acl || JSON.stringify(acl) !== JSON.stringify(folder.acl))) {
+      folder.acl = acl
+      this.props.actions.updateFolderPermissions(folder.id, acl)
+    }
   }
 
-  edit = (event) => {
+  rename = (event) => {
     const { folder, user } = this.props
     this.dismissContextMenu(event)
     const width = '300px'
-    const { acl, timeCreated, timeModified, name } = this.props.folder
+    const { timeCreated, timeModified, name } = this.props.folder
     const date = timeModified > timeCreated ? `Modified ${new Date(timeModified).toLocaleString('en-US')}` : `Created ${new Date(timeCreated).toLocaleString('en-US')}`
     const writePermission = folder.hasAccess(user, AclEntry.WriteAccess)
     const readPermission = folder.hasAccess(user, AclEntry.ReadAccess)
-    const body = <CreateFolder title='Edit Collection'
-                               acl={acl}
+    const body = <CreateFolder title='Rename Folder'
                                date={date}
                                name={name}
                                includeAssets={false}
+                               includePermissions={false}
                                onCreate={this.editFolder}
                                onDelete={writePermission && this.deleteFolder}
                                onLink={readPermission && this.getLink}/>
+    this.props.actions.showModal({body, width})
+  }
+
+  setPermissions = (name, acl) => {
+    const folderIds = new Set([...this.props.selectedFolderIds, ...this.props.folder.id])
+    folderIds.forEach(id => {
+      this.props.actions.updateFolderPermissions(id, acl)
+    })
+  }
+
+  permissions = (event) => {
+    this.dismissContextMenu(event)
+    const width = '300px'
+    const { selectedFolderIds, folder } = this.props
+    let count = selectedFolderIds ? (selectedFolderIds.size + (selectedFolderIds.has(folder.id) ? 0 : 1)) : 0
+    const acl = count === 1 ? folder.acl : []
+    const body = <CreateFolder title='Set Permissions'
+                               acl={acl}
+                               includeAssets={false}
+                               includePermissions={true}
+                               onCreate={this.setPermissions}/>
     this.props.actions.showModal({body, width})
   }
 
@@ -335,7 +364,7 @@ class FolderItem extends Component {
   }
 
   renderContextMenu () {
-    const { folder, selectedFolderIds, selectedAssetIds, user, isAdministrator } = this.props
+    const { folder, selectedFolderIds, selectedAssetIds, user, isAdministrator, isManager, uxLevel } = this.props
     if (!this.state.isContextMenuVisible) {
       return
     }
@@ -351,13 +380,14 @@ class FolderItem extends Component {
     const addableAssets = selectedAssetsNotInFolder && this.simpleFolderIds().length > 0
     const removableAssets = selectedAssets && this.selectedFolderContainsSelectedAssets()
     const writePermission = folder.hasAccess(user, AclEntry.WriteAccess)
-    const canAddChild = singleFolderSelected && !folder.isDyhi() && !folder.search && writePermission
+    const exportPermission = folder.hasAccess(user, AclEntry.ExportAccess)
+    const canAddChild = singleFolderSelected && !folder.isDyhi() && folder.isSimpleCollection() && writePermission
     let canAddChildTitle = ''
     if (!singleFolderSelected) {
       canAddChildTitle = 'Select a single folder as parent'
     } else if (folder.isDyhi()) {
       canAddChildTitle = 'Cannot add children to an automatic smart folder'
-    } else if (folder.search) {
+    } else if (folder.isSmartCollection()) {
       canAddChildTitle = 'Cannot add children to a smart folder'
     } else if (!writePermission) {
       canAddChildTitle = 'No write permission on parent folder'
@@ -406,24 +436,39 @@ class FolderItem extends Component {
                 <div>Public Collection</div>
               </div>
             ))}
-          { singleFolderSelected && !folder.isDyhi() && folder.search &&
-          <div onClick={this.restoreFolder}
-               className="FolderItem-context-item FolderItem-context-restore-widgets"
+          { singleFolderSelected && writePermission &&
+          <div onClick={this.rename}
+               className="FolderItem-context-item FolderItem-context-edit"
                onContextMenu={this.dismissContextMenu}>
-            <div className="icon-settings_backup_restore"/><div>Restore Widgets</div></div> }
+            <div className="icon-pencil"/>
+            <div>Rename Folder...</div>
+          </div> }
+          { (isManager || isAdministrator) && uxLevel > 0 && (!singleFolderSelected || writePermission) && (
+            <div onClick={this.permissions}
+                 className="FolderItem-context-item FolderItem-context-edit"
+                 onContextMenu={this.dismissContextMenu}>
+              <div className="icon-public"/>
+              <div>Folder Permissions...</div>
+            </div>
+          )}
           { singleFolderSelected && isAdministrator &&
-          <div onClick={this.setAssetPermissions}
+          <div onClick={this.assetPermissions}
                className="FolderItem-context-item FolderItem-context-asset-permissions"
                onContextMenu={this.dismissContextMenu}>
-            <div className="icon-link2"/><div>Set Permissions...</div></div> }
-          { singleFolderSelected &&
+            <div className="icon-link2"/><div>Asset Permissions...</div></div> }
+          { singleFolderSelected && exportPermission &&
           <div onClick={this.exportFolder}
                className="FolderItem-context-item FolderItem-context-export"
                onContextMenu={this.dismissContextMenu}>
             <div className="icon-export"/>
-            <div>Export folder</div>
+            <div>Export Assets</div>
           </div> }
-          { singleFolderSelected && !folder.isDyhi() && !folder.search &&
+          { singleFolderSelected && !folder.isDyhi() && folder.isSmartCollection() &&
+          <div onClick={this.restoreFolder}
+               className="FolderItem-context-item FolderItem-context-restore-widgets"
+               onContextMenu={this.dismissContextMenu}>
+            <div className="icon-settings_backup_restore"/><div>Restore Widgets</div></div> }
+          { singleFolderSelected && !folder.isDyhi() && folder.isSimpleCollection() && writePermission &&
             <div onClick={canAddChild && this.createChild}
                  className="FolderItem-context-item FolderItem-context-create-subfolder"
                  onContextMenu={this.dismissContextMenu}>
@@ -437,7 +482,7 @@ class FolderItem extends Component {
                  className="FolderItem-context-item FolderItem-context-taxonomy"
                  onContextMenu={this.dismissContextMenu}>
               <div className="icon-site-map"/>
-              <div>Delete taxonomy</div>
+              <div>Delete Taxonomy</div>
             </div>
           }
           { singleFolderSelected && !folder.taxonomyRoot && isAdministrator &&
@@ -446,7 +491,7 @@ class FolderItem extends Component {
                className="FolderItem-context-item FolderItem-context-taxonomy"
                onContextMenu={this.dismissContextMenu}>
             <div className="icon-site-map"/>
-            <div>Create taxonomy</div>
+            <div>Create Taxonomy</div>
           </div>
           }
           <div onClick={addableAssets && this.addAssetsToFolders}
@@ -461,19 +506,12 @@ class FolderItem extends Component {
             <div className="icon-removeasset"/>
             <div>Remove Assets</div>
           </div>
-          { singleFolderSelected &&
-          <div onClick={this.edit}
-               className="FolderItem-context-item FolderItem-context-edit"
-               onContextMenu={this.dismissContextMenu}>
-            <div className="icon-pencil"/>
-            <div>Edit...</div>
-          </div> }
           <div onClick={writePermission && this.removeFolder}
                title={removeFolderTitle}
                className={classnames('FolderItem-context-item FolderItem-context-remove-folder', {disabled: !writePermission})}
                onContextMenu={this.dismissContextMenu}>
             <div className="icon-trash2"/>
-            <div>Remove folder</div>
+            <div>Trash Folder</div>
           </div>
         </div>
       </div>
@@ -514,7 +552,7 @@ class FolderItem extends Component {
   render () {
     const { folder, depth, isOpen, hasChildren, isSelected, onToggle, onSelect, dropparams, dropFolderId, top } = this.props
     const dragHover = this.props.dragHover || dropFolderId === folder.id
-    const icon = folder.isDyhi() ? 'icon-foldercog' : (folder.search ? 'icon-collections-smart' : 'icon-collections-simple')
+    const icon = folder.isDyhi() ? 'icon-foldercog' : (folder.isSmartCollection() ? 'icon-collections-smart' : 'icon-collections-simple')
     const draggable = !folder.isDyhi() || folder.dyhiRoot
     const isDropTarget = dropTarget(this.props)
     const dragparams = { ...this.props.dragparams, draggable }  // disable drag
@@ -560,7 +598,9 @@ export default connect(state => ({
   user: state.auth.user,
   dragInfo: state.app.dragInfo,
   metadataFields: state.app.metadataFields,
+  isManager: state.auth.isManager,
   isAdministrator: state.auth.isAdministrator,
+  uxLevel: state.app.uxLevel,
   userSettings: state.app.userSettings
 }), dispatch => ({
   actions: bindActionCreators({
@@ -573,6 +613,7 @@ export default connect(state => ({
     hideModal,
     deleteFolderIds,
     updateFolder,
+    updateFolderPermissions,
     restoreFolders,
     setAssetPermissions,
     createTaxonomy,

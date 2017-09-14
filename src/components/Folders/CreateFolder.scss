@@ -60,6 +60,7 @@
       .CreateFolder-public-private {
         color: $zorroa-gray;
         margin-left: 18px;
+        cursor: pointer;
         &.disabled { color: $zorroa-lightgray; }
         div {
           margin-left: 4px;

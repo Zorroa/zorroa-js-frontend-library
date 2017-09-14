@@ -248,8 +248,8 @@ class Folders extends Component {
 
   addFolder = () => {
     const width = '300px'
-    const body = <CreateFolder title='Create Collection' acl={[]}
-                               includeAssets={true}
+    const body = <CreateFolder title='Create Collection' acl={[]} name=""
+                               includeAssets={true} includePermissions={false}
                                onCreate={this.createFolder}/>
     this.props.actions.showModal({body, width})
   }

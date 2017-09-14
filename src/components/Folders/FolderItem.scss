@@ -112,6 +112,7 @@ $FolderItemHeight : 25px;
 
 .FolderItem-permission {
   margin-right: 8px;
+  .dark & { color: $zorroa-gray; }
 }
 
 .FolderItem-dropzone {

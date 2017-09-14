@@ -35,6 +35,16 @@ export function resetRacetrackWidgets (widgets) {
 export function similar (similar) {
   const maxValues = 10
   if (similar && similar.values && similar.values.length > maxValues) {
+    if (similar.ofsIds.length !== similar.values.length) {
+      const count = Math.min(similar.ofsIds.length, similar.values.length)
+      similar.ofsIds = similar.ofsIds.slice(0, count)
+      similar.values = similar.values.slice(0, count)
+    }
+    if (similar.weights.length < similar.values.length) {
+      for (let i = similar.weights.length; i < similar.values.length; ++i) similar.weights.push(1)
+    } else if (similar.weights.length > similar.values.length) {
+      similar.weights.length = similar.weights.length.slice(0, similar.values.length)
+    }
     assert.ok(similar.ofsIds.length === similar.values.length)
     assert.ok(similar.weights.length === similar.values.length)
     similar.values = similar.values.slice(0, maxValues)

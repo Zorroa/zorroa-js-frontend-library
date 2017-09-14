@@ -3,7 +3,7 @@ import {
   DELETE_FOLDER, TOGGLE_FOLDER, ADD_ASSETS_TO_FOLDER,
   REMOVE_ASSETS_FROM_FOLDER, DROP_FOLDER_ID,
   FOLDER_COUNTS, QUEUE_FOLDER_COUNTS, CLEAR_FOLDER_COUNT_QUEUE,
-  CREATE_TAXONOMY, DELETE_TAXONOMY
+  CREATE_TAXONOMY, DELETE_TAXONOMY, UPDATE_FOLDER_PERMISSIONS
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import { restoreFolders } from './racetrackAction'
@@ -115,6 +115,22 @@ export function updateFolder (folder) {
       })
       .catch(error => {
         console.error('Error updating folder ' + folder.name + ': ' + error)
+      })
+  }
+}
+
+export function updateFolderPermissions (folderId, acl) {
+  return dispatch => {
+    console.log('Update folder ' + folderId + ' permissions: ' + JSON.stringify(acl))
+    archivistPut(dispatch, `${rootEndpoint}/${folderId}/_permissions`, {acl})
+      .then(response => {
+        dispatch({
+          type: UPDATE_FOLDER_PERMISSIONS,
+          payload: new Folder(response.data)
+        })
+      })
+      .catch(error => {
+        console.error('Error updating folder ' + folderId + ' permissions: ' + error)
       })
   }
 }

@@ -5,7 +5,7 @@ import {
   TRASHED_FOLDERS, EMPTY_FOLDER_TRASH, COUNT_TRASHED_FOLDERS,
   RESTORE_TRASHED_FOLDERS, DELETE_TRASHED_FOLDERS,
   QUEUE_FOLDER_COUNTS, CLEAR_FOLDER_COUNT_QUEUE, ASSET_SEARCH,
-  CREATE_TAXONOMY, DELETE_TAXONOMY
+  CREATE_TAXONOMY, DELETE_TAXONOMY, UPDATE_FOLDER_PERMISSIONS
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import * as assert from 'assert'
@@ -160,6 +160,20 @@ export default function (state = initialState, action) {
         _addAncestorIds(oldFolder, modifiedIds, state.all)
         _addAncestorIds(folder, modifiedIds, state.all)
         return {...state, all, openFolderIds, modifiedIds}
+      }
+      break
+    }
+
+    case UPDATE_FOLDER_PERMISSIONS: {
+      const folder = action.payload
+      const parent = state.all.get(folder.parentId) // get folder's parent to open it
+      if (folder) {
+        let all = new Map(state.all) // copy folder map
+        assert.ok(parent.childIds.has(folder.id))
+        all.set(folder.id, folder)
+        const modifiedIds = new Set(state.modifiedIds)
+        modifiedIds.add(folder.id)
+        return {...state, all, modifiedIds}
       }
       break
     }

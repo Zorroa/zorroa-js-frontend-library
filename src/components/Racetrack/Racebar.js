@@ -93,8 +93,8 @@ class Racebar extends Component {
     })
     const width = '400px'
     const body = <CreateFolder title='Create Smart Collection' acl={[]}
-                               includeAssets={false}
-                               dyhiLevels={dyhiLevels}
+                               includeAssets={false} includePermissions={false}
+                               dyhiLevels={dyhiLevels} name=""
                                onCreate={this.saveSearch}/>
     this.props.actions.showModal({body, width})
   }
