@@ -7,7 +7,6 @@ import { hideModal } from '../../actions/appActions'
 import User from '../../models/User'
 import AclEntry from '../../models/Acl'
 import AclEditor from '../AclEditor'
-import Toggle from '../Toggle'
 
 class CreateFolder extends Component {
   static propTypes = {

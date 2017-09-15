@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 import Permission from '../../models/Permission'
-import AclEntry, { isPublic } from '../../models/Acl'
+import AclEntry from '../../models/Acl'
 import { getAllPermissions } from '../../actions/permissionsAction'
 import Filter from '../Filter'
 

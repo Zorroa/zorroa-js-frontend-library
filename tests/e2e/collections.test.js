@@ -230,7 +230,7 @@ describe('Collections', function () {
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.FolderItem-context-menu')))
       .then(_ => driver.findElement(By.css('.FolderItem-context-taxonomy')).then(ele => { taxonomyItem = ele }))
       .then(_ => expect(taxonomyItem.value === 'Delete Taxonomy'))
-      .then(_ => selenium.clickSelector(By.css('.FolderItem-context-taxonomy')))
+      .then(_ => driver.actions().click(taxonomyItem).perform()) // right-click
       .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.FolderItem-context-menu')))
 
       .then(_ => { DEBUG && console.log('Delete the saved search') })
