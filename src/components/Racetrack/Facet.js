@@ -80,7 +80,7 @@ class Facet extends Component {
       } else if (widget.isEnabled) {
         this.setState({terms: [], otherIsSelected: false})
       }
-      if (widget.isEnabled) {
+      if (widget.isEnabled && widget.sliver.aggs && widget.sliver.aggs.facet) {
         const order = widget.sliver.aggs.facet.terms.order
         if (order) this.setState({order})
       }

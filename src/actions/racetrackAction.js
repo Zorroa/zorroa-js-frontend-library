@@ -221,12 +221,12 @@ function restoreWidgetSlivers (widgets, search) {
     Object.keys(filter.terms).forEach(field => {
       const terms = filter.terms[field]
       if (terms && terms.length) {
+        const order = { '_count': 'desc' }
+        const w = createFacetWidget(field, 'string', terms, order, isEnabled, isPinned)
         const facet = findWidget(field)
         if (facet) {
-          facet.sliver.filter = new AssetFilter({terms: {[field]: terms}})
+          facet.sliver = w.sliver
         } else {
-          const order = { '_count': 'desc' }
-          const w = createFacetWidget(field, 'string', terms, order, isEnabled, isPinned)
           widgets.push(w)
         }
       }
