@@ -305,9 +305,9 @@ function restoreWidgetSlivers (widgets, search) {
   // FIXME: Should look in postFilter for completeness?
   let selectedFolderIds
   if (search.filter && search.filter.links && search.filter.links.folder && search.filter.links.folder.length) {
+    selectedFolderIds = new Set([...search.filter.links.folder])
     const collections = findWidget('_collections', CollectionsWidgetInfo.type)
     if (!collections) {
-      selectedFolderIds = new Set([...search.filter.links.folder])
       const w = createCollectionsWidget('_collections', undefined, isEnabled, isPinned)
       widgets.push(w)
     }

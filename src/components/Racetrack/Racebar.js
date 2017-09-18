@@ -65,9 +65,6 @@ class Racebar extends Component {
           if (similar.values && similar.values.length) openId = -1
         } else if (widget.type === WidgetInfo.SortOrderWidgetInfo.type) {
           if (order && order.length) openId = -1
-        } else if (widget.type === WidgetInfo.CollectionsWidgetInfo.type) {
-          const nonTrashedFolderIds = Searcher.nonTrashedFolderIds(selectedFolderIds, trashedFolders)
-          if (nonTrashedFolderIds && nonTrashedFolderIds.length) openId = -1
         } else {
           if (widget.sliver && !widget.sliver.empty()) openId = -1
         }
