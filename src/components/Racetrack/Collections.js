@@ -99,7 +99,8 @@ class Collections extends Component {
       const links = { folder: unrestoredFolderIds }
       const filter = new AssetFilter({links})
       const search = new AssetSearch({filter})
-      const folder = new Folder({search})
+      const attrs = { widgets: [] }
+      const folder = new Folder({search, attrs})
       smartFolders.push(folder)
     }
     this.props.actions.restoreFolders(smartFolders)
