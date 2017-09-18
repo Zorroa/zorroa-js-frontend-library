@@ -86,10 +86,10 @@ class Searchbar extends Component {
     const { queryString } = this.state
     const value = query && query.query && query.query !== queryString ? query.query
       : (query && query.query === undefined && queryString ? '' : undefined)
-
+    const title = 'quikc~ brwn~ foks~\n+fox, -hen\nquick AND brown || !hen\n"exact match"\nqu?ck bro*\nmetaField:"quick brown"\nmulti.fiel\\*:(hen fox)\ncount:[10 TO *]'
     return (
       <div className="Searchbar">
-        <div className="Searchbar-body flexCenter">
+        <div className="Searchbar-body flexCenter" title={title}>
           <Suggestions suggestions={suggestions}
                        showSuggestions={this.showSuggestions}
                        query={query}
