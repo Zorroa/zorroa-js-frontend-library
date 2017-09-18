@@ -242,7 +242,7 @@ class FolderItem extends Component {
   }
 
   setPermissions = (name, acl) => {
-    const folderIds = new Set([...this.props.selectedFolderIds, ...this.props.folder.id])
+    const folderIds = new Set([...this.props.selectedFolderIds, this.props.folder.id])
     folderIds.forEach(id => {
       this.props.actions.updateFolderPermissions(id, acl)
     })
