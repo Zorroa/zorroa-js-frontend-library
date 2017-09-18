@@ -23,7 +23,7 @@ export default class ThumbSizeSlider extends Component {
     return (
       <div className='ThumbSizeSlider flexRow flexAlignItemsCenter'>
         <div className='ThumbSizeSlider-smaller flexOff flexRowCenter'
-             onClick={this.goSmaller}>
+             onClick={this.goSmaller} title="Smaller thumbnails">
           <i className='icon-picture2' style={{fontSize: '12px'}} />
         </div>
         <div className='ThumbSizeSlider-box flexRowCenter'>
@@ -32,6 +32,7 @@ export default class ThumbSizeSlider extends Component {
           </div>
           <input className='ThumbSizeSlider-slider'
                  type='range'
+                 title='Thumbnail size'
                  min={`${MIN_THUMBSIZE}`}
                  max={`${MAX_THUMBSIZE}`}
                  step='4'
@@ -39,7 +40,7 @@ export default class ThumbSizeSlider extends Component {
                  onChange={this.handleChange}/>
         </div>
         <div className='ThumbSizeSlider-bigger flexOff flexRowCenter'
-             onClick={this.goBigger}>
+             onClick={this.goBigger} title="Larger thumbnails">
           <i className='icon-picture2' style={{fontSize: '24px'}} />
         </div>
       </div>

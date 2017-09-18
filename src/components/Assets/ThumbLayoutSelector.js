@@ -2,8 +2,8 @@ import React, { PropTypes } from 'react'
 import classnames from 'classnames'
 
 const layouts = [
-  { name: 'grid', icon: 'icon-layout2' },
-  { name: 'masonry', icon: 'icon-layout3' }
+  { name: 'grid', icon: 'icon-layout2', title: 'Grid layout' },
+  { name: 'masonry', icon: 'icon-layout3', title: 'Flow layout' }
 ]
 
 function handleClick (onClick, layout) {
@@ -17,7 +17,7 @@ const ThumbLayoutSelector = (props) => (
       const classNames = classnames('thumb-layout-button', layout.icon, {
         'thumb-layout-enabled': (layout.name === props.thumbLayout)
       })
-      return (<div key={layout.name} className={classNames} onClick={onClick}/>)
+      return (<div key={layout.name} title={layout.title} className={classNames} onClick={onClick}/>)
     }) }
   </div>
 )

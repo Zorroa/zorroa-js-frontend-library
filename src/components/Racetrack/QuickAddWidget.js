@@ -133,7 +133,7 @@ class QuickAddWidget extends Component {
     const widgetInfos = this.widgetInfos()
     return (
       <div className="QuickAddWidget Racebar-add-widget">
-        <div className="QuickAddWidget-input-container icon-plus">
+        <div className="QuickAddWidget-input-container icon-plus" title="Add a new search widget">
           <input value={this.state.filterText} onChange={this.changeFilterText}
                  onKeyDown={this.keyDown} onFocus={this.focus} onBlur={this.blur}
                  className="QuickAddWidget-input"

@@ -220,6 +220,7 @@
   border-radius: 3px;
   padding: 5px;
   color: $zorroa-darkgray;
+  cursor: pointer;
   @include flexRow;
   @include flexAlignItemsCenter;
   @include clampText;
