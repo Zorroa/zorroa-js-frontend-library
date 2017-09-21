@@ -1,4 +1,4 @@
-import { ARCHIVIST_INFO, ARCHIVIST_HEALTH, ARCHIVIST_METRICS, ARCHIVIST_SETTING } from '../constants/actionTypes'
+import { ARCHIVIST_INFO, ARCHIVIST_HEALTH, ARCHIVIST_METRICS, ARCHIVIST_SETTING, ARCHIVIST_SETTINGS } from '../constants/actionTypes'
 
 const initialState = {
   info: null,
@@ -18,6 +18,13 @@ export default function archivist (state = initialState, action) {
     case ARCHIVIST_SETTING: {
       const settings = { ...state.settings }
       settings[action.payload.name] = action.payload
+      return { ...state, settings }
+    }
+    case ARCHIVIST_SETTINGS: {
+      const settings = { ...state.settings }
+      action.payload.forEach(setting => {
+        settings[setting.name] = setting
+      })
       return { ...state, settings }
     }
   }

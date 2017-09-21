@@ -1,0 +1,150 @@
+@import '../../styles/core-mixins.scss';
+
+.Settings {
+
+}
+
+.Settings-title-group {
+  @include flexRowCenter;
+  margin-left: 10px;
+}
+
+.Settings-title {
+  margin-left: 10px;
+  font-size: 16px;
+}
+
+.Settings-title-icon {
+  font-size: 20px;
+}
+
+.Settings-header {
+  @include flexRow;
+  @include flexJustifySpaceBetween;
+  @include flexAlignItemsCenter;
+  color: white;
+  background-color: black;
+}
+
+.Settings-close {
+  padding: 14px;
+  &:hover { background-color: $zorroa-darkgray; }
+}
+
+.Settings-body {
+  position: relative;
+}
+
+.Settings-filter {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  margin: 10px;
+}
+
+.Settings-show-live {
+  @include flexRowCenter;
+  margin-left: 20px;
+}
+
+.Settings-show-live-label {
+  margin-left: 4px;
+}
+
+.Settings-settings {
+  max-height: 400px;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 45px;
+  margin-bottom: 10px;
+  overflow: auto;
+}
+
+.Settings-table-header {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  background-color: $zorroa-lightgray;
+  position: absolute;
+  margin-left: 10px;
+}
+
+.Settings-column {
+  padding: 8px;
+  font-weight: 500;
+  //border-right: 1px solid $zorroa-gray;
+}
+
+.Settings-setting {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  cursor: pointer;
+  &:not(.live) { color: $zorroa-lightgray; }
+  margin-top: 1px;
+  margin-bottom: 1px;
+}
+
+.Settings-setting-name {
+  @include nowrap;
+  @include clampText;
+  padding: 8px;
+}
+
+.Settings-setting-live {
+  padding: 8px;
+}
+
+.Settings-setting-category {
+  @include nowrap;
+  @include clampText;
+  padding: 8px;
+}
+
+.Settings-setting-value {
+  padding: 8px;
+  font-family: Roboto;
+  font-size: 14px;
+  resize: none;
+  border: none;
+  color: $zorroa-gray;
+  border-radius: 3px;
+
+  .Settings-setting.live & {
+    color: black;
+    background-color: $zorroa-nearwhite;
+  }
+}
+
+.Settings-setting-default {
+  @include clampText;
+  padding: 8px;
+}
+
+.Settings-setting-description {
+  padding: 8px;
+}
+
+.Settings-footer {
+  @include flexRowCenter;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border-top: 1px solid $zorroa-nearwhite;
+  padding-top: 20px;
+}
+
+.Settings-save {
+  background-color: $zorroa-sickly-green;
+  color: white;
+  padding: 10px 20px;
+  margin-right: 20px;
+  border-radius: 3px;
+  cursor: pointer;
+  &.disabled { background-color: $zorroa-lightgray; }
+  &:not(.disabled):hover { background-color: darken($zorroa-sickly-green, 15%); }
+}
+
+.Settings-cancel {
+  padding: 10px 20px;
+  border-radius: 3px;
+  color: $zorroa-gray;
+  cursor: pointer;
+  &:hover {background-color: $zorroa-gray; color: white; }
+}
