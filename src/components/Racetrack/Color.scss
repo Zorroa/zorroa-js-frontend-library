@@ -163,6 +163,29 @@
     }
   }
 
+  .Color-developer {
+    @include fullWidth;
+  }
+
+  .Color-developer-title {
+    @include fullWidth;
+    @include flexRowCenter;
+    padding: 5px;
+  }
+
+  .Color-hsvHash {
+    margin: 20px;
+  }
+
+  .Color-hsvHash-controls {
+    @include fullWidth;
+    @include flexRowCenter;
+  }
+
+  .Color-hsvHash-select {
+    margin-left: 10px;
+  }
+
   .Color-hsvHash-hash {
     font-size: 8px;
   }

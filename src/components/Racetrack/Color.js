@@ -19,10 +19,10 @@ const RATIO_MAX_FACTOR = 1.5  // maxRatio in query is this factor times user rat
 const LUMA_OVERLAY_THRESHOLD = 0.5
 
 const HASHES = [
+  'similarity.hue',
   'similarity.combined',
   'similarity.hsv',
   'similarity.dephsv',
-  'similarity.hue',
   'similarity.deprgb_444'
 ]
 
@@ -40,7 +40,9 @@ class Color extends Component {
       values: PropTypes.arrayOf(PropTypes.string).isRequired,
       ofsIds: PropTypes.arrayOf(PropTypes.string).isRequired,
       minScore: PropTypes.number
-    }).isRequired
+    }).isRequired,
+    uxLevel: PropTypes.number,
+    isDeveloper: PropTypes.bool
   }
 
   state = {
@@ -275,34 +277,28 @@ class Color extends Component {
 
     // const radii = remap(colors.length, 1, 5, 1, 0.5)
     const radii = [ -1, 2, 2, 2, 1, 1 ]
-    console.log('radius', radii)
 
     switch (this.resolveHashType(hsvHash, colors)) {
       case 'similarity.hsv':
         const hhash = subHash(colors, normal, 0, HSV_RANGE[0], HL, radii[colors.length], true)
         const shash = subHash(colors, normal, 1, HSV_RANGE[1], SL, colors.length > 2 ? 0.5 : 1, false)
         const vhash = subHash(colors, normal, 2, HSV_RANGE[2], VL, colors.length > 2 ? 0.5 : 1, false)
-        console.log(hhash, shash, vhash)
         return hhash + shash + vhash
 
       case 'similarity.hue':
         const hueHash = subHash(colors, normal, 0, HSV_RANGE[0], HL, remap(colors.length, 1, 5, 1, 0.5), true)
-        console.log(hueHash)
         return hueHash
 
       case 'similarity.dephsv': {
         const radiusArray = [radii[colors.length], colors.length <= 2 ? 1 : 0.5, colors.length <= 2 ? 1 : 0.5]
         const depHash = computeDepHsvHash(colors, normal, [6, 3, 3], radiusArray)
-        console.log(depHash)
         return depHash
       }
 
       case 'similarity.deprgb_444': {
         const radius = remap(colors.length, 1, 5, 2.5, 1.5)
         const radiusArray = [radius, radius, radius]
-        // const rgbHash = computeDepRgbHash(colors)
         const rgbHash = computeDepRgbHash(colors, normal, [4, 4, 4], radiusArray)
-        console.log(rgbHash)
         return rgbHash
       }
 
@@ -521,8 +517,9 @@ class Color extends Component {
   }
 
   render () {
-    const { id, floatBody, isIconified, isOpen, onOpen } = this.props
+    const { id, floatBody, isIconified, isOpen, onOpen, isDeveloper, uxLevel } = this.props
     const { colors } = this.state
+    const isAdvanced = uxLevel > 0
 
     let hsl = [0, 0, 100]
     if (colors.length) {
@@ -560,21 +557,27 @@ class Color extends Component {
             </div>
           </div>
 
-          <div className="Color-separator"/>
+          { isDeveloper && isAdvanced && (
+            <div className="Color-developer">
+              <div className="Color-separator"/>
 
-          <div className="Color-hsvHash">
-            { /* TODO: remove this debug toggle (see comments on toggleServerHSL) */ }
-            <input checked={this.state.useHsvHash} type="checkbox"
-                   className='' name="color-hsvHash"
-                   onChange={this.toggleHsvHash}/>
-            <span>Use HSV hash</span>
-            <br/>
-            <select className='Color-hsvHash-select' onChange={this.selectHsvHash}>
-              { HASHES.map(hash => (<option value={`${hash}`}>{hash}</option>)) }
-            </select>
-            <br/>
-            <span className='Color-hsvHash-hash'>{this.colors2Hash(colors, this.state.hsvHash)}</span>
-          </div>
+              <span className="Color-developer-title">Developer controls (experimental)</span>
+
+              <div className="Color-hsvHash">
+                { /* TODO: remove this debug toggle (see comments on toggleServerHSL) */ }
+                <div className="Color-hsvHash-controls">
+                  <input checked={this.state.useHsvHash} type="checkbox"
+                         className='' name="color-hsvHash"
+                         onChange={this.toggleHsvHash}/>
+                  <span>Use HSV hash</span>
+                  <select className='Color-hsvHash-select' onChange={this.selectHsvHash}>
+                    { HASHES.map(hash => (<option value={`${hash}`}>{hash}</option>)) }
+                  </select>
+                </div>
+                <span className='Color-hsvHash-hash'>{this.colors2Hash(colors, this.state.hsvHash)}</span>
+              </div>
+            </div>
+          )}
 
           <div className="Color-separator"/>
 
@@ -627,7 +630,9 @@ class Color extends Component {
 export default connect(
   state => ({
     widgets: state.racetrack && state.racetrack.widgets,
-    similar: state.racetrack.similar
+    similar: state.racetrack.similar,
+    uxLevel: state.app.uxLevel,
+    isDeveloper: state.auth.isDeveloper
   }), dispatch => ({
     actions: bindActionCreators({ modifyRacetrackWidget, similar }, dispatch)
   })
