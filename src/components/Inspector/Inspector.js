@@ -17,12 +17,17 @@ class Inspector extends Component {
     actions: PropTypes.object
   }
 
+  state = {
+    error: undefined
+  }
+
   render () {
     const { asset, origin, thumbSize, onNext, onPrev } = this.props
-    const mediaType = asset.mediaType().toLowerCase()
+    const { error } = this.state
+    const mediaType = error ? 'error' : asset.mediaType().toLowerCase()
     const url = asset.url(origin)
     const imageFormats = [ 'jpeg', 'jpg', 'png', 'gif' ]
-    let warning = null    // FIXME: move to Lightbar?
+    let warning = null
     let inspector = null
 
     if (mediaType.startsWith('image') &&
@@ -32,7 +37,8 @@ class Inspector extends Component {
     } else if (mediaType.startsWith('video')) {
       inspector = <Video url={url} backgroundURL={asset.backgroundURL(origin)}
                          frames={asset.frames()} frameRate={asset.frameRate()}
-                         startFrame={asset.startFrame()} stopFrame={asset.stopFrame()}/>
+                         startFrame={asset.startFrame()} stopFrame={asset.stopFrame()}
+                         onError={error => this.setState({error})} />
     } else if (mediaType === 'application/pdf') {
       const rangeChunkSize = 65536 * 64
       inspector = <Pdf page={asset.startPage()} thumbSize={thumbSize}
@@ -40,7 +46,12 @@ class Inspector extends Component {
     } else {
       const proxy = asset.biggestProxy()
       inspector = <Image url={asset.largestProxyURL(origin)} />
-      warning = <div>{proxy.width} x {proxy.height} proxy</div>
+      warning = (
+        <div className="Inspector-proxy">
+          <div className="Inspector-proxy">{proxy.width} x {proxy.height} proxy</div>
+          { error && <div className="Inspector-error">{error.code === 4 ? 'Cannot open video file' : error.message}</div> }
+        </div>
+      )
     }
 
     return (

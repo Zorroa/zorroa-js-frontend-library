@@ -22,6 +22,7 @@ class Video extends Component {
     startFrame: PropTypes.number,
     stopFrame: PropTypes.number,
     videoVolume: PropTypes.number,
+    onError: PropTypes.func.isRequired,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object
@@ -37,8 +38,7 @@ class Video extends Component {
     played: 0,
     loaded: 0,
     startFrame: this.props.startFrame,
-    stopFrame: this.props.stopFrame,
-    error: null
+    stopFrame: this.props.stopFrame
   }
 
   resize = () => this.forceUpdate()
@@ -136,8 +136,8 @@ class Video extends Component {
   }
 
   render () {
-    const { url, frameRate, frames, backgroundURL } = this.props
-    const { playing, volume, played, startFrame, stopFrame, error } = this.state
+    const { url, frameRate, frames, backgroundURL, onError } = this.props
+    const { playing, volume, played, startFrame, stopFrame } = this.state
     const seconds = played ? (played * frames - startFrame) / frameRate : 0
     const duration = (stopFrame - startFrame) / frameRate
     const title = <div className="Video-time"><Duration className='Video-remaining' seconds={seconds} frameRate={frameRate} />/<Duration seconds={duration} frameRate={frameRate}/></div>
@@ -145,7 +145,6 @@ class Video extends Component {
     return (
       <div className='Video'>
         <div className="Video-pan-zoom">
-          { error && <div className="Video-error">{error.message}</div> }
           <PanZoom title={title} titleWidth={300}
                    onVideo={this.shuttle} playing={playing}
                    onVolume={this.setVolume} volume={volume}>
@@ -161,7 +160,7 @@ class Video extends Component {
               onPlay={() => this.setState({ playing: true })}
               onPause={() => this.setState({ playing: false })}
               onEnded={() => this.setState({ playing: false })}
-              onError={error => this.setState({ error })}
+              onError={e => onError && onError(e.target.error)}
               onProgress={this.onProgress}
               progressFrequency={100} />
           </PanZoom>
