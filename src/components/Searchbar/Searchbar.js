@@ -22,8 +22,6 @@ class Searchbar extends Component {
     order: PropTypes.arrayOf(PropTypes.object)
   }
 
-  showSuggestions = true
-
   state = {
     queryString: this.props.query && this.props.query.query
   }
@@ -44,13 +42,7 @@ class Searchbar extends Component {
   // lastAction is 'type' or 'select' - whatever the user did to cause us to get here
   // (when 'type': start the search timer; when 'select': no timer)
   suggest = (suggestion, lastAction) => {
-    // hide suggestions whenever the search input is cleared
-    if (!suggestion) this.showSuggestions = false
-
     if (lastAction === 'type') this.props.actions.suggestQueryStrings(suggestion)
-
-    // show suggestions whenever the user types into the input
-    this.showSuggestions = true
   }
 
   // Submit a new query string, replacing the first SimpleSearch widget
@@ -70,15 +62,6 @@ class Searchbar extends Component {
       widgets[index] = widget
     }
     this.props.actions.resetRacetrackWidgets(widgets)
-    // hide suggestions whenever a search is performed
-    this.showSuggestions = false
-  }
-
-  forceSearch = () => {
-    const { query, actions } = this.props
-    const force = true
-    const isFirstPage = true
-    actions.searchAssets(query, query, force, isFirstPage)
   }
 
   render () {
@@ -91,11 +74,10 @@ class Searchbar extends Component {
       <div className="Searchbar">
         <div className="Searchbar-body flexCenter" title={title}>
           <Suggestions suggestions={suggestions}
-                       showSuggestions={this.showSuggestions}
                        query={query}
                        value={value}
                        onChange={this.suggest}
-                       onSelect={this.search.bind(this)} />
+                       onSelect={this.search} />
         </div>
         { error && <div className="Searchbar-error">Search syntax error</div> }
       </div>

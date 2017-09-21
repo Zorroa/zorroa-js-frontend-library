@@ -7,7 +7,6 @@ export default class Suggestions extends Component {
     value: PropTypes.string,
     query: PropTypes.instanceOf(AssetSearch),
     suggestions: PropTypes.arrayOf(PropTypes.object),
-    showSuggestions: PropTypes.bool,
     placeholder: PropTypes.string,
     style: PropTypes.object,
     className: PropTypes.string,
@@ -17,8 +16,7 @@ export default class Suggestions extends Component {
 
   static defaultProps = {
     placeholder: 'Search...',
-    style: { width: '100%' },
-    showSuggestions: true
+    style: { width: '100%' }
   }
 
   state = {
@@ -153,11 +151,11 @@ export default class Suggestions extends Component {
   }
 
   render () {
-    const { placeholder, style, query, className } = this.props
+    const { placeholder, style, query, className, onSelect } = this.props
     const { value } = this.state
 
     /* dont show suggestions if input matches current results */
-    const showSuggestions = this.props.showSuggestions && value && (!query || query.query !== value)
+    const showSuggestions = ((!query || !query.query || !query.query.length) && value && value.length) || (query && query.query && query.query !== value)
 
     return (
     <div className={'Suggestions' + (className ? ' ' + className : '')} style={style}>
@@ -177,7 +175,7 @@ export default class Suggestions extends Component {
                 disabled={!value || !value.length}
                 className="Suggestions-clear icon-cancel-circle" />
       </div>
-      <div onClick={this.forceSearch} className="Suggestions-search-button icon-search" >
+      <div onClick={_ => onSelect && onSelect(this.state.value)} className="Suggestions-search-button icon-search" >
         <div className="Suggestions-search-button-label">Search</div>
       </div>
       { showSuggestions && this.renderSuggestions() }
