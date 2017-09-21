@@ -213,9 +213,9 @@ export function suggestQueryStrings (text) {
     return ({ type: SUGGEST_COMPLETIONS, payload: null })
   }
   return dispatch => {
-    archivistPost(dispatch, '/api/v2/assets/_suggest', {text})
+    archivistPost(dispatch, '/api/v3/assets/_suggest', {text})
       .then(response => {
-        const suggestions = response.data.completions[0].options
+        const suggestions = response.data
         dispatch({
           type: SUGGEST_COMPLETIONS,
           payload: suggestions

@@ -153,8 +153,10 @@ export default function (state = initialState, action) {
       return { ...state, selectedIds: action.payload, selectionCounter }
     }
 
-    case SUGGEST_COMPLETIONS:
-      return { ...state, suggestions: action.payload }
+    case SUGGEST_COMPLETIONS: {
+      const suggestions = action.payload ? action.payload.map(text => ({text})) : []
+      return {...state, suggestions}
+    }
 
     case ADD_ASSETS_TO_FOLDER: {
       // Update the asset's folder list so asset-in-folder checks work

@@ -117,7 +117,7 @@ export default class Suggestions extends Component {
   }
 
   chooseSuggestion (suggestion) {
-    console.log('Suggest: ' + suggestion.text + ' (' + suggestion.score)
+    console.log('Suggest: ' + suggestion.text + (suggestion.score ? ' (' + suggestion.score + ')' : ''))
     this.setState({ value: suggestion.text })
     this.props.onSelect(suggestion.text)
   }
@@ -136,7 +136,7 @@ export default class Suggestions extends Component {
     let { suggestions } = this.props
     const { selectedIndex } = this.state
     if (!suggestions || !suggestions.length) suggestions = []
-    suggestions = suggestions.slice(0, 4)
+    suggestions = suggestions.slice(0, 10)
     return (
       <div className="Suggestions-suggestions">
         { suggestions.map((suggestion, index) => (
