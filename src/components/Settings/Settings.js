@@ -76,7 +76,7 @@ class Settings extends Component {
       setting.category.toLowerCase().includes(lcFilter) ||
       setting.currentValue.toLowerCase().includes(lcFilter) ||
       (setting.description && setting.description.toLowerCase().includes(lcFilter))))
-    const canSave = Object.values(modifiedValues).length > 0
+    const canSave = Object.keys(modifiedValues).length > 0
 
     return (
       <div className="Settings">
@@ -109,7 +109,7 @@ class Settings extends Component {
                 <img className="Header-loading" src={loader}/>
               </div>
             )}
-            { settings && Object.values(settings).filter(filterSetting).sort(this.sort).map(setting => (
+            { settings && Object.keys(settings).map(k => settings[k]).filter(filterSetting).sort(this.sort).map(setting => (
               <div className={classnames('Settings-setting', {live: setting.live})} key={setting.name}>
                 <div className="Settings-setting-name" style={{minWidth: columnWidth.name}} title={setting.name}>{setting.name}</div>
                 <div className="Settings-setting-category" style={{minWidth: columnWidth.category}} title={setting.category}>{setting.category}</div>

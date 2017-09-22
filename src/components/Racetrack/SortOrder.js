@@ -47,9 +47,9 @@ class SortOrder extends Component {
     let suggestions = []
     if (suggestion && suggestion.length && lastAction === 'type') {
       const key = suggestion.toLowerCase()
-      const iter = Object.values(fields)
-      for (let i = 0; i < iter.length && suggestions.length < 5; ++i) {
-        const fields = iter[i]
+      const keys = Object.keys(fields)
+      for (let i = 0; i < keys.length && suggestions.length < 5; ++i) {
+        const fields = fields[keys[i]]
         for (let j = 0; j < fields.length && suggestions.length < 5; ++j) {
           const field = fields[j]
           if (field.toLowerCase().includes(key)) suggestions.push({text: field})
