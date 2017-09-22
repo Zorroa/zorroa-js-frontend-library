@@ -22,7 +22,7 @@ export default function archivist (state = initialState, action) {
     }
     case ARCHIVIST_SETTINGS: {
       const settings = { ...state.settings }
-      action.payload.forEach(setting => {
+      action.payload && action.payload.forEach(setting => {
         settings[setting.name] = setting
       })
       return { ...state, settings }

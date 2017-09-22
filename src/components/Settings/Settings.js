@@ -89,12 +89,15 @@ class Settings extends Component {
         </div>
         <div className="Settings-body">
           <div className="Settings-filter">
-            <Filter value={filter} onChange={this.changeFilter}
-                    onClear={this.clearFilter} placeholder="Filter Settings"/>
-            <div className="Settings-show-live">
-              <input type="checkbox" checked={showLiveOnly} onChange={this.toggleShowLive}/>
-              <div className="Settings-show-live-label">Only Show Editable Settings</div>
+            <div className="Settings-filter-controls">
+              <Filter value={filter} onChange={this.changeFilter}
+                      onClear={this.clearFilter} placeholder="Filter Settings"/>
+              <div className="Settings-show-live">
+                <input type="checkbox" checked={showLiveOnly} onChange={this.toggleShowLive}/>
+                <div className="Settings-show-live-label">Only Show Editable Settings</div>
+              </div>
             </div>
+            <div className="Settings-tip">Hover for values</div>
           </div>
           <div className="Settings-table-header">
             <div className="Settings-column" style={{minWidth: columnWidth.name}} >Name</div>
@@ -113,7 +116,7 @@ class Settings extends Component {
               <div className={classnames('Settings-setting', {live: setting.live})} key={setting.name}>
                 <div className="Settings-setting-name" style={{minWidth: columnWidth.name}} title={setting.name}>{setting.name}</div>
                 <div className="Settings-setting-category" style={{minWidth: columnWidth.category}} title={setting.category}>{setting.category}</div>
-                <textarea className="Settings-setting-value" style={{minWidth: columnWidth.currentValue}} disabled={!setting.live} value={modifiedValues[setting.name] || setting.currentValue} title={setting.currentValue} onChange={e => this.changeSetting(e, setting)}/>
+                <textarea className="Settings-setting-value" style={{minWidth: columnWidth.currentValue}} disabled={!setting.live} value={modifiedValues[setting.name] !== undefined ? modifiedValues[settings.name] : setting.currentValue} title={setting.currentValue} onChange={e => this.changeSetting(e, setting)}/>
                 <div className="Settings-setting-default" style={{minWidth: columnWidth.defaultValue}} title={setting.defaultValue}>{setting.defaultValue}</div>
                 <div className="Settings-setting-description" style={{minWidth: columnWidth.description}} title={setting.description}>{setting.description}</div>
               </div>

@@ -38,7 +38,17 @@
 .Settings-filter {
   @include flexRow;
   @include flexAlignItemsCenter;
+  @include flexJustifySpaceBetween;
   margin: 10px;
+}
+
+.Settings-filter-controls {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+}
+
+.Settings-tip {
+  color: $zorroa-lightgray;
 }
 
 .Settings-show-live {
@@ -75,7 +85,7 @@
 
 .Settings-setting {
   @include flexRow;
-  @include flexAlignItemsCenter;
+  @include flexAlignItemsStart;
   cursor: pointer;
   &:not(.live) { color: $zorroa-lightgray; }
   margin-top: 1px;
@@ -106,6 +116,8 @@
   border: none;
   color: $zorroa-gray;
   border-radius: 3px;
+  background: white;
+  background-color: white;
 
   .Settings-setting.live & {
     color: black;

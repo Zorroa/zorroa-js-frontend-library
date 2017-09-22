@@ -205,7 +205,7 @@ class Header extends Component {
               )}
               { (isAdministrator || isDeveloper) && (
                 <div className="header-menu-item header-menu-settings" onClick={this.showSettings}>
-                  Settings...
+                  Archivist Settings...
                 </div>
               )}
               <Link className="header-menu-item header-menu-logout" to="/signout">Logout</Link>
