@@ -152,7 +152,7 @@ export function selectId (id, shiftKey, metaKey, items, selectedIds) {
 // Parse a string into a list of variable names, e.g.: 'foo %{bar} %{bam}' returns ['bar', 'bam']
 // If template syntax changes, see also FieldTemplate.js
 export function parseVariables (template) {
-  return template.match(/%{[a-zA-Z.|]*}/g)
+  return template.match(/%{[a-zA-Z0-9.|]*}/g)
 }
 
 // Replace the variables in the string template with values

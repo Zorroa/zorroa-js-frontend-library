@@ -20,7 +20,7 @@ function metadataBadge (fieldTemplate, asset) {
     return <div/>
   })
   // If template syntax changes, see also jsUtil.js:parseVariables
-  const text = fieldTemplate.replace(/%{[a-zA-Z.|]*}/g, '%%')
+  const text = fieldTemplate.replace(/%{[a-zA-Z0-9.|]*}/g, '%%')
   const texts = text.split('%%')
   const elems = texts.map((t, i) => (<div className="FieldTemplate-field" key={i}><div className="FieldTemplate-label">{t}</div>{fields[i]}</div>))
   return <div className="FieldTemplate">{elems}</div>
