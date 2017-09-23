@@ -51,41 +51,16 @@ class Color extends Component {
     hsvHash: HASHES[0]
   }
 
-  // sync local state with existing app state
-  syncLocalColorWithAppState (nextProps) {
-    const { id, widgets, similar } = nextProps
-    const index = widgets && widgets.findIndex(widget => (id === widget.id))
-    const widget = widgets && widgets[index]
-    if (!widget || !widget.sliver) return
-
-    if (isSimilarColor(similar) !== this.state.useHsvHash) this.setState({useHsvHash: isSimilarColor(similar)})
-    let colors
-    try {
-      colors = widget.sliver.filter.colors.colors
-    } catch (e) {
-      return
-    }
-
-    this.setState({colors: colors.map(color => {
-      const colorArray = [color.hue, color.saturation, color.brightness]
-      const hsl = HSV2HSL(colorArray)
-      return {
-        hsl,
-        key: color.key || this.getKeyForHSL(hsl),
-        ratio: color.ratio || color.maxRatio / (RATIO_MAX_FACTOR * 100),
-        maxRatio: color.maxRatio,
-        minRatio: color.minRatio
-      }
-    })})
-  }
-
   componentWillReceiveProps (nextProps) {
-    this.syncLocalColorWithAppState(nextProps)
   }
 
   componentWillMount () {
     this.resizer = new Resizer()
-    this.syncLocalColorWithAppState(this.props)
+
+    // Restore saved state from widget
+    const { id, widgets } = this.props
+    const widget = widgets && widgets.find(widget => widget.id === id)
+    if (widget && widget.state) this.setState(widget.state)
   }
 
   componentWillUnmount () {
@@ -365,6 +340,7 @@ class Color extends Component {
 
   removeColorByKey = (key) => {
     const { colors } = this.state
+    if (!colors) return   // removed last color
     const keyIndex = colors.findIndex(color => key === color.key)
     if (keyIndex < 0) return
 
@@ -517,7 +493,7 @@ class Color extends Component {
   }
 
   render () {
-    const { id, floatBody, isIconified, isOpen, onOpen, isDeveloper, uxLevel } = this.props
+    const { id, widgets, floatBody, isIconified, isOpen, onOpen, isDeveloper, uxLevel } = this.props
     const { colors } = this.state
     const isAdvanced = uxLevel > 0
 
@@ -530,6 +506,10 @@ class Color extends Component {
     const colorHeightAdjust = (colors.length)
       ? (colors.length - 1) * COLOR_RESIZER_HEIGHT / colors.length
       : 0
+
+    // Reflect current state in widget to recover after save
+    const widget = widgets && widgets.find(widget => (id === widget.id))
+    widget.state = this.state
 
     return (
       <Widget className="Color"
