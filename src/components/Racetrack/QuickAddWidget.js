@@ -7,8 +7,9 @@ import DisplayOptions from '../DisplayOptions'
 import AddWidget from './AddWidget'
 import Permission from '../../models/Permission'
 import { modifyRacetrackWidget } from '../../actions/racetrackAction'
-import { showModal } from '../../actions/appActions'
+import { showModal, dialogAlertPromise } from '../../actions/appActions'
 import { getAllPermissions } from '../../actions/permissionsAction'
+import * as WidgetInfo from './WidgetInfo'
 
 class QuickAddWidget extends Component {
   static propTypes = {
@@ -33,6 +34,22 @@ class QuickAddWidget extends Component {
       this.dismiss(event)
       return
     }
+
+    // TEMPORARY BAND-AID
+    // Don't allow a color widget and a similar hash widget simultaneously
+    // Remove when we can do both at the same time
+    const { widgets } = this.props
+    const colorWidgets = widgets.filter(widget => widget.type === WidgetInfo.ColorWidgetInfo.type)
+    if (colorWidgets.length && widgetInfo.type === WidgetInfo.SimilarHashWidgetInfo.type) {
+      this.props.actions.dialogAlertPromise('Similarity', 'Please delete the Color widget to use Similar image search. This is only temporary.')
+      return
+    }
+    const similarWidgets = widgets.filter(widget => widget.type === WidgetInfo.SimilarHashWidgetInfo.type)
+    if (similarWidgets.length && widgetInfo.type === WidgetInfo.ColorWidgetInfo.type) {
+      this.props.actions.dialogAlertPromise('Color', 'Please delete the Similar widget to use Color image search. This is only temporary.')
+      return
+    }
+
     const width = '75%'
     const body = <DisplayOptions title='Search Field'
                                  singleSelection={true}
@@ -166,5 +183,7 @@ export default connect(state => ({
   actions: bindActionCreators({
     modifyRacetrackWidget,
     getAllPermissions,
-    showModal }, dispatch)
+    dialogAlertPromise,
+    showModal
+  }, dispatch)
 }))(QuickAddWidget)
