@@ -9,13 +9,12 @@ import { ColorWidgetInfo } from './WidgetInfo'
 import { modifyRacetrackWidget, similar, isSimilarColor } from '../../actions/racetrackAction'
 import Widget from './Widget'
 import Resizer from '../../services/Resizer'
-import { hexToRgb, HSL2HSV, HSL2RGB, HSV2HSL, RGB2HSL, rgbToHex } from '../../services/color'
+import { hexToRgb, HSL2HSV, HSL2RGB, RGB2HSL, rgbToHex } from '../../services/color'
 import { remap, clamp } from '../../services/jsUtil'
 
 const COLOR_SLIDER_HEIGHT = 180
 const COLOR_RESIZER_HEIGHT = 5
 
-const RATIO_MAX_FACTOR = 1.5  // maxRatio in query is this factor times user ratio
 const LUMA_OVERLAY_THRESHOLD = 0.5
 
 const HASHES = [
@@ -85,16 +84,6 @@ class Color extends Component {
     const HEX_DIGITS = 'abcdefghijklmnop' // use a hamming-friendly encoding for hex digits
     const HSV_RANGE = [ [0, 360], [0, 100], [0, 100] ]
     const MAX_HIST_VAL = 256 ** 2
-
-    /*
-    const box = (x, center, radius) => (x > center - radius && x < center + radius) ? 1 / (2 * radius) : 0
-
-    const hat = (x, center, radius) => {
-      if (x <= center && x > center - radius) return remap(x, center - radius, center, 0, 1 / radius)
-      if (x >= center && x < center + radius) return remap(x, center, center + radius, 1 / radius, 0)
-      return 0
-    }
-    */
 
     const normal = (x, center, radius) => {
       if (x < center - radius || x > center + radius) return 0
@@ -367,7 +356,8 @@ class Color extends Component {
     this.modifySliver(newColors, this.state.useHsvHash, this.state.hsvHash)
   }
 
-  setColorHEX = (hexStr) => {
+  setColorHEX = (str) => {
+    const hexStr = (str[0] === '#') ? str : `#${str}`
     // only consider 6-char hex strings for now
     if (hexStr.length !== 7) return
 
@@ -497,12 +487,6 @@ class Color extends Component {
     const { colors } = this.state
     const isAdvanced = uxLevel > 0
 
-    let hsl = [0, 0, 100]
-    if (colors.length) {
-      hsl = colors[colors.length - 1].hsl
-    }
-    const lightOverlay = this.HSLLuma(hsl) < LUMA_OVERLAY_THRESHOLD
-
     const colorHeightAdjust = (colors.length)
       ? (colors.length - 1) * COLOR_RESIZER_HEIGHT / colors.length
       : 0
@@ -527,10 +511,6 @@ class Color extends Component {
               { this.renderSwatches() }
             </div>
             <div className="Color-status">
-              <div className={classnames('Color-preview', {lightOverlay})}
-                   style={{ backgroundColor: `hsl(${hsl[0]}, ${hsl[1]}%, ${hsl[2]}%)` }}>
-                <div className="Color-preview-icon icon-eyedropper"/>
-              </div>
               <input className="Color-hex-input"
                      placeholder="Enter HEX value"
                      onInput={event => this.setColorHEX(event.target.value)}/>
