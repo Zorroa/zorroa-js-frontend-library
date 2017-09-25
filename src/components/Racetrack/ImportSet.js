@@ -49,7 +49,7 @@ class ImportSet extends Component {
     }
     const MIN_JOBS = 3
     if (jobs.length < MIN_JOBS && nextProps.jobs) {
-      const firstJobs = Object.values(nextProps.jobs)
+      const firstJobs = Object.keys(nextProps.jobs).map(k => nextProps.jobs[k])
         .filter(job => job.type === Job.Import && jobs.findIndex(j => j.id !== job.id) < 0)
         .sort((a, b) => (a.timeStarted < b.timeStarted ? -1 : (a.timeStarted > b.timeStarted ? 1 : 0)))
         .slice(0, MIN_JOBS)
@@ -81,7 +81,8 @@ class ImportSet extends Component {
     let suggestions = []
     if (suggestion && suggestion.length && lastAction === 'type') {
       const key = suggestion.toLowerCase()
-      Object.values(jobs).forEach(job => {
+      Object.keys(jobs).forEach(jobKey => {
+        const job = jobs[key]
         if (job.type === Job.Import &&
           job.name.toLowerCase().includes(key) &&
           curJobs.findIndex(j => j.id === job.id) < 0) {

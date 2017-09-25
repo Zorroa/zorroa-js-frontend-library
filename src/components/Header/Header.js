@@ -11,6 +11,7 @@ import DropdownMenu from '../../components/DropdownMenu'
 import Preferences from '../../components/Preferences'
 import Feedback from '../../components/Feedback'
 import Developer from '../../components/Developer'
+import Settings from '../../components/Settings'
 import AssetCounter from '../Assets/AssetCounter'
 import { showModal } from '../../actions/appActions'
 import { archivistBaseURL, saveUserSettings } from '../../actions/authAction'
@@ -58,6 +59,12 @@ class Header extends Component {
   showDeveloper = () => {
     const width = '800px'
     const body = <Developer/>
+    this.props.actions.showModal({body, width})
+  }
+
+  showSettings = () => {
+    const width = '75vw'
+    const body = <Settings/>
     this.props.actions.showModal({body, width})
   }
 
@@ -195,6 +202,11 @@ class Header extends Component {
                 <a href={`${baseURL}/gui`} target="_blank" className="header-menu-item header-menu-admin">
                   Administrator...
                 </a>
+              )}
+              { (isAdministrator || isDeveloper) && (
+                <div className="header-menu-item header-menu-settings" onClick={this.showSettings}>
+                  Archivist Settings...
+                </div>
               )}
               <Link className="header-menu-item header-menu-logout" to="/signout">Logout</Link>
             </DropdownMenu>
