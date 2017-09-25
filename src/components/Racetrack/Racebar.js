@@ -181,10 +181,12 @@ class Racebar extends Component {
     return (
       <div className="Racebar">
         <Searcher/>
-        <div className="Racebar-wrap">
+        <div className="Racebar-left">
           <div className="Racebar-searchbar">
             <Searchbar/>
           </div>
+        </div>
+        <div className="Racebar-wrap">
           { widgets && widgets.length > 0 && widgets.filter(w => (blacklist.indexOf(w.type) < 0)).map((widget, i) => (
             <div key={widget.id}
                  className={classnames('Racebar-widget', {hoverField: hoverFields.has(removeRaw(widget.field))})} >
@@ -193,6 +195,7 @@ class Racebar extends Component {
           ))}
           <QuickAddWidget/>
         </div>
+        <div className="Racebar-spacer flexOn"/>
         <div className="Racebar-right">
           <div className={classnames('Racebar-save', {disabled})}
                onClick={!disabled && this.saveRacetrack} title="Save the search">
