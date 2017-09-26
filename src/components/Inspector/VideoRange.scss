@@ -21,7 +21,7 @@
 }
 
 .VideoRange-clip-range-left {
-  cursor: pointer;
+  cursor: ew-resize;
   width: 5px;
   @include fullHeight;
   border-radius: 2px;
@@ -34,7 +34,7 @@
 }
 
 .VideoRange-clip-range-right {
-  cursor: pointer;
+  cursor: ew-resize;
   width: 5px;
   @include fullHeight;
   border-radius: 2px;
@@ -49,7 +49,7 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  cursor: pointer;
+  cursor: ew-resize;
   &:hover:not(.scrubbing) { background-color: $zorroa-water-blue; }
   &.scrubbing { background-color: $zorroa-water-blue; }
 }
@@ -86,8 +86,28 @@
 
 .VideoRange-bar-range {
   position: absolute;
-  border: 2px solid $zorroa-golden-yellow;
+  border: 2px solid $zorroa-gray;
   border-radius: 2px;
+  &:hover { border: 2px solid $zorroa-lightgray; }
+  @include fullHeight;
+  @include flexRow;
+  @include flexJustifySpaceBetween;
+}
+
+.VideoRange-bar-range-left {
+  width: 5px;
+  cursor: w-resize;
+  @include fullHeight;
+}
+
+.VideoRange-bar-range-middle {
+  @include flexOn;
+  cursor: ew-resize;
+}
+
+.VideoRange-bar-range-right {
+  width: 5px;
+  cursor: e-resize;
   @include fullHeight;
 }
 
@@ -107,4 +127,11 @@
   bottom: 0;
   right: 0;
   pointer-events: none;
+}
+
+.VideoRange-bar-clip {
+  position: absolute;
+  height: 100%;
+  border-left: 1px dotted $zorroa-golden-yellow;
+  border-right: 1px dotted $zorroa-golden-yellow;
 }
