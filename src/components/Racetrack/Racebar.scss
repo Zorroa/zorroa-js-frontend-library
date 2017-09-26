@@ -16,10 +16,6 @@
 }
 
 .Racebar-wrap {
-  @include flexRow;
-  @include flexAlignItemsCenter;
-  @include flexWrap;
-  @include flexOn;
 }
 
 .Racebar-right {
@@ -32,8 +28,25 @@
   .dark & { border-left: 1px solid $zorroa-dimgray; }
 }
 
+.Racebar-left {
+  position: relative; // FBO .Racebar-share-copy
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include fullHeight;
+  padding-right: 4px; // this keep the border here aligned with the left sidebar's border
+  border-right: 1px solid $zorroa-nearwhite;
+  .dark & { border-right: 1px solid $zorroa-dimgray; }
+}
+
 .Racebar-widget {
   margin: 2px 4px;
+  display: inline-block;
+}
+
+.Racebar-add-widget {
+  margin: 2px 4px;
+  display: inline-block;
+  font-size: 18px;
 }
 
 .Racebar-clear {
