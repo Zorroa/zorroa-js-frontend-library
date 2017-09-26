@@ -10,8 +10,12 @@ import AssetFilter from '../../models/AssetFilter'
 import TrashedFolder from '../../models/TrashedFolder'
 import { searchAssets, getAssetFields, requiredFields } from '../../actions/assetsAction'
 import { countAssetsInFolderIds, clearFolderCountQueue } from '../../actions/folderAction'
+import { isSimilarColor } from '../../actions/racetrackAction'
 import { saveUserSettings } from '../../actions/authAction'
-import { MapWidgetInfo, CollectionsWidgetInfo, SortOrderWidgetInfo, SimilarHashWidgetInfo, ImportSetWidgetInfo } from './WidgetInfo'
+import {
+  MapWidgetInfo, CollectionsWidgetInfo, SortOrderWidgetInfo,
+  SimilarHashWidgetInfo, ImportSetWidgetInfo, ColorWidgetInfo
+} from './WidgetInfo'
 
 // Searcher is a singleton. It combines AssetSearches from the Racetrack
 // and Folders and submits a new query to the Archivist server.
@@ -144,6 +148,7 @@ class Searcher extends Component {
         if (widget.type === CollectionsWidgetInfo.type) foldersDisabled = !widget.isEnabled
         if (widget.type === SortOrderWidgetInfo.type) orderDisabled = !widget.isEnabled
         if (widget.type === SimilarHashWidgetInfo.type) similarDisabled = !widget.isEnabled
+        if (widget.type === ColorWidgetInfo.type && isSimilarColor(similar)) similarDisabled = !widget.isEnabled
         if (widget.type === ImportSetWidgetInfo.type) importsDisabled = !widget.isEnabled
         if (!widget.sliver) continue
         let sliver = widget.sliver

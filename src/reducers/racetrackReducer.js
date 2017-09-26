@@ -3,6 +3,7 @@ import {
   SIMILAR_VALUES, ASSET_ORDER, ASSET_SORT, ASSET_FIELDS, SELECT_FOLDERS,
   SELECT_JOBS, ANALYZE_SIMILAR, UNAUTH_USER, ISOLATE_PARENT } from '../constants/actionTypes'
 import Widget, { createImportSetWidget } from '../models/Widget'
+import { isSimilarColor } from '../actions/racetrackAction'
 import {
   SimilarHashWidgetInfo, CollectionsWidgetInfo, SortOrderWidgetInfo,
   MultipageWidgetInfo, ImportSetWidgetInfo } from '../components/Racetrack/WidgetInfo'
@@ -74,14 +75,14 @@ function updateSimilarity (similar, state) {
   // Backwards compatibility for saved searches prior to weights
   if (similar.values && (!similar.weights || similar.weights.length !== similar.values.length)) similar.weights = similar.values.map(_ => (1))
   assert.ok(Array.isArray(similar.weights))
-  assert.ok(similar.values.length === similar.ofsIds.length)
+  assert.ok(similar.values.length === similar.ofsIds.length || isSimilarColor(similar))
   assert.ok(similar.values.length === similar.weights.length)
   assert.ok(similar.values.length <= 10)
   const minScoreField = `minScore-${similar.field}`
   if (state.similar.field !== similar.field && state.similar[minScoreField]) similar.minScore = parseFloat(state.similar[minScoreField])
   similar[minScoreField] = similar.minScore   // Save min score for this field (restored from searches too)
   const index = state.widgets.findIndex(widget => (widget.type === SimilarHashWidgetInfo.type))
-  if (index < 0 && similar.values.length) {
+  if (index < 0 && similar.values.length && !isSimilarColor(similar)) {
     let widgets = [...state.widgets]
     const isEnabled = true
     const isPinned = false

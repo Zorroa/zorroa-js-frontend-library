@@ -17,13 +17,14 @@ export default class Widget {
     return ++Widget._guid
   }
 
-  constructor ({id, type, field, sliver, isEnabled, isPinned}) {
+  constructor ({id, type, field, sliver, isEnabled, isPinned, state}) {
     this.id = Widget.guid(id)
     this.type = type
     this.field = field
     this.sliver = new AssetSearch(sliver)
     this.isEnabled = (isEnabled !== undefined) ? isEnabled : true
     this.isPinned = (isPinned !== undefined) ? isPinned : false
+    this.state = state && JSON.parse(JSON.stringify(state))
   }
 
   merge (rhs) {

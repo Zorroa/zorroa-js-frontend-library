@@ -57,6 +57,14 @@ export function parseTimecodeMS (timecodeStr) {
   return time
 }
 
+export function lerp (x, min, max) {
+  return min + (max - min) * x
+}
+
+export function unlerp (x, min, max) {
+  return (x - min) / (max - min)
+}
+
 export function remap (x, min1, max1, min2, max2) {
   return min2 + (max2 - min2) * ((x - min1) / (max1 - min1))
 }

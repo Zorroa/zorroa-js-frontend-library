@@ -13,12 +13,13 @@ import Feedback from '../../components/Feedback'
 import Developer from '../../components/Developer'
 import Settings from '../../components/Settings'
 import AssetCounter from '../Assets/AssetCounter'
-import { showModal } from '../../actions/appActions'
+import { showModal, dialogAlertPromise } from '../../actions/appActions'
 import { archivistBaseURL, saveUserSettings } from '../../actions/authAction'
 import { selectAssetIds } from '../../actions/assetsAction'
 import { similar } from '../../actions/racetrackAction'
 import { weights } from '../Racetrack/SimilarHash'
 import { equalSets } from '../../services/jsUtil'
+import * as WidgetInfo from '../../components/Racetrack/WidgetInfo'
 
 class Header extends Component {
   static propTypes = {
@@ -39,7 +40,8 @@ class Header extends Component {
     }).isRequired,
     similarAssets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     userSettings: PropTypes.object.isRequired,
-    actions: PropTypes.object.isRequired
+    actions: PropTypes.object.isRequired,
+    widgets: PropTypes.arrayOf(PropTypes.object)
   }
 
   showPreferences = () => {
@@ -73,6 +75,15 @@ class Header extends Component {
   }
 
   sortSimilar = () => {
+    // TEMPORARY BAND-AID
+    // Don't allow a color widget and a similar hash widget simultaneously
+    // Remove when we can do both at the same time
+    const colorWidgets = this.props.widgets.filter(widget => widget.type === WidgetInfo.ColorWidgetInfo.type)
+    if (colorWidgets.length) {
+      this.props.actions.dialogAlertPromise('Similarity', 'Please delete the Color widget to use Similar image search. This is only temporary.')
+      return
+    }
+
     const { actions, selectedIds, similarAssets } = this.props
     if (!selectedIds || !selectedIds.size) return
     const selectedAssets = [...selectedIds].map(id => (similarAssets.find(asset => (asset.id === id)))).filter(asset => asset)
@@ -233,12 +244,14 @@ export default connect(state => ({
   assetFields: state.assets && state.assets.fields,
   similar: state.racetrack.similar,
   similarAssets: state.assets.similar,
-  userSettings: state.app.userSettings
+  userSettings: state.app.userSettings,
+  widgets: state.racetrack.widgets
 }), dispatch => ({
   actions: bindActionCreators({
     showModal,
     selectAssetIds,
     similar,
-    saveUserSettings
+    saveUserSettings,
+    dialogAlertPromise
   }, dispatch)
 }))(Header)

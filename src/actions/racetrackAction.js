@@ -32,6 +32,10 @@ export function resetRacetrackWidgets (widgets) {
   })
 }
 
+export function isSimilarColor (similar) {
+  return similar.field && similar.field.toLowerCase().startsWith('similar') && (!similar.ofsIds || !similar.ofsIds.length)
+}
+
 export function similar (similar) {
   const maxValues = 10
   if (similar && similar.values && similar.values.length > maxValues) {

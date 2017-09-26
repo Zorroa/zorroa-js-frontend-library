@@ -5,7 +5,7 @@ import classnames from 'classnames'
 import LRUCache from 'lru-cache'
 
 import { SimilarHashWidgetInfo } from './WidgetInfo'
-import { similar } from '../../actions/racetrackAction'
+import { similar, isSimilarColor } from '../../actions/racetrackAction'
 import { equalSets } from '../../services/jsUtil'
 import Widget from './Widget'
 import Asset from '../../models/Asset'
@@ -83,15 +83,16 @@ class SimilarHash extends Component {
   }
 
   selectedSimilar = () => {
-    const ofsIds = [...this.props.similar.ofsIds]
-    const values = [...this.props.similar.values]
+    const { similar } = this.props
+    const ofsIds = [...similar.ofsIds]
+    const values = isSimilarColor(similar) ? [] : [...similar.values]
     for (var i = 0; i < this.props.similarAssets.length; ++i) {
       const asset = this.props.similarAssets[i]
       const ofsId = asset.closestProxy(256, 256).id
       const exists = ofsIds.findIndex(id => (id === ofsId)) >= 0
       if (!exists) {
         ofsIds.push(ofsId)
-        values.push(asset.rawValue(this.props.similar.field))
+        values.push(asset.rawValue(similar.field))
       }
     }
     return { values, ofsIds, weights: weights(ofsIds) }
