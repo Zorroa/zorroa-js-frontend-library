@@ -257,8 +257,10 @@ class FolderItem extends Component {
   }
 
   exportFolder = (event) => {
+    this.dismissContextMenu(event)
     const width = '340px'
-    const body = <CreateExport onCreate={this.createExport}/>
+    const name = this.props.folder.name
+    const body = <CreateExport onCreate={this.createExport} name={name}/>
     this.props.actions.showModal({body, width})
   }
 
