@@ -131,13 +131,13 @@ class Video extends Component {
   }
 
   clipRange = (clipStartFrame, clipStopFrame) => {
-    if (clipStartFrame < 0 || clipStopFrame > this.props.frames) return
+    if (clipStartFrame < 0 || clipStopFrame > this.props.frames - 1) return
     if (clipStartFrame > clipStopFrame) clipStartFrame = clipStopFrame
     this.setState({ clipStartFrame, clipStopFrame })
   }
 
   range = (startFrame, stopFrame) => {
-    if (startFrame < 0 || stopFrame > this.props.frames) return
+    if (startFrame < 0 || stopFrame > this.props.frames - 1) return
     if (startFrame > stopFrame) startFrame = stopFrame
     this.setState({ startFrame, stopFrame })
     if (startFrame < this.state.clipStartFrame) this.setState({ clipStartFrame: startFrame })
