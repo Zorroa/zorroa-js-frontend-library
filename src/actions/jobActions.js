@@ -22,15 +22,17 @@ export function exportAssets (name, search, fields, includeSource) {
   return dispatch => {
     console.log('Export: ' + JSON.stringify(search) +
     ' and fields: ' + fields ? JSON.stringify(fields) : 'none')
-    archivistPost(dispatch, '/api/v1/exports', {name, search, fields, includeSource})
+    return archivistPost(dispatch, '/api/v1/exports', {name, search, fields, includeSource})
       .then(response => {
         dispatch({
           type: EXPORT_ASSETS,
           payload: new Job(response.data)
         })
+        return response.data.jobId
       })
       .catch(error => {
         console.error('Error creating export with search ' + JSON.stringify(search) + ', error: ' + error)
+        return Promise.reject(error)
       })
   }
 }
@@ -81,12 +83,13 @@ export function getJobs (jobFilter, from, count) {
       params: { from, count },
       headers: { 'X-Requested-With': 'XMLHttpRequest' }
     }
-    archivistRequest(dispatch, request)
+    return archivistRequest(dispatch, request)
       .then(response => {
         dispatch({
           type: GET_JOBS,
           payload: response.data.list.map(job => (new Job(job)))
         })
+        return response
       })
       .catch(error => {
         console.error('Error getting jobs filter=' + JSON.stringify(jobFilter) + ' from=' + from + ' count=' + count + ' error:' + error)
