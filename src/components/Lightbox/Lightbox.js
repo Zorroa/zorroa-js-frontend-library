@@ -80,7 +80,7 @@ class Lightbox extends Component {
       <div className="lightbox">
         <Lightbar showMetadata={lightboxMetadata.show}
                   onMetadata={this.toggleMetadata}/>
-        <div className="lightbox-body flexOn fullWidth fullHeight">
+        <div className="lightbox-body">
           <Inspector asset={asset}
                      onNext={hasNext ? _ => this.isolateIndexOffset(1) : null}
                      onPrev={hasPrev ? _ => this.isolateIndexOffset(-1) : null} />

@@ -56,10 +56,8 @@ class Inspector extends Component {
 
     return (
       <div className="Inspector">
-        <div className='Inspector-content'>
-          { inspector }
-          { warning ? <div className="Inspector-warning">{warning}</div> : null }
-        </div>
+        { inspector }
+        { warning ? <div className="Inspector-warning">{warning}</div> : null }
       </div>
     )
   }
