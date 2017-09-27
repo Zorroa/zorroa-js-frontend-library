@@ -90,7 +90,7 @@ class Filetype extends Component {
     const widget = widgets && widgets[index]
     if (widget && widget.sliver) {
       if (widget.sliver.filter) {
-        const exts = widget.sliver.filter.terms[extField]
+        const exts = widget.sliver.filter.terms[extField] || []
         if (JSON.stringify(exts) !== JSON.stringify(this.state.exts)) {
           this.setState({exts, suggestions: [], suggestion: ''})
         }
