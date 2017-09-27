@@ -11,51 +11,42 @@ export default class VideoRange extends Component {
     frameRate: PropTypes.number.isRequired,
     startFrame: PropTypes.number.isRequired,
     stopFrame: PropTypes.number.isRequired,
+    clipStartFrame: PropTypes.number.isRequired,
+    clipStopFrame: PropTypes.number.isRequired,
     onScrub: PropTypes.func.isRequired,
+    onRange: PropTypes.func.isRequired,
     onClipRange: PropTypes.func.isRequired,
     backgroundURL: PropTypes.string
-  }
-
-  state = {
-    clipStartFrame: 0,
-    clipStopFrame: 0
   }
 
   resizer = null
 
   componentWillMount = () => {
     this.resizer = new Resizer()
-    this.componentWillReceiveProps(this.props)
   }
 
   componentWillUnmount = () => {
     this.resizer.release()
   }
 
-  componentWillReceiveProps (nextProps) {
-    const clipStartFrame = Math.max(0, nextProps.startFrame - (nextProps.stopFrame - nextProps.startFrame))
-    const clipStopFrame = Math.min(nextProps.frames - 1, nextProps.stopFrame + (nextProps.stopFrame - nextProps.startFrame))
-    this.setState({ clipStartFrame, clipStopFrame })
-  }
-
   resizeStart = (update, event) => {
     this.resizer.capture(
-      update,                /* onMove    */
-      null,                             /* onRelease */
-      event.clientX,            /* startX    */
-      0,                                /* startY    */
-      1,                                /* optScaleX */
-      0)                                /* optScaleY */
+      update,                 /* onMove    */
+      null,                   /* onRelease */
+      event.clientX,          /* startX    */
+      0,                      /* startY    */
+      1,                      /* optScaleX */
+      0)                      /* optScaleY */
     update(event.clientX)
     event.preventDefault()
     event.stopPropagation()
   }
 
   frameAtX = (x) => {
-    const { clipStartFrame, clipStopFrame } = this.state
+    const { frames, clipStartFrame, clipStopFrame } = this.props
     const clipWidth = this.refs.clip && this.refs.clip.clientWidth || 1
     const clipFrames = clipStopFrame - clipStartFrame + 1
-    return Math.max(0, Math.min(this.props.frames - 1, clipStartFrame + clipFrames * (x - 8) / clipWidth))
+    return Math.max(0, Math.min(frames - 1, clipStartFrame + clipFrames * (x - 8) / clipWidth))
   }
 
   resizeUpdate = (x) => {
@@ -64,19 +55,28 @@ export default class VideoRange extends Component {
 
   resizeLeft = (x) => {
     const frame = Math.min(this.frameAtX(x), this.props.stopFrame)
-    this.props.onClipRange(frame, this.props.stopFrame)
-    if (frame < this.state.clipStartFrame) this.setState({clipStartFrame: frame})
+    this.props.onRange(frame, this.props.stopFrame)
   }
 
   resizeRight = (x) => {
     const frame = Math.max(this.frameAtX(x), this.props.startFrame)
-    this.props.onClipRange(this.props.startFrame, frame)
-    if (frame > this.state.clipStopFrame) this.setState({clipStopFrame: frame})
+    this.props.onRange(this.props.startFrame, frame)
+  }
+
+  resizeClip = (frame) => {
+    this.props.onClipRange(frame, frame + (this.props.clipStopFrame - this.props.clipStartFrame))
+  }
+
+  resizeClipLeft = (frame) => {
+    this.props.onClipRange(frame, this.props.clipStopFrame)
+  }
+
+  resizeClipRight = (frame) => {
+    this.props.onClipRange(this.props.clipStartFrame, frame)
   }
 
   render () {
-    const { clipStartFrame, clipStopFrame } = this.state
-    const { played, frames, frameRate, backgroundURL, startFrame, stopFrame } = this.props
+    const { played, frames, frameRate, backgroundURL, startFrame, stopFrame, clipStartFrame, clipStopFrame } = this.props
     if (!frames) return
     const clipWidth = this.refs.clip && this.refs.clip.clientWidth || 0
     const clipHeight = this.refs.clip && this.refs.clip.clientHeight || 0
@@ -87,6 +87,8 @@ export default class VideoRange extends Component {
     const barLeftPx = clipWidth * clipStartFrame / frames
     const barRightPx = clipWidth * clipStopFrame / frames
     const barWidthPx = Math.max(5, barRightPx - barLeftPx)
+    const barClipLeftPx = clipWidth * startFrame / frames
+    const barClipRightPx = clipWidth * stopFrame / frames
     const playhead = `${clipWidth * (played * frames - clipStartFrame) / clipFrames - 4}px`
     const scrubbing = this.resizer.active
     const clipScale = clipWidth * frames / clipFrames
@@ -119,13 +121,18 @@ export default class VideoRange extends Component {
         { clipWidth && clipFrames !== frames && (
           <div className="VideoRange-movie">
             <div className="VideoRange-movie-background" style={barBackground}/>
-            <div className="VideoRange-bar-range" style={{ marginLeft: `${barLeftPx}px`, width: `${barWidthPx}px` }}/>
-            <div className="VideoRange-movie-thumb" style={{ left: `${clipWidth * played}px` }}>
-              <div className="VideoRange-movie-thumb-marker"/>
-            </div>
+            <div className="VideoRange-bar-clip" style={{ left: barClipLeftPx, width: barClipRightPx - barClipLeftPx }} />
             <div className="VideoRange-axis">
               <TimeAxis format="duration" position="top" width={clipWidth} height={clipHeight} margin={0}
                         beginTime={startTime} endTime={stopTime} tickCount={tickCount} standalone={true} />
+            </div>
+            <div className="VideoRange-bar-range" style={{ marginLeft: `${barLeftPx}px`, width: `${barWidthPx}px` }}>
+              <div className="VideoRange-bar-range-left" onMouseDown={_ => { this.resizer.capture(this.resizeClipLeft, null, this.props.clipStartFrame, 0, this.props.frames / clipWidth, 0) }}/>
+              <div className="VideoRange-bar-range-middle" onMouseDown={_ => { this.resizer.capture(this.resizeClip, null, this.props.clipStartFrame, 0, this.props.frames / clipWidth, 0) }}/>
+              <div className="VideoRange-bar-range-right" onMouseDown={_ => { this.resizer.capture(this.resizeClipRight, null, this.props.clipStopFrame, 0, this.props.frames / clipWidth, 0) }}/>
+            </div>
+            <div className="VideoRange-movie-thumb" style={{ left: `${clipWidth * played}px` }}>
+              <div className="VideoRange-movie-thumb-marker"/>
             </div>
           </div>
         )}

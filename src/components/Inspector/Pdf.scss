@@ -5,6 +5,7 @@
   @include flexAlignItemsCenter;
   @include flexJustifyCenter;
   @include flexOn;
+  width: 100%;
 
   position: relative;
   img.loading {
