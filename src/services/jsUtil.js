@@ -25,10 +25,10 @@ export function isValidEmail (email) {
 
 export function formatDuration (seconds, fps) {
   const date = new Date(seconds * 1000)
-  const hh = date.getUTCHours()
-  const mm = date.getUTCMinutes()
+  const hh = pad(date.getUTCHours())
+  const mm = pad(date.getUTCMinutes())
   const ss = pad(date.getUTCSeconds())
-  if (hh) {
+  if (hh !== '00') {
     return `${hh}:${pad(mm)}:${ss}`
   } else if (fps) {
     const ff = pad(Math.round(fps * date.getUTCMilliseconds() / 1000))
