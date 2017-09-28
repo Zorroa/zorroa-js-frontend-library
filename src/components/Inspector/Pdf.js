@@ -170,19 +170,27 @@ export default class Pdf extends Component {
     if (!canvas) return
     const canvasContext = canvas.getContext('2d')
     let unscaledViewport = page.getViewport(1)
-    const scale = this.state.scale * canvas.width / unscaledViewport.width
+    const scaleW = canvas.width / unscaledViewport.width
+    const scaleH = canvas.height / unscaledViewport.height
+    const scale = this.state.scale * Math.min(scaleW, scaleH)
     let viewport = page.getViewport(scale)
 
     // Adjust the scale so the view exactly fits the parent body element
     const body = canvas.parentElement
     let { width, height } = viewport
-    const aspect = width / height
     let disableZoomOut = false
-    if (height < body.clientHeight) {
+    if (height < body.clientHeight || width < body.clientWidth) {
       disableZoomOut = true
-      height = body.clientHeight
-      width = height * aspect
-      viewport = page.getViewport(scale * width / viewport.width)
+      const aspect = width / height
+      if (width / body.clientWidth < height / body.clientHeight) {
+        height = body.clientHeight
+        width = height * aspect
+        viewport = page.getViewport(scale * width / viewport.width)
+      } else {
+        width = body.clientWidth
+        height = width / aspect
+        viewport = page.getViewport(scale * height / viewport.height)
+      }
     }
     canvas.height = viewport.height
     canvas.width = viewport.width

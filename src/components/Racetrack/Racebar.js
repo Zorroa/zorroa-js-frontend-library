@@ -195,7 +195,6 @@ class Racebar extends Component {
           ))}
           <QuickAddWidget/>
         </div>
-        <div className="Racebar-spacer flexOn"/>
         <div className="Racebar-right">
           <div className={classnames('Racebar-save', {disabled})}
                onClick={!disabled && this.saveRacetrack} title="Save the search">

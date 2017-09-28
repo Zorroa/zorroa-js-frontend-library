@@ -16,6 +16,14 @@
 }
 
 .Racebar-wrap {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  @include flexWrap;
+  @include flexOn;
+  border-left: 1px solid $zorroa-nearwhite;
+  .dark & { border-left: 1px solid $zorroa-dimgray; }
+  border-right: 1px solid $zorroa-nearwhite;
+  .dark & { border-right: 1px solid $zorroa-dimgray; }
 }
 
 .Racebar-right {
@@ -24,8 +32,6 @@
   @include flexAlignItemsCenter;
   @include fullHeight;
   padding-left: 8px;
-  border-left: 1px solid $zorroa-nearwhite;
-  .dark & { border-left: 1px solid $zorroa-dimgray; }
 }
 
 .Racebar-left {
@@ -34,8 +40,6 @@
   @include flexAlignItemsCenter;
   @include fullHeight;
   padding-right: 4px; // this keep the border here aligned with the left sidebar's border
-  border-right: 1px solid $zorroa-nearwhite;
-  .dark & { border-right: 1px solid $zorroa-dimgray; }
 }
 
 .Racebar-widget {
@@ -46,7 +50,6 @@
 .Racebar-add-widget {
   margin: 2px 4px;
   display: inline-block;
-  font-size: 18px;
 }
 
 .Racebar-clear {

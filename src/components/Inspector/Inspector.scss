@@ -2,21 +2,14 @@
 
 .Inspector {
   @include fullWidth;
-  @include flexCenter;
+  @include fullHeight;
   @include flexOn;
-  @include flexCol;
+  @include flexColCenter;
 
   padding: 8px;
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.Inspector-content {
-  @include flexCol;
-  @include flexOn;
-  width: 100%;
-  max-width:100%;
   overflow: hidden;
   position: relative;
 }

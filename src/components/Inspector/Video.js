@@ -38,13 +38,16 @@ class Video extends Component {
     played: 0,
     loaded: 0,
     startFrame: this.props.startFrame,
-    stopFrame: this.props.stopFrame
+    stopFrame: this.props.stopFrame,
+    clipStartFrame: Number.MAX_SAFE_INTEGER,
+    clipStopFrame: -Number.MAX_SAFE_INTEGER
   }
 
   resize = () => this.forceUpdate()
 
   componentDidMount () {
     window.addEventListener('resize', this.resize)
+    this.componentWillReceiveProps(this.props)
   }
 
   componentWillUnmount () {
@@ -52,8 +55,13 @@ class Video extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    const { startFrame, stopFrame } = nextProps
+    const { frames, startFrame, stopFrame, url } = nextProps
     this.setState({ startFrame, stopFrame, played: 0 })
+    if (this.state.clipStartFrame === Number.MAX_SAFE_INTEGER || url !== this.props.url) {
+      const clipStartFrame = Math.max(0, startFrame - (stopFrame - startFrame))
+      const clipStopFrame = Math.min(frames - 1, stopFrame + (stopFrame - startFrame))
+      this.setState({clipStartFrame, clipStopFrame})
+    }
   }
 
   @keydown('space')
@@ -122,8 +130,18 @@ class Video extends Component {
     return clamp((t * frames - startFrame) / (stopFrame - startFrame), 0, 1)
   }
 
-  clipRange = (startFrame, stopFrame) => {
+  clipRange = (clipStartFrame, clipStopFrame) => {
+    if (clipStartFrame < 0 || clipStopFrame > this.props.frames - 1) return
+    if (clipStartFrame > clipStopFrame) clipStartFrame = clipStopFrame
+    this.setState({ clipStartFrame, clipStopFrame })
+  }
+
+  range = (startFrame, stopFrame) => {
+    if (startFrame < 0 || stopFrame > this.props.frames - 1) return
+    if (startFrame > stopFrame) startFrame = stopFrame
     this.setState({ startFrame, stopFrame })
+    if (startFrame < this.state.clipStartFrame) this.setState({ clipStartFrame: startFrame })
+    if (stopFrame > this.state.clipStopFrame) this.setState({ clipStopFrame: stopFrame })
   }
 
   init () {
@@ -137,11 +155,12 @@ class Video extends Component {
 
   render () {
     const { url, frameRate, frames, backgroundURL, onError } = this.props
-    const { playing, volume, played, startFrame, stopFrame } = this.state
+    const { playing, volume, played, startFrame, stopFrame, clipStartFrame, clipStopFrame } = this.state
     const seconds = played ? (played * frames - startFrame) / frameRate : 0
     const duration = (stopFrame - startFrame) / frameRate
     const title = <div className="Video-time"><Duration className='Video-remaining' seconds={seconds} frameRate={frameRate} />/<Duration seconds={duration} frameRate={frameRate}/></div>
     const total = frames * 10
+
     return (
       <div className='Video'>
         <div className="Video-pan-zoom">
@@ -167,7 +186,9 @@ class Video extends Component {
         </div>
         <VideoRange played={played} frames={frames} frameRate={frameRate}
                     startFrame={startFrame} stopFrame={stopFrame} total={total}
-                    onScrub={this.scrub} onClipRange={this.clipRange} backgroundURL={backgroundURL}/>
+                    clipStartFrame={clipStartFrame} clipStopFrame={clipStopFrame}
+                    onScrub={this.scrub} onClipRange={this.clipRange}
+                    onRange={this.range} backgroundURL={backgroundURL}/>
       </div>
     )
   }

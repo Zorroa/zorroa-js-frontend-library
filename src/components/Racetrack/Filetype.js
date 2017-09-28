@@ -90,7 +90,7 @@ class Filetype extends Component {
     const widget = widgets && widgets[index]
     if (widget && widget.sliver) {
       if (widget.sliver.filter) {
-        const exts = widget.sliver.filter.terms[extField]
+        const exts = widget.sliver.filter.terms[extField] || []
         if (JSON.stringify(exts) !== JSON.stringify(this.state.exts)) {
           this.setState({exts, suggestions: [], suggestion: ''})
         }
@@ -156,6 +156,7 @@ class Filetype extends Component {
   }
 
   selectionState (exts) {
+    if (!exts || !this.state.exts) return 'empty'
     let found = 0
     for (let i = 0; i < exts.length; ++i) {
       if (this.state.exts.findIndex(ext => (ext === exts[i])) >= 0) {
@@ -192,7 +193,7 @@ class Filetype extends Component {
 
   aggCount (ext) {
     const { id, aggs } = this.props
-    const buckets = aggs && (id in aggs) ? aggs[id].filetype.buckets : []
+    const buckets = aggs && (id in aggs) && aggs[id].filetype ? aggs[id].filetype.buckets : []
     for (let i = 0; i < buckets.length; ++i) {
       if (buckets[i].key === ext) return buckets[i].doc_count
     }
@@ -298,7 +299,7 @@ class Filetype extends Component {
   render () {
     const { id, floatBody, isIconified, isOpen, onOpen } = this.props
     const { exts, suggestions, suggestion } = this.state
-    const isSelected = this.state.exts.length > 0
+    const isSelected = this.state.exts && this.state.exts.length > 0
     const placeholder = isSelected ? '' : 'Search filetypes'
     const style = { width: isSelected ? '60px' : '140px' }
     const active = exts && exts.length
