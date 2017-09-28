@@ -81,25 +81,10 @@ class Filetype extends Component {
   }
 
   componentWillMount () {
-    this.componentWillReceiveProps(this.props)
-  }
-
-  componentWillReceiveProps (nextProps) {
-    const { id, widgets } = nextProps
-    const index = widgets && widgets.findIndex(widget => (id === widget.id))
-    const widget = widgets && widgets[index]
-    if (widget && widget.sliver) {
-      if (widget.sliver.filter) {
-        const exts = widget.sliver.filter.terms[extField] || []
-        if (JSON.stringify(exts) !== JSON.stringify(this.state.exts)) {
-          this.setState({exts, suggestions: [], suggestion: ''})
-        }
-      } else if (this.state.exts && this.state.exts.length) {
-        this.setState({exts: [], suggestions: [], suggestion: ''})
-      }
-    } else {
-      this.modifySliver([])
-    }
+    // Restore saved state from widget
+    const { id, widgets } = this.props
+    const widget = widgets && widgets.find(widget => widget.id === id)
+    if (widget && widget.state) this.setState({ exts: widget.state && widget.state.exts || [] })
   }
 
   modifySliver = (exts) => {
@@ -114,6 +99,7 @@ class Filetype extends Component {
     const widget = createFiletypeWidget(extField, 'string', exts, isEnabled, isPinned)
     widget.id = this.props.id
     this.props.actions.modifyRacetrackWidget(widget)
+    this.setState({exts})
   }
 
   selectTypes = (exts) => {
@@ -297,7 +283,7 @@ class Filetype extends Component {
   }
 
   render () {
-    const { id, floatBody, isIconified, isOpen, onOpen } = this.props
+    const { id, widgets, floatBody, isIconified, isOpen, onOpen } = this.props
     const { exts, suggestions, suggestion } = this.state
     const isSelected = this.state.exts && this.state.exts.length > 0
     const placeholder = isSelected ? '' : 'Search filetypes'
@@ -305,6 +291,11 @@ class Filetype extends Component {
     const active = exts && exts.length
     const title = active ? (isOpen ? FiletypeWidgetInfo.title : undefined) : FiletypeWidgetInfo.title
     const field = active ? (isOpen ? undefined : this.title()) : undefined
+
+    // Reflect current state in widget to recover after save
+    const widget = widgets && widgets.find(widget => (id === widget.id))
+    widget.state = this.state
+
     return (
       <Widget className="Filetype"
               id={id}

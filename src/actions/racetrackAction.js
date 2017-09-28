@@ -2,7 +2,7 @@ import { MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_W
   SIMILAR_VALUES } from '../constants/actionTypes'
 import Widget, { createFacetWidget, createExistsWidget, createMapWidget,
   createDateRangeWidget, createRangeWidget, createCollectionsWidget,
-  createFiletypeWidget, createColorWidget, createSortOrderWidget } from '../models/Widget'
+  createFiletypeWidget, createColorWidget, createSortOrderWidget, removeRaw } from '../models/Widget'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
 import { CollectionsWidgetInfo, SimpleSearchWidgetInfo, SortOrderWidgetInfo } from '../components/Racetrack/WidgetInfo'
@@ -216,7 +216,7 @@ function restoreWidgetSlivers (widgets, search) {
   const isEnabled = true
   const isPinned = false
 
-  const findWidget = (field, type) => widgets.find(widget => (widget.field === field || widget.type === type))
+  const findWidget = (field, type) => widgets.find(widget => (removeRaw(widget.field) === removeRaw(field) || widget.type === type))
 
   // Create a facet for each term.
   // FIXME: Maps create a term facet too!
