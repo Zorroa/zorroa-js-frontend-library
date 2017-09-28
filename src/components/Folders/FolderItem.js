@@ -10,7 +10,6 @@ import Folder from '../../models/Folder'
 import AclEntry from '../../models/Acl'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
-import Job, { JobFilter } from '../../models/Job'
 import CreateExport from './CreateExport'
 import CreateFolder from './CreateFolder'
 import AssetPermissions from '../AssetPermissions'
@@ -25,8 +24,8 @@ import {
   createTaxonomy,
   deleteTaxonomy
 } from '../../actions/folderAction'
-import { showModal, hideModal, dialogAlertPromise } from '../../actions/appActions'
-import { exportAssets, getJobs, markJobDownloaded } from '../../actions/jobActions'
+import { showModal, hideModal, dialogAlertPromise, toggleCollapsible } from '../../actions/appActions'
+import { exportAssets, getJob, markJobDownloaded } from '../../actions/jobActions'
 import { restoreFolders } from '../../actions/racetrackAction'
 import { setAssetPermissions } from '../../actions/assetsAction'
 import { isolateSelectId } from '../../services/jsUtil'
@@ -273,25 +272,24 @@ class FolderItem extends Component {
     const filter = new AssetFilter({links: {folder: [...folderIds]}})
     const search = new AssetSearch({filter})
     const fields = exportTable && metadataFields
+    actions.toggleCollapsible('exportJobs', true)
     return actions.exportAssets(name, search, fields, exportImages)
     .then(this.waitForExportAndDownload)
   }
 
+  // duplicate code warning: keep this in sync with ExportJobs.waitForExportAndDownload (TODO: share this code)
   waitForExportAndDownload = (exportId) => {
-    const { user, actions } = this.props
-    const userId = user && user.id
-    const type = Job.Export
-    const jobFilter = new JobFilter({ type, userId })
+    const { actions } = this.props
     let timeout = 100
     return new Promise(resolve => {
       // wait until export job is done, then auto-download it
       // this code adapted from Jobs.refreshJobs()
       const waitForJob = (jobId) => {
-        actions.getJobs(jobFilter)
+        actions.getJob(exportId)
+        .then(data => new Promise(resolve => requestAnimationFrame(_ => resolve(data)))) // wait 1 frame for getJob() data to post to global state
         .then(response => {
-          // const jobData = response.data.list.find(job => job.id == jobId)
           // We'll watch the app state to see if our job is finished, rather
-          // than checking the response from getJobs()
+          // than checking the response from getJob()
           const job = this.props.jobs && this.props.jobs[jobId]
           if (job && job.isFinished()) {
             resolve(job)
@@ -306,9 +304,9 @@ class FolderItem extends Component {
     .then(job => {
       const retval = window.open(job.exportStream(this.props.origin))
       if (!retval) {
-        actions.dialogAlertPromise('Export blocked',
+        actions.dialogAlertPromise('Export complete',
           'Your export package is ready for download, using the Exports panel on the left. ' +
-          'Automatic download was blocked, you can fix this for future exports this by allowing popus.')
+          'You can enable automatic downloads for future exports by allowing popus for this site.')
         return
       }
       actions.markJobDownloaded(job.id)
@@ -655,7 +653,7 @@ export default connect(state => ({
     removeAssetIdsFromFolderId,
     dropFolderId,
     exportAssets,
-    getJobs,
+    getJob,
     markJobDownloaded,
     showModal,
     hideModal,
@@ -666,6 +664,7 @@ export default connect(state => ({
     restoreFolders,
     setAssetPermissions,
     createTaxonomy,
-    deleteTaxonomy
+    deleteTaxonomy,
+    toggleCollapsible
   }, dispatch)
 }))(FolderItem)
