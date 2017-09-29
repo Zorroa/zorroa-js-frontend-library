@@ -105,7 +105,7 @@ export default class Asset {
   stopFrame () {    // stop frame for this clip -- <= frames()
     if (this.document.video) {
       if (this.document.source.clip && this.document.source.clip.frame) return this.document.source.clip.frame.stop
-      return this.document.video.frames
+      return this.document.video.frames - 1
     }
   }
 
