@@ -6,7 +6,7 @@ import Pipeline from '../models/Pipeline'
 import AssetSearch from '../models/AssetSearch'
 import {
   EXPORT_ASSETS, IMPORT_ASSETS,
-  GET_PIPELINES, GET_JOBS, ISOLATE_JOB,
+  GET_PIPELINES, GET_JOBS, GET_JOB, ISOLATE_JOB,
   QUEUE_UPLOAD_FILE_ENTRIES, DEQUEUE_UPLOADED_FILE_ENTRIES,
   MARK_JOB_DOWNLOADED, GET_PROCESSORS,
   CANCEL_JOB, RESTART_JOB, SELECT_JOBS } from '../constants/actionTypes'
@@ -22,15 +22,17 @@ export function exportAssets (name, search, fields, includeSource) {
   return dispatch => {
     console.log('Export: ' + JSON.stringify(search) +
     ' and fields: ' + fields ? JSON.stringify(fields) : 'none')
-    archivistPost(dispatch, '/api/v1/exports', {name, search, fields, includeSource})
+    return archivistPost(dispatch, '/api/v1/exports', {name, search, fields, includeSource})
       .then(response => {
         dispatch({
           type: EXPORT_ASSETS,
           payload: new Job(response.data)
         })
+        return response.data.jobId
       })
       .catch(error => {
         console.error('Error creating export with search ' + JSON.stringify(search) + ', error: ' + error)
+        return Promise.reject(error)
       })
   }
 }
@@ -71,6 +73,7 @@ export function getPipelines () {
       })
   }
 }
+
 export function getJobs (jobFilter, from, count) {
   return dispatch => {
     console.log('Get jobs: ' + JSON.stringify(jobFilter) + ' from=' + from + ' count=' + count)
@@ -81,16 +84,39 @@ export function getJobs (jobFilter, from, count) {
       params: { from, count },
       headers: { 'X-Requested-With': 'XMLHttpRequest' }
     }
-    archivistRequest(dispatch, request)
+    return archivistRequest(dispatch, request)
       .then(response => {
         dispatch({
           type: GET_JOBS,
           payload: response.data.list.map(job => (new Job(job)))
         })
+        return response
       })
       .catch(error => {
         console.error('Error getting jobs filter=' + JSON.stringify(jobFilter) + ' from=' + from + ' count=' + count + ' error:' + error)
       })
+  }
+}
+
+export function getJob (jobId) {
+  return dispatch => {
+    console.log(`Get job ${jobId}`)
+    const request = {
+      method: 'get',
+      url: `${jobEndpoint}/${jobId}`,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    }
+    return archivistRequest(dispatch, request)
+    .then(response => {
+      dispatch({
+        type: GET_JOB,
+        payload: new Job(response.data)
+      })
+      return response
+    })
+    .catch(error => {
+      console.error('Error getting job id=' + jobId, error)
+    })
   }
 }
 

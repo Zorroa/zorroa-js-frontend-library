@@ -1,6 +1,6 @@
 import {
   EXPORT_ASSETS, IMPORT_ASSETS,
-  GET_JOBS, GET_PIPELINES, ISOLATE_JOB, SELECT_JOBS,
+  GET_JOBS, GET_JOB, GET_PIPELINES, ISOLATE_JOB, SELECT_JOBS,
   QUEUE_UPLOAD_FILE_ENTRIES, DEQUEUE_UPLOADED_FILE_ENTRIES,
   MARK_JOB_DOWNLOADED, GET_PROCESSORS,
   RESTART_JOB, CANCEL_JOB, UNAUTH_USER } from '../constants/actionTypes'
@@ -40,6 +40,15 @@ export default function (state = initialState, action) {
         job.notDownloaded = all[job.id] ? all[job.id].notDownloaded : !firstLoad
         all[job.id] = job
       })
+      return { ...state, all }
+    }
+
+    case GET_JOB: {
+      const all = { ...state.all }
+      const firstLoad = !Object.keys(all).length
+      const job = action.payload
+      job.notDownloaded = all[job.id] ? all[job.id].notDownloaded : !firstLoad
+      all[job.id] = job
       return { ...state, all }
     }
 

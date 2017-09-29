@@ -24,8 +24,8 @@ import {
   createTaxonomy,
   deleteTaxonomy
 } from '../../actions/folderAction'
-import { showModal, hideModal } from '../../actions/appActions'
-import { exportAssets } from '../../actions/jobActions'
+import { showModal, hideModal, dialogAlertPromise, toggleCollapsible } from '../../actions/appActions'
+import { exportAssets, getJob, markJobDownloaded } from '../../actions/jobActions'
 import { restoreFolders } from '../../actions/racetrackAction'
 import { setAssetPermissions } from '../../actions/assetsAction'
 import { isolateSelectId } from '../../services/jsUtil'
@@ -102,6 +102,7 @@ class FolderItem extends Component {
     dropFolderId: PropTypes.number,
     filteredCounts: PropTypes.instanceOf(Map),
     user: PropTypes.instanceOf(User),
+    origin: PropTypes.string,
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     allAssetCount: PropTypes.number,
     metadataFields: PropTypes.arrayOf(PropTypes.string),
@@ -109,7 +110,8 @@ class FolderItem extends Component {
     isAdministrator: PropTypes.bool,
     uxLevel: PropTypes.number,
     actions: PropTypes.object,
-    userSettings: PropTypes.object.isRequired
+    userSettings: PropTypes.object.isRequired,
+    jobs: PropTypes.object
   }
 
   state = {
@@ -257,18 +259,58 @@ class FolderItem extends Component {
   }
 
   exportFolder = (event) => {
+    this.dismissContextMenu(event)
     const width = '340px'
-    const body = <CreateExport onCreate={this.createExport}/>
+    const name = this.props.folder.name
+    const body = <CreateExport onCreate={this.createExport} name={name}/>
     this.props.actions.showModal({body, width})
   }
 
   createExport = (event, name, exportImages, exportTable) => {
-    const { selectedFolderIds, metadataFields, folder } = this.props
+    const { selectedFolderIds, metadataFields, folder, actions } = this.props
     const folderIds = selectedFolderIds.has(folder.id) ? new Set(this.props.selectedFolderIds) : [folder.id]
     const filter = new AssetFilter({links: {folder: [...folderIds]}})
     const search = new AssetSearch({filter})
     const fields = exportTable && metadataFields
-    this.props.actions.exportAssets(name, search, fields, exportImages)
+    actions.toggleCollapsible('exportJobs', true)
+    return actions.exportAssets(name, search, fields, exportImages)
+    .then(this.waitForExportAndDownload)
+  }
+
+  // duplicate code warning: keep this in sync with ExportJobs.waitForExportAndDownload (TODO: share this code)
+  waitForExportAndDownload = (exportId) => {
+    const { actions } = this.props
+    let timeout = 100
+    return new Promise(resolve => {
+      // wait until export job is done, then auto-download it
+      // this code adapted from Jobs.refreshJobs()
+      const waitForJob = (jobId) => {
+        actions.getJob(exportId)
+        .then(data => new Promise(resolve => requestAnimationFrame(_ => resolve(data)))) // wait 1 frame for getJob() data to post to global state
+        .then(response => {
+          // We'll watch the app state to see if our job is finished, rather
+          // than checking the response from getJob()
+          const job = this.props.jobs && this.props.jobs[jobId]
+          if (job && job.isFinished()) {
+            resolve(job)
+          } else {
+            timeout = Math.min(5000, timeout * 2) // try often at first, but back off for long jobs
+            setTimeout(_ => waitForJob(jobId), timeout)
+          }
+        })
+      }
+      waitForJob(exportId)
+    })
+    .then(job => {
+      const retval = window.open(job.exportStream(this.props.origin))
+      if (!retval) {
+        actions.dialogAlertPromise('Export complete',
+          'Your export package is ready for download, using the Exports panel on the left. ' +
+          'You can enable automatic downloads for future exports by allowing popus for this site.')
+        return
+      }
+      actions.markJobDownloaded(job.id)
+    })
   }
 
   addAssetsToFolders = () => {
@@ -596,12 +638,14 @@ export default connect(state => ({
   selectedAssetIds: state.assets.selectedIds,
   dropFolderId: state.folders.dropFolderId,
   user: state.auth.user,
+  origin: state.auth.origin,
   dragInfo: state.app.dragInfo,
   metadataFields: state.app.metadataFields,
   isManager: state.auth.isManager,
   isAdministrator: state.auth.isAdministrator,
   uxLevel: state.app.uxLevel,
-  userSettings: state.app.userSettings
+  userSettings: state.app.userSettings,
+  jobs: state.jobs.all
 }), dispatch => ({
   actions: bindActionCreators({
     createFolder,
@@ -609,14 +653,18 @@ export default connect(state => ({
     removeAssetIdsFromFolderId,
     dropFolderId,
     exportAssets,
+    getJob,
+    markJobDownloaded,
     showModal,
     hideModal,
+    dialogAlertPromise,
     deleteFolderIds,
     updateFolder,
     updateFolderPermissions,
     restoreFolders,
     setAssetPermissions,
     createTaxonomy,
-    deleteTaxonomy
+    deleteTaxonomy,
+    toggleCollapsible
   }, dispatch)
 }))(FolderItem)

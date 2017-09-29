@@ -7,13 +7,14 @@ import { hideModal } from '../../actions/appActions'
 
 class CreateExport extends Component {
   static propTypes = {
+    name: PropTypes.string,               // optional export name
     onCreate: PropTypes.func.isRequired,
     onDismiss: PropTypes.func,
     actions: PropTypes.object
   }
 
   state = {
-    name: '',
+    name: this.props.name || '',
     exportImages: true,
     exportTable: true,
     exportContactSheet: false
