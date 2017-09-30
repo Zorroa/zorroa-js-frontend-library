@@ -12,6 +12,8 @@ import { DropboxAuthenticator } from '../Import/DropboxAuthenticator'
 import { BoxAuthenticator } from '../Import/BoxAuthenticator'
 import { GDriveAuthenticator } from '../Import/GDriveAuthenticator'
 import { defaultThumbFieldTemplate, defaultLightbarFieldTemplate } from '../../reducers/appReducer'
+import { FILTERED_COUNTS, FULL_COUNTS, NO_COUNTS } from '../Folders/Folders'
+import DropdownMenu from '../DropdownMenu/DropdownMenu'
 
 const theme = {
   scheme: 'bright',
@@ -142,9 +144,8 @@ class Preferences extends Component {
     this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, monochrome })
   }
 
-  toggleFilteredFolderCounts = (event) => {
-    const showFilteredFolderCounts = !this.props.userSettings.showFilteredFolderCounts
-    this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, showFilteredFolderCounts })
+  setFolderCounts = (showFolderCounts) => {
+    this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, showFolderCounts })
   }
 
   render () {
@@ -179,9 +180,13 @@ class Preferences extends Component {
               <input type="checkbox" className="Preferences-monochrome-input" checked={monochrome} onChange={this.toggleMonochrome}/>
                   <div className="Preferences-monochrome-label Preferences-checkbox-label">Dark Theme</div>
                 </div>
-                <div className="Preferences-showFilteredFolderCounts Preferences-checkbox">
-                  <input type="checkbox" className="Preferences-showFilteredFolderCounts-input" checked={userSettings.showFilteredFolderCounts} onChange={this.toggleFilteredFolderCounts}/>
-                  <div className="Preferences-showFilteredFolderCounts-label Preferences-checkbox-label">Show folder search counts</div>
+                <div className="Preferences-showFolderCounts">
+                  <div className="Preferences-showFolderCounts-label">Show folder counts: </div>
+                  <DropdownMenu label={userSettings.showFolderCounts || FILTERED_COUNTS}>
+                    <div className="Preferences-showFolderCounts-menuitem" onClick={_ => this.setFolderCounts(FILTERED_COUNTS)}>{FILTERED_COUNTS}</div>
+                    <div className="Preferences-showFolderCounts-menuitem" onClick={_ => this.setFolderCounts(FULL_COUNTS)}>{FULL_COUNTS}</div>
+                    <div className="Preferences-showFolderCounts-menuitem" onClick={_ => this.setFolderCounts(NO_COUNTS)}>{NO_COUNTS}</div>
+                  </DropdownMenu>
                 </div>
               </div>
             </div>

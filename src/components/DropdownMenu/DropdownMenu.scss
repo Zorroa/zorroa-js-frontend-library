@@ -47,7 +47,7 @@
     right: 0;
     z-index: 1000;
     box-shadow: 0 0 30px 0 $zorroa-nearblack;
-    min-width: 240px;
+    min-width: 100px;
     .dark & { color: $zorroa-whitegray; background-color: $zorroa-greyish-brown; }
   }
 

@@ -30,6 +30,10 @@ const NUMTRUE = {numeric: true}
 
 const target = { drop (props, se) { /* only needed for highlighting -- drop happens on FolderItem */ } }
 
+export const FULL_COUNTS = 'full'
+export const FILTERED_COUNTS = 'filtered'
+export const NO_COUNTS = 'none'
+
 // Display all folders, starting with the root.
 // Later this will be broken into Collections and Smart Folders.
 @DropTarget(target)
@@ -101,28 +105,31 @@ class Folders extends Component {
     // computed (here), and search counts recomputed if the search changed (below).
     const uncomputedVisibleIds = [...this.foldersVisible].filter(id => !folderCounts.has(id))
 
+    // Track the remaining items to determine if we retrigger the timer
+    let remainingFull = []
+    let remainingSearch = []
+
     // Compute a batch of full folder counts to request
     const maxBatchSize = 3
-    const allFullCountIds = [...modifiedVisibleIds, ...uncomputedVisibleIds]
-    const unrequestedFullCountIds = allFullCountIds.filter(id => !this.fullCountRequested.has(id))
-    const remainingFull = unrequestedFullCountIds.slice(maxBatchSize)
-    const fullCountIds = unrequestedFullCountIds.slice(0, maxBatchSize)
-    if (fullCountIds.length) {
-      // Request the full folder counts
-      this.props.actions.countAssetsInFolderIds(fullCountIds)
-
-      // Clear out the remaining lists to see if we have more work and mark requested
-      fullCountIds.forEach(id => this.fullCountRequested.add(id))
+    if (userSettings.showFolderCounts !== NO_COUNTS) {
+      const allFullCountIds = [...modifiedVisibleIds, ...uncomputedVisibleIds]
+      const unrequestedFullCountIds = allFullCountIds.filter(id => !this.fullCountRequested.has(id))
+      remainingFull = unrequestedFullCountIds.slice(maxBatchSize)
+      const fullCountIds = unrequestedFullCountIds.slice(0, maxBatchSize)
+      if (fullCountIds.length) {
+        // Request the full folder counts
+        this.props.actions.countAssetsInFolderIds(fullCountIds)
+        fullCountIds.forEach(id => this.fullCountRequested.add(id))
+      }
     }
 
-    // Remove returned filtered counts from the requested set
+    // Remove returned filtered counts from the requested set to trigger the next batch
     this.searchCountRequested = new Set([...this.searchCountRequested].filter(id => !filteredCounts.has(id)))
 
     // Wait until the last batch of search counts is finished,
     // and then compute the filtered folder counts with similar logic,
     // clearing remaining and marking requested
-    let remainingSearch = []
-    if (userSettings.showFilteredFolderCounts && query && !query.empty() && !this.searchCountRequested.size) {
+    if (userSettings.showFolderCounts === FILTERED_COUNTS && query && !query.empty() && !this.searchCountRequested.size) {
       // Note that filteredCounts is cleared in the foldersReducer whenever
       // the search has changed, so checking for a valid value is sufficient.
       const visibleSearchCountIds = [...this.foldersVisible].filter(id => !filteredCounts.has(id))
@@ -184,6 +191,12 @@ class Folders extends Component {
       this.setState({ rootId: nextProps.rootId })
     } else if (this.state.rootId === undefined) {
       this.setState({ rootId: Folder.ROOT_ID })
+    }
+
+    // Recompute counts if the folder count setting has changed
+    if (nextProps.userSettings.showFolderCounts !== this.showFolderCounts) {
+      this.showFolderCounts = nextProps.userSettings.showFolderCounts
+      this.queueFolderCounts()
     }
   }
 

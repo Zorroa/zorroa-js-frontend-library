@@ -8,12 +8,14 @@ import TrashedFolder from '../../models/TrashedFolder'
 import { isPublic } from '../../models/Acl'
 import { selectFolderId } from '../../actions/folderAction'
 import { getTrashedFolders, countTrashedFolders, emptyFolderTrash, deleteTrashedFolders, restoreTrashedFolders } from '../../actions/trashedFolderActions'
+import { NO_COUNTS } from './Folders'
 
 class Trash extends Component {
   static propTypes = {
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
     selectedFolderIds: PropTypes.instanceOf(Set),
     user: PropTypes.instanceOf(User),
+    userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object
   }
 
@@ -120,7 +122,7 @@ class Trash extends Component {
   }
 
   render () {
-    const { trashedFolders, selectedFolderIds } = this.props
+    const { trashedFolders, selectedFolderIds, userSettings } = this.props
     const { isOpen, contextMenuTrashedFolderId } = this.state
     const hasChildren = trashedFolders && trashedFolders.length > 0
     const isSelected = false
@@ -142,14 +144,17 @@ class Trash extends Component {
               <i className="Trash-header-icon icon-trash2"/>
               <div className="Trash-label">Trash</div>
             </div>
-            <div className="Trash-header-count">
-              { trashedFolders.length }
-            </div>
+            { userSettings.showFolderCounts !== NO_COUNTS && (
+              <div className="Trash-header-count">
+                { trashedFolders.length }
+              </div>
+            )}
           </div>
         </div>
         { isOpen ? (
           <div className="Trash-body">
             <div className="Trash-subheader">
+              { }
               <div className="Trash-count">
                 <div>{ trashedFolders.length }</div>
                 <div>folders</div>
@@ -186,7 +191,8 @@ class Trash extends Component {
 export default connect(state => ({
   trashedFolders: state.folders.trashedFolders,
   selectedFolderIds: state.folders.selectedFolderIds,
-  user: state.auth.user
+  user: state.auth.user,
+  userSettings: state.app.userSettings
 }), dispatch => ({
   actions: bindActionCreators({
     getTrashedFolders,
