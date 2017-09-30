@@ -3,15 +3,12 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import Job, { jobsOfType } from '../../models/Job'
-import User from '../../models/User'
 import Widget from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import TrashedFolder from '../../models/TrashedFolder'
 import { searchAssets, getAssetFields, requiredFields } from '../../actions/assetsAction'
-import { countAssetsInFolderIds, clearFolderCountQueue } from '../../actions/folderAction'
 import { isSimilarColor } from '../../actions/racetrackAction'
-import { saveUserSettings } from '../../actions/authAction'
 import {
   MapWidgetInfo, CollectionsWidgetInfo, SortOrderWidgetInfo,
   SimilarHashWidgetInfo, ImportSetWidgetInfo, ColorWidgetInfo
@@ -24,9 +21,6 @@ class Searcher extends Component {
     query: PropTypes.instanceOf(AssetSearch),
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
     selectedFolderIds: PropTypes.object,
-    modifiedFolderIds: PropTypes.instanceOf(Set),
-    folderCounts: PropTypes.instanceOf(Map),
-    filteredFolderCounts: PropTypes.instanceOf(Map),
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
     selectedJobIds: PropTypes.instanceOf(Set),
     order: PropTypes.arrayOf(PropTypes.object),
@@ -42,8 +36,6 @@ class Searcher extends Component {
     thumbFields: PropTypes.arrayOf(PropTypes.string),
     dragFields: PropTypes.arrayOf(PropTypes.string),
     jobs: PropTypes.object,
-    user: PropTypes.instanceOf(User),
-    userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired
   }
 
@@ -52,8 +44,6 @@ class Searcher extends Component {
   }
 
   componentWillMount () {
-    this.pendingQueryCountIds = new Set()
-    this.pendingFullCountIds = new Set()
     this.props.actions.getAssetFields()
   }
 
@@ -81,51 +71,6 @@ class Searcher extends Component {
         this.props.actions.getAssetFields()
       }
     }
-  }
-
-  isCounted (folderId) {
-    const {folderCounts, filteredFolderCounts} = this.props
-    return folderCounts && folderCounts.has(folderId) && filteredFolderCounts && filteredFolderCounts.has(folderId)
-  }
-
-  // Manage a cache of pending count ids for both full and query counts.
-  queueFolderCounts = (ids, query) => {
-    if (this.pendingQuery && query && !this.pendingQuery.equals(query)) {
-      this.pendingQueryCountIds = new Set()
-    }
-    if (query) {
-      const { fuzzy } = this.props.userSettings
-      this.pendingQuery = new AssetSearch({ ...query, fuzzy })
-    }
-    if (query) {
-      this.pendingQueryCountIds = new Set([...this.pendingQueryCountIds, ...ids])
-    } else {
-      this.pendingFullCountIds = new Set([...this.pendingFullCountIds, ...ids])
-    }
-    this.resetFolderCountTimer()
-  }
-
-  resetFolderCountTimer = () => {
-    if (this.folderCountTimer) clearTimeout(this.folderCountTimer)
-    this.folderCountTimer = null
-    if (this.pendingQueryCountIds.size || this.pendingFullCountIds.size) {
-      this.folderCountTimer = setTimeout(this.runFolderCount, 0)
-    }
-  }
-
-  runFolderCountBatch (ids, query) {
-    if (!ids.size) return
-    const maxBatchSize = 50
-    const countIds = [...ids].slice(0, maxBatchSize)
-    this.props.actions.countAssetsInFolderIds(countIds, query)
-    countIds.forEach(id => ids.delete(id))
-  }
-
-  runFolderCount = () => {
-    const { showFilteredFolderCounts } = this.props.userSettings
-    if (showFilteredFolderCounts) this.runFolderCountBatch(this.pendingQueryCountIds, this.pendingQuery)
-    this.runFolderCountBatch(this.pendingFullCountIds)
-    this.resetFolderCountTimer()
   }
 
   // The Searcher does not render any JSX, and is purely reactive.
@@ -233,7 +178,7 @@ class Searcher extends Component {
   render () {
     const {
       widgets, actions, selectedFolderIds, query,
-      modifiedFolderIds, trashedFolders, order,
+      trashedFolders, order,
       similar, showMultipage, selectedJobIds,
       metadataFields, lightbarFields, thumbFields, dragFields, fieldTypes
     } = this.props
@@ -268,14 +213,6 @@ class Searcher extends Component {
       }
     }
 
-    if (modifiedFolderIds && modifiedFolderIds.size) {
-      this.queueFolderCounts(modifiedFolderIds)
-      if (assetSearch && !assetSearch.empty()) {
-        this.queueFolderCounts(modifiedFolderIds, assetSearch)
-      }
-      requestAnimationFrame(_ => this.props.actions.clearFolderCountQueue(modifiedFolderIds))
-    }
-
     if (this.inflightQuery && query && this.inflightQuery.equals(query)) this.inflightQuery = null
     return null   // Just reacting to new slivers
   }
@@ -284,10 +221,7 @@ class Searcher extends Component {
 const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators({
     searchAssets,
-    getAssetFields,
-    countAssetsInFolderIds,
-    clearFolderCountQueue,
-    saveUserSettings
+    getAssetFields
   }, dispatch)
 })
 
@@ -295,10 +229,7 @@ const mapStateToProps = state => ({
   query: state.assets.query,
   order: state.assets.order,
   widgets: state.racetrack.widgets,
-  folderCounts: state.folders.counts,
-  filteredFolderCounts: state.folders.filteredCounts,
   selectedFolderIds: state.folders.selectedFolderIds,
-  modifiedFolderIds: state.folders.modifiedIds,
   trashedFolders: state.folders.trashedFolders,
   similar: state.racetrack.similar,
   fieldTypes: state.assets.types,
@@ -308,9 +239,7 @@ const mapStateToProps = state => ({
   thumbFields: state.app.thumbFields,
   dragFields: state.app.dragFields,
   jobs: state.jobs.all,
-  selectedJobIds: state.jobs.selectedIds,
-  user: state.auth.user,
-  userSettings: state.app.userSettings
+  selectedJobIds: state.jobs.selectedIds
 })
 
 export default connect(

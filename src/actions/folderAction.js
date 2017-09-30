@@ -2,7 +2,7 @@ import {
   GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, UPDATE_FOLDER,
   DELETE_FOLDER, TOGGLE_FOLDER, ADD_ASSETS_TO_FOLDER,
   REMOVE_ASSETS_FROM_FOLDER, DROP_FOLDER_ID,
-  FOLDER_COUNTS, QUEUE_FOLDER_COUNTS, CLEAR_FOLDER_COUNT_QUEUE,
+  FOLDER_COUNTS, CLEAR_MODIFIED_FOLDERS,
   CREATE_TAXONOMY, DELETE_TAXONOMY, UPDATE_FOLDER_PERMISSIONS
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
@@ -183,27 +183,16 @@ export function removeAssetIdsFromFolderId (assetIds, folderId) {
   }
 }
 
-// Setting folders visible means request folder counts
-// For use outside of Searcher (in Folders); This will result in countAssetsInFolderIds
-// being called with & without the current query, via Searcher
-export function queueFolderCounts (ids) {
+export function clearModifiedFolderIds (ids) {
   if (!(ids instanceof Set)) ids = new Set(ids)
   return {
-    type: QUEUE_FOLDER_COUNTS,
-    payload: ids
-  }
-}
-
-export function clearFolderCountQueue (ids) {
-  if (!(ids instanceof Set)) ids = new Set(ids)
-  return {
-    type: CLEAR_FOLDER_COUNT_QUEUE,
+    type: CLEAR_MODIFIED_FOLDERS,
     payload: ids
   }
 }
 
 export function countAssetsInFolderIds (ids, search) {
-  if (search && search.empty()) {
+  if (search && search.empty() || (!ids || !ids.length)) {
     // Fast path -- empty search, just set filteredCounts to counts in reducer
     return ({
       type: FOLDER_COUNTS,

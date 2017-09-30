@@ -9,7 +9,7 @@ import Folder from '../../models/Folder'
 import AclEntry from '../../models/Acl'
 import AssetSearch from '../../models/AssetSearch'
 import { getFolderChildren, createFolder, selectFolderIds, selectFolderId,
-  toggleFolder, queueFolderCounts } from '../../actions/folderAction'
+  toggleFolder, countAssetsInFolderIds } from '../../actions/folderAction'
 import { showModal, sortFolders } from '../../actions/appActions'
 import Trash from './Trash'
 import FolderItem from './FolderItem'
@@ -51,7 +51,11 @@ class Folders extends Component {
     // state props
     folders: PropTypes.object.isRequired,
     sortFolders: PropTypes.string,
-    user: PropTypes.instanceOf(User)
+    folderCounts: PropTypes.instanceOf(Map),
+    filteredCounts: PropTypes.instanceOf(Map),
+    modifiedFolderIds: PropTypes.instanceOf(Set),
+    user: PropTypes.instanceOf(User),
+    userSettings: PropTypes.object.isRequired
   }
 
   constructor (props) {
@@ -67,8 +71,9 @@ class Folders extends Component {
     this.folderSortCache = new LRUCache({ max: 1000 })
 
     this.foldersVisible = new Set()
-    this.folderCountRequested = new Map()
-    this.requestFolderCountsTimer
+    this.fullCountRequested = new Set()
+    this.searchCountRequested = new Set()
+    this.requestFolderCountsTimer = null
 
     this.assetsCounter = 0
   }
@@ -78,13 +83,61 @@ class Folders extends Component {
     this.requestFolderCountsTimer = setTimeout(this.requestFolderCounts, FOLDER_COUNT_SCROLL_IDLE_THRESH_MS)
   }
 
+  // Request only visible folder counts. Build a list of folder counts for
+  // full and filtered counts, avoiding re-sending pending requests for the
+  // current search. Relies on the flushing of the state.folder.filteredCounts
+  // in the folderReducer each time a new search is sent. Modified folders
+  // always recompute their full and filtered counts since they may change as
+  // a result of new descendents.
+
   requestFolderCounts = () => {
-    var requestSet = new Set(this.foldersVisible)
-    for (let id of requestSet) {
-      if (this.folderCountRequested.get(id) === this.assetsCounter) requestSet.delete(id)
+    const { modifiedFolderIds, query, folderCounts, filteredCounts, userSettings } = this.props
+
+    // Modified folders need to have full and search counts recomputed,
+    // but only for the visible ones.
+    const modifiedVisibleIds = [...modifiedFolderIds].filter(id => this.foldersVisible.has(id))
+
+    // Visible folders need their full counts recomputed if they are not yet
+    // computed (here), and search counts recomputed if the search changed (below).
+    const uncomputedVisibleIds = [...this.foldersVisible].filter(id => !folderCounts.has(id))
+
+    // Compute a batch of full folder counts to request
+    const maxBatchSize = 3
+    const allFullCountIds = [...modifiedVisibleIds, ...uncomputedVisibleIds]
+    const unrequestedFullCountIds = allFullCountIds.filter(id => !this.fullCountRequested.has(id))
+    const remainingFull = unrequestedFullCountIds.slice(maxBatchSize)
+    const fullCountIds = unrequestedFullCountIds.slice(0, maxBatchSize)
+    if (fullCountIds.length) {
+      // Request the full folder counts
+      this.props.actions.countAssetsInFolderIds(fullCountIds)
+
+      // Clear out the remaining lists to see if we have more work and mark requested
+      fullCountIds.forEach(id => this.fullCountRequested.add(id))
     }
-    this.props.actions.queueFolderCounts(requestSet)
-    for (let id of requestSet) this.folderCountRequested.set(id, this.assetsCounter)
+
+    // Remove returned filtered counts from the requested set
+    this.searchCountRequested = new Set([...this.searchCountRequested].filter(id => !filteredCounts.has(id)))
+
+    // Wait until the last batch of search counts is finished,
+    // and then compute the filtered folder counts with similar logic,
+    // clearing remaining and marking requested
+    let remainingSearch = []
+    if (userSettings.showFilteredFolderCounts && query && !query.empty() && !this.searchCountRequested.size) {
+      // Note that filteredCounts is cleared in the foldersReducer whenever
+      // the search has changed, so checking for a valid value is sufficient.
+      const visibleSearchCountIds = [...this.foldersVisible].filter(id => !filteredCounts.has(id))
+      const unrequestedSearchCountIds = visibleSearchCountIds.filter(id => !this.searchCountRequested.has(id))
+      const searchCountIds = unrequestedSearchCountIds.slice(0, maxBatchSize)
+      remainingSearch = unrequestedSearchCountIds.slice(maxBatchSize)
+      if (searchCountIds.length) {
+        this.props.actions.countAssetsInFolderIds(searchCountIds, query)
+        searchCountIds.forEach(id => this.searchCountRequested.add(id))
+      }
+    }
+
+    // Reset the timer if there are any modified or visible folders that
+    // have not been recomputed, or if we are waiting for a search batch
+    if (remainingFull.length || remainingSearch.length || this.searchCountRequested.size) this.queueFolderCounts()
   }
 
   foldersScroll = (event) => {
@@ -179,9 +232,6 @@ class Folders extends Component {
       this.loadChildren(folder)
       this.scrollToFolder(folder.id)
     }
-
-    // evict all folders from counted list; will start refreshing everyone
-    this.folderCountRequested = new Map()
   }
 
   scrollToFolder = (folderId) => {
@@ -440,7 +490,8 @@ class Folders extends Component {
     if (this.props.assetsCounter !== this.assetsCounter && !query.from) {
       this.assetsCounter = this.props.assetsCounter
       // evict all folders from counted list; will start refreshing everyone
-      this.folderCountRequested = new Map()
+      this.fullCountRequested = new Set()
+      this.searchCountRequested = new Set()
       this.queueFolderCounts()
     }
 
@@ -523,9 +574,13 @@ class Folders extends Component {
 export default connect(state => ({
   folders: state.folders,
   sortFolders: state.app.sortFolders,
+  folderCounts: state.folders.counts,
+  filteredCounts: state.folders.filteredCounts,
+  modifiedFolderIds: state.folders.modifiedIds,
   query: state.assets.query,
   assetsCounter: state.assets.assetsCounter,
-  user: state.auth.user
+  user: state.auth.user,
+  userSettings: state.app.userSettings
 }), dispatch => ({
   actions: bindActionCreators({
     getFolderChildren,
@@ -535,6 +590,6 @@ export default connect(state => ({
     toggleFolder,
     showModal,
     sortFolders,
-    queueFolderCounts
+    countAssetsInFolderIds
   }, dispatch)
 }))(Folders)
