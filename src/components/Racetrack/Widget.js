@@ -4,13 +4,10 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 import WidgetHeader from './WidgetHeader'
-import {
-  SimilarHashWidgetInfo, CollectionsWidgetInfo,
-  SortOrderWidgetInfo, MultipageWidgetInfo, ImportSetWidgetInfo, ColorWidgetInfo
-} from './WidgetInfo'
+import { CollectionsWidgetInfo, SortOrderWidgetInfo, MultipageWidgetInfo, ImportSetWidgetInfo } from './WidgetInfo'
 import { iconifyRightSidebar } from '../../actions/appActions'
 import { sortAssets, isolateParent } from '../../actions/assetsAction'
-import { modifyRacetrackWidget, removeRacetrackWidgetIds, similar, isSimilarColor } from '../../actions/racetrackAction'
+import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { selectJobIds } from '../../actions/jobActions'
 
@@ -31,12 +28,6 @@ class Widget extends Component {
     widgets: PropTypes.arrayOf(PropTypes.object),
     uxLevel: PropTypes.number,
     monochrome: PropTypes.bool,
-    similar: PropTypes.shape({
-      field: PropTypes.string,
-      values: PropTypes.arrayOf(PropTypes.string).isRequired,
-      ofsIds: PropTypes.arrayOf(PropTypes.string).isRequired,
-      minScore: PropTypes.number
-    }).isRequired,
     actions: PropTypes.object
   }
 
@@ -68,10 +59,7 @@ class Widget extends Component {
   }
 
   removeFilter = () => {
-    const { similar } = this.props
     const widget = this.widget()
-    if (widget && widget.type === SimilarHashWidgetInfo.type) this.props.actions.similar()
-    if (widget && widget.type === ColorWidgetInfo.type && isSimilarColor(similar)) this.props.actions.similar()
     if (widget && widget.type === SortOrderWidgetInfo.type) this.props.actions.sortAssets()
     if (widget && widget.type === CollectionsWidgetInfo.type) this.props.actions.selectFolderIds()
     if (widget && widget.type === ImportSetWidgetInfo.type) this.props.actions.selectJobIds()
@@ -121,12 +109,10 @@ export default connect(
   state => ({
     widgets: state.racetrack && state.racetrack.widgets,
     uxLevel: state.app.uxLevel,
-    monochrome: state.app.monochrome,
-    similar: state.racetrack.similar
+    monochrome: state.app.monochrome
   }), dispatch => ({
     actions: bindActionCreators({
       iconifyRightSidebar,
-      similar,
       sortAssets,
       selectFolderIds,
       selectJobIds,

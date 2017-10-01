@@ -2,32 +2,17 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
-import LRUCache from 'lru-cache'
 
+import { createSimilarityWidget } from '../../models/Widget'
 import { SimilarHashWidgetInfo } from './WidgetInfo'
-import { similar, isSimilarColor } from '../../actions/racetrackAction'
+import { modifyRacetrackWidget, similarMinScore } from '../../actions/racetrackAction'
 import { equalSets } from '../../services/jsUtil'
 import Widget from './Widget'
 import Asset from '../../models/Asset'
 
-const DEFAULT_WEIGHT = 1
-
-const similarityCache = new LRUCache({ max: 1000 })
-
-export function weights (ofsIds) {
-  return ofsIds.map(id => similarityCache.has(id) ? parseFloat(similarityCache.get(id)) : DEFAULT_WEIGHT)
-}
-
 class SimilarHash extends Component {
   static propTypes = {
-    // state props
-    similar: PropTypes.shape({
-      field: PropTypes.string,
-      values: PropTypes.arrayOf(PropTypes.string).isRequired,
-      ofsIds: PropTypes.arrayOf(PropTypes.string).isRequired,
-      minScore: PropTypes.number
-    }).isRequired,
-    similarAssets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+    widgets: PropTypes.arrayOf(PropTypes.object),
     selectedAssetIds: PropTypes.instanceOf(Set),
     origin: PropTypes.string,
     actions: PropTypes.object.isRequired,
@@ -41,106 +26,105 @@ class SimilarHash extends Component {
   }
 
   state = {
-    minScore: this.props.similar.minScore || 75
+    minScore: 75,
+    hashes: []
   }
 
   adjustTimout = null
 
   componentWillMount () {
-    this.componentWillReceiveProps(this.props)
+    // Restore saved state from widget
+    const { id, widgets } = this.props
+    const widget = widgets && widgets.find(widget => widget.id === id)
+    if (widget && widget.state) this.setState(widget.state)
   }
 
-  componentWillReceiveProps = (nextProps) => {
-    // initialize hashTypes first time through -- or maybe (TODO) later as well
-    const ofsIds = nextProps.similar.ofsIds
-    ofsIds && ofsIds.forEach(id => {
-      if (!similarityCache.has(id)) similarityCache.set(id, DEFAULT_WEIGHT)
-    })
-    if (nextProps.similar && nextProps.similar.minScore && this.state.minScore !== nextProps.similar.minScore) {
-      this.setState({minScore: nextProps.similar.minScore})
-    }
+  setStateProm = (newState) => {
+    return new Promise(resolve => this.setState(newState, resolve))
   }
 
   changeMinScore = (event) => {
-    this.setState({ minScore: parseFloat(event.target.value) })
-    if (this.adjustTimout) clearTimeout(this.adjustTimout)
-    this.adjustTimout = setTimeout(this.adjustSimilarity, 500)
+    const minScore = parseFloat(event.target.value)
+    this.setStateProm({ minScore })
+      .then(_ => {
+        if (this.adjustTimout) clearTimeout(this.adjustTimout)
+        this.adjustTimout = setTimeout(this.modifySliver, 500)
+        const widget = this.props.widgets.find(widget => widget.id === this.props.id)
+        if (widget) this.props.actions.similarMinScore(widget.field, minScore)
+      })
   }
 
   changeSimilarity = (id, weight) => {
-    similarityCache.set(id, weight)
-    if (this.adjustTimout) clearTimeout(this.adjustTimout)
-    this.adjustTimout = setTimeout(this.adjustSimilarity, 500)
+    const hashes = [...this.state.hashes]
+    const hash = hashes.find(hash => hash.hash === id)
+    hash.weight = weight
+    this.setStateProm({hashes}).then(this.modifySliver)
   }
 
-  adjustSimilarity = () => {
-    const similar = {
-      ...this.props.similar,
-      weights: weights(this.props.similar.ofsIds),
-      minScore: this.state.minScore
+  modifySliver = () => {
+    const { id, widgets } = this.props
+    const { hashes, minScore } = this.state
+    const index = widgets && widgets.findIndex(widget => (id === widget.id))
+    const oldWidget = widgets && widgets[index]
+    let isEnabled, isPinned
+    if (oldWidget) {
+      isEnabled = oldWidget.isEnabled
+      isPinned = oldWidget.isPinned
     }
-    this.props.actions.similar(similar)
-  }
-
-  selectedSimilar = () => {
-    const { similar } = this.props
-    const ofsIds = [...similar.ofsIds]
-    const values = isSimilarColor(similar) ? [] : [...similar.values]
-    for (var i = 0; i < this.props.similarAssets.length; ++i) {
-      const asset = this.props.similarAssets[i]
-      const ofsId = asset.closestProxy(256, 256).id
-      const exists = ofsIds.findIndex(id => (id === ofsId)) >= 0
-      if (!exists) {
-        ofsIds.push(ofsId)
-        values.push(asset.rawValue(similar.field))
-      }
-    }
-    return { values, ofsIds, weights: weights(ofsIds) }
+    const widget = createSimilarityWidget(oldWidget.field, null, hashes, minScore, isEnabled, isPinned)
+    widget.id = this.props.id
+    this.props.actions.modifyRacetrackWidget(widget)
   }
 
   addSelected = () => {
-    const similar = this.selectedSimilar()
-    this.props.actions.similar(similar)
+    const { selectedAssetIds } = this.props
+    const hashes = [ ...this.state.hashes ]
+    selectedAssetIds.forEach(id => {
+      const index = hashes.findIndex(hash => hash.hash === id)
+      if (index < 0) hashes.push({ hash: id, weight: 1 })
+    })
+    this.setStateProm({hashes}).then(this.modifySliver)
   }
 
-  removeOfsId = (id) => {
-    const ofsIds = [...this.props.similar.ofsIds]
-    const index = ofsIds.findIndex(i => i === id)
+  removeId = (id) => {
+    const hashes = [...this.state.hashes]
+    const index = hashes.findIndex(hash => hash.hash === id)
     if (index >= 0) {
-      ofsIds.splice(index, 1)
-      const values = [...this.props.similar.values]
-      values.splice(index, 1)
-      const similar = { values, ofsIds, weights: weights(ofsIds) }
-      this.props.actions.similar(similar)
+      hashes.splice(index, 1)
+      this.setStateProm({hashes}).then(this.modifySliver)
     }
   }
 
-  renderThumb (id) {
-    const { origin } = this.props
-    const url = Asset.ofsURL(id, origin)
+  renderThumb (hash) {
+    const id = hash.hash
+    const weight = hash.weight
     const width = 120
     const height = 90
+    const { origin } = this.props
+    // Allow an optional ofsId in the hash for uploaded files that are not added as assets
+    const url = hash.ofsId ? Asset.ofsURL(hash.ofsId, origin) : Asset._closestProxyURL(hash.hash, origin, width, height)
     const style = { backgroundImage: `url(${url})`, minWidth: width, minHeight: height }
     return (
       <div className="SimilarHash-thumb" key={id} style={style}>
-        <div className="SimilarHash-thumb-cancel icon-cancel-circle" onClick={_ => this.removeOfsId(id)}/>
-        <div className={classnames('SimilarHash-thumb-thumbs-up', 'icon-thumbs-up', {selected: similarityCache.get(id) > 0})}
+        <div className="SimilarHash-thumb-cancel icon-cancel-circle" onClick={_ => this.removeId(id)}/>
+        <div className={classnames('SimilarHash-thumb-thumbs-up', 'icon-thumbs-up', {selected: weight > 0})}
              onClick={_ => this.changeSimilarity(id, 1)}/>
-        <div className={classnames('SimilarHash-thumb-thumbs-down', 'icon-thumbs-up', {selected: similarityCache.get(id) < 0})}
+        <div className={classnames('SimilarHash-thumb-thumbs-down', 'icon-thumbs-up', {selected: weight < 0})}
              onClick={_ => this.changeSimilarity(id, -0.2)}/>
       </div>
     )
   }
 
   render () {
-    const { id, floatBody, isOpen, onOpen, isIconified, similar } = this.props
-    const { minScore } = this.state
-    const adjustable = similar && similar.ofsIds
-    const selectedSimilar = this.selectedSimilar()
-    const disabled = !selectedSimilar.values || !selectedSimilar.values.length || selectedSimilar.values.length > 10 ||
-        !similar.field || !similar.field.length ||
-        equalSets(new Set([...similar.values]), new Set([...selectedSimilar.values]))
-    const field = similar && similar.field && similar.field.replace(/^similarity\./, '').replace(/^Similarity\./, '').replace(/\.raw$/, '')
+    const { id, floatBody, isOpen, onOpen, isIconified, widgets, selectedAssetIds } = this.props
+    const { hashes, minScore } = this.state
+    const adjustable = hashes.length
+    const similarAssetsIds = hashes.map(hash => hash.hash)
+    const disabled = !selectedAssetIds || !selectedAssetIds.size || equalSets(new Set([...similarAssetsIds]), selectedAssetIds)
+    const widget = widgets && widgets.find(widget => widget.id === id)
+    widget.state = this.state
+    const field = widget && widget.field && widget.field.replace(/^similarity\./, '').replace(/^Similarity\./, '').replace(/\.raw$/, '')
+
     return (
       <Widget className="SimilarHash"
               id={id}
@@ -154,8 +138,8 @@ class SimilarHash extends Component {
               icon={SimilarHashWidgetInfo.icon}>
         <div className="SimilarHash-body">
           <div className="SimilarHash-carousel">
-            { similar.ofsIds.map(id => this.renderThumb(id)) }
-            { !similar.ofsIds.length && (
+            { hashes.map(hash => this.renderThumb(hash)) }
+            { !hashes.length && (
               <div className="SimilarHash-carousel-empty">
                 <div className="SimilarHash-carousel-empty-icon icon-emptybox"/>
                 <div className="SimilarHash-carousel-empty-label">
@@ -195,13 +179,13 @@ class SimilarHash extends Component {
 
 export default connect(
   state => ({
-    similar: state.racetrack.similar,
-    similarAssets: state.assets.similar,
+    widgets: state.racetrack && state.racetrack.widgets,
     selectedAssetIds: state.assets.selectedIds,
     origin: state.auth.origin
   }), dispatch => ({
     actions: bindActionCreators({
-      similar
+      modifyRacetrackWidget,
+      similarMinScore
     }, dispatch)
   })
 )(SimilarHash)

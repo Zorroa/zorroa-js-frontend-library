@@ -6,7 +6,7 @@ import {
   ASSET_PERMISSIONS, ASSET_SEARCHING,
   UPDATE_COMMAND, GET_COMMANDS,
   ISOLATE_ASSET, SELECT_ASSETS, ISOLATE_PARENT,
-  SUGGEST_COMPLETIONS, SIMILAR_ASSETS, ALL_ASSET_COUNT
+  SUGGEST_COMPLETIONS, ALL_ASSET_COUNT, SIMILAR_FIELDS
 } from '../constants/actionTypes'
 import Asset from '../models/Asset'
 import Page from '../models/Page'
@@ -82,6 +82,27 @@ export function searchAssetsRequestProm (dispatch, query) {
   })
 }
 
+export function countAssetsRequestProm (dispatch, query) {
+  assert.ok(query instanceof AssetSearch)
+  console.log('Count: ' + JSON.stringify(query))
+
+  return archivistPost(dispatch, '/api/v2/assets/_count', query)
+    .then(response => {
+      console.log('Count query ' + JSON.stringify(query))
+      console.log(response)
+      return response
+    })
+    .catch(error => {
+      console.error('Error counting assets', error)
+      if (DEBUG) {
+        if (error.response && error.response.data && error.response.data.message) {
+          console.error('You have mail: ', error.response.data.message)
+        }
+      }
+      return Promise.reject(error) // re-throw the error, so downstream can catch
+    })
+}
+
 export function assetsForIds (assetIds, fields) {
   return new Promise(resolve => {
     const ids = [...assetIds]
@@ -99,25 +120,6 @@ export function assetsForIds (assetIds, fields) {
         console.error('Error finding assets for ids: ' + error)
       })
   })
-}
-
-export function similarAssets (assetIds, fields) {
-  if (!assetIds || !assetIds.length) {
-    return ({
-      type: SIMILAR_ASSETS,
-      payload: []
-    })
-  }
-  return dispatch => {
-    assetsForIds(assetIds, fields)
-      .then(assets => dispatch({
-        type: SIMILAR_ASSETS,
-        payload: assets
-      }))
-      .catch(error => {
-        console.error('Error searching for similar assets: ' + error)
-      })
-  }
 }
 
 export function isolateParent (asset) {
@@ -269,6 +271,41 @@ export function getAssetFields () {
   }
 }
 
+export function findSimilarFields (assetFields) {
+  console.log('Find similar fields...')
+  if (!assetFields || !Object.keys(assetFields).length) {
+    return ({
+      type: SIMILAR_FIELDS,
+      payload: null
+    })
+  }
+  return dispatch => {
+    let fields = []
+    if (assetFields.string) fields = fields.concat(assetFields.string.filter(field => field.toLowerCase().startsWith('similar')))
+    if (assetFields.hash) fields = fields.concat(assetFields.hash.filter(field => field.toLowerCase().startsWith('similar')))
+    if (!fields.length) {
+      dispatch({
+        type: SIMILAR_FIELDS,
+        payload: null
+      })
+    }
+    const aggs = {}
+    fields.forEach(field => { aggs[field] = { filter: { exists: { field: field } } } })
+    const query = new AssetSearch({aggs, size: 1, fields: ['source.basename']})
+    searchAssetsRequestProm(dispatch, query)
+      .then(response => {
+        console.log('Found similar field aggs: ' + JSON.stringify(response.data))
+        dispatch({
+          type: SIMILAR_FIELDS,
+          payload: response.data
+        })
+      })
+      .catch(error => {
+        console.error('Error getting similar counts: ' + error)
+      })
+  }
+}
+
 export function setAssetPermissions (search, acl) {
   return dispatch => {
     console.log('Set asset permissions ' + JSON.stringify(acl) + '\non: ' + JSON.stringify(search))
@@ -320,9 +357,17 @@ export function getAllCommands () {
   }
 }
 
-export function setAllAssetCount (count) {
-  return ({
-    type: ALL_ASSET_COUNT,
-    payload: count
-  })
+export function getAllAssetCount () {
+  return dispatch => {
+    countAssetsRequestProm(dispatch, new AssetSearch())
+      .then(response => {
+        dispatch({
+          type: ALL_ASSET_COUNT,
+          payload: response.data.count
+        })
+      })
+      .catch(error => {
+        console.log('Error counting all assets: ' + error)
+      })
+  }
 }

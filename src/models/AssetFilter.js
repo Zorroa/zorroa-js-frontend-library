@@ -10,7 +10,7 @@ export default class AssetFilter {
       this.scripts = json.scripts   // [AssetScript]
       this.colors = json.colors     // {string, [ColorFilters]
       this.links = json.links       // {string, [object]}
-      this.hamming = json.hamming   // {string, [object]}
+      this.similarity = json.similarity   // {field, {minScore, hashes[{hash,weight}, ...]}}
       if (json.must) this.must = json.must.map(filter => new AssetFilter(filter))
       if (json.must_not) this.must_not = json.must_not.map(filter => new AssetFilter(filter))
       if (json.should) this.should = json.should.map(filter => new AssetFilter(filter))
@@ -26,7 +26,7 @@ export default class AssetFilter {
       (this.scripts && this.scripts.length) ||
       (this.colors && Object.keys(this.colors).length) ||
       (this.links && Object.keys(this.links).length) ||
-      (this.hamming && Object.keys(this.hamming).length) ||
+      (this.similarity && Object.keys(this.similarity).length && Object.keys(this.similarity).findIndex(key => this.similarity[key].hashes && this.similarity[key].hashes.length) >= 0) ||
       (this.must && this.must.findIndex(f => !f.empty()) >= 0) ||
       (this.must_not && this.must_not.findIndex(f => !f.empty()) >= 0) ||
       (this.should && this.should.findIndex(f => !f.empty()) >= 0)) {
@@ -76,20 +76,21 @@ export default class AssetFilter {
         this.terms = { ...filter.terms }
       }
     }
-    if (filter.hamming) {
-      if (this.hamming) {
-        for (let key in filter.hamming) {
-          if (key === 'field') continue   // FIXME: breaks for mixed similarity fields!
-          if (key in filter.hamming) {
-            if (key in this.hamming) {
-              this.hamming[key] = union([this.hamming[key], filter.hamming[key]])
+    if (filter.similarity) {
+      if (this.similarity) {
+        for (let key in filter.similarity) {
+          if (key in filter.similarity) {
+            if (key in this.similarity) {
+              // Average min scores and concatenate hashes
+              this.similarity[key].minScore = 0.5 * (this.similarity[key].minScore + filter.similarity[key].minScore)
+              this.similarity[key].hashes = this.similarity[key].hashes.concat(filter.similarity[key].hashes)
             } else {
-              this.hamming[key] = [ ...filter.hamming[key] ]
+              this.similarity[key] = {...filter.similarity[key]}
             }
           }
         }
       } else {
-        this.hamming = { ...filter.hamming }
+        this.similarity = { ...filter.similarity }
       }
     }
     if (filter.range) {
@@ -153,7 +154,7 @@ export default class AssetFilter {
       (this.exists ? this.exists.length : 0) +
       (this.missing ? this.missing.length : 0) +
       (this.scripts ? this.scripts.length : 0) +
-      (this.hamming ? 1 : 0)
+      (this.similarity ? Object.keys(this.similarity).length : 0)
 
     if (count > 1) {
       const filter = new AssetFilter(this)

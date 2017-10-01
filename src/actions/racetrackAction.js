@@ -1,8 +1,13 @@
-import { MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS,
-  SIMILAR_VALUES } from '../constants/actionTypes'
-import Widget, { createFacetWidget, createExistsWidget, createMapWidget,
+import {
+  MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS,
+  RESET_RACETRACK_WIDGETS, SIMILAR_MINSCORE
+} from '../constants/actionTypes'
+import Widget, {
+  createFacetWidget, createExistsWidget, createMapWidget,
   createDateRangeWidget, createRangeWidget, createCollectionsWidget,
-  createFiletypeWidget, createColorWidget, createSortOrderWidget, removeRaw } from '../models/Widget'
+  createFiletypeWidget, createColorWidget, createSortOrderWidget, removeRaw,
+  createSimilarityWidget
+} from '../models/Widget'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
 import { CollectionsWidgetInfo, SimpleSearchWidgetInfo, SortOrderWidgetInfo } from '../components/Racetrack/WidgetInfo'
@@ -32,32 +37,10 @@ export function resetRacetrackWidgets (widgets) {
   })
 }
 
-export function isSimilarColor (similar) {
-  return similar.field && similar.field.toLowerCase().startsWith('similar') && (!similar.ofsIds || !similar.ofsIds.length)
-}
-
-export function similar (similar) {
-  const maxValues = 10
-  if (similar && similar.values && similar.values.length > maxValues) {
-    if (similar.ofsIds.length !== similar.values.length) {
-      const count = Math.min(similar.ofsIds.length, similar.values.length)
-      similar.ofsIds = similar.ofsIds.slice(0, count)
-      similar.values = similar.values.slice(0, count)
-    }
-    if (similar.weights.length < similar.values.length) {
-      for (let i = similar.weights.length; i < similar.values.length; ++i) similar.weights.push(1)
-    } else if (similar.weights.length > similar.values.length) {
-      similar.weights.length = similar.weights.length.slice(0, similar.values.length)
-    }
-    assert.ok(similar.ofsIds.length === similar.values.length)
-    assert.ok(similar.weights.length === similar.values.length)
-    similar.values = similar.values.slice(0, maxValues)
-    similar.ofsIds = similar.ofsIds.slice(0, maxValues)
-    similar.weights = similar.weights.slice(0, maxValues)
-  }
+export function similarMinScore (field, minScore) {
   return ({
-    type: SIMILAR_VALUES,
-    payload: similar
+    type: SIMILAR_MINSCORE,
+    payload: { field, minScore }
   })
 }
 
@@ -78,7 +61,7 @@ function extractSimilar (search) {
 export function restoreFolders (folders) {
   if (!folders || !folders.length) return
 
-  let mergedSimilar, order
+  let order
   const widgets = []
   const search = new AssetSearch()
   let missingWidgets = false
@@ -92,23 +75,6 @@ export function restoreFolders (folders) {
     if (!folder.attrs) {
       missingWidgets = true
       continue
-    }
-    const attrs = folder.attrs
-    if (mergedSimilar && attrs.similar) {
-      // Duplicated code from AssetFilter.merge()
-      for (let key in attrs.similar) {
-        if (key === 'field') continue   // FIXME: breaks for mixed similarity fields!
-        if (key in attrs.similar) {
-          if (key in mergedSimilar) {
-            const union = (arr) => ([ ...new Set([].concat(...arr)) ])
-            mergedSimilar[key] = union([mergedSimilar[key], attrs.similar[key]])
-          } else {
-            mergedSimilar[key] = [ ...attrs.similar[key] ]
-          }
-        }
-      }
-    } else if (!mergedSimilar) {
-      mergedSimilar = attrs.similar
     }
     if (!order) order = folder.attrs && folder.attrs.order
     if (!folder.attrs || !folder.attrs.widgets) {
@@ -135,7 +101,7 @@ export function restoreFolders (folders) {
 
   // Do not restore selected folders to avoid infinite recursion
   const selectedFolderIds = restoreWidgetSlivers(widgets, search)
-  return restoreActions(widgets, search, selectedFolderIds, mergedSimilar)
+  return restoreActions(widgets, search, selectedFolderIds)
 }
 
 // Reconstruct Racetrack widgets from a search.
@@ -204,8 +170,13 @@ function restoreSearch (search) {
   }
 
   const mergedSimilar = extractSimilar(search)
+  if (mergedSimilar) {
+    const similar = createSimilarityWidget(mergedSimilar.field, null,
+      mergedSimilar.values, mergedSimilar.minScore, isEnabled, isPinned)
+    widgets.push(similar)
+  }
   const selectedFolderIds = restoreWidgetSlivers(widgets, search)
-  return restoreActions(widgets, search, selectedFolderIds, mergedSimilar)
+  return restoreActions(widgets, search, selectedFolderIds)
 }
 
 // Helper function to extract widget slivers from the search,
@@ -322,7 +293,7 @@ function restoreWidgetSlivers (widgets, search) {
 
 // Helper function to return an array of actions needed to restore
 // app state to match the widgets, search, and selected folders.
-function restoreActions (widgets, search, selectedFolderIds, mergedSimilar) {
+function restoreActions (widgets, search, selectedFolderIds) {
   // Return actions to update the racetrack for the new search
   const actions = [resetRacetrackWidgets(widgets)]
   actions.push(selectFolderIds(selectedFolderIds))
@@ -330,10 +301,6 @@ function restoreActions (widgets, search, selectedFolderIds, mergedSimilar) {
   // Set the global order to match the search
   if (search.order) {
     actions.push(orderAssets(search.order))
-  }
-
-  if (mergedSimilar) {
-    actions.push(similar(mergedSimilar))
   }
 
   // Reset the racetrack to the new widget

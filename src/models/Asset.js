@@ -16,26 +16,41 @@ export default class Asset {
 
   source () { return this.document.source && this.document.source.filename }
 
-  endpoint (origin, id) {
+  static endpoint (origin, id) {
     return `${origin}/api/v1/assets/${id}`
   }
 
+  static _url (id, origin) {
+    return Asset.endpoint(origin, id) + '/_stream'
+  }
+
   url (origin) {
-    return this.endpoint(origin, this.id) + '/_stream'
+    return Asset._url(this.id, origin)
+  }
+
+  static _closestProxyURL (id, origin, width, height) {
+    return `${Asset.endpoint(origin, id)}/proxies/closest/${Math.round(width)}x${Math.round(height)}`
   }
 
   closestProxyURL (origin, width, height) {
-    return `${this.endpoint(origin, this.id)}/proxies/closest/${Math.round(width)}x${Math.round(height)}`
+    return Asset._closestProxyURL(this.id, origin, width, height)
+  }
+
+  static _largestProxyURL (id, origin) {
+    return Asset.endpoint(origin, id) + '/proxies/largest'
   }
 
   largestProxyURL (origin) {
-    return this.endpoint(origin, this.id) + '/proxies/largest'
+    return Asset._largestProxyURL(this.id, origin)
+  }
+
+  static _smallestParentProxyURL (parentId, origin) {
+    if (!parentId) return null
+    return Asset.endpoint(origin, parentId) + '/proxies/smallest'
   }
 
   smallestParentProxyURL (origin) {
-    const parentId = this.parentId()
-    if (!parentId) return null
-    return this.endpoint(origin, parentId) + '/proxies/smallest'
+    Asset._smallestParentProxyURL(this.parentId(), origin)
   }
 
   backgroundURL (origin) {
@@ -220,6 +235,14 @@ export default class Asset {
       }
       return name
     }
+  }
+
+  findRawValue (fields) {
+    for (let i = 0; i < fields.length; ++i) {
+      const val = this.rawValue(fields[i])
+      if (val !== undefined) return val
+    }
+    return undefined
   }
 
   // Return the value for a metadata field specified using dot-notation

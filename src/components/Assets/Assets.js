@@ -10,8 +10,8 @@ import User from '../../models/User'
 import Asset from '../../models/Asset'
 import Widget from '../../models/Widget'
 import Folder from '../../models/Folder'
-import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, similarAssets, unorderAssets, isolateParent } from '../../actions/assetsAction'
-import { resetRacetrackWidgets, restoreFolders, similar } from '../../actions/racetrackAction'
+import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, unorderAssets, isolateParent } from '../../actions/assetsAction'
+import { resetRacetrackWidgets, restoreFolders } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
 import { setThumbSize, setThumbLayout, showTable, setTableHeight, showMultipage, showModal, hideModal, iconifyRightSidebar } from '../../actions/appActions'
@@ -53,11 +53,6 @@ class Assets extends Component {
     rightSidebarIsIconified: PropTypes.bool,
     folders: PropTypes.instanceOf(Map),
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
-    similar: PropTypes.shape({
-      field: PropTypes.string,
-      values: PropTypes.arrayOf(PropTypes.string).isRequired,
-      ofsIds: PropTypes.arrayOf(PropTypes.string).isRequired
-    }).isRequired,
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
     uxLevel: PropTypes.number,
     user: PropTypes.instanceOf(User),
@@ -225,7 +220,6 @@ class Assets extends Component {
   clearSearch = () => {
     this.props.actions.resetRacetrackWidgets()
     this.props.actions.selectFolderIds()
-    this.props.actions.similar()
     this.props.actions.unorderAssets()
     this.props.actions.selectJobIds()
     this.props.actions.isolateParent()
@@ -271,7 +265,6 @@ class Assets extends Component {
     }
     this.updateAssetsScrollSizeInterval = setInterval(this.updateAssetsScrollSize, 150)
     this.resizer = new Resizer()
-    this.updateSelectedHashes(this.props.similar.field, this.props.selectedIds)
 
     // Support using the navigation buttons to restore previous search state
     // This 'first' history entry is a sentinel we use to warn the user about going back too far & losing their history
@@ -337,12 +330,12 @@ class Assets extends Component {
 
   saveHistory = (optFirstTimeHistoryKey) => {
     if (this.historyNav && !optFirstTimeHistoryKey) return
-    const { query, similar, order, widgets } = this.props
+    const { query, order, widgets } = this.props
     this.stopHistoryNav()
 
     const path = location.pathname + location.search
     const historyKey = optFirstTimeHistoryKey || Date.now().toString()
-    const attrs = { similar, widgets, order }
+    const attrs = { widgets, order }
     const folderObj = { search: query, attrs }
     const folder = new Folder(folderObj)
     this.history[historyKey] = { folder }
@@ -366,25 +359,6 @@ class Assets extends Component {
     // clear any pending layout
     this.clearAssetsLayoutTimer()
     this.resizer.release()
-  }
-
-  componentWillReceiveProps = (nextProps) => {
-    this.updateSelectedHashes(nextProps.similar.field, nextProps.selectedIds)
-  }
-
-  updateSelectedHashes = (similarField, selectedIds) => {
-    if (similarField && similarField.length && selectedIds && selectedIds.size) {
-      const ids = new Set([...selectedIds])
-      if (this.similarIds && equalSets(ids, this.similarIds) && this.similarField && this.similarField === similarField) return
-      this.similarIds = ids
-      this.similarField = similarField
-      const assetIds = [...ids]
-      const fields = [similarField, 'proxies*']
-      this.props.actions.similarAssets(assetIds, fields)
-    } else {
-      this.similarIds = null
-      this.props.actions.similarAssets()
-    }
   }
 
   onAssetsScrollScroll = (event) => {
@@ -725,7 +699,6 @@ export default connect(state => ({
   showTable: state.app.showTable,
   tableHeight: state.app.tableHeight,
   showMultipage: state.app.showMultipage,
-  similar: state.racetrack.similar,
   widgets: state.racetrack.widgets,
   origin: state.auth.origin
 }), dispatch => ({
@@ -735,9 +708,7 @@ export default connect(state => ({
     selectAssetIds,
     sortAssets,
     searchAssets,
-    similarAssets,
     unorderAssets,
-    similar,
     resetRacetrackWidgets,
     restoreFolders,
     selectFolderIds,
