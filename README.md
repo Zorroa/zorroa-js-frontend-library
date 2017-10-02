@@ -17,6 +17,33 @@ Run `npm install` from the project root using your terminal.  This command will 
 
 You can view the first level dependencies by running `npm list -g --depth 0`.  Depth here is the nesting level.  Try a number like 10 to see the full dependency chain.  It is important to note that while it looks like a tree when running this command, the install is flat and will make your `node_modules` directory look completely terrifying.
 
+#### Adding & Removing Dependencies
+
+For stability, we use the 'npm shrinkwrap' feature to version-lock all packages.
+
+To add a new package:
+
+- npm install normally. Make sure to use an exact version number in package.json
+-- Make sure to use an exact version and not a range. For example use "axios": "0.14.0" rather than "axios": "0.14.0^"
+-- We do not want versions to automatically upgrade. We want to upgrade packages explicitly. Automatic upgrades have broken the build unexpectedly.
+-- Info on version number syntax here: https://github.com/npm/node-semver
+- npm shrinkwrap --dev
+- Manually remove the top-level "fsevents" block from npm-shrinkwrap.json, if it exists.
+
+To remove a package:
+
+- Remove the package line from package.json
+- Remove the top-level entry for that package from npm-shrinkwrap.json
+- Reinstall packages: npm cache clean; rm -rf node_modules; npm install
+
+To upgrade packages:
+
+- Set desired versions in package.json
+- rm npm-shrinkwrap.json
+- Reinstall packages: npm cache clean; rm -rf node_modules; npm install
+- npm shrinkwrap --dev
+- Manually remove the top-level "fsevents" block from npm-shrinkwrap.json, if it exists.
+
 ## Code Style
 
 The one and only:

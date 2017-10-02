@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react'
-import ReactPlayer from 'react-player'
 
 const TutorialVideos = (props) => (
   <div className="TutorialVideos">
@@ -7,8 +6,8 @@ const TutorialVideos = (props) => (
     <div className="TutorialVideos-title">
       While we're waiting for your assets to be analyzed, let's watch some tutorials
     </div>
-    <ReactPlayer
-      url="https://www.youtube.com/watch?v=7r9E6bn5bxY&list=PLQqS0BVI3mPGufVivRzSuxqHhb-y92I7m"
+    <video
+      src="https://www.youtube.com/watch?v=7r9E6bn5bxY&list=PLQqS0BVI3mPGufVivRzSuxqHhb-y92I7m"
       controls={true}
       width="60vw" height="34vw"
     />

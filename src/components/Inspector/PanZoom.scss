@@ -9,6 +9,7 @@
 .PanZoom {
   @include flexCol;
   @include flexOn;
+  @include flexJustifyCenter;
   overflow: hidden;
   position: relative;
   cursor: move; /* fallback if grab cursor is unsupported */
