@@ -201,7 +201,7 @@ export function countAssetsInFolderIds (ids, search) {
   }
   return dispatch => {
     console.log('Count query assets in folders ' + JSON.stringify(ids) + (search ? ' with query ' + JSON.stringify(search) : ' without search'))
-    archivistPost(dispatch, `${rootEndpoint}/_assetCounts`, { search, ids })
+    return archivistPost(dispatch, `${rootEndpoint}/_assetCounts`, { search, ids })
       .then(response => {
         const counts = response.data.counts
         dispatch({
@@ -211,6 +211,7 @@ export function countAssetsInFolderIds (ids, search) {
       })
       .catch(error => {
         console.error('Error counting query assets in folders ' + JSON.stringify(ids) + ': ' + error)
+        return Promise.reject(error)
       })
   }
 }

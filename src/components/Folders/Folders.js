@@ -75,8 +75,8 @@ class Folders extends Component {
     this.folderSortCache = new LRUCache({ max: 1000 })
 
     this.foldersVisible = new Set()
-    this.fullCountRequested = new Set()
-    this.searchCountRequested = new Set()
+    this.pendingFullRequest = false
+    this.pendingSearchRequest = false
     this.requestFolderCountsTimer = null
 
     this.assetsCounter = 0
@@ -87,64 +87,68 @@ class Folders extends Component {
     this.requestFolderCountsTimer = setTimeout(this.requestFolderCounts, FOLDER_COUNT_SCROLL_IDLE_THRESH_MS)
   }
 
-  // Request only visible folder counts. Build a list of folder counts for
-  // full and filtered counts, avoiding re-sending pending requests for the
-  // current search. Relies on the flushing of the state.folder.filteredCounts
-  // in the folderReducer each time a new search is sent. Modified folders
-  // always recompute their full and filtered counts since they may change as
-  // a result of new descendents.
+  // Request folder counts for visible folders. There are two types of counts,
+  // full and filtered by the current search. Full counts are the total count of
+  // assets in the folder in the entire repo. Filtered counts are the number of
+  // assets in the folder filtered by the current search. Full counts need to be
+  // computed whenever the folder is modified -- new parents or children, or
+  // assets are added or removed manually from the folder. Filtered counts need
+  // to be updated whenever the search changes. The folderReducer will clear the
+  // filtered count map whenever the search changes, so simply checking for the
+  // existence of the folder's id in filteredCounts is enough to know if we need
+  // to recompute a filteredCount. Full counts need to be computed when either
+  // the full count does not exist yet, or the folder was modified. In all cases
+  // we only want to compute the counts for currently visible folders.
+  //
+  // Folder counts are computed in batches to avoid blocking the server with
+  // count requests. Batches are sent serially, waiting for each batch to finish
+  // before sending another. Note that we do send full and filtered batches
+  // separately, so there are potentially two batches in flight at any time.
+  // Rather than keeping a queue of batches, we can use the dynamically updated
+  // list of modified and visible folders to construct a batch of work at the
+  // last possible second -- sort of an implicit queue.
 
   requestFolderCounts = () => {
     const { modifiedFolderIds, query, folderCounts, filteredCounts, userSettings } = this.props
 
-    // Modified folders need to have full and search counts recomputed,
-    // but only for the visible ones.
+    // Find the set of modified visible folders for full counts.
     const modifiedVisibleIds = [...modifiedFolderIds].filter(id => this.foldersVisible.has(id))
 
-    // Visible folders need their full counts recomputed if they are not yet
-    // computed (here), and search counts recomputed if the search changed (below).
+    // Find the set of visible folders that have not had any full count computed
     const uncomputedVisibleIds = [...this.foldersVisible].filter(id => !folderCounts.has(id))
-
-    // Track the remaining items to determine if we retrigger the timer
-    let remainingFull = []
-    let remainingSearch = []
 
     // Compute a batch of full folder counts to request
     const maxBatchSize = 3
-    if (userSettings.showFolderCounts !== NO_COUNTS) {
+    if (userSettings.showFolderCounts !== NO_COUNTS && !this.pendingFullRequest) {
       const allFullCountIds = [...modifiedVisibleIds, ...uncomputedVisibleIds]
-      const unrequestedFullCountIds = allFullCountIds.filter(id => !this.fullCountRequested.has(id))
-      remainingFull = unrequestedFullCountIds.slice(maxBatchSize)
-      const fullCountIds = unrequestedFullCountIds.slice(0, maxBatchSize)
+      const fullCountIds = allFullCountIds.slice(0, maxBatchSize)
       if (fullCountIds.length) {
-        // Request the full folder counts
+        this.pendingFullRequest = true        // Serialize batches
         this.props.actions.countAssetsInFolderIds(fullCountIds)
-        fullCountIds.forEach(id => this.fullCountRequested.add(id))
+          .then(_ => {
+            this.pendingFullRequest = false
+            this.queueFolderCounts()          // Recheck for more work
+          })
+          .catch(_ => { this.pendingFullRequest = false })
       }
     }
 
-    // Remove returned filtered counts from the requested set to trigger the next batch
-    this.searchCountRequested = new Set([...this.searchCountRequested].filter(id => !filteredCounts.has(id)))
-
-    // Wait until the last batch of search counts is finished,
-    // and then compute the filtered folder counts with similar logic,
-    // clearing remaining and marking requested
-    if (userSettings.showFolderCounts === FILTERED_COUNTS && query && !query.empty() && !this.searchCountRequested.size) {
+    // Compute a batch of filtered folder counts to request
+    if (userSettings.showFolderCounts === FILTERED_COUNTS && query && !query.empty() && !this.pendingSearchRequest) {
       // Note that filteredCounts is cleared in the foldersReducer whenever
       // the search has changed, so checking for a valid value is sufficient.
       const visibleSearchCountIds = [...this.foldersVisible].filter(id => !filteredCounts.has(id))
-      const unrequestedSearchCountIds = visibleSearchCountIds.filter(id => !this.searchCountRequested.has(id))
-      const searchCountIds = unrequestedSearchCountIds.slice(0, maxBatchSize)
-      remainingSearch = unrequestedSearchCountIds.slice(maxBatchSize)
+      const searchCountIds = visibleSearchCountIds.slice(0, maxBatchSize)
       if (searchCountIds.length) {
+        this.pendingSearchRequest = true        // Serialize batches
         this.props.actions.countAssetsInFolderIds(searchCountIds, query)
-        searchCountIds.forEach(id => this.searchCountRequested.add(id))
+          .then(_ => {
+            this.pendingSearchRequest = false
+            this.queueFolderCounts()            // Recheck for more work
+          })
+          .catch(_ => { this.pendingSearchRequest = false })
       }
     }
-
-    // Reset the timer if there are any modified or visible folders that
-    // have not been recomputed, or if we are waiting for a search batch
-    if (remainingFull.length || remainingSearch.length || this.searchCountRequested.size) this.queueFolderCounts()
   }
 
   foldersScroll = (event) => {
@@ -502,9 +506,6 @@ class Folders extends Component {
 
     if (this.props.assetsCounter !== this.assetsCounter && !query.from) {
       this.assetsCounter = this.props.assetsCounter
-      // evict all folders from counted list; will start refreshing everyone
-      this.fullCountRequested = new Set()
-      this.searchCountRequested = new Set()
       this.queueFolderCounts()
     }
 
