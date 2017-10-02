@@ -448,6 +448,16 @@ class Assets extends Component {
     this.scrollToSelection()
   }
 
+  scrollToPx = (scrollPx) => {
+    requestAnimationFrame(() => {
+      if (this.refs.assetsScroll) {
+        this.refs.assetsScroll.scrollTop = scrollPx
+      }
+    })
+  }
+
+  scrollToTop = this.scrollToPx.bind(this, 0)
+
   scrollToSelection = () => {
     const { assets, selectedIds } = this.props
     if (!assets.length) return
@@ -479,19 +489,12 @@ class Assets extends Component {
     const selectionHeight = bottomPx - topPx
 
     // center the selection vertically
-    let scrollPx = topPx + selectionHeight / 2 - this.state.assetsScrollHeight / 2
-
     // if the selection doesn't fit, scroll so the first selected row is
     // at the top of the visible table area
-    if (selectionHeight > this.state.assetsScrollHeight) {
-      scrollPx = topPx
-    }
+    const scrollPx = selectionHeight > this.state.assetsScrollHeight
+      ? topPx : topPx + selectionHeight / 2 - this.state.assetsScrollHeight / 2
 
-    requestAnimationFrame(() => {
-      if (this.refs.assetsScroll) {
-        this.refs.assetsScroll.scrollTop = scrollPx
-      }
-    })
+    this.scrollToPx(scrollPx)
   }
 
   clampTableHeight = (tableHeight) => {
@@ -648,8 +651,8 @@ class Assets extends Component {
       // Invalidate the auto-load cache each time we have a new bare search.
       if (query.from === undefined) {
         this.loaded = 0
-        this.scrollToSelection()
         this.saveHistory()
+        this.scrollToTop()
       }
     }
     this.assetsCounter = assetsCounter
