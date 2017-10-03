@@ -570,6 +570,7 @@ class FolderItem extends Component {
       if (filteredCount === allAssetCount) filteredCount = 'all'
     }
     if (count === undefined) return <div/>
+    if (count === filteredCount) return <div className="FolderItem-count">{count}</div>
     switch (userSettings.showFolderCounts) {
       case NO_COUNTS: return <div/>
       case FULL_COUNTS: return <div className="FolderItem-count">{count}</div>

@@ -154,7 +154,6 @@ class Trash extends Component {
         { isOpen ? (
           <div className="Trash-body">
             <div className="Trash-subheader">
-              { }
               <div className="Trash-count">
                 <div>{ trashedFolders.length }</div>
                 <div>folders</div>
