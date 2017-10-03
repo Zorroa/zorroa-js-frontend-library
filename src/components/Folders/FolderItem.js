@@ -29,6 +29,7 @@ import { exportAssets, getJob, markJobDownloaded } from '../../actions/jobAction
 import { restoreFolders } from '../../actions/racetrackAction'
 import { setAssetPermissions } from '../../actions/assetsAction'
 import { isolateSelectId } from '../../services/jsUtil'
+import { FILTERED_COUNTS, FULL_COUNTS, NO_COUNTS } from './Folders'
 
 // Renders folder children as Collapsible elements.
 const folderSource = {
@@ -569,18 +570,20 @@ class FolderItem extends Component {
       if (filteredCount === allAssetCount) filteredCount = 'all'
     }
     if (count === undefined) return <div/>
-    const showFilteredCounts = userSettings.showFilteredFolderCounts && filteredCount !== undefined && count !== filteredCount
-    if (!showFilteredCounts) {
-      return <div className="FolderItem-count">{count}</div>
+    if (count === filteredCount) return <div className="FolderItem-count">{count}</div>
+    switch (userSettings.showFolderCounts) {
+      case NO_COUNTS: return <div/>
+      case FULL_COUNTS: return <div className="FolderItem-count">{count}</div>
+      case FILTERED_COUNTS:
+      default:
+        return (
+          <div className="FolderItem-counts">
+            <div className={classnames('FolderItem-filtered-count', {isZero: filteredCount === 0})}>{filteredCount}</div>
+            { filteredCount !== undefined && <div>/</div> }
+            <div className="FolderItem-count">{count}</div>
+          </div>
+        )
     }
-    const isZero = filteredCount === 0
-    return (
-      <div className="FolderItem-counts">
-        <div className={classnames('FolderItem-filtered-count', {isZero})}>{filteredCount}</div>
-        /
-        <div className="FolderItem-count">{count}</div>
-      </div>
-    )
   }
 
   renderPermission () {

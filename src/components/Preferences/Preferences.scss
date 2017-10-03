@@ -3,6 +3,9 @@
 .Preferences {
   overflow: auto;
   max-height: 95vh;
+
+  .dark & { background-color: $zorroa-mattblack; }
+
   .Preferences-header {
     text-transform: uppercase;
     color: white;
@@ -28,6 +31,7 @@
   .footer {
     border: none;
     border-top: 1px solid $zorroa-lightgray;
+    .dark & { border-top: 1px solid $zorroa-darkgray; }
     min-height: 72px;
     max-height: 72px;
     padding: 0;
@@ -46,25 +50,32 @@
       font-size: 16px;
       color: $zorroa-lightgray;
 
+      .dark & { color: $zorroa-darkgray; }
+
       &:hover {
         color: $zorroa-darkgray;
         background-color: $zorroa-lightgray;
+
+        .dark & {
+          color: $zorroa-lightgray;
+          background-color: $zorroa-darkgray;
+        }
       }
 
       &.default {
         color: $zorroa-nearwhite;
         background-color: $zorroa-sickly-green;
 
-        &:hover {
-          color: white;
-        }
+        &:hover { color: white; }
       }
 
       &.disabled {
         background-color: $zorroa-lightgray;
 
+        .dark & { background-color: $zorroa-darkgray; }
         &:hover {
           color: $zorroa-nearwhite;
+          .dark & { color: $zorroa-nearblack; }
         }
       }
     }
@@ -81,12 +92,14 @@
   @include flexJustifySpaceBetween;
   color: $zorroa-darkgray;
   background-color: $zorroa-lightgray;
+  .dark & { color: $zorroa-whitegray; background-color: $zorroa-darkgray; }
   margin-bottom: 10px;
   padding: 10px 20px;
 }
 
 .Preferences-curator {
   border-bottom: 1px solid $zorroa-lightgray;
+  .dark & { border-bottom: 1px solid $zorroa-darkgray; }
   padding: 10px 20px;
 }
 
@@ -117,11 +130,13 @@
   font-size: 12px;
   text-align: right;
   color: $zorroa-lightgray;
+  .dark & { color: $zorroa-darkgray; }
   text-transform: uppercase;
 }
 
 .Preferences-build-value {
   color: $zorroa-darkgray;
+  .dark & { color: $zorroa-lightgray; }
   font-weight: 100;
 }
 
@@ -147,7 +162,11 @@
 .Preferences-field-template-input {
   width: 300px;
   color: $zorroa-gray;
-  padding: 4px;
+  padding: 6px;
+  border: none;
+  background-color: $zorroa-nearwhite;
+  .dark & { background-color: $zorroa-nearblack; }
+  margin-top: 4px;
 }
 
 .Preferences-field-template-label {
@@ -198,4 +217,18 @@
 .Preferences-cloud-reset {
   @include flexRow;
   @include fullWidth;
+}
+
+.Preferences-showFolderCounts {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  margin-left: 16px;
+}
+
+.Preferences-showFolderCounts-label {
+  margin-left: 6px;
+  color: $zorroa-gray;
+}
+
+.Preferences-showFolderCounts-menuitem {
 }

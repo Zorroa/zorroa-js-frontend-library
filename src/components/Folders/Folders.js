@@ -9,7 +9,7 @@ import Folder from '../../models/Folder'
 import AclEntry from '../../models/Acl'
 import AssetSearch from '../../models/AssetSearch'
 import { getFolderChildren, createFolder, selectFolderIds, selectFolderId,
-  toggleFolder, queueFolderCounts } from '../../actions/folderAction'
+  toggleFolder, countAssetsInFolderIds } from '../../actions/folderAction'
 import { showModal, sortFolders } from '../../actions/appActions'
 import Trash from './Trash'
 import FolderItem from './FolderItem'
@@ -29,6 +29,10 @@ const FOLDER_COUNT_SCROLL_IDLE_THRESH_MS = 250 // ms to wait after scrolling sto
 const NUMTRUE = {numeric: true}
 
 const target = { drop (props, se) { /* only needed for highlighting -- drop happens on FolderItem */ } }
+
+export const FULL_COUNTS = 'full'
+export const FILTERED_COUNTS = 'filtered'
+export const NO_COUNTS = 'none'
 
 // Display all folders, starting with the root.
 // Later this will be broken into Collections and Smart Folders.
@@ -51,7 +55,11 @@ class Folders extends Component {
     // state props
     folders: PropTypes.object.isRequired,
     sortFolders: PropTypes.string,
-    user: PropTypes.instanceOf(User)
+    folderCounts: PropTypes.instanceOf(Map),
+    filteredCounts: PropTypes.instanceOf(Map),
+    modifiedFolderIds: PropTypes.instanceOf(Set),
+    user: PropTypes.instanceOf(User),
+    userSettings: PropTypes.object.isRequired
   }
 
   constructor (props) {
@@ -67,8 +75,9 @@ class Folders extends Component {
     this.folderSortCache = new LRUCache({ max: 1000 })
 
     this.foldersVisible = new Set()
-    this.folderCountRequested = new Map()
-    this.requestFolderCountsTimer
+    this.pendingFullRequest = false
+    this.pendingSearchRequest = false
+    this.requestFolderCountsTimer = null
 
     this.assetsCounter = 0
   }
@@ -78,13 +87,68 @@ class Folders extends Component {
     this.requestFolderCountsTimer = setTimeout(this.requestFolderCounts, FOLDER_COUNT_SCROLL_IDLE_THRESH_MS)
   }
 
+  // Request folder counts for visible folders. There are two types of counts,
+  // full and filtered by the current search. Full counts are the total count of
+  // assets in the folder in the entire repo. Filtered counts are the number of
+  // assets in the folder filtered by the current search. Full counts need to be
+  // computed whenever the folder is modified -- new parents or children, or
+  // assets are added or removed manually from the folder. Filtered counts need
+  // to be updated whenever the search changes. The folderReducer will clear the
+  // filtered count map whenever the search changes, so simply checking for the
+  // existence of the folder's id in filteredCounts is enough to know if we need
+  // to recompute a filteredCount. Full counts need to be computed when either
+  // the full count does not exist yet, or the folder was modified. In all cases
+  // we only want to compute the counts for currently visible folders.
+  //
+  // Folder counts are computed in batches to avoid blocking the server with
+  // count requests. Batches are sent serially, waiting for each batch to finish
+  // before sending another. Note that we do send full and filtered batches
+  // separately, so there are potentially two batches in flight at any time.
+  // Rather than keeping a queue of batches, we can use the dynamically updated
+  // list of modified and visible folders to construct a batch of work at the
+  // last possible second -- sort of an implicit queue.
+
   requestFolderCounts = () => {
-    var requestSet = new Set(this.foldersVisible)
-    for (let id of requestSet) {
-      if (this.folderCountRequested.get(id) === this.assetsCounter) requestSet.delete(id)
+    const { modifiedFolderIds, query, folderCounts, filteredCounts, userSettings } = this.props
+
+    // Find the set of modified visible folders for full counts.
+    const modifiedVisibleIds = [...modifiedFolderIds].filter(id => this.foldersVisible.has(id))
+
+    // Find the set of visible folders that have not had any full count computed
+    const uncomputedVisibleIds = [...this.foldersVisible].filter(id => !folderCounts.has(id))
+
+    // Compute a batch of full folder counts to request
+    const maxBatchSize = 3
+    if (userSettings.showFolderCounts !== NO_COUNTS && !this.pendingFullRequest) {
+      const allFullCountIds = [...modifiedVisibleIds, ...uncomputedVisibleIds]
+      const fullCountIds = allFullCountIds.slice(0, maxBatchSize)
+      if (fullCountIds.length) {
+        this.pendingFullRequest = true        // Serialize batches
+        this.props.actions.countAssetsInFolderIds(fullCountIds)
+          .then(_ => {
+            this.pendingFullRequest = false
+            this.queueFolderCounts()          // Recheck for more work
+          })
+          .catch(_ => { this.pendingFullRequest = false })
+      }
     }
-    this.props.actions.queueFolderCounts(requestSet)
-    for (let id of requestSet) this.folderCountRequested.set(id, this.assetsCounter)
+
+    // Compute a batch of filtered folder counts to request
+    if (userSettings.showFolderCounts === FILTERED_COUNTS && query && !query.empty() && !this.pendingSearchRequest) {
+      // Note that filteredCounts is cleared in the foldersReducer whenever
+      // the search has changed, so checking for a valid value is sufficient.
+      const visibleSearchCountIds = [...this.foldersVisible].filter(id => !filteredCounts.has(id))
+      const searchCountIds = visibleSearchCountIds.slice(0, maxBatchSize)
+      if (searchCountIds.length) {
+        this.pendingSearchRequest = true        // Serialize batches
+        this.props.actions.countAssetsInFolderIds(searchCountIds, query)
+          .then(_ => {
+            this.pendingSearchRequest = false
+            this.queueFolderCounts()            // Recheck for more work
+          })
+          .catch(_ => { this.pendingSearchRequest = false })
+      }
+    }
   }
 
   foldersScroll = (event) => {
@@ -131,6 +195,12 @@ class Folders extends Component {
       this.setState({ rootId: nextProps.rootId })
     } else if (this.state.rootId === undefined) {
       this.setState({ rootId: Folder.ROOT_ID })
+    }
+
+    // Recompute counts if the folder count setting has changed
+    if (nextProps.userSettings.showFolderCounts !== this.showFolderCounts) {
+      this.showFolderCounts = nextProps.userSettings.showFolderCounts
+      this.queueFolderCounts()
     }
   }
 
@@ -179,9 +249,6 @@ class Folders extends Component {
       this.loadChildren(folder)
       this.scrollToFolder(folder.id)
     }
-
-    // evict all folders from counted list; will start refreshing everyone
-    this.folderCountRequested = new Map()
   }
 
   scrollToFolder = (folderId) => {
@@ -439,8 +506,6 @@ class Folders extends Component {
 
     if (this.props.assetsCounter !== this.assetsCounter && !query.from) {
       this.assetsCounter = this.props.assetsCounter
-      // evict all folders from counted list; will start refreshing everyone
-      this.folderCountRequested = new Map()
       this.queueFolderCounts()
     }
 
@@ -523,9 +588,13 @@ class Folders extends Component {
 export default connect(state => ({
   folders: state.folders,
   sortFolders: state.app.sortFolders,
+  folderCounts: state.folders.counts,
+  filteredCounts: state.folders.filteredCounts,
+  modifiedFolderIds: state.folders.modifiedIds,
   query: state.assets.query,
   assetsCounter: state.assets.assetsCounter,
-  user: state.auth.user
+  user: state.auth.user,
+  userSettings: state.app.userSettings
 }), dispatch => ({
   actions: bindActionCreators({
     getFolderChildren,
@@ -535,6 +604,6 @@ export default connect(state => ({
     toggleFolder,
     showModal,
     sortFolders,
-    queueFolderCounts
+    countAssetsInFolderIds
   }, dispatch)
 }))(Folders)

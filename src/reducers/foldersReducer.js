@@ -4,7 +4,7 @@ import {
   TOGGLE_FOLDER, UNAUTH_USER, FOLDER_COUNTS, DROP_FOLDER_ID,
   TRASHED_FOLDERS, EMPTY_FOLDER_TRASH, COUNT_TRASHED_FOLDERS,
   RESTORE_TRASHED_FOLDERS, DELETE_TRASHED_FOLDERS,
-  QUEUE_FOLDER_COUNTS, CLEAR_FOLDER_COUNT_QUEUE, ASSET_SEARCH,
+  CLEAR_MODIFIED_FOLDERS, ASSET_SEARCH,
   CREATE_TAXONOMY, DELETE_TAXONOMY, UPDATE_FOLDER_PERMISSIONS
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
@@ -18,8 +18,11 @@ export var createInitialState = () => ({
   // Folder model data from the server
   all: new Map([[ Folder.ROOT_ID, new Folder({ id: Folder.ROOT_ID, name: 'Root' }) ]]),
 
-  // Counts of folders for current search
+  // Total counts of folders for the full repository
   counts: new Map([[ Folder.ROOT_ID, 0 ]]),
+
+  // Filtered counts of folders for the current search
+  filteredCounts: new Map(),
 
   // a set of folder ids. items in the set are "open", meaning visible & un-collapsed in the UI
   openFolderIds: new Set([Folder.ROOT_ID]),
@@ -203,14 +206,7 @@ export default function (state = initialState, action) {
       break
     }
 
-    case QUEUE_FOLDER_COUNTS: {
-      // Setting folders visible means request folder counts
-      const modifiedIds = new Set([...state.modifiedIds, ...action.payload])
-      return { ...state, modifiedIds }
-    }
-
-    case CLEAR_FOLDER_COUNT_QUEUE: {
-      // Setting folders visible means request folder counts
+    case CLEAR_MODIFIED_FOLDERS: {
       const modifiedIds = new Set([...state.modifiedIds])
       for (let id of action.payload) modifiedIds.delete(id)
       return { ...state, modifiedIds }

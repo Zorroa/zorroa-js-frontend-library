@@ -27,7 +27,6 @@ class Racebar extends Component {
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
     hoverFields: PropTypes.instanceOf(Set),
     isolatedId: PropTypes.string,
-    folderCounts: PropTypes.instanceOf(Map),
     selectedFolderIds: PropTypes.object,
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
     selectedJobIds: PropTypes.instanceOf(Set),
