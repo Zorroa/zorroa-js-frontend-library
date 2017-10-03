@@ -48,8 +48,7 @@ class Searchbar extends Component {
   // Submit a new query string, replacing the first SimpleSearch widget
   // if one already exists, or adding a new one if none in racetrack.
   search = (query) => {
-    const { fuzzy } = this.props.userSettings
-    const sliver = new AssetSearch({ query, fuzzy })
+    const sliver = new AssetSearch({ query })
     const widget = new Widget({ type: SimpleSearchWidgetInfo.type, sliver })
     const index = this.props.widgets && this.props.widgets.findIndex(widget => (
       widget.type === SimpleSearchWidgetInfo.type))

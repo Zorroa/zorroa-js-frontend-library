@@ -72,9 +72,9 @@ export function widgetTypeForField (field, type) {
   }
 }
 
-export function createSearchWidget (field, fieldType, queryString, fuzzy, isEnabled, isPinned) {
+export function createSearchWidget (field, fieldType, queryString, isEnabled, isPinned) {
   const type = SimpleSearchWidgetInfo.type
-  const sliver = new AssetSearch({query: queryString, fuzzy})
+  const sliver = new AssetSearch({query: queryString})
   if (field.length) {
     sliver.queryFields = { [field]: 1 }
   }

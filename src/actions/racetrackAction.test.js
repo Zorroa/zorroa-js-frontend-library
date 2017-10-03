@@ -8,7 +8,7 @@ import { SimpleSearchWidgetInfo } from '../components/Racetrack/WidgetInfo'
 
 describe('racetrackActions', () => {
   it('should modify widget', () => {
-    const sliver = new AssetSearch({ query: 'foo', fuzzy: false })
+    const sliver = new AssetSearch({ query: 'foo' })
     const widget = new Widget({ sliver, type: SimpleSearchWidgetInfo.type })
     const expectedAction = {
       type: MODIFY_RACETRACK_WIDGET,
@@ -28,7 +28,7 @@ describe('racetrackActions', () => {
   })
 
   it('should reset racetrack', () => {
-    const sliver = new AssetSearch({ query: 'foo', fuzzy: false })
+    const sliver = new AssetSearch({ query: 'foo' })
     const widget = new Widget({ sliver, type: SimpleSearchWidgetInfo.type })
     const widgets = [widget]
     const expectedAction = {

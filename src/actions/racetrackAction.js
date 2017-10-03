@@ -144,7 +144,7 @@ function restoreSearch (search) {
 
   // Create a SimpleSearch if we have a query string
   if (search.query) {
-    const sliver = new AssetSearch({ query: search.query, fuzzy: search.fuzzy })
+    const sliver = new AssetSearch({ query: search.query })
     const simpleSearch = new Widget({ type: SimpleSearchWidgetInfo.type, sliver })
     widgets.push(simpleSearch)
   }
