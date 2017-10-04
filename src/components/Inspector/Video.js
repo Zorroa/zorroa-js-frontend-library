@@ -33,7 +33,7 @@ class Video extends Component {
     playing: false,
     volume: this.props.videoVolume,
     played: 0,
-    loaded: 0,
+    lastPlayed: 0,
     startFrame: this.props.startFrame,
     stopFrame: this.props.stopFrame,
     clipStartFrame: Number.MAX_SAFE_INTEGER,
@@ -86,12 +86,13 @@ class Video extends Component {
     if (!this.player) return
     const { frames, frameRate } = this.props
     const { stopFrame, playing } = this.state
+    const lastPlayed = this.state.played
     const played = this.player.currentTime / (frames / frameRate)
     if (played >= stopFrame / (frames - 1)) {
       this.stop()
-      this.setState({ played: stopFrame / (frames - 1) })
+      this.setState({ played: stopFrame / (frames - 1), lastPlayed })
     } else {
-      this.setState({ played })
+      if (played !== lastPlayed) this.setState({ played, lastPlayed })
     }
     if (playing) requestAnimationFrame(this.onProgress)
   }
