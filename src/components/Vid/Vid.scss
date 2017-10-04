@@ -1,0 +1,211 @@
+@import '../../styles/core-mixins.scss';
+
+.Vid {
+  @include flexCol;
+  @include flexAlignItemsCenter;
+  @include fullWidth;
+  @include fullHeight;
+  @include flexOn;
+  color: white;
+  background-color: black;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+
+  // This is the native video element that React-player creates
+  video {
+    object-fit: contain; // needed for Firefox when window is narrower aspect than video
+    object-position: center center; // needed for Chrome when window is narrower aspect than video
+  }
+
+  .PanZoom-controls {
+    position: fixed;    // avoid overflow:hidden on Vid-pan-zoom
+    left: 200px;        // Next to the time display
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .Vid-pan-zoom {
+    @include flexCol;
+    @include flexOn;
+    @include fullWidth;
+    overflow: hidden;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+  }
+
+  .Vid-player {
+    @include flexColCenter;
+    @include flexOn;
+    @include fullWidth;
+    overflow: hidden;
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  .Vid-progress-bar {
+    @include fullWidth;
+    @include flexOff;
+    @include flexRowCenter;
+
+    position: relative;
+    top: 0;
+    left: 0;
+    height: 16px;
+
+    .Vid-scrub {
+      @include fullWidth;
+      z-index: 10;
+      position: relative;
+    }
+
+    input[type=range] {
+      -webkit-appearance: none;
+      height: 4px;
+      background-color: rgba(64,64,64,0.05);
+    }
+
+    input.Vid-scrub[type=range] {
+      &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        border: none;
+        height: 8px;
+        width: 8px;
+        border-radius: 25%;
+        background: $zorroa-nearwhite;
+        margin-top: 4px;
+      }
+
+      &::-moz-range-thumb {
+        -webkit-appearance: none;
+        border: none;
+        height: 8px;
+        width: 8px;
+        border-radius: 25%;
+        background: $zorroa-nearwhite;
+        // margin-top: -4px;
+      }
+    }
+
+    progress[value] {
+      @include fullWidth;
+      -webkit-appearance: none;
+      height: 4px;
+      background: none;
+    }
+
+    progress[value]::-webkit-progress-bar {
+      background-color: transparent;
+    }
+
+    .Vid-progress-progress {
+      @include fullWidth;
+      height: 4px;
+
+      position: absolute;
+      left:0;
+      top: 6px; // .Vid-progress-bar.height - 0.5 * .Vid-progress-progress.height
+    }
+  }
+
+  .Vid-control-bar {
+    @include fullWidth;
+    @include flexRow;
+    @include flexJustifySpaceBetween;
+    @include flexAlignItemsCenter;
+    box-shadow: 0 0 3px 3px rgba(0,0,0,0.25);
+    border-radius: 3px;
+    height: 60px;
+    min-height: 60px;
+    max-height: 60px;
+    background: none;
+
+  &.ProgressBar {
+    @include fullWidth;
+  }
+}
+
+  .Vid-controls {
+    @include flexRow;
+    @include flexJustifyCenter;
+    @include flexAlignItemsCenter;
+    margin-bottom: 5px;
+    color: $zorroa-slategray;
+
+    div {
+      text-align: center;
+      font-size: 30px;
+      margin-left: 14px;
+      margin-right: 14px;
+
+      &:hover {
+        color: $zorroa-sickly-green;
+      }
+    }
+
+    .Vid-play {
+      color: white;
+      border-radius: 3px;
+      background: $zorroa-sickly-green;
+      margin-left: 8px;
+      margin-right: 8px;
+      margin-bottom: 5px;
+      padding-left: 22px;
+      padding-right: 28px;
+      padding-top: 10px;
+      padding-bottom: 10px;
+
+      &:hover {
+        color: $zorroa-slategray;
+      }
+
+      div:hover {
+        color: $zorroa-slategray;
+      }
+
+      [class*="icon-"] {
+        margin: 0;
+        padding: 0;
+        width: 18px;
+        height: auto;
+      }
+    }
+  }
+
+  .Vid-misc {
+  }
+
+  .Vid-multipage {
+    &:hover {
+      cursor: pointer;
+      color: $zorroa-sickly-green;
+    }
+  }
+}
+
+.Vid-time {
+  padding-left: 10px;
+  font-size: 18px;
+  color: $zorroa-gray;
+
+  .Vid-duration {
+    font-size: 16px;
+    padding: 8px;
+    font-weight: 100;
+    font-style: normal;
+    font-stretch: normal;
+    -webkit-font-smoothing: subpixel-antialiased;
+  }
+
+  .Vid-remaining {
+    @extend .Vid-duration;
+    color: $zorroa-lightgray;
+  }
+}
+
+.Vid-error {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  color: red;
+}
