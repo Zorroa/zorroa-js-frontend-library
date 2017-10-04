@@ -5,9 +5,10 @@ import keydown from 'react-keydown'
 
 import { setVideoVolume } from '../../actions/appActions'
 import { saveUserSettings } from '../../actions/authAction'
-import { formatDuration, clamp } from '../../services/jsUtil'
+import { formatDuration, PubSub } from '../../services/jsUtil'
 import PanZoom from './PanZoom'
 import VideoRange from './VideoRange'
+import Vid from '../Vid'
 import User from '../../models/User'
 
 class Video extends Component {
@@ -29,32 +30,32 @@ class Video extends Component {
     frameRate: 30
   }
 
-  state = {
-    playing: false,
-    volume: this.props.videoVolume,
-    played: 0,
-    lastPlayed: 0,
-    startFrame: this.props.startFrame,
-    stopFrame: this.props.stopFrame,
-    clipStartFrame: Number.MAX_SAFE_INTEGER,
-    clipStopFrame: -Number.MAX_SAFE_INTEGER
-  }
+  constructor (props) {
+    super(props)
 
-  resize = () => this.forceUpdate()
+    this.shuttler = new PubSub()
+    this.status = new PubSub()
+
+    this.status.on('played', played => { this.setState({ played }) })
+    this.status.on('playing', playing => { this.setState({ playing }) })
+
+    this.state = {
+      playing: false,
+      volume: this.props.videoVolume,
+      played: 0,
+      startFrame: this.props.startFrame,
+      stopFrame: this.props.stopFrame,
+      clipStartFrame: Number.MAX_SAFE_INTEGER,
+      clipStopFrame: -Number.MAX_SAFE_INTEGER
+    }
+  }
 
   componentDidMount () {
-    window.addEventListener('resize', this.resize)
     this.componentWillReceiveProps(this.props)
-    this.start()
-  }
-
-  componentWillUnmount () {
-    window.removeEventListener('resize', this.resize)
   }
 
   componentWillReceiveProps (nextProps) {
     const { frames, startFrame, stopFrame, url } = nextProps
-    this.setState({ startFrame, stopFrame, played: 0 })
     if (this.state.clipStartFrame === Number.MAX_SAFE_INTEGER || url !== this.props.url) {
       const clipStartFrame = Math.max(0, startFrame - (stopFrame - startFrame))
       const clipStopFrame = Math.min(frames - 1, stopFrame + (stopFrame - startFrame))
@@ -65,91 +66,21 @@ class Video extends Component {
   @keydown('space')
   playPause (event) {
     if (event) event.preventDefault()
-    const playing = !this.state.playing
-    if (playing) this.start()
-    else this.stop()
-    if (playing && this.state.played >= this.state.stopFrame / (this.props.frames - 1)) {
-      this.scrub(this.state.startFrame)
-    }
+    // const { playing } = this.state
+    // if (playing) this.shuttler.publish('start')
+    // else this.shuttler.publish('stop')
+    this.shuttler.publish('startOrStop')
   }
 
   setVolume = e => {
     const volume = parseFloat(e.target.value)
     this.setState({ volume })
-    this.player.volume = volume
     this.props.actions.setVideoVolume(volume)
     const settings = { ...this.props.userSettings, videoVolume: volume }
     this.props.actions.saveUserSettings(this.props.user, settings)
   }
 
-  onProgress = () => {
-    if (!this.player) return
-    const { frames, frameRate } = this.props
-    const { stopFrame, playing } = this.state
-    const lastPlayed = this.state.played
-    const played = this.player.currentTime / (frames / frameRate)
-    if (played >= stopFrame / (frames - 1)) {
-      this.stop()
-      this.setState({ played: stopFrame / (frames - 1), lastPlayed })
-    } else {
-      if (played !== lastPlayed) this.setState({ played, lastPlayed })
-    }
-    if (playing) requestAnimationFrame(this.onProgress)
-  }
-
-  start = () => {
-    this.setState({ playing: true }, this.onProgress)
-    this.player.play()
-  }
-
-  stop = () => {
-    this.setState({ playing: false })
-    this.player.pause()
-  }
-
-  rewind = () => {
-    this.scrub(this.state.startFrame)
-  }
-
-  fastForward = () => {
-    this.scrub(this.state.stopFrame)
-  }
-
-  frameBack = () => {
-    const frame = Math.max(0, this.state.played * this.props.frames - 1)
-    this.scrub(frame)
-  }
-
-  frameForward = () => {
-    const frame = Math.min(this.state.played * this.props.frames + 1, this.props.frames - 1)
-    this.scrub(frame)
-  }
-
-  shuttle = (action) => {
-    switch (action) {
-      case 'rewind': return this.rewind()
-      case 'frameBack': return this.frameBack()
-      case 'play': return this.playPause()
-      case 'frameForward': return this.frameForward()
-      case 'fastForward': return this.fastForward()
-    }
-  }
-
-  scrub = (frame) => {
-    const played = frame / (this.props.frames - 1)
-    this.setState({ played })
-    try {
-      this.player.currentTime = played * this.props.frames / this.props.frameRate
-    } catch (e) {
-      console.log('Player isn\'t ready to seek: ' + e)
-    }
-  }
-
-  clipTime (t) {
-    const { frames } = this.props
-    const { startFrame, stopFrame } = this.state
-    return clamp((t * frames - startFrame) / (stopFrame - startFrame), 0, 1)
-  }
+  scrub = (frame) => this.shuttler.publish('scrub', frame)
 
   clipRange = (clipStartFrame, clipStopFrame) => {
     if (clipStartFrame < 0 || clipStopFrame > this.props.frames - 1) return
@@ -165,16 +96,6 @@ class Video extends Component {
     if (stopFrame > this.state.clipStopFrame) this.setState({ clipStopFrame: stopFrame })
   }
 
-  init = () => {
-    const { url } = this.props
-    const { startFrame, volume } = this.state
-    const initialized = `${url}@${startFrame}`
-    if (this.initialized === initialized) return
-    this.player.volume = volume
-    this.scrub(startFrame)
-    this.initialized = initialized
-  }
-
   render () {
     const { url, frameRate, frames, backgroundURL, onError } = this.props
     const { playing, volume, played, startFrame, stopFrame, clipStartFrame, clipStopFrame } = this.state
@@ -187,20 +108,18 @@ class Video extends Component {
       <div className='Video'>
         <div className="Video-pan-zoom">
           <PanZoom title={title} titleWidth={300}
-                   onVideo={this.shuttle} playing={playing}
+                   shuttler={this.shuttler} playing={playing}
                    onVolume={this.setVolume} volume={volume}>
-            <video className="Video-video"
-                   onCanPlay={this.init}
-                   autoPlay={playing}
-                   onPlay={ this.start }
-                   onPause={ this.stop }
-                   onEnded={ this.stop }
-                   onError={e => onError && onError(e.target.error)}
-                   width="100%" height="100%"
-                   ref={player => { this.player = player }}>
-              { exts.map(ext => <source key={ext} src={`${url}?ext=${ext}`} type={`video/${ext}`}/>) }
-              <source key="raw" src={url}/>
-            </video>
+            <Vid url={url}
+                 backgroundURL={backgroundURL}
+                 frames={frames}
+                 frameRate={frameRate}
+                 startFrame={startFrame}
+                 stopFrame={stopFrame}
+                 onError={onError}
+                 shuttler={this.shuttler}
+                 status={this.status}
+            />
           </PanZoom>
         </div>
         <VideoRange played={played} frames={frames} frameRate={frameRate}

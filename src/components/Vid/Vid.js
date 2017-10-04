@@ -5,9 +5,7 @@ import keydown from 'react-keydown'
 
 import { setVideoVolume } from '../../actions/appActions'
 import { saveUserSettings } from '../../actions/authAction'
-import { /*formatDuration,*/ clamp } from '../../services/jsUtil'
-// import PanZoom from './PanZoom'
-// import VideoRange from './VideoRange'
+import { clamp, PubSub } from '../../services/jsUtil'
 import User from '../../models/User'
 
 class Vid extends Component {
@@ -22,122 +20,114 @@ class Vid extends Component {
     onError: PropTypes.func.isRequired,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
-    actions: PropTypes.object
+    actions: PropTypes.object,
+    shuttler: PropTypes.instanceOf(PubSub).isRequired,
+    status: PropTypes.instanceOf(PubSub).isRequired
   }
 
   static defaultProps = {
     frameRate: 30
   }
 
-  state = {
-    playing: false,
-    volume: this.props.videoVolume,
-    played: 0,
-    lastPlayed: 0,
-    startFrame: this.props.startFrame,
-    stopFrame: this.props.stopFrame,
-    clipStartFrame: Number.MAX_SAFE_INTEGER,
-    clipStopFrame: -Number.MAX_SAFE_INTEGER
+  constructor(props) {
+    super(props)
+
+    props.shuttler.on('start', this.start)
+    props.shuttler.on('stop', this.stop)
+    props.shuttler.on('startOrStop', this.startOrStop)
+    props.shuttler.on('rewind', this.rewind)
+    props.shuttler.on('fastForward', this.fastForward)
+    props.shuttler.on('frameBack', this.frameBack)
+    props.shuttler.on('frameForward', this.frameForward)
+    props.shuttler.on('scrub', this.scrub)
+
+    this.state = {
+      playing: false,
+      played: 0,
+      lastPlayed: 0,
+      startFrame: this.props.startFrame,
+      stopFrame: this.props.stopFrame,
+    }
   }
 
   resize = () => this.forceUpdate()
 
   componentDidMount () {
     window.addEventListener('resize', this.resize)
-    this.componentWillReceiveProps(this.props)
-    // this.start()
   }
 
   componentWillUnmount () {
     window.removeEventListener('resize', this.resize)
   }
 
-  componentWillReceiveProps (nextProps) {
-    const { frames, startFrame, stopFrame, url } = nextProps
-    this.setState({ startFrame, stopFrame, played: 0 })
-    if (this.state.clipStartFrame === Number.MAX_SAFE_INTEGER || url !== this.props.url) {
-      const clipStartFrame = Math.max(0, startFrame - (stopFrame - startFrame))
-      const clipStopFrame = Math.min(frames - 1, stopFrame + (stopFrame - startFrame))
-      this.setState({clipStartFrame, clipStopFrame})
-    }
-  }
-
-  @keydown('space')
-  playPause (event) {
-    if (event) event.preventDefault()
-    const playing = !this.state.playing
-    if (playing) this.start()
-    else this.stop()
-    if (playing && this.state.played >= this.state.stopFrame / (this.props.frames - 1)) {
-      this.scrub(this.state.startFrame)
-    }
-  }
-
-  setVolume = e => {
-    const volume = parseFloat(e.target.value)
-    this.setState({ volume })
-    this.player.volume = volume
-    this.props.actions.setVideoVolume(volume)
-    const settings = { ...this.props.userSettings, videoVolume: volume }
-    this.props.actions.saveUserSettings(this.props.user, settings)
-  }
-
   onProgress = () => {
     if (!this.player) return
-    const { frames, frameRate } = this.props
-    const { stopFrame, playing } = this.state
+    const { frames, stopFrame, frameRate, status } = this.props
+    const { playing } = this.state
     const lastPlayed = this.state.played
     const played = this.player.currentTime / (frames / frameRate)
-    if (played >= stopFrame / (frames - 1)) {
+    const stopPct = stopFrame / (frames - 1)
+    if (played >= stopPct) {
       this.stop()
-      this.setState({ played: stopFrame / (frames - 1), lastPlayed })
+      this.setState({ played: stopPct, lastPlayed })
+      status.publish('played', stopPct)
     } else {
-      if (played !== lastPlayed) this.setState({ played, lastPlayed })
+      if (played !== lastPlayed) {
+        this.setState({ played, lastPlayed })
+        status.publish('played', played)
+      }
     }
     if (playing) requestAnimationFrame(this.onProgress)
   }
 
   start = () => {
+    const { frames, stopFrame, startFrame } = this.props
+    if (this.state.played >= stopFrame / (frames - 1)) {
+      this.scrub(this.state.startFrame)
+    }
     this.setState({ playing: true }, this.onProgress)
-    this.player.play()
+    this.props.status.publish('playing', true)
+    if (this.player) this.player.play()
+    else this.stop()
   }
 
   stop = () => {
     this.setState({ playing: false })
-    this.player.pause()
+    this.props.status.publish('playing', false)
+    if (this.player) this.player.pause()
+  }
+
+  startOrStop = () => {
+    if (this.state.playing) this.stop()
+    else this.start()
   }
 
   rewind = () => {
+    if (this.state.playing) this.stop()
     this.scrub(this.state.startFrame)
   }
 
   fastForward = () => {
+    if (this.state.playing) this.stop()
     this.scrub(this.state.stopFrame)
   }
 
   frameBack = () => {
-    const frame = Math.max(0, this.state.played * this.props.frames - 1)
+    if (this.state.playing) this.stop()
+    const frame = Math.max(0, Math.floor(this.state.played * this.props.frames) - 1)
     this.scrub(frame)
   }
 
   frameForward = () => {
-    const frame = Math.min(this.state.played * this.props.frames + 1, this.props.frames - 1)
+    if (this.state.playing) this.stop()
+    const frame = Math.min(Math.floor(this.state.played * this.props.frames) + 1, this.props.frames - 1)
     this.scrub(frame)
-  }
-
-  shuttle = (action) => {
-    switch (action) {
-      case 'rewind': return this.rewind()
-      case 'frameBack': return this.frameBack()
-      case 'play': return this.playPause()
-      case 'frameForward': return this.frameForward()
-      case 'fastForward': return this.fastForward()
-    }
   }
 
   scrub = (frame) => {
     const played = frame / (this.props.frames - 1)
     this.setState({ played })
+    this.props.status.publish('played', played)
     try {
       this.player.currentTime = played * this.props.frames / this.props.frameRate
     } catch (e) {
@@ -151,45 +141,33 @@ class Vid extends Component {
     return clamp((t * frames - startFrame) / (stopFrame - startFrame), 0, 1)
   }
 
-  clipRange = (clipStartFrame, clipStopFrame) => {
-    if (clipStartFrame < 0 || clipStopFrame > this.props.frames - 1) return
-    if (clipStartFrame > clipStopFrame) clipStartFrame = clipStopFrame
-    this.setState({ clipStartFrame, clipStopFrame })
-  }
-
-  range = (startFrame, stopFrame) => {
-    if (startFrame < 0 || stopFrame > this.props.frames - 1) return
-    if (startFrame > stopFrame) startFrame = stopFrame
-    this.setState({ startFrame, stopFrame })
-    if (startFrame < this.state.clipStartFrame) this.setState({ clipStartFrame: startFrame })
-    if (stopFrame > this.state.clipStopFrame) this.setState({ clipStopFrame: stopFrame })
-  }
-
   init = () => {
-    const { url } = this.props
-    const { startFrame, volume } = this.state
+    const { url, startFrame } = this.props
+    const { volume } = this.state
     const initialized = `${url}@${startFrame}`
     if (this.initialized === initialized) return
-    this.player.volume = volume
     this.scrub(startFrame)
+    this.start()
     this.initialized = initialized
   }
 
   render () {
     const { url, frameRate, frames, backgroundURL, onError } = this.props
-    const { playing, volume, played, startFrame, stopFrame, clipStartFrame, clipStopFrame } = this.state
+    const { startFrame, stopFrame } = this.props
+    const { videoVolume } = this.props
+
+    const { playing, played  } = this.state
     const seconds = played ? (played * frames - startFrame) / frameRate : 0
-    // const duration = (stopFrame - startFrame) / frameRate
-    // const title = <div className="Vid-time"><Duration className='Vid-remaining' seconds={seconds} frameRate={frameRate} />/<Duration seconds={duration} frameRate={frameRate}/></div>
     const total = frames * 10
     const exts = [ 'mp4', 'm4v', 'webm', 'ogv', 'ogg' ]
+
+    if (this.player) this.player.volume = videoVolume
+
     return (
       <div className='Vid'>
         <video className="Vid-video"
                onCanPlay={this.init}
                autoPlay={playing}
-               onPlay={ this.start }
-               onPause={ this.stop }
                onEnded={ this.stop }
                onError={e => onError && onError(e.target.error)}
                width="100%" height="100%"
@@ -203,27 +181,13 @@ class Vid extends Component {
 }
 
 export default connect(state => ({
-  videoVolume: state.app.videoVolume,
   user: state.auth.user,
-  userSettings: state.app.userSettings
+  userSettings: state.app.userSettings,
+  videoVolume: state.app.videoVolume
 }), dispatch => ({
   actions: bindActionCreators({
     setVideoVolume,
     saveUserSettings
   }, dispatch)
 }))(Vid)
-
-// const Duration = ({ className, seconds, frameRate }) => {
-//   return (
-//     <time dateTime={`P${Math.round(seconds)}S`} className={className || 'Vid-duration'}>
-//       {formatDuration(seconds, frameRate)}
-//     </time>
-//   )
-// }
-
-// Duration.propTypes = {
-//   seconds: PropTypes.number.isRequired,
-//   frameRate: PropTypes.number.isRequired,
-//   className: PropTypes.string
-// }
 

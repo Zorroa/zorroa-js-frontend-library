@@ -7,6 +7,7 @@ import { DragSource } from '../../services/DragDrop'
 import Asset from '../../models/Asset'
 
 import { addSiblings, isolateSelectId, replaceVariables, valuesForFields, parseVariables } from '../../services/jsUtil'
+import Vid from '../Vid'
 
 // Extract thumb page info from an asset
 export function page (asset, width, height, origin) {
@@ -130,6 +131,7 @@ class Thumb extends Component {
     iconBadge: PropTypes.element,
     isSelected: PropTypes.bool,
     badgeHeight: PropTypes.number,
+    asset: PropTypes.instanceOf(Asset).isRequired,
 
     // Actions
     onClick: PropTypes.func.isRequired,
@@ -141,10 +143,15 @@ class Thumb extends Component {
     assetId: PropTypes.string,
     dragparams: PropTypes.object,
 
-    // Dragging properties from app state
+    // properties from app state
+    origin: PropTypes.string,
     allAssets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     showMultipage: PropTypes.bool,
     selectedAssetIds: PropTypes.instanceOf(Set)
+  }
+
+  state = {
+    hover: false
   }
 
   renderBadges = () => {
@@ -167,38 +174,76 @@ class Thumb extends Component {
     )
   }
 
+  vidError = (error) => {
+    console.log(error)
+  }
+
+  onMouseEnter = (event) => {
+    if (this.props.onMouseEnter) this.props.onMouseEnter(event)
+    this.setState({ hover: true })
+  }
+
+  onMouseLeave = (event) => {
+    if (this.props.onMouseLeave) this.props.onMouseLeave(event)
+    this.setState({ hover: false })
+  }
+
   render () {
-    const {pages, parentURL, isSelected, onClick, onMouseEnter, onMouseLeave, onDoubleClick, dragparams} = this.props
+    const {pages, parentURL, isSelected, onClick, onDoubleClick, dragparams} = this.props
     const {width, height, x, y} = this.props.dim      // Original thumb rect
     if (!width || !height) return null
 
     const style = {width, height, left: x, top: y}    // Dim -> left, right
+    const { asset, origin } = this.props
+
+    const video = false && this.state.hover && asset.mediaType().includes('video') && (
+      <Vid url={asset.url(origin)}
+           backgroundURL={asset.backgroundURL(origin)}
+           frames={asset.frames()}
+           frameRate={asset.frameRate()}
+           startFrame={asset.startFrame()}
+           stopFrame={asset.stopFrame()}
+           onError={this.vidError}
+      />
+    )
 
     if (!parentURL) {
       const { url, backgroundColor } = pages[0]
       return (
-        <div className={classnames('Thumb', {isSelected})} style={style}
-             onClick={onClick} onDoubleClick={onDoubleClick}
-             onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} {...dragparams}>
-          <ImageThumb url={url} backgroundColor={backgroundColor}>
-            { this.renderOverlays() }
-            { this.renderBadges() }
-          </ImageThumb>
+        <div className={classnames('Thumb', {isSelected})}
+             style={style}
+             onClick={onClick}
+             onDoubleClick={onDoubleClick}
+             onMouseEnter={this.onMouseEnter}
+             onMouseLeave={this.onMouseLeave}
+             onMouseOut={this.onMouseLeave}
+             {...dragparams}>
+          { video || (
+            <ImageThumb url={url} backgroundColor={backgroundColor}>
+              { this.renderOverlays() }
+              { this.renderBadges() }
+            </ImageThumb>
+          )}
         </div>
       )
     }
 
     return (
-      <div className={classnames('Thumb', {isSelected})} style={style}
-           onClick={onClick} onDoubleClick={onDoubleClick}
-           onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} {...dragparams}>
+      <div className={classnames('Thumb', {isSelected})}
+           style={style}
+           onClick={onClick}
+           onDoubleClick={onDoubleClick}
+           onMouseEnter={this.onMouseEnter}
+           onMouseLeave={this.onMouseLeave}
+           onMouseOut={this.onMouseLeave}
+           {...dragparams}>
         { pages.slice(0, 3).reverse().map((page, rindex) => {
           const { url, backgroundColor } = page
           const index = Math.min(3, pages.length) - rindex - 1
           return (
             <div key={`${url}-${index}`}
                  className={classnames('Thumb-stack', `Thumb-stack-${index}`)}>
-              <ImageThumb url={url} backgroundColor={backgroundColor}/>
+              { video || (<ImageThumb url={url} backgroundColor={backgroundColor}/>) }
               { rindex === pages.length - 1 && this.renderBadges() }
             </div>
           )
@@ -213,6 +258,7 @@ class Thumb extends Component {
 }
 
 export default connect(state => ({
+  origin: state.auth.origin,
   showMultipage: state.app.showMultipage,
   dragFieldTemplate: state.app.dragFieldTemplate,
   allAssets: state.assets.all,

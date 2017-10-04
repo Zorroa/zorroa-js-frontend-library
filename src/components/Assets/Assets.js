@@ -612,6 +612,7 @@ class Assets extends Component {
                            onMouseLeave={e => { if (this.state.badgeId === asset.id) this.setState({ badgeId: null }) }}
                            dim={dim}
                            key={asset.id}
+                           asset={asset}
                            assetId={asset.id}
                            pages={pages}
                            badgeHeight={badgeHeight}
