@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import keydown from 'react-keydown'
 import * as assert from 'assert'
 
-import Thumb, { page, monopageBadges, multipageBadges } from '../Thumb'
+import Thumb, { page } from '../Thumb'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
 import Widget from '../../models/Widget'
@@ -20,7 +20,6 @@ import Footer from './Footer'
 import Table from '../Table'
 import Sidebar from '../Sidebar'
 import Racetrack from '../Racetrack'
-import FieldTemplate from '../FieldTemplate'
 import * as ComputeLayout from './ComputeLayout.js'
 import AssetSearch from '../../models/AssetSearch'
 import Resizer from '../../services/Resizer'
@@ -51,7 +50,6 @@ class Assets extends Component {
     showTable: PropTypes.bool.isRequired,
     tableHeight: PropTypes.number.isRequired,
     showMultipage: PropTypes.bool.isRequired,
-    thumbFieldTemplate: PropTypes.string.isRequired,
     rightSidebarIsIconified: PropTypes.bool,
     folders: PropTypes.instanceOf(Map),
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
@@ -520,7 +518,7 @@ class Assets extends Component {
 
   renderAssets () {
     const { assets, selectedIds, loadedCount, filteredCount, layout, showMultipage,
-      parentCounts, parentTotals, origin, thumbSize, query, thumbFieldTemplate, isolatedParent } = this.props
+      parentCounts, origin, thumbSize, query, isolatedParent } = this.props
     const { positions, multipage, tableIsResizing } = this.state
     api.setTableIsResizing(tableIsResizing)
 
@@ -596,13 +594,12 @@ class Assets extends Component {
                   }
                   if (!dim || width <= 0 || height <= 0) return null
                   const parentId = asset.parentId()
-                  const indexes = parentId && multipage[parentId]
-                  const stackCount = parentId && parentTotals && parentTotals.get(parentId)
-                  const showBadge = this.state.badgeId === asset.id
                   const badgeHeight = thumbSize < 100 ? 15 : 25
-                  const badge = showMultipage && parentId !== isolatedParentId ? multipageBadges(asset, origin, stackCount) : monopageBadges(asset)
-                  const iconBadge = showBadge ? <div className="Thumb-field"><FieldTemplate asset={asset} template={thumbFieldTemplate} extensionOnLeft={false}/></div> : null
+                  const showMultipageBadges = showMultipage && parentId !== isolatedParentId
 
+                  const showBadge = this.state.badgeId === asset.id
+
+                  const indexes = parentId && multipage[parentId]
                   const pages = indexes && indexes.slice(0, 3).map(index => (
                       page(assets[index], width, height, origin, indexes))) ||
                     [page(asset, width, height, origin)]
@@ -616,8 +613,8 @@ class Assets extends Component {
                            assetId={asset.id}
                            pages={pages}
                            badgeHeight={badgeHeight}
-                           iconBadge={iconBadge}
-                           { ...badge }
+                           showBadge={showBadge}
+                           showMultipageBadges={showMultipageBadges}
                            onClick={event => {
                              // don't scroll assets when we select thumbs. (table selection will scroll)
                              this.skipNextSelectionScroll = true
@@ -734,7 +731,6 @@ export default connect(state => ({
   showTable: state.app.showTable,
   tableHeight: state.app.tableHeight,
   showMultipage: state.app.showMultipage,
-  thumbFieldTemplate: state.app.thumbFieldTemplate,
   similar: state.racetrack.similar,
   widgets: state.racetrack.widgets,
   origin: state.auth.origin
