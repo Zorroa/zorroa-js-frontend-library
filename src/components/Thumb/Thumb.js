@@ -6,7 +6,7 @@ import Duration from '../Duration'
 import { DragSource } from '../../services/DragDrop'
 import Asset from '../../models/Asset'
 
-import { addSiblings, isolateSelectId, replaceVariables, valuesForFields, parseVariables } from '../../services/jsUtil'
+import { addSiblings, isolateSelectId, replaceVariables, valuesForFields, parseVariables, PubSub } from '../../services/jsUtil'
 import Vid from '../Vid'
 
 // Extract thumb page info from an asset
@@ -150,8 +150,18 @@ class Thumb extends Component {
     selectedAssetIds: PropTypes.instanceOf(Set)
   }
 
-  state = {
-    hover: false
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      hover: false
+    }
+
+    this.shuttler = new PubSub()
+    this.status = new PubSub()
+
+    // this.status.on('played', played => { this.setState({ played }) })
+    this.status.on('playing', playing => { this.setState({ playing }) })
   }
 
   renderBadges = () => {
@@ -180,7 +190,7 @@ class Thumb extends Component {
 
   onMouseEnter = (event) => {
     if (this.props.onMouseEnter) this.props.onMouseEnter(event)
-    this.setState({ hover: true })
+    this.setState({ hover: true }, _ => requestAnimationFrame(_ => { this.shuttler.publish('start') }))
   }
 
   onMouseLeave = (event) => {
@@ -196,8 +206,10 @@ class Thumb extends Component {
     const style = {width, height, left: x, top: y}    // Dim -> left, right
     const { asset, origin } = this.props
 
-    const video = false && this.state.hover && asset.mediaType().includes('video') && (
-      <Vid url={asset.url(origin)}
+    const video = this.state.hover && asset.mediaType().includes('video') && (
+      <Vid shuttler={this.shuttler}
+           status={this.status}
+           url={asset.url(origin)}
            backgroundURL={asset.backgroundURL(origin)}
            frames={asset.frames()}
            frameRate={asset.frameRate()}
