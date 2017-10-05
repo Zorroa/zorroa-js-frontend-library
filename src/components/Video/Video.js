@@ -1,14 +1,13 @@
 import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import keydown from 'react-keydown'
 
 import { setVideoVolume } from '../../actions/appActions'
 import { saveUserSettings } from '../../actions/authAction'
 import { clamp, PubSub } from '../../services/jsUtil'
 import User from '../../models/User'
 
-class Vid extends Component {
+class Video extends Component {
   static propTypes = {
     url: PropTypes.string.isRequired,
     backgroundURL: PropTypes.string,
@@ -29,7 +28,7 @@ class Vid extends Component {
     frameRate: 30
   }
 
-  constructor(props) {
+  constructor (props) {
     super(props)
 
     props.shuttler.on('start', this.start)
@@ -44,9 +43,7 @@ class Vid extends Component {
     this.state = {
       playing: false,
       played: 0,
-      lastPlayed: 0,
-      startFrame: this.props.startFrame,
-      stopFrame: this.props.stopFrame,
+      lastPlayed: 0
     }
   }
 
@@ -83,7 +80,7 @@ class Vid extends Component {
   start = () => {
     const { frames, stopFrame, startFrame } = this.props
     if (this.state.played >= stopFrame / (frames - 1)) {
-      this.scrub(this.state.startFrame)
+      this.scrub(startFrame)
     }
     this.setState({ playing: true }, this.onProgress)
     this.props.status.publish('playing', true)
@@ -104,12 +101,12 @@ class Vid extends Component {
 
   rewind = () => {
     if (this.state.playing) this.stop()
-    this.scrub(this.state.startFrame)
+    this.scrub(this.props.startFrame)
   }
 
   fastForward = () => {
     if (this.state.playing) this.stop()
-    this.scrub(this.state.stopFrame)
+    this.scrub(this.props.stopFrame)
   }
 
   frameBack = () => {
@@ -136,14 +133,12 @@ class Vid extends Component {
   }
 
   clipTime (t) {
-    const { frames } = this.props
-    const { startFrame, stopFrame } = this.state
+    const { frames, startFrame, stopFrame } = this.props
     return clamp((t * frames - startFrame) / (stopFrame - startFrame), 0, 1)
   }
 
   init = () => {
     const { url, startFrame } = this.props
-    const { volume } = this.state
     const initialized = `${url}@${startFrame}`
     if (this.initialized === initialized) return
     this.scrub(startFrame)
@@ -152,20 +147,15 @@ class Vid extends Component {
   }
 
   render () {
-    const { url, frameRate, frames, backgroundURL, onError } = this.props
-    const { startFrame, stopFrame } = this.props
-    const { videoVolume } = this.props
-
-    const { playing, played  } = this.state
-    const seconds = played ? (played * frames - startFrame) / frameRate : 0
-    const total = frames * 10
+    const { url, onError, videoVolume } = this.props
+    const { playing } = this.state
     const exts = [ 'mp4', 'm4v', 'webm', 'ogv', 'ogg' ]
 
     if (this.player) this.player.volume = videoVolume
 
     return (
-      <div className='Vid'>
-        <video className="Vid-video"
+      <div className='Video'>
+        <video className="Video-video"
                onCanPlay={this.init}
                autoPlay={playing}
                onEnded={ this.stop }
@@ -189,5 +179,5 @@ export default connect(state => ({
     setVideoVolume,
     saveUserSettings
   }, dispatch)
-}))(Vid)
+}))(Video)
 

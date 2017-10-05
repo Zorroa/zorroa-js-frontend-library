@@ -8,10 +8,10 @@ import { saveUserSettings } from '../../actions/authAction'
 import { formatDuration, PubSub } from '../../services/jsUtil'
 import PanZoom from './PanZoom'
 import VideoRange from './VideoRange'
-import Vid from '../Vid'
+import Video from '../Video'
 import User from '../../models/User'
 
-class Video extends Component {
+class VideoViewer extends Component {
   static propTypes = {
     url: PropTypes.string.isRequired,
     backgroundURL: PropTypes.string,
@@ -101,16 +101,15 @@ class Video extends Component {
     const { playing, volume, played, startFrame, stopFrame, clipStartFrame, clipStopFrame } = this.state
     const seconds = played ? (played * frames - startFrame) / frameRate : 0
     const duration = (stopFrame - startFrame) / frameRate
-    const title = <div className="Video-time"><Duration className='Video-remaining' seconds={seconds} frameRate={frameRate} />/<Duration seconds={duration} frameRate={frameRate}/></div>
+    const title = <div className="VideoViewer-time"><Duration className='VideoViewer-remaining' seconds={seconds} frameRate={frameRate} />/<Duration seconds={duration} frameRate={frameRate}/></div>
     const total = frames * 10
-    const exts = [ 'mp4', 'm4v', 'webm', 'ogv', 'ogg' ]
     return (
-      <div className='Video'>
-        <div className="Video-pan-zoom">
+      <div className='VideoViewer'>
+        <div className="VideoViewer-pan-zoom">
           <PanZoom title={title} titleWidth={300}
                    shuttler={this.shuttler} playing={playing}
                    onVolume={this.setVolume} volume={volume}>
-            <Vid url={url}
+            <Video url={url}
                  backgroundURL={backgroundURL}
                  frames={frames}
                  frameRate={frameRate}
@@ -141,11 +140,11 @@ export default connect(state => ({
     setVideoVolume,
     saveUserSettings
   }, dispatch)
-}))(Video)
+}))(VideoViewer)
 
 const Duration = ({ className, seconds, frameRate }) => {
   return (
-    <time dateTime={`P${Math.round(seconds)}S`} className={className || 'Video-duration'}>
+    <time dateTime={`P${Math.round(seconds)}S`} className={className || 'VideoViewer-duration'}>
       {formatDuration(seconds, frameRate)}
     </time>
   )

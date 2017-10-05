@@ -7,7 +7,7 @@ import { DragSource } from '../../services/DragDrop'
 import Asset from '../../models/Asset'
 
 import { addSiblings, isolateSelectId, replaceVariables, valuesForFields, parseVariables, PubSub } from '../../services/jsUtil'
-import Vid from '../Vid'
+import Video from '../Video'
 
 // Extract thumb page info from an asset
 export function page (asset, width, height, origin) {
@@ -207,15 +207,15 @@ class Thumb extends Component {
     const { asset, origin } = this.props
 
     const video = this.state.hover && asset.mediaType().includes('video') && (
-      <Vid shuttler={this.shuttler}
-           status={this.status}
-           url={asset.url(origin)}
-           backgroundURL={asset.backgroundURL(origin)}
-           frames={asset.frames()}
-           frameRate={asset.frameRate()}
-           startFrame={asset.startFrame()}
-           stopFrame={asset.stopFrame()}
-           onError={this.vidError}
+      <Video shuttler={this.shuttler}
+             status={this.status}
+             url={asset.url(origin)}
+             backgroundURL={asset.backgroundURL(origin)}
+             frames={asset.frames()}
+             frameRate={asset.frameRate()}
+             startFrame={asset.startFrame()}
+             stopFrame={asset.stopFrame()}
+             onError={this.vidError}
       />
     )
 

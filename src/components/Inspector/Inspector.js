@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import Pdf from './Pdf'
-import Video from './Video'
+import VideoViewer from './VideoViewer'
 import Image from './Image'
 import Asset from '../../models/Asset'
 
@@ -35,7 +35,7 @@ class Inspector extends Component {
       inspector = <Image url={url}
                          onNextPage={onNext} onPrevPage={onPrev} />
     } else if (mediaType.startsWith('video')) {
-      inspector = <Video url={url} backgroundURL={asset.backgroundURL(origin)}
+      inspector = <VideoViewer url={url} backgroundURL={asset.backgroundURL(origin)}
                          frames={asset.frames()} frameRate={asset.frameRate()}
                          startFrame={asset.startFrame()} stopFrame={asset.stopFrame()}
                          onError={error => this.setState({error})} />
