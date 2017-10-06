@@ -46,11 +46,13 @@
   border-top: 8px solid transparent;
   border-bottom: 8px solid transparent;
   border-left: 12px solid $zorroa-greyish-brown;
+  .Duration:hover &.video { border-left: 12px solid $zorroa-avocado-green; }
 
   .small & {
     border-top: 4px solid transparent;
     border-bottom: 4px solid transparent;
     border-left: 6px solid $zorroa-greyish-brown;
+    .Duration:hover &.video { border-left: 6px solid $zorroa-avocado-green; }
   }
 }
 
@@ -58,8 +60,10 @@
   width: 0;
   height: 0;
   border: 7px solid $zorroa-greyish-brown;
+  .Duration:hover &.video { border: 7px solid $zorroa-faded-red; }
 
   .small & {
     border: 4px solid $zorroa-greyish-brown;
+    .Duration:hover &.video { border: 4px solid $zorroa-faded-red; }
   }
 }

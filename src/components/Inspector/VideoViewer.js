@@ -37,9 +37,11 @@ class VideoViewer extends Component {
     this.status = new PubSub()
 
     this.status.on('played', played => { this.setState({ played }) })
+    this.status.on('started', started => { this.setState({ started }) })
     this.status.on('playing', playing => { this.setState({ playing }) })
 
     this.state = {
+      started: false,
       playing: false,
       volume: this.props.videoVolume,
       played: 0,
@@ -98,7 +100,7 @@ class VideoViewer extends Component {
 
   render () {
     const { url, frameRate, frames, backgroundURL, onError } = this.props
-    const { playing, volume, played, startFrame, stopFrame, clipStartFrame, clipStopFrame } = this.state
+    const { started, volume, played, startFrame, stopFrame, clipStartFrame, clipStopFrame } = this.state
     const seconds = played ? (played * frames - startFrame) / frameRate : 0
     const duration = (stopFrame - startFrame) / frameRate
     const title = <div className="VideoViewer-time"><Duration className='VideoViewer-remaining' seconds={seconds} frameRate={frameRate} />/<Duration seconds={duration} frameRate={frameRate}/></div>
@@ -107,7 +109,7 @@ class VideoViewer extends Component {
       <div className='VideoViewer'>
         <div className="VideoViewer-pan-zoom">
           <PanZoom title={title} titleWidth={300}
-                   shuttler={this.shuttler} playing={playing}
+                   shuttler={this.shuttler} playing={started}
                    onVolume={this.setVolume} volume={volume}>
             <Video url={url}
                  backgroundURL={backgroundURL}

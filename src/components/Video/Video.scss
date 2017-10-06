@@ -9,6 +9,7 @@
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
   overflow: hidden;
+  position: relative;
 
   // This is the native video element that React-player creates
   video {

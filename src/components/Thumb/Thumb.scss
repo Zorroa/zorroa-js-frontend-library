@@ -5,6 +5,8 @@
   background-origin: border-box;
 
   position: absolute;
+  top: 0;
+  left: 0;
 
   @include fullWidth;
   @include fullHeight;

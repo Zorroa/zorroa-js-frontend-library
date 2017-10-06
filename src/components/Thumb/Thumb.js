@@ -115,14 +115,19 @@ class Thumb extends Component {
     super(props)
 
     this.state = {
-      // playing: false
+      videoStarted: false,
+      videoPlaying: false,
+      doVideoPreview: false
     }
 
     this.shuttler = new PubSub()
     this.status = new PubSub()
 
-    // this.status.on('played', played => { this.setState({ played }) })
-    // this.status.on('playing', playing => { this.setState({ playing }) })
+    this.status.on('started', videoStarted => {
+      if (this.state.videoStarted && !videoStarted) this.setState({ doVideoPreview: false })
+      this.setState({ videoStarted })
+    })
+    this.status.on('playing', videoPlaying => { this.setState({ videoPlaying }) })
   }
 
   // Extract badging info from an asset.
@@ -131,7 +136,14 @@ class Thumb extends Component {
     const stopPage = asset.stopPage()
     let pageBadge
     if (asset.mediaType().includes('video')) {
-      pageBadge = <Duration duration={asset.duration()}/>
+      pageBadge = (
+        <Duration duration={asset.duration()}
+                  onClick={_ => {
+                    this.setState({ doVideoPreview: true },
+                      _ => this.shuttler.publish('startOrStop'))
+                  }}
+                  playing={this.state.videoStarted}/>
+      )
     } else if (startPage && (!stopPage || startPage === stopPage)) {
       pageBadge = <div className="Thumb-page-label">{startPage}</div>
     } else if (startPage && stopPage) {
@@ -201,12 +213,10 @@ class Thumb extends Component {
 
   onMouseEnter = (event) => {
     if (this.props.onMouseEnter) this.props.onMouseEnter(event)
-    // this.setState({ hover: true }, _ => requestAnimationFrame(_ => { this.shuttler.publish('start') }))
   }
 
   onMouseLeave = (event) => {
     if (this.props.onMouseLeave) this.props.onMouseLeave(event)
-    // this.setState({ hover: false })
   }
 
   render () {
@@ -224,7 +234,8 @@ class Thumb extends Component {
 
     if (!parentURL) {
       const { url, backgroundColor } = pages[0]
-      const shouldRenderVideo = this.state.hover && asset.mediaType().includes('video')
+      const shouldRenderVideo = this.state.doVideoPreview && asset.mediaType().includes('video')
+      const shouldRenderImageThumb = !this.state.videoPlaying
 
       return (
         <div className={classnames('Thumb', {isSelected})}
@@ -245,6 +256,7 @@ class Thumb extends Component {
                    startFrame={asset.startFrame()}
                    stopFrame={asset.stopFrame()}
                    onError={this.vidError}>
+              { shouldRenderImageThumb ? <ImageThumb url={url} backgroundColor={backgroundColor}/> : null }
               { this.renderOverlays() }
               { badges }
             </Video>
@@ -252,8 +264,8 @@ class Thumb extends Component {
             <ImageThumb url={url} backgroundColor={backgroundColor}>
               { this.renderOverlays() }
               { badges }
-            </ImageThumb>
-          )}
+            </ImageThumb>)
+          }
         </div>
       )
     }
