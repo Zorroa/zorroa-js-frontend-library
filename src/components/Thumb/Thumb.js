@@ -10,6 +10,8 @@ import { addSiblings, isolateSelectId, replaceVariables, valuesForFields, parseV
 import Video from '../Video'
 import FieldTemplate from '../FieldTemplate'
 
+const ellipsis = require('../Assets/ellipsis.gif')
+
 // Extract thumb page info from an asset
 export function page (asset, width, height, origin) {
   const url = asset && asset.closestProxyURL(origin, width, height) || ''
@@ -256,7 +258,13 @@ class Thumb extends Component {
                    startFrame={asset.startFrame()}
                    stopFrame={asset.stopFrame()}
                    onError={this.vidError}>
-              { shouldRenderImageThumb ? <ImageThumb url={url} backgroundColor={backgroundColor}/> : null }
+              { shouldRenderImageThumb ? (
+                <div className='Thumb-video-waiting flexCenter fullWidth fullHeight' style={{ position: 'absolute', top: '0', left: 0 }}>
+                  <ImageThumb url={url} backgroundColor={backgroundColor}/>
+                  <img className='Thumb-video-waiting-spinner' src={ellipsis} style={{ position: 'relative' }}/>
+                </div>
+                )
+                : null }
               { this.renderOverlays() }
               { badges }
             </Video>
