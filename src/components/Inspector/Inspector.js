@@ -44,12 +44,13 @@ class Inspector extends Component {
       inspector = <Pdf page={asset.startPage()} thumbSize={thumbSize}
                        documentInitParameters={{url, withCredentials: true, rangeChunkSize}} />
     } else {
+      const message = error ? (error.code === 4 ? 'Cannot open video file' : error.message) : (mediaType.startsWith('video') ? 'Invalid video file' : undefined)
       const proxy = asset.biggestProxy()
       inspector = <Image url={asset.largestProxyURL(origin)} />
       warning = (
         <div className="Inspector-proxy">
           <div className="Inspector-proxy">{proxy.width} x {proxy.height} proxy</div>
-          { error && <div className="Inspector-error">{error.code === 4 ? 'Cannot open video file' : error.message}</div> }
+          { message && <div className="Inspector-error">{message}</div> }
         </div>
       )
     }
