@@ -34,12 +34,12 @@ class Inspector extends Component {
       imageFormats.findIndex(format => (mediaType.endsWith(format))) >= 0) {
       inspector = <Image url={url}
                          onNextPage={onNext} onPrevPage={onPrev} />
-    } else if (mediaType.startsWith('video')) {
+    } else if (mediaType.startsWith('video') && asset.validVideo()) {
       inspector = <Video url={url} backgroundURL={asset.backgroundURL(origin)}
                          frames={asset.frames()} frameRate={asset.frameRate()}
                          startFrame={asset.startFrame()} stopFrame={asset.stopFrame()}
                          onError={error => this.setState({error})} />
-    } else if (mediaType === 'application/pdf') {
+    } else if (mediaType === 'application/pdf' && asset.pageCount()) {
       const rangeChunkSize = 65536 * 64
       inspector = <Pdf page={asset.startPage()} thumbSize={thumbSize}
                        documentInitParameters={{url, withCredentials: true, rangeChunkSize}} />

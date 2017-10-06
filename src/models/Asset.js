@@ -108,6 +108,12 @@ export default class Asset {
       return this.document.video.frames - 1
     }
   }
+  validVideo () {
+    if (!this.frameRate()) return false
+    if (!this.frames()) return false
+    if (!this.frameRange()) return false
+    return true
+  }
 
   smallestProxy () {
     if (!this.proxies) return null
