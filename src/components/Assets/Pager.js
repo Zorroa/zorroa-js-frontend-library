@@ -14,7 +14,7 @@ class Pager extends Component {
   render () {
     const {loaded, total} = this.props
     if (loaded < total) {
-      const ellipsis = require('./ellipsis.gif')
+      const ellipsis = require('./ellipsis.svg')
       return (
         <div className="Pager-waiting flexRowCenter"
              style={{top: this.props.top + 'px'}}>

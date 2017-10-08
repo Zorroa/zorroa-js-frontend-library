@@ -112,7 +112,7 @@ class Developer extends Component {
   renderSelectedAssets () {
     const { selectedAssetIds } = this.props
     const { selectedAssets, copyingAssets } = this.state
-    const loading = require('../Assets/ellipsis.gif')
+    const loading = require('../Assets/ellipsis.svg')
     return (
       <div className="Developer-assets">
         <div className="Developer-assets-title">
