@@ -68,9 +68,6 @@ class VideoViewer extends Component {
   @keydown('space')
   playPause (event) {
     if (event) event.preventDefault()
-    // const { playing } = this.state
-    // if (playing) this.shuttler.publish('start')
-    // else this.shuttler.publish('stop')
     this.shuttler.publish('startOrStop')
   }
 
