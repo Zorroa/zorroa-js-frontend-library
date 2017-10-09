@@ -245,7 +245,7 @@ class LocalChooser extends Component {
     if (onImport) {
       const totalSize = this.totalSize()
       this.setState({totalSize})
-      this.generateFileBatches(onImport || this.configureUploadFileImport)
+      this.generateFileBatches(onImport)
     } else {
       this.onDone(event)
     }
@@ -307,8 +307,11 @@ class LocalChooser extends Component {
     Promise.all(promises)
       .then(_ => {
         if (files.length) batches.push(files)
-        this.setState({uploadedSize: 0, onImport, cancelUpload: false})
-        makePromiseQueue(batches, this.launchImport, 1, this.launchProgress)
+        const setStateProm = (newState) => {
+          return new Promise(resolve => this.setState(newState, resolve))
+        }
+        setStateProm({uploadedSize: 0, onImport, cancelUpload: false})
+          .then(_ => makePromiseQueue(batches, this.launchImport, 1, this.launchProgress))
       })
   }
 
@@ -463,7 +466,7 @@ class LocalChooser extends Component {
         </div>
         <div className="LocalChooser-start">
           <div className="LocalChooser-button">
-            <div className={classnames('Import-button', {disabled, running})} onClick={!disabled && this.upload}>
+            <div className={classnames('Import-button', {disabled, running})} onClick={!disabled && (e => this.upload(e, this.configureUploadFileImport))}>
               {title}
             </div>
           </div>

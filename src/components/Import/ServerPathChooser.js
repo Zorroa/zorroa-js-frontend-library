@@ -32,10 +32,14 @@ class ServerPathChooser extends Component {
     // To test this scenario, uncomment the makeDelayPromise() below,
     // and set the timeout value to be less than the delay value.
     makeTimeoutPromise(
+      // Load the root path list, create items for each root directory
       this.props.actions.getServerRootPath()
       // .then(response => makeDelayPromise(2000, response)) // Uncomment this to test slow server response
-      .then(response => this.setStateProm({rootPath: response.defaultValue, loading: true}))
-      .then(_ => this.loadFiles(this.state.rootPath, this.state.rootId)),
+      .then(response => {
+        const dirs = response.currentValue.split(',')
+        this.insertItems(ROOT_ID, '', dirs, [])
+        this.setState({rootPath: '/'})
+      }),
       10000, 'unavailable')
     .catch(_ => this.setState({rootPath: 'unavailable'}))
   }
@@ -53,35 +57,38 @@ class ServerPathChooser extends Component {
     .then(_ => this.props.actions.listServerImportFiles(path))
     .then((response) => {
       assert.ok(response)
-      const dirs = response.dirs
-      const files = response.files
-      const children = dirs.concat(files)
-      const childIds = new Set()
-      let { items } = this.state
-      children.forEach(f => {
-        const itemPath = path + '/' + f
-        const item = {
-          id: itemPath,
-          childIds: (dirs.indexOf(f) >= 0) ? new Set() : undefined,
-          name: f,
-          path: itemPath,
-          parentId,
-          metadata: { path_lower: itemPath.toLowerCase() }
-        }
-        items.set(itemPath, item)
-        childIds.add(itemPath)
-      })
-      const parent = items.get(parentId)
-      const newParent = parent ? { ...parent } : { id: ROOT_ID, path: rootPath, name: '/' }
-      newParent.childIds = childIds
-      items.set(parentId, newParent)
+      this.insertItems(parentId, path, response.dirs, response.files)
       const cursor = response.cursor
-      this.setState({items, cursor, loading: false})
+      this.setState({cursor, loading: false})
     })
     .catch((error) => {
       console.log(error)
       this.setState({items: new Map(), loading: false})
     })
+  }
+
+  insertItems = (parentId, path, dirs, files) => {
+    const children = dirs.concat(files)
+    const childIds = new Set()
+    let { items } = this.state
+    children.forEach(f => {
+      const itemPath = path + (path.length ? '/' : '') + f
+      const item = {
+        id: itemPath,
+        childIds: (dirs.indexOf(f) >= 0) ? new Set() : undefined,
+        name: f,
+        path: itemPath,
+        parentId,
+        metadata: { path_lower: itemPath.toLowerCase() }
+      }
+      items.set(itemPath, item)
+      childIds.add(itemPath)
+    })
+    const parent = items.get(parentId)
+    const newParent = parent ? { ...parent } : { id: ROOT_ID, path: '/', name: '/' }
+    newParent.childIds = childIds
+    items.set(parentId, newParent)
+    this.setState({items})
   }
 
   loadDirectory = (id) => {
