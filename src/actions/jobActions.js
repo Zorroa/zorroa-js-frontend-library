@@ -172,8 +172,9 @@ export function uploadFiles (name, pipelineId, files, onUploadProgress) {
   return dispatch => {
     // Pass the Files in FormData, for multipart request headers?
     const formData = new FormData()
-    formData.append('name', name)
-    formData.append('pipelineId', pipelineId)
+    const pipelineIds = []
+    if (pipelineId > 0) pipelineIds.push(pipelineId)
+    formData.append('body', JSON.stringify({name, pipelineIds}))
     files.forEach(file => { formData.append('files', file, file.name) })
     const request = {
       method: 'post',
