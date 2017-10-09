@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import Measure from 'react-measure'
 
 import Controlbar from './Controlbar'
+import { PubSub } from '../../services/jsUtil'
 
 export default class PanZoom extends Component {
   static propTypes = {
@@ -10,7 +11,7 @@ export default class PanZoom extends Component {
     showControls: PropTypes.bool,
     onNextPage: PropTypes.func,
     onPrevPage: PropTypes.func,
-    onVideo: PropTypes.func,
+    shuttler: PropTypes.instanceOf(PubSub),
     playing: PropTypes.bool,
     onVolume: PropTypes.func,
     volume: PropTypes.number,
@@ -121,7 +122,7 @@ export default class PanZoom extends Component {
   }
 
   render () {
-    const { title, titleWidth, showControls, onPrevPage, onNextPage, onVolume, volume, onVideo, playing } = this.props
+    const { title, titleWidth, showControls, onPrevPage, onNextPage, onVolume, volume, shuttler, playing } = this.props
     const { moving } = this.state
     const epsilon = 0.01
     const zoomOutDisabled = this.panner.scale <= PanZoom.minZoom + epsilon
@@ -149,7 +150,7 @@ export default class PanZoom extends Component {
                               onNextPage={onNextPage}
                               onPrevPage={onPrevPage}
                               onVolume={onVolume} volume={volume}
-                              onVideo={onVideo} playing={playing} />)
+                              shuttler={shuttler} playing={playing} />)
               }
             </div>
           )

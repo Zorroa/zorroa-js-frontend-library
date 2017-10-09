@@ -252,3 +252,37 @@ export function makePromiseQueue (data, mkPromiseFn, optNumInflight, optProgress
     for (var i = 0; i < optNumInflight; i++) start(i)
   })
 }
+
+/* ---------------------------------------------------------------------- */
+export class PubSub {
+  topics = {}
+
+  subscribe = (topic, fn) => {
+    if (!topic || !fn) return
+    if (!(topic in this.topics)) this.topics[topic] = []
+    this.topics[topic].push(fn)
+  }
+
+  on = this.subscribe
+
+  unsubscribe = (topic, fn) => {
+    if (!topic) return
+    if (!fn) {
+      delete this.topics[topic]
+    } else {
+      let fns = this.topics[topic]
+      if (!fns) return
+      const index = fns.indexOf(fn)
+      if (index !== -1) fns.splice(index, 1)
+    }
+  }
+
+  off = this.unsubscribe
+
+  publish = (topic, ...data) => {
+    if (!topic) return
+    const fns = this.topics[topic]
+    if (!fns) return
+    fns.forEach(fn => fn(...data))
+  }
+}
