@@ -81,8 +81,7 @@ class Assets extends Component {
       tableIsResizing: false,
       positions: [],
       multipage: {},
-      collapsed: 0,
-      badgeId: null
+      collapsed: 0
     }
 
     this.newTableHeight = 0
@@ -597,23 +596,18 @@ class Assets extends Component {
                   const badgeHeight = thumbSize < 100 ? 15 : 25
                   const showMultipageBadges = showMultipage && parentId !== isolatedParentId
 
-                  const showBadge = this.state.badgeId === asset.id
-
                   const indexes = parentId && multipage[parentId]
                   const pages = indexes && indexes.slice(0, 3).map(index => (
                       page(assets[index], width, height, origin, indexes))) ||
                     [page(asset, width, height, origin)]
                   return (
                     <Thumb isSelected={selectedIds && selectedIds.has(asset.id)}
-                           onMouseEnter={e => this.setState({ badgeId: asset.id })}
-                           onMouseLeave={e => { if (this.state.badgeId === asset.id) this.setState({ badgeId: null }) }}
                            dim={dim}
                            key={asset.id}
                            asset={asset}
                            assetId={asset.id}
                            pages={pages}
                            badgeHeight={badgeHeight}
-                           showBadge={showBadge}
                            showMultipageBadges={showMultipageBadges}
                            onClick={event => {
                              // don't scroll assets when we select thumbs. (table selection will scroll)

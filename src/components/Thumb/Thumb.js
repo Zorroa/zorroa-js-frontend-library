@@ -90,14 +90,11 @@ class Thumb extends Component {
     isSelected: PropTypes.bool,
     badgeHeight: PropTypes.number,
     asset: PropTypes.instanceOf(Asset).isRequired,
-    showBadge: PropTypes.bool,
     showMultipageBadges: PropTypes.bool,
     stackCount: PropTypes.number,
 
     // Actions
     onClick: PropTypes.func.isRequired,
-    onMouseEnter: PropTypes.func.isRequired,
-    onMouseLeave: PropTypes.func.isRequired,
     onDoubleClick: PropTypes.func.isRequired,
 
     // Dragging properties
@@ -119,7 +116,8 @@ class Thumb extends Component {
     this.state = {
       videoStarted: false,
       videoPlaying: false,
-      doVideoPreview: false
+      doVideoPreview: false,
+      showBadge: false
     }
 
     this.shuttler = new PubSub()
@@ -183,7 +181,8 @@ class Thumb extends Component {
   }
 
   renderBadges = (asset, origin, stackCount) => {
-    const { badgeHeight, showBadge, showMultipageBadges, thumbFieldTemplate } = this.props
+    const { badgeHeight, showMultipageBadges, thumbFieldTemplate } = this.props
+    const { showBadge } = this.state
     const iconBadge = showBadge ? <div className="Thumb-field"><FieldTemplate asset={asset} template={thumbFieldTemplate} extensionOnLeft={false}/></div> : null
     const { pageBadge, parentURL } = showMultipageBadges
       ? this.renderMultipageBadges(asset, origin, this.props.stackCount)
@@ -214,11 +213,11 @@ class Thumb extends Component {
   }
 
   onMouseEnter = (event) => {
-    if (this.props.onMouseEnter) this.props.onMouseEnter(event)
+    this.setState({ showBadge: true })
   }
 
   onMouseLeave = (event) => {
-    if (this.props.onMouseLeave) this.props.onMouseLeave(event)
+    this.setState({ showBadge: false })
   }
 
   render () {
@@ -246,7 +245,6 @@ class Thumb extends Component {
              onDoubleClick={onDoubleClick}
              onMouseEnter={this.onMouseEnter}
              onMouseLeave={this.onMouseLeave}
-             onMouseOut={this.onMouseLeave}
              {...dragparams}>
           { shouldRenderVideo && (
             <Video shuttler={this.shuttler}
@@ -285,7 +283,6 @@ class Thumb extends Component {
            onDoubleClick={onDoubleClick}
            onMouseEnter={this.onMouseEnter}
            onMouseLeave={this.onMouseLeave}
-           onMouseOut={this.onMouseLeave}
            {...dragparams}>
         { pages.slice(0, 3).reverse().map((page, rindex) => {
           const { url, backgroundColor } = page
