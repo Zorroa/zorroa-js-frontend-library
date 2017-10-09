@@ -10,7 +10,7 @@ import { addSiblings, isolateSelectId, replaceVariables, valuesForFields, parseV
 import Video from '../Video'
 import FieldTemplate from '../FieldTemplate'
 
-const ellipsis = require('../Assets/ellipsis.gif')
+const ellipsis = require('../Assets/ellipsis.svg')
 
 // Extract thumb page info from an asset
 export function page (asset, width, height, origin) {
