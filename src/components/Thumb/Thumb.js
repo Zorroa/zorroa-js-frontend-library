@@ -91,7 +91,6 @@ class Thumb extends Component {
     badgeHeight: PropTypes.number,
     asset: PropTypes.instanceOf(Asset).isRequired,
     showMultipageBadges: PropTypes.bool,
-    stackCount: PropTypes.number,
 
     // Actions
     onClick: PropTypes.func.isRequired,
@@ -185,7 +184,7 @@ class Thumb extends Component {
     const { showBadge } = this.state
     const iconBadge = showBadge ? <div className="Thumb-field"><FieldTemplate asset={asset} template={thumbFieldTemplate} extensionOnLeft={false}/></div> : null
     const { pageBadge, parentURL } = showMultipageBadges
-      ? this.renderMultipageBadges(asset, origin, this.props.stackCount)
+      ? this.renderMultipageBadges(asset, origin, stackCount)
       : this.renderMonopageBadges(asset)
 
     if (!pageBadge && !iconBadge) return { }
