@@ -24,6 +24,7 @@ export function isValidEmail (email) {
 }
 
 export function formatDuration (seconds, fps) {
+  if (!seconds) return '??:??'
   const date = new Date(seconds * 1000)
   const hh = pad(date.getUTCHours())
   const mm = pad(date.getUTCMinutes())

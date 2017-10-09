@@ -34,22 +34,23 @@ class Inspector extends Component {
       imageFormats.findIndex(format => (mediaType.endsWith(format))) >= 0) {
       inspector = <Image url={url}
                          onNextPage={onNext} onPrevPage={onPrev} />
-    } else if (mediaType.startsWith('video')) {
+    } else if (mediaType.startsWith('video') && asset.validVideo()) {
       inspector = <VideoViewer url={url} backgroundURL={asset.backgroundURL(origin)}
                          frames={asset.frames()} frameRate={asset.frameRate()}
                          startFrame={asset.startFrame()} stopFrame={asset.stopFrame()}
                          onError={error => this.setState({error})} />
-    } else if (mediaType === 'application/pdf') {
+    } else if (mediaType === 'application/pdf' && asset.pageCount()) {
       const rangeChunkSize = 65536 * 64
       inspector = <Pdf page={asset.startPage()} thumbSize={thumbSize}
                        documentInitParameters={{url, withCredentials: true, rangeChunkSize}} />
     } else {
+      const message = error ? (error.code === 4 ? 'Cannot open video file' : error.message) : (mediaType.startsWith('video') ? 'Invalid video file' : undefined)
       const proxy = asset.biggestProxy()
       inspector = <Image url={asset.largestProxyURL(origin)} />
       warning = (
         <div className="Inspector-proxy">
           <div className="Inspector-proxy">{proxy.width} x {proxy.height} proxy</div>
-          { error && <div className="Inspector-error">{error.code === 4 ? 'Cannot open video file' : error.message}</div> }
+          { message && <div className="Inspector-error">{message}</div> }
         </div>
       )
     }
