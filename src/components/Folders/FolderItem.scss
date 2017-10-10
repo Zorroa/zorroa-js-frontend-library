@@ -204,4 +204,5 @@ $FolderItemHeight : 25px;
 
 .FolderItem-taxonomy {
   margin-right: 8px;
+  .dark & { color: $zorroa-gray; }
 }

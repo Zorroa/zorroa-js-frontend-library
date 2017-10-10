@@ -9,7 +9,9 @@ $TrashHeight : 25px;
   &:not(.isOpen) .Trash-toggleArrow {
     transform: rotate(-90deg);
   }
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid $zorroa-darkgray;
+
+  .dark & { border-bottom: 1px solid $zorroa-lightgray; }
 }
 
 .Trash-header {
@@ -81,12 +83,6 @@ $TrashHeight : 25px;
 .Trash-items {
   @include flexCol;
   color: $zorroa-greyish-brown;
-
-  &:nth-child(odd) {
-    background-color: white;
-
-    .dark & { background-color: black; }
-  }
 }
 
 .Trash-item {
@@ -100,6 +96,14 @@ $TrashHeight : 25px;
   padding-right: 10px;
 
   &.isSelected { color: white; background-color: $zorroa-gray }
+
+  background-color: #f1f1f1;
+  .dark & { background-color: $zorroa-mattblack; }
+
+  &:nth-child(even) {
+    background-color: white;
+    .dark & { background-color: black; }
+  }
 }
 
 .Trash-context-menu {
