@@ -14,13 +14,12 @@
 
 .VideoRange-clip-range {
   //background-color: red;
-  @include flexOff;
-  @include flexRow;
-  @include flexJustifySpaceBetween;
   @include fullHeight;
+  @include fullWidth;
 }
 
 .VideoRange-clip-range-left {
+  position: absolute;
   cursor: ew-resize;
   width: 5px;
   @include fullHeight;
@@ -29,11 +28,8 @@
   &:hover { background-color: lightyellow; }
 }
 
-.VideoRange-clip-range-middle{
-  @include flexOn;
-}
-
 .VideoRange-clip-range-right {
+  position: absolute;
   cursor: ew-resize;
   width: 5px;
   @include fullHeight;
@@ -43,15 +39,18 @@
 }
 
 .VideoRange-clip-playhead {
-  width: 8px;
-  border-radius: 2px;
-  border: solid 3px $zorroa-water-blue;
+  width: 16px;
+  height: 16px;
+  border-radius: 8px;
   position: absolute;
   top: 0;
   bottom: 0;
+  margin-left: -6px;
+  margin-top: auto;
+  margin-bottom: auto;
   cursor: ew-resize;
-  &:hover:not(.scrubbing) { background-color: $zorroa-water-blue; }
-  &.scrubbing { background-color: $zorroa-water-blue; }
+  background-color: $zorroa-navy-blue;
+  &:hover { background-color: $zorroa-water-blue; }
 }
 
 .VideoRange-movie {
