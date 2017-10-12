@@ -240,7 +240,7 @@ class Video extends Component {
 
   init = () => {
     if (this.initialized()) return
-    this.rewind()
+    this.scrub(this.props.startFrame)
     this.start()
     this.initialize()
   }
