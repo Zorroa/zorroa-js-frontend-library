@@ -6,7 +6,8 @@ import DropboxChooser from './DropboxChooser'
 import BoxChooser from './BoxChooser'
 import GDriveChooser from './GDriveChooser'
 import CloudproxyChooser from './CloudproxyChooser'
-import { DROPBOX_CLOUD, BOX_CLOUD, GDRIVE_CLOUD, CLOUDPROXY_CLOUD } from './ImportConstants'
+import ServerPathChooser from './ServerPathChooser'
+import { DROPBOX_CLOUD, BOX_CLOUD, GDRIVE_CLOUD, CLOUDPROXY_CLOUD, SERVER_PATH_CLOUD } from './ImportConstants'
 
 export default class ImportFinder extends Component {
   static propTypes = {
@@ -67,6 +68,7 @@ export default class ImportFinder extends Component {
       case BOX_CLOUD: return <BoxChooser onSelect={this.selectFile} onBack={onBack} accessToken={accessToken} clientID="nvjb3koff9j86go05crt24o0br60gk2r" clientSecret="sPX3HUXU98pRMj1QDCVjW3xeTw8ccmPy"/>
       case CLOUDPROXY_CLOUD: return <CloudproxyChooser onSelect={this.selectFile} onBack={onBack}/>
       case GDRIVE_CLOUD: return <GDriveChooser onSelect={this.selectFile} onBack={onBack} accessToken=""/>
+      case SERVER_PATH_CLOUD: return <ServerPathChooser onSelect={this.selectFile} onBack={onBack}/>
     }
   }
 
@@ -87,7 +89,7 @@ export default class ImportFinder extends Component {
     return (
       <div className="ImportFinder">
         <div className="Import-back" onClick={onBack}>
-          <div className="icon-arrow-down" style={{transform: 'rotate(-90deg)'}}/>
+          <div className="icon-arrow-down" style={{transform: 'rotate(90deg)'}}/>
           Back
         </div>
         <div className="Import-title">
@@ -104,7 +106,7 @@ export default class ImportFinder extends Component {
                  onClick={this.addSelected} style={{transform: 'rotate(-90deg)'}}/>
             <div className={classnames('ImportFinder-shifter',
               'icon-arrow-down', 'flip', {disabled: !selectedAddedFiles.size})}
-                 onClick={this.removeSelected} style={{transform: 'rotate(-90deg)'}}/>
+                 onClick={this.removeSelected} style={{transform: 'rotate(90deg)'}}/>
           </div>
           <div className="ImportFinder-added">
             <div className="ImportFinder-added-filter">

@@ -253,6 +253,26 @@ export function makePromiseQueue (data, mkPromiseFn, optNumInflight, optProgress
   })
 }
 
+/* ----------------------------------------------------------------------
+Return a promise that resolves after the given number of milliseconds
+*/
+export function makeDelayPromise (msToWait, optResolveVal) {
+  return new Promise((resolve, reject) => setTimeout(_ => resolve(optResolveVal), msToWait))
+}
+
+/* ----------------------------------------------------------------------
+Return a promise that times out & rejects after the given number of milliseconds
+optRejectVal is optional, the value to pass to reject()
+https://www.promisejs.org/patterns/
+*/
+export function makeTimeoutPromise (promise, msToWait, optRejectVal) {
+  var rejectVal = (optRejectVal !== undefined) ? optRejectVal : 'timeout'
+  return Promise.race([
+    promise,
+    makeDelayPromise(msToWait).then(_ => Promise.reject(rejectVal))
+  ])
+}
+
 /* ---------------------------------------------------------------------- */
 export class PubSub {
   topics = {}

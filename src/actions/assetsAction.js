@@ -6,14 +6,14 @@ import {
   ASSET_PERMISSIONS, ASSET_SEARCHING,
   UPDATE_COMMAND, GET_COMMANDS,
   ISOLATE_ASSET, SELECT_ASSETS, ISOLATE_PARENT,
-  SUGGEST_COMPLETIONS, ALL_ASSET_COUNT, SIMILAR_FIELDS
+  SUGGEST_COMPLETIONS, ALL_ASSET_COUNT, SIMILAR_FIELDS, ASSET_DELETE
 } from '../constants/actionTypes'
 import Asset from '../models/Asset'
 import Page from '../models/Page'
 import Command from '../models/Command'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
-import { archivistGet, archivistPut, archivistPost } from './authAction'
+import { archivistGet, archivistPut, archivistPost, archivistDelete } from './authAction'
 
 export function requiredFields (fields, fieldTypes) {
   const required = [
@@ -369,5 +369,21 @@ export function getAllAssetCount () {
       .catch(error => {
         console.log('Error counting all assets: ' + error)
       })
+  }
+}
+
+export function deleteAsset (assetId, folderId) {
+  return dispatch => {
+    return archivistDelete(dispatch, `/api/v1/assets/${assetId}`)
+    .then(response => {
+      dispatch({
+        type: ASSET_DELETE,
+        payload: { assetId, folderId, data: response.data }
+      })
+    })
+    .catch(error => {
+      console.error(`Error deleting assed ${assetId}`, error)
+      return Promise.reject(error)
+    })
   }
 }

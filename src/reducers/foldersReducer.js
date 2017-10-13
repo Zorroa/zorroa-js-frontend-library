@@ -4,7 +4,7 @@ import {
   TOGGLE_FOLDER, UNAUTH_USER, FOLDER_COUNTS, DROP_FOLDER_ID,
   TRASHED_FOLDERS, EMPTY_FOLDER_TRASH, COUNT_TRASHED_FOLDERS,
   RESTORE_TRASHED_FOLDERS, DELETE_TRASHED_FOLDERS,
-  CLEAR_MODIFIED_FOLDERS, ASSET_SEARCH,
+  CLEAR_MODIFIED_FOLDERS, ASSET_SEARCH, ASSET_DELETE,
   CREATE_TAXONOMY, DELETE_TAXONOMY, UPDATE_FOLDER_PERMISSIONS
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
@@ -246,6 +246,13 @@ export default function (state = initialState, action) {
     }
 
     case REMOVE_ASSETS_FROM_FOLDER: {
+      const folder = state.all && state.all.get(action.payload.folderId)
+      const modifiedIds = new Set(state.modifiedIds)
+      _addAncestorIds(folder, modifiedIds, state.all)
+      return { ...state, modifiedIds }
+    }
+
+    case ASSET_DELETE: {
       const folder = state.all && state.all.get(action.payload.folderId)
       const modifiedIds = new Set(state.modifiedIds)
       _addAncestorIds(folder, modifiedIds, state.all)

@@ -3,7 +3,7 @@ import {
   ASSET_SORT, ASSET_ORDER, ASSET_FIELDS,
   ASSET_PERMISSIONS, ASSET_SEARCHING,
   UPDATE_COMMAND, GET_COMMANDS,
-  ISOLATE_ASSET, SELECT_ASSETS,
+  ISOLATE_ASSET, SELECT_ASSETS, ASSET_DELETE,
   ADD_ASSETS_TO_FOLDER, REMOVE_ASSETS_FROM_FOLDER,
   SUGGEST_COMPLETIONS, UNAUTH_USER, ISOLATE_PARENT,
   ALL_ASSET_COUNT, SIMILAR_FIELDS
@@ -233,6 +233,27 @@ export default function (state = initialState, action) {
 
     case ALL_ASSET_COUNT:
       return { ...state, allAssetCount: action.payload }
+
+    case ASSET_DELETE:
+      const { assetId, folderId } = action.payload // TODO: do we need to examine the response (action.payload.data)?
+
+      // remove the deleted asset from list of all assets
+      const all = [...state.all]
+      const index = all.findIndex(asset => (asset.id === assetId))
+      if (index >= 0) {
+        const asset = new Asset(all[index])
+        asset.removeFolderIds([folderId])
+        all.splice(index, 1)
+      }
+
+      // increment asset counter
+      const assetsCounter = state.assetsCounter + 1
+      api.setAssetsCounter(assetsCounter)
+
+      // clear selection
+      const selectedIds = new Set()
+
+      return { ...state, selectedIds, all, assetsCounter }
   }
 
   return state

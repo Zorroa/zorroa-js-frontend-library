@@ -21,7 +21,8 @@ import User from '../../models/User'
 import Pipeline from '../../models/Pipeline'
 import Processor from '../../models/Processor'
 import Cloudproxy from '../../services/Cloudproxy'
-import { CLOUD_IMPORT, SERVER_IMPORT, LOCAL_IMPORT, CLOUDPROXY_IMPORT, DROPBOX_CLOUD, BOX_CLOUD, GDRIVE_CLOUD, CLOUDPROXY_CLOUD } from './ImportConstants'
+import { CLOUD_IMPORT, SERVER_IMPORT, SERVER_PATH_IMPORT, LOCAL_IMPORT, CLOUDPROXY_IMPORT,
+  DROPBOX_CLOUD, BOX_CLOUD, GDRIVE_CLOUD, CLOUDPROXY_CLOUD, SERVER_PATH_CLOUD } from './ImportConstants'
 
 class Import extends Component {
   static propTypes = {
@@ -123,9 +124,10 @@ class Import extends Component {
         }
         break
       case LOCAL_IMPORT: return this.configureUploadFileImport(files, progress)
-      case SERVER_IMPORT:
-        break
       case CLOUDPROXY_IMPORT: return this.configureCloudproxyImport(files, progress)
+      case SERVER_IMPORT:
+      case SERVER_PATH_IMPORT:
+        return this.configureServerPathImport(files, progress)
     }
     return {}
   }
@@ -226,6 +228,7 @@ class Import extends Component {
       case SERVER_IMPORT: return <ImportCloudproxy onSelect={this.selectCloudproxy} onBack={e => this.setStep(1)} local={this.state.uploadOverflow}/>
       case LOCAL_IMPORT: return <LocalChooser onImport={this.configureUploadFileImport} onBack={e => this.setStep(1)} onCloudproxy={this.localToCloudproxy}/>
       case CLOUDPROXY_IMPORT: return <LocalCloudproxy step={2} onBack={e => this.setStep(1)} onDone={e => { this.setState({cloud: CLOUDPROXY_CLOUD}); this.setStep(3) }}/>
+      case SERVER_PATH_IMPORT: requestAnimationFrame(_ => this.setStep(3)); return null
     }
   }
 
@@ -236,6 +239,7 @@ class Import extends Component {
       case CLOUD_IMPORT: return <ImportFinder mode={cloud} accessToken={accessToken} onImport={this.createImport} onBack={e => { this.setState({cloud: ''}); this.setStep(2) }}/>
       case SERVER_IMPORT: return <CloudproxyInstructions local={uploadOverflow} os={os} onDone={this.cloudproxyInstalled} onBack={e => this.setStep(2)}/>
       case LOCAL_IMPORT: return <LocalChooser onDone={e => this.setStep(4)} onBack={e => this.setStep(2)}/>
+      case SERVER_PATH_IMPORT: return <ImportFinder mode={SERVER_PATH_CLOUD} onImport={this.createImport} onBack={e => this.setStep(1)}/>
     }
   }
 
