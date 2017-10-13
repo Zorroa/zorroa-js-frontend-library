@@ -24,10 +24,10 @@ import {
   createTaxonomy,
   deleteTaxonomy
 } from '../../actions/folderAction'
-import { showModal, hideModal, dialogAlertPromise, toggleCollapsible } from '../../actions/appActions'
+import { showModal, hideModal, dialogAlertPromise, dialogConfirmPromise, toggleCollapsible } from '../../actions/appActions'
 import { exportAssets, getJob, markJobDownloaded } from '../../actions/jobActions'
 import { restoreFolders } from '../../actions/racetrackAction'
-import { setAssetPermissions } from '../../actions/assetsAction'
+import { setAssetPermissions, deleteAsset, searchAssets, selectAssetIds } from '../../actions/assetsAction'
 import { isolateSelectId } from '../../services/jsUtil'
 import { FILTERED_COUNTS, FULL_COUNTS, NO_COUNTS } from './Folders'
 
@@ -112,7 +112,8 @@ class FolderItem extends Component {
     uxLevel: PropTypes.number,
     actions: PropTypes.object,
     userSettings: PropTypes.object.isRequired,
-    jobs: PropTypes.object
+    jobs: PropTypes.object,
+    query: PropTypes.instanceOf(AssetSearch)
   }
 
   state = {
@@ -330,6 +331,41 @@ class FolderItem extends Component {
     })
   }
 
+  deleteAssets = () => {
+    const { selectedAssetIds, actions } = this.props
+    if (!selectedAssetIds) return
+    this.dismissContextMenu(event)
+
+    const selectedFolderIds = this.simpleFolderIds()
+    if (!selectedFolderIds || selectedFolderIds.length > 1) {
+      actions.dialogAlertPromise('Unsafe delete',
+        'For safety, asset delete is only allowed from 1 folder at a time.')
+      return
+    }
+    if (selectedAssetIds.size > 20) {
+      actions.dialogAlertPromise('Unsafe delete',
+        'For safety, asset delete is limited to 20 assets.')
+      return
+    }
+
+    return actions.dialogConfirmPromise('Delete Assets',
+      'This cannot be undone. Are you sure you want to permanently delete these assets?')
+    .then(_ => {
+      const folderId = selectedFolderIds[0]
+      const promises = [...selectedAssetIds].map(assetId => actions.deleteAsset(assetId, folderId))
+      return Promise.all(promises)
+      /* eslint-disable handle-callback-err */ // error is handled in actions.deleteAsset, and also here (we just don't need the error object)
+      .catch(error => {
+        actions.dialogAlertPromise('Delete errors',
+          'There was an error deleting some or all assets. Check the browser dev console for a complete list.')
+      })
+      /* eslint-enable handle-callback-err */
+      .then(() => {
+        // Anything else? Flush or update query? Delete folder?
+      })
+    })
+  }
+
   createTaxonomy = (create) => {
     const {actions, folder} = this.props
     this.dismissContextMenu(event)
@@ -449,6 +485,7 @@ class FolderItem extends Component {
     } else if (!this.selectedFolderContainsSelectedAssets()) {
       removableAssetTitle = 'Selected assets are not in selected folder'
     }
+    const deleteAssetsTitle = 'Delete assets'
     let removeFolderTitle = writePermission ? 'Move folder to trash' : 'No write permission'
 
     // FIXME: Get Link, Move to, and Favorite are disabled until implemented
@@ -549,6 +586,12 @@ class FolderItem extends Component {
             <div className="icon-removeasset"/>
             <div>Remove Assets</div>
           </div>
+          <div onClick={removableAssets && this.deleteAssets}
+               title={deleteAssetsTitle}
+               className={classnames('FolderItem-context-item FolderItem-context-delete-assets', {disabled: !removableAssets})}>
+            <div className="icon-cross"/>
+            <div>Delete Assets</div>
+          </div>
           <div onClick={writePermission && this.removeFolder}
                title={removeFolderTitle}
                className={classnames('FolderItem-context-item FolderItem-context-remove-folder', {disabled: !writePermission})}
@@ -648,7 +691,8 @@ export default connect(state => ({
   isAdministrator: state.auth.isAdministrator,
   uxLevel: state.app.uxLevel,
   userSettings: state.app.userSettings,
-  jobs: state.jobs.all
+  jobs: state.jobs.all,
+  query: state.assets && state.assets.query
 }), dispatch => ({
   actions: bindActionCreators({
     createFolder,
@@ -661,11 +705,15 @@ export default connect(state => ({
     showModal,
     hideModal,
     dialogAlertPromise,
+    dialogConfirmPromise,
     deleteFolderIds,
     updateFolder,
     updateFolderPermissions,
     restoreFolders,
     setAssetPermissions,
+    deleteAsset,
+    searchAssets,
+    selectAssetIds,
     createTaxonomy,
     deleteTaxonomy,
     toggleCollapsible
