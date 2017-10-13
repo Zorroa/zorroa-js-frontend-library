@@ -1,12 +1,12 @@
 import {
   ASSET_SEARCH, ASSET_AGGS, ASSET_SEARCH_ERROR,
   ASSET_SORT, ASSET_ORDER, ASSET_FIELDS,
-  SIMILAR_VALUES, SIMILAR_ASSETS,
   ASSET_PERMISSIONS, ASSET_SEARCHING,
   UPDATE_COMMAND, GET_COMMANDS,
   ISOLATE_ASSET, SELECT_ASSETS, ASSET_DELETE,
   ADD_ASSETS_TO_FOLDER, REMOVE_ASSETS_FROM_FOLDER,
-  SUGGEST_COMPLETIONS, UNAUTH_USER, ISOLATE_PARENT, ALL_ASSET_COUNT
+  SUGGEST_COMPLETIONS, UNAUTH_USER, ISOLATE_PARENT,
+  ALL_ASSET_COUNT, SIMILAR_FIELDS
 } from '../constants/actionTypes'
 
 import * as api from '../globals/api.js'
@@ -21,7 +21,7 @@ const initialState = {
   assetsCounter: 0,
   selectionCounter: 0,
   commands: new Map(),
-  similar: []
+  similarFields: new Set()
 }
 
 export default function (state = initialState, action) {
@@ -124,15 +124,16 @@ export default function (state = initialState, action) {
     case ASSET_ORDER:
       return { ...state, order: action.payload, similar: [] }
 
-    case SIMILAR_VALUES:
-      if (action.payload) {
-        const hashes = action.payload.values
-        if (hashes.length) return { ...state, order: null }
-      }
-      break
-
-    case SIMILAR_ASSETS:
-      return { ...state, similar: action.payload }
+    case SIMILAR_FIELDS: {
+      if (!action.payload || !action.payload.aggregations) return state
+      const aggs = action.payload.aggregations
+      const similarFields = new Set()
+      Object.keys(aggs).forEach(key => {
+        const count = aggs[key].doc_count
+        if (count) similarFields.add(key)
+      })
+      return { ...state, similarFields }
+    }
 
     case ASSET_FIELDS: {
       const fields = action.payload

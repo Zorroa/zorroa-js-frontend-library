@@ -5,13 +5,13 @@ import { connect } from 'react-redux'
 import keydown from 'react-keydown'
 import * as assert from 'assert'
 
-import Thumb, { page, monopageBadges, multipageBadges } from '../Thumb'
+import Thumb, { page } from '../Thumb'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
 import Widget from '../../models/Widget'
 import Folder from '../../models/Folder'
-import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, similarAssets, unorderAssets, isolateParent } from '../../actions/assetsAction'
-import { resetRacetrackWidgets, restoreFolders, similar } from '../../actions/racetrackAction'
+import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, unorderAssets, isolateParent } from '../../actions/assetsAction'
+import { resetRacetrackWidgets, restoreFolders } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
 import { setThumbSize, setThumbLayout, showTable, setTableHeight, showMultipage, showModal, hideModal, iconifyRightSidebar } from '../../actions/appActions'
@@ -20,7 +20,6 @@ import Footer from './Footer'
 import Table from '../Table'
 import Sidebar from '../Sidebar'
 import Racetrack from '../Racetrack'
-import FieldTemplate from '../FieldTemplate'
 import * as ComputeLayout from './ComputeLayout.js'
 import AssetSearch from '../../models/AssetSearch'
 import Resizer from '../../services/Resizer'
@@ -51,15 +50,9 @@ class Assets extends Component {
     showTable: PropTypes.bool.isRequired,
     tableHeight: PropTypes.number.isRequired,
     showMultipage: PropTypes.bool.isRequired,
-    thumbFieldTemplate: PropTypes.string.isRequired,
     rightSidebarIsIconified: PropTypes.bool,
     folders: PropTypes.instanceOf(Map),
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
-    similar: PropTypes.shape({
-      field: PropTypes.string,
-      values: PropTypes.arrayOf(PropTypes.string).isRequired,
-      ofsIds: PropTypes.arrayOf(PropTypes.string).isRequired
-    }).isRequired,
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
     uxLevel: PropTypes.number,
     user: PropTypes.instanceOf(User),
@@ -83,8 +76,7 @@ class Assets extends Component {
       tableIsResizing: false,
       positions: [],
       multipage: {},
-      collapsed: 0,
-      badgeId: null
+      collapsed: 0
     }
 
     this.newTableHeight = 0
@@ -228,7 +220,6 @@ class Assets extends Component {
   clearSearch = () => {
     this.props.actions.resetRacetrackWidgets()
     this.props.actions.selectFolderIds()
-    this.props.actions.similar()
     this.props.actions.unorderAssets()
     this.props.actions.selectJobIds()
     this.props.actions.isolateParent()
@@ -274,7 +265,6 @@ class Assets extends Component {
     }
     this.updateAssetsScrollSizeInterval = setInterval(this.updateAssetsScrollSize, 150)
     this.resizer = new Resizer()
-    this.updateSelectedHashes(this.props.similar.field, this.props.selectedIds)
 
     // Support using the navigation buttons to restore previous search state
     // This 'first' history entry is a sentinel we use to warn the user about going back too far & losing their history
@@ -340,12 +330,12 @@ class Assets extends Component {
 
   saveHistory = (optFirstTimeHistoryKey) => {
     if (this.historyNav && !optFirstTimeHistoryKey) return
-    const { query, similar, order, widgets } = this.props
+    const { query, order, widgets } = this.props
     this.stopHistoryNav()
 
     const path = location.pathname + location.search
     const historyKey = optFirstTimeHistoryKey || Date.now().toString()
-    const attrs = { similar, widgets, order }
+    const attrs = { widgets, order }
     const folderObj = { search: query, attrs }
     const folder = new Folder(folderObj)
     this.history[historyKey] = { folder }
@@ -369,25 +359,6 @@ class Assets extends Component {
     // clear any pending layout
     this.clearAssetsLayoutTimer()
     this.resizer.release()
-  }
-
-  componentWillReceiveProps = (nextProps) => {
-    this.updateSelectedHashes(nextProps.similar.field, nextProps.selectedIds)
-  }
-
-  updateSelectedHashes = (similarField, selectedIds) => {
-    if (similarField && similarField.length && selectedIds && selectedIds.size) {
-      const ids = new Set([...selectedIds])
-      if (this.similarIds && equalSets(ids, this.similarIds) && this.similarField && this.similarField === similarField) return
-      this.similarIds = ids
-      this.similarField = similarField
-      const assetIds = [...ids]
-      const fields = [similarField, 'proxies*']
-      this.props.actions.similarAssets(assetIds, fields)
-    } else {
-      this.similarIds = null
-      this.props.actions.similarAssets()
-    }
   }
 
   onAssetsScrollScroll = (event) => {
@@ -520,7 +491,7 @@ class Assets extends Component {
 
   renderAssets () {
     const { assets, selectedIds, loadedCount, filteredCount, layout, showMultipage,
-      parentCounts, parentTotals, origin, thumbSize, query, thumbFieldTemplate, isolatedParent } = this.props
+      parentCounts, origin, thumbSize, query, isolatedParent } = this.props
     const { positions, multipage, tableIsResizing } = this.state
     api.setTableIsResizing(tableIsResizing)
 
@@ -596,27 +567,22 @@ class Assets extends Component {
                   }
                   if (!dim || width <= 0 || height <= 0) return null
                   const parentId = asset.parentId()
-                  const indexes = parentId && multipage[parentId]
-                  const stackCount = parentId && parentTotals && parentTotals.get(parentId)
-                  const showBadge = this.state.badgeId === asset.id
                   const badgeHeight = thumbSize < 100 ? 15 : 25
-                  const badge = showMultipage && parentId !== isolatedParentId ? multipageBadges(asset, origin, stackCount) : monopageBadges(asset)
-                  const iconBadge = showBadge ? <div className="Thumb-field"><FieldTemplate asset={asset} template={thumbFieldTemplate} extensionOnLeft={false}/></div> : null
+                  const showMultipageBadges = showMultipage && parentId !== isolatedParentId
 
+                  const indexes = parentId && multipage[parentId]
                   const pages = indexes && indexes.slice(0, 3).map(index => (
                       page(assets[index], width, height, origin, indexes))) ||
                     [page(asset, width, height, origin)]
                   return (
                     <Thumb isSelected={selectedIds && selectedIds.has(asset.id)}
-                           onMouseEnter={e => this.setState({ badgeId: asset.id })}
-                           onMouseLeave={e => { if (this.state.badgeId === asset.id) this.setState({ badgeId: null }) }}
                            dim={dim}
                            key={asset.id}
+                           asset={asset}
                            assetId={asset.id}
                            pages={pages}
                            badgeHeight={badgeHeight}
-                           iconBadge={iconBadge}
-                           { ...badge }
+                           showMultipageBadges={showMultipageBadges}
                            onClick={event => {
                              // don't scroll assets when we select thumbs. (table selection will scroll)
                              this.skipNextSelectionScroll = true
@@ -733,8 +699,6 @@ export default connect(state => ({
   showTable: state.app.showTable,
   tableHeight: state.app.tableHeight,
   showMultipage: state.app.showMultipage,
-  thumbFieldTemplate: state.app.thumbFieldTemplate,
-  similar: state.racetrack.similar,
   widgets: state.racetrack.widgets,
   origin: state.auth.origin
 }), dispatch => ({
@@ -744,9 +708,7 @@ export default connect(state => ({
     selectAssetIds,
     sortAssets,
     searchAssets,
-    similarAssets,
     unorderAssets,
-    similar,
     resetRacetrackWidgets,
     restoreFolders,
     selectFolderIds,

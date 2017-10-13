@@ -9,7 +9,6 @@ import Permission from '../../models/Permission'
 import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import { showModal, dialogAlertPromise } from '../../actions/appActions'
 import { getAllPermissions } from '../../actions/permissionsAction'
-import * as WidgetInfo from './WidgetInfo'
 
 class QuickAddWidget extends Component {
   static propTypes = {
@@ -32,21 +31,6 @@ class QuickAddWidget extends Component {
     if (widgetInfo.fieldTypes && !widgetInfo.fieldTypes.length && !widgetInfo.fieldRegex) {
       this.updateDisplayOptions(event, {}, widgetInfo)
       this.dismiss(event)
-      return
-    }
-
-    // TEMPORARY BAND-AID
-    // Don't allow a color widget and a similar hash widget simultaneously
-    // Remove when we can do both at the same time
-    const { widgets } = this.props
-    const colorWidgets = widgets.filter(widget => widget.type === WidgetInfo.ColorWidgetInfo.type)
-    if (colorWidgets.length && widgetInfo.type === WidgetInfo.SimilarHashWidgetInfo.type) {
-      this.props.actions.dialogAlertPromise('Similarity', 'Please delete the Color widget to use Similar image search. This is only temporary.')
-      return
-    }
-    const similarWidgets = widgets.filter(widget => widget.type === WidgetInfo.SimilarHashWidgetInfo.type)
-    if (similarWidgets.length && widgetInfo.type === WidgetInfo.ColorWidgetInfo.type) {
-      this.props.actions.dialogAlertPromise('Color', 'Please delete the Similar widget to use Color image search. This is only temporary.')
       return
     }
 

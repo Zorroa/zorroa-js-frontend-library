@@ -6,7 +6,11 @@ import Duration from '../Duration'
 import { DragSource } from '../../services/DragDrop'
 import Asset from '../../models/Asset'
 
-import { addSiblings, isolateSelectId, replaceVariables, valuesForFields, parseVariables } from '../../services/jsUtil'
+import { addSiblings, isolateSelectId, replaceVariables, valuesForFields, parseVariables, PubSub } from '../../services/jsUtil'
+import Video from '../Video'
+import FieldTemplate from '../FieldTemplate'
+
+const ellipsis = require('../Assets/ellipsis.svg')
 
 // Extract thumb page info from an asset
 export function page (asset, width, height, origin) {
@@ -14,49 +18,6 @@ export function page (asset, width, height, origin) {
   const tproxy = asset && asset.tinyProxy()
   const backgroundColor = tproxy ? tproxy[4] : '#888'
   return { url, backgroundColor }
-}
-
-// Extract badging info from an asset.
-export function monopageBadges (asset) {
-  const startPage = asset.startPage()
-  const stopPage = asset.stopPage()
-  let pageBadge
-  if (asset.mediaType().includes('video')) {
-    pageBadge = <Duration duration={asset.duration()}/>
-  } else if (startPage && (!stopPage || startPage === stopPage)) {
-    pageBadge = <div className="Thumb-page-label">{startPage}</div>
-  } else if (startPage && stopPage) {
-    pageBadge = <div className="Thumb-page-label">{startPage} - {stopPage}</div>
-  }
-  return { pageBadge }
-}
-
-export function multipageBadges (asset, origin, stackCount) {
-  let pageBadge, parentURL
-
-  const pageCount = asset.pageCount() || stackCount
-  const startPage = asset.startPage()
-  const stopPage = asset.stopPage()
-  if (pageCount > 1) {
-    if (stackCount > 0 && stackCount !== pageCount) {
-      pageBadge = <div className="Thumb-page-label">{stackCount} of {pageCount}</div>
-    } else if (stackCount === pageCount) {
-      pageBadge = <div className="Thumb-page-label">{pageCount}</div>
-    } else if (startPage && (!stopPage || startPage === stopPage)) {
-      pageBadge = <div className="Thumb-page-label">{startPage}</div>
-    } else if (startPage && stopPage) {
-      pageBadge = <div className="Thumb-page-label">{startPage} - {stopPage}</div>
-    }
-  } else if (asset.mediaType().includes('video')) {
-    pageBadge = <Duration duration={asset.duration()}/>
-  }
-
-  // Show the icon & inset if we have any page badging
-  if (pageBadge) {
-    parentURL = asset.smallestParentProxyURL(origin)
-  }
-
-  return { pageBadge, parentURL }
 }
 
 // Called when dragging an asset to assign assetIds to drop info
@@ -125,38 +86,117 @@ class Thumb extends Component {
     })).isRequired,
 
     // Rendering options
-    parentURL: PropTypes.string,
-    pageBadge: PropTypes.node,
     iconBadge: PropTypes.element,
     isSelected: PropTypes.bool,
     badgeHeight: PropTypes.number,
+    asset: PropTypes.instanceOf(Asset).isRequired,
+    showMultipageBadges: PropTypes.bool,
 
     // Actions
     onClick: PropTypes.func.isRequired,
-    onMouseEnter: PropTypes.func.isRequired,
-    onMouseLeave: PropTypes.func.isRequired,
     onDoubleClick: PropTypes.func.isRequired,
 
     // Dragging properties
     assetId: PropTypes.string,
     dragparams: PropTypes.object,
 
-    // Dragging properties from app state
+    // properties from app state
     allAssets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+    origin: PropTypes.string,
+    parentTotals: PropTypes.instanceOf(Map),
     showMultipage: PropTypes.bool,
-    selectedAssetIds: PropTypes.instanceOf(Set)
+    selectedAssetIds: PropTypes.instanceOf(Set),
+    thumbFieldTemplate: PropTypes.string.isRequired
   }
 
-  renderBadges = () => {
-    const { pageBadge, iconBadge, badgeHeight } = this.props
-    if (!pageBadge && !iconBadge) return
+  constructor (props) {
+    super(props)
 
-    return (
-      <div className={classnames('Thumb-badges', { small: badgeHeight < 25 })}>
-        {pageBadge ? <div className="Thumb-pages">{pageBadge}</div> : null}
-        {iconBadge ? <div className="Thumb-icon">{iconBadge}</div> : null}
-      </div>
-    )
+    this.state = {
+      videoStarted: false,
+      videoPlaying: false,
+      doVideoPreview: false,
+      showBadge: false
+    }
+
+    this.shuttler = new PubSub()
+    this.status = new PubSub()
+
+    this.status.on('started', videoStarted => {
+      if (this.state.videoStarted && !videoStarted) this.setState({ doVideoPreview: false })
+      this.setState({ videoStarted })
+    })
+    this.status.on('playing', videoPlaying => { this.setState({ videoPlaying }) })
+  }
+
+  // Extract badging info from an asset.
+  renderMonopageBadges = (asset) => {
+    const startPage = asset.startPage()
+    const stopPage = asset.stopPage()
+    let pageBadge
+    if (asset.mediaType().includes('video')) {
+      pageBadge = (
+        <Duration duration={asset.duration()}
+                  onClick={_ => {
+                    this.setState({ doVideoPreview: true },
+                      _ => this.shuttler.publish('startOrStop'))
+                  }}
+                  playing={this.state.videoStarted}/>
+      )
+    } else if (startPage && (!stopPage || startPage === stopPage)) {
+      pageBadge = <div className="Thumb-page-label">{startPage}</div>
+    } else if (startPage && stopPage) {
+      pageBadge = <div className="Thumb-page-label">{startPage} - {stopPage}</div>
+    }
+    return { pageBadge }
+  }
+
+  renderMultipageBadges = (asset, origin, stackCount) => {
+    let pageBadge, parentURL
+
+    const pageCount = asset.pageCount() || stackCount
+    const startPage = asset.startPage()
+    const stopPage = asset.stopPage()
+    if (pageCount > 1) {
+      if (stackCount > 0 && stackCount !== pageCount) {
+        pageBadge = <div className="Thumb-page-label">{stackCount} of {pageCount}</div>
+      } else if (stackCount === pageCount) {
+        pageBadge = <div className="Thumb-page-label">{pageCount}</div>
+      } else if (startPage && (!stopPage || startPage === stopPage)) {
+        pageBadge = <div className="Thumb-page-label">{startPage}</div>
+      } else if (startPage && stopPage) {
+        pageBadge = <div className="Thumb-page-label">{startPage} - {stopPage}</div>
+      }
+    } else if (asset.mediaType().includes('video')) {
+      pageBadge = <Duration duration={asset.duration()}/>
+    }
+
+    // Show the icon & inset if we have any page badging
+    if (pageBadge) {
+      parentURL = asset.smallestParentProxyURL(origin)
+    }
+
+    return { pageBadge, parentURL }
+  }
+
+  renderBadges = (asset, origin, stackCount) => {
+    const { badgeHeight, showMultipageBadges, thumbFieldTemplate } = this.props
+    const { showBadge } = this.state
+    const iconBadge = showBadge ? <div className="Thumb-field"><FieldTemplate asset={asset} template={thumbFieldTemplate} extensionOnLeft={false}/></div> : null
+    const { pageBadge, parentURL } = showMultipageBadges
+      ? this.renderMultipageBadges(asset, origin, stackCount)
+      : this.renderMonopageBadges(asset)
+
+    if (!pageBadge && !iconBadge) return { }
+
+    return { parentURL,
+      badges: (
+        <div className={classnames('Thumb-badges', { small: badgeHeight < 25 })}>
+          {pageBadge ? <div className="Thumb-pages">{pageBadge}</div> : null}
+          {iconBadge ? <div className="Thumb-icon">{iconBadge}</div> : null}
+        </div>
+      )
+    }
   }
 
   renderOverlays = () => {
@@ -167,31 +207,82 @@ class Thumb extends Component {
     )
   }
 
+  vidError = (error) => {
+    console.log(error)
+  }
+
+  onMouseEnter = (event) => {
+    this.setState({ showBadge: true })
+  }
+
+  onMouseLeave = (event) => {
+    this.setState({ showBadge: false })
+  }
+
   render () {
-    const {pages, parentURL, isSelected, onClick, onMouseEnter, onMouseLeave, onDoubleClick, dragparams} = this.props
+    const {pages, isSelected, onClick, onDoubleClick, dragparams, parentTotals} = this.props
     const {width, height, x, y} = this.props.dim      // Original thumb rect
     if (!width || !height) return null
 
     const style = {width, height, left: x, top: y}    // Dim -> left, right
+    const { asset, origin } = this.props
+
+    const parentId = asset.parentId()
+    const stackCount = parentId && parentTotals && parentTotals.get(parentId)
+
+    const { parentURL, badges } = this.renderBadges(asset, origin, stackCount)
 
     if (!parentURL) {
       const { url, backgroundColor } = pages[0]
+      const shouldRenderVideo = this.state.doVideoPreview && asset.mediaType().includes('video')
+      const shouldRenderImageThumb = !this.state.videoPlaying
+
       return (
-        <div className={classnames('Thumb', {isSelected})} style={style}
-             onClick={onClick} onDoubleClick={onDoubleClick}
-             onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} {...dragparams}>
-          <ImageThumb url={url} backgroundColor={backgroundColor}>
-            { this.renderOverlays() }
-            { this.renderBadges() }
-          </ImageThumb>
+        <div className={classnames('Thumb', {isSelected})}
+             style={style}
+             onClick={onClick}
+             onDoubleClick={onDoubleClick}
+             onMouseEnter={this.onMouseEnter}
+             onMouseLeave={this.onMouseLeave}
+             {...dragparams}>
+          { shouldRenderVideo && (
+            <Video shuttler={this.shuttler}
+                   status={this.status}
+                   url={asset.url(origin)}
+                   backgroundURL={asset.backgroundURL(origin)}
+                   frames={asset.frames()}
+                   frameRate={asset.frameRate()}
+                   startFrame={asset.startFrame()}
+                   stopFrame={asset.stopFrame()}
+                   onError={this.vidError}>
+              { shouldRenderImageThumb ? (
+                <div className='Thumb-video-waiting flexCenter fullWidth fullHeight' style={{ position: 'absolute', top: '0', left: 0 }}>
+                  <ImageThumb url={url} backgroundColor={backgroundColor}/>
+                  <img className='Thumb-video-waiting-spinner' src={ellipsis} style={{ position: 'relative' }}/>
+                </div>
+                )
+                : null }
+              { this.renderOverlays() }
+              { badges }
+            </Video>
+          ) || (
+            <ImageThumb url={url} backgroundColor={backgroundColor}>
+              { this.renderOverlays() }
+              { badges }
+            </ImageThumb>)
+          }
         </div>
       )
     }
 
     return (
-      <div className={classnames('Thumb', {isSelected})} style={style}
-           onClick={onClick} onDoubleClick={onDoubleClick}
-           onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} {...dragparams}>
+      <div className={classnames('Thumb', {isSelected})}
+           style={style}
+           onClick={onClick}
+           onDoubleClick={onDoubleClick}
+           onMouseEnter={this.onMouseEnter}
+           onMouseLeave={this.onMouseLeave}
+           {...dragparams}>
         { pages.slice(0, 3).reverse().map((page, rindex) => {
           const { url, backgroundColor } = page
           const index = Math.min(3, pages.length) - rindex - 1
@@ -199,7 +290,7 @@ class Thumb extends Component {
             <div key={`${url}-${index}`}
                  className={classnames('Thumb-stack', `Thumb-stack-${index}`)}>
               <ImageThumb url={url} backgroundColor={backgroundColor}/>
-              { rindex === pages.length - 1 && this.renderBadges() }
+              { rindex === pages.length - 1 && badges }
             </div>
           )
         })}
@@ -213,8 +304,11 @@ class Thumb extends Component {
 }
 
 export default connect(state => ({
-  showMultipage: state.app.showMultipage,
-  dragFieldTemplate: state.app.dragFieldTemplate,
   allAssets: state.assets.all,
-  selectedAssetIds: state.assets.selectedIds
+  dragFieldTemplate: state.app.dragFieldTemplate,
+  origin: state.auth.origin,
+  parentTotals: state.assets.parentTotals,
+  selectedAssetIds: state.assets.selectedIds,
+  showMultipage: state.app.showMultipage,
+  thumbFieldTemplate: state.app.thumbFieldTemplate
 }))(Thumb)

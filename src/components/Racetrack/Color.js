@@ -4,9 +4,9 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
-import { createColorWidget } from '../../models/Widget'
+import { createColorWidget, createSimilarityWidget } from '../../models/Widget'
 import { ColorWidgetInfo } from './WidgetInfo'
-import { modifyRacetrackWidget, similar, isSimilarColor } from '../../actions/racetrackAction'
+import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import Widget from './Widget'
 import Resizer from '../../services/Resizer'
 import { hexToRgb, HSL2HSV, HSL2RGB, RGB2HSL, rgbToHex } from '../../services/color'
@@ -21,6 +21,9 @@ const HASHES = [
   'similarity.hue',
   'similarity.combined',
   'similarity.hsv',
+  'similarity.rgb',
+  'similarity.lab',
+  'similarity.hsl',
   'similarity.dephsv',
   'similarity.deprgb_444'
 ]
@@ -34,19 +37,13 @@ class Color extends Component {
     floatBody: PropTypes.bool.isRequired,
     isIconified: PropTypes.bool.isRequired,
     widgets: PropTypes.arrayOf(PropTypes.object),
-    similar: PropTypes.shape({
-      field: PropTypes.string,
-      values: PropTypes.arrayOf(PropTypes.string).isRequired,
-      ofsIds: PropTypes.arrayOf(PropTypes.string).isRequired,
-      minScore: PropTypes.number
-    }).isRequired,
     uxLevel: PropTypes.number,
     isDeveloper: PropTypes.bool
   }
 
   state = {
     colors: [],
-    useHsvHash: false,
+    useHsvHash: true,
     hsvHash: HASHES[0]
   }
 
@@ -274,7 +271,6 @@ class Color extends Component {
   }
 
   modifySliver (colors, useHsvHash, hsvHash) {
-    const { similar } = this.props
     const { id, widgets } = this.props
     const index = widgets && widgets.findIndex(widget => (id === widget.id))
     const oldWidget = widgets && widgets[index]
@@ -287,17 +283,12 @@ class Color extends Component {
     widget.id = this.props.id
 
     if (useHsvHash) {
-      const similar = {
-        field: this.resolveHashType(hsvHash, colors),
-        values: [this.colors2Hash(colors, hsvHash)],
-        weights: [1],
-        ofsIds: [],
-        minScore: 25
-      }
-      this.props.actions.similar(similar)
-      widget.sliver.filter = null
-    } else if (isSimilarColor(similar)) {
-      this.props.actions.similar()
+      const field = this.resolveHashType(hsvHash, colors)
+      const minScore = 75
+      const weight = 1
+      const hash = this.colors2Hash(colors, hsvHash)
+      const similar = createSimilarityWidget(field, null, [{hash, weight}], minScore, isEnabled, isPinned)
+      widget.sliver = similar.sliver
     }
 
     this.props.actions.modifyRacetrackWidget(widget)
@@ -531,7 +522,7 @@ class Color extends Component {
                          onChange={this.toggleHsvHash}/>
                   <span>Use HSV hash</span>
                   <select className='Color-hsvHash-select' onChange={this.selectHsvHash}>
-                    { HASHES.map(hash => (<option value={`${hash}`}>{hash}</option>)) }
+                    { HASHES.map(hash => (<option key={hash} value={`${hash}`}>{hash}</option>)) }
                   </select>
                 </div>
                 <span className='Color-hsvHash-hash'>{this.colors2Hash(colors, this.state.hsvHash)}</span>
@@ -589,11 +580,10 @@ class Color extends Component {
 
 export default connect(
   state => ({
-    widgets: state.racetrack && state.racetrack.widgets,
-    similar: state.racetrack.similar,
+    widgets: state.racetrack.widgets,
     uxLevel: state.app.uxLevel,
     isDeveloper: state.auth.isDeveloper
   }), dispatch => ({
-    actions: bindActionCreators({ modifyRacetrackWidget, similar }, dispatch)
+    actions: bindActionCreators({ modifyRacetrackWidget }, dispatch)
   })
 )(Color)

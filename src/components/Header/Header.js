@@ -15,11 +15,10 @@ import Settings from '../../components/Settings'
 import AssetCounter from '../Assets/AssetCounter'
 import { showModal, dialogAlertPromise } from '../../actions/appActions'
 import { archivistBaseURL, saveUserSettings } from '../../actions/authAction'
-import { selectAssetIds } from '../../actions/assetsAction'
-import { similar } from '../../actions/racetrackAction'
-import { weights } from '../Racetrack/SimilarHash'
+import { selectAssetIds, findSimilarFields, assetsForIds } from '../../actions/assetsAction'
+import { resetRacetrackWidgets } from '../../actions/racetrackAction'
 import { equalSets } from '../../services/jsUtil'
-import * as WidgetInfo from '../../components/Racetrack/WidgetInfo'
+import { createSimilarityWidget } from '../../models/Widget'
 
 class Header extends Component {
   static propTypes = {
@@ -33,15 +32,52 @@ class Header extends Component {
     totalCount: PropTypes.number,
     loadedCount: PropTypes.number,
     assetFields: PropTypes.object,
-    similar: PropTypes.shape({
-      field: PropTypes.string,
-      values: PropTypes.arrayOf(PropTypes.string).isRequired,
-      ofsIds: PropTypes.arrayOf(PropTypes.string).isRequired
-    }).isRequired,
-    similarAssets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+    similarFields: PropTypes.instanceOf(Set),
+    similarMinScore: PropTypes.object,
     userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired,
     widgets: PropTypes.arrayOf(PropTypes.object)
+  }
+
+  state = {
+    similarField: '',
+    isSelectedHashValid: false
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.assetFields && !this.props.assetFields) {
+      this.props.actions.findSimilarFields(nextProps.assetFields)
+    }
+    let similarField = this.state.similarField
+    if (!similarField && nextProps.similarFields && nextProps.similarFields.size) {
+      similarField = [...nextProps.similarFields][0]
+      this.lastSelectedIds = null
+      this.setState({similarField})
+    }
+    this.updateIsSelectedHashValid(nextProps.selectedIds, similarField)
+  }
+
+  updateIsSelectedHashValid (selectedIds, similarField) {
+    if (similarField && selectedIds && !equalSets(this.lastSelectedIds, selectedIds)) {
+      this.lastSelectedIds = new Set(selectedIds)
+      if (selectedIds.size) {
+        assetsForIds(selectedIds, [similarField])
+          .then(selectedAssets => {
+            const selectedHashes = selectedAssets.map(asset => asset.rawValue(similarField)).filter(hash => hash && hash.length)
+            const isSelectedHashValid = selectedHashes.length > 0
+            this.setState({isSelectedHashValid})
+          })
+          .catch(error => {
+            console.log('Error getting selected asset hashes: ' + error)
+          })
+      } else {
+        const isSelectedHashValid = false
+        this.setState({isSelectedHashValid})
+      }
+    } else {
+      const isSelectedHashValid = false
+      this.setState({isSelectedHashValid})
+    }
   }
 
   showPreferences = () => {
@@ -75,49 +111,47 @@ class Header extends Component {
   }
 
   sortSimilar = () => {
-    // TEMPORARY BAND-AID
-    // Don't allow a color widget and a similar hash widget simultaneously
-    // Remove when we can do both at the same time
-    const colorWidgets = this.props.widgets.filter(widget => widget.type === WidgetInfo.ColorWidgetInfo.type)
-    if (colorWidgets.length) {
-      this.props.actions.dialogAlertPromise('Similarity', 'Please delete the Color widget to use Similar image search. This is only temporary.')
-      return
+    const { similarField } = this.state
+    if (!similarField) return
+
+    const { selectedIds, similarMinScore } = this.props
+    const widgets = [...this.props.widgets]
+    const index = widgets && widgets.findIndex(widget => widget.field === similarField)
+    const oldWidget = widgets && index >= 0 && widgets[index]
+    const isEnabled = true
+    const isPinned = false
+    const minScore = similarMinScore[similarField] || 75
+    const oldFilter = oldWidget && oldWidget.sliver && oldWidget.sliver.filter && oldWidget.sliver.filter.similarity[oldWidget.field]
+    const oldHashes = oldFilter && oldFilter.hashes
+    const hashes = [...selectedIds].map(id => {
+      const oldHash = oldHashes && oldHashes.find(hash => hash.hash === id)
+      if (oldHash) return oldHash
+      return { hash: id, weight: 1 }
+    })
+    const widget = createSimilarityWidget(similarField, null, hashes, minScore, isEnabled, isPinned)
+    if (index < 0) {
+      widgets.push(widget)
+    } else {
+      widgets[index] = widget
     }
-
-    const { actions, selectedIds, similarAssets } = this.props
-    if (!selectedIds || !selectedIds.size) return
-    const selectedAssets = [...selectedIds].map(id => (similarAssets.find(asset => (asset.id === id)))).filter(asset => asset)
-    const values = selectedAssets.map(asset => asset.rawValue(this.props.similar.field))
-    const ofsIds = selectedAssets.map(asset => asset.closestProxy(256, 256).id)
-    const similar = { values, ofsIds, weights: weights(ofsIds) }
-    actions.similar(similar)
+    this.props.actions.resetRacetrackWidgets(widgets)
   }
 
-  similarFields = () => {
-    const { assetFields } = this.props
-    if (!assetFields) return []
-    let fields = []
-    if (assetFields.string) fields = fields.concat(assetFields.string.filter(field => field.toLowerCase().startsWith('similar') && !field.match(/\.(raw|byte|point|bit)$/)))
-    if (assetFields.hash) fields = fields.concat(assetFields.hash.filter(field => field.toLowerCase().startsWith('similar') && !field.match(/\.(raw|byte|point|bit)$/)))
-    return fields
-  }
-
-  selectSimilarField = (field) => {
-    const { actions } = this.props
-    // FIXME: Need new hashes via similarAssets action (not state!), but need asset ids
-    const values = []
-    const ofsIds = []
-    const similar = { ...this.props.similar, field, values, ofsIds }
-    actions.similar(similar)
+  selectSimilarField = (similarField) => {
+    if (similarField !== this.state.similarField) {
+      this.lastSelectedIds = null
+      this.updateIsSelectedHashValid(this.props.selectedIds, similarField)
+      this.setState({similarField})
+    }
   }
 
   renderSimilar = () => {
-    const { selectedIds, similar, similarAssets } = this.props
+    const { similarField, isSelectedHashValid } = this.state
+    const { selectedIds, similarFields, widgets } = this.props
 
-    const similarFields = this.similarFields()
     const displayName = (field) => {
       const name = field.replace(/\.(raw|byte|point|bit)$/, '').replace(/^.*\./, '')
-      const remap = { resnet: 'image (RN)', tensorflow: 'image (TF)', hsv: 'color' }
+      const remap = { mxnet: 'image (MX)', resnet: 'image (RN)', tensorflow: 'image (TF)', rgb: 'color (RGB)', hsv: 'color (HSV)', lab: 'color (LAB)', hsl: 'color (HSL)' }
       const rname = remap[name.toLowerCase()]
       if (rname) return rname
       return name
@@ -133,28 +167,29 @@ class Header extends Component {
       return 'icon-similarity'
     }
 
-    const nAssetsSelected = selectedIds ? selectedIds.size : 0
-    const selectedAssets = nAssetsSelected && [...selectedIds].map(id => (similarAssets.find(asset => (asset.id === id)))).filter(asset => asset)
-    const similarHashes = selectedAssets && selectedAssets.map(asset => asset.rawValue(this.props.similar.field))
-    const similarActive = similar.field && similar.field.length > 0 && similar.values && similar.values.length > 0
-    const similarValuesSelected = similarActive && similar.values && similarHashes && equalSets(new Set([...similar.values]), new Set([...similarHashes]))
+    const similarActive = similarField && selectedIds
+    const widget = widgets && widgets.find(widget => widget.field === similarField)
+    const filter = similarField && widget && widget.sliver && widget.sliver.filter && widget.sliver.filter.similarity && widget.sliver.filter.similarity[similarField]
+    const hashes = filter && filter.hashes
+    const similarAssetIds = hashes ? hashes.map(hash => hash.hash) : []
+    const similarValuesSelected = similarActive && selectedIds && equalSets(new Set(similarAssetIds), selectedIds)
 
     // Only enable similar button if selected assets have the right hash
-    const canSortSimilar = similarFields && similarFields.length && selectedIds && selectedIds.size > 0 && similar.field && similar.field.length > 0 && !similarValuesSelected
+    const canSortSimilar = similarFields && similarFields.size && similarField && similarField.length > 0 && !similarValuesSelected && isSelectedHashValid
     const sortSimilar = canSortSimilar ? this.sortSimilar : null
 
     return (
       <div className="Editbar-similar-section">
         <div className={classnames('Editbar-similar', { 'selected': similarActive, 'disabled': !canSortSimilar })}
              onClick={sortSimilar} title="Find similar assets">
-          <div className={`Editbar-similar-icon ${displayIcon(similar.field)}`}/>
+          <div className={`Editbar-similar-icon ${displayIcon(similarField)}`}/>
           Similar
         </div>
-        { similarFields && similarFields.length > 1 && (
+        { similarFields && similarFields.size > 1 && (
           <DropdownMenu>
-            { similarFields.map(field => (
+            { [...similarFields].map(field => (
               <div className="Editbar-similar-menu-item" key={field} onClick={_ => this.selectSimilarField(field) } title={field}>
-                <div className={`Editbar-similar-menu-item-selected${similar.field === field ? ' icon-check' : ''}`}/>
+                <div className={`Editbar-similar-menu-item-selected${similarField === field ? ' icon-check' : ''}`}/>
                 <div className={`Editbar-similar-icon ${displayIcon(field)}`}/>
                 <div className="Editbar-similar-menu-item-label">{ displayName(field) }</div>
               </div>
@@ -241,17 +276,18 @@ export default connect(state => ({
   selectedIds: state.assets.selectedIds,
   totalCount: state.assets.totalCount,
   loadedCount: state.assets.loadedCount,
-  assetFields: state.assets && state.assets.fields,
-  similar: state.racetrack.similar,
-  similarAssets: state.assets.similar,
+  assetFields: state.assets.fields,
+  similarFields: state.assets.similarFields,
+  similarMinScore: state.racetrack.similarMinScore,
   userSettings: state.app.userSettings,
   widgets: state.racetrack.widgets
 }), dispatch => ({
   actions: bindActionCreators({
     showModal,
     selectAssetIds,
-    similar,
     saveUserSettings,
-    dialogAlertPromise
+    dialogAlertPromise,
+    findSimilarFields,
+    resetRacetrackWidgets
   }, dispatch)
 }))(Header)

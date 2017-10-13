@@ -17,7 +17,7 @@ import CreateFolder from '../Folders/CreateFolder'
 import { showModal, toggleCollapsible, dialogAlertPromise } from '../../actions/appActions'
 import { unorderAssets, isolateParent } from '../../actions/assetsAction'
 import { createFolder, selectFolderIds, createDyHiFolder } from '../../actions/folderAction'
-import { resetRacetrackWidgets, similar, isSimilarColor } from '../../actions/racetrackAction'
+import { resetRacetrackWidgets } from '../../actions/racetrackAction'
 import { saveSharedLink } from '../../actions/sharedLinkAction'
 import { selectJobIds } from '../../actions/jobActions'
 import { LOAD_SEARCH_ITEM } from '../../constants/localStorageItems'
@@ -31,11 +31,6 @@ class Racebar extends Component {
     trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
     selectedJobIds: PropTypes.instanceOf(Set),
     order: PropTypes.arrayOf(PropTypes.object),
-    similar: PropTypes.shape({
-      field: PropTypes.string,
-      values: PropTypes.arrayOf(PropTypes.string),
-      ofsIds: PropTypes.arrayOf(PropTypes.string)
-    }),
     query: PropTypes.instanceOf(AssetSearch),
     user: PropTypes.instanceOf(User).isRequired,
     actions: PropTypes.object.isRequired
@@ -50,7 +45,7 @@ class Racebar extends Component {
   lastWidgetCount = -1
 
   componentWillReceiveProps (nextProps) {
-    const { widgets, similar, order, selectedFolderIds, trashedFolders } = nextProps
+    const { widgets, order, selectedFolderIds, trashedFolders } = nextProps
     const isOpenPinned = widgets.findIndex(widget => widget.id === this.state.openId && widget.isPinned) >= 0
     if (isOpenPinned) {
       this.setState({openId: -1})
@@ -60,9 +55,7 @@ class Racebar extends Component {
         // Only open the widget if we've added a single new widget without a search
         const widget = widgets.length && widgets[widgets.length - 1]
         let openId = widget ? widget.id : -1
-        if (widget.type === WidgetInfo.SimilarHashWidgetInfo.type) {
-          if (similar.values && similar.values.length) openId = -1
-        } else if (widget.type === WidgetInfo.SortOrderWidgetInfo.type) {
+        if (widget.type === WidgetInfo.SortOrderWidgetInfo.type) {
           if (order && order.length) openId = -1
         } else if (widget.type === WidgetInfo.CollectionsWidgetInfo.type) {
           const nonTrashedFolderIds = Searcher.nonTrashedFolderIds(selectedFolderIds, trashedFolders)
@@ -99,10 +92,10 @@ class Racebar extends Component {
   }
 
   saveSearch = (name, acl, dyhiLevels) => {
-    const { widgets, selectedFolderIds, trashedFolders, selectedJobIds, order, similar, user } = this.props
+    const { widgets, selectedFolderIds, trashedFolders, selectedJobIds, order, user } = this.props
     const parentId = user && user.homeFolderId
     const nonTrashedFolderIds = Searcher.nonTrashedFolderIds(selectedFolderIds, trashedFolders)
-    const search = Searcher.build(widgets, nonTrashedFolderIds, selectedJobIds, order, similar)
+    const search = Searcher.build(widgets, nonTrashedFolderIds, selectedJobIds, order)
     const saveSearch = dyhiLevels && typeof dyhiLevels === 'string' && dyhiLevels === 'Search'
     const saveLayout = dyhiLevels && typeof dyhiLevels === 'string' && dyhiLevels === 'Layout'
     if (!saveLayout && !saveSearch && dyhiLevels && dyhiLevels.length) {
@@ -118,9 +111,8 @@ class Racebar extends Component {
         search.postFilter = undefined
         search.order = []
       }
-      const hasSimilar = widgets.findIndex(widget => widget.type === WidgetInfo.SimilarHashWidgetInfo.type) >= 0 || (widgets.findIndex(widget => widget.type === WidgetInfo.ColorWidgetInfo.type) >= 0 && isSimilarColor(similar))
       const hasOrder = widgets.findIndex(widget => widget.type === WidgetInfo.SortOrderWidgetInfo.type) >= 0
-      const attrs = { widgets, similar: hasSimilar ? similar : undefined, order: hasOrder ? order : undefined }
+      const attrs = { widgets, order: hasOrder ? order : undefined }
       const folder = new Folder({ name, acl, parentId, search, attrs })
       this.props.actions.createFolder(folder)
       this.props.actions.toggleCollapsible('home', true)
@@ -130,15 +122,14 @@ class Racebar extends Component {
   clearRacetrack = () => {
     this.props.actions.resetRacetrackWidgets()
     this.props.actions.selectFolderIds()
-    this.props.actions.similar()
     this.props.actions.unorderAssets()
     this.props.actions.selectJobIds()
     this.props.actions.isolateParent()
   }
 
   shareSearch = () => {
-    const { query, similar, order, widgets, actions } = this.props
-    const attrs = { similar, widgets, order }
+    const { query, order, widgets, actions } = this.props
+    const attrs = { widgets, order }
 
     actions.saveSharedLink({folder: { search: query, attrs }})
     .then(id => {
@@ -173,10 +164,9 @@ class Racebar extends Component {
 
   render () {
     const { sharedLink, copyingLink } = this.state
-    const { widgets, hoverFields, order, similar } = this.props
+    const { widgets, hoverFields, order } = this.props
     const blacklist = [WidgetInfo.SimpleSearchWidgetInfo.type]
-    const disabled = !(widgets && widgets.length) && !(order && order.length) &&
-      !(similar && similar.field && similar.values && similar.values.length)
+    const disabled = !(widgets && widgets.length) && !(order && order.length)
     return (
       <div className="Racebar">
         <Searcher/>
@@ -227,14 +217,12 @@ export default connect(state => ({
   selectedJobIds: state.jobs.selectedIds,
   selectedFolderIds: state.folders.selectedFolderIds,
   trashedFolders: state.folders.trashedFolders,
-  similar: state.racetrack.similar,
   user: state.auth.user
 }), dispatch => ({
   actions: bindActionCreators({
     resetRacetrackWidgets,
     createFolder,
     createDyHiFolder,
-    similar,
     unorderAssets,
     isolateParent,
     selectFolderIds,

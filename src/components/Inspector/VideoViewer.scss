@@ -1,6 +1,6 @@
 @import '../../styles/core-mixins.scss';
 
-.Video {
+.VideoViewer {
   @include flexCol;
   @include flexAlignItemsCenter;
   @include fullWidth;
@@ -11,12 +11,6 @@
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
 
-  // This is the native video element that React-player creates
-  video {
-    object-fit: contain; // needed for Firefox when window is narrower aspect than video
-    object-position: center center; // needed for Chrome when window is narrower aspect than video
-  }
-
   .PanZoom-controls {
     position: fixed;    // avoid overflow:hidden on Video-pan-zoom
     left: 200px;        // Next to the time display
@@ -24,7 +18,7 @@
     margin-right: 0;
   }
 
-  .Video-pan-zoom {
+  .VideoViewer-pan-zoom {
     @include flexCol;
     @include flexOn;
     @include fullWidth;
@@ -34,7 +28,7 @@
     position: relative;
   }
 
-  .Video-player {
+  .VideoViewer-player {
     @include flexColCenter;
     @include flexOn;
     @include fullWidth;
@@ -43,7 +37,7 @@
     max-height: 100%;
   }
 
-  .Video-progress-bar {
+  .VideoViewer-progress-bar {
     @include fullWidth;
     @include flexOff;
     @include flexRowCenter;
@@ -53,7 +47,7 @@
     left: 0;
     height: 16px;
 
-    .Video-scrub {
+    .VideoViewer-scrub {
       @include fullWidth;
       z-index: 10;
       position: relative;
@@ -65,7 +59,7 @@
       background-color: rgba(64,64,64,0.05);
     }
 
-    input.Video-scrub[type=range] {
+    input.VideoViewer-scrub[type=range] {
       &::-webkit-slider-thumb {
         -webkit-appearance: none;
         border: none;
@@ -98,17 +92,17 @@
       background-color: transparent;
     }
 
-    .Video-progress-progress {
+    .VideoViewer-progress-progress {
       @include fullWidth;
       height: 4px;
 
       position: absolute;
       left:0;
-      top: 6px; // .Video-progress-bar.height - 0.5 * .Video-progress-progress.height
+      top: 6px; // .VideoViewer-progress-bar.height - 0.5 * .VideoViewer-progress-progress.height
     }
   }
 
-  .Video-control-bar {
+  .VideoViewer-control-bar {
     @include fullWidth;
     @include flexRow;
     @include flexJustifySpaceBetween;
@@ -125,7 +119,7 @@
   }
 }
 
-  .Video-controls {
+  .VideoViewer-controls {
     @include flexRow;
     @include flexJustifyCenter;
     @include flexAlignItemsCenter;
@@ -143,7 +137,7 @@
       }
     }
 
-    .Video-play {
+    .VideoViewer-play {
       color: white;
       border-radius: 3px;
       background: $zorroa-sickly-green;
@@ -172,10 +166,10 @@
     }
   }
 
-  .Video-misc {
+  .VideoViewer-misc {
   }
 
-  .Video-multipage {
+  .VideoViewer-multipage {
     &:hover {
       cursor: pointer;
       color: $zorroa-sickly-green;
@@ -183,12 +177,12 @@
   }
 }
 
-.Video-time {
+.VideoViewer-time {
   padding-left: 10px;
   font-size: 18px;
   color: $zorroa-gray;
 
-  .Video-duration {
+  .VideoViewer-duration {
     font-size: 16px;
     padding: 8px;
     font-weight: 100;
@@ -197,13 +191,13 @@
     -webkit-font-smoothing: subpixel-antialiased;
   }
 
-  .Video-remaining {
-    @extend .Video-duration;
+  .VideoViewer-remaining {
+    @extend .VideoViewer-duration;
     color: $zorroa-lightgray;
   }
 }
 
-.Video-error {
+.VideoViewer-error {
   position: absolute;
   left: 8px;
   top: 8px;

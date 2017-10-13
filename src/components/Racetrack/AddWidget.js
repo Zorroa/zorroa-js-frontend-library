@@ -66,7 +66,7 @@ class AddWidget extends Component {
   // static because this filter is also used in QuickAddWidget
   static widgetInfos = (widgets, filterText, permissions) => {
     const filter = filterText.toLowerCase()
-    const singletonTypes = new Set([ WidgetInfo.SimilarHashWidgetInfo.type,
+    const singletonTypes = new Set([
       WidgetInfo.FiletypeWidgetInfo.type, WidgetInfo.CollectionsWidgetInfo.type,
       WidgetInfo.MultipageWidgetInfo.type, WidgetInfo.ImportSetWidgetInfo.type ])
     const singletons = new Set()

@@ -27,13 +27,8 @@ class LocalChooser extends Component {
     onBack: PropTypes.func,
     onDone: PropTypes.func,
     fileEntries: PropTypes.instanceOf(Map),
-    similar: PropTypes.shape({
-      field: PropTypes.string,
-      values: PropTypes.arrayOf(PropTypes.string).isRequired,
-      ofsIds: PropTypes.arrayOf(PropTypes.string).isRequired,
-      minScore: PropTypes.number
-    }).isRequired,
     processors: PropTypes.arrayOf(PropTypes.instanceOf(Processor)),
+    similarMinScore: PropTypes.object,
     actions: PropTypes.object
   }
 
@@ -434,7 +429,7 @@ class LocalChooser extends Component {
   }
 
   render () {
-    const { onImport, onBack, similar } = this.props
+    const { onImport, onBack, similarMinScore } = this.props
     const { progressEvent, directoryCount } = this.state
     const fileCount = this.props.fileEntries.size - directoryCount
     const uploadsCompleted = progressEvent && progressEvent.loaded >= progressEvent.total
@@ -447,8 +442,9 @@ class LocalChooser extends Component {
     if (importing && fileCount) title += ` ${fileCount} File${fileCount > 1 ? 's' : ''}`
     if (importing && fileCount && directoryCount) title += ' and'
     if (importing && directoryCount) title += ` ${directoryCount} Folder${directoryCount > 1 ? 's' : ''}`
-    const similarDisabled = directoryCount || fileCount > 5 || !fileCount || !similar.field
-    const similarTitle = similarDisabled ? (!similar.field ? 'Compute Similarity on Repo' : 'Similarity requires files only') : 'Analyze for Similarity'
+    const validSimilar = Object.keys(similarMinScore).length > 0
+    const similarDisabled = directoryCount || fileCount > 5 || !fileCount || !validSimilar
+    const similarTitle = similarDisabled ? (!validSimilar ? 'Compute Similarity on Repo' : 'Similarity requires files only') : 'Analyze for Similarity'
     return (
       <div className="LocalChooser">
         { onBack && (
@@ -483,7 +479,7 @@ class LocalChooser extends Component {
 
 export default connect(state => ({
   fileEntries: state.jobs.fileEntries,
-  similar: state.racetrack.similar,
+  similarMinScore: state.racetrack.similarMinScore,
   processors: state.jobs.processors
 }), dispatch => ({
   actions: bindActionCreators({

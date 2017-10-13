@@ -21,7 +21,7 @@ import Racebar from '../Racetrack/Racebar'
 import { iconifyLeftSidebar, toggleCollapsible, showModal, hideModal, dialogAlertPromise, dialogConfirmPromise, dialogPromptPromise, setEmbedModeEnabled } from '../../actions/appActions'
 import { getUserPermissions, updatePassword, changePassword } from '../../actions/authAction'
 import { queueFileEntrysUpload } from '../../actions/jobActions'
-import { updateCommand, getAllCommands, isolateAssetId, searchAssetsRequestProm, setAllAssetCount } from '../../actions/assetsAction'
+import { updateCommand, getAllCommands, isolateAssetId, getAllAssetCount } from '../../actions/assetsAction'
 import { restoreFolders } from '../../actions/racetrackAction'
 import { loadSharedLink } from '../../actions/sharedLinkAction'
 import ChangePassword from '../auth/ChangePassword'
@@ -37,7 +37,6 @@ import Importer from '../Importer'
 import { ImportJobs, ExportJobs } from '../Jobs'
 import { LOCAL_IMPORT, CLOUD_IMPORT, SERVER_IMPORT, SERVER_PATH_IMPORT } from '../Import/ImportConstants'
 import { EMBEDMODE_ITEM, LOAD_SEARCH_ITEM, SESSION_STATE_ITEM, SHOW_IMPORT_ITEM } from '../../constants/localStorageItems'
-import AssetSearch from '../../models/AssetSearch'
 
 class Workspace extends Component {
   static displayName () {
@@ -143,15 +142,7 @@ class Workspace extends Component {
       this.props.actions.showModal({body, width})
     }
 
-    // Run an empty search to count assets
-    // so we can show "all" instead of a number, e.g., Folders/FolderItem components
-    const dummyDispatch = () => {}
-    searchAssetsRequestProm(dummyDispatch, new AssetSearch({size: 1}))
-    .then(response => {
-      if (response && response.data && response.data.page && response.data.page.totalCount) {
-        actions.setAllAssetCount(response.data.page.totalCount)
-      }
-    })
+    actions.getAllAssetCount()
   }
 
   componentDidMount () {
@@ -535,6 +526,6 @@ export default connect(state => ({
     getAllCommands,
     updateCommand,
     setEmbedModeEnabled,
-    setAllAssetCount
+    getAllAssetCount
   }, dispatch)
 }))(Workspace)

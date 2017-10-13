@@ -43,20 +43,20 @@ HEX_DIGITS = 'abcdefghijklmnop'
 #   return min2 + (max2 - min2) * ((x - min1) / (max1 - min1))
 
 # encode an array of float values in the range [0,maxVal] into an
-# array of float values in the range [0,16]
+# array of float values in the range [0,1]
 # encoding may be non-linear
 def histogramToEncodedNormalHistogram(hist, maxVal):
   # offset linear encoding: (mostly) linear histogram, a threshold of 10 pixels makes the value non-zero
   # return remap(hist, 10.0, float(maxVal), 1.0/16.0, 1.0)
 
   # square root encoding
-  return (math.sqrt(maxVal) * np.sqrt(hist))
+  return (np.sqrt(hist) / math.sqrt(maxVal))
 
   # log encoding
   # with np.errstate(divide='ignore'):
-  #   return (math.log(maxVal) * np.where(hist != 0, np.log(hist), 0))
+  #   return (np.where(hist != 0, np.log(hist), 0) / math.log(maxVal))
 
-# turn an array of float values in the range [0,16] into a hash string of chars 'a'-'p'
+# turn an array of float values in the range [0,1] into a hash string of chars 'a'-'p'
 def encodedNormalHistogramToHashString(hexArray):
   HEX_DIGITS = 'abcdefghijklmnop' # use a hamming-friendly encoding for hex digits
   intClippedArray = (16.0 * hexArray).astype(int).clip(0,15)

@@ -1,9 +1,10 @@
 import React, { PropTypes } from 'react'
 
 import VolumeBar from './VolumeBar'
+import { PubSub } from '../../services/jsUtil'
 
 // Helpers to compute width because we use {left:0, right:0, margin-left:auto, margin-right:auto}
-const showVideo = (props) => (!!props.onVideo)
+const showVideo = (props) => (!!props.shuttler)
 const showVolume = (props) => (!!props.onVolume)
 const showZoom = (props) => (props.onZoomIn || props.onZoomOut || props.onFit)
 const iconCount = (props) => ((showVideo(props) ? 5 : 0) + (showZoom(props) ? 3 : 0))
@@ -16,13 +17,13 @@ const Controlbar = (props) => (
     { props.title && <div className="Controlbar-separator" /> }
     { showVideo(props) && (
       <div className="Controlbar-section">
-        <button onClick={e => props.onVideo('rewind', e)} className="icon-prev-clip"/>
-        <button onClick={e => props.onVideo('frameBack', e)} className="icon-frame-back"/>
-        <div onClick={e => props.onVideo('play', e)} className="Video-play">
+        <button onClick={e => props.shuttler.publish('rewind', e)} className="icon-prev-clip"/>
+        <button onClick={e => props.shuttler.publish('frameBack', e)} className="icon-frame-back"/>
+        <div onClick={e => props.shuttler.publish('startOrStop', e)} className="Video-play">
           <button className={props.playing ? 'icon-pause' : 'icon-play3'} />
         </div>
-        <button onClick={e => props.onVideo('frameForward', e)} className="icon-frame-forward"/>
-        <button onClick={e => props.onVideo('fastForward', e)} className="icon-next-clip"/>
+        <button onClick={e => props.shuttler.publish('frameForward', e)} className="icon-frame-forward"/>
+        <button onClick={e => props.shuttler.publish('fastForward', e)} className="icon-next-clip"/>
       </div>
     )}
     { showVideo(props) && showVolume(props) && <div className="Controlbar-separator" /> }
@@ -50,7 +51,7 @@ Controlbar.propTypes = {
   onFit: PropTypes.func,
   onNextPage: PropTypes.func,
   onPrevPage: PropTypes.func,
-  onVideo: PropTypes.func,
+  shuttler: PropTypes.instanceOf(PubSub),
   playing: PropTypes.bool,
   onVolume: PropTypes.func,
   volume: PropTypes.number

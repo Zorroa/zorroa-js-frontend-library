@@ -1,9 +1,9 @@
 import {
   MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS,
-  SIMILAR_VALUES, ASSET_ORDER, ASSET_SORT, ASSET_FIELDS, SELECT_FOLDERS,
-  SELECT_JOBS, ANALYZE_SIMILAR, UNAUTH_USER, ISOLATE_PARENT } from '../constants/actionTypes'
-import Widget, { createImportSetWidget } from '../models/Widget'
-import { isSimilarColor } from '../actions/racetrackAction'
+  ASSET_ORDER, ASSET_SORT, SELECT_FOLDERS,
+  SELECT_JOBS, ANALYZE_SIMILAR, UNAUTH_USER, ISOLATE_PARENT, SIMILAR_MINSCORE
+} from '../constants/actionTypes'
+import Widget from '../models/Widget'
 import {
   SimilarHashWidgetInfo, CollectionsWidgetInfo, SortOrderWidgetInfo,
   MultipageWidgetInfo, ImportSetWidgetInfo } from '../components/Racetrack/WidgetInfo'
@@ -11,86 +11,7 @@ import * as assert from 'assert'
 
 const initialState = {
   widgets: [],
-  similar: { field: null, values: [], ofsIds: [] }
-}
-
-function extractSimilar (similar, widget) {
-  assert.ok(widget.type === SimilarHashWidgetInfo.type)
-  if (!widget.field || !widget.field.length) return similar
-  const field = widget.field.replace(/\.raw$/, '')
-  const hamming = widget && widget.sliver && widget.sliver.filter && widget.sliver.filter.hamming
-  if (hamming) {
-    if (!hamming.hashes || !hamming.hashes.length) widget.sliver.filter = null  // Remove invalid empty filter
-  }
-  return { ...similar, field }
-}
-
-function fieldExists (field, fieldTypes) {
-  const types = Object.keys(fieldTypes)
-  for (let i = 0; i < types.length; ++i) {
-    const type = types[i]
-    const fields = fieldTypes[type]
-    for (let j = 0; j < fields.length; ++j) {
-      if (fields[j] === field) return true
-    }
-  }
-  return false
-}
-
-function bestSimilarityField (curField, fieldTypes) {
-  if (curField && fieldExists(curField, fieldTypes)) return curField
-  const defaultFields = [
-    'similarity.mxnet.byte',
-    'similarity.tensorflow.byte',
-    'similarity.Tensorflow.byte',
-    'similarity.TensorFlow.byte',
-    'Similarity.Tensorflow.byte',
-    'Similarity.TensorFlow.byte',
-    'Similarity.tensorflow.byte',
-    'similarity.hsv.byte'
-  ]
-  for (let i = 0; i < defaultFields.length; ++i) {
-    if (fieldExists(defaultFields[i], fieldTypes)) return defaultFields[i]
-  }
-  const types = Object.keys(fieldTypes)
-  for (let i = 0; i < types.length; ++i) {
-    const type = types[i]
-    const fields = fieldTypes[type]
-    for (let j = 0; j < fields.length; ++j) {
-      if (fields[j].startsWith('similarity')) return fields[j]
-    }
-  }
-  for (let i = 0; i < types.length; ++i) {
-    const type = types[i]
-    const fields = fieldTypes[type]
-    for (let j = 0; j < fields.length; ++j) {
-      if (fields[j].toLowerCase().startsWith('similarity')) return fields[j]
-    }
-  }
-}
-
-function updateSimilarity (similar, state) {
-  assert.ok(Array.isArray(similar.values))
-  assert.ok(Array.isArray(similar.ofsIds))
-  // Backwards compatibility for saved searches prior to weights
-  if (similar.values && (!similar.weights || similar.weights.length !== similar.values.length)) similar.weights = similar.values.map(_ => (1))
-  assert.ok(Array.isArray(similar.weights))
-  assert.ok(similar.values.length === similar.ofsIds.length || isSimilarColor(similar))
-  assert.ok(similar.values.length === similar.weights.length)
-  assert.ok(similar.values.length <= 10)
-  const minScoreField = `minScore-${similar.field}`
-  if (state.similar.field !== similar.field && state.similar[minScoreField]) similar.minScore = parseFloat(state.similar[minScoreField])
-  similar[minScoreField] = similar.minScore   // Save min score for this field (restored from searches too)
-  const index = state.widgets.findIndex(widget => (widget.type === SimilarHashWidgetInfo.type))
-  if (index < 0 && similar.values.length && !isSimilarColor(similar)) {
-    let widgets = [...state.widgets]
-    const isEnabled = true
-    const isPinned = false
-    const widget = SimilarHashWidgetInfo.create(undefined, undefined, isEnabled, isPinned)
-    widgets.push(widget)
-    return { ...state, similar, widgets }
-  }
-  return { ...state, similar }
+  similarMinScore: {/* field: lastMinScore */}
 }
 
 export default function (state = initialState, action) {
@@ -98,10 +19,6 @@ export default function (state = initialState, action) {
     case MODIFY_RACETRACK_WIDGET: {
       const widget = action.payload
       assert.ok(widget instanceof Widget)
-      let similar = state.similar
-      if (widget.type === SimilarHashWidgetInfo.type) {
-        similar = extractSimilar(similar, widget)
-      }
       const index = state.widgets.findIndex(w => w.id === widget.id)
       const widgets = [...state.widgets]
       if (index < 0) {
@@ -109,7 +26,7 @@ export default function (state = initialState, action) {
       } else {
         widgets[index] = widget
       }
-      return { ...state, widgets, similar }
+      return { ...state, widgets }
     }
     case REMOVE_RACETRACK_WIDGET_IDS: {
       assert.ok(Array.isArray(action.payload))
@@ -125,37 +42,44 @@ export default function (state = initialState, action) {
       assert.ok(!widgets.length || widgets[0] instanceof Widget)
       return { ...state, widgets }
     }
-    case SIMILAR_VALUES: {
-      const similar = action.payload ? { ...state.similar, ...action.payload } : { ...state.similar, values: [], ofsIds: [], weights: [] }
-      return updateSimilarity(similar, state)
-    }
     case ANALYZE_SIMILAR: {
       const assets = action.payload
-      const values = assets.map(asset => asset.rawValue(state.similar.field))
-      const ofsIds = assets.map(asset => asset.closestProxy(256, 256).id)
-      const similar = { ...state.similar, values, ofsIds }
-      return updateSimilarity(similar, state)
+      const similarity = assets[0].rawValue('similarity')
+      const similarField = Object.keys(similarity)[0]
+      const hash = 'foobar'
+      const proxy = assets[0].closestProxy(256, 256)
+      const ofsId = proxy && proxy.id
+      const hashes = assets.map(asset => ({ hash, ofsId, weight: 1 }))
+      const minScore = state.minScore[state.similarField] || 75
+      let widgets = [...state.widgets]
+      const index = widgets.findIndex(widget => widget.type === SimilarHashWidgetInfo.type && widget.field === similarField)
+      const isEnabled = true
+      const isPinned = false
+      const widget = SimilarHashWidgetInfo.create(similarField, null, hashes, minScore, isEnabled, isPinned)
+      if (index >= 0) {
+        widgets[index] = widget
+      } else {
+        widgets.push(widget)
+      }
+      return { ...state, widgets }
+    }
+    case SIMILAR_MINSCORE: {
+      const { field, minScore } = action.payload
+      const similarMinScore = { ...state.similarMinScore, [field]: minScore }
+      return { ...state, similarMinScore }
     }
     case ASSET_ORDER:
     case ASSET_SORT: {
       const widgets = [...state.widgets]
-      const similar = {...state.similar}
       if (action.type === ASSET_SORT || (action.payload && action.payload.length > 0)) {
-        // Actively sorting by another field, remove all similar assets, add a sort widget if needed
-        similar.values = []
-        similar.ofsIds = []
+        // Actively sorting by another field, add a sort widget if needed
         const index = state.widgets.findIndex(widget => (widget.type === SortOrderWidgetInfo.type))
         if (index < 0) {
           const widget = SortOrderWidgetInfo.create()
           widgets.push(widget)
         }
       }
-      return { ...state, widgets, similar }
-    }
-    case ASSET_FIELDS: {
-      // Scan available asset fields for the preferred or a valid field
-      const field = bestSimilarityField(state.similar.field, action.payload)
-      return { ...state, similar: { ...state.similar, field } }
+      return { ...state, widgets }
     }
     case SELECT_FOLDERS: {
       const selectedFolderIds = action.payload
@@ -176,7 +100,7 @@ export default function (state = initialState, action) {
         if (index < 0) {
           const isEnabled = true
           const isPinned = false
-          const widget = createImportSetWidget(undefined, undefined, isEnabled, isPinned)
+          const widget = ImportSetWidgetInfo.create(undefined, undefined, isEnabled, isPinned)
           const widgets = [...state.widgets, widget]
           return {...state, widgets}
         }

@@ -136,9 +136,28 @@ export function createRangeWidget (field, fieldType, min, max, isEnabled, isPinn
   return new Widget({ type, field, sliver, isEnabled, isPinned })
 }
 
-export function createSimilarityWidget (field, fieldType, isEnabled, isPinned) {
+export function createSimilarityWidget (field, fieldType, hashes, minScore, isEnabled, isPinned) {
   const type = SimilarHashWidgetInfo.type
-  return new Widget({type, field, isEnabled, isPinned})
+
+  // Normalize the minScore based on the total weights
+  let avgWeight = 0
+  if (hashes && hashes.length) {
+    hashes.forEach(hash => { avgWeight += hash.weight })
+    avgWeight /= hashes.length
+  } else {
+    avgWeight = 1
+  }
+  const filter = new AssetFilter({
+    similarity: {
+      [field]: {
+        minScore: avgWeight * (minScore || 75),
+        hashes
+      }
+    }
+  })
+  const sliver = new AssetSearch({filter})
+  const state = { hashes, minScore }
+  return new Widget({type, field, sliver, isEnabled, isPinned, state})
 }
 
 export function createFiletypeWidget (field, fieldType, exts, isEnabled, isPinned) {
