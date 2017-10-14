@@ -56,11 +56,14 @@ class VideoViewer extends Component {
 
   componentWillReceiveProps (nextProps) {
     const { frames, startFrame, stopFrame, url } = nextProps
-    this.setState({ startFrame, stopFrame, played: 0 })
+    if (this.props.startFrame !== startFrame || this.props.stopFrame !== stopFrame) {
+      this.setState({ startFrame, stopFrame, played: 0 })
+    }
     if (this.state.clipStartFrame === Number.MAX_SAFE_INTEGER || url !== this.props.url) {
       const clipStartFrame = Math.max(0, startFrame - (stopFrame - startFrame))
       const clipStopFrame = Math.min(frames - 1, stopFrame + (stopFrame - startFrame))
       this.setState({clipStartFrame, clipStopFrame})
+      this.shuttler.publish('load')
     }
   }
 

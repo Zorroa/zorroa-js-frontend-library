@@ -58,6 +58,7 @@ class Video extends Component {
   constructor (props) {
     super(props)
 
+    props.shuttler.on('load', this.load)
     props.shuttler.on('start', this.start)
     props.shuttler.on('stop', this.stop)
     props.shuttler.on('startOrStop', this.startOrStop)
@@ -90,11 +91,13 @@ class Video extends Component {
 
   componentWillReceiveProps (nextProps) {
     // Force a video.load() after render of new video source
-    if (nextProps.url !== this.props.url) {
+    if (!this._initialized) {
       this.player.load()
       this._queueStart()
     }
   }
+
+  load = () => { this._initialized = false }
 
   // Make sure we only have one progress loop running at a time
   _queueProgress = () => {
@@ -234,15 +237,11 @@ class Video extends Component {
     return clamp((t * frames - startFrame) / (stopFrame - startFrame), 0, 1)
   }
 
-  initialized = () => (this._initialized === this._initializer())
-  initialize = () => { this._initialized = this._initializer() }
-  _initializer = () => (`${this.props.url}@${this.props.startFrame}`)
-
   init = () => {
-    if (this.initialized()) return
+    if (this._initialized) return
     this.scrub(this.props.startFrame)
     this.start()
-    this.initialize()
+    this._initialized = true
   }
 
   render () {
@@ -265,7 +264,7 @@ class Video extends Component {
           { exts.map(ext => <source key={ext} src={`${url}?ext=${ext}`} type={`video/${ext}`}/>) }
           <source key="raw" src={url}/>
         </video>
-        { !this.initialized() && <img className="Video-loading" src={svg}/> }
+        { (!this.player || this.player.readyState < 1) && <img className="Video-loading" src={svg}/> }
         { this.props.children }
       </div>
     )
