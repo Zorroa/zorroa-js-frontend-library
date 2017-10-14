@@ -50,7 +50,7 @@ export default class Asset {
   }
 
   smallestParentProxyURL (origin) {
-    Asset._smallestParentProxyURL(this.parentId(), origin)
+    return Asset._smallestParentProxyURL(this.parentId(), origin)
   }
 
   backgroundURL (origin) {

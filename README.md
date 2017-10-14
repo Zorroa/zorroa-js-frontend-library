@@ -87,6 +87,10 @@ npm run dev # will run with hot reloading on a special server over HTTP
 npm run dev -- --https # dev server over HTTPS
 ```
 
+#### Remote debugging
+
+Here's the entire process: I start my curator. Then I use ssh -R 8080:localhost:8080 computeruser@shub.zorroa.com, and leave that running in a shell. It'll stay exposed as long as ssh is connected. Then I tell Juan to visit shub.zorroa.com:8080, and he will see & use the version of curator on my laptop.
+
 ### Static mode
 
 Static mode is for testing the static build before submitting pull requests or deploying. Static mode bundles code & assets using our production settings into the bin directory, then serves that directory using a node server.  The bin/ directory is the final product and can be deployed to a server.
