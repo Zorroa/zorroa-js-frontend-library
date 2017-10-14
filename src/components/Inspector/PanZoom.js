@@ -1,10 +1,15 @@
 import React, { Component, PropTypes } from 'react'
 import Measure from 'react-measure'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 
+import User from '../../models/User'
 import Controlbar from './Controlbar'
 import { PubSub } from '../../services/jsUtil'
+import { lightboxPanner } from '../../actions/appActions'
+import { saveUserSettings } from '../../actions/authAction'
 
-export default class PanZoom extends Component {
+class PanZoom extends Component {
   static propTypes = {
     title: PropTypes.node,
     titleWidth: PropTypes.number,
@@ -15,6 +20,13 @@ export default class PanZoom extends Component {
     playing: PropTypes.bool,
     onVolume: PropTypes.func,
     volume: PropTypes.number,
+    lightboxPanner: PropTypes.shape({
+      x: PropTypes.number.isRequired,
+      y: PropTypes.number.isRequired,
+      scale: PropTypes.number.isRequired
+    }),
+    user: PropTypes.instanceOf(User),
+    userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object,
     children: PropTypes.node.isRequired
   }
@@ -23,15 +35,12 @@ export default class PanZoom extends Component {
     showControls: true
   }
 
-  constructor (props) {
-    super(props)
-    this.panner = new Panner()
-    this.state = {
-      scale: this.panner.scale,
-      translate: { x: this.panner.x, y: this.panner.y },
-      moving: false
-    }
-    this.movingTimer = null
+  state = {
+    moving: false
+  }
+
+  componentWillMount () {
+    this.panner = new Panner(this.props.lightboxPanner || {})
   }
 
   // Keep track of when the image is in motion, so we can
@@ -56,6 +65,9 @@ export default class PanZoom extends Component {
       clearTimeout(this.movingTimer)
       this.setState({moving: false})
       this.movingTimer = null
+      this.props.actions.lightboxPanner(this.panner)
+      this.props.actions.saveUserSettings(this.props.user,
+        { ...this.props.userSettings, lightboxPanner: this.panner })
     }
   }
 
@@ -70,6 +82,9 @@ export default class PanZoom extends Component {
   stopDrag = (event) => {
     document.removeEventListener('mouseup', this.stopDrag, true)
     document.removeEventListener('mousemove', this.drag, true)
+    this.props.actions.lightboxPanner(this.panner)
+    this.props.actions.saveUserSettings(this.props.user,
+      { ...this.props.userSettings, lightboxPanner: this.panner })
     this.stopMoving()
   }
 
@@ -79,7 +94,7 @@ export default class PanZoom extends Component {
       { x: event.pageX, y: event.pageY })
     this.startX = event.pageX
     this.startY = event.pageY
-    this.setStateToPanner()
+    this.forceUpdate()
     this.startMoving()
   }
 
@@ -87,14 +102,14 @@ export default class PanZoom extends Component {
   static minZoom = 1 / PanZoom.maxZoom
 
   zoom = (event) => {
-    const { scale } = this.state
+    const { scale } = this.panner
     const scalePct = 1 + Math.abs(event.deltaY) * 0.005
     const scaleMult = (event.deltaY > 0 ? scalePct : 1 / scalePct)
     const zoomFactor = Math.min(PanZoom.maxZoom, Math.max(PanZoom.minZoom, scale * scaleMult))
     const topPadding = 50
     const leftPadding = 8
     this.panner.zoom(zoomFactor, {x: event.pageX - leftPadding, y: event.pageY - topPadding})
-    this.setStateToPanner()
+    this.forceUpdate()
     this.startMoving()
   }
 
@@ -109,29 +124,23 @@ export default class PanZoom extends Component {
   }
 
   zoomToFit = (event) => {
-    this.panner = new Panner(this.panner.screenWidth, this.panner.screenHeight)
-    this.setStateToPanner()
+    const { screenWidth, screenHeight } = this.panner
+    this.panner = new Panner({screenWidth, screenHeight})
+    this.forceUpdate()
     this.stopMoving()
   }
 
-  setStateToPanner () {
-    this.setState({
-      translate: { x: this.panner.x, y: this.panner.y },
-      scale: this.panner.scale
-    })
-  }
-
   render () {
-    const { title, titleWidth, showControls, onPrevPage, onNextPage, onVolume, volume, shuttler, playing } = this.props
+    const { title, titleWidth, showControls, onPrevPage, onNextPage, onVolume, volume, shuttler, playing, userSettings } = this.props
     const { moving } = this.state
     const epsilon = 0.01
     const zoomOutDisabled = this.panner.scale <= PanZoom.minZoom + epsilon
     const zoomInDisabled = this.panner.scale >= PanZoom.maxZoom - epsilon
     const zoomToFitDisabled = this.panner.scale > (1 - epsilon) && this.panner.scale < (1 + epsilon)
     const style = {}
-    style['transform'] = `translate(${this.state.translate.x}px, ${this.state.translate.y}px) scale(${this.state.scale})`
+    style['transform'] = `translate(${this.panner.x}px, ${this.panner.y}px) scale(${this.panner.scale})`
     style['transformOrigin'] = 'top left'
-    style['imageRendering'] = moving ? 'pixelated' : 'auto'
+    style['imageRendering'] = (moving && userSettings.fastLightboxPanning) ? 'pixelated' : 'auto'
     return (
       <Measure>
         {({width, height}) => {
@@ -160,9 +169,20 @@ export default class PanZoom extends Component {
   }
 }
 
+export default connect(state => ({
+  lightboxPanner: state.app.lightboxPanner,
+  user: state.auth.user,
+  userSettings: state.app.userSettings
+}), dispatch => ({
+  actions: bindActionCreators({
+    lightboxPanner,
+    saveUserSettings
+  }, dispatch)
+}))(PanZoom)
+
 // Utility class for managing the panned region
 class Panner {
-  constructor (screenWidth, screenHeight, scale, x, y, width, height) {
+  constructor ({screenWidth, screenHeight, scale, x, y, width, height}) {
     this.screenWidth = screenWidth
     this.screenHeight = screenHeight
     this.x = x || 0

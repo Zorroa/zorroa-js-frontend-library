@@ -1,7 +1,7 @@
 import {
   SHOW_MODAL, HIDE_MODAL, SORT_FOLDERS,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
-  METADATA_FIELDS, LIGHTBOX_METADATA,
+  METADATA_FIELDS, LIGHTBOX_METADATA, LIGHTBOX_PANNER,
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
   SHOW_MULTIPAGE, VIDEO_VOLUME,
@@ -148,6 +148,13 @@ export function lightboxMetadata ({show, left, top, width, height}) {
   return ({
     type: LIGHTBOX_METADATA,
     payload: { show, left, top, width, height }
+  })
+}
+
+export function lightboxPanner ({x, y, scale}) {
+  return ({
+    type: LIGHTBOX_PANNER,
+    payload: { x, y, scale }
   })
 }
 

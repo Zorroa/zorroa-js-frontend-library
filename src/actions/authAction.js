@@ -8,7 +8,8 @@ import {
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT, SET_TABLE_FIELD_WIDTH,
   SHOW_MULTIPAGE, VIDEO_VOLUME, AUTH_CHANGE_PASSWORD, AUTH_DEFAULTS,
   UX_LEVEL, MONOCHROME, THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE,
-  DRAG_FIELD_TEMPLATE, LIST_SERVER_IMPORT_FILES, GET_SERVER_DEFAULT_PATH
+  DRAG_FIELD_TEMPLATE, LIST_SERVER_IMPORT_FILES, GET_SERVER_DEFAULT_PATH,
+  LIGHTBOX_METADATA, LIGHTBOX_PANNER
 } from '../constants/actionTypes'
 import { USER_ITEM, ORIGIN_ITEM } from '../constants/localStorageItems'
 import User from '../models/User'
@@ -204,6 +205,12 @@ function authorize (dispatch, json, source) {
     } else {
       dispatch(archivistSetting('archivist.export.dragTemplate'))
     }
+    if (metadata.lightboxMetadata !== undefined) {
+      dispatch({type: LIGHTBOX_METADATA, payload: metadata.lightboxMetadata})
+    }
+    if (metadata.lightboxPanner !== undefined) {
+      dispatch({type: LIGHTBOX_PANNER, payload: metadata.lightboxPanner})
+    }
   }
   const url = source && source.length ? '?source=' + source : ''
   browserHistory.push(url)   // Retain search from original URL
@@ -315,7 +322,6 @@ export function saveUserSettings (user, metadata) {
     return archivistPut(dispatch, '/api/v1/users/' + user.id + '/_settings', settings)
       .then(response => {
         dispatch({ type: USER_SETTINGS, payload: { user, metadata } })
-        console.log('Save user settings')
       })
       .catch(error => {
         console.error('Cannot save user settings ' + error)

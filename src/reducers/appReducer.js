@@ -1,7 +1,8 @@
 import {
   SHOW_MODAL, HIDE_MODAL, SORT_FOLDERS,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
-  METADATA_FIELDS, LIGHTBOX_METADATA, ASSET_FIELDS,
+  METADATA_FIELDS, ASSET_FIELDS,
+  LIGHTBOX_METADATA, LIGHTBOX_PANNER,
   SET_DRAGGING, SET_TABLE_FIELD_WIDTH,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
   SHOW_MULTIPAGE, VIDEO_VOLUME,
@@ -122,6 +123,8 @@ export default function app (state = initialState, action) {
       return { ...state, metadataFields: action.payload, tableFieldWidth }
     case LIGHTBOX_METADATA:
       return { ...state, lightboxMetadata: action.payload }
+    case LIGHTBOX_PANNER:
+      return { ...state, lightboxPanner: action.payload }
     case SET_DRAGGING:
       return { ...state, dragInfo: action.payload }
     case SET_TABLE_FIELD_WIDTH:

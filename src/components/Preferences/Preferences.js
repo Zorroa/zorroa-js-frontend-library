@@ -144,6 +144,12 @@ class Preferences extends Component {
     this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, monochrome })
   }
 
+  toggleFastLightboxPanning = (event) => {
+    if (!this.props.userSettings) return
+    const fastLightboxPanning = event.checked
+    this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, fastLightboxPanning })
+  }
+
   setFolderCounts = (showFolderCounts) => {
     this.props.actions.saveUserSettings(this.props.user, { ...this.props.userSettings, showFolderCounts })
   }
@@ -173,12 +179,16 @@ class Preferences extends Component {
             <div className="Preferences-checkboxes">
               <div className="Preferences-checkboxes-inner">
                 <div className="Preferences-uxlevel Preferences-checkbox">
-              <input type="checkbox" className="Preferences-uxlevel-input" checked={uxLevel > 0} onChange={this.toggleUXLevel}/>
+                  <input type="checkbox" className="Preferences-uxlevel-input" checked={uxLevel > 0} onChange={this.toggleUXLevel}/>
                   <div className="Preferences-uxlevel-label Preferences-checkbox-label">Advanced Controls</div>
-            </div>
+                </div>
                 <div className="Preferences-monochrome Preferences-checkbox">
-              <input type="checkbox" className="Preferences-monochrome-input" checked={monochrome} onChange={this.toggleMonochrome}/>
+                  <input type="checkbox" className="Preferences-monochrome-input" checked={monochrome} onChange={this.toggleMonochrome}/>
                   <div className="Preferences-monochrome-label Preferences-checkbox-label">Dark Theme</div>
+                </div>
+                <div className="Preferences-monochrome Preferences-checkbox">
+                  <input type="checkbox" className="Preferences-monochrome-input" checked={userSettings.fastLightboxPanning} onChange={this.toggleFastLightboxPanning}/>
+                  <div className="Preferences-monochrome-label Preferences-checkbox-label">Fast lightbox panning</div>
                 </div>
                 <div className="Preferences-showFolderCounts">
                   <div className="Preferences-showFolderCounts-label">Show folder counts: </div>

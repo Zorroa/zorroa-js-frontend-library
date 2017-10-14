@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import keydown from 'react-keydown'
 
+import User from '../../models/User'
 import Asset from '../../models/Asset'
 import Lightbar from './Lightbar'
 import Inspector from '../Inspector'
@@ -10,6 +11,7 @@ import Metadata from '../Metadata'
 import ResizableWindow from '../ResizableWindow'
 import { isolateAssetId } from '../../actions/assetsAction'
 import { lightboxMetadata } from '../../actions/appActions'
+import { saveUserSettings } from '../../actions/authAction'
 
 class Lightbox extends Component {
   static propTypes = {
@@ -22,6 +24,8 @@ class Lightbox extends Component {
       width: PropTypes.number.isRequired,
       height: PropTypes.number.isRequired
     }),
+    user: PropTypes.instanceOf(User),
+    userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object
   }
 
@@ -49,18 +53,25 @@ class Lightbox extends Component {
   }
 
   toggleMetadata = (event) => {
-    const { lightboxMetadata } = this.props
-    this.props.actions.lightboxMetadata({ ...lightboxMetadata, show: !lightboxMetadata.show })
+    const { user, userSettings } = this.props
+    const lightboxMetadata = { ...this.props.lightboxMetadata, show: !this.props.lightboxMetadata.show }
+    this.props.actions.lightboxMetadata(lightboxMetadata)
+    this.props.actions.saveUserSettings(user, { ...userSettings, lightboxMetadata })
   }
 
   closeMetadata = (event) => {
-    const { lightboxMetadata } = this.props
-    this.props.actions.lightboxMetadata({ ...lightboxMetadata, show: false })
+    const { user, userSettings } = this.props
+    const lightboxMetadata = { ...this.props.lightboxMetadata, show: false }
+    this.props.actions.lightboxMetadata(lightboxMetadata)
+    this.props.actions.saveUserSettings(user, { ...userSettings, lightboxMetadata })
     event.stopPropagation()
   }
 
   moveMetadata = ({left, top, width, height}) => {
-    this.props.actions.lightboxMetadata({ left, top, width, height, show: true })
+    const { user, userSettings } = this.props
+    const lightboxMetadata = { ...this.props.lightboxMetadata, left, top, width, height }
+    this.props.actions.lightboxMetadata(lightboxMetadata)
+    this.props.actions.saveUserSettings(user, { ...userSettings, lightboxMetadata })
   }
 
   render () {
@@ -101,7 +112,13 @@ class Lightbox extends Component {
 export default connect(state => ({
   assets: state.assets.all,
   isolatedId: state.assets.isolatedId,
-  lightboxMetadata: state.app.lightboxMetadata
+  lightboxMetadata: state.app.lightboxMetadata,
+  user: state.auth.user,
+  userSettings: state.app.userSettings,
 }), dispatch => ({
-  actions: bindActionCreators({ isolateAssetId, lightboxMetadata }, dispatch)
+  actions: bindActionCreators({
+    isolateAssetId,
+    lightboxMetadata,
+    saveUserSettings
+  }, dispatch)
 }))(Lightbox)
