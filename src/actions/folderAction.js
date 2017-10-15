@@ -10,6 +10,7 @@ import {
   archivistGet, archivistPut, archivistPost, archivistRequest,
   archivistDelete
 } from './authAction'
+import { restoreFolders } from './racetrackAction'
 import { selectId } from '../services/jsUtil'
 
 const rootEndpoint = '/api/v1/folders'
@@ -45,7 +46,7 @@ export function getFolderChildren (parentId, optOnDoneFn) {
   }
 }
 
-export function selectFolderIds (ids, curIds, folders) {
+export function selectFolderIds (ids) {
   if (!(ids instanceof Set)) ids = new Set(ids)
   return [{
     type: SELECT_FOLDERS,
@@ -53,14 +54,30 @@ export function selectFolderIds (ids, curIds, folders) {
   }]
 }
 
+// Select the folder and restore launchpads if needed.
 // Works when folders is an array of either Folder or TrashedFolder so that
 // we can share this logic without duplicating the TrashedFolder array into
 // a Folder array each time we do selection, which would require dup+find.
 // TrashedFolder.folderId is used instead of Folder.id rather than instanceof.
-export function selectFolderId (id, shiftKey, metaKey, folders, selectedIds, all) {
-  console.log('selectFolder')
+export function selectFolderId (id, shiftKey, metaKey, folders, selectedIds) {
   let selectedFolderIds = selectId(id, shiftKey, metaKey, folders, selectedIds)
-  return selectFolderIds(selectedFolderIds, selectedIds, all)
+  const restoredFolders = []
+  selectedFolderIds = new Set([...selectedFolderIds].filter(id => {
+    const folder = folders.find(folder => id === folder.id)
+    if (!folder) return false
+    if (folder.isLaunchpad()) {
+      restoredFolders.push(folder)
+      return false
+    }
+    return true
+  }))
+
+  let actions = []
+  if (selectedFolderIds.size) actions = actions.concat(selectFolderIds(selectedFolderIds))
+  const upsert = shiftKey || metaKey
+  if (restoredFolders.length) actions = actions.concat(restoreFolders(restoredFolders, upsert))
+
+  return actions
 }
 
 export function createFolder (folder, assetIds) {
@@ -183,24 +200,17 @@ export function removeAssetIdsFromFolderId (assetIds, folderId) {
   }
 }
 
-export function clearModifiedFolderIds (ids) {
-  if (!(ids instanceof Set)) ids = new Set(ids)
-  return {
-    type: CLEAR_MODIFIED_FOLDERS,
-    payload: ids
-  }
-}
-
 export function countAssetsInFolderIds (ids, search) {
   if (search && search.empty() || (!ids || !ids.length)) {
     // Fast path -- empty search, just set filteredCounts to counts in reducer
-    return ({
-      type: FOLDER_COUNTS,
-      payload: { search, ids }
-    })
+    return ([
+      { type: FOLDER_COUNTS, payload: { search, ids } },
+      { type: CLEAR_MODIFIED_FOLDERS, payload: ids }
+    ])
   }
   return dispatch => {
     console.log('Count query assets in folders ' + JSON.stringify(ids) + (search ? ' with query ' + JSON.stringify(search) : ' without search'))
+    dispatch({ type: CLEAR_MODIFIED_FOLDERS, payload: ids })
     return archivistPost(dispatch, `${rootEndpoint}/_assetCounts`, { search, ids })
       .then(response => {
         const counts = response.data.counts

@@ -98,7 +98,8 @@ class Racebar extends Component {
     const search = Searcher.build(widgets, nonTrashedFolderIds, selectedJobIds, order)
     const saveSearch = dyhiLevels && typeof dyhiLevels === 'string' && dyhiLevels === 'Search'
     const saveLayout = dyhiLevels && typeof dyhiLevels === 'string' && dyhiLevels === 'Layout'
-    if (!saveLayout && !saveSearch && dyhiLevels && dyhiLevels.length) {
+    const saveLaunchpad = dyhiLevels && typeof dyhiLevels === 'string' && dyhiLevels === 'Launchpad'
+    if (!saveLayout && !saveSearch && !saveLaunchpad && dyhiLevels && dyhiLevels.length) {
       if (search.filter && search.filter.terms) {
         dyhiLevels.forEach(dyhi => { search.filter.terms[dyhi.field] = undefined })
       }
@@ -112,7 +113,7 @@ class Racebar extends Component {
         search.order = []
       }
       const hasOrder = widgets.findIndex(widget => widget.type === WidgetInfo.SortOrderWidgetInfo.type) >= 0
-      const attrs = { widgets, order: hasOrder ? order : undefined }
+      const attrs = { widgets, order: hasOrder ? order : undefined, launchpad: saveLaunchpad }
       const folder = new Folder({ name, acl, parentId, search, attrs })
       this.props.actions.createFolder(folder)
       this.props.actions.toggleCollapsible('home', true)

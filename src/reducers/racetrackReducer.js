@@ -1,7 +1,8 @@
 import {
   MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS,
   ASSET_ORDER, ASSET_SORT, SELECT_FOLDERS,
-  SELECT_JOBS, ANALYZE_SIMILAR, UNAUTH_USER, ISOLATE_PARENT, SIMILAR_MINSCORE
+  SELECT_JOBS, ANALYZE_SIMILAR, UNAUTH_USER, ISOLATE_PARENT, SIMILAR_MINSCORE,
+  UPSERT_RACETRACK_WIDGETS
 } from '../constants/actionTypes'
 import Widget from '../models/Widget'
 import {
@@ -40,6 +41,18 @@ export default function (state = initialState, action) {
       const widgets = action.payload ? action.payload : []
       assert.ok(Array.isArray(widgets))
       assert.ok(!widgets.length || widgets[0] instanceof Widget)
+      return { ...state, widgets }
+    }
+    case UPSERT_RACETRACK_WIDGETS: {
+      const widgets = [...state.widgets]
+      action.payload.forEach(widget => {
+        const index = widgets.findIndex(w => w.id === widget.id)
+        if (index < 0) {
+          widgets.push(widget)
+        } else {
+          widgets[index] = widget
+        }
+      })
       return { ...state, widgets }
     }
     case ANALYZE_SIMILAR: {
