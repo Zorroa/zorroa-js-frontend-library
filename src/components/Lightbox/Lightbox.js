@@ -114,7 +114,7 @@ export default connect(state => ({
   isolatedId: state.assets.isolatedId,
   lightboxMetadata: state.app.lightboxMetadata,
   user: state.auth.user,
-  userSettings: state.app.userSettings,
+  userSettings: state.app.userSettings
 }), dispatch => ({
   actions: bindActionCreators({
     isolateAssetId,
