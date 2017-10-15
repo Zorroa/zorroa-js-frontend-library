@@ -137,14 +137,19 @@ $FolderItemHeight : 25px;
 .FolderItem-context-menu {
   @include flexCol;
   background-color: white;
+  color: $zorroa-greyish-brown;
+  box-shadow: 0 0 4px 4px rgba(0,0,0,0.15);
+  .dark & {
+    background-color: $zorroa-mattblack;
+    color: $zorroa-whitegray;
+    box-shadow: 0 0 4px 4px rgba(0,0,0,0.45);
+  }
   border-radius: 3px;
   position: fixed;
   top: 24px;
   left: 28px;
   width: 180px;
   z-index: 1000;
-  color: $zorroa-greyish-brown;
-  box-shadow: 0 0 4px 4px rgba(0,0,0,0.15);
   font-size: 12px;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -155,6 +160,7 @@ $FolderItemHeight : 25px;
 
     max-width: 100%;
     border-bottom: 1px solid $zorroa-nearwhite;
+    .dark & { border-bottom: 1px solid $zorroa-nearblack; }
     margin-left: 4px;
     margin-right: 4px;
     margin-top: 4px;
@@ -167,14 +173,17 @@ $FolderItemHeight : 25px;
 
     &:hover {
       background-color: $zorroa-lightgray;
+      .dark & { background-color: $zorroa-darkgray; }
     }
 
     &.disabled {
       color: $zorroa-lightgray;
+      .dark & { color: $zorroa-darkgray; }
     }
 
     &.disabled:hover {
       background-color: white;
+      .dark & { background-color: $zorroa-mattblack; }
     }
 
     div[class^="icon-"]:before {
