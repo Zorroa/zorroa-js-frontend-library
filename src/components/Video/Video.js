@@ -58,6 +58,7 @@ class Video extends Component {
   constructor (props) {
     super(props)
 
+    props.shuttler.on('load', this.load)
     props.shuttler.on('start', this.start)
     props.shuttler.on('stop', this.stop)
     props.shuttler.on('startOrStop', this.startOrStop)
@@ -87,6 +88,16 @@ class Video extends Component {
   componentWillUnmount () {
     window.removeEventListener('resize', this.resize)
   }
+
+  componentWillReceiveProps (nextProps) {
+    // Force a video.load() after render of new video source
+    if (!this._initialized) {
+      this.player.load()
+      this._queueStart()
+    }
+  }
+
+  load = () => { this._initialized = false }
 
   // Make sure we only have one progress loop running at a time
   _queueProgress = () => {
@@ -175,7 +186,7 @@ class Video extends Component {
 
     // If the player hasn't started playing, then don't call pause()
     // Otherwise, we get a console error
-    if (this.player.readyState >= 2) {
+    if (this.player.readyState >= 1) {
       this.player.pause()
     }
   }
@@ -209,11 +220,13 @@ class Video extends Component {
 
   scrub = (frame) => {
     if (!this.player) return
-    const played = frame / (this.props.frames - 1)
+    const { frames, stopFrame, frameRate, status } = this.props
+    const played = frame / (frames - 1)
+    if (played >= stopFrame / (frames - 1)) this.stop()
     this.setState({ played })
-    this.props.status.publish('played', played)
+    status.publish('played', played)
     try {
-      this.player.currentTime = played * this.props.frames / this.props.frameRate
+      this.player.currentTime = played * frames / frameRate
     } catch (e) {
       console.log('Player isn\'t ready to seek: ' + e)
     }
@@ -225,18 +238,17 @@ class Video extends Component {
   }
 
   init = () => {
-    const { url, startFrame } = this.props
-    const initialized = `${url}@${startFrame}`
-    if (this.initialized === initialized) return
-    this.scrub(startFrame)
+    if (this._initialized) return
+    this.scrub(this.props.startFrame)
     this.start()
-    this.initialized = initialized
+    this._initialized = true
   }
 
   render () {
     const { url, onError, videoVolume } = this.props
     const { started } = this.state
     const exts = [ 'mp4', 'm4v', 'webm', 'ogv', 'ogg' ]
+    const svg = require('../Inspector/loading-ring.svg')
 
     if (this.player) this.player.volume = videoVolume
 
@@ -252,6 +264,7 @@ class Video extends Component {
           { exts.map(ext => <source key={ext} src={`${url}?ext=${ext}`} type={`video/${ext}`}/>) }
           <source key="raw" src={url}/>
         </video>
+        { (!this.player || this.player.readyState < 1) && <img className="Video-loading" src={svg}/> }
         { this.props.children }
       </div>
     )

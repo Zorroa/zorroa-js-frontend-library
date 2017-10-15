@@ -38,11 +38,9 @@ class VideoViewer extends Component {
 
     this.status.on('played', played => { this.setState({ played }) })
     this.status.on('started', started => { this.setState({ started }) })
-    this.status.on('playing', playing => { this.setState({ playing }) })
 
     this.state = {
       started: false,
-      playing: false,
       volume: this.props.videoVolume,
       played: 0,
       startFrame: this.props.startFrame,
@@ -58,10 +56,14 @@ class VideoViewer extends Component {
 
   componentWillReceiveProps (nextProps) {
     const { frames, startFrame, stopFrame, url } = nextProps
+    if (this.props.startFrame !== startFrame || this.props.stopFrame !== stopFrame) {
+      this.setState({ startFrame, stopFrame, played: 0 })
+    }
     if (this.state.clipStartFrame === Number.MAX_SAFE_INTEGER || url !== this.props.url) {
       const clipStartFrame = Math.max(0, startFrame - (stopFrame - startFrame))
       const clipStopFrame = Math.min(frames - 1, stopFrame + (stopFrame - startFrame))
       this.setState({clipStartFrame, clipStopFrame})
+      this.shuttler.publish('load')
     }
   }
 
