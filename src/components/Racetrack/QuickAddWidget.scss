@@ -8,9 +8,12 @@
     top: 120%;
     left: 0;
     background-color: white;
-    .dark & { background-color: $zorroa-nearblack; }
     border-radius: 3px;
     box-shadow: 0 2px 6px 6px rgba(0,0,0, 0.15);
+    .dark & {
+      background-color: $zorroa-nearblack;
+      box-shadow: 0 2px 6px 6px rgba(0,0,0, 0.45);
+    }
     padding-left: 8px;
     padding-right: 8px;
     padding-top: 6px;
@@ -26,18 +29,11 @@
       padding: 6px;
       margin-top: 2px;
       border-radius: 3px;
-      border: 3px solid transparent;
       text-transform: uppercase;
       color: white;
 
-      &:not(.selected):hover {
-        border: 3px solid $zorroa-gray;
-      }
-
-      &.selected {
-        opacity: 0.75;
-        border: 3px solid $zorroa-darkgray;
-      }
+      &:not(.selected):hover { filter: brightness(125%); }
+      &.selected { opacity: 0.75; }
     }
   }
 }
@@ -56,6 +52,7 @@
   color: white;
   background-color: $zorroa-sickly-green;
   padding: 5px;
+  margin-left: 2px;
 }
 
 .QuickAddWidget-input {

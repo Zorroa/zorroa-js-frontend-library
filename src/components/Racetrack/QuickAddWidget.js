@@ -109,7 +109,7 @@ class QuickAddWidget extends Component {
 
   focus = () => {
     // FIXME: Storing focus as state breaks clicking on widget items.
-    this.focused = true
+    this.focused = !this.focused
     this.setState({selectedWidgetInfo: null, filterText: ''})
   }
 
@@ -136,7 +136,7 @@ class QuickAddWidget extends Component {
       <div className="QuickAddWidget Racebar-add-widget">
         <div className="QuickAddWidget-input-container icon-plus" title="Add a new search widget">
           <input value={this.state.filterText} onChange={this.changeFilterText}
-                 onKeyDown={this.keyDown} onFocus={this.focus} onBlur={this.blur}
+                 onKeyDown={this.keyDown} onClick={this.focus} onBlur={this.blur}
                  className="QuickAddWidget-input"
                  placeholder="Quick Add - Widget"/>
         </div>
