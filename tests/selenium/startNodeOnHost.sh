@@ -15,5 +15,5 @@ if [[ "$HOST" == "" ]]; then >&2 echo "Usage: $0 <ip>"; exit 1; fi
 chmod 600 id_rsa_zorroa_selenium_node
 
 ./sshNodeHost.sh $HOST "cd ~; mkdir -p Desktop/selenium"
-tar cfz - startNode.sh stopNode.sh | ./sshNodeHost.sh $HOST 'cd ~/Desktop/selenium; tar xfz -'
+tar cfz - startNode.sh stopNode.sh com.user.selenium.plist | ./sshNodeHost.sh $HOST 'cd ~/Desktop/selenium; tar xfz -'
 ./sshNodeHost.sh $HOST "cd ~/Desktop/selenium; ./startNode.sh"

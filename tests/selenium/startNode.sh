@@ -7,7 +7,9 @@
 
 SERVER=selenium-server-standalone-3.4.0.jar
 CHROMEDRIVER=chromedriver
-HUB=http://10.8.0.1:4444
+HUB_IP=10.8.0.1
+HUB_PORT=4444
+HUB=http://$HUB_IP:$HUB_PORT
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
@@ -30,6 +32,23 @@ killall java
 
 # delete all but last 2 log files
 ls selenium-node-*.log | sort -r | sed '1d;2d' | xargs rm
+
+# install selenium startup script, to allow scheduled reboots
+# TODO: get this working, I tried, but resorted to Automator instead on the mac minis
+# https://stackoverflow.com/a/13372744/1424242
+# TODO: this is mac-specific. Make it Linux capable when we have Linux grid nodes
+# if [[ -e ~/.zorroa-grid ]]; then
+#   cp com.user.selenium.plist ~/Library/LaunchAgents
+#   perl -i -pe "s|~|$HOME|" ~/Library/LaunchAgents/com.user.selenium.plist
+#   launchctl unload ~/Library/LaunchAgents/com.user.selenium.plist
+#   launchctl load ~/Library/LaunchAgents/com.user.selenium.plist
+# fi
+
+# wait for the hub connection to spin up
+if ! nc -w 0 $HUB_IP $HUB_PORT </dev/null 2>&1; then
+  >&2 echo "waiting for vpn/hub connection"
+  while ! nc -w 0 $HUB_IP $HUB_PORT </dev/null; do sleep 1; done
+fi
 
 # launch & disown selenium node
 logfile=selenium-node-$(date "+%Y_%m_%d_%Hh_%Mm_%Ss").log
