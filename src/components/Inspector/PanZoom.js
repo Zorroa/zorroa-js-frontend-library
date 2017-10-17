@@ -43,6 +43,12 @@ class PanZoom extends Component {
     this.panner = new Panner(this.props.lightboxPanner || {})
   }
 
+  savePanner = () => {
+    this.props.actions.lightboxPanner(this.panner)
+    this.props.actions.saveUserSettings(this.props.user,
+      { ...this.props.userSettings, lightboxPanner: this.panner })
+  }
+
   // Keep track of when the image is in motion, so we can
   // temporarily drop image quality in favor of responsiveness.
   // Call this every time the image starts moving, and
@@ -65,9 +71,6 @@ class PanZoom extends Component {
       clearTimeout(this.movingTimer)
       this.setState({moving: false})
       this.movingTimer = null
-      this.props.actions.lightboxPanner(this.panner)
-      this.props.actions.saveUserSettings(this.props.user,
-        { ...this.props.userSettings, lightboxPanner: this.panner })
     }
   }
 
@@ -82,9 +85,7 @@ class PanZoom extends Component {
   stopDrag = (event) => {
     document.removeEventListener('mouseup', this.stopDrag, true)
     document.removeEventListener('mousemove', this.drag, true)
-    this.props.actions.lightboxPanner(this.panner)
-    this.props.actions.saveUserSettings(this.props.user,
-      { ...this.props.userSettings, lightboxPanner: this.panner })
+    this.savePanner()
     this.stopMoving()
   }
 
@@ -115,11 +116,13 @@ class PanZoom extends Component {
 
   zoomIn = (event) => {
     this.zoom({ ...event, deltaY: 50, pageX: this.panner.screenWidth / 2, pageY: this.panner.screenHeight / 2 })
+    this.savePanner()
     this.stopMoving()
   }
 
   zoomOut = (event) => {
     this.zoom({ ...event, deltaY: -50, pageX: this.panner.screenWidth / 2, pageY: this.panner.screenHeight / 2 })
+    this.savePanner()
     this.stopMoving()
   }
 
@@ -127,6 +130,7 @@ class PanZoom extends Component {
     const { screenWidth, screenHeight } = this.panner
     this.panner = new Panner({screenWidth, screenHeight})
     this.forceUpdate()
+    this.savePanner()
     this.stopMoving()
   }
 
