@@ -45,6 +45,10 @@ export default class Folder {
     return !this.isDyhi() && !this.isSmartCollection()
   }
 
+  isLaunchpad () {
+    return this.attrs.launchpad
+  }
+
   isPrivate (user, userPermissions) {
     return !this.isPublic(user, userPermissions)
   }

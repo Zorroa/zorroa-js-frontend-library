@@ -275,7 +275,7 @@ class Folders extends Component {
     const rootFolder = folders.all.get(this.state.rootId)
     const folderList = this.folderList(rootFolder)
     this.props.actions.selectFolderId(folder.id, event.shiftKey, event.metaKey,
-      folderList, this.props.folders.selectedFolderIds, this.props.folders.all)
+      folderList, this.props.folders.selectedFolderIds)
   }
 
   filterFolders = (event) => {

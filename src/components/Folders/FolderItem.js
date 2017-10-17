@@ -640,7 +640,7 @@ class FolderItem extends Component {
   render () {
     const { folder, depth, isOpen, hasChildren, isSelected, onToggle, onSelect, dropparams, dropFolderId, top } = this.props
     const dragHover = this.props.dragHover || dropFolderId === folder.id
-    const icon = folder.isDyhi() ? 'icon-foldercog' : (folder.isSmartCollection() ? 'icon-collections-smart' : 'icon-collections-simple')
+    const icon = folder.isLaunchpad() ? 'icon-settings_backup_restore' : (folder.isDyhi() ? 'icon-foldercog' : (folder.isSmartCollection() ? 'icon-collections-smart' : 'icon-collections-simple'))
     const draggable = !folder.isDyhi() || folder.dyhiRoot
     const isDropTarget = dropTarget(this.props)
     const dragparams = { ...this.props.dragparams, draggable }  // disable drag

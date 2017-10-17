@@ -1,6 +1,6 @@
 import {
   MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS,
-  RESET_RACETRACK_WIDGETS, SIMILAR_MINSCORE
+  RESET_RACETRACK_WIDGETS, UPSERT_RACETRACK_WIDGETS, SIMILAR_MINSCORE
 } from '../constants/actionTypes'
 import Widget, {
   createFacetWidget, createExistsWidget, createMapWidget,
@@ -37,6 +37,13 @@ export function resetRacetrackWidgets (widgets) {
   })
 }
 
+export function upsertRacetrackWidgets (widgets) {
+  return ({
+    type: UPSERT_RACETRACK_WIDGETS,
+    payload: widgets
+  })
+}
+
 export function similarMinScore (field, minScore) {
   return ({
     type: SIMILAR_MINSCORE,
@@ -58,7 +65,7 @@ function extractSimilar (search) {
 }
 
 // Merge widgets from multiple folders and restore search and related state
-export function restoreFolders (folders) {
+export function restoreFolders (folders, upsert) {
   if (!folders || !folders.length) return
 
   let order
@@ -101,7 +108,7 @@ export function restoreFolders (folders) {
 
   // Do not restore selected folders to avoid infinite recursion
   const selectedFolderIds = restoreWidgetSlivers(widgets, search)
-  return restoreActions(widgets, search, selectedFolderIds)
+  return restoreActions(widgets, search, selectedFolderIds, upsert)
 }
 
 // Reconstruct Racetrack widgets from a search.
@@ -293,9 +300,9 @@ function restoreWidgetSlivers (widgets, search) {
 
 // Helper function to return an array of actions needed to restore
 // app state to match the widgets, search, and selected folders.
-function restoreActions (widgets, search, selectedFolderIds) {
+function restoreActions (widgets, search, selectedFolderIds, upsert) {
   // Return actions to update the racetrack for the new search
-  const actions = [resetRacetrackWidgets(widgets)]
+  const actions = [upsert ? upsertRacetrackWidgets(widgets) : resetRacetrackWidgets(widgets)]
   actions.push(selectFolderIds(selectedFolderIds))
 
   // Set the global order to match the search

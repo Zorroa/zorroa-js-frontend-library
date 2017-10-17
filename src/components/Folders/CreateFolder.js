@@ -106,7 +106,7 @@ class CreateFolder extends Component {
     if (!isManager && !isAdministrator) return
     const { dyhiLevels } = this.props
     const { name, mode } = this.state
-    const modes = ['Search']
+    const modes = ['Search', 'Launchpad']
     if (dyhiLevels && dyhiLevels.length) modes.push('Hierarchy')
     const cleanField = (field) => (field.endsWith('.raw') ? field.slice(0, -4) : field)
     return (
@@ -114,7 +114,7 @@ class CreateFolder extends Component {
         { modes.length > 1 && (
           <div className="CreateFolder-modes">
             {modes.map(m => (
-              <div key={m} className={classnames('CreateFolder-mode', {selected: m === mode})}
+              <div key={m} className={classnames('CreateFolder-mode', `CreateFolder-mode-${m}`, {selected: m === mode})}
                    onClick={_ => this.changeMode(m)}>{m}</div>
             ))}
           </div>
@@ -122,7 +122,13 @@ class CreateFolder extends Component {
         { modes.length > 1 && mode === 'Search' && (
           <div className="CreateFolder-mode-info">
             Save the current search as a smart folder.
-            Select the folder to restore the search.
+            Select the folder to restrict results to the saved search.
+          </div>
+        )}
+        { modes.length > 1 && mode === 'Launchpad' && (
+          <div className="CreateFolder-mode-info">
+            Save the current search as a launchpad.
+            Select the folder to restore the saved search widgets.
           </div>
         )}
         { mode === 'Hierarchy' && (
@@ -167,7 +173,7 @@ class CreateFolder extends Component {
                    placeholder="Collection Name" onKeyDown={this.checkForSubmit}
                    value={name} onChange={this.changeName} />
             )}
-            { this.renderModes() }
+            { !includeAssets && this.renderModes() }
             { includeAssets && (
               <div className={classnames('CreateFolder-include-selected-assets', {disabled: disableIncludeSelected})}>
                 <input type="checkbox" checked={includeSelectedAssets} disabled={disableIncludeSelected}
