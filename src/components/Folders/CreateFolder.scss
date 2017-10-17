@@ -188,6 +188,7 @@
 .CreateFolder-mode {
   padding: 4px 8px;
   border: 1px solid $zorroa-lightgray;
+  cursor: pointer;
 
   &:first-child {
     border-top-left-radius: 3px;

@@ -114,7 +114,7 @@ class CreateFolder extends Component {
         { modes.length > 1 && (
           <div className="CreateFolder-modes">
             {modes.map(m => (
-              <div key={m} className={classnames('CreateFolder-mode', {selected: m === mode})}
+              <div key={m} className={classnames('CreateFolder-mode', `CreateFolder-mode-${m}`, {selected: m === mode})}
                    onClick={_ => this.changeMode(m)}>{m}</div>
             ))}
           </div>
@@ -173,7 +173,7 @@ class CreateFolder extends Component {
                    placeholder="Collection Name" onKeyDown={this.checkForSubmit}
                    value={name} onChange={this.changeName} />
             )}
-            { this.renderModes() }
+            { !includeAssets && this.renderModes() }
             { includeAssets && (
               <div className={classnames('CreateFolder-include-selected-assets', {disabled: disableIncludeSelected})}>
                 <input type="checkbox" checked={includeSelectedAssets} disabled={disableIncludeSelected}
