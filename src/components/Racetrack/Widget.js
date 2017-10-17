@@ -93,7 +93,7 @@ class Widget extends Component {
     const { className } = this.props
     const widgetClasses = classnames('Widget', 'flexCol', {'parent': children, floatBody, isOpen, isIconified, isEnabled, [className]: !!className})
     return (
-      <div className={widgetClasses}>
+      <div className={widgetClasses} onBlur={onOpen} contentEditable={true}>
         <WidgetHeader {...WidgetHeaderParams}/>
         { !isIconified && isOpen && (
           <div className={classnames('Widget-body', {floatBody})}>
