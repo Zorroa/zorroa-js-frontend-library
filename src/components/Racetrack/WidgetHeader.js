@@ -3,12 +3,12 @@ import classnames from 'classnames'
 
 import pin from './pin.svg'
 
-const WidgetHeader = ({ isEnabled, isPinned, isIconified, maxWidth, title, field, icon, backgroundColor, enableToggleFn, collapseToggleFn, pinnedToggleFn, onClose }) => {
+const WidgetHeader = ({ isEnabled, isPinned, isIconified, isOpen, maxWidth, title, field, icon, backgroundColor, enableToggleFn, collapseToggleFn, pinnedToggleFn, onClose }) => {
   const iconClassNames = classnames('WidgetHeader-icon', icon, { isEnabled, isIconified })
   return (
     <div style={{backgroundColor, maxWidth}} className={classnames('WidgetHeader', {isEnabled})}>
       <div className='WidgetHeader-hover'>
-        <div className='WidgetHeader-toggle flexRowCenter fullWidth fullHeight' onClick={collapseToggleFn}>
+        <div className='WidgetHeader-toggle flexRowCenter fullWidth fullHeight' onClick={_ => collapseToggleFn(!isOpen)}>
           <div className={iconClassNames}/>
           { !isIconified && (
             <div className="WidgetHeader-header">

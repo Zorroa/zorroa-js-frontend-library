@@ -69,9 +69,8 @@ class Racebar extends Component {
     }
   }
 
-  toggleOpen = (widget) => {
-    const { openId } = this.state
-    this.setState({ openId: widget.id === openId ? -1 : widget.id })
+  toggleOpen = (widget, isOpen) => {
+    this.setState({ openId: isOpen ? widget.id : -1 })
   }
 
   saveRacetrack = () => {
@@ -157,7 +156,7 @@ class Racebar extends Component {
     const isPinned = false
     const isEnabled = widget.isEnabled
     const isOpen = !this.props.isolatedId && this.state.openId === widget.id
-    const onOpen = _ => this.toggleOpen(widget)
+    const onOpen = (e) => this.toggleOpen(widget, e)
     const floatBody = true
     const maxWidth = 360
     return cloneElement(widgetInfo.element, {id: widget.id, isIconified, isPinned, isEnabled, isOpen, onOpen, maxWidth, floatBody})
