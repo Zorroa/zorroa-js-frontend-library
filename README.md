@@ -264,7 +264,7 @@ RUNS  tests/e2e/workspace.test.js
 
 ### Adding a node to the Zorroa Grid
 
-Here's how to spinn up a new mac mini node machine & add it to our grid
+Here's how to spin up a new mac mini node machine & add it to our grid
 
 ```
 Install teamViewer
@@ -274,6 +274,7 @@ Install teamViewer
 ```
 Install tunnelBlick
   Add selenium vpn keys & connect to the vpn (vpn keys are in tests/selenium/zorroa-openvpn-client.tar.gz)
+  Connect when tunnelblick launches
   Don't route all traffic
   Do connect to vpn on startup
   Keep connected
@@ -291,8 +292,13 @@ Install java
 
 ```
 Set mac to auto-login to user account zorroa (to faciliate restarts via teamviewer)
-set power save settings to not sleep
-(TODO: this is probably not needed) System Preferences | Security & Privacy | Turn off require password
+  Preferences | Users & Groups | Login Options
+Set power save settings to not sleep
+  Preferences | Energy Saver
+Disable login password (TODO: this is probably not needed)
+  System Preferences | Security & Privacy | Turn off require password
+Schedule a nightly restart for 3am
+  System Preferences | Energy Saver | Schedule...
 ```
 
 ```
@@ -306,6 +312,19 @@ Turn on remote login (ssh access) and copy ssh keys to the machine:
   ssh zorroa@$HOST -i id_rsa_zorroa_selenium_node # make sure it works - this should not ask for a password
   ./startNodeOnHost.sh $HOST
   ./sshNodeHost.sh $HOST 'touch ~/.zorroa-grid' # enable this node; startAllNodes.sh looks for this file
+```
+
+```
+[Mac only & temporary] Create a login task in Automator set it to launch on login
+  Start Automator.
+  Create a new file, select "Application".
+  Click "Show library" in the toolbar (if hidden)
+  Add "Run shell script" (from the Actions/Utilities)
+  Set the script to "/Users/zorroa/Desktop/selenium/startNode.sh"
+  Save the file to "startSeleniumOnLogin" in the Desktop/selenium folder
+  Go to System Preferences -> Accounts -> Login items
+  Add the new app: ~/Desktop/selenium/startSeleniumOnLogin
+  Restart & test to make sure the node connects automatically.
 ```
 
 mac mini user account password: z0rr0@12
