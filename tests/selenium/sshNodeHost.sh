@@ -3,7 +3,7 @@
 # open ssh connection to node.
 # pass the vpn ip, e.g. 10.8.0.3
 #
-# Usage: sshNodeHost.sh <vpn ip>
+# Usage: sshNodeHost.sh <vpn ip> [command]
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR

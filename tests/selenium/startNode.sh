@@ -7,6 +7,7 @@
 
 SERVER=selenium-server-standalone-3.4.0.jar
 CHROMEDRIVER=chromedriver
+CHROMEDRIVER_VERSION=2.33
 HUB_IP=10.8.0.1
 HUB_PORT=4444
 HUB=http://$HUB_IP:$HUB_PORT
@@ -22,9 +23,10 @@ fi
 # download chromedriver if it's not already here
 # https://sites.google.com/a/chromium.org/chromedriver/downloads
 # https://chromedriver.storage.googleapis.com/2.29/chromedriver_mac64.zip
-if [[ ! -e $CHROMEDRIVER ]]; then
-  curl -O https://chromedriver.storage.googleapis.com/2.29/chromedriver_mac64.zip
-  unzip chromedriver_mac64.zip
+if [[ ! -e chromedriver_mac64_${CHROMEDRIVER_VERSION}.zip ]]; then
+  rm chromedriver*
+  curl https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_mac64.zip > chromedriver_mac64_${CHROMEDRIVER_VERSION}.zip
+  unzip chromedriver_mac64_${CHROMEDRIVER_VERSION}.zip
 fi
 
 # kill old server, if running
