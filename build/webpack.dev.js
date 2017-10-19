@@ -7,6 +7,9 @@ const ENV = 'DEV'
 
 module.exports = {
   devtool: 'eval-cheap-module-source-map',
+  devServer: {
+    disableHostCheck: true,
+  },
   entry: [
     require.resolve('webpack-dev-server/client') + '?/',
     require.resolve('webpack/hot/dev-server'),
