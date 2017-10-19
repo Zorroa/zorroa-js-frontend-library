@@ -27,8 +27,9 @@
     "update-fonts": "src/assets/fonts/zorroa-icons/update-fonts.bash",
     "preview-fonts": "src/assets/fonts/zorroa-icons/preview-fonts.bash"
   },
-  "author": "Jordan Papaleo",
-  "license": "",
+  "author": "zorroa.com",
+  "license": "UNLICENSED",
+  "private": true,
   "engines": {
     "node": "7.10.1",
     "npm": "^3.10.7"
