@@ -576,14 +576,7 @@ class Assets extends Component {
                     [page(asset, width, height, origin)]
                   return (
                     <Thumb isSelected={selectedIds && selectedIds.has(asset.id)}
-                           dim={
-                            /*
-                             Note an offset of assetsScrollPadding became necessary after an npm upgrade.
-                             The padding style in assetsScrollParams used to offset Thumbs, but at some point stopped
-                             TODO: see if there's a way to simplify & factor out this offset
-                            */
-                            { x: dim.x + assetsScrollPadding, y: dim.y + assetsScrollPadding, width, height }
-                           }
+                           dim={dim}
                            key={asset.id}
                            asset={asset}
                            assetId={asset.id}
