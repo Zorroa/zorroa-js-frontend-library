@@ -72,14 +72,14 @@ global.expect = global.expect || (x => {
 // https://groups.google.com/forum/#!topic/selenium-users/ilfLKSUAqQQ
 // check memory and CPU usage by node/s and HUB with docker stats $(docker ps -aq)
 
-var SauceLabs = require('saucelabs')
+// var SauceLabs = require('saucelabs')
 
 var username = process.env.SAUCE_USERNAME
 var accessKey = process.env.SAUCE_ACCESS_KEY
 
 var saucelabs
 
-const USE_SAUCE = (username !== undefined)
+const USE_SAUCE = false // (username !== undefined)
 
 if (USE_SAUCE) {
   saucelabs = new SauceLabs({
@@ -420,6 +420,7 @@ export function login () {
   return logout()
   .then(_ => { DEBUG && console.log('loggin in') })
   .then(_ => driver.get(`${BASE_URL}/?ClearSessionState=1`))
+  .then(_ => driver.executeScript('console.log(JSON.stringify(window.zorroa))'))
   .then(_ => driver.executeScript('window.zorroa.setSeleniumTesting(true)'))
   .then(_ => driver.findElement(By.css('input[name="username"]')).sendKeys('selenium'))
   .then(_ => driver.findElement(By.css('input[name="password"]')).sendKeys('z0rr0@12'))

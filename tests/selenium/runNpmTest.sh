@@ -26,12 +26,12 @@ if [[ $USE_ZORROA_GRID == "true" ]]; then
 
   curl localhost:4444 > /dev/null # wait for ssh to finish fully connecting
 
-  # make sure a server is running
-  if ! nc -z shub.zorroa.com $ZORROA_GRID_PORT; then
-    echo "I see no curator running on shub:$ZORROA_GRID_PORT; make sure to start your server"
-    kill $sshPid
-    exit 1
-  fi
+  # # make sure a server is running
+  # if ! nc -z shub.zorroa.com $ZORROA_GRID_PORT; then
+  #   echo "I see no curator running on shub:$ZORROA_GRID_PORT; make sure to start your server"
+  #   kill $sshPid
+  #   exit 1
+  # fi
 fi
 
 # Run all tests

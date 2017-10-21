@@ -244,8 +244,22 @@ class Video extends Component {
     this._initialized = true
   }
 
+  onError = (err) => {
+    const { onError } = this.props
+    // This error handler is called for extensions that don't match.
+    // We don't care about that unless all extensions fail.
+    // So make sure the error is legit before forwarding it.
+    // If we forward extension errors, and our parent calls setState() in response,
+    // then we'll be rendered again, triggering the first extension error in an
+    // infinite loop. TODO: test a real video error, validate err.target.error is
+    // the correct object path to watch here.
+    if (onError && err.target.error) {
+      onError(err.target.error)
+    }
+  }
+
   render () {
-    const { url, onError, videoVolume } = this.props
+    const { url, videoVolume } = this.props
     const { started } = this.state
     const exts = [ 'mp4', 'm4v', 'webm', 'ogv', 'ogg' ]
     const svg = require('../Inspector/loading-ring.svg')
@@ -258,7 +272,7 @@ class Video extends Component {
                onCanPlay={this.init}
                autoPlay={started}
                onEnded={ this.stop }
-               onError={e => onError && onError(e.target.error)}
+               onError={this.onError}
                width="100%" height="100%"
                ref={player => { this.player = player }}>
           { exts.map(ext => <source key={ext} src={`${url}?ext=${ext}`} type={`video/${ext}`}/>) }
