@@ -51,12 +51,8 @@ describe('search widget', function () {
   // Tests below ASSUME we are logged in!
   // ------------------------------------
 
-  it('pin a widget to racetrack', function () {
+  it('Enable advanced preferences', function () {
     return driver
-      .then(_ => { DEBUG && console.log('------ pin a widget to racetrack') })
-      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Racetrack'), 5000))
-      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Racebar-widget .Widget')))
-
       .then(_ => { DEBUG && console.log('admin menu preferences') })
       .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.header-menu-user')))
       .then(_ => { DEBUG && console.log('admin menu preferences - 1') })
@@ -76,6 +72,13 @@ describe('search widget', function () {
       .then(_ => { DEBUG && console.log('admin menu preferences - 7') })
       .then(_ => selenium.clickSelector(By.css('.Preferences-close')))
       .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Preferences')))
+  })
+
+  it('pin a widget to racetrack', function () {
+    return driver
+      .then(_ => { DEBUG && console.log('------ pin a widget to racetrack') })
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Racetrack'), 5000))
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Racebar-widget .Widget')))
 
       .then(_ => { DEBUG && console.log('create a color widget') })
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racebar-add-widget')))
