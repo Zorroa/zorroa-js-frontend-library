@@ -1,49 +1,37 @@
 import React, { Component, PropTypes } from 'react'
-import ReactDOMServer from 'react-dom/server'
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
 import classnames from 'classnames'
 
-import Asset, { minimalUniqueFieldTitle } from '../../models/Asset'
-import AssetSearch from '../../models/AssetSearch'
-import User from '../../models/User'
-import { unCamelCase } from '../../services/jsUtil'
-import { setTableFieldWidth, iconifyRightSidebar } from '../../actions/appActions'
-import { createFacetWidget, fieldUsedInWidget } from '../../models/Widget'
-import { modifyRacetrackWidget } from '../../actions/racetrackAction'
-import { sortAssets, unorderAssets, isolateAssetId } from '../../actions/assetsAction'
-import { saveUserSettings } from '../../actions/authAction'
-import TableField from './TableField'
 import Resizer from '../../services/Resizer'
-import { defaultMetadataFields } from '../../reducers/appReducer'
 
 const rowHeightPx = 30
 const tableHeaderHeight = 26
 
-class Table extends Component {
+export default class Table extends Component {
   static propTypes = {
-    // app state
-    assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+    assets: PropTypes.arrayOf(PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    })).isRequired,
     assetsCounter: PropTypes.number.isRequired,
     selectedAssetIds: PropTypes.instanceOf(Set),
     selectionCounter: PropTypes.number.isRequired,
-    monochrome: PropTypes.bool,
-    fields: PropTypes.arrayOf(PropTypes.string).isRequired,
-    fieldWidth: PropTypes.objectOf(PropTypes.number).isRequired,
-    fieldTypes: PropTypes.object,
-    widgets: PropTypes.arrayOf(PropTypes.object),
-    order: PropTypes.arrayOf(PropTypes.object),
-    user: PropTypes.instanceOf(User),
-    userSettings: PropTypes.object.isRequired,
-    query: PropTypes.instanceOf(AssetSearch),
+    fields: PropTypes.arrayOf(PropTypes.shape({
+      field: PropTypes.string.isRequired,
+      title: PropTypes.element.isRequired,
+      order: PropTypes.string,
+      width: PropTypes.number.isRequired
+    })).isRequired,
 
     // input props
     height: PropTypes.number.isRequired,
     tableIsResizing: PropTypes.bool.isRequired,
-    selectFn: PropTypes.func.isRequired,
 
-    // connect actions
-    actions: PropTypes.object
+    // Callbacks
+    selectFn: PropTypes.func.isRequired,
+    isolateFn: PropTypes.func,
+    autoResizeFieldFn: PropTypes.func,
+    setFieldWidthFn: PropTypes.func,
+    sortFieldFn: PropTypes.func,
+    elementFn: PropTypes.func.isRequired
   }
 
   constructor (props) {
@@ -81,71 +69,44 @@ class Table extends Component {
   componentWillMount = () => { this.resizer = new Resizer() }
   componentWillUmount = () => { this.resizer.release() }
 
-  saveTableFieldWidths () {
-    const { userSettings, actions, user, fieldWidth } = this.props
-    const settings = { ...userSettings, tableFieldWidths: fieldWidth }
-    actions.saveUserSettings(user, settings)
-  }
-
   columnResizeStart = (event, field) => {
     this.columnResizeFieldName = field
-    this.resizer.capture(this.columnResizeUpdate, this.columnResizeStop,
-      this.props.fieldWidth[field], 0)
+    const index = this.props.fields.findIndex(f => f.field === field)
+    const width = index >= 0 && this.props.fields[index].width || 100
+    this.resizer.capture(this.columnResizeUpdate, this.columnResizeStop, width, 0)
   }
 
   columnResizeUpdate = (resizeX, resizeY) => {
     var fieldWidth = Math.min(2000, Math.max(50, resizeX))
-    this.props.actions.setTableFieldWidth({[this.columnResizeFieldName]: fieldWidth})
+    this.props.setFieldWidthFn(this.columnResizeFieldName, fieldWidth)
   }
 
   columnResizeStop = (event) => {
     this.columnResizeFieldName = null
-    this.saveTableFieldWidths()
   }
 
   columnAutoResize = (event, field) => {
-    const { assets, monochrome } = this.props
-    var test = document.getElementById('Table-cell-test')
-    var maxWidth = 0
+    const { assets, autoResizeFieldFn } = this.props
+    let maxWidth = 0
 
     // measure the largest cell in this column
-    assets.forEach(asset => {
-      test.innerHTML = ReactDOMServer.renderToString(<TableField dark={monochrome} {...{ asset, field, isOpen: false }}/>)
-      maxWidth = Math.max(maxWidth, test.clientWidth)
-    })
-    // include the header!
-    assets.forEach(asset => {
-      test.innerHTML = unCamelCase(Asset.lastNamespace(field))
-      maxWidth = Math.max(maxWidth, test.clientWidth)
-    })
-    test.innerHTML = '' // clean up
+    if (autoResizeFieldFn) {
+      assets.forEach(asset => {
+        const width = autoResizeFieldFn(field, asset)
+        maxWidth = Math.max(maxWidth, width)
+      })
+    } else {
+      // Get the current width of this column
+      const index = this.props.fields.findIndex(f => f.field === field)
+      maxWidth = index >= 0 && this.props.fields[index].width || 100
+    }
 
     // A tiny bit of padding, just to be safe
     maxWidth += 10
 
     // guarantee the result is sane
     maxWidth = Math.max(50, Math.min(2000, maxWidth))
-
-    this.props.actions.setTableFieldWidth({[field]: maxWidth})
-    this.saveTableFieldWidths()
-  }
-
-  toggleArrayField = (asset, field) => {
-    let assetFieldOpen = {...this.state.assetFieldOpen} // copy assetFieldOpen
-    const doOpen = !(assetFieldOpen[asset.id] && assetFieldOpen[asset.id][field])
-    if (doOpen) {
-      if (!assetFieldOpen[asset.id]) {
-        assetFieldOpen[asset.id] = {}
-      }
-      assetFieldOpen[asset.id][field] = true
-    } else {
-      delete assetFieldOpen[asset.id][field]
-      if (assetFieldOpen[asset.id] && Object.keys(assetFieldOpen[asset.id]).length === 0) {
-        delete assetFieldOpen[asset.id]
-      }
-    }
-    this.assetsCounter = 0 // trigger row height recompute
-    this.setState({assetFieldOpen})
+    this.props.setFieldWidthFn(field, maxWidth)
   }
 
   rowBottomPx = (row) => (Math.max(0, row + 1) * rowHeightPx)
@@ -162,8 +123,9 @@ class Table extends Component {
     }
   }
 
-  isolateToLightbox (asset) {
-    this.props.actions.isolateAssetId(asset.id)
+  isolate = (asset, event) => {
+    const { isolateFn } = this.props
+    if (isolateFn) isolateFn(asset, event)
   }
 
   // light wrapper around Assets.select(); just make sure we don't scroll
@@ -211,72 +173,20 @@ class Table extends Component {
     })
   }
 
-  // Rotate through on -> off -> unordered
-  sortByField (field) {
-    console.log('Sort by ' + field)
-    const { order } = this.props
-    let ascending = true
-    if (order) {
-      const index = order && order.findIndex(order => (order.field === field))
-      if (index >= 0) {
-        ascending = order[index].ascending ? false : undefined
-      }
-    }
-    if (ascending === undefined) {
-      this.props.actions.unorderAssets()
-    } else {
-      this.props.actions.sortAssets(field, ascending)
-    }
+  sortOrderClassnames (order) {
+    const icon = !order ? 'icon-sort' : (order === 'ascending' ? 'icon-sort-asc' : 'icon-sort-desc')
+    return `Table-header-sort ${icon} Table-header-sort-order-${order || 'none'}`
   }
 
-  createTagFacet = (term, field, event) => {
-    const fieldType = this.props.fieldTypes[field]
-    field = field && field.endsWith('.raw') ? field : field + '.raw'
-    const index = this.props.widgets.findIndex(widget => fieldUsedInWidget(field, widget))
-    let terms = [term]
-    if (index >= 0 && event.shiftKey) {       // Add to terms for shift
-      const widget = this.props.widgets[index]
-      if (widget.sliver && widget.sliver.filter && widget.sliver.filter.terms) {
-        terms = [...widget.sliver.filter.terms[field], term]
-      }
-    }
-    const widget = createFacetWidget(field, fieldType, terms)
-    if (index >= 0) widget.id = this.props.widgets[index].id
-    this.props.actions.modifyRacetrackWidget(widget)
-    this.props.actions.iconifyRightSidebar(false)
-    event.stopPropagation()
-  }
-
-  renderTitle (field, fields) {
-    const { head, tails } = minimalUniqueFieldTitle(field, fields, 0)
-    const tail = tails && '\u2039 ' + tails.join(' \u2039 ')
-    return (
-      <div className="Table-title">
-        <div className="Table-title-head">{unCamelCase(head)}</div>
-        { tail && <div className="Table-title-tail">{tail}</div> }
-      </div>
-    )
-  }
-
-  sortOrderClassnames (field) {
-    const { order } = this.props
-    const index = order && order.findIndex(order => (order.field === field))
-    const icon = !order || index !== 0 ? 'icon-sort' : (order[index].ascending ? 'icon-sort-asc' : 'icon-sort-desc')
-    return `Table-header-sort ${icon} Table-header-sort-order-${index}`
-  }
-
-  headerClassnames (field) {
-    const { order } = this.props
-    const index = order && order.findIndex(order => (order.field === field))
-    const ordered = !(!order || index !== 0)
+  headerClassnames (order) {
+    const ordered = !!order
     return classnames('Table-header-cell', {ordered})
   }
 
   render () {
-    const { assets, fieldWidth, height, tableIsResizing, selectedAssetIds, monochrome } = this.props
+    const { assets, fields, height, tableIsResizing, selectedAssetIds } = this.props
     if (!assets) return
 
-    const fields = this.props.fields && this.props.fields.length ? this.props.fields : defaultMetadataFields
     const { tableScrollTop, tableScrollHeight } = this.state
     const tableScrollBottom = tableScrollTop + tableScrollHeight
 
@@ -317,8 +227,7 @@ class Table extends Component {
     let visibleFields = []
     for (let i = 0; i < fields.length; i++) {
       fieldLeft.push(sumOfFieldWidths)
-      const field = fields[i]
-      const width = fieldWidth[field]
+      const width = fields[i].width
       // Is right side of field left of the table's left edge?
       if (sumOfFieldWidths + width < this.state.tableScrollLeft) {
         firstVisibleFieldIndex = i + 1
@@ -339,15 +248,15 @@ class Table extends Component {
       <div className="Table" style={tableStyle}>
         <div className='Table-header' style={{height: `${tableHeaderHeight}px`, width: `${sumOfFieldWidths}px`}}>
           { visibleFields.map((fieldIndex) => {
-            const field = fields[fieldIndex]
+            const { field, title, order, width } = fields[fieldIndex]
             return (
               <div key={fieldIndex}
-                   className={this.headerClassnames(field)}
-                   style={{width: `${fieldWidth[field]}px`, left: `${fieldLeft[fieldIndex]}px`, top: '0px', position: 'absolute'}}>
+                   className={this.headerClassnames(order)}
+                   style={{width: `${width}px`, left: `${fieldLeft[fieldIndex]}px`, top: '0px', position: 'absolute'}}>
                 <div className={`Table-cell`}>
-                  { this.renderTitle(field, fields) }
+                  { title }
                 </div>
-                <i onClick={this.sortByField.bind(this, field)} className={this.sortOrderClassnames(field)}/>
+                { this.props.sortFieldFn && <i onClick={_ => this.props.sortFieldFn(field)} className={this.sortOrderClassnames(order)}/> }
                 <div className='flexOn'/>
                 <div className='Table-header-resizer'
                      onMouseDown={event => this.columnResizeStart(event, field)}
@@ -379,14 +288,10 @@ class Table extends Component {
                        className={classnames('Table-row', { even: !!(index % 2), isSelected })}
                        style={{top: `${rowTopPx}px`, height: `${rowBottomPx - rowTopPx}px`, width: `${sumOfFieldWidths}px`}}
                        onClick={event => this.select(asset, event)}
-                       onDoubleClick={event => this.isolateToLightbox(asset)}>
+                       onDoubleClick={event => this.isolate(asset, event)}>
                     { visibleFields.map((fieldIndex) => {
-                      const field = fields[fieldIndex]
-                      const width = fieldWidth[field]
-                      return (
-                        <TableField dark={monochrome} {...{ asset, field, key: field, width, left: `${fieldLeft[fieldIndex]}px`, top: `0px` }}
-                          onTag={this.createTagFacet} />
-                      )
+                      const { field, width } = fields[fieldIndex]
+                      return this.props.elementFn(asset, field, width, fieldLeft[fieldIndex])
                     })}
                   </div>)
               })}
@@ -397,29 +302,3 @@ class Table extends Component {
     )
   }
 }
-
-export default connect(state => ({
-  assets: state.assets.all,
-  assetsCounter: state.assets.assetsCounter,
-  selectedAssetIds: state.assets.selectedIds,
-  selectionCounter: state.assets.selectionCounter,
-  query: state.assets.query,
-  order: state.assets.order,
-  monochrome: state.app.monochrome,
-  fields: state.app.metadataFields,
-  fieldWidth: state.app.tableFieldWidth,
-  fieldTypes: state.assets.types,
-  widgets: state.racetrack.widgets,
-  user: state.auth.user,
-  userSettings: state.app.userSettings
-}), dispatch => ({
-  actions: bindActionCreators({
-    sortAssets,
-    unorderAssets,
-    isolateAssetId,
-    setTableFieldWidth,
-    modifyRacetrackWidget,
-    iconifyRightSidebar,
-    saveUserSettings
-  }, dispatch)
-}))(Table)

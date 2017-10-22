@@ -17,7 +17,7 @@ import { saveUserSettings } from '../../actions/authAction'
 import { setThumbSize, setThumbLayout, showTable, setTableHeight, showMultipage, showModal, hideModal, iconifyRightSidebar } from '../../actions/appActions'
 import Pager from './Pager'
 import Footer from './Footer'
-import Table from '../Table'
+import AssetsTable from './AssetsTable'
 import Sidebar from '../Sidebar'
 import Racetrack from '../Racetrack'
 import * as ComputeLayout from './ComputeLayout.js'
@@ -664,9 +664,9 @@ class Assets extends Component {
               handleThumbSize={this.changeThumbSize.bind(this)}
             /> }
             { totalCount > 0 && showTable && uxLevel > 0 && (
-              <Table height={this.clampTableHeight(tableHeight)}
-                     tableIsResizing={tableIsResizing}
-                     selectFn={this.select}/>
+              <AssetsTable height={this.clampTableHeight(tableHeight)}
+                          tableIsResizing={tableIsResizing}
+                          selectFn={this.select}/>
             )}
           </div>
           { pinnedWidget && <div className="Workspace-vertical-separator flexOff"/> }
