@@ -67,6 +67,19 @@ class Widget extends Component {
     this.props.actions.removeRacetrackWidgetIds([this.props.id])
   }
 
+  // Release focus on the element when focus is moved outside.
+  // From: https://gist.github.com/pstoica/4323d3e6e37e8a23dd59
+  // Timeout explanation: https://stackoverflow.com/questions/11592966/get-the-newly-focussed-element-if-any-from-the-onblur-event/11592974#11592974
+  onBlur = (e) => {
+    const currentTarget = e.currentTarget
+    setTimeout(_ => {
+      if (!currentTarget.contains(document.activeElement)) {
+        console.log('Component blurred')
+        this.props.onOpen(false)
+      }
+    })
+  }
+
   render () {
     const { children, icon, title, field, backgroundColor, isIconified, floatBody, isOpen, onOpen, uxLevel } = this.props
     const widget = this.widget()
@@ -93,7 +106,7 @@ class Widget extends Component {
     const { className } = this.props
     const widgetClasses = classnames('Widget', 'flexCol', {'parent': children, floatBody, isOpen, isIconified, isEnabled, [className]: !!className})
     return (
-      <div className={widgetClasses}>
+      <div className={widgetClasses} onBlur={this.onBlur} tabIndex={0} ref="widgetTab">
         <WidgetHeader {...WidgetHeaderParams}/>
         { !isIconified && isOpen && (
           <div className={classnames('Widget-body', {floatBody})}>
