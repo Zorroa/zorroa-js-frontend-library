@@ -89,17 +89,19 @@ export default function (state = initialState, action) {
       const totalCount = page && page.totalCount && isFirstPage ? page.totalCount : state.totalCount
       const assetsCounter = state.assetsCounter + 1
       api.setAssetsCounter(assetsCounter)
-      return { ...state, all, query, totalCount, filteredCount, loadedCount, parentCounts, suggestions: null, assetsCounter, error: null }
+      const updates = { all, totalCount, filteredCount, loadedCount, parentCounts, suggestions: null, assetsCounter, error: null }
+      if (isFirstPage) updates.query = query
+      return { ...state, ...updates }
     }
 
     case ASSET_AGGS: {
       const { aggs } = action.payload
       if (aggs.parentCounts) {
         const parentTotals = new Map()
-        aggs.parentCounts.parentCounts.buckets.forEach(bucket => {
+        aggs.parentCounts.buckets.forEach(bucket => {
           parentTotals.set(bucket.key, bucket.doc_count)
         })
-        return { ...state, aggs, parentTotals }
+        return { ...state, parentTotals }
       }
       return { ...state, aggs }
     }

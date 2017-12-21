@@ -10,7 +10,7 @@ import User from '../../models/User'
 import Asset from '../../models/Asset'
 import Widget from '../../models/Widget'
 import Folder from '../../models/Folder'
-import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, unorderAssets, isolateParent } from '../../actions/assetsAction'
+import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, updateParentTotals, unorderAssets, isolateParent } from '../../actions/assetsAction'
 import { resetRacetrackWidgets, restoreFolders } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
@@ -370,7 +370,7 @@ class Assets extends Component {
     const width = this.state.assetsScrollWidth - 2 * assetsScrollPadding
     if (!width) return
 
-    const { assets, layout, thumbSize, showMultipage, isolatedParent } = this.props
+    const { query, assets, layout, thumbSize, showMultipage, isolatedParent } = this.props
     if (!assets) return
 
     const assetSizes = assets.map(asset => {
@@ -379,15 +379,23 @@ class Assets extends Component {
       return { width, height, parentId: asset.parentId(), id: asset.id }
     })
 
+    const isolatedParentId = isolatedParent && isolatedParent.parentId()
     var { positions, multipage, collapsed } = (_ => {
-      const isolatedParentId = isolatedParent && isolatedParent.parentId()
       switch (layout) {
         case 'grid': return ComputeLayout.grid(assetSizes, width, thumbSize, showMultipage, isolatedParentId)
         case 'masonry': return ComputeLayout.masonry(assetSizes, width, thumbSize, showMultipage, isolatedParentId)
       }
     })()
 
+    // Recompute the parent counts whenever we add new entries
+    const a = new Set(Object.keys(multipage))
+    const b = new Set(Object.keys(this.state.multipage))
+    const parentsModified = !equalSets(a, b)
     this.setState({ positions, multipage, collapsed })
+    const parentIds = showMultipage && multipage && Object.keys(multipage)
+    if (parentsModified) {
+      this.props.actions.updateParentTotals(query, parentIds)
+    }
 
     this.clearAssetsLayoutTimer()
 
@@ -708,6 +716,7 @@ export default connect(state => ({
     selectAssetIds,
     sortAssets,
     searchAssets,
+    updateParentTotals,
     unorderAssets,
     resetRacetrackWidgets,
     restoreFolders,

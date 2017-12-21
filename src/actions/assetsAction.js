@@ -157,21 +157,17 @@ export function searchAssets (query, lastQuery, force, isFirstPage, parentIds) {
       if (isFirstPage) requestAnimationFrame(_ => { dispatch({ type: ASSET_SEARCHING, payload: true }) })
       promises.push(searchAssetsRequestProm(dispatch, mainQuery))
     }
+
     const aggsChanged = !lastQuery || !lastQuery.aggs || JSON.stringify(query.aggs) !== JSON.stringify(lastQuery.aggs)
-    if (isFirstPage && (mainQueryChanged || aggsChanged || parentIds)) {
+    if (isFirstPage && query.aggs && (mainQueryChanged || aggsChanged)) {
       const aggQuery = new AssetSearch(query)
-
-      // Add an agg for all parents
-      if (parentIds) {
-        const filter = query.postFilter ? query.postFilter.convertToBool() : {}
-        const parentAggs = { parentCounts: {filter, aggs: {parentCounts: {terms: {field: 'source.clip.parent.raw', size: 1000}}}} }
-        aggQuery.merge(new AssetSearch({ aggs: parentAggs }))
-      }
-
       aggQuery.postFilter = null
       aggQuery.from = 0
       aggQuery.size = 1
+      aggQuery.fields = ['_id']
+      aggQuery.order = null
       promises.push(searchAssetsRequestProm(dispatch, aggQuery))
+      if (parentIds && parentIds.length) promises.push(updateParentTotals(query, parentIds))
     }
 
     return Promise.all(promises)
@@ -207,6 +203,49 @@ export function searchAssets (query, lastQuery, force, isFirstPage, parentIds) {
         payload: error
       })
     })
+  }
+}
+
+export function updateParentTotals (query, parentIds) {
+  return dispatch => {
+    if (parentIds && parentIds.length) {
+      const aggQuery = new AssetSearch(query)
+      if (aggQuery.postFilter) {
+        if (aggQuery.filter) {
+          aggQuery.filter.merge(query.postFilter)
+        } else {
+          aggQuery.filter = query.postFilter
+        }
+      }
+      const parentFilter = new AssetFilter({terms: { 'source.clip.parent.raw': parentIds }})
+      if (aggQuery.filter) {
+        aggQuery.filter.merge(parentFilter)
+      } else {
+        aggQuery.filter = parentFilter
+      }
+      // Filter to children of visible parents
+      const parentAggs = { parentCounts: {terms: {field: 'source.clip.parent.raw', size: 1000}} }
+      aggQuery.merge(new AssetSearch({ aggs: parentAggs }))
+      aggQuery.postFilter = null
+      aggQuery.from = 0
+      aggQuery.size = 1
+      aggQuery.fields = ['_id']
+      aggQuery.order = null
+      console.log('Parent query: ' + JSON.stringify(aggQuery))
+      searchAssetsRequestProm(dispatch, aggQuery)
+        .then(response => {
+          const aggs = response.data.aggregations
+          dispatch({
+            type: ASSET_AGGS,
+            payload: { aggs }
+          })
+        })
+        .catch(error => {
+          console.log('Cannot get parent counts: ' + error)
+        })
+    }
+
+    return ({ type: ASSET_AGGS, payload: {aggs: {parentCounts: null}} })
   }
 }
 

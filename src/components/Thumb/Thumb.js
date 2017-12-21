@@ -226,7 +226,9 @@ class Thumb extends Component {
     const { asset, origin } = this.props
 
     const parentId = asset.parentId()
-    const stackCount = parentId && parentTotals && parentTotals.get(parentId)
+
+    // Fall back to pages.length while waiting for parentTotals to return
+    const stackCount = parentId && parentTotals && parentTotals.get(parentId) || (pages && pages.length)
 
     const { parentURL, badges } = this.renderBadges(asset, origin, stackCount)
 
