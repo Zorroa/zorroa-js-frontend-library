@@ -2,9 +2,8 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import { isolateAssetId, suggestQueryStrings, searchAssets } from '../../actions/assetsAction'
+import { suggestQueryStrings } from '../../actions/assetsAction'
 import { resetRacetrackWidgets } from '../../actions/racetrackAction'
-import { dialogAlertPromise } from '../../actions/appActions'
 import { SimpleSearchWidgetInfo } from '../Racetrack/WidgetInfo'
 import Widget from '../../models/Widget'
 import AssetSearch from '../../models/AssetSearch'
@@ -87,10 +86,7 @@ class Searchbar extends Component {
 const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators({
     resetRacetrackWidgets,
-    suggestQueryStrings,
-    searchAssets,
-    dialogAlertPromise,
-    isolateAssetId
+    suggestQueryStrings
   },
   dispatch)
 })

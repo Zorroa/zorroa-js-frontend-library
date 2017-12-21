@@ -13,7 +13,7 @@ const FileIcon = (props) => {
     case 'FLV': color = '#FF0000'; break
     case 'GIF': color = '#00980D'; break
     case 'INDD': color = '#FF3D8F'; break
-    case 'JPG': color = '#7F7F0A'; break
+    case 'JPG':
     case 'JPEG': color = '#7F7F0A'; break
     case 'MIDI': color = '#009999'; break
     case 'MOV': color = '#990066'; break
@@ -27,7 +27,8 @@ const FileIcon = (props) => {
     case 'RAW': color = '#FFBF00'; break
     case 'RTF': color = '#7F0100'; break
     case 'SVG': color = '#990066'; break
-    case 'TIFF': color = '#2020A6'; break
+    case 'TIF':
+    case 'TIFF': color = '#E88808'; break
     case 'TXT': color = '#0066CC'; break
     case 'WAV': color = '#00980D'; break
     case 'XLS': color = '#00980D'; break
