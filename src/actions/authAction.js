@@ -241,7 +241,7 @@ export function changePassword (state) {
 export function updatePassword (user, password) {
   return dispatch => {
     user = new User({ ...user, password })
-    archivistPut(dispatch, '/api/v1/users/' + user.id, user, {
+    archivistPut(dispatch, '/api/v1/users/' + user.id, {...user, password}, {
       headers: {'X-Requested-With': 'XMLHttpRequest'} // disable browser auth
     })
       .then(response => {
