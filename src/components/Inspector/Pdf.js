@@ -16,6 +16,7 @@ export default class Pdf extends Component {
     documentInitParameters: PropTypes.shape({
       url: PropTypes.string
     }),
+    path: PropTypes.string.isRequired,
     page: PropTypes.number
   }
 
@@ -46,10 +47,7 @@ export default class Pdf extends Component {
   componentWillReceiveProps (newProps) {
     const { pdf } = this.state
 
-    const newDocInit = newProps.documentInitParameters
-    const docInit = this.props.documentInitParameters
-
-    if (newDocInit && docInit && newDocInit.url !== docInit.url) {
+    if (this.props.path !== newProps.path) {
       this.loadPDFDocument(newProps)
     }
 

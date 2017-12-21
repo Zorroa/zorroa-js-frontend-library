@@ -41,7 +41,8 @@ class Inspector extends Component {
                          onError={error => this.setState({error})} />
     } else if (mediaType === 'application/pdf' && asset.pageCount()) {
       const rangeChunkSize = 65536 * 64
-      inspector = <Pdf page={asset.startPage()} thumbSize={thumbSize}
+      inspector = <Pdf path={asset.rawValue('source.path')}
+                       page={asset.startPage()} thumbSize={thumbSize}
                        documentInitParameters={{url, withCredentials: true, rangeChunkSize}} />
     } else {
       const message = error ? (error.code === 4 ? 'Cannot open video file' : error.message) : (mediaType.startsWith('video') ? 'Invalid video file' : undefined)
