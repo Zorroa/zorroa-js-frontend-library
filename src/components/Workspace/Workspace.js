@@ -337,7 +337,7 @@ class Workspace extends Component {
       isOpen: app.collapsibleOpen.library,
       isIconified: app.leftSidebarIsIconified,
       onOpen: this.toggleCollapsible.bind(this, 'library'),
-      closeIcon: 'icon-collections-smart',
+      closeIcon: 'icon-library',
       className: 'Library-collapsible Collections-library'
     })
     const HomeParams = () => ({
@@ -345,7 +345,7 @@ class Workspace extends Component {
       isOpen: app.collapsibleOpen.home,
       isIconified: app.leftSidebarIsIconified,
       onOpen: this.toggleCollapsible.bind(this, 'home'),
-      closeIcon: 'icon-collections-simple',
+      closeIcon: 'icon-bookmarks',
       className: 'Home-collapsible Collections-home'
     })
     const ExplorerParams = () => ({
@@ -353,7 +353,7 @@ class Workspace extends Component {
       isOpen: app.collapsibleOpen.explorer,
       isIconified: app.leftSidebarIsIconified,
       onOpen: this.toggleCollapsible.bind(this, 'explorer'),
-      closeIcon: 'icon-binoculars',
+      closeIcon: 'icon-telescope',
       className: 'Explorer-collapsible'
     })
     const MetadataParams = () => ({
