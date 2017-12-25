@@ -214,7 +214,7 @@ export function updateParentTotals (query, parentIds) {
         if (aggQuery.filter) {
           aggQuery.filter.merge(query.postFilter)
         } else {
-          aggQuery.filter = query.postFilter
+          aggQuery.filter = new AssetFilter(query.postFilter)
         }
       }
       const parentFilter = new AssetFilter({terms: { 'source.clip.parent.raw': parentIds }})

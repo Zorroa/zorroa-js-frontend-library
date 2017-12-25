@@ -89,8 +89,7 @@ export default function (state = initialState, action) {
       const totalCount = page && page.totalCount && isFirstPage ? page.totalCount : state.totalCount
       const assetsCounter = state.assetsCounter + 1
       api.setAssetsCounter(assetsCounter)
-      const updates = { all, totalCount, filteredCount, loadedCount, parentCounts, suggestions: null, assetsCounter, error: null }
-      if (isFirstPage) updates.query = query
+      const updates = { query, all, totalCount, filteredCount, loadedCount, parentCounts, suggestions: null, assetsCounter, error: null }
       return { ...state, ...updates }
     }
 
