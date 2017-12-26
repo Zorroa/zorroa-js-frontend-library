@@ -253,11 +253,11 @@ export default class Table extends Component {
               <div key={fieldIndex}
                    className={this.headerClassnames(order)}
                    style={{width: `${width}px`, left: `${fieldLeft[fieldIndex]}px`, top: '0px', position: 'absolute'}}>
-                <div className={`Table-cell`}>
+                <div className="Table-cell">
                   { title }
                 </div>
-                { this.props.sortFieldFn && <i onClick={_ => this.props.sortFieldFn(field)} className={this.sortOrderClassnames(order)}/> }
                 <div className='flexOn'/>
+                { this.props.sortFieldFn && <i onClick={_ => this.props.sortFieldFn(field)} className={this.sortOrderClassnames(order)}/> }
                 <div className='Table-header-resizer'
                      onMouseDown={event => this.columnResizeStart(event, field)}
                      onDoubleClick={event => this.columnAutoResize(event, field)}>
@@ -290,8 +290,8 @@ export default class Table extends Component {
                        onClick={event => this.select(asset, event)}
                        onDoubleClick={event => this.isolate(asset, event)}>
                     { visibleFields.map((fieldIndex) => {
-                      const { field, width } = fields[fieldIndex]
-                      return this.props.elementFn(asset, field, width, fieldLeft[fieldIndex])
+                      const { field, width, order } = fields[fieldIndex]
+                      return this.props.elementFn(asset, field, width, fieldLeft[fieldIndex], order)
                     })}
                   </div>)
               })}

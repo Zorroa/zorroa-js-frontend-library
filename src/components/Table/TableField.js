@@ -13,6 +13,7 @@ export default class TableField extends Component {
     onOpen: PropTypes.func,
     onTag: PropTypes.func,
     width: PropTypes.number,
+    order: PropTypes.string,
     left: PropTypes.string, // if given, then position becomes absolute
     top: PropTypes.string // if given, then position becomes absolute
   }
@@ -84,7 +85,7 @@ export default class TableField extends Component {
   }
 
   render = () => {
-    const { asset, field, width, left, top, isOpen, dark } = this.props
+    const { asset, field, width, left, top, isOpen, dark, order } = this.props
     const val = asset.rawValue(field)
     let renderValFn = this.renderGeneral
     let padding = '4px 4px'
@@ -120,7 +121,7 @@ export default class TableField extends Component {
       style.top = top
       style.position = 'absolute'
     }
-
-    return (<div className={classnames('Table-cell', {isOpen, dark})} style={style}>{renderValFn(val, asset)}</div>)
+    const ordered = !!order
+    return (<div className={classnames('Table-cell', {isOpen, dark, ordered})} style={style}>{renderValFn(val, asset)}</div>)
   }
 }

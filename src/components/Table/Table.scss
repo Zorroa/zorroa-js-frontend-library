@@ -31,11 +31,6 @@ $tableResizeRightPadding: 20px;
   height: 100%;
   @include flexRowCenter;
 
-  &.ordered {
-    background-color: $zorroa-selected;
-    .dark & { background-color: $zorroa-dark-selected; }
-  }
-
   &.hovered {
     background-color: $zorroa-nearwhite;
     .dark & { background-color: $zorroa-darkgray; }
@@ -53,10 +48,16 @@ $tableResizeRightPadding: 20px;
   border-radius: 3px;
   color: $zorroa-lightgray;
 
-  .dark & { color: $zorroa-dimgray; }
+  .dark & { color: $zorroa-gray; }
 
   &.icon-sort {
     color: $zorroa-nearwhite;
+    .dark & { color: $zorroa-dimgray; }
+  }
+
+  .ordered & {
+    color: black;
+    .dark & { color: white; }
   }
 
   &:hover {
@@ -81,7 +82,7 @@ $tableResizeRightPadding: 20px;
 .Table-header-resizer {
   @include flexRowCenter;
   height: 100%;
-  width: 10px;
+  width: 8px;
   cursor: col-resize;
 }
 
@@ -163,12 +164,17 @@ $tableResizeRightPadding: 20px;
 
 .Table-cell {
   text-align: left;
-  font-size: 12px;
-  font-family: Roboto Condensed;
+  font-size: 14px;
+  font-family: Roboto;
   cursor: default;
+  color: $zorroa-whitegray;
 
   &.dark { color: $zorroa-whitegray; }
   &:not(.isOpen) { @include clampText; }
+  &.ordered {
+    color: black;
+    &.dark { color: white; }
+  }
 }
 
 // This is for measure text, for auto column width resizing
@@ -195,7 +201,11 @@ $tableResizeRightPadding: 20px;
   font-size: 12px;
   font-family: Roboto Condensed;
   color: $zorroa-gray;
-  .dark & { color: $zorroa-whitegray; }
+
+  .ordered & {
+    color: black;
+    .dark & { color: white; }
+  }
 }
 
 .Table-title-tail {

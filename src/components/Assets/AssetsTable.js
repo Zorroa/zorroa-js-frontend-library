@@ -139,9 +139,9 @@ class AssetsTable extends Component {
     return order[index].ascending ? 'ascending' : 'descending'
   }
 
-  renderElement = (asset, field, width, leftPx) => {
+  renderElement = (asset, field, width, leftPx, order) => {
     const { monochrome } = this.props
-    return <TableField dark={monochrome}
+    return <TableField dark={monochrome} order={order}
                        {...{ asset, field, key: field, width, left: `${leftPx}px`, top: `0px` }}
                        onTag={this.createTagFacet} />
   }
