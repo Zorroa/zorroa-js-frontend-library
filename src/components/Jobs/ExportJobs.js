@@ -6,6 +6,7 @@ import classnames from 'classnames'
 import User from '../../models/User'
 import Job from '../../models/Job'
 import Jobs from './Jobs'
+import FieldList from '../../models/FieldList'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import CreateExport from '../Folders/CreateExport'
@@ -18,7 +19,8 @@ class ExportJobs extends Component {
     origin: PropTypes.string,
     selectedAssetIds: PropTypes.instanceOf(Set),
     query: PropTypes.instanceOf(AssetSearch),
-    metadataFields: PropTypes.arrayOf(PropTypes.string),
+    selectedTableLayoutId: PropTypes.string,
+    tableLayouts: PropTypes.arrayOf(PropTypes.instanceOf(FieldList)),
     actions: PropTypes.object,
     jobs: PropTypes.object
   }
@@ -30,12 +32,14 @@ class ExportJobs extends Component {
   }
 
   createExport = (event, name, exportImages, exportTable) => {
-    const { selectedAssetIds, query, metadataFields } = this.props
+    const { selectedAssetIds, query, selectedTableLayoutId, tableLayouts } = this.props
     let search = query
     if (selectedAssetIds && selectedAssetIds.size) {
       search = new AssetSearch({ filter: new AssetFilter({ terms: {'_id': [...selectedAssetIds]} }) })
     }
-    const fields = exportTable && metadataFields
+    const layout = tableLayouts.find(layout => layout.id === selectedTableLayoutId)
+    const tableFields = layout && layout.fields
+    const fields = exportTable && tableFields
     this.props.actions.exportAssets(name, search, fields, exportImages)
     .then(this.waitForExportAndDownload)
   }
@@ -95,7 +99,8 @@ class ExportJobs extends Component {
 export default connect(state => ({
   query: state.assets.query,
   selectedAssetIds: state.assets.selectedIds,
-  metadataFields: state.app.metadataFields,
+  selectedTableLayoutId: state.app.selectedTableLayoutId,
+  tableLayouts: state.app.tableLayouts,
   user: state.auth.user,
   origin: state.auth.origin,
   jobs: state.jobs.all

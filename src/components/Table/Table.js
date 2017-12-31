@@ -24,6 +24,9 @@ export default class Table extends Component {
     // input props
     height: PropTypes.number.isRequired,
     tableIsResizing: PropTypes.bool.isRequired,
+    onSettings: PropTypes.func,
+    onColumnHeaderContextMenu: PropTypes.func,
+    children: PropTypes.arrayOf(PropTypes.element),
 
     // Callbacks
     selectFn: PropTypes.func.isRequired,
@@ -184,7 +187,7 @@ export default class Table extends Component {
   }
 
   render () {
-    const { assets, fields, height, tableIsResizing, selectedAssetIds } = this.props
+    const { assets, fields, height, tableIsResizing, selectedAssetIds, onColumnHeaderContextMenu, onSettings, children } = this.props
     if (!assets) return
 
     const { tableScrollTop, tableScrollHeight } = this.state
@@ -251,6 +254,7 @@ export default class Table extends Component {
             const { field, title, order, width } = fields[fieldIndex]
             return (
               <div key={fieldIndex}
+                   onContextMenu={e => onColumnHeaderContextMenu(fieldIndex, e)}
                    className={this.headerClassnames(order)}
                    style={{width: `${width}px`, left: `${fieldLeft[fieldIndex]}px`, top: '0px', position: 'absolute'}}>
                 <div className="Table-cell">
@@ -298,6 +302,8 @@ export default class Table extends Component {
             </div>
           </div>
         </div>
+        { onSettings && <div className="Table-settings icon-cog" onClick={onSettings}/> }
+        { children }
       </div>
     )
   }

@@ -97,8 +97,7 @@ class Explorer extends Component {
     this.props.actions.updateMetadataFields(fields)
     const settings = {
       ...userSettings,
-      metadataFields: fields,
-      tableFields: []   // Remove deprecated setting
+      metadataFields: fields
     }
     this.props.actions.saveUserSettings(user, settings)
     event.stopPropagation()

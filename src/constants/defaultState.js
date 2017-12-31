@@ -1,0 +1,9 @@
+export const defaultTableFieldWidth = 100
+export const defaultTableFields = [ 'source.type', 'source.filename', 'source.date', 'source.fileSize' ]
+export const defaultMetadataFields = [ 'source.filename', 'source.date', 'source.fileSize' ]
+export const defaultLightbarFields = [ 'source.type', 'source.filename', 'source.date', 'image.width', 'image.height', 'video.width', 'video.height' ]
+export const defaultThumbFields = [ 'source.type', 'image.width', 'image.height', 'video.width', 'video.height' ]
+export const defaultDragFields = []
+export const defaultThumbFieldTemplate = '%{image.width|video.width}x%{image.height|video.height} %{source.type}'
+export const defaultLightbarFieldTemplate = '%{source.type} %{source.filename} %{image.width|video.width}x%{image.height|video.height} %{source.date}'
+export const defaultTableLayouts = []

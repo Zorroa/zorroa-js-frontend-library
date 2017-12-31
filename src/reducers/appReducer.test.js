@@ -1,8 +1,8 @@
 import {
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
-  METADATA_FIELDS, SET_TABLE_FIELD_WIDTH, SET_DRAGGING
+  METADATA_FIELDS, SET_DRAGGING
 } from '../constants/actionTypes'
-import appReducer, { defaultMetadataFields } from './appReducer'
+import appReducer from './appReducer'
 
 describe('appReducer', () => {
   describe('SIDEBAR', () => {
@@ -31,26 +31,8 @@ describe('appReducer', () => {
     it('set metadata fields', () => {
       const fields = [ 'some.important.thing' ]
       const action = { type: METADATA_FIELDS, payload: fields }
-      expect(appReducer({}, action)
-      ).toEqual({ metadataFields: fields, tableFieldWidth: {'some.important.thing': 100} })
-    })
-
-    it('set table field widths', () => {
-      // Test setting all default fields to non-default widths
-      const tableFields = [ ...defaultMetadataFields ]
-      const tableFieldWidth = Object.assign({},
-        ...tableFields.map(f => ({[f]: 101})))
-      const action = { type: SET_TABLE_FIELD_WIDTH, payload: tableFieldWidth }
       expect(appReducer({}, action))
-      .toEqual({ tableFieldWidth })
-
-      // Test overriding 2 fields with new widths & other fields should stay put
-      const tableFields2 = [ defaultMetadataFields[0], 'some.important.thing' ]
-      const tableFieldWidth2 = Object.assign({},
-        ...tableFields2.map(f => ({[f]: 102})))
-      const action2 = { type: SET_TABLE_FIELD_WIDTH, payload: tableFieldWidth2 }
-      expect(appReducer({tableFieldWidth}, action2))
-      .toEqual({ tableFieldWidth: { ...tableFieldWidth, ...tableFieldWidth2 } })
+      .toEqual({ metadataFields: fields })
     })
   })
 

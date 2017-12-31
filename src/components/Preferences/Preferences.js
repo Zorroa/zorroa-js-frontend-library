@@ -11,7 +11,7 @@ import User from '../../models/User'
 import { DropboxAuthenticator } from '../Import/DropboxAuthenticator'
 import { BoxAuthenticator } from '../Import/BoxAuthenticator'
 import { GDriveAuthenticator } from '../Import/GDriveAuthenticator'
-import { defaultThumbFieldTemplate, defaultLightbarFieldTemplate } from '../../reducers/appReducer'
+import { defaultThumbFieldTemplate, defaultLightbarFieldTemplate } from '../../constants/defaultState'
 import { FILTERED_COUNTS, FULL_COUNTS, NO_COUNTS } from '../Folders/Folders'
 import DropdownMenu from '../DropdownMenu/DropdownMenu'
 

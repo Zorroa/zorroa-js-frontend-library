@@ -683,8 +683,8 @@ class Assets extends Component {
             /> }
             { totalCount > 0 && showTable && uxLevel > 0 && (
               <AssetsTable height={this.clampTableHeight(tableHeight)}
-                          tableIsResizing={tableIsResizing}
-                          selectFn={this.select}/>
+                           tableIsResizing={tableIsResizing}
+                           selectFn={this.select}/>
             )}
           </div>
           { pinnedWidget && <div className="Workspace-vertical-separator flexOff"/> }

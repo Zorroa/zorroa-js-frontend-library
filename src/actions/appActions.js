@@ -1,8 +1,7 @@
 import {
   SHOW_MODAL, HIDE_MODAL, SORT_FOLDERS,
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
-  METADATA_FIELDS, LIGHTBOX_METADATA, LIGHTBOX_PANNER,
-  SET_DRAGGING, SET_TABLE_FIELD_WIDTH,
+  METADATA_FIELDS, LIGHTBOX_METADATA, LIGHTBOX_PANNER, SET_DRAGGING,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
   SHOW_MULTIPAGE, VIDEO_VOLUME,
   HOVER_FIELD, CLEAR_HOVER_FIELD,
@@ -11,7 +10,8 @@ import {
   SHOW_DIALOG_PROMPT, HIDE_DIALOG_PROMPT,
   THUMB_FIELD_TEMPLATE, DRAG_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE,
   UX_LEVEL, EMBEDMODE_ENABLED, MONOCHROME, SHOW_IMPORT,
-  SHOW_QUICKVIEW, HIDE_QUICKVIEW
+  SHOW_QUICKVIEW, HIDE_QUICKVIEW,
+  TABLE_LAYOUTS, SELECT_TABLE_LAYOUT, ADD_TABLE_LAYOUT, DELETE_TABLE_LAYOUT
 } from '../constants/actionTypes'
 
 export const MIN_THUMBSIZE = 48
@@ -159,6 +159,34 @@ export function updateMetadataFields (fields) {
   })
 }
 
+export function updateTableLayouts (tableLayouts) {
+  return ({
+    type: TABLE_LAYOUTS,
+    payload: tableLayouts
+  })
+}
+
+export function addTableLayout (layout) {
+  return {
+    type: ADD_TABLE_LAYOUT,
+    payload: layout
+  }
+}
+
+export function deleteTableLayout (layoutId) {
+  return {
+    type: DELETE_TABLE_LAYOUT,
+    payload: layoutId
+  }
+}
+
+export function selectTableLayout (layoutId) {
+  return {
+    type: SELECT_TABLE_LAYOUT,
+    payload: layoutId
+  }
+}
+
 export function lightboxMetadata ({show, left, top, width, height}) {
   return ({
     type: LIGHTBOX_METADATA,
@@ -184,14 +212,6 @@ export function stopDragging () {
   return ({
     type: SET_DRAGGING,
     payload: null
-  })
-}
-
-// newFieldWidths should be an object of one or more [field]: width pairs
-export function setTableFieldWidth (newFieldWidths) {
-  return ({
-    type: SET_TABLE_FIELD_WIDTH,
-    payload: newFieldWidths
   })
 }
 

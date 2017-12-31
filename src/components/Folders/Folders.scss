@@ -19,6 +19,7 @@
   // max-height: 50vh;
   overflow-y: auto;
   overflow-x: hidden;
+  &::-webkit-scrollbar { width: 5px; }
 }
 
 .Folders-body {

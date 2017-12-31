@@ -6,8 +6,12 @@ export default class Suggestions extends Component {
   static propTypes = {
     value: PropTypes.string,
     query: PropTypes.instanceOf(AssetSearch),
-    suggestions: PropTypes.arrayOf(PropTypes.object),
+    suggestions: PropTypes.arrayOf(PropTypes.shape({
+      text: PropTypes.string.isRequired,
+      score: PropTypes.number
+    })),
     placeholder: PropTypes.string,
+    button: PropTypes.node,
     style: PropTypes.object,
     className: PropTypes.string,
     onChange: PropTypes.func.isRequired,
@@ -16,6 +20,12 @@ export default class Suggestions extends Component {
 
   static defaultProps = {
     placeholder: 'Search...',
+    button: (
+      <div className="Suggestions-search-button-body">
+        <div className="icon-search"/>
+        <div className="Suggestions-search-button-label">Search</div>
+      </div>
+    ),
     style: { width: '100%' }
   }
 
@@ -145,13 +155,13 @@ export default class Suggestions extends Component {
             <div>{suggestion.score}</div>
           </div>
         ))}
-        <div className="Suggestions-instructions">Press Enter to search</div>
+        <div className="Suggestions-instructions">`Press Enter to select`</div>
       </div>
     )
   }
 
   render () {
-    const { placeholder, style, query, className, onSelect } = this.props
+    const { placeholder, button, style, query, className, onSelect } = this.props
     const { value } = this.state
 
     /* dont show suggestions if input matches current results */
@@ -175,8 +185,8 @@ export default class Suggestions extends Component {
                 disabled={!value || !value.length}
                 className="Suggestions-clear icon-cancel-circle" />
       </div>
-      <div onClick={_ => onSelect && onSelect(this.state.value)} className="Suggestions-search-button icon-search" >
-        <div className="Suggestions-search-button-label">Search</div>
+      <div onClick={_ => onSelect && onSelect(this.state.value)} className="Suggestions-search-button" >
+        { button }
       </div>
       { showSuggestions && this.renderSuggestions() }
     </div>

@@ -8,6 +8,7 @@ import User from '../../models/User'
 import Asset from '../../models/Asset'
 import Folder from '../../models/Folder'
 import AclEntry from '../../models/Acl'
+import FieldList from '../../models/FieldList'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import CreateExport from './CreateExport'
@@ -106,7 +107,8 @@ class FolderItem extends Component {
     origin: PropTypes.string,
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     allAssetCount: PropTypes.number,
-    metadataFields: PropTypes.arrayOf(PropTypes.string),
+    selectedTableLayoutId: PropTypes.string,
+    tableLayouts: PropTypes.arrayOf(PropTypes.instanceOf(FieldList)),
     isManager: PropTypes.bool,
     isAdministrator: PropTypes.bool,
     uxLevel: PropTypes.number,
@@ -269,11 +271,13 @@ class FolderItem extends Component {
   }
 
   createExport = (event, name, exportImages, exportTable) => {
-    const { selectedFolderIds, metadataFields, folder, actions } = this.props
+    const { selectedFolderIds, folder, actions, selectedTableLayoutId, tableLayouts } = this.props
     const folderIds = selectedFolderIds.has(folder.id) ? new Set(this.props.selectedFolderIds) : [folder.id]
     const filter = new AssetFilter({links: {folder: [...folderIds]}})
     const search = new AssetSearch({filter})
-    const fields = exportTable && metadataFields
+    const layout = tableLayouts.find(layout => layout.id === selectedTableLayoutId)
+    const tableFields = layout && layout.fields
+    const fields = exportTable && tableFields
     actions.toggleCollapsible('exportJobs', true)
     return actions.exportAssets(name, search, fields, exportImages)
     .then(this.waitForExportAndDownload)
@@ -507,13 +511,13 @@ class FolderItem extends Component {
               <div className="FolderItem-context-item FolderItem-context-private disabled"
                    onContextMenu={this.dismissContextMenu}>
                 <div className="icon-private"/>
-                <div>Private Collection</div>
+                <div>My Collection</div>
               </div>
             ) : (
               <div className="FolderItem-context-item FolderItem-context-public disabled"
                    onContextMenu={this.dismissContextMenu}>
                 <div className="icon-public"/>
-                <div>Public Collection</div>
+                <div>Shared Collection</div>
               </div>
             ))}
           { singleFolderSelected && writePermission &&
@@ -528,14 +532,14 @@ class FolderItem extends Component {
                  className="FolderItem-context-item FolderItem-context-edit"
                  onContextMenu={this.dismissContextMenu}>
               <div className="icon-public"/>
-              <div>Folder Permissions...</div>
+              <div>Share Folder...</div>
             </div>
           )}
           { singleFolderSelected && isAdministrator &&
           <div onClick={this.assetPermissions}
                className="FolderItem-context-item FolderItem-context-asset-permissions"
                onContextMenu={this.dismissContextMenu}>
-            <div className="icon-link2"/><div>Asset Permissions...</div></div> }
+            <div className="icon-link2"/><div>Share Asset...</div></div> }
           { singleFolderSelected && exportPermission &&
           <div onClick={this.exportFolder}
                className="FolderItem-context-item FolderItem-context-export"
@@ -686,7 +690,8 @@ export default connect(state => ({
   user: state.auth.user,
   origin: state.auth.origin,
   dragInfo: state.app.dragInfo,
-  metadataFields: state.app.metadataFields,
+  selectedTableLayoutId: state.app.selectedTableLayoutId,
+  tableLayouts: state.app.tableLayouts,
   isManager: state.auth.isManager,
   isAdministrator: state.auth.isAdministrator,
   uxLevel: state.app.uxLevel,

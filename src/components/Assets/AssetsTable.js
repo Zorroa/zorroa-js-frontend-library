@@ -7,14 +7,18 @@ import Asset, { minimalUniqueFieldTitle } from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
 import User from '../../models/User'
 import { unCamelCase } from '../../services/jsUtil'
-import { setTableFieldWidth, iconifyRightSidebar } from '../../actions/appActions'
+import { updateTableLayouts, iconifyRightSidebar, addTableLayout, deleteTableLayout, selectTableLayout, showModal, hideModal } from '../../actions/appActions'
 import { createFacetWidget, fieldUsedInWidget } from '../../models/Widget'
 import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import { sortAssets, unorderAssets, isolateAssetId } from '../../actions/assetsAction'
 import { saveUserSettings } from '../../actions/authAction'
-import TableField from '../Table/TableField'
 import Table from '../Table'
-import { defaultMetadataFields } from '../../reducers/appReducer'
+import AclEntry from '../../models/Acl'
+import FieldList from '../../models/FieldList'
+import TableField from '../Table/TableField'
+import TableSettings from '../Table/TableSettings'
+import TableContextMenu from '../Table/TableContextMenu'
+import { defaultTableFields, defaultTableFieldWidth } from '../../constants/defaultState'
 
 class AssetsTable extends Component {
   static propTypes = {
@@ -24,9 +28,10 @@ class AssetsTable extends Component {
     selectedAssetIds: PropTypes.instanceOf(Set),
     selectionCounter: PropTypes.number.isRequired,
     monochrome: PropTypes.bool,
-    fields: PropTypes.arrayOf(PropTypes.string).isRequired,
-    fieldWidth: PropTypes.objectOf(PropTypes.number).isRequired,
+    selectedTableLayoutId: PropTypes.string,
+    tableLayouts: PropTypes.arrayOf(PropTypes.instanceOf(FieldList)),
     fieldTypes: PropTypes.object,
+    assetFields: PropTypes.object,
     widgets: PropTypes.arrayOf(PropTypes.object),
     order: PropTypes.arrayOf(PropTypes.object),
     user: PropTypes.instanceOf(User),
@@ -42,18 +47,31 @@ class AssetsTable extends Component {
     actions: PropTypes.object
   }
 
-  setFieldWidth = (field, width) => {
-    this.props.actions.setTableFieldWidth({[field]: width})
-    if (this.saveTimer) clearTimeout(this.saveTimer)
-    this.saveTimer = setTimeout(_ => this.saveTableFieldWidth(field, width), 500)
+  state = {
+    showSettings: false,
+    showContextMenu: false,
+    contextMenuPos: { x: 0, y: 0 },
+    selectedFieldIndex: -1
   }
 
-  saveTableFieldWidth = (field, width) => {
-    const { userSettings, actions, user } = this.props
-    const tableFieldWidths = { ...userSettings.tableFieldWidths, [field]: width }
-    const settings = { ...userSettings, tableFieldWidths }
-    actions.saveUserSettings(user, settings)
-    this.saveTimer = null
+  setFieldWidth = (field, width) => {
+    const { actions, userSettings } = this.props
+    const tableLayouts = [...this.props.tableLayouts]
+    const index = tableLayouts.findIndex(layout => layout.id === this.props.selectedTableLayoutId)
+    let settings = userSettings
+    if (index >= 0) {
+      const layout = new FieldList(tableLayouts[index])
+      layout.widths = {...layout.widths, [field]: width}
+      tableLayouts[index] = layout
+      actions.updateTableLayouts(tableLayouts)
+      settings = { ...userSettings, tableLayouts }
+      if (this.saveTimer) clearTimeout(this.saveTimer)
+      this.saveTimer = setTimeout(() => this.saveTableFieldWidth(settings), 500)
+    }
+  }
+
+  saveTableFieldWidth = (settings) => {
+    this.props.actions.saveUserSettings(this.props.user, settings)
   }
 
   columnAutoResize = (field, asset) => {
@@ -86,7 +104,6 @@ class AssetsTable extends Component {
 
   // Rotate through on -> off -> unordered
   sortByField = (field) => {
-    console.log('Sort by ' + field)
     const { order } = this.props
     let ascending = true
     if (order) {
@@ -100,6 +117,88 @@ class AssetsTable extends Component {
     } else {
       this.props.actions.sortAssets(field, ascending)
     }
+  }
+
+  updateFields = (fields) => {
+    const { actions, user, userSettings } = this.props
+    const tableLayouts = [...this.props.tableLayouts]
+    const index = tableLayouts.findIndex(layout => layout.id === this.props.selectedTableLayoutId)
+    if (index >= 0) {
+      const layout = new FieldList(tableLayouts[index])
+      layout.fields = [...fields]
+      tableLayouts[index] = layout
+      actions.updateTableLayouts(tableLayouts)
+      actions.saveUserSettings(user, { ...userSettings, tableLayouts })
+    }
+  }
+
+  duplicateTableLayout = (event) => {
+    const { actions, user, userSettings } = this.props
+    const tableLayouts = [...this.props.tableLayouts]
+    const layout = tableLayouts.find(layout => layout.id === this.props.selectedTableLayoutId)
+    if (layout) {
+      const acl = [ new AclEntry({ permissionId: user.permissionId, access: AclEntry.ReadAccess | AclEntry.WriteAccess }) ]
+      const name = `${layout.name} (copy)`
+      const id = isNaN(parseInt(layout.id)) ? `${layout.id}1` : String(parseInt(layout.id) + 1)
+      const dup = new FieldList({ ...layout, acl, name, id })
+      const selectedTableLayoutId = dup.id
+      tableLayouts.push(dup)
+      actions.addTableLayout(dup)
+      actions.saveUserSettings(user, { ...userSettings, tableLayouts, selectedTableLayoutId })
+    }
+  }
+
+  shareTableLayout = () => {
+  }
+
+  deleteTableLayout = (event) => {
+    this.props.actions.deleteTableLayout(this.props.selectedTableLayoutId)
+
+    // Remove layout from user settings
+    const { actions, user, userSettings } = this.props
+    const tableLayouts = [...this.props.tableLayouts]
+    let selectedTableLayoutId = this.props.selectedTableLayoutId
+    const index = tableLayouts.findIndex(layout => layout.id === selectedTableLayoutId)
+    if (index >= 0) {
+      if (index === 0) selectedTableLayoutId = tableLayouts[0].id
+      else selectedTableLayoutId = tableLayouts[index - 1].id
+      tableLayouts.splice(index, 1)
+      actions.saveUserSettings(user, { ...userSettings, tableLayouts, selectedTableLayoutId })
+    }
+  }
+
+  selectTableLayout = (layout) => {
+    const { actions, user, userSettings } = this.props
+    actions.selectTableLayout(layout.id)
+    actions.saveUserSettings(user, { ...userSettings, selectedTableLayoutId: layout.id })
+  }
+
+  renameTableLayout = (layoutId, name) => {
+    if (!name.trim().length) return
+    const { actions, user, userSettings } = this.props
+    const index = this.props.tableLayouts.findIndex(layout => layout.id === layoutId)
+    if (index < 0) return
+    const tableLayouts = [ ...this.props.tableLayouts ]
+    tableLayouts[index] = new FieldList({ ...tableLayouts[index], name })
+    actions.updateTableLayouts(tableLayouts)
+    actions.saveUserSettings(user, { ...userSettings, tableLayouts })
+  }
+
+  showModal = (modal) => { this.props.actions.showModal(modal) }
+  hideModal = () => { this.props.actions.hideModal() }
+
+  showContextMenu = (selectedFieldIndex, event) => {
+    event.preventDefault()
+    this.setState({
+      selectedFieldIndex,
+      showContextMenu: true,
+      contextMenuPos: { x: event.pageX, y: event.pageY }
+    })
+  }
+
+  dismissContextMenu = (event) => {
+    if (event) event.preventDefault()
+    this.setState({ showContextMenu: false })
   }
 
   createTagFacet = (term, field, event) => {
@@ -135,7 +234,7 @@ class AssetsTable extends Component {
     const { order } = this.props
     if (!order) return
     const index = order.findIndex(order => (order.field === field))
-    if (index < 0) return
+    if (index !== 0) return
     return order[index].ascending ? 'ascending' : 'descending'
   }
 
@@ -146,29 +245,82 @@ class AssetsTable extends Component {
                        onTag={this.createTagFacet} />
   }
 
+  renderSettings (fields, layout) {
+    const { tableLayouts, user, assetFields, selectedTableLayoutId } = this.props
+    if (!this.state.showSettings) return
+    const layoutActions = [
+      { label: 'Duplicate', fn: this.duplicateTableLayout, disabled: false },
+      { label: 'Share', fn: this.shareTableLayout, disabled: true },
+      { label: 'Delete', fn: this.deleteTableLayout, disabled: tableLayouts.length <= 1 || !selectedLayoutHasWritePermission }
+    ]
+    const selectedLayoutHasWritePermission = layout && layout.hasAccess(user, AclEntry.WriteAccess)
+    const allFieldNames = []
+    Object.keys(assetFields).forEach(type => assetFields[type].forEach(field => allFieldNames.push(field)))
+    return (
+      <div>
+        <div className="Table-context-background"
+             onClick={() => this.setState({ showSettings: false })}
+             onContextMenu={() => this.setState({ showSettings: false })}/>
+        <TableSettings fields={fields}
+                       allFieldNames={allFieldNames}
+                       tableLayouts={tableLayouts}
+                       selectedTableLayoutId={selectedTableLayoutId}
+                       user={user}
+                       layoutActions={layoutActions}
+                       updateFieldsFn={this.updateFields}
+                       selectTableLayoutFn={this.selectTableLayout}
+                       renameTableLayoutFn={this.renameTableLayout}
+                       showModalFn={this.showModal}
+                       hideModalFn={this.hideModal} />
+      </div>
+    )
+  }
+
+  renderContextMenu (fields) {
+    const { contextMenuPos, selectedFieldIndex } = this.state
+    if (!this.state.showContextMenu) return
+    return (
+      <TableContextMenu fields={fields}
+                        contextMenuPos={contextMenuPos}
+                        selectedFieldIndex={selectedFieldIndex}
+                        onDismiss={this.dismissContextMenu}
+                        updateFieldsFn={this.updateFields} />
+    )
+  }
+
   render () {
-    const { assets, assetsCounter, selectedAssetIds, selectionCounter, fieldWidth, tableIsResizing, height, selectFn } = this.props
-    const fieldNames = this.props.fields && this.props.fields.length ? this.props.fields : defaultMetadataFields
-    const fields = fieldNames.map(field => ({
+    const { assets, assetsCounter, selectedAssetIds, selectionCounter, tableLayouts, selectedTableLayoutId, tableIsResizing, height, selectFn } = this.props
+    const layout = tableLayouts && tableLayouts.find(layout => layout.id === selectedTableLayoutId)
+    const tableFields = layout && layout.fields || defaultTableFields
+    const fields = tableFields.map(field => ({
       field: field,
-      title: this.renderTitle(field, fieldNames),
+      title: this.renderTitle(field, tableFields),
       order: this.fieldOrder(field),
-      width: fieldWidth[field]
+      width: layout && layout.widths && layout.widths[field] || defaultTableFieldWidth
     }))
-    return <Table assets={assets}
-                  assetsCounter={assetsCounter}
-                  selectedAssetIds={selectedAssetIds}
-                  selectionCounter={selectionCounter}
-                  fields={fields}
-                  height={height}
-                  tableIsResizing={tableIsResizing}
-                  selectFn={selectFn}
-                  isolateFn={this.isolateToLightbox}
-                  autoResizeFieldFn={this.columnAutoResize}
-                  setFieldWidthFn={this.setFieldWidth}
-                  fieldOrderFn={this.fieldOrder}
-                  sortFieldFn={this.sortByField}
-                  elementFn={this.renderElement} />
+    return (
+      <div>
+        <Table assets={assets}
+               assetsCounter={assetsCounter}
+               selectedAssetIds={selectedAssetIds}
+               selectionCounter={selectionCounter}
+               fields={fields}
+               height={height}
+               tableIsResizing={tableIsResizing}
+               onSettings={() => this.setState({ showSettings: true })}
+               onColumnHeaderContextMenu={this.showContextMenu}
+               selectFn={selectFn}
+               isolateFn={this.isolateToLightbox}
+               autoResizeFieldFn={this.columnAutoResize}
+               setFieldWidthFn={this.setFieldWidth}
+               fieldOrderFn={this.fieldOrder}
+               sortFieldFn={this.sortByField}
+               elementFn={this.renderElement} >
+          { this.renderSettings(fields) }
+          { this.renderContextMenu(fields) }
+        </Table>
+      </div>
+    )
   }
 }
 
@@ -180,9 +332,10 @@ export default connect(state => ({
   query: state.assets.query,
   order: state.assets.order,
   monochrome: state.app.monochrome,
-  fields: state.app.metadataFields,
-  fieldWidth: state.app.tableFieldWidth,
+  selectedTableLayoutId: state.app.selectedTableLayoutId,
+  tableLayouts: state.app.tableLayouts,
   fieldTypes: state.assets.types,
+  assetFields: state.assets.fields,
   widgets: state.racetrack.widgets,
   user: state.auth.user,
   userSettings: state.app.userSettings
@@ -191,9 +344,14 @@ export default connect(state => ({
     sortAssets,
     unorderAssets,
     isolateAssetId,
-    setTableFieldWidth,
+    updateTableLayouts,
+    addTableLayout,
+    deleteTableLayout,
+    selectTableLayout,
     modifyRacetrackWidget,
     iconifyRightSidebar,
+    showModal,
+    hideModal,
     saveUserSettings
   }, dispatch)
 }))(AssetsTable)

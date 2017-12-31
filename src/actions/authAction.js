@@ -4,17 +4,22 @@ import * as api from '../globals/api.js'
 
 import {
   AUTH_USER, UNAUTH_USER, AUTH_ORIGIN, AUTH_ERROR, USER_SETTINGS,
-  AUTH_PERMISSIONS, AUTH_SYNC, METADATA_FIELDS, AUTH_ONBOARDING, AUTH_HMAC,
-  THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT, SET_TABLE_FIELD_WIDTH,
+  AUTH_PERMISSIONS, AUTH_SYNC, METADATA_FIELDS,
+  AUTH_ONBOARDING, AUTH_HMAC,
+  THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
   SHOW_MULTIPAGE, VIDEO_VOLUME, AUTH_CHANGE_PASSWORD, AUTH_DEFAULTS,
   UX_LEVEL, MONOCHROME, THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE,
   DRAG_FIELD_TEMPLATE, LIST_SERVER_IMPORT_FILES, GET_SERVER_DEFAULT_PATH,
-  LIGHTBOX_METADATA, LIGHTBOX_PANNER
+  LIGHTBOX_METADATA, LIGHTBOX_PANNER,
+  TABLE_LAYOUTS, SELECT_TABLE_LAYOUT
 } from '../constants/actionTypes'
 import { USER_ITEM, ORIGIN_ITEM } from '../constants/localStorageItems'
 import User from '../models/User'
+import AclEntry from '../models/Acl'
+import FieldList from '../models/FieldList'
 import Permission from '../models/Permission'
 import { archivistSetting } from './archivistAction'
+import { defaultTableFields } from '../constants/defaultState'
 
 // Global variable to hold axios connection
 // FIXME: Should this be state?
@@ -160,12 +165,26 @@ function authorize (dispatch, json, source) {
       dispatch(restoreSearch(query))
     }
     */
-    if (metadata.metadataFields || metadata.tableFields) {
+    if (metadata.metadataFields) {
       const fields = new Set()
       if (metadata.metadataFields) metadata.metadataFields.forEach(f => fields.add(f))
-      if (metadata.tableFields) metadata.tableFields.forEach(f => fields.add(f))
       const payload = [...fields]
       dispatch({type: METADATA_FIELDS, payload})
+    }
+    if (Array.isArray(metadata.tableLayouts)) {
+      const tableLayouts = metadata.tableLayouts.map(json => new FieldList(json))
+      dispatch({type: TABLE_LAYOUTS, payload: tableLayouts})
+      dispatch({type: SELECT_TABLE_LAYOUT, payload: metadata.selectedTableLayoutId})
+    } else {
+      const id = `${user.id}-`
+      const name = `${user.firstName} Default`
+      const acl = [ new AclEntry({ permissionId: user.permissionId, access: AclEntry.ReadAccess | AclEntry.WriteAccess }) ]
+      const layout = new FieldList({ id, name, acl, fields: defaultTableFields })
+      const tableLayouts = [layout]
+      metadata.tableLayouts = tableLayouts
+      dispatch({type: USER_SETTINGS, payload: {user, metadata}})
+      dispatch({type: TABLE_LAYOUTS, payload: [layout]})
+      dispatch({type: SELECT_TABLE_LAYOUT, payload: id})
     }
     if (metadata.thumbSize) {
       dispatch({type: THUMB_SIZE, payload: metadata.thumbSize})
@@ -184,9 +203,6 @@ function authorize (dispatch, json, source) {
     }
     if (metadata.videoVolume !== undefined) {
       dispatch({type: VIDEO_VOLUME, payload: metadata.videoVolume})
-    }
-    if (metadata.tableFieldWidths) {
-      dispatch({type: SET_TABLE_FIELD_WIDTH, payload: metadata.tableFieldWidths})
     }
     if (metadata.uxLevel !== undefined) {
       dispatch({type: UX_LEVEL, payload: metadata.uxLevel})

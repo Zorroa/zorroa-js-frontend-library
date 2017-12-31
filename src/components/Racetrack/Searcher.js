@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 
 import Job, { jobsOfType } from '../../models/Job'
 import Widget from '../../models/Widget'
+import FieldList from '../../models/FieldList'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import TrashedFolder from '../../models/TrashedFolder'
@@ -23,6 +24,8 @@ class Searcher extends Component {
     fieldTypes: PropTypes.object,
     showMultipage: PropTypes.bool,
     metadataFields: PropTypes.arrayOf(PropTypes.string),
+    selectedTableLayoutId: PropTypes.string,
+    tableLayouts: PropTypes.arrayOf(PropTypes.instanceOf(FieldList)),
     lightbarFields: PropTypes.arrayOf(PropTypes.string),
     thumbFields: PropTypes.arrayOf(PropTypes.string),
     dragFields: PropTypes.arrayOf(PropTypes.string),
@@ -145,7 +148,8 @@ class Searcher extends Component {
       widgets, actions, selectedFolderIds, query,
       trashedFolders, order,
       showMultipage, selectedJobIds,
-      metadataFields, lightbarFields, thumbFields, dragFields, fieldTypes
+      metadataFields, lightbarFields, thumbFields, dragFields, fieldTypes,
+      selectedTableLayoutId, tableLayouts
     } = this.props
     if (!fieldTypes) return null
 
@@ -155,7 +159,9 @@ class Searcher extends Component {
 
     // Limit results to favorited fields, since we only display values
     // in those fields in the Table and Lightbar
-    const fields = requiredFields([...metadataFields, ...lightbarFields, ...thumbFields, ...dragFields], fieldTypes)
+    const layout = tableLayouts.find(layout => layout.id === selectedTableLayoutId)
+    const tableFields = layout && layout.fields || []
+    const fields = requiredFields([...metadataFields, ...tableFields, ...lightbarFields, ...thumbFields, ...dragFields], fieldTypes)
     assetSearch.fields = [...fields]
 
     // Do not send the query unless it is different than the last returned query
@@ -199,6 +205,8 @@ const mapStateToProps = state => ({
   fieldTypes: state.assets.types,
   showMultipage: state.app.showMultipage,
   metadataFields: state.app.metadataFields,
+  selectedTableLayoutId: state.app.selectedTableLayoutId,
+  tableLayouts: state.app.tableLayouts,
   lightbarFields: state.app.lightbarFields,
   thumbFields: state.app.thumbFields,
   dragFields: state.app.dragFields,

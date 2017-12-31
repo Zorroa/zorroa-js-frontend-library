@@ -3,7 +3,7 @@ import {
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
   METADATA_FIELDS, ASSET_FIELDS,
   LIGHTBOX_METADATA, LIGHTBOX_PANNER,
-  SET_DRAGGING, SET_TABLE_FIELD_WIDTH,
+  SET_DRAGGING,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
   SHOW_MULTIPAGE, VIDEO_VOLUME,
   HOVER_FIELD, CLEAR_HOVER_FIELD,
@@ -13,18 +13,17 @@ import {
   SHOW_DIALOG_PROMPT, HIDE_DIALOG_PROMPT,
   THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE, DRAG_FIELD_TEMPLATE,
   UX_LEVEL, EMBEDMODE_ENABLED, MONOCHROME, SHOW_IMPORT, ARCHIVIST_SETTING,
-  SHOW_QUICKVIEW, HIDE_QUICKVIEW
+  SHOW_QUICKVIEW, HIDE_QUICKVIEW,
+  TABLE_LAYOUTS, ADD_TABLE_LAYOUT, DELETE_TABLE_LAYOUT, SELECT_TABLE_LAYOUT
 } from '../constants/actionTypes'
 import { DEFAULT_THUMBSIZE } from '../actions/appActions'
 import { parseVariables, fieldsForVariables } from '../services/jsUtil'
+import FieldList from '../models/FieldList'
+import {
+  defaultMetadataFields, defaultLightbarFields, defaultThumbFields,
+  defaultDragFields, defaultThumbFieldTemplate, defaultLightbarFieldTemplate,
+  defaultTableLayouts } from '../constants/defaultState'
 
-export const defaultTableFieldWidth = 100
-export const defaultMetadataFields = [ 'source.filename', 'source.date', 'source.fileSize' ]
-export const defaultLightbarFields = [ 'source.type', 'source.filename', 'source.date', 'image.width', 'image.height', 'video.width', 'video.height' ]
-export const defaultThumbFields = [ 'source.type', 'image.width', 'image.height', 'video.width', 'video.height' ]
-export const defaultDragFields = []
-export const defaultThumbFieldTemplate = '%{image.width|video.width}x%{image.height|video.height} %{source.type}'
-export const defaultLightbarFieldTemplate = '%{source.type} %{source.filename} %{image.width|video.width}x%{image.height|video.height} %{source.date}'
 const initialState = {
   modal: null,
   uxLevel: 0,
@@ -53,9 +52,9 @@ const initialState = {
   lightbarFields: [ ...defaultLightbarFields ],
   thumbFields: [ ...defaultThumbFields ],
   dragFields: [ ...defaultDragFields ],
+  tableLayouts: [ ...defaultTableLayouts ],
+  selectedTableLayoutId: undefined,
   lightboxMetadata: { show: false, left: 20, top: 80, width: 300, height: 500 },
-  tableFieldWidth: Object.assign({},
-    ...defaultMetadataFields.map(field => ({ [field]: defaultTableFieldWidth }))),
   thumbSize: DEFAULT_THUMBSIZE,
   thumbLayout: 'masonry',
   tableHeight: 300,
@@ -112,25 +111,49 @@ export default function app (state = initialState, action) {
       const fields = action.payload
       Object.keys(fields).forEach(type => { fields[type].forEach(field => { fieldSet.add(field) }) })
       const metadataFields = state.metadataFields.filter(field => fieldSet.has(field))
-      return { ...state, metadataFields }
+      let tableLayouts = []
+      state.tableLayouts.forEach(fieldList => {
+        const dup = new FieldList(fieldList)
+        if (dup.fields) dup.fields = dup.fields.filter(field => fieldSet.has(field))
+        tableLayouts.push(dup)
+      })
+      return { ...state, metadataFields, tableLayouts }
     }
     case METADATA_FIELDS:
-      // set default table widths for all new fields we haven't seen or set yet
-      const tableFieldWidth = {
-        // Start with the default width for all fields in response.
-        ...Object.assign({}, ...action.payload.map(field => ({ [field]: defaultTableFieldWidth }))),
-        // Override with all values we already have. Any new ones will be left at default width.
-        ...state.tableFieldWidth
+      return { ...state, metadataFields: action.payload }
+    case TABLE_LAYOUTS:
+      return { ...state, tableLayouts: action.payload }
+    case ADD_TABLE_LAYOUT: {
+      const tableLayouts = [ ...state.tableLayouts, action.payload ]
+      return { ...state, tableLayouts, selectedTableLayoutId: action.payload.id }
+    }
+    case DELETE_TABLE_LAYOUT: {
+      const layoutId = action.payload
+      const index = state.tableLayouts.findIndex(layout => layout.id === layoutId)
+      const tableLayouts = [ ...state.tableLayouts ]
+      if (index >= 0) tableLayouts.splice(index, 1)
+      let selectedTableLayoutId = state.selectedTableLayoutId
+      if (state.selectedTableLayoutId === layoutId) {
+        if (index === 0) selectedTableLayoutId = state.tableLayouts[0]
+        else selectedTableLayoutId = state.tableLayouts[index - 1].id
       }
-      return { ...state, metadataFields: action.payload, tableFieldWidth }
+      return { ...state, tableLayouts, selectedTableLayoutId }
+    }
+    case SELECT_TABLE_LAYOUT: {
+      const selectedTableLayoutId = action.payload
+      if (state.tableLayouts && state.tableLayouts.findIndex(layout => layout.id === selectedTableLayoutId) >= 0) {
+        return { ...state, selectedTableLayoutId }
+      } else if (state.tableLayouts && state.tableLayouts.length) {
+        return { ...state, selectedTableLayoutId: state.tableLayouts[0].id }
+      }
+      break
+    }
     case LIGHTBOX_METADATA:
       return { ...state, lightboxMetadata: action.payload }
     case LIGHTBOX_PANNER:
       return { ...state, lightboxPanner: action.payload }
     case SET_DRAGGING:
       return { ...state, dragInfo: action.payload }
-    case SET_TABLE_FIELD_WIDTH:
-      return { ...state, tableFieldWidth: { ...state.tableFieldWidth, ...action.payload } }
     case THUMB_SIZE:
       return { ...state, thumbSize: action.payload }
     case THUMB_LAYOUT:
