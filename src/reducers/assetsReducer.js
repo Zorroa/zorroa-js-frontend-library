@@ -157,9 +157,9 @@ export default function (state = initialState, action) {
     }
 
     case SUGGEST_COMPLETIONS: {
-      const suggestionPayload = Array.isArray(action.payload) ? action.payload : [];
-      const deduplicatedSuggestions = deduplicateStringsByCaseAndWhitespace(suggestionPayload);
-      const suggestions = deduplicatedSuggestions.map(text => ({text}));
+      const suggestionPayload = Array.isArray(action.payload) ? action.payload : []
+      const deduplicatedSuggestions = deduplicateStringsByCaseAndWhitespace(suggestionPayload)
+      const suggestions = deduplicatedSuggestions.map(text => ({text}))
 
       return {...state, suggestions}
     }
