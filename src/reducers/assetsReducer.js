@@ -10,6 +10,7 @@ import {
 } from '../constants/actionTypes'
 
 import * as api from '../globals/api.js'
+import { deduplicateStringsByCaseAndWhitespace } from '../services/jsUtil.js'
 import Asset from '../models/Asset'
 import AssetSearch from '../models/AssetSearch'
 
@@ -156,7 +157,10 @@ export default function (state = initialState, action) {
     }
 
     case SUGGEST_COMPLETIONS: {
-      const suggestions = action.payload ? action.payload.map(text => ({text})) : []
+      const suggestionPayload = Array.isArray(action.payload) ? action.payload : [];
+      const deduplicatedSuggestions = deduplicateStringsByCaseAndWhitespace(suggestionPayload);
+      const suggestions = deduplicatedSuggestions.map(text => ({text}));
+
       return {...state, suggestions}
     }
 

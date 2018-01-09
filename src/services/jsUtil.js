@@ -273,6 +273,28 @@ export function makeTimeoutPromise (promise, msToWait, optRejectVal) {
   ])
 }
 
+function normalizeStringByCaseAndWhitespace(string) {
+  const whitespace = /\s/ig;
+  return string.toLowerCase().replace(whitespace, ' ');
+}
+
+/* ----------------------------------------------------------------------
+Looks at an array of values, and attempts to deduplicate values where the
+only differnce is casing or whitespace
+*/
+export function deduplicateStringsByCaseAndWhitespace (strings) {
+  return strings.reduce((accumulator, string) => {
+    const normalizedSuggestText = normalizeStringByCaseAndWhitespace(string);
+    const isNormalizedValueDuplicated = accumulator.some(deduplicatedString => {
+      return normalizeStringByCaseAndWhitespace(deduplicatedString) === normalizedSuggestText;
+    });
+    if (!isNormalizedValueDuplicated) {
+      accumulator.push(string);
+    }
+    return accumulator;
+  }, []);
+}
+
 /* ---------------------------------------------------------------------- */
 export class PubSub {
   topics = {}
