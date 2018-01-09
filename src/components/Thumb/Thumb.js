@@ -50,8 +50,10 @@ const source = {
 // Internal component to render an image div with children (badges)
 const ImageThumb = (props) => {
   const { url, backgroundColor, children } = props
+  const backgroundSize = props.backgroundSize || 'contain'
   const style = {
     backgroundColor,
+    backgroundSize,
     'backgroundImage': `url(${url})`
   }
   return (
@@ -64,6 +66,7 @@ const ImageThumb = (props) => {
 ImageThumb.propTypes = {
   url: PropTypes.string.isRequired,
   backgroundColor: PropTypes.string,
+  backgroundSize: PropTypes.oneOf(['cover', 'contain']),
   children: PropTypes.arrayOf(React.PropTypes.element)
 }
 
@@ -103,7 +106,8 @@ class Thumb extends Component {
     parentTotals: PropTypes.instanceOf(Map),
     showMultipage: PropTypes.bool,
     selectedAssetIds: PropTypes.instanceOf(Set),
-    thumbFieldTemplate: PropTypes.string.isRequired
+    thumbFieldTemplate: PropTypes.string.isRequired,
+    thumbLayout: PropTypes.string.isRequired
   }
 
   constructor (props) {
@@ -266,7 +270,11 @@ class Thumb extends Component {
               { badges }
             </Video>
           ) || (
-            <ImageThumb url={url} backgroundColor={backgroundColor}>
+            <ImageThumb
+              url={url}
+              backgroundSize={ this.props.thumbLayout === 'masonry' ? 'cover' : 'contain' }
+              backgroundColor={backgroundColor}
+            >
               { this.renderOverlays() }
               { badges }
             </ImageThumb>)
@@ -289,7 +297,11 @@ class Thumb extends Component {
           return (
             <div key={`${url}-${index}`}
                  className={classnames('Thumb-stack', `Thumb-stack-${index}`)}>
-              <ImageThumb url={url} backgroundColor={backgroundColor}/>
+              <ImageThumb
+                url={url}
+                backgroundSize={ this.props.thumbLayout === 'masonry' ? 'cover' : 'contain' }
+                backgroundColor={backgroundColor}
+              />
               { rindex === pages.length - 1 && badges }
             </div>
           )
@@ -310,5 +322,6 @@ export default connect(state => ({
   parentTotals: state.assets.parentTotals,
   selectedAssetIds: state.assets.selectedIds,
   showMultipage: state.app.showMultipage,
-  thumbFieldTemplate: state.app.thumbFieldTemplate
+  thumbFieldTemplate: state.app.thumbFieldTemplate,
+  thumbLayout: state.app.thumbLayout
 }))(Thumb)
