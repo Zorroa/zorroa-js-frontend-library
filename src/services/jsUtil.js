@@ -275,7 +275,7 @@ export function makeTimeoutPromise (promise, msToWait, optRejectVal) {
 
 function normalizeStringByCaseAndWhitespace (string) {
   const whitespace = /\s/ig
-  return string.toLowerCase().replace(whitespace, ' ')
+  return string.trim().toLowerCase().replace(whitespace, ' ')
 }
 
 /* ----------------------------------------------------------------------
