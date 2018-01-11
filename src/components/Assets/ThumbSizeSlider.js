@@ -22,7 +22,7 @@ export default class ThumbSizeSlider extends Component {
   render () {
     return (
       <div className='ThumbSizeSlider flexRow flexAlignItemsCenter'>
-        <div className='ThumbSizeSlider-smaller flexOff flexRowCenter'
+        <div className='ThumbSizeSlider-smaller Footer__icon flexOff flexRowCenter'
              onClick={this.goSmaller} title="Smaller thumbnails">
           <i className='icon-picture2' style={{fontSize: '12px'}} />
         </div>
@@ -39,9 +39,9 @@ export default class ThumbSizeSlider extends Component {
                  value={this.props.value}
                  onChange={this.handleChange}/>
         </div>
-        <div className='ThumbSizeSlider-bigger flexOff flexRowCenter'
+        <div className='ThumbSizeSlider-bigger Footer__icon flexOff flexRowCenter'
              onClick={this.goBigger} title="Larger thumbnails">
-          <i className='icon-picture2' style={{fontSize: '24px'}} />
+          <i className='icon-picture2' style={{fontSize: '20px'}} />
         </div>
       </div>
     )
