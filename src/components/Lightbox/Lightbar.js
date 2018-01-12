@@ -85,22 +85,22 @@ class Lightbar extends Component {
     return (
       <div className="Lightbar" style={{height: lightbarHeight}}>
         <div className="Lightbar-metadata">
-          <div onClick={onMetadata} className={classnames('Lightbar-settings', 'icon-arrow-down', {isOpen: showMetadata})} />
+          <div onClick={onMetadata} className={classnames('Lightbar__settings', 'icon-arrow-down', {'Lightbar__settings--is-open': showMetadata})} />
           <FieldTemplate asset={asset} template={lightbarFieldTemplate} extensionOnLeft={true}/>
         </div>
         <div className="Lightbar-actions" style={{width: actionWidth, minWidth: actionWidth}}>
           <a href={this.isolatedAssetURL()} className='Lightbar-action' download={this.isolatedAssetURL()}>
+            <i className='Lightbar__icon icon-download2'/>
             <span className='Lightbar-action-text Lightbar-action-download'>Download</span>
-            <i className='Lightbar-btn-icon icon-download2'/>
           </a>
           <div onClick={!copyingLink && this.copyIsolatedAssetLink} className='Lightbar-action'>
+            <i className='Lightbar__icon icon-link2'/>
             <span className='Lightbar-action-text Lightbar-action-get-link'>Get Link</span>
-            <i className='Lightbar-btn-icon icon-link2'/>
             { copyingLink && <div className="Lightbar-performed-action">Copied URL to clipboard</div> }
           </div>
           <div onClick={this.showFolders} className='Lightbar-action'>
             <span className='Lightbar-action-text Lightbar-action-add-to-collection'>Add to Collection</span>
-            <i className='Lightbar-btn-icon icon-chevron-down'/>
+            <i className='Lightbar__context icon-chevron-down'/>
             { showFolders && (
               <div className="Lightbar-folders" onClick={e => { e.stopPropagation() }}>
                 <Folders filterName="simple" onSelect={this.addToCollection}

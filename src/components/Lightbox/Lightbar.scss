@@ -13,14 +13,20 @@
   min-height: 42px;
 }
 
-.Lightbar-settings {
+.Lightbar__settings {
   @include zorroa-square-btn-lighten(42px);
   font-size: 16px;
   color: white;
   background-color: black;
   border: none;
+  border-right: 1px solid $zorroa-darkgray;
+  margin-right: 10px;
+}
 
-  &.isOpen { transform: rotate(180deg); }
+.Lightbar__settings--is-open {
+  &::before {
+    transform: rotate(180deg);
+  }
 }
 
 .Lightbar-metadata {
@@ -28,8 +34,13 @@
   @include flexAlignItemsCenter;
 }
 
-.Lightbar-btn-icon {
+.Lightbar__icon {
   font-size: 20px;
+  margin-right: 10px;
+}
+
+.Lightbar__context {
+  font-size: 10px;
   margin-left: 10px;
 }
 
@@ -44,7 +55,7 @@
   @include flexRowCenter;
   @include noSelect;
   color: $zorroa-nearwhite;
-  margin: 10px;
+  margin: 10px 20px;
   border: none;
   background: none;
   outline: none;
@@ -67,8 +78,9 @@
 .Lightbar-close {
   @include zorroa-square-btn-lighten(42px);
   @include flexCenter;
-  font-size: 16px;
+  font-size: 14px;
   border: none;
+  border-left: 1px solid $zorroa-darkgray;
   outline: none;
   color: white;
   background-color: black;

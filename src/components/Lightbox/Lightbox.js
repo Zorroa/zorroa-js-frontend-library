@@ -99,7 +99,7 @@ class Lightbox extends Component {
         { lightboxMetadata.show && (
           <ResizableWindow onClose={this.closeMetadata} onMove={this.moveMetadata}
                            {...lightboxMetadata}
-                           title={<div className="Lightbox-metadata-title"><div className="icon-register"/><div>Metadata</div></div>}>
+                           title={<div className="Lightbox-metadata-title"><div className="Lightbox__metadata-icon icon-register"/><div>Metadata</div></div>}>
             <Metadata assetIds={new Set([isolatedId])} dark={true} height="100%"/>
           </ResizableWindow>
           )
