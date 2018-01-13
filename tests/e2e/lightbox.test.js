@@ -76,7 +76,7 @@ describe('Lightbox', function () {
 
     .then(_ => { DEBUG && console.log('check basic lightbox layout') })
     .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Lightbar')))
-    .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Lightbar-settings')))
+    .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Lightbar__settings')))
     .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Lightbar-close')))
     .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Controlbar')))
 
@@ -97,5 +97,4 @@ describe('Lightbox', function () {
     .then(_ => selenium.clickSelector(By.css('.Lightbar-action-add-to-collection')))
     .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Lightbar-folders')))
   })
-
 })
