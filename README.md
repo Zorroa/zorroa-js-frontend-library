@@ -108,6 +108,10 @@ npm run dev -- --https # dev server over HTTPS
 
 Here's the entire process: I start my curator. Then I use ssh -R 8080:localhost:8080 computeruser@shub.zorroa.com, and leave that running in a shell. It'll stay exposed as long as ssh is connected. Then I tell Juan to visit shub.zorroa.com:8080, and he will see & use the version of curator on my laptop.
 
+#### Fonts
+
+Make sure you install all the fonts in the [./src/assets/fonts](https://github.com/Zorroa/zorroa-js-curator/tree/master/src/assets/fonts) directory. It's not strictly needed for running, but trust us, it'll make your life easier.
+
 ### Static mode
 
 Static mode is for testing the static build before submitting pull requests or deploying. Static mode bundles code & assets using our production settings into the bin directory, then serves that directory using a node server.  The bin/ directory is the final product and can be deployed to a server.
