@@ -46,9 +46,26 @@ To upgrade packages:
 
 ## Code Style
 
+### Javascript
+
 The one and only:
 
 [![JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
+
+### CSS/SCSS
+
+There are many different styles of CSS in the code base. That's changing, we'd like to use a [BEM-inspired](getbem.com/introduction/) standard going forward. Example class names could look
+like:
+
+```scss
+.ImageThumb__fan-stack {
+  // Stuff
+}
+
+.ImageThumb__fan-stack--disabled {
+  // Stuff
+}
+```
 
 ## Starting the App
 
@@ -402,6 +419,16 @@ Before you deploy:
 - Deploy will git pull - it may modify your working tree.
 - Deploy will nuke & re-install all your npm packages, and also rebuild. This may take some time.
 
+How a deploy gets to our users:
+
+1. Once all tests and CI build jobs pass, and the pull request has been approved, merge in to master.
+1. Every week or so (maybe soon every night), build a RPM of server+curator and install on non-production servers for testing (TODO, reference the documentation for this process)
+1. Work with Amber & Matt to coordinate a release
+1. Work with Ken, Juan, Amber, and Grue to test manually the bits we don’t test in Selenium
+1. Build and test RPMs again, push to one or more customer machines.
+
+Sometimes patches need to happen. If that occurs: we will cherry pick that commit into the 0.x branch and cut 0.x.1.
+
 The **npm run deploy** command will:
 
 - Rebuild
@@ -436,7 +463,7 @@ A "minor" or "major" deploy will increment the minor version number, and create 
 
 ## Development Tools
 
-Our project will run in most standard JavaScript editors, including atom
+Our project will run in most standard JavaScript editors, including Atom
 and WebStorm.
 
 You can set breakpoints and debug variables in Chrome, Firefox or
