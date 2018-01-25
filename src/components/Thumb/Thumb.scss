@@ -46,7 +46,17 @@
   position: absolute;
   cursor: pointer;
   &.isSelected {
-    outline: 5px solid $zorroa-water-blue;
+    $selected-border-size: 5px;
+    &::before {
+        border: $selected-border-size solid $zorroa-water-blue;
+        position: absolute;
+        width: calc(100% + #{$selected-border-size * 2});
+        height: calc(100% + #{$selected-border-size * 2});
+        content: "";
+        z-index: 1;
+        top: -$selected-border-size;
+        left: -$selected-border-size;
+    }
   }
 }
 
@@ -63,6 +73,7 @@
 
 .Thumb-field {
   background-color: rgba(255, 255, 255, 0.65);
+  z-index: 2;
 }
 
 .Thumb-icon-badge {
