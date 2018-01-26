@@ -245,7 +245,7 @@ class Header extends Component {
                 </div>
               )}
               { isAdministrator && baseURL && (
-                <a href={`${baseURL}/gui`} target="_blank" className="header-menu-item header-menu-admin">
+                <a href={`${baseURL}/admin/gui`} target="_blank" className="header-menu-item header-menu-admin">
                   Administrator...
                 </a>
               )}
