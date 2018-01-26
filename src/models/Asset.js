@@ -36,6 +36,13 @@ export default class Asset {
     return Asset._closestProxyURL(this.id, origin, width, height)
   }
 
+  atLeastProxyURL (origin, width, height) {
+    const id = this.id
+    const largestDimension = Math.round(Math.max(width, height))
+
+    return `${Asset.endpoint(origin, id)}/proxies/at-least/${largestDimension}`
+  }
+
   static _largestProxyURL (id, origin) {
     return Asset.endpoint(origin, id) + '/proxies/largest'
   }
