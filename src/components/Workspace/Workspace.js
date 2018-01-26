@@ -31,6 +31,7 @@ import Asset from '../../models/Asset'
 import Folder from '../../models/Folder'
 import CommandProgress from '../Workspace/CommandProgress'
 import Lightbox from '../Lightbox'
+import Quickview from '../Quickview'
 import Feedback from '../Feedback'
 import Import, { LocalChooser } from '../Import'
 import Importer from '../Importer'
@@ -67,7 +68,8 @@ class Workspace extends Component {
     isManager: PropTypes.bool,
     isDeveloper: PropTypes.bool,
     isSharer: PropTypes.bool,
-    monochrome: PropTypes.bool
+    monochrome: PropTypes.bool,
+    showQuickview: PropTypes.bool.isRequired
   }
 
   state = {
@@ -330,7 +332,7 @@ class Workspace extends Component {
   render () {
     const { app, isolatedId, selectedAssetIds, user,
       isAdministrator, isManager, isDeveloper, isSharer,
-      searching, monochrome, isolatedJob } = this.props
+      searching, monochrome, isolatedJob, showQuickview } = this.props
 
     const LibraryParams = () => ({
       header: (<span>Library</span>),
@@ -478,7 +480,8 @@ class Workspace extends Component {
           Drop Assets to Import
         </div>
 
-        { isolatedId && <Lightbox/> }
+        { isolatedId && showQuickview === false && <Lightbox/> }
+        { isolatedId && showQuickview === true && <Quickview/>}
         { isolatedJob && <Importer/> }
 
         { this.renderModalTest() }
@@ -492,6 +495,7 @@ class Workspace extends Component {
 
 export default connect(state => ({
   app: state.app,
+  showQuickview: state.app.showQuickview,
   user: state.auth.user,
   isolatedId: state.assets.isolatedId,
   isolatedJob: state.jobs.isolated,

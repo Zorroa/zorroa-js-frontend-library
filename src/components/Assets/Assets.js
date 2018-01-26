@@ -14,7 +14,7 @@ import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, updateParentT
 import { resetRacetrackWidgets, restoreFolders } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
-import { setThumbSize, setThumbLayout, showTable, setTableHeight, showMultipage, showModal, hideModal, iconifyRightSidebar } from '../../actions/appActions'
+import { setThumbSize, setThumbLayout, showTable, setTableHeight, showMultipage, showModal, hideModal, iconifyRightSidebar, showQuickview } from '../../actions/appActions'
 import Pager from './Pager'
 import Footer from './Footer'
 import AssetsTable from './AssetsTable'
@@ -58,7 +58,8 @@ class Assets extends Component {
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     origin: PropTypes.string,
-    actions: PropTypes.object
+    actions: PropTypes.object,
+    showQuickview: PropTypes.bool.isRequired
   }
 
   constructor (props) {
@@ -151,6 +152,23 @@ class Assets extends Component {
   }
 
   @keydown('space')
+  isolateToQuickview () {
+    if (this.props.showQuickview === true) {
+      // Nothing to do here
+      return
+    }
+
+    const { selectedIds } = this.props
+    if (selectedIds && selectedIds.size >= 1) {
+      const id = selectedIds.values().next().value
+      if (id) {
+        this.skipNextSelectionScroll = true
+        this.props.actions.isolateAssetId(id)
+        this.props.actions.showQuickview()
+      }
+    }
+  }
+
   isolateSelected () {
     const { assets, selectedIds } = this.props
     if (selectedIds && selectedIds.size === 1) {
@@ -708,7 +726,8 @@ export default connect(state => ({
   tableHeight: state.app.tableHeight,
   showMultipage: state.app.showMultipage,
   widgets: state.racetrack.widgets,
-  origin: state.auth.origin
+  origin: state.auth.origin,
+  showQuickview: state.app.showQuickview
 }), dispatch => ({
   actions: bindActionCreators({
     isolateAssetId,
@@ -729,6 +748,7 @@ export default connect(state => ({
     showModal,
     hideModal,
     iconifyRightSidebar,
-    saveUserSettings
+    saveUserSettings,
+    showQuickview
   }, dispatch)
 }))(Assets)

@@ -10,7 +10,8 @@ import {
   SHOW_DIALOG_CONFIRM, HIDE_DIALOG_CONFIRM,
   SHOW_DIALOG_PROMPT, HIDE_DIALOG_PROMPT,
   THUMB_FIELD_TEMPLATE, DRAG_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE,
-  UX_LEVEL, EMBEDMODE_ENABLED, MONOCHROME, SHOW_IMPORT
+  UX_LEVEL, EMBEDMODE_ENABLED, MONOCHROME, SHOW_IMPORT,
+  SHOW_QUICKVIEW, HIDE_QUICKVIEW
 } from '../constants/actionTypes'
 
 export const MIN_THUMBSIZE = 48
@@ -28,6 +29,20 @@ export function showModal (props) {
 export function hideModal () {
   return {
     type: HIDE_MODAL,
+    payload: null
+  }
+}
+
+export function showQuickview () {
+  return {
+    type: SHOW_QUICKVIEW,
+    payload: null
+  }
+}
+
+export function hideQuickview () {
+  return {
+    type: HIDE_QUICKVIEW,
     payload: null
   }
 }

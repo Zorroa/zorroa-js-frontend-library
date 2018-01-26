@@ -12,7 +12,8 @@ import {
   SHOW_DIALOG_CONFIRM, HIDE_DIALOG_CONFIRM,
   SHOW_DIALOG_PROMPT, HIDE_DIALOG_PROMPT,
   THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE, DRAG_FIELD_TEMPLATE,
-  UX_LEVEL, EMBEDMODE_ENABLED, MONOCHROME, SHOW_IMPORT, ARCHIVIST_SETTING
+  UX_LEVEL, EMBEDMODE_ENABLED, MONOCHROME, SHOW_IMPORT, ARCHIVIST_SETTING,
+  SHOW_QUICKVIEW, HIDE_QUICKVIEW
 } from '../constants/actionTypes'
 import { DEFAULT_THUMBSIZE } from '../actions/appActions'
 import { parseVariables, fieldsForVariables } from '../services/jsUtil'
@@ -75,7 +76,8 @@ const initialState = {
     videoVolume: 0.8,
     showFolderCounts: 'filtered'
   },
-  allAssetCount: 0
+  allAssetCount: 0,
+  showQuickview: false
 }
 
 export default function app (state = initialState, action) {
@@ -196,6 +198,10 @@ export default function app (state = initialState, action) {
       return { ...state, userSettings: { ...oldUserSettings, ...newUserSettings } }
     case UNAUTH_USER:
       return initialState
+    case SHOW_QUICKVIEW:
+      return { ...state, showQuickview: true }
+    case HIDE_QUICKVIEW:
+      return { ...state, showQuickview: false }
     default:
       return state
   }

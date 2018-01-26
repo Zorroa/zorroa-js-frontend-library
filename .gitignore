@@ -8,3 +8,5 @@ node_modules
 node_cache
 tmp
 coverage
+cert.pem
+key.pem
