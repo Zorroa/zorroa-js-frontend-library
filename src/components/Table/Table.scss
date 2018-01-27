@@ -139,8 +139,8 @@ $tableResizeRightPadding: 20px;
     .dark & { background-color: $zorroa-mattblack; }
   }
   &.isSelected {
-    color: $zorroa-nearblack;
-    .dark & { color: $zorroa-nearwhite; }
+    background-color: $zorroa-selected;
+    .dark & { background-color: $zorroa-dark-selected; }
   }
 }
 
