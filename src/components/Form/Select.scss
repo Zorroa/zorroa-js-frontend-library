@@ -1,0 +1,23 @@
+@import './variables.scss';
+
+.FormInput__select {
+  margin-top: $form-element-top-margin;
+  margin-bottom: $form-element-bottom-margin;
+  border: $form-element-border;
+  border-radius: $form-element-border-radius;
+  max-width: 300px;
+}
+
+.FormInput__select-native {
+  font-size: 14px;
+  background: none;
+  border: 0;
+  height: $form-element-height - $form-element-border-size;
+  width: calc(100% - 20px);
+  margin: 0 10px;
+  outline: none;
+
+  .dark & {
+    color: $zorroa-color-gray-dark-3;
+  }
+}

@@ -201,7 +201,7 @@ class Metadata extends Component {
     )
   }
 
-  renderValue (field, namespace, asset, isFavorite) {
+  renderValue (field, namespace, asset) {
     if (asset === null) {
       return <div className="Metadata-value-various">Various</div>
     } else if (asset.rawValue(field) === undefined) {
@@ -216,7 +216,7 @@ class Metadata extends Component {
     return <div className="Metadata-value-null">null</div>
   }
 
-  renderLeaf (field, namespace, fields, isSelected, isFavorite, widgetIcon) {
+  renderLeaf (field, namespace, fields, isSelected, isFavorite) {
     const { selectedAssets, titleWidth, showNull } = this.state
     const itemClass = field.replace('.', '-')
     let asset
@@ -238,7 +238,7 @@ class Metadata extends Component {
     return (
       <div key={itemClass} className={classnames('Metadata-leaf', {isSelected})}
            title={field}
-           onMouseOver={e => this.hover(namespace)} onMouseOut={e => this.clearHover(namespace)}
+           onMouseOver={() => this.hover(namespace)} onMouseOut={() => this.clearHover(namespace)}
            onClick={e => this.toggleWidget(field, e)}>
         <div className="Metadata-leaf-title" style={{minWidth: titleWidth, maxWidth: titleWidth}}>
           <div className="Metadata-leaf-title-head">

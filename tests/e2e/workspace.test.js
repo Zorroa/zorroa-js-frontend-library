@@ -129,14 +129,14 @@ describe('Workspace', function () {
     .then(_ => selenium.clickSelector(By.css('.header-menu-user')))
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.header-menu-prefs')))
     .then(_ => selenium.clickSelector(By.css('.header-menu-prefs')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Preferences')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Preferences-header')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Preferences-user')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Preferences-curator')))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Preferences .footer button')))
-    .then(_ => selenium.clickSelector(By.css('.Preferences .footer button')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.PreferencesPane')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.PreferencesPane__header')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.General-user')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.General-curator')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.PreferencesPane .footer button')))
+    .then(_ => selenium.clickSelector(By.css('.PreferencesPane .footer button')))
     .then(_ => { DEBUG && console.log('-- 1 --') })
-    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Preferences')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.PreferencesPane')))
     .then(_ => { DEBUG && console.log('-- 2 --') })
 
     .then(_ => { DEBUG && console.log('admin menu developer') })
@@ -176,7 +176,7 @@ describe('Workspace', function () {
     .then(_ => { DEBUG && console.log('command progress - finished') })
   })
 
-  it ('make sure shared link copy works', () => {
+  it('make sure shared link copy works', () => {
     var sharedLinkURL = null
     return driver
     .then(_ => { DEBUG && console.log('make sure shared link copy works') })
@@ -206,7 +206,7 @@ describe('Workspace', function () {
     .then(_ => selenium.clickSelector(By.css('.Racebar-share')))
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racebar-share-copy')))
     .then(_ => driver.findElement(By.css('.Racebar-share-copy')).getAttribute('data-link')
-      .then(dataLink => { sharedLinkURL = dataLink } ))
+      .then(dataLink => { sharedLinkURL = dataLink }))
     .then(_ => selenium.clickSelector(By.css('.Racebar-share-copy')))
 
     .then(_ => { DEBUG && console.log(`sharedLinkURL=${sharedLinkURL}`) })
@@ -228,7 +228,7 @@ describe('Workspace', function () {
     .then(_ => { DEBUG && console.log('make sure shared link copy works 3') })
   })
 
-  xit ('make sure undo works', () => {
+  xit('make sure undo works', () => {
     return driver
       .then(_ => { DEBUG && console.log('make sure undo works 1') })
       .then(_ => driver.get(`${selenium.BASE_URL}?ClearSessionState=1`))
@@ -266,7 +266,7 @@ describe('Workspace', function () {
       .then(_ => { DEBUG && console.log('make sure undo works 4') })
   })
 
-  it ('make sure session restore works', () => {
+  it('make sure session restore works', () => {
     return driver
     .then(_ => { DEBUG && console.log('make sure session restore works 1') })
     .then(_ => driver.get(`${selenium.BASE_URL}?ClearSessionState=1`))
@@ -296,7 +296,7 @@ describe('Workspace', function () {
     .then(_ => { DEBUG && console.log('make sure session restore works 3') })
   })
 
-  it ('make sure embed mode works', () => {
+  it('make sure embed mode works', () => {
     return driver
     .then(_ => { DEBUG && console.log('make sure embed mode works 1') })
     .then(_ => driver.get(`${selenium.BASE_URL}?EmbedMode=true&ClearSessionState=1`))
@@ -317,7 +317,7 @@ describe('Workspace', function () {
     .then(_ => { DEBUG && console.log('make sure embed mode works 3') })
   })
 
-  it ('make sure import window url param works', () => {
+  it('make sure import window url param works', () => {
     return driver
     .then(_ => { DEBUG && console.log('make sure import window url param works') })
 

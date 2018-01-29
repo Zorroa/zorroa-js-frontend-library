@@ -133,21 +133,21 @@ export default class Finder extends Component {
                 { file.childIds && (opened.has(file.id) ? closeIcon : openIcon) }
               </div>
               <div className="Finder-file-name"
-                   onDoubleClick={file.childIds && (e => this.setRoot(file.id))}
+                   onDoubleClick={file.childIds && (() => this.setRoot(file.id))}
                    onClick={e => this.select(file.id, e)}>{file.name}</div>
             </div>
           ))}
         </div>
         <div className="Finder-root">
           <div key="/" className="flexRowCenter">
-            <div onClick={e => this.setRoot(0)}
+            <div onClick={() => this.setRoot(0)}
                  className="Finder-root-folder icon-folder" />
             <div className="Finder-root-dir">/</div>
           </div>
-          { dirs.map((dir, i) => (
+          { dirs.map((dir) => (
             <div key={dir.id} className="flexRowCenter">
               <div className="Finder-root-separator">&rsaquo;</div>
-              <div onClick={e => this.setRoot(dir.id)}
+              <div onClick={() => this.setRoot(dir.id)}
                    className="Finder-root-folder icon-folder" />
               <div className="Finder-root-dir">{dir.name}</div>
             </div>

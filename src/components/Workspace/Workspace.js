@@ -459,12 +459,12 @@ class Workspace extends Component {
           <div className="Workspace-reloader">
             <div className="flexRowCenter">
               This version of Curator has been updated.
-              <button className="Workspace-reloader-reload" onClick={e => location.reload()}>
+              <button className="Workspace-reloader-reload" onClick={() => location.reload()}>
                 Reload now
               </button>
             </div>
             <div className="Workspace-reloader-close icon-cross"
-                 onClick={e => this.setState({ showReloader: false })}/>
+                 onClick={() => this.setState({ showReloader: false })}/>
           </div>
         )}
 

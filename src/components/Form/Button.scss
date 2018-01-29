@@ -1,0 +1,39 @@
+@import '../../styles/core-mixins.scss';
+
+.FormButton {
+  height: 40px;
+  background: $zorroa-color-green-1;
+  color: $zorroa-white;
+  padding: 0 30px;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  text-transform: uppercase;
+  border: 1px solid $zorroa-color-green-1;
+  border-radius: 3px;
+  font-size: 14px;
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    background-color: $zorroa-color-gray-dark-4;
+    border-color: $zorroa-color-gray-dark-4;
+  }
+
+  ~ .FormButton {
+    margin-left: 20px;
+  }
+
+  &--minimal {
+    background: none;
+    color: $zorroa-color-gray-dark-4;
+    border-color: transparent;
+
+    &:hover,
+    &:focus {
+      border-color: $zorroa-color-gray-light-1;
+      background: $zorroa-color-gray-light-1;
+      color: $zorroa-color-gray-dark-2;
+    }
+  }
+}

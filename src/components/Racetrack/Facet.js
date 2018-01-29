@@ -341,7 +341,7 @@ class Facet extends Component {
 
       case PIE_CHART:
         const data = buckets.map(bucket => ({name: bucket.key, value: bucket.doc_count}))
-        const activeIndex = mergedTerms.map((term, index) => (buckets.findIndex(bucket => (bucket.key === term))))
+        const activeIndex = mergedTerms.map((term) => (buckets.findIndex(bucket => (bucket.key === term))))
         return <PieChart field={field} data={data} terms={terms} otherIsSelected={otherIsSelected}
                          activeIndex={activeIndex} COLORS={COLORS}
                          animate={animate} bucketKey={this.renderBucketKey}

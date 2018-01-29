@@ -35,7 +35,7 @@ class Onboard extends Component {
   }
 }
 
-export default connect(state => ({
+export default connect(() => ({
 }), dispatch => ({
   actions: bindActionCreators({
     resetPassword

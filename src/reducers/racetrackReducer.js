@@ -62,7 +62,7 @@ export default function (state = initialState, action) {
       const hash = 'foobar'
       const proxy = assets[0].closestProxy(256, 256)
       const ofsId = proxy && proxy.id
-      const hashes = assets.map(asset => ({ hash, ofsId, weight: 1 }))
+      const hashes = assets.map(() => ({ hash, ofsId, weight: 1 }))
       const minScore = state.minScore[state.similarField] || 75
       let widgets = [...state.widgets]
       const index = widgets.findIndex(widget => widget.type === SimilarHashWidgetInfo.type && widget.field === similarField)

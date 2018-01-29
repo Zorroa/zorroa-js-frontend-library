@@ -544,7 +544,7 @@ class Assets extends Component {
     return (
       <div {...assetsScrollParams}>
         <Measure>
-          {({width, height}) => {
+          {({width}) => {
             if (!width || !positions.length) {
               this.queueAssetsLayout()
               return (<div style={{'width': '100%'}}></div>)

@@ -42,5 +42,14 @@
     "zvVersion": true,
     "emailjs": true
   },
-  "rules": {}
+  "rules": {
+    "no-unused-vars": [
+      "error", {
+        "vars": "all",
+        "args": "after-used",
+        "argsIgnorePattern": "_|event|response",
+        "ignoreRestSiblings": false
+      }
+    ]
+  }
 }

@@ -50,7 +50,7 @@ class Importer extends Component {
     console.log('Retry')
   }
 
-  selectError = ({ name }, i, event) => {
+  selectError = ({ name }) => {
     console.log('Select exception ' + name)
   }
 

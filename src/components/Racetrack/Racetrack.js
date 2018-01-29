@@ -30,7 +30,7 @@ class Racetrack extends Component {
     if (!openedWidgets || !openedWidgets.length) return
     return (
       <div className="Racetrack">
-        {openedWidgets.map((widget, i) => (
+        {openedWidgets.map((widget) => (
           <div key={widget.id}
                className={classnames('Racetrack-widget', {hoverField: hoverFields.has(removeRaw(widget.field))})} >
             { this.renderWidget(widget, isIconified) }

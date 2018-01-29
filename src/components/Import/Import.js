@@ -160,7 +160,7 @@ class Import extends Component {
     this.props.actions.uploadFiles(name, pipelineId, uploadFiles, progress)
   }
 
-  configureDropboxImport = (dropboxFiles, progress) => {
+  configureDropboxImport = (dropboxFiles) => {
     if (!dropboxFiles || !dropboxFiles.length) return {}
     const { pipelineId } = this.state
     const accessKey = this.state.accessToken
@@ -176,7 +176,7 @@ class Import extends Component {
     return { name, pipelineId, processors, generators }
   }
 
-  configureBoxImport = (files, progress) => {
+  configureBoxImport = (files) => {
     if (!files || !files.length) return {}
     const { pipelineId } = this.state
     const accessKey = this.state.accessToken
@@ -192,11 +192,11 @@ class Import extends Component {
     return { name, pipelineId, processors, generators }
   }
 
-  configureGDriveImport = (files, progress) => {
+  configureGDriveImport = () => {
     console.log('GDrive support coming soon')
   }
 
-  configureCloudproxyImport = (files, progress) => {
+  configureCloudproxyImport = (files) => {
     const { user, hmacKey, origin } = this.props
     const paths = files.map(file => file.path)
     const cloudproxy = new Cloudproxy('localhost')
@@ -224,10 +224,10 @@ class Import extends Component {
 
   renderStep2 () {
     switch (this.state.source) {
-      case CLOUD_IMPORT: return <ImportCloud launch={this.state.cloud} onSelect={this.selectCloud} onBack={e => this.setStep(1)}/>
-      case SERVER_IMPORT: return <ImportCloudproxy onSelect={this.selectCloudproxy} onBack={e => this.setStep(1)} local={this.state.uploadOverflow}/>
-      case LOCAL_IMPORT: return <LocalChooser onImport={this.configureUploadFileImport} onBack={e => this.setStep(1)} onCloudproxy={this.localToCloudproxy}/>
-      case CLOUDPROXY_IMPORT: return <LocalCloudproxy step={2} onBack={e => this.setStep(1)} onDone={e => { this.setState({cloud: CLOUDPROXY_CLOUD}); this.setStep(3) }}/>
+      case CLOUD_IMPORT: return <ImportCloud launch={this.state.cloud} onSelect={this.selectCloud} onBack={() => this.setStep(1)}/>
+      case SERVER_IMPORT: return <ImportCloudproxy onSelect={this.selectCloudproxy} onBack={() => this.setStep(1)} local={this.state.uploadOverflow}/>
+      case LOCAL_IMPORT: return <LocalChooser onImport={this.configureUploadFileImport} onBack={() => this.setStep(1)} onCloudproxy={this.localToCloudproxy}/>
+      case CLOUDPROXY_IMPORT: return <LocalCloudproxy step={2} onBack={() => this.setStep(1)} onDone={() => { this.setState({cloud: CLOUDPROXY_CLOUD}); this.setStep(3) }}/>
       case SERVER_PATH_IMPORT: requestAnimationFrame(_ => this.setStep(3)); return null
     }
   }
@@ -235,11 +235,11 @@ class Import extends Component {
   renderStep3 () {
     const { source, cloud, accessToken, uploadOverflow, os } = this.state
     switch (source) {
-      case CLOUDPROXY_IMPORT: return <ImportFinder mode={CLOUDPROXY_CLOUD} onImport={this.createImport} onBack={e => { this.setStep(1) }}/>
-      case CLOUD_IMPORT: return <ImportFinder mode={cloud} accessToken={accessToken} onImport={this.createImport} onBack={e => { this.setState({cloud: ''}); this.setStep(2) }}/>
-      case SERVER_IMPORT: return <CloudproxyInstructions local={uploadOverflow} os={os} onDone={this.cloudproxyInstalled} onBack={e => this.setStep(2)}/>
-      case LOCAL_IMPORT: return <LocalChooser onDone={e => this.setStep(4)} onBack={e => this.setStep(2)}/>
-      case SERVER_PATH_IMPORT: return <ImportFinder mode={SERVER_PATH_CLOUD} onImport={this.createImport} onBack={e => this.setStep(1)}/>
+      case CLOUDPROXY_IMPORT: return <ImportFinder mode={CLOUDPROXY_CLOUD} onImport={this.createImport} onBack={() => { this.setStep(1) }}/>
+      case CLOUD_IMPORT: return <ImportFinder mode={cloud} accessToken={accessToken} onImport={this.createImport} onBack={() => { this.setState({cloud: ''}); this.setStep(2) }}/>
+      case SERVER_IMPORT: return <CloudproxyInstructions local={uploadOverflow} os={os} onDone={this.cloudproxyInstalled} onBack={() => this.setStep(2)}/>
+      case LOCAL_IMPORT: return <LocalChooser onDone={() => this.setStep(4)} onBack={() => this.setStep(2)}/>
+      case SERVER_PATH_IMPORT: return <ImportFinder mode={SERVER_PATH_CLOUD} onImport={this.createImport} onBack={() => this.setStep(1)}/>
     }
   }
 
@@ -261,8 +261,8 @@ class Import extends Component {
       case 1: return <ImportSource onSelect={this.selectSource}/>
       case 2: return this.renderStep2()
       case 3: return this.renderStep3()
-      case 4: return <ImportingTip onDismiss={e => this.setStep(5)}/>
-      case 5: return <TutorialVideos onDismiss={e => this.setStep(6)}/>
+      case 4: return <ImportingTip onDismiss={() => this.setStep(5)}/>
+      case 5: return <TutorialVideos onDismiss={() => this.setStep(6)}/>
     }
   }
 
@@ -274,9 +274,9 @@ class Import extends Component {
       return (
         <div className="Import-footer">
           Want to get assets from a
-          <div className="Import-source-link" onClick={e => { this.setState({source: SERVER_IMPORT}) }}>a server</div>
+          <div className="Import-source-link" onClick={() => { this.setState({source: SERVER_IMPORT}) }}>a server</div>
           or
-          <div className="Import-source-link" onClick={e => { this.setState({source: LOCAL_IMPORT}) }}>your computer</div>
+          <div className="Import-source-link" onClick={() => { this.setState({source: LOCAL_IMPORT}) }}>your computer</div>
           instead of a cloud service?
           <div className="Import-hint">You can also add more sources later.</div>
         </div>

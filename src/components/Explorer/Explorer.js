@@ -270,7 +270,7 @@ class Explorer extends Component {
       <div className={classnames('Explorer-item', 'Explorer-item-' + itemClass, {isSelected, isLeaf, isOpen})}
            key={namespace} title={field}
            onClick={e => hasChildren ? this.toggleCollapsible(namespace, e) : this.toggleWidget(field, e)}
-           onMouseOver={e => this.hover(namespace)} onMouseOut={e => this.clearHover(namespace)} >
+           onMouseOver={() => this.hover(namespace)} onMouseOut={() => this.clearHover(namespace)} >
         { this.renderPads(depth) }
         <div className="Explorer-left">
           <div className={classnames('Explorer-item-toggle', {hasChildren})}

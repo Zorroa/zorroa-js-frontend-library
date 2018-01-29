@@ -1,0 +1,10 @@
+.UserStatusToggle {
+  &__label {
+    display: inline-block;
+    padding-left: 10px;
+  }
+
+  &--loading {
+    cursor: wait;
+  }
+}

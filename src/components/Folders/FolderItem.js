@@ -34,7 +34,7 @@ import { FILTERED_COUNTS, FULL_COUNTS, NO_COUNTS } from './Folders'
 
 // Renders folder children as Collapsible elements.
 const folderSource = {
-  dragStart (props, type, se) {
+  dragStart (props) {
     const { folder, selectedFolderIds } = props
     const folderIds = isolateSelectId(folder.id, selectedFolderIds)
     return {folderIds}
@@ -53,7 +53,7 @@ function dropTarget (props) {
 }
 
 const target = {
-  drop (props, se) {
+  drop (props) {
     const { dragInfo, folder, folders, user } = props
     if (!dragInfo) return
     switch (dragInfo.type) {
@@ -359,7 +359,7 @@ class FolderItem extends Component {
       const promises = [...selectedAssetIds].map(assetId => actions.deleteAsset(assetId, folderId))
       return Promise.all(promises)
       /* eslint-disable handle-callback-err */ // error is handled in actions.deleteAsset, and also here (we just don't need the error object)
-      .catch(error => {
+      .catch(() => {
         actions.dialogAlertPromise('Delete errors',
           'There was an error deleting some or all assets. Check the browser dev console for a complete list.')
       })
@@ -370,13 +370,13 @@ class FolderItem extends Component {
     })
   }
 
-  createTaxonomy = (create) => {
+  createTaxonomy = () => {
     const {actions, folder} = this.props
     this.dismissContextMenu(event)
     actions.createTaxonomy(folder.id)
   }
 
-  deleteTaxonomy = (create) => {
+  deleteTaxonomy = () => {
     const {actions, folder} = this.props
     this.dismissContextMenu(event)
     actions.deleteTaxonomy(folder.id)

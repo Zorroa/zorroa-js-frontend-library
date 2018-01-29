@@ -28,7 +28,7 @@ const FOLDER_COUNT_SCROLL_IDLE_THRESH_MS = 250 // ms to wait after scrolling sto
 
 const NUMTRUE = {numeric: true}
 
-const target = { drop (props, se) { /* only needed for highlighting -- drop happens on FolderItem */ } }
+const target = { drop () { /* only needed for highlighting -- drop happens on FolderItem */ } }
 
 export const FULL_COUNTS = 'full'
 export const FILTERED_COUNTS = 'filtered'
@@ -487,7 +487,7 @@ class Folders extends Component {
     )
   }
 
-  renderFolderDeselector (folderList) {
+  renderFolderDeselector () {
     const selectedFolderIds = this.props.folders && this.props.folders.selectedFolderIds
     if (!selectedFolderIds || selectedFolderIds.size === 0) return null
     return (

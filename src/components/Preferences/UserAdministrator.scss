@@ -1,0 +1,84 @@
+@import '../../styles/core-mixins.scss';
+@import '../../styles/colors.scss';
+
+.UserAdministrator {
+  box-sizing: border-box;
+
+  &__form {
+    margin-bottom: 30px;
+    padding: 10px 20px;
+  }
+
+  &__fields {
+    display: flex;
+    flex-direction: row;
+  }
+
+  &__field-group {
+    display: flex;
+    flex-direction: column;
+    border: 0;
+    flex-grow: 1;
+    padding: 0 20px 0 0;
+    flex-basis: 25%;
+
+    & ~ .UserAdministrator__field-group {
+      padding-left: 20px;
+    }
+
+    &--permissions {
+      flex-basis: 50%;
+    }
+  }
+
+  &__form-element {
+    margin: 20px 0;
+  }
+
+  &__link {
+    color: $zorroa-color-blue-1;
+    cursor: pointer;
+
+    .dark & {
+      color: $zorroa-color-blue-3;
+    }
+
+    .isSelected & {
+      color: $zorroa-color-gray-dark-2;
+
+      .dark & {
+        color: $zorroa-color-white;
+      }
+    }
+
+    &:hover,
+    &:focus {
+      color: $zorroa-color-blue-2;
+
+      .dark & {
+        color: $zorroa-color-blue-4;
+      }
+    }
+  }
+
+  &__error {
+    margin: 20px 0;
+    border: 1px solid $zorroa-color-danger;
+    color: $zorroa-color-danger;
+    padding: 20px;
+    margin: 20px;
+  }
+
+  &__form-actions {
+    display: flex;
+    flex-direction: row;
+  }
+
+  &__header-cell {
+    padding: 10px;
+  }
+
+  &__cell {
+    padding: 10px;
+  }
+}

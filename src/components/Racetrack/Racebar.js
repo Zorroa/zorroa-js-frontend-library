@@ -176,7 +176,7 @@ class Racebar extends Component {
           </div>
         </div>
         <div className="Racebar-wrap">
-          { widgets && widgets.length > 0 && widgets.filter(w => (blacklist.indexOf(w.type) < 0)).map((widget, i) => (
+          { widgets && widgets.length > 0 && widgets.filter(w => (blacklist.indexOf(w.type) < 0)).map((widget) => (
             <div key={widget.id}
                  className={classnames('Racebar-widget', {hoverField: hoverFields.has(removeRaw(widget.field))})} >
               { this.renderWidget(widget, false) }

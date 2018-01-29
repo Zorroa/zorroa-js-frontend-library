@@ -303,7 +303,7 @@ export default class Asset {
     // FIXME: Unify array management with _field
     if (Array.isArray(value) || value instanceof Array) {
       let array = '['
-      value.map((f, i) => {
+      value.map((f) => {
         array += Asset._valueToString(f)
         array += ', '
       })

@@ -89,7 +89,7 @@ class Video extends Component {
     window.removeEventListener('resize', this.resize)
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps () {
     // Force a video.load() after render of new video source
     if (!this._initialized) {
       this.player.load()
@@ -295,4 +295,3 @@ export default connect(state => ({
     saveUserSettings
   }, dispatch)
 }))(Video)
-

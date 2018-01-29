@@ -51,7 +51,7 @@ const ImportCloud = (props) => {
         { clouds.map((c, i) => (
           <div className="ImportCloud-service" key={i}>
             <img className="ImportCloud-logo" src={logos[i]}/>
-            <div onClick={e => auths[i].authorize()} className={classnames('Import-button', {disabled: c === GDRIVE_CLOUD})}>
+            <div onClick={() => auths[i].authorize()} className={classnames('Import-button', {disabled: c === GDRIVE_CLOUD})}>
               Authenticate
             </div>
           </div>

@@ -1,3 +1,2 @@
-import Preferences from './Preferences'
-import './Preferences.scss'
-export default Preferences
+import PreferencesPane from './PreferencesPane'
+export default PreferencesPane

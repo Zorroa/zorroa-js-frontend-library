@@ -49,7 +49,7 @@ export default class Sidebar extends Component {
       0)                                /* optScaleY */
   }
 
-  resizeUpdate = (resizeX, resizeY) => {
+  resizeUpdate = (resizeX) => {
     if (resizeX < 160 && !this.props.isIconified) {
       this.props.onToggle()
     } else {

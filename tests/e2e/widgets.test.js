@@ -62,16 +62,16 @@ describe('search widget', function () {
       .then(_ => { DEBUG && console.log('admin menu preferences - 3') })
       .then(_ => selenium.clickSelector(By.css('.header-menu-prefs')))
       .then(_ => { DEBUG && console.log('admin menu preferences - 4') })
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Preferences')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.General')))
       .then(_ => { DEBUG && console.log('admin menu preferences - 6') })
-      .then(_ => driver.findElement(By.css('.Preferences-uxlevel-input')))
+      .then(_ => driver.findElement(By.css('.General-uxlevel-input')))
       .then(ele => {
         DEBUG && console.log('found uxlevel input')
         if (ele.value !== 'on') ele.click()
       })
       .then(_ => { DEBUG && console.log('admin menu preferences - 7') })
-      .then(_ => selenium.clickSelector(By.css('.Preferences-close')))
-      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Preferences')))
+      .then(_ => selenium.clickSelector(By.css('.PreferencesPane__header .ModalHeader__close')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.PreferencesPane')))
   })
 
   it('pin a widget to racetrack', function () {
@@ -447,7 +447,7 @@ describe('search widget', function () {
     .then(_ => driver.findElement(By.css('.DateRange-min input')).clear())
     .then(_ => driver.sleep(1))
     .then(_ => driver.findElement(By.css('.DateRange-min input')))
-      .then(ele => ele.sendKeys.apply(ele, Array.apply(0, Array(12)).map(_=>Key.BACK_SPACE)))
+      .then(ele => ele.sendKeys.apply(ele, Array.apply(0, Array(12)).map(_ => Key.BACK_SPACE)))
 
     .then(_ => driver.sleep(1))
     .then(_ => driver.findElement(By.css('.DateRange-min input')).sendKeys('2010/01/01', Key.TAB))

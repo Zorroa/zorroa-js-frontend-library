@@ -1,36 +1,28 @@
 @import '../../styles/core-mixins.scss';
 
+$zorroa-color-toggle-unchecked: $zorroa-gray;
+$zorroa-color-toggle-checked: $zorroa-sickly-green;
+$zorroa-color-toggle-disabled: $zorroa-lightgray;
+$zorroa-dark-color-toggle-disabled: $zorroa-darkgray;
+
 .Toggle {
   position: relative;
   display: inline-block;
   width: 30px;
-  height: 6px;
+  height: 4px;
 
-  input:checked + .Toggle-slider {
-    background-color: $zorroa-sickly-green;
+  :checked + .Toggle__slider {
+    background-color: $zorroa-color-toggle-checked;
   }
 
-  input:focus + .Toggle-slider {
-    box-shadow: 0 0 1px $zorroa-sickly-green;
+  :focus + .Toggle__slider {
+    box-shadow: 0 0 1px $zorroa-color-toggle-checked;
   }
 
-  input:checked + .Toggle-slider:before {
-    -webkit-transform: translateX(18px);
-    -ms-transform: translateX(18px);
-    transform: translateX(18px);
-  }
-
-  /* Rounded sliders */
-  .Toggle-slider.round {
-    border-radius: 34px;
-  }
-
-  .Toggle-slider.round:before {
-    border-radius: 50%;
-    border-color: red;
+  :checked + .Toggle__slider::before {
+    transform: translateX(0);
   }
 }
-
 
 .Toggle input {
   display: none;
@@ -38,33 +30,70 @@
 
 $animation-duration: 0.25s;
 
-.Toggle-slider {
+.Toggle__slider {
   position: absolute;
   cursor: pointer;
   top: 0;
-  left: 0;
+  left: 1px;
   right: 0;
   bottom: 0;
   border-radius: 2px;
-  background-color: $zorroa-gray;
+  background-color: $zorroa-color-toggle-unchecked;
   -webkit-transition: $animation-duration;
   transition: $animation-duration;
-}
 
-.Toggle-slider:before {
-  position: absolute;
-  content: "";
-  height: 12px;
-  width: 12px;
-  left: 0;
-  bottom: -3px;
-  background-color: $zorroa-sickly-green;
-  box-shadow: 0px 0px 0px 1px white;
-  -webkit-transition: $animation-duration;
-  transition: $animation-duration;
-  border-radius: 6px;
-}
+  :checked {
+    background-color: $zorroa-color-toggle-checked;
+  }
 
-.Toggle-checkbox {
+  &--round {
+    border-radius: 34px;
 
+    &::before {
+      border-radius: 50%;
+    }
+  }
+
+  &--waiting {
+    cursor: wait;
+  }
+
+  &--disabled {
+    cursor: not-allowed;
+    background-color: $zorroa-color-toggle-disabled!important;
+
+    &::before {
+      background-color: $zorroa-color-toggle-disabled!important;
+    }
+
+    .dark & {
+      background-color: $zorroa-dark-color-toggle-disabled!important;
+      &::before {
+        background-color: $zorroa-dark-color-toggle-disabled!important;
+      }
+    }
+  }
+
+  &::before {
+    position: absolute;
+    content: "";
+    height: 10px;
+    width: 11px;
+    left: 0;
+    bottom: -3px;
+    background-color: $zorroa-color-toggle-unchecked;
+    box-shadow: 0px 0px 0px 1px white;
+    -webkit-transition: $animation-duration;
+    transition: $animation-duration;
+    border-radius: 5px;
+    transform: translateX(18px);
+
+    .dark & {
+      box-shadow: 0px 0px 0px 1px $zorroa-nearblack;
+    }
+
+    :checked + & {
+      background-color: $zorroa-color-toggle-checked;
+    }
+  }
 }

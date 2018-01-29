@@ -108,6 +108,6 @@ class CreateExport extends Component {
   }
 }
 
-export default connect(state => ({}), dispatch => ({
+export default connect(() => ({}), dispatch => ({
   actions: bindActionCreators({ hideModal }, dispatch)
 }))(CreateExport)

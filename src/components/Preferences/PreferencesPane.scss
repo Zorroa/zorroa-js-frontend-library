@@ -1,0 +1,68 @@
+@import '../../styles/core-mixins.scss';
+@import '../../styles/colors.scss';
+
+$border-color: 1px solid $zorroa-lightgray;
+$sidebar-width: 240px;
+
+.PreferencesPane {
+  overflow: auto;
+  max-height: 95vh;
+  display: flex;
+  flex-direction: column;
+
+  .dark & { background-color: $zorroa-color-gray-dark-1; }
+
+  &__title {
+    flex-grow: 2;
+  }
+
+  &__close {
+    @include zorroa-square-btn-lighten(40px);
+  }
+
+  &__body {
+    display: flex;
+  }
+
+  &__sidebar {
+      border-right: 1px solid $zorroa-color-gray-dark-3;
+      flex-basis: $sidebar-width;
+  }
+
+  &__menu-link {
+    cursor: pointer;
+  }
+
+  &__main {
+    max-height: 100%;
+    overflow-y: auto;
+    flex-basis: calc(100% - #{$sidebar-width});
+  }
+
+  &__menu {
+    padding: 0;
+    list-style: none;
+    margin: 0;
+    font-weight: 500;
+    color: $zorroa-color-gray-dark-3;
+
+    ~ .PreferencesPane__menu {
+      border-top: 1px solid $zorroa-color-gray-dark-3;
+    }
+
+    & .PreferencesPane__menu {
+      font-weight: normal;
+    }
+  }
+
+  &__menu-item {
+    padding: 10px 20px;
+
+    &--active {
+      color: $zorroa-color-black;
+      .dark & {
+        color: $zorroa-color-white;
+      }
+    }
+  }
+}

@@ -222,7 +222,7 @@ class Filetype extends Component {
     return exts.map(ext => (
       <div key={ext} className="Filetype-selected-ext">
         {ext}
-        <div className="Filetype-remove-ext icon-cross" onClick={e => { this.removeType(ext) }} />
+        <div className="Filetype-remove-ext icon-cross" onClick={() => { this.removeType(ext) }} />
       </div>
     ))
   }
@@ -233,7 +233,7 @@ class Filetype extends Component {
     return (
       <div className={classnames('Filetype-group', `Filetype-group-${group}`, {disabled: count <= 0})} key={group}>
         <Check state={this.selectionState(exts)}
-               onClick={e => this.selectTypes(exts)}
+               onClick={() => this.selectTypes(exts)}
                color={FiletypeWidgetInfo.color}/>
         <div className="Filetype-group-icon icon-files"/>
         <div className="Filetype-group-label">{group}</div>
@@ -260,7 +260,7 @@ class Filetype extends Component {
     return (
       <div className={classnames('Filetype-type', {disabled: count <= 0})} key={ext}>
         <Check state={this.selectionState([ext])}
-               onClick={e => { this.toggleType(ext) }}
+               onClick={() => { this.toggleType(ext) }}
                color={FiletypeWidgetInfo.color} />
         <div className="Filetype-type-ext">{ext}&nbsp;-&nbsp;</div>
         <div className="Filetype-type-label">{allExts[ext]}</div>

@@ -1,0 +1,44 @@
+@import '../../styles/colors.scss';
+@import './variables.scss';
+
+.FormInput {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 30px;
+
+  .dark & {
+    color: $zorroa-dark-color-text;
+  }
+  &--vertical {
+    flex-direction: column;
+  }
+
+  &__label {
+    color: $zorroa-color-gray-dark-3;
+  }
+
+  &__input {
+    border-radius: $form-element-border-radius;
+    height: $form-element-height;
+    line-height: 20px;
+    padding: 10px;
+    border: $form-element-border;
+    margin-top: $form-element-top-margin;
+    margin-bottom: $form-element-bottom-margin;
+    font-size: 14px;
+    background: none;
+
+    .dark & {
+      color: $zorroa-dark-color-text;
+    }
+
+    &--error {
+      color: $zorroa-color-danger;
+      border-color: $zorroa-color-danger;
+    }
+  }
+
+  &--error {
+    color: $zorroa-color-danger;
+  }
+}

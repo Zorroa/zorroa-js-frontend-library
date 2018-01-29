@@ -26,7 +26,7 @@ class Pager extends Component {
   }
 }
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = () => ({
 })
 
 const mapStateToProps = state => ({

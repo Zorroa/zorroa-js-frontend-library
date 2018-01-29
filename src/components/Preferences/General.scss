@@ -1,33 +1,9 @@
 @import '../../styles/core-mixins.scss';
+@import '../../styles/colors.scss';
 
-.Preferences {
-  overflow: auto;
-  max-height: 95vh;
+$border-color: 1px solid $zorroa-lightgray;
 
-  .dark & { background-color: $zorroa-mattblack; }
-
-  .Preferences-header {
-    text-transform: uppercase;
-    color: white;
-    background-color: black;
-    height: 40px;
-
-    @include flexRow;
-    @include flexAlignItemsCenter;
-    @include flexJustifySpaceBetween;
-  }
-
-  .Preferences-icon {
-    @include zorroa-square-icon(40px);
-  }
-
-  .Preferences-close {
-    @include zorroa-square-btn-lighten(40px);
-  }
-
-  .body {
-  }
-
+.General {
   .footer {
     border: none;
     border-top: 1px solid $zorroa-lightgray;
@@ -82,12 +58,12 @@
   }
 }
 
-.Preferences-user {
+.General-user {
   @include flexCol;
   color: $zorroa-darkgray;
 }
 
-.Preferences-user-header {
+.General-user-header {
   @include flexRow;
   @include flexJustifySpaceBetween;
   color: $zorroa-darkgray;
@@ -97,13 +73,13 @@
   padding: 10px 20px;
 }
 
-.Preferences-curator {
+.General-curator {
   border-bottom: 1px solid $zorroa-lightgray;
   .dark & { border-bottom: 1px solid $zorroa-darkgray; }
   padding: 10px 20px;
 }
 
-.Preferences-reset {
+.General-reset {
   margin-top: 20px;
   border: none;
   color: white;
@@ -117,7 +93,7 @@
   &:not(:first-child) { margin-left: 5px; }
 }
 
-.Preferences-build {
+.General-build {
   @include flexCol;
   color: $zorroa-gray;
   padding: 10px 0;
@@ -126,7 +102,7 @@
   font-weight: 400;
 }
 
-.Preferences-build-title {
+.General-build-title {
   font-size: 12px;
   text-align: right;
   color: $zorroa-lightgray;
@@ -134,32 +110,32 @@
   text-transform: uppercase;
 }
 
-.Preferences-build-value {
+.General-build-value {
   color: $zorroa-darkgray;
   .dark & { color: $zorroa-lightgray; }
   font-weight: 100;
 }
 
-.Preferences-archivist {
+.General-archivist {
   color: $zorroa-gray;
   font-weight: 400;
   text-transform: uppercase;
   padding: 10px 0;
 }
 
-.Preferences-status {
+.General-status {
   max-height: 300px;
   overflow: auto;
   margin: 10px 20px;
 }
 
-.Preferences-field-template {
+.General-field-template {
   @include flexRow;
   @include flexAlignItemsCenter;
   margin-top: 10px;
 }
 
-.Preferences-field-template-input {
+.General-field-template-input {
   width: 300px;
   color: $zorroa-gray;
   padding: 6px;
@@ -169,14 +145,14 @@
   margin-top: 4px;
 }
 
-.Preferences-field-template-label {
+.General-field-template-label {
   width: 120px;
   margin-left: 8px;
   color: $zorroa-gray;
   @include nowrap;
 }
 
-.Preferences-field-template-reset {
+.General-field-template-reset {
   padding: 5px 8px;
   background-color: $zorroa-water-blue;
   color: white;
@@ -189,46 +165,46 @@
   &.disabled { background-color: $zorroa-lightgray; }
 }
 
-.Preferences-checkboxes {
+.General-checkboxes {
   @include flexRow;
   margin-top: 15px;
   margin-bottom: 15px;
 }
 
-.Preferences-checkboxes-inner {
+.General-checkboxes-inner {
   @include flexCol;
 }
 
-.Preferences-checkbox {
+.General-checkbox {
   @include flexRow;
   margin-top: 5px;
 }
 
-.Preferences-checkbox-label {
+.General-checkbox-label {
   margin-left: 4px;
   color: $zorroa-gray;
 }
 
-.Preferences-account-reset {
+.General-account-reset {
   @include flexRow;
   @include fullWidth;
 }
 
-.Preferences-cloud-reset {
+.General-cloud-reset {
   @include flexRow;
   @include fullWidth;
 }
 
-.Preferences-showFolderCounts {
+.General-showFolderCounts {
   @include flexRow;
   @include flexAlignItemsCenter;
   margin-left: 16px;
 }
 
-.Preferences-showFolderCounts-label {
+.General-showFolderCounts-label {
   margin-left: 6px;
   color: $zorroa-gray;
 }
 
-.Preferences-showFolderCounts-menuitem {
+.General-showFolderCounts-menuitem {
 }

@@ -13,7 +13,7 @@ import Feedback from '../../components/Feedback'
 import Developer from '../../components/Developer'
 import Settings from '../../components/Settings'
 import AssetCounter from '../Assets/AssetCounter'
-import { showModal, dialogAlertPromise } from '../../actions/appActions'
+import { showModal, hideModal, dialogAlertPromise } from '../../actions/appActions'
 import { archivistBaseURL, saveUserSettings } from '../../actions/authAction'
 import { selectAssetIds, findSimilarFields, assetsForIds } from '../../actions/assetsAction'
 import { resetRacetrackWidgets } from '../../actions/racetrackAction'
@@ -80,11 +80,15 @@ class Header extends Component {
     }
   }
 
-  showPreferences = () => {
+  showPreferences = (activePane) => {
     const { user, actions } = this.props
-    const width = '480px'
-    const body = <Preferences user={user}/>
-    actions.showModal({body, width})
+    const width = '90vw'
+    const body = <Preferences activePane={activePane} user={user}/>
+    actions.showModal({
+      body,
+      width,
+      onModalUnderlayClick: actions.hideModal
+    })
   }
 
   showFeedback = () => {
@@ -236,7 +240,7 @@ class Header extends Component {
           </div>
           <div className="header-menu header-menu-user icon-zorroa-person-06">
             <DropdownMenu label={(<div>{user.username}</div>)}>
-              <div className="header-menu-item header-menu-prefs" onClick={this.showPreferences}>
+              <div className="header-menu-item header-menu-prefs" onClick={() => { this.showPreferences('general') }}>
                 Preferences...
               </div>
               { isDeveloper && (
@@ -248,6 +252,11 @@ class Header extends Component {
                 <a href={`${baseURL}/admin/gui`} target="_blank" className="header-menu-item header-menu-admin">
                   Administrator...
                 </a>
+              )}
+              { isAdministrator && (
+                <div className="header-menu-item header-menu-settings" onClick={() => { this.showPreferences('user') }}>
+                  User Admin...
+                </div>
               )}
               { (isAdministrator || isDeveloper) && (
                 <div className="header-menu-item header-menu-settings" onClick={this.showSettings}>
@@ -284,6 +293,7 @@ export default connect(state => ({
 }), dispatch => ({
   actions: bindActionCreators({
     showModal,
+    hideModal,
     selectAssetIds,
     saveUserSettings,
     dialogAlertPromise,

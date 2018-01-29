@@ -32,7 +32,7 @@ class Multipage extends Component {
     return new Promise(resolve => this.setState(newState, resolve))
   }
 
-  title = (parentId) => ('Multipage')
+  title = () => ('Multipage')
 
   sortPages = (sortByPage) => {
     this.setStatePromise({sortByPage})

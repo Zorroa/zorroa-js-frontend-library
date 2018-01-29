@@ -138,9 +138,17 @@ $tableResizeRightPadding: 20px;
     background-color: #fff;
     .dark & { background-color: $zorroa-mattblack; }
   }
-  &.isSelected {
+  &.isSingleSelectOnly {
+    border: 1px solid transparent;
+  }
+  &.isSelected:not(.isSingleSelectOnly) {
     background-color: $zorroa-selected;
     .dark & { background-color: $zorroa-dark-selected; }
+  }
+  &.isSelected.isSingleSelectOnly {
+    border-color: $zorroa-selected;
+
+    .dark & { border-color: $zorroa-dark-selected; }
   }
 }
 

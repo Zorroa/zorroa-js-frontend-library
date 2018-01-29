@@ -13,9 +13,59 @@ Only put definitions & mixins here, not selectors/globals
 
 @mixin animate { transition:0.25s; }
 
+$zorroa-color-blue-1: #4160b8;
+$zorroa-color-blue-2: #387ca3;
+$zorroa-color-blue-3: #4ba8d7;
+$zorroa-color-blue-4: #39897e;
+$zorroa-color-blue-5: #54a8a8;
+
+$zorroa-color-black: #1f1a17;
+$zorroa-color-white: #ffffff;
+
+$zorroa-color-gray-dark-1: #1f1a17;
+$zorroa-color-gray-dark-2: #4d4948;
+$zorroa-color-gray-dark-3: #808080;
+$zorroa-color-gray-dark-4: #b3b3b3;
+$zorroa-color-gray-light-1: #e1e1e1;
+$zorroa-color-gray-light-2: #e7e7e7;
+
+$zorroa-color-green-1: #73b61c;
+$zorroa-color-green-2: #89c366;
+$zorroa-color-green-3: #b4a50b;
+$zorroa-color-green-4: #51af5f;
+$zorroa-color-green-5: #55c39e;
+$zorroa-color-green-brand: #b7df4d;
+$zorroa-color-green-link: #82a626;
+$zorroa-color-green-usable: #73b61c;
+
+$zorroa-color-orange-1: #ee7f29;
+$zorroa-color-orange-2: #e88808;
+$zorroa-color-orange-3: #ebb52d;
+$zorroa-color-orange-4: #f6a72a;
+$zorroa-color-orange-5: #e68305;
+
+$zorroa-color-pink-1: #ce2d3f;
+$zorroa-color-pink-2: #c05a5c;
+$zorroa-color-pink-3: #fb8681;
+$zorroa-color-pink-4: #e38eaa;
+$zorroa-color-pink-5: #bd3270;
+
+$zorroa-color-purple-1: #753689;
+$zorroa-color-purple-2: #734876;
+$zorroa-color-purple-3: #8466b3;
+$zorroa-color-purple-4: #a672b6;
+$zorroa-color-purple-5: #757bd3;
+
+$zorroa-brown-1: #744e19;
+$zorroa-brown-2: #976a50;
+$zorroa-brown-3: #95794b;
+
+$zorroa-yellow-1: #ffd000;
+$zorroa-yellow-2: #f5cc6c;
+
 /*
-Define colors from the Zorroa style guide:
-https://app.zeplin.io/project.html#pid=57c999e39adaa8120388fa9a&styleguide
+These are legacy colors. DO NOT use these anymore. Only colors starting
+with $zorroa-color should be used.
 */
 
 $zorroa-greyish-brown  : #4d4948;
@@ -45,20 +95,21 @@ $zorroa-hover-green    : #4F7F15;
 
 $zorroa-mattblack : #161616;
 $zorroa-nearblack  : #2e2e2e;
-$zorroa-darkgray   : #4a4a4a;
+$zorroa-darkgray   : $zorroa-color-gray-dark-2;
 $zorroa-dimgray    : #606060;
-$zorroa-gray       : #808080;
-$zorroa-whitegray  : #b3b3b3;
+$zorroa-gray       : $zorroa-color-gray-dark-3;
+$zorroa-whitegray  : $zorroa-color-gray-dark-4;
 $zorroa-lightgray  : #c3c3c3;
-$zorroa-darkwhite  : #d8d8d8;
-$zorroa-nearwhite  : #e7e7e7;
+$zorroa-darkwhite  : $zorroa-color-gray-light-1;
+$zorroa-nearwhite  : $zorroa-color-gray-light-2;
+$zorroa-white      : $zorroa-color-white;
 $zorroa-transparent: transparent;
 
-$zorroa-selected       : #D1E3F6;
-$zorroa-dark-selected  : rgba(114,181,28, 0.5);
-$zorroa-hover          : rgba(0,0,0,0.1);
-$zorroa-dark-hover     : rgba(255,255,255,0.2);
-$zorroa-dropzone       : rgba(115, 182, 28, 0.75);
+$zorroa-selected       : $zorroa-color-gray-light-1;
+$zorroa-dark-selected  : rgba($zorroa-color-green-1, 0.5);
+$zorroa-hover          : rgba($zorroa-color-black,0.1);
+$zorroa-dark-hover     : rgba($zorroa-color-white,0.2);
+$zorroa-dropzone       : rgba($zorroa-color-green-2, 0.75);
 
 /* shared metrics */
 

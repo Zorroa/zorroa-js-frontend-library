@@ -258,7 +258,7 @@ export function isolateJob (job) {
   })
 }
 
-export function selectJobIds (ids, curIds, jobs) {
+export function selectJobIds (ids) {
   if (!(ids instanceof Set)) ids = new Set(ids)
   return ({
     type: SELECT_JOBS,

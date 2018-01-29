@@ -30,7 +30,7 @@ export function toggleFolder (folderId, isOpen) {
 // the request will be passed the list of children loaded
 export function getFolderChildren (parentId, optOnDoneFn) {
   if (parentId < Folder.ROOT_ID) {             // Catch "fake" folders, if used
-    return dispatch => { return Promise.resolve() }
+    return () => { return Promise.resolve() }
   }
   return dispatch => {
     console.log('Load folder ' + parentId)

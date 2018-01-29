@@ -1,0 +1,42 @@
+@import '../../styles/colors.scss';
+
+.Heading {
+  margin: 10px 0;
+  font-family: "Roboto";
+  font-weight: 500;
+  color: $zorroa-color-headline;
+
+  .dark & {
+    color: $zorroa-dark-color-headline;
+  }
+
+  &--huge {
+    font-size: 32px;
+    line-height: 32px;
+  }
+
+  &--large {
+    font-size: 20px;
+    line-height: 20px;
+  }
+
+  &--medium {
+    font-size: 18px;
+    line-height: 18px;
+  }
+
+  &--small {
+    line-height: 16px;
+    font-size: 16px;
+  }
+
+  &--tiny {
+    line-height: 14px;
+    font-size: 14px;
+  }
+
+  &--micro {
+    line-height: 12px;
+    font-size: 12px;
+  }
+}

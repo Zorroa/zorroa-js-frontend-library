@@ -257,7 +257,7 @@ export function makePromiseQueue (data, mkPromiseFn, optNumInflight, optProgress
 Return a promise that resolves after the given number of milliseconds
 */
 export function makeDelayPromise (msToWait, optResolveVal) {
-  return new Promise((resolve, reject) => setTimeout(_ => resolve(optResolveVal), msToWait))
+  return new Promise((resolve) => setTimeout(_ => resolve(optResolveVal), msToWait))
 }
 
 /* ----------------------------------------------------------------------

@@ -47,9 +47,6 @@ class Color extends Component {
     hsvHash: HASHES[0]
   }
 
-  componentWillReceiveProps (nextProps) {
-  }
-
   componentWillMount () {
     this.resizer = new Resizer()
 

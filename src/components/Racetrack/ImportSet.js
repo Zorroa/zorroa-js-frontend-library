@@ -81,7 +81,7 @@ class ImportSet extends Component {
     let suggestions = []
     if (suggestion && suggestion.length && lastAction === 'type') {
       const key = suggestion.toLowerCase()
-      Object.keys(jobs).forEach(jobKey => {
+      Object.keys(jobs).forEach(() => {
         const job = jobs[key]
         if (job.type === Job.Import &&
           job.name.toLowerCase().includes(key) &&

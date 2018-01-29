@@ -20,6 +20,10 @@ export default class Permission {
     return this.type + '::' + this.name
   }
 
+  get fullName () {
+    return this.authority()
+  }
+
   equals (name, type) {
     if (!name || !type) return false
     if (this.name !== name) return false

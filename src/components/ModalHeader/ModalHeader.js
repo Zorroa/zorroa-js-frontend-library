@@ -1,14 +1,19 @@
 import React, { PropTypes } from 'react'
+import classnames from 'classnames'
 
 const ModalHeader = (props) => {
-  const { children, closeFn } = props
+  const { children, icon, closeFn } = props
   const style = {}
+  const iconClassNames = classnames('ModalHeader__icon', props.icon)
   return (
     <div className='ModalHeader' style={style}>
-      <div className='ModalHeader-title'>
+      { icon !== undefined && (
+        <div className={iconClassNames} />
+      ) }
+      <div className='ModalHeader__title'>
         { children }
       </div>
-      <div className='ModalHeader-close' onClick={_ => closeFn && closeFn()}>
+      <div className='ModalHeader__close' onClick={_ => closeFn && closeFn()}>
         <div className='icon-cross'/>
       </div>
     </div>
@@ -17,6 +22,7 @@ const ModalHeader = (props) => {
 
 ModalHeader.propTypes = {
   children: PropTypes.node,
+  icon: PropTypes.string,
   closeFn: PropTypes.func
 }
 

@@ -3,9 +3,6 @@ import classnames from 'classnames'
 
 import Resizer from '../../services/Resizer'
 
-const rowHeightPx = 30
-const tableHeaderHeight = 26
-
 export default class Table extends Component {
   static propTypes = {
     assets: PropTypes.arrayOf(PropTypes.shape({
@@ -20,6 +17,8 @@ export default class Table extends Component {
       order: PropTypes.string,
       width: PropTypes.number.isRequired
     })).isRequired,
+    look: PropTypes.oneOf(['compact', 'clean']),
+    isSingleSelectOnly: PropTypes.bool,
 
     // input props
     height: PropTypes.number.isRequired,
@@ -56,6 +55,30 @@ export default class Table extends Component {
     this.resizer = null
   }
 
+  getRowHeight () {
+    if (this.props.look === 'clean') {
+      return 40
+    }
+
+    return 30
+  }
+
+  getTableHeaderHeight () {
+    if (this.props.look === 'clean') {
+      return 40
+    }
+
+    return 26
+  }
+
+  onColumnHeaderContextMenu = (fieldIndex, event) => {
+    const onColumnHeaderContextMenu = this.props.onColumnHeaderContextMenu
+
+    if (typeof this.props.onColumnHeaderContextMenu === 'function') {
+      onColumnHeaderContextMenu(fieldIndex, event)
+    }
+  }
+
   tableScroll = (event) => {
     // Horizontal scrolling for the table header,
     // keep the header in perfect sync with the table body's horiz scroll
@@ -79,9 +102,11 @@ export default class Table extends Component {
     this.resizer.capture(this.columnResizeUpdate, this.columnResizeStop, width, 0)
   }
 
-  columnResizeUpdate = (resizeX, resizeY) => {
+  columnResizeUpdate = (resizeX) => {
     var fieldWidth = Math.min(2000, Math.max(50, resizeX))
-    this.props.setFieldWidthFn(this.columnResizeFieldName, fieldWidth)
+    if (this.canResizeFieldWidth()) {
+      this.props.setFieldWidthFn(this.columnResizeFieldName, fieldWidth)
+    }
   }
 
   columnResizeStop = (event) => {
@@ -109,10 +134,13 @@ export default class Table extends Component {
 
     // guarantee the result is sane
     maxWidth = Math.max(50, Math.min(2000, maxWidth))
-    this.props.setFieldWidthFn(field, maxWidth)
+
+    if (this.canResizeFieldWidth()) {
+      this.props.setFieldWidthFn(field, maxWidth)
+    }
   }
 
-  rowBottomPx = (row) => (Math.max(0, row + 1) * rowHeightPx)
+  rowBottomPx = (row) => (Math.max(0, row + 1) * this.getRowHeight())
 
   recomputeRowHeights = () => {
     let { assets } = this.props
@@ -186,8 +214,13 @@ export default class Table extends Component {
     return classnames('Table-header-cell', {ordered})
   }
 
+  canResizeFieldWidth () {
+    return typeof this.props.setFieldWidthFn === 'function'
+  }
+
   render () {
-    const { assets, fields, height, tableIsResizing, selectedAssetIds, onColumnHeaderContextMenu, onSettings, children } = this.props
+    const { assets, fields, height, tableIsResizing, selectedAssetIds, onSettings, children, isSingleSelectOnly } = this.props
+    const tableHeaderHeight = this.getTableHeaderHeight()
     if (!assets) return
 
     const { tableScrollTop, tableScrollHeight } = this.state
@@ -254,7 +287,7 @@ export default class Table extends Component {
             const { field, title, order, width } = fields[fieldIndex]
             return (
               <div key={fieldIndex}
-                   onContextMenu={e => onColumnHeaderContextMenu(fieldIndex, e)}
+                   onContextMenu={e => this.onColumnHeaderContextMenu(fieldIndex, e)}
                    className={this.headerClassnames(order)}
                    style={{width: `${width}px`, left: `${fieldLeft[fieldIndex]}px`, top: '0px', position: 'absolute'}}>
                 <div className="Table-cell">
@@ -265,7 +298,9 @@ export default class Table extends Component {
                 <div className='Table-header-resizer'
                      onMouseDown={event => this.columnResizeStart(event, field)}
                      onDoubleClick={event => this.columnAutoResize(event, field)}>
-                  <div className='Table-header-resizer-handle'/>
+                     { this.canResizeFieldWidth() &&
+                       (<div className='Table-header-resizer-handle'/>)
+                     }
                 </div>
               </div>
             )
@@ -289,7 +324,11 @@ export default class Table extends Component {
                 const isSelected = selectedAssetIds && selectedAssetIds.has(asset.id)
                 return (
                   <div key={asset.id}
-                       className={classnames('Table-row', { even: !!(index % 2), isSelected })}
+                       className={classnames('Table-row', {
+                         even: !!(index % 2),
+                         isSelected,
+                         isSingleSelectOnly: isSingleSelectOnly === true
+                       })}
                        style={{top: `${rowTopPx}px`, height: `${rowBottomPx - rowTopPx}px`, width: `${sumOfFieldWidths}px`}}
                        onClick={event => this.select(asset, event)}
                        onDoubleClick={event => this.isolate(asset, event)}>

@@ -14,6 +14,7 @@ import { GDriveAuthenticator } from '../Import/GDriveAuthenticator'
 import { defaultThumbFieldTemplate, defaultLightbarFieldTemplate } from '../../constants/defaultState'
 import { FILTERED_COUNTS, FULL_COUNTS, NO_COUNTS } from '../Folders/Folders'
 import DropdownMenu from '../DropdownMenu/DropdownMenu'
+import './General.scss'
 
 const theme = {
   scheme: 'bright',
@@ -36,7 +37,7 @@ const theme = {
   base0F: '#be643c'
 }
 
-class Preferences extends Component {
+class General extends Component {
   static propTypes = {
     user: PropTypes.instanceOf(User),
     onDismiss: PropTypes.func,
@@ -159,84 +160,77 @@ class Preferences extends Component {
       lightbarFieldTemplate, thumbFieldTemplate, dragFieldTemplate,
       uxLevel, monochrome, userSettings } = this.props
     return (
-      <div className="Preferences">
-        <div className="Preferences-header">
-          <div className="flexRow flexAlignItemsCenter">
-            <div className="Preferences-icon icon-cog"/>
-            <div>Preferences</div>
-          </div>
-          <div onClick={this.dismiss} className="Preferences-close icon-cross"/>
-        </div>
+      <div className="General">
         <div className="body">
-          <div className="Preferences-user">
-            <div className="Preferences-user-header">
+          <div className="General-user">
+            <div className="General-user-header">
               <span>{user.username}</span>
               <span>{user.firstName} {user.lastName}</span>
               <span>{user.email}</span>
             </div>
           </div>
-          <div className="Preferences-curator flexCol">
-            <div className="Preferences-checkboxes">
-              <div className="Preferences-checkboxes-inner">
-                <div className="Preferences-uxlevel Preferences-checkbox">
-                  <input type="checkbox" className="Preferences-uxlevel-input" checked={uxLevel > 0} onChange={this.toggleUXLevel}/>
-                  <div className="Preferences-uxlevel-label Preferences-checkbox-label">Advanced Controls</div>
+          <div className="General-curator flexCol">
+            <div className="General-checkboxes">
+              <div className="General-checkboxes-inner">
+                <div className="General-uxlevel General-checkbox">
+                  <input type="checkbox" className="General-uxlevel-input" checked={uxLevel > 0} onChange={this.toggleUXLevel}/>
+                  <div className="General-uxlevel-label General-checkbox-label">Advanced Controls</div>
                 </div>
-                <div className="Preferences-monochrome Preferences-checkbox">
-                  <input type="checkbox" className="Preferences-monochrome-input" checked={monochrome} onChange={this.toggleMonochrome}/>
-                  <div className="Preferences-monochrome-label Preferences-checkbox-label">Dark Theme</div>
+                <div className="General-monochrome General-checkbox">
+                  <input type="checkbox" className="General-monochrome-input" checked={monochrome} onChange={this.toggleMonochrome}/>
+                  <div className="General-monochrome-label General-checkbox-label">Dark Theme</div>
                 </div>
-                <div className="Preferences-monochrome Preferences-checkbox">
-                  <input type="checkbox" className="Preferences-monochrome-input" checked={userSettings.fastLightboxPanning} onChange={this.toggleFastLightboxPanning}/>
-                  <div className="Preferences-monochrome-label Preferences-checkbox-label">Fast lightbox panning</div>
+                <div className="General-monochrome General-checkbox">
+                  <input type="checkbox" className="General-monochrome-input" checked={userSettings.fastLightboxPanning} onChange={this.toggleFastLightboxPanning}/>
+                  <div className="General-monochrome-label General-checkbox-label">Fast lightbox panning</div>
                 </div>
-                <div className="Preferences-showFolderCounts">
-                  <div className="Preferences-showFolderCounts-label">Show folder counts: </div>
+                <div className="General-showFolderCounts">
+                  <div className="General-showFolderCounts-label">Show folder counts: </div>
                   <DropdownMenu label={userSettings.showFolderCounts || FILTERED_COUNTS}>
-                    <div className="Preferences-showFolderCounts-menuitem" onClick={_ => this.setFolderCounts(FILTERED_COUNTS)}>{FILTERED_COUNTS}</div>
-                    <div className="Preferences-showFolderCounts-menuitem" onClick={_ => this.setFolderCounts(FULL_COUNTS)}>{FULL_COUNTS}</div>
-                    <div className="Preferences-showFolderCounts-menuitem" onClick={_ => this.setFolderCounts(NO_COUNTS)}>{NO_COUNTS}</div>
+                    <div className="General-showFolderCounts-menuitem" onClick={_ => this.setFolderCounts(FILTERED_COUNTS)}>{FILTERED_COUNTS}</div>
+                    <div className="General-showFolderCounts-menuitem" onClick={_ => this.setFolderCounts(FULL_COUNTS)}>{FULL_COUNTS}</div>
+                    <div className="General-showFolderCounts-menuitem" onClick={_ => this.setFolderCounts(NO_COUNTS)}>{NO_COUNTS}</div>
                   </DropdownMenu>
                 </div>
               </div>
             </div>
-            <div className="Preferences-field-template">
-              <input type="text" className="Preferences-field-template-input" value={lightbarFieldTemplate || ''} onChange={this.changeLightbarFieldTemplate}/>
-              <div className="Preferences-field-template-label">Lightbar Label</div>
+            <div className="General-field-template">
+              <input type="text" className="General-field-template-input" value={lightbarFieldTemplate || ''} onChange={this.changeLightbarFieldTemplate}/>
+              <div className="General-field-template-label">Lightbar Label</div>
             </div>
-            <div className="Preferences-field-template">
-              <input type="text" className="Preferences-field-template-input" value={thumbFieldTemplate || ''} onChange={this.changeThumbFieldTemplate}/>
-              <div className="Preferences-field-template-label">Thumbnail Label</div>
+            <div className="General-field-template">
+              <input type="text" className="General-field-template-input" value={thumbFieldTemplate || ''} onChange={this.changeThumbFieldTemplate}/>
+              <div className="General-field-template-label">Thumbnail Label</div>
             </div>
-            <div className="Preferences-field-template">
-              <input type="text" className="Preferences-field-template-input" style={{width: '240px'}} value={dragFieldTemplate || ''} onChange={this.changeDragFieldTemplate}/>
-              <div className={classnames('Preferences-field-template-reset', {disabled: !this.defaultDragTemplate()})} onClick={this.resetDragFieldTemplate}>Reset</div>
-              <div className="Preferences-field-template-label">Drag Template</div>
+            <div className="General-field-template">
+              <input type="text" className="General-field-template-input" style={{width: '240px'}} value={dragFieldTemplate || ''} onChange={this.changeDragFieldTemplate}/>
+              <div className={classnames('General-field-template-reset', {disabled: !this.defaultDragTemplate()})} onClick={this.resetDragFieldTemplate}>Reset</div>
+              <div className="General-field-template-label">Drag Template</div>
             </div>
-            <div className="Preferences-cloud-reset">
-              { DropboxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutDropbox}>Logout Dropbox</button> }
-              { BoxAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutBox}>Logout Box</button> }
-              { GDriveAuthenticator.accessToken() && <button className="Preferences-reset" onClick={this.logoutGDrive}>Logout Google Drive</button> }
+            <div className="General-cloud-reset">
+              { DropboxAuthenticator.accessToken() && <button className="General-reset" onClick={this.logoutDropbox}>Logout Dropbox</button> }
+              { BoxAuthenticator.accessToken() && <button className="General-reset" onClick={this.logoutBox}>Logout Box</button> }
+              { GDriveAuthenticator.accessToken() && <button className="General-reset" onClick={this.logoutGDrive}>Logout Google Drive</button> }
             </div>
-            <div className="Preferences-account-reset">
-              <button className="Preferences-reset" onClick={this.reset}>Reset Default User Settings</button>
-              <button className="Preferences-reset" onClick={this.changePassword}>Change Password</button>
+            <div className="General-account-reset">
+              <button className="General-reset" onClick={this.reset}>Reset Default User Settings</button>
+              <button className="General-reset" onClick={this.changePassword}>Change Password</button>
             </div>
           </div>
-          <div className="Preferences-status">
-            <div className='Preferences-build'>
+          <div className="General-status">
+            <div className='General-build'>
               <div>CURATOR</div>
               <table cellSpacing={5}>
                 <tbody>
-                <tr><td className="Preferences-build-title">Version</td><td className="Preferences-build-value">{`${zvVersion}`}</td></tr>
-                <tr><td className="Preferences-build-title">Build</td><td className="Preferences-build-value">{`${zvCount} (${zvCommit} ${zvBranch})`}</td></tr>
-                <tr><td className="Preferences-build-title">Date</td><td className="Preferences-build-value">{`${zvDateStr}`}</td></tr>
+                <tr><td className="General-build-title">Version</td><td className="General-build-value">{`${zvVersion}`}</td></tr>
+                <tr><td className="General-build-title">Build</td><td className="General-build-value">{`${zvCount} (${zvCommit} ${zvBranch})`}</td></tr>
+                <tr><td className="General-build-title">Date</td><td className="General-build-value">{`${zvDateStr}`}</td></tr>
                 </tbody>
               </table>
             </div>
-            { info && <div className="Preferences-archivist">Archivisit Info<JSONTree data={info} theme={theme} invertTheme hideRoot/></div> }
-            { health && <div className="Preferences-archivist">Archivisit Health<JSONTree data={health} theme={theme} invertTheme hideRoot/></div> }
-            { metrics && <div className="Preferences-archivist">Archivisit Metrics<JSONTree data={metrics} theme={theme} invertTheme hideRoot/></div> }
+            { info && <div className="General-archivist">Archivisit Info<JSONTree data={info} theme={theme} invertTheme hideRoot/></div> }
+            { health && <div className="General-archivist">Archivisit Health<JSONTree data={health} theme={theme} invertTheme hideRoot/></div> }
+            { metrics && <div className="General-archivist">Archivisit Metrics<JSONTree data={metrics} theme={theme} invertTheme hideRoot/></div> }
           </div>
         </div>
         <div className="footer">
@@ -273,4 +267,4 @@ export default connect(state => ({
     uxLevel,
     monochrome
   }, dispatch)
-}))(Preferences)
+}))(General)

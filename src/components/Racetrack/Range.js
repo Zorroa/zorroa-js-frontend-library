@@ -205,7 +205,7 @@ class Range extends Component {
         (range.max - range.min) / this.refs.rangeSliderBox.clientWidth, 0)
     }
   }
-  minUpdate = (x, y) => {
+  minUpdate = (x) => {
     const range = this.aggRange(this.aggField(this.props))
     const min = Math.min(range.max, Math.max(range.min, x))
     const max = Math.max(this.state.max === undefined ? range.max : this.state.max, min) // let this handle push the other one around
@@ -226,7 +226,7 @@ class Range extends Component {
     }
   }
 
-  maxUpdate = (x, y) => {
+  maxUpdate = (x) => {
     const range = this.aggRange(this.aggField(this.props))
     const max = Math.min(range.max, Math.max(range.min, x))
     const min = Math.min(this.state.min === undefined ? range.min : this.state.min, max) // let this handle push the other one around

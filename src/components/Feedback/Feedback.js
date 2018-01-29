@@ -114,7 +114,7 @@ class Feedback extends Component {
         // console.log("SUCCESS. status=%d, text=%s", response.status, response.text)
         if (this._isMounted) this.setState({ sendState: SENT })
       },
-      (reason) => {
+      () => {
         // console.log("FAILED. error=", reason)
         if (this._isMounted) this.setState({ sendState: SENDERROR })
       }
@@ -184,6 +184,6 @@ class Feedback extends Component {
   }
 }
 
-export default connect(state => ({}), dispatch => ({
+export default connect(() => ({}), dispatch => ({
   actions: bindActionCreators({ hideModal }, dispatch)
 }))(Feedback)

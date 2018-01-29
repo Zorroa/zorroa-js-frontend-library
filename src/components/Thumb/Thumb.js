@@ -20,7 +20,7 @@ export function page (asset, width, height, origin) {
 
 // Called when dragging an asset to assign assetIds to drop info
 const source = {
-  dragStart (props, type, se) {
+  dragStart (props) {
     const { assetId, selectedAssetIds, allAssets, showMultipage, dragFieldTemplate } = props
     let assetIds = isolateSelectId(assetId, selectedAssetIds)
     if (showMultipage) {
