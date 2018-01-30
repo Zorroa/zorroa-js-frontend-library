@@ -1,7 +1,8 @@
 import React, { Component, PropTypes } from 'react'
 import ProgressCircle from '../ProgressCircle'
 import { PubSub } from '../../services/jsUtil'
-import axios from 'axios'
+import getImage from '../../services/getImage'
+
 import {
   FLIPBOOK_STARTED,
   FLIPBOOK_FRAME_SELECTED,
@@ -9,34 +10,34 @@ import {
 } from '../../constants/pubSubTopics'
 const mockFrames = [{
   number: 1,
-  url: 'https://test.pool.zorroa.com/api/v1/assets/86cf3538-9f77-5b1b-be36-107bf502e28e/proxies/at-least/282'
+  url: 'https://test.pool.zorroa.com/api/v1/assets/86cf3538-9f77-5b1b-be36-107bf502e28e/proxies/atLeast/282'
 }, {
   number: 5,
-  url: 'https://test.pool.zorroa.com/api/v1/assets/52384f88-b29e-5595-8c23-c8c5db19ae86/proxies/at-least/282'
+  url: 'https://test.pool.zorroa.com/api/v1/assets/52384f88-b29e-5595-8c23-c8c5db19ae86/proxies/atLeast/282'
 }, {
   number: 10,
-  url: 'https://test.pool.zorroa.com/api/v1/assets/a15f0d3e-cc0d-5701-9435-a8030077f5f2/proxies/at-least/282'
+  url: 'https://test.pool.zorroa.com/api/v1/assets/a15f0d3e-cc0d-5701-9435-a8030077f5f2/proxies/atLeast/282'
 }, {
   number: 15,
-  url: 'https://test.pool.zorroa.com/api/v1/assets/39a905ae-2bdb-5a81-bf66-2162b223baa8/proxies/at-least/282'
+  url: 'https://test.pool.zorroa.com/api/v1/assets/39a905ae-2bdb-5a81-bf66-2162b223baa8/proxies/atLeast/282'
 }, {
   number: 65,
-  url: 'https://test.pool.zorroa.com/api/v1/assets/00e88ee8-af80-5ec0-9504-af9fcb8f31d8/proxies/at-least/282'
+  url: 'https://test.pool.zorroa.com/api/v1/assets/00e88ee8-af80-5ec0-9504-af9fcb8f31d8/proxies/atLeast/282'
 }, {
   number: 130,
-  url: 'https://test.pool.zorroa.com/api/v1/assets/13233b7e-7833-5484-b8ae-61c81c9d8a54/proxies/at-least/282'
+  url: 'https://test.pool.zorroa.com/api/v1/assets/13233b7e-7833-5484-b8ae-61c81c9d8a54/proxies/atLeast/282'
 }, {
   number: 135,
-  url: 'https://test.pool.zorroa.com/api/v1/assets/20bf0d19-66dd-5f87-8def-b3db9ac6727b/proxies/at-least/282'
+  url: 'https://test.pool.zorroa.com/api/v1/assets/20bf0d19-66dd-5f87-8def-b3db9ac6727b/proxies/atLeast/282'
 }, {
   number: 140,
-  url: 'https://test.pool.zorroa.com/api/v1/assets/a15f0d3e-cc0d-5701-9435-a8030077f5f2/proxies/at-least/282'
+  url: 'https://test.pool.zorroa.com/api/v1/assets/a15f0d3e-cc0d-5701-9435-a8030077f5f2/proxies/atLeast/282'
 }, {
   number: 145,
-  url: 'https://test.pool.zorroa.com/api/v1/assets/52384f88-b29e-5595-8c23-c8c5db19ae86/proxies/at-least/282'
+  url: 'https://test.pool.zorroa.com/api/v1/assets/52384f88-b29e-5595-8c23-c8c5db19ae86/proxies/atLeast/282'
 }, {
   number: 150,
-  url: 'https://test.pool.zorroa.com/api/v1/assets/86cf3538-9f77-5b1b-be36-107bf502e28e/proxies/at-least/282'
+  url: 'https://test.pool.zorroa.com/api/v1/assets/86cf3538-9f77-5b1b-be36-107bf502e28e/proxies/atLeast/282'
 }]
 
 function findLastFrame (framesToFind) {
@@ -164,21 +165,14 @@ export default class Flipbook extends Component {
 
   componentDidMount () {
     const loadingFrames = this.state.frames.map(frame => {
-      return axios
-        .get(frame.url, {
-          withCredentials: true,
-          responseType: 'blob'
-        })
-        .then(response => {
+      return getImage(frame.url)
+        .then(imageBitmap => {
           this.setState(prevState => {
             return {
               loadImagesCount: prevState.loadImagesCount + 1
             }
           })
 
-          return window.createImageBitmap(response.data)
-        })
-        .then(imageBitmap => {
           const dataFrame = {
             url: frame.url,
             number: frame.number,
@@ -198,7 +192,10 @@ export default class Flipbook extends Component {
       })
       .catch(error => {
         this.onError(error)
-        return Promise.reject(error)
+        this.setState({
+          frames: []
+        })
+        return []
       })
   }
 

@@ -35,7 +35,7 @@ export default class FlipbookViewer extends Component {
     this.shuttler.off()
   }
 
-  onError (error) {
+  onError = (error) => {
     if (this.props.onError !== undefined) {
       this.props.onError(error)
     }
