@@ -3,6 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import Pdf from './Pdf'
+import FlipbookViewer from './FlipbookViewer'
 import VideoViewer from './VideoViewer'
 import Image from './Image'
 import Asset from '../../models/Asset'
@@ -53,6 +54,15 @@ class Inspector extends Component {
           <div className="Inspector-proxy">{proxy.width} x {proxy.height} proxy</div>
           { message && <div className="Inspector-error">{message}</div> }
         </div>
+      )
+    }
+
+    // TODO: Remove this before comitting, as it forces everything to use the flipbook media type
+    if (mediaType.startsWith('i')) {
+      inspector = (
+        <FlipbookViewer
+          fps={30}
+        />
       )
     }
 
