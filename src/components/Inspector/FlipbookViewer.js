@@ -2,16 +2,18 @@ import React, { Component, PropTypes } from 'react'
 import { PubSub } from '../../services/jsUtil'
 import Flipbook from './Flipbook'
 import PanZoom from './PanZoom'
-import {
-  FLIPBOOK_FRAME_SELECTED
-} from '../../constants/pubSubTopics'
+import { connect } from 'react-redux'
 
-export default class FlipbookViewer extends Component {
+class FlipbookViewer extends Component {
   static propTypes = {
     onError: PropTypes.func,
     fps: PropTypes.number,
-    status: PropTypes.instanceOf(PubSub),
-    shuttler: PropTypes.instanceOf(PubSub)
+    frames: PropTypes.arrayOf(PropTypes.shape({
+      url: PropTypes.string.isRequired,
+      imageBitmap: PropTypes.instanceOf(ImageBitmap),
+      number: PropTypes.number.isRequired
+    })).isRequired,
+    totalFrames: PropTypes.number.isRequired
   }
 
   constructor (props) {
@@ -20,13 +22,21 @@ export default class FlipbookViewer extends Component {
     this.shuttler = new PubSub()
     this.status = new PubSub()
     this.state = {
-      currentFrame: 0
+      playing: false,
+      fps: 30,
+      currentFrameNumber: 0
     }
   }
 
   componentDidMount () {
-    this.status.on(FLIPBOOK_FRAME_SELECTED, currentFrame => {
-      this.setState({ currentFrame })
+    this.status.on('playing', playing => {
+      this.setState({ playing })
+    })
+    this.status.on('started', started => {
+      this.setState({ started })
+    })
+    this.status.on('played', currentFrameNumber => {
+      this.setState({ currentFrameNumber })
     })
   }
 
@@ -41,23 +51,58 @@ export default class FlipbookViewer extends Component {
     }
   }
 
+  onFrameFrequency = fps => {
+    this.setState({
+      fps
+    })
+  }
+
+  scrub = (frame) => {
+    this.shuttler.publish('scrub', frame)
+  }
+
   render () {
+    const frameFrequency = {
+      onFrameFrequency: this.onFrameFrequency,
+      rate: this.state.fps,
+      options: [12, 24, 30]
+    }
+
     return (
       <div className="FlipbookViewer">
-        <div>
-          Current frame: { this.state.currentFrame }
-        </div>
         <PanZoom
+          frameFrequency={frameFrequency}
+          onScrub={this.scrub}
           shuttler={this.shuttler}
+          playing={this.state.playing}
+          currentFrameNumber={this.state.currentFrameNumber}
+          totalFrames={this.props.totalFrames}
         >
           <Flipbook
-            fps={30}
+            fps={this.state.fps}
             onError={this.onError}
             shuttler={this.shuttler}
             status={this.status}
+            frames={this.props.frames}
+            totalFrames={this.props.totalFrames}
           />
         </PanZoom>
       </div>
     )
   }
 }
+
+function getTotalFrames (frames) {
+  return frames.reduce((numberOfFrames, frame) => {
+    if (frame.number > numberOfFrames) {
+      return frame.number
+    }
+
+    return numberOfFrames
+  }, 0)
+}
+
+export default connect(state => ({
+  frames: state.flipbook.frames,
+  totalFrames: getTotalFrames(state.flipbook.frames)
+}), () => ({}))(FlipbookViewer)
