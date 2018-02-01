@@ -1,0 +1,21 @@
+@import '../../styles/core-mixins.scss';
+
+.FlipbookViewer {
+  height: 100%;
+  width: 100%;
+  @include flexCol;
+  @include flexAlignItemsCenter;
+  @include fullWidth;
+  @include fullHeight;
+  @include flexOn;
+
+  &__pan-zoom {
+    @include flexCol;
+    @include flexOn;
+    @include fullWidth;
+    overflow: hidden;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+  }
+}

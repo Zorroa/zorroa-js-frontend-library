@@ -77,6 +77,12 @@ export default class Controlbar extends PureComponent {
   }
 
   toggleShowFpsOptions = () => {
+    document.removeEventListener('click', this.toggleShowFpsOptions)
+
+    if (this.state.showFpsOptions === false) {
+      document.addEventListener('click', this.toggleShowFpsOptions)
+    }
+
     this.setState(prevState => {
       return {
         showFpsOptions: !prevState.showFpsOptions

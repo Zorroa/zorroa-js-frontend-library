@@ -70,23 +70,25 @@ class FlipbookViewer extends Component {
 
     return (
       <div className="FlipbookViewer">
-        <PanZoom
-          frameFrequency={frameFrequency}
-          onScrub={this.scrub}
-          shuttler={this.shuttler}
-          playing={this.state.playing}
-          currentFrameNumber={this.state.currentFrameNumber}
-          totalFrames={this.props.totalFrames}
-        >
-          <Flipbook
-            fps={this.state.fps}
-            onError={this.onError}
+        <div className="FlipbookViewer__pan-zoom">
+          <PanZoom
+            frameFrequency={frameFrequency}
+            onScrub={this.scrub}
             shuttler={this.shuttler}
-            status={this.status}
-            frames={this.props.frames}
+            playing={this.state.playing}
+            currentFrameNumber={this.state.currentFrameNumber}
             totalFrames={this.props.totalFrames}
-          />
-        </PanZoom>
+          >
+            <Flipbook
+              fps={this.state.fps}
+              onError={this.onError}
+              shuttler={this.shuttler}
+              status={this.status}
+              frames={this.props.frames}
+              totalFrames={this.props.totalFrames}
+            />
+          </PanZoom>
+        </div>
       </div>
     )
   }
