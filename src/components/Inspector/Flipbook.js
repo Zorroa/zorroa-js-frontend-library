@@ -299,7 +299,13 @@ export default class Flipbook extends PureComponent {
   }
 
   getLoadedPercentage () {
-    return Math.floor((this.state.loadImagesCount / this.state.frames.length) * 100)
+    const percentage = Math.floor((this.state.loadImagesCount / this.props.frames.length) * 100)
+
+    if (Number.isNaN(percentage)) {
+      return 0
+    }
+
+    return percentage
   }
 
   render () {
@@ -309,6 +315,10 @@ export default class Flipbook extends PureComponent {
       'Flipbook--is-loading': areFramesLoaded === false
     })
 
+    const flipbookCanvasClasses = classnames('Flipbook__canvas', {
+      'Flipbook__canvas--is-loading': areFramesLoaded === false
+    })
+
     return (
       <div className={flipbookClasses}>
         { areFramesLoaded === false && (
@@ -316,7 +326,7 @@ export default class Flipbook extends PureComponent {
             <ProgressCircle percentage={ this.getLoadedPercentage() } />
           </div>
         )}
-        <div className="Flipbook__canvas">
+        <div className={flipbookCanvasClasses}>
           <Canvas
             image={this.state.currentFrameImage}
             height={height}
