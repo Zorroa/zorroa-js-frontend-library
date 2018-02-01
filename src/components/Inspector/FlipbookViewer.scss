@@ -1,5 +1,7 @@
 @import '../../styles/core-mixins.scss';
 
+$film-strip-grabber-height: $zorroa-metric-base * 3;
+
 .FlipbookViewer {
   height: 100%;
   width: 100%;
@@ -17,5 +19,21 @@
     max-width: 100%;
     max-height: 100%;
     position: relative;
+  }
+
+  &__film-strip {
+    min-height: $zorroa-metric-base * 5;
+    width: 100%;
+    border-top: 1px solid $zorroa-color-gray-dark-3;
+  }
+
+  &__film-strip-grabber {
+    width: 100%;
+    height: $film-strip-grabber-height;
+    display: block;
+    cursor: row-resize;
+    position: relative;
+    top: $film-strip-grabber-height / 2;
+    z-index: 1;
   }
 }

@@ -2,6 +2,8 @@ import React, { Component, PropTypes } from 'react'
 import { PubSub } from '../../services/jsUtil'
 import Flipbook from './Flipbook'
 import PanZoom from './PanZoom'
+import SplitPane from 'react-split-pane'
+
 import { connect } from 'react-redux'
 
 class FlipbookViewer extends Component {
@@ -22,6 +24,7 @@ class FlipbookViewer extends Component {
     this.shuttler = new PubSub()
     this.status = new PubSub()
     this.state = {
+      resizing: false,
       playing: false,
       fps: 30,
       currentFrameNumber: 0
@@ -70,7 +73,14 @@ class FlipbookViewer extends Component {
 
     return (
       <div className="FlipbookViewer">
-        <div className="FlipbookViewer__pan-zoom">
+        <SplitPane
+          split="horizontal"
+          defaultSize={40}
+          maxSize={320}
+          primary="second"
+          pane1ClassName="FlipbookViewer__pan-zoom"
+          resizerClassName="FlipbookViewer__film-strip-grabber"
+        >
           <PanZoom
             frameFrequency={frameFrequency}
             onScrub={this.scrub}
@@ -88,7 +98,10 @@ class FlipbookViewer extends Component {
               totalFrames={this.props.totalFrames}
             />
           </PanZoom>
-        </div>
+          <div className="FlipbookViewer__film-strip">
+            Draggable filmstrip area
+          </div>
+        </SplitPane>
       </div>
     )
   }
