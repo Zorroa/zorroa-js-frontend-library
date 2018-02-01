@@ -25,7 +25,7 @@ export function CancelCircle () {
 }
 
 export class Gauge extends PureComponent {
-  propTypes = {
+  static propTypes = {
     color: PropTypes.string.isRequired,
     intensity: PropTypes.oneOf(['high', 'medium', 'low'])
   }

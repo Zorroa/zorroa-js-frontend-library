@@ -1,6 +1,7 @@
 import React, { PureComponent, PropTypes } from 'react'
 import classnames from 'classnames'
 import ProgressCircle from '../ProgressCircle'
+import Canvas from './Canvas'
 import { PubSub } from '../../services/jsUtil'
 import getImage from '../../services/getImage'
 
@@ -76,7 +77,6 @@ export default class Flipbook extends PureComponent {
     forcedTimeOffset,
     totalFrames
   }) => {
-    const canvas = this.canvas
     const currentFrameNumber = this.getCurrentFrameNumberByTime(
       totalFrames,
       this.props.fps,
@@ -90,9 +90,7 @@ export default class Flipbook extends PureComponent {
       return
     }
 
-    if (canvas !== undefined && frame !== undefined) {
-      this.drawFrame(frame)
-    }
+    this.drawFrame(frame)
 
     this.animationFrameId = requestAnimationFrame(() => {
       this.animationLoop({
@@ -219,6 +217,7 @@ export default class Flipbook extends PureComponent {
           frames
         })
         this.publishStatusTopic('started', true)
+        this.startAnimationLoop()
       })
       .catch(error => {
         this.onError(error)
@@ -257,22 +256,13 @@ export default class Flipbook extends PureComponent {
     }
   }
 
-  drawFrame = (frame) => {
-    const canvas = this.canvas
+  drawFrame = frame => {
     const image = frame.imageBitmap
     this.animationFrameNumber = frame.number
 
-    if ((image instanceof ImageBitmap) === false) {
-      return
-    }
-
-    this.canvas.getContext('2d').drawImage(
-      image,
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    )
+    this.setState({
+      currentFrameImage: image
+    })
 
     this.publishStatusTopic('played', frame.number)
   }
@@ -319,15 +309,6 @@ export default class Flipbook extends PureComponent {
       'Flipbook--is-loading': areFramesLoaded === false
     })
 
-    if (this.areFramesLoaded()) {
-      this.startAnimationLoop()
-    }
-
-    const canvasStyle = {
-      height: `${height}px`,
-      width: `${width}px`
-    }
-
     return (
       <div className={flipbookClasses}>
         { areFramesLoaded === false && (
@@ -335,14 +316,13 @@ export default class Flipbook extends PureComponent {
             <ProgressCircle percentage={ this.getLoadedPercentage() } />
           </div>
         )}
-        { areFramesLoaded === true && (
-          <div className="Flipbook__canvas">
-            <canvas
-              ref={canvas => { this.canvas = canvas }}
-              style={canvasStyle}
-            />
-          </div>
-        )}
+        <div className="Flipbook__canvas">
+          <Canvas
+            image={this.state.currentFrameImage}
+            height={height}
+            width={width}
+          />
+        </div>
       </div>
     )
   }
