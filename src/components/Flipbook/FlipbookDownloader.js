@@ -27,6 +27,8 @@ export default function withFlipbook (WrappedComponent, flipbookAssetId) {
         frames: []
       }
 
+      this.downloadableFrameCount = 0
+
       this.downloadBitmapImages()
     }
 
@@ -35,6 +37,7 @@ export default function withFlipbook (WrappedComponent, flipbookAssetId) {
         .flipbook
         .get(flipbookAssetId)
         .then(frames => {
+          this.downloadableFrameCount = frames.length
           const loadingFrames = frames.map(frame => {
             return getImage(frame.url)
               .then(imageBitmap => {
@@ -63,13 +66,13 @@ export default function withFlipbook (WrappedComponent, flipbookAssetId) {
     }
 
     getLoadedPercentage () {
-      if (this.state.frames.length === 0) {
+      const percentage = Math.floor((this.state.loadImagesCount / this.downloadableFrameCount) * 100)
+
+      if (Number.isNaN(percentage)) {
         return 0
       }
 
-      const percentage = Math.floor((this.state.loadImagesCount / this.state.frames.length) * 100)
-
-      if (Number.isNaN(percentage)) {
+      if (this.state.frames.length === 0) {
         return 0
       }
 
