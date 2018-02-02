@@ -1,9 +1,6 @@
 import React, { PureComponent, PropTypes } from 'react'
-import classnames from 'classnames'
-import ProgressCircle from '../ProgressCircle'
 import CanvasImage from '../CanvasImage'
 import { PubSub } from '../../services/jsUtil'
-import getImage from '../../services/getImage'
 
 export default class Flipbook extends PureComponent {
   static propTypes = {
@@ -33,15 +30,7 @@ export default class Flipbook extends PureComponent {
     this.animationFrameNumber = undefined
 
     this.state = {
-      frames: [],
-      loadImagesCount: 0,
       currentFrameImage: undefined
-    }
-  }
-
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.frames !== this.props.frames) {
-      this.downloadBitmapImages(nextProps.frames)
     }
   }
 
@@ -63,7 +52,7 @@ export default class Flipbook extends PureComponent {
   }
 
   getClosestFrameByFrameNumber (desiredFrameNumber) {
-    const frames = this.state.frames
+    const frames = this.props.frames
     const frameNumbers = frames.reduce((accumulator, frame) => {
       accumulator.push(frame.number)
       return accumulator
@@ -128,13 +117,9 @@ export default class Flipbook extends PureComponent {
   }
 
   shouldComponentUpdate (nextProps, nextState) {
-    const didNewImagesLoad = nextState.loadImagesCount !== this.state.loadImagesCount
-    const didFramesChange = nextState.frames !== this.state.frames
+    const didFramesChange = nextProps.frames !== this.props.frames
     const didSetNewFrame = nextState.currentFrameImage !== this.state.currentFrameImage
-    return (didNewImagesLoad ||
-      didFramesChange ||
-      didSetNewFrame
-    )
+    return (didFramesChange || didSetNewFrame)
   }
 
   cancelAnimation () {
@@ -199,59 +184,9 @@ export default class Flipbook extends PureComponent {
     this.drawFrame(frame)
   }
 
-  shouldShowLoadingStatus () {
-    return typeof this.props.onFrameLoaded !== 'function'
-  }
-
-  downloadBitmapImages (frames) {
-    if (frames.length === 0) {
-      return
-    }
-
-    const loadingFrames = frames.map(frame => {
-      return getImage(frame.url)
-        .then(imageBitmap => {
-          if (this.shouldShowLoadingStatus() === false) {
-            this.props.onFrameLoaded(this.state.loadImagesCount + 1)
-          }
-
-          this.setState(prevState => {
-            return {
-              loadImagesCount: prevState.loadImagesCount + 1
-            }
-          })
-
-          const dataFrame = {
-            url: frame.url,
-            number: frame.number,
-            imageBitmap
-          }
-
-          return dataFrame
-        })
-    })
-
-    Promise
-      .all(loadingFrames)
-      .then(frames => {
-        this.setState({
-          frames
-        })
-        this.publishStatusTopic('started', true)
-        this.startAnimationLoop()
-      })
-      .catch(error => {
-        this.onError(error)
-        this.setState({
-          frames: []
-        })
-        return []
-      })
-  }
-
   componentDidMount () {
     this.registerShuttlerHandles()
-    this.downloadBitmapImages(this.props.frames)
+    this.startAnimationLoop()
   }
 
   /**
@@ -277,7 +212,7 @@ export default class Flipbook extends PureComponent {
     return {
       animationStartTime,
       forcedTimeOffset: this.getForcedTimeOffset(),
-      frames: this.state.frames,
+      frames: this.props.frames,
       totalFrames: this.getNumberOfFrames()
     }
   }
@@ -293,19 +228,12 @@ export default class Flipbook extends PureComponent {
     this.publishStatusTopic('played', frame.number)
   }
 
-  areFramesLoaded () {
-    return this.state.loadImagesCount > 0 && this.state.loadImagesCount === this.state.frames.length
-  }
-
   getCanvasDimensions () {
-    let aspectRatio = 1
     let width = Math.floor(window.innerWidth)
     let height = Math.floor(window.innerHeight)
 
-    if (this.areFramesLoaded() === true && this.state.frames[0].imageBitmap) {
-      const frame = this.state.frames[0]
-      aspectRatio = frame.imageBitmap.width / frame.imageBitmap.height
-    }
+    const frame = this.props.frames[0]
+    const aspectRatio = frame.imageBitmap.width / frame.imageBitmap.height
 
     if (aspectRatio > 1) {
       height = Math.round(width / aspectRatio)
@@ -320,39 +248,17 @@ export default class Flipbook extends PureComponent {
   }
 
   startAnimationLoop () {
+    this.publishStatusTopic('started', true) // TODO, this might not be the right place for this...
     this.publishStatusTopic('playing', true)
     this.animationLoop(this.getAnimationLoopParameters())
   }
 
-  getLoadedPercentage () {
-    const percentage = Math.floor((this.state.loadImagesCount / this.props.frames.length) * 100)
-
-    if (Number.isNaN(percentage)) {
-      return 0
-    }
-
-    return percentage
-  }
-
   render () {
-    const areFramesLoaded = this.areFramesLoaded()
     const { width, height } = this.getCanvasDimensions()
-    const flipbookClasses = classnames('Flipbook', {
-      'Flipbook--is-loading': areFramesLoaded === false
-    })
-
-    const flipbookCanvasClasses = classnames('Flipbook__canvas', {
-      'Flipbook__canvas--is-loading': areFramesLoaded === false
-    })
 
     return (
-      <div className={flipbookClasses}>
-        { areFramesLoaded === false && this.shouldShowLoadingStatus() && (
-          <div className="Flipbook__progress-circle">
-            <ProgressCircle percentage={ this.getLoadedPercentage() } />
-          </div>
-        )}
-        <div className={flipbookCanvasClasses}>
+      <div className="Flipbook">
+        <div className="Flipbook__canvas">
           <CanvasImage
             image={this.state.currentFrameImage}
             height={height}

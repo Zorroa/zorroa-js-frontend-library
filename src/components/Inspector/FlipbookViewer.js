@@ -1,18 +1,21 @@
 import React, { Component, PropTypes } from 'react'
 import classnames from 'classnames'
 import { PubSub } from '../../services/jsUtil'
-import Asset from '../../models/Asset'
 import { Flipbook } from '../Flipbook'
 import PanZoom from './PanZoom'
 import SplitPane from 'react-split-pane'
-import api from '../../api'
 import ProgressCircle from '../ProgressCircle'
 
 export default class FlipbookViewer extends Component {
   static propTypes = {
     onError: PropTypes.func,
-    fps: PropTypes.number,
-    asset: PropTypes.instanceOf(Asset)
+    frames: PropTypes.arrayOf(PropTypes.shape({
+      url: PropTypes.string.isRequired,
+      imageBitmap: PropTypes.instanceOf(ImageBitmap),
+      number: PropTypes.number.isRequired
+    })).isRequired,
+    totalFrames: PropTypes.number.isRequired,
+    loadedPercentage: PropTypes.number.isRequired
   }
 
   constructor (props) {
@@ -23,20 +26,11 @@ export default class FlipbookViewer extends Component {
     this.state = {
       playing: false,
       fps: 30,
-      currentFrameNumber: 0,
-      frames: [],
-      totalFrames: 0,
-      loadedImagesCount: true
+      currentFrameNumber: 0
     }
   }
 
   componentDidMount () {
-    this.getFlipbookFrames(
-      this.props.asset.document.source.clip.parent,
-      window.width,
-      window.innerHeight
-    )
-
     this.status.on('playing', playing => {
       this.setState({ playing })
     })
@@ -48,28 +42,9 @@ export default class FlipbookViewer extends Component {
     })
   }
 
-  componentWillReceiveProps (nextProps) {
-    if (this.props.asset !== nextProps.asset) {
-      this.getFlipbookFrames(nextProps.asset.document.source.clip.parent)
-    }
-  }
-
   componentWillUnmount () {
     this.status.off()
     this.shuttler.off()
-  }
-
-  getFlipbookFrames (flipbookAssetId) {
-    api
-      .flipbook
-      .get(flipbookAssetId)
-      .then(frames => {
-        console.log(frames)
-        this.setState({
-          frames: frames,
-          totalFrames: getTotalFrames(frames)
-        })
-      })
   }
 
   onError = (error) => {
@@ -88,24 +63,8 @@ export default class FlipbookViewer extends Component {
     this.shuttler.publish('scrub', frame)
   }
 
-  onFrameLoaded = loadedImagesCount => {
-    this.setState({
-      loadedImagesCount
-    })
-  }
-
   getLoadedPercentage () {
-    const percentage = Math.floor((this.state.loadedImagesCount / this.state.frames.length) * 100)
-
-    if (this.state.frames.length === 0) {
-      return 0
-    }
-
-    if (Number.isNaN(percentage)) {
-      return 0
-    }
-
-    return percentage
+    return this.props.loadedPercentage
   }
 
   render () {
@@ -135,26 +94,25 @@ export default class FlipbookViewer extends Component {
                 <ProgressCircle percentage={ this.getLoadedPercentage() } />
               </div>
             )}
-            <div>
+            { isLoading === false && (
               <PanZoom
                 frameFrequency={frameFrequency}
                 onScrub={this.scrub}
                 shuttler={this.shuttler}
                 playing={this.state.playing}
                 currentFrameNumber={this.state.currentFrameNumber}
-                totalFrames={this.state.totalFrames}
+                totalFrames={this.props.totalFrames}
               >
                 <Flipbook
                   fps={this.state.fps}
                   onError={this.onError}
                   shuttler={this.shuttler}
                   status={this.status}
-                  frames={this.state.frames}
-                  totalFrames={this.state.totalFrames}
-                  onFrameLoaded={this.onFrameLoaded}
+                  frames={this.props.frames}
+                  totalFrames={this.props.totalFrames}
                 />
               </PanZoom>
-            </div>
+            )}
           </div>
           <div className="FlipbookViewer__film-strip">
             Draggable filmstrip area
@@ -163,14 +121,4 @@ export default class FlipbookViewer extends Component {
       </div>
     )
   }
-}
-
-function getTotalFrames (frames) {
-  return frames.reduce((numberOfFrames, frame) => {
-    if (frame.number > numberOfFrames) {
-      return frame.number
-    }
-
-    return numberOfFrames
-  }, 0)
 }

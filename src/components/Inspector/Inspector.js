@@ -3,7 +3,8 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import Pdf from './Pdf'
-import FlipbookViewer from './FlipbookViewer'
+import { withFlipbook } from '../Flipbook'
+import FlipbookViewer from './FlipbookViewer.js'
 import VideoViewer from './VideoViewer'
 import Image from './Image'
 import Asset from '../../models/Asset'
@@ -32,11 +33,12 @@ class Inspector extends Component {
     let inspector = null
 
     if (asset.clipType() === 'flipbook') {
+      const FlipbookViewerWrapped = withFlipbook(
+        FlipbookViewer,
+        this.props.asset.document.source.clip.parent
+      )
       inspector = (
-        <FlipbookViewer
-          asset={asset}
-          fps={30}
-        />
+        <FlipbookViewerWrapped />
       )
     } else if (mediaType.startsWith('image') &&
       imageFormats.findIndex(format => (mediaType.endsWith(format))) >= 0) {
