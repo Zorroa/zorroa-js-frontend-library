@@ -16,6 +16,7 @@ export default class Flipbook extends PureComponent {
       imageBitmap: PropTypes.instanceOf(ImageBitmap),
       number: PropTypes.number.isRequired
     })).isRequired,
+    onFrameLoaded: PropTypes.func,
     totalFrames: PropTypes.number.isRequired
   }
 
@@ -24,13 +25,23 @@ export default class Flipbook extends PureComponent {
 
     this.shuttler = new PubSub()
     this.status = new PubSub()
+
+    // Tracks the identifier for the queued requestAnimationFrame call
     this.animationFrameId = undefined
+
+    // Tracks the current frame number that has been rendered
     this.animationFrameNumber = undefined
 
     this.state = {
       frames: [],
       loadImagesCount: 0,
-      currentFrame: undefined
+      currentFrameImage: undefined
+    }
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.frames !== this.props.frames) {
+      this.downloadBitmapImages(nextProps.frames)
     }
   }
 
@@ -188,12 +199,22 @@ export default class Flipbook extends PureComponent {
     this.drawFrame(frame)
   }
 
-  componentDidMount () {
-    this.registerShuttlerHandles()
+  shouldShowLoadingStatus () {
+    return typeof this.props.onFrameLoaded !== 'function'
+  }
 
-    const loadingFrames = this.props.frames.map(frame => {
+  downloadBitmapImages (frames) {
+    if (frames.length === 0) {
+      return
+    }
+
+    const loadingFrames = frames.map(frame => {
       return getImage(frame.url)
         .then(imageBitmap => {
+          if (this.shouldShowLoadingStatus() === false) {
+            this.props.onFrameLoaded(this.state.loadImagesCount + 1)
+          }
+
           this.setState(prevState => {
             return {
               loadImagesCount: prevState.loadImagesCount + 1
@@ -226,6 +247,11 @@ export default class Flipbook extends PureComponent {
         })
         return []
       })
+  }
+
+  componentDidMount () {
+    this.registerShuttlerHandles()
+    this.downloadBitmapImages(this.props.frames)
   }
 
   /**
@@ -321,7 +347,7 @@ export default class Flipbook extends PureComponent {
 
     return (
       <div className={flipbookClasses}>
-        { areFramesLoaded === false && (
+        { areFramesLoaded === false && this.shouldShowLoadingStatus() && (
           <div className="Flipbook__progress-circle">
             <ProgressCircle percentage={ this.getLoadedPercentage() } />
           </div>

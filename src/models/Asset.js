@@ -189,6 +189,14 @@ export default class Asset {
     return this.document.source.clip.parent
   }
 
+  clipType () {
+    if (this.document.source === undefined || this.document.source.clip === undefined) {
+      return null
+    }
+
+    return this.document.source.clip.type
+  }
+
   // Returns true if the asset is in any of the folder ids
   memberOfAnyFolderIds (folderIds) {
     const folders = this.document && this.document.links && this.document.links.folder

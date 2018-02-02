@@ -1,21 +1,17 @@
 import React, { Component, PropTypes } from 'react'
 import { PubSub } from '../../services/jsUtil'
+import Asset from '../../models/Asset'
 import Flipbook from './Flipbook'
 import PanZoom from './PanZoom'
 import SplitPane from 'react-split-pane'
+import api from '../../api'
+import ProgressCircle from '../ProgressCircle'
 
-import { connect } from 'react-redux'
-
-class FlipbookViewer extends Component {
+export default class FlipbookViewer extends Component {
   static propTypes = {
     onError: PropTypes.func,
     fps: PropTypes.number,
-    frames: PropTypes.arrayOf(PropTypes.shape({
-      url: PropTypes.string.isRequired,
-      imageBitmap: PropTypes.instanceOf(ImageBitmap),
-      number: PropTypes.number.isRequired
-    })).isRequired,
-    totalFrames: PropTypes.number.isRequired
+    asset: PropTypes.instanceOf(Asset)
   }
 
   constructor (props) {
@@ -24,14 +20,22 @@ class FlipbookViewer extends Component {
     this.shuttler = new PubSub()
     this.status = new PubSub()
     this.state = {
-      resizing: false,
       playing: false,
       fps: 30,
-      currentFrameNumber: 0
+      currentFrameNumber: 0,
+      frames: [],
+      totalFrames: 0,
+      loadedImagesCount: true
     }
   }
 
   componentDidMount () {
+    this.getFlipbookFrames(
+      this.props.asset.document.source.clip.parent,
+      window.width,
+      window.innerHeight
+    )
+
     this.status.on('playing', playing => {
       this.setState({ playing })
     })
@@ -43,9 +47,28 @@ class FlipbookViewer extends Component {
     })
   }
 
+  componentWillReceiveProps (nextProps) {
+    if (this.props.asset !== nextProps.asset) {
+      this.getFlipbookFrames(nextProps.asset.document.source.clip.parent)
+    }
+  }
+
   componentWillUnmount () {
     this.status.off()
     this.shuttler.off()
+  }
+
+  getFlipbookFrames (flipbookAssetId) {
+    api
+      .flipbook
+      .get(flipbookAssetId)
+      .then(frames => {
+        console.log(frames)
+        this.setState({
+          frames: frames,
+          totalFrames: getTotalFrames(frames)
+        })
+      })
   }
 
   onError = (error) => {
@@ -62,6 +85,22 @@ class FlipbookViewer extends Component {
 
   scrub = (frame) => {
     this.shuttler.publish('scrub', frame)
+  }
+
+  onFrameLoaded = loadedImagesCount => {
+    this.setState({
+      loadedImagesCount
+    })
+  }
+
+  getLoadedPercentage () {
+    const percentage = Math.floor((this.state.loadedImagesCount / this.state.frames.length) * 100)
+
+    if (Number.isNaN(percentage)) {
+      return 0
+    }
+
+    return percentage
   }
 
   render () {
@@ -81,23 +120,31 @@ class FlipbookViewer extends Component {
           pane1ClassName="FlipbookViewer__pan-zoom"
           resizerClassName="FlipbookViewer__film-strip-grabber"
         >
-          <PanZoom
-            frameFrequency={frameFrequency}
-            onScrub={this.scrub}
-            shuttler={this.shuttler}
-            playing={this.state.playing}
-            currentFrameNumber={this.state.currentFrameNumber}
-            totalFrames={this.props.totalFrames}
-          >
-            <Flipbook
-              fps={this.state.fps}
-              onError={this.onError}
+          <div>
+            { this.getLoadedPercentage() < 1 && (
+              <div className="FlipbookViewer__loading-status">
+                <ProgressCircle percentage={ this.getLoadedPercentage() } />
+              </div>
+            )}
+            <PanZoom
+              frameFrequency={frameFrequency}
+              onScrub={this.scrub}
               shuttler={this.shuttler}
-              status={this.status}
-              frames={this.props.frames}
-              totalFrames={this.props.totalFrames}
-            />
-          </PanZoom>
+              playing={this.state.playing}
+              currentFrameNumber={this.state.currentFrameNumber}
+              totalFrames={this.state.totalFrames}
+            >
+              <Flipbook
+                fps={this.state.fps}
+                onError={this.onError}
+                shuttler={this.shuttler}
+                status={this.status}
+                frames={this.state.frames}
+                totalFrames={this.state.totalFrames}
+                onFrameLoaded={this.onFrameLoaded}
+              />
+            </PanZoom>
+          </div>
           <div className="FlipbookViewer__film-strip">
             Draggable filmstrip area
           </div>
@@ -116,8 +163,3 @@ function getTotalFrames (frames) {
     return numberOfFrames
   }, 0)
 }
-
-export default connect(state => ({
-  frames: state.flipbook.frames,
-  totalFrames: getTotalFrames(state.flipbook.frames)
-}), () => ({}))(FlipbookViewer)

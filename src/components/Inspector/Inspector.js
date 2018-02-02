@@ -31,7 +31,14 @@ class Inspector extends Component {
     let warning = null
     let inspector = null
 
-    if (mediaType.startsWith('image') &&
+    if (asset.clipType() === 'flipbook') {
+      inspector = (
+        <FlipbookViewer
+          asset={asset}
+          fps={30}
+        />
+      )
+    } else if (mediaType.startsWith('image') &&
       imageFormats.findIndex(format => (mediaType.endsWith(format))) >= 0) {
       inspector = <Image url={url}
                          onNextPage={onNext} onPrevPage={onPrev} />
@@ -54,15 +61,6 @@ class Inspector extends Component {
           <div className="Inspector-proxy">{proxy.width} x {proxy.height} proxy</div>
           { message && <div className="Inspector-error">{message}</div> }
         </div>
-      )
-    }
-
-    // TODO: Remove this before comitting, as it forces everything to use the flipbook media type
-    if (mediaType.startsWith('i')) {
-      inspector = (
-        <FlipbookViewer
-          fps={30}
-        />
       )
     }
 

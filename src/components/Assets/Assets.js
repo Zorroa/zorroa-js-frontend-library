@@ -180,19 +180,29 @@ class Assets extends Component {
     }
   }
 
+  shouldBypassParentIsolation (asset) {
+    return asset.clipType() === 'flipbook'
+  }
+
   isolateToLightbox = (asset) => {
     const { showMultipage, parentTotals, isolatedParent } = this.props
     const parentId = showMultipage && asset.parentId()
     const isolatedParentId = isolatedParent && isolatedParent.parentId()
     const stackCount = parentId && parentId !== isolatedParentId && parentTotals && parentTotals.get(parentId)
-    if (stackCount > 1) {
-      this.props.actions.isolateParent(asset)
-    } else {
+    const simulatedEvent = { shiftKey: false, metaKey: false }
+
+    if (stackCount === 1) {
       // Select the isolated asset, which is DE-selected on the second click
       this.skipNextSelectionScroll = true
-      const event = { shiftKey: false, metaKey: false }
-      this.select(asset, event)
+      this.select(asset, simulatedEvent)
       this.props.actions.isolateAssetId(asset.id)
+    } else if (this.shouldBypassParentIsolation(asset)) {
+      // Select the isolated asset, which is DE-selected on the second click
+      this.skipNextSelectionScroll = true
+      this.select(asset, simulatedEvent)
+      this.props.actions.isolateAssetId(asset.id)
+    } else {
+      this.props.actions.isolateParent(asset)
     }
   }
 
