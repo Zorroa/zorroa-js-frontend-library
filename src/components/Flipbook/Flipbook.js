@@ -1,7 +1,7 @@
 import React, { PureComponent, PropTypes } from 'react'
 import classnames from 'classnames'
 import ProgressCircle from '../ProgressCircle'
-import Canvas from './Canvas'
+import CanvasImage from '../CanvasImage'
 import { PubSub } from '../../services/jsUtil'
 import getImage from '../../services/getImage'
 
@@ -353,7 +353,7 @@ export default class Flipbook extends PureComponent {
           </div>
         )}
         <div className={flipbookCanvasClasses}>
-          <Canvas
+          <CanvasImage
             image={this.state.currentFrameImage}
             height={height}
             width={width}

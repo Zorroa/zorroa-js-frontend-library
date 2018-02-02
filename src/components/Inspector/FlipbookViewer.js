@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import classnames from 'classnames'
 import { PubSub } from '../../services/jsUtil'
 import Asset from '../../models/Asset'
-import Flipbook from './Flipbook'
+import { Flipbook } from '../Flipbook'
 import PanZoom from './PanZoom'
 import SplitPane from 'react-split-pane'
 import api from '../../api'
@@ -129,13 +129,13 @@ export default class FlipbookViewer extends Component {
           pane1ClassName=""
           resizerClassName="FlipbookViewer__film-strip-grabber"
         >
-          <div>
+          <div className={panZoomCLassNames}>
             { isLoading && (
               <div className="FlipbookViewer__loading-status">
                 <ProgressCircle percentage={ this.getLoadedPercentage() } />
               </div>
             )}
-            <div className={panZoomCLassNames}>
+            <div>
               <PanZoom
                 frameFrequency={frameFrequency}
                 onScrub={this.scrub}

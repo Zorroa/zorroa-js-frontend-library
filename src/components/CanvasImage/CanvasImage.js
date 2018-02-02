@@ -1,6 +1,6 @@
 import React, { PureComponent, PropTypes } from 'react'
 
-export default class Canvas extends PureComponent {
+export default class CanvasImage extends PureComponent {
   static propTypes = {
     image: PropTypes.instanceOf(ImageBitmap),
     height: PropTypes.number.isRequired,
@@ -8,7 +8,9 @@ export default class Canvas extends PureComponent {
   }
 
   componentWillReceiveProps (nextProps) {
-    if (this.canvas && nextProps.image) {
+    const isImageProvided = nextProps.image !== undefined
+    const isDifferentImage = nextProps.image !== this.props.image
+    if (this.canvas && isImageProvided && isDifferentImage) {
       this.canvas.getContext('2d').drawImage(
         nextProps.image,
         0,
@@ -16,8 +18,8 @@ export default class Canvas extends PureComponent {
         this.canvas.width,
         this.canvas.height
       )
-    } else {
-      console.warn('Skipping render of image, canvas or image is not ready')
+    } else if (isImageProvided === false && isDifferentImage) {
+      console.warn('Skipping render of new frame, image is not provided')
     }
   }
 
