@@ -1,4 +1,5 @@
 import React, {PropTypes, PureComponent} from 'react'
+import ease from 'ease-component'
 
 export function CancelCircle () {
   return (
@@ -53,7 +54,7 @@ export class Gauge extends PureComponent {
       oldIntensity: this.props.intensity
     })
 
-    const animationDurationMilliseconds = 500
+    const animationDurationMilliseconds = 1000
     const animationStartTime = Number(new Date())
     this.startAnimation(animationDurationMilliseconds, animationStartTime, nextProps.intensity)
   }
@@ -66,11 +67,12 @@ export class Gauge extends PureComponent {
     this.isAnimating = true
     requestAnimationFrame(() => {
       const currentTimestamp = Number(new Date())
-      const percentComplete = (currentTimestamp - animationStartTime) / animationDurationMilliseconds
+      const delta = currentTimestamp - animationStartTime
+      const percentComplete = ease.outBounce(delta / animationDurationMilliseconds)
       const finalRotationDegrees = this.availableRotateDegrees[intensity]
       const oldRotationDegrees = this.availableRotateDegrees[this.state.oldIntensity]
 
-      if (percentComplete > 1) {
+      if (delta > animationDurationMilliseconds) {
         this.setState({
           rotateDegrees: finalRotationDegrees
         })

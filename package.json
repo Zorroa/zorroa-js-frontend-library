@@ -90,6 +90,7 @@
     "copy-to-clipboard": "3.0.8",
     "debug": "2.6.9",
     "dropbox": "2.5.12",
+    "ease-component": "1.0.0",
     "latlon-geohash": "1.1.0",
     "lru-cache": "4.1.1",
     "moment": "2.19.1",

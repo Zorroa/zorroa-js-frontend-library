@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react'
+import classnames from 'classnames'
 import { PubSub } from '../../services/jsUtil'
 import Asset from '../../models/Asset'
 import Flipbook from './Flipbook'
@@ -96,6 +97,10 @@ export default class FlipbookViewer extends Component {
   getLoadedPercentage () {
     const percentage = Math.floor((this.state.loadedImagesCount / this.state.frames.length) * 100)
 
+    if (this.state.frames.length === 0) {
+      return 0
+    }
+
     if (Number.isNaN(percentage)) {
       return 0
     }
@@ -104,11 +109,15 @@ export default class FlipbookViewer extends Component {
   }
 
   render () {
+    const isLoading = this.getLoadedPercentage() < 100
     const frameFrequency = {
       onFrameFrequency: this.onFrameFrequency,
       rate: this.state.fps,
       options: [12, 24, 30]
     }
+    const panZoomCLassNames = classnames('FlipbookViewer__pan-zoom', {
+      'FlipbookViewer__pan-zoom--is-loading': isLoading
+    })
 
     return (
       <div className="FlipbookViewer">
@@ -117,33 +126,35 @@ export default class FlipbookViewer extends Component {
           defaultSize={40}
           maxSize={320}
           primary="second"
-          pane1ClassName="FlipbookViewer__pan-zoom"
+          pane1ClassName=""
           resizerClassName="FlipbookViewer__film-strip-grabber"
         >
           <div>
-            { this.getLoadedPercentage() < 1 && (
+            { isLoading && (
               <div className="FlipbookViewer__loading-status">
                 <ProgressCircle percentage={ this.getLoadedPercentage() } />
               </div>
             )}
-            <PanZoom
-              frameFrequency={frameFrequency}
-              onScrub={this.scrub}
-              shuttler={this.shuttler}
-              playing={this.state.playing}
-              currentFrameNumber={this.state.currentFrameNumber}
-              totalFrames={this.state.totalFrames}
-            >
-              <Flipbook
-                fps={this.state.fps}
-                onError={this.onError}
+            <div className={panZoomCLassNames}>
+              <PanZoom
+                frameFrequency={frameFrequency}
+                onScrub={this.scrub}
                 shuttler={this.shuttler}
-                status={this.status}
-                frames={this.state.frames}
+                playing={this.state.playing}
+                currentFrameNumber={this.state.currentFrameNumber}
                 totalFrames={this.state.totalFrames}
-                onFrameLoaded={this.onFrameLoaded}
-              />
-            </PanZoom>
+              >
+                <Flipbook
+                  fps={this.state.fps}
+                  onError={this.onError}
+                  shuttler={this.shuttler}
+                  status={this.status}
+                  frames={this.state.frames}
+                  totalFrames={this.state.totalFrames}
+                  onFrameLoaded={this.onFrameLoaded}
+                />
+              </PanZoom>
+            </div>
           </div>
           <div className="FlipbookViewer__film-strip">
             Draggable filmstrip area
