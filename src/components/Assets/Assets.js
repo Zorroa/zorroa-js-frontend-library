@@ -189,21 +189,17 @@ class Assets extends Component {
     const parentId = showMultipage && asset.parentId()
     const isolatedParentId = isolatedParent && isolatedParent.parentId()
     const stackCount = parentId && parentId !== isolatedParentId && parentTotals && parentTotals.get(parentId)
-    const simulatedEvent = { shiftKey: false, metaKey: false }
 
-    if (stackCount === 1) {
-      // Select the isolated asset, which is DE-selected on the second click
-      this.skipNextSelectionScroll = true
-      this.select(asset, simulatedEvent)
-      this.props.actions.isolateAssetId(asset.id)
-    } else if (this.shouldBypassParentIsolation(asset)) {
-      // Select the isolated asset, which is DE-selected on the second click
-      this.skipNextSelectionScroll = true
-      this.select(asset, simulatedEvent)
-      this.props.actions.isolateAssetId(asset.id)
-    } else {
+    if (stackCount > 1 && this.shouldBypassParentIsolation(asset) === false) {
       this.props.actions.isolateParent(asset)
+      return
     }
+
+    // Select the isolated asset, which is DE-selected on the second click
+    this.skipNextSelectionScroll = true
+    const event = { shiftKey: false, metaKey: false }
+    this.select(asset, event)
+    this.props.actions.isolateAssetId(asset.id)
   }
 
   toggleShowTable = () => {
