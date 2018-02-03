@@ -66,7 +66,7 @@ export default class FlipbookViewer extends Component {
   }
 
   render () {
-    const isLoading = this.getLoadedPercentage() < 100
+    const isLoading = this.getLoadedPercentage() < 100 || this.props.frames.length === 0
     const { currentFrameNumber, playing } = this.state
     const frameFrequency = {
       onFrameFrequency: this.onFrameFrequency,

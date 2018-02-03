@@ -80,10 +80,6 @@ export default function withFlipbook (WrappedComponent) {
         return 0
       }
 
-      if (this.state.frames.length === 0) {
-        return 0
-      }
-
       return percentage
     }
 
