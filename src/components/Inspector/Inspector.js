@@ -8,6 +8,8 @@ import VideoViewer from './VideoViewer'
 import Image from './Image'
 import Asset from '../../models/Asset'
 
+const FlipbookViewerWrapped = withFlipbook(FlipbookViewer)
+
 class Inspector extends Component {
   static propTypes = {
     asset: PropTypes.instanceOf(Asset),
@@ -21,13 +23,7 @@ class Inspector extends Component {
     error: undefined
   }
 
-  constructor (props) {
-    super(props)
-    this.FlipbookViewerWrapped = withFlipbook(FlipbookViewer)
-  }
-
   render () {
-    const FlipbookViewerWrapped = this.FlipbookViewerWrapped
     const { asset, origin, thumbSize, onNext, onPrev } = this.props
     const { error } = this.state
     const mediaType = error ? 'error' : asset.mediaType().toLowerCase()
