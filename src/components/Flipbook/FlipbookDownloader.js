@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, PropTypes } from 'react'
 import getImage from '../../services/getImage'
 import api from '../../api'
 
@@ -16,8 +16,16 @@ function getTotalFrames (frames) {
   }, 0)
 }
 
-export default function withFlipbook (WrappedComponent, flipbookAssetId) {
+function getDisplayName (WrappedComponent) {
+  return WrappedComponent.displayName || WrappedComponent.name || 'Component'
+}
+
+export default function withFlipbook (WrappedComponent) {
   return class FlipbookDownloader extends PureComponent {
+    static displayName = `WithFlipbook(${getDisplayName(WrappedComponent)})`
+    static propTypes = {
+      clipParentId: PropTypes.string.isRequired
+    }
     constructor (props) {
       super(props)
 
@@ -35,10 +43,11 @@ export default function withFlipbook (WrappedComponent, flipbookAssetId) {
     downloadBitmapImages () {
       api
         .flipbook
-        .get(flipbookAssetId)
+        .get(this.props.clipParentId)
         .then(frames => {
           this.downloadableFrameCount = frames.length
-          const loadingFrames = frames.map(frame => {
+
+          return Promise.all(frames.map(frame => {
             return getImage(frame.url)
               .then(imageBitmap => {
                 this.setState(prevState => {
@@ -55,8 +64,7 @@ export default function withFlipbook (WrappedComponent, flipbookAssetId) {
 
                 return dataFrame
               })
-          })
-          return Promise.all(loadingFrames)
+          }))
         }).then(framesWithBitmaps => {
           this.setState({
             frames: framesWithBitmaps,
@@ -80,11 +88,15 @@ export default function withFlipbook (WrappedComponent, flipbookAssetId) {
     }
 
     render () {
+      // Filter out extra props that are specific to this HOC
+      // eslint-disable-next-line no-unused-vars
+      const { clipParentId, ...passThroughProps } = this.props
+
       return <WrappedComponent
         loadedPercentage={this.getLoadedPercentage()}
         frames={this.state.frames}
         totalFrames={this.state.totalFrames}
-        {...this.props}
+        {...passThroughProps}
       />
     }
   }

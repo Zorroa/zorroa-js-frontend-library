@@ -254,15 +254,19 @@ export default class Flipbook extends PureComponent {
   }
 
   render () {
-    const { width, height } = this.getCanvasDimensions()
+    const image = this.state.currentFrameImage
+
+    if (image === undefined) {
+      return null
+    }
 
     return (
       <div className="Flipbook">
         <div className="Flipbook__canvas">
           <CanvasImage
-            image={this.state.currentFrameImage}
-            height={height}
-            width={width}
+            image={image}
+            height={image.height}
+            width={image.width}
           />
         </div>
       </div>

@@ -11,6 +11,12 @@ $film-strip-grabber-height: $zorroa-metric-base * 3;
   @include fullHeight;
   @include flexOn;
 
+  &__media {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
   &__loading-status {
     height: 100%;
     width: 100%;
@@ -29,15 +35,10 @@ $film-strip-grabber-height: $zorroa-metric-base * 3;
     max-width: 100%;
     max-height: 100%;
     position: relative;
+    flex-shrink: 1;
   }
 
-  &__film-strip {
-    min-height: $zorroa-metric-base * 5;
-    width: 100%;
-    border-top: 1px solid $zorroa-color-gray-dark-3;
-  }
-
-  &__film-strip-grabber {
+  &__resizer {
     width: 100%;
     height: $film-strip-grabber-height;
     display: block;

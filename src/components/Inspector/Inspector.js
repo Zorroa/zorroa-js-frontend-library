@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react'
-import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import Pdf from './Pdf'
@@ -15,31 +14,31 @@ class Inspector extends Component {
     onNext: PropTypes.func,
     onPrev: PropTypes.func,
     origin: PropTypes.string,
-    thumbSize: PropTypes.number,
-    actions: PropTypes.object
+    thumbSize: PropTypes.number
   }
 
   state = {
     error: undefined
   }
 
+  constructor (props) {
+    super(props)
+    this.FlipbookViewerWrapped = withFlipbook(FlipbookViewer)
+  }
+
   render () {
+    const FlipbookViewerWrapped = this.FlipbookViewerWrapped
     const { asset, origin, thumbSize, onNext, onPrev } = this.props
     const { error } = this.state
     const mediaType = error ? 'error' : asset.mediaType().toLowerCase()
     const url = asset.url(origin)
     const imageFormats = [ 'jpeg', 'jpg', 'png', 'gif' ]
+
     let warning = null
     let inspector = null
 
     if (asset.clipType() === 'flipbook') {
-      const FlipbookViewerWrapped = withFlipbook(
-        FlipbookViewer,
-        this.props.asset.document.source.clip.parent
-      )
-      inspector = (
-        <FlipbookViewerWrapped />
-      )
+      inspector = <FlipbookViewerWrapped clipParentId={asset.document.source.clip.parent} />
     } else if (mediaType.startsWith('image') &&
       imageFormats.findIndex(format => (mediaType.endsWith(format))) >= 0) {
       inspector = <Image url={url}
@@ -79,7 +78,4 @@ export default connect(state => ({
   origin: state.auth.origin,
   host: state.auth.host,
   thumbSize: state.app.thumbSize
-}), dispatch => ({
-  actions: bindActionCreators({
-  }, dispatch)
 }))(Inspector)

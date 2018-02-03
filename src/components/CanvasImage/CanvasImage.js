@@ -4,23 +4,22 @@ export default class CanvasImage extends PureComponent {
   static propTypes = {
     image: PropTypes.instanceOf(ImageBitmap),
     height: PropTypes.number.isRequired,
-    width: PropTypes.number.isRequired
+    width: PropTypes.number.isRequired,
+    debug: PropTypes.bool,
+    className: PropTypes.string,
+    onClick: PropTypes.func
   }
 
   componentWillReceiveProps (nextProps) {
-    const isImageProvided = nextProps.image !== undefined
     const isDifferentImage = nextProps.image !== this.props.image
-    if (this.canvas && isImageProvided && isDifferentImage) {
-      this.canvas.getContext('2d').drawImage(
-        nextProps.image,
-        0,
-        0,
-        this.canvas.width,
-        this.canvas.height
-      )
-    } else if (isImageProvided === false && isDifferentImage) {
-      console.warn('Skipping render of new frame, image is not provided')
+
+    if (isDifferentImage) {
+      this.drawImage(nextProps)
     }
+  }
+
+  componentDidMount () {
+    this.drawImage(this.props)
   }
 
   shouldComponentUpdate (nextProps) {
@@ -33,16 +32,38 @@ export default class CanvasImage extends PureComponent {
     return (isHeightChanged || isWidthChanged)
   }
 
-  render () {
-    const canvasStyle = {
-      height: `${this.props.height}px`,
-      width: `${this.props.width}px`
+  drawImage (props) {
+    const isImageProvided = props.image !== undefined
+
+    if (this.canvas === null) {
+      return
     }
 
+    if (isImageProvided === false) {
+      console.warn('Skipping render of new frame, image is not provided')
+      return
+    }
+
+    this.canvas.getContext('2d').drawImage(
+      props.image,
+      0,
+      0,
+      this.canvas.width,
+      this.canvas.height
+    )
+  }
+
+  render () {
+    const canvasAttributes = {
+      onClick: this.props.onClick,
+      height: this.props.height,
+      width: this.props.width,
+      className: this.props.className
+    }
     return (
       <canvas
         ref={canvasRef => { this.canvas = canvasRef }}
-        style={canvasStyle}
+        {...canvasAttributes}
       />
     )
   }

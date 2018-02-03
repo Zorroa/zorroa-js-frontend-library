@@ -2,8 +2,8 @@ import React, { Component, PropTypes } from 'react'
 import classnames from 'classnames'
 import { PubSub } from '../../services/jsUtil'
 import { Flipbook } from '../Flipbook'
+import FlipbookStrip from './FlipbookStrip'
 import PanZoom from './PanZoom'
-import SplitPane from 'react-split-pane'
 import ProgressCircle from '../ProgressCircle'
 
 export default class FlipbookViewer extends Component {
@@ -23,6 +23,7 @@ export default class FlipbookViewer extends Component {
 
     this.shuttler = new PubSub()
     this.status = new PubSub()
+
     this.state = {
       playing: false,
       fps: 30,
@@ -33,9 +34,6 @@ export default class FlipbookViewer extends Component {
   componentDidMount () {
     this.status.on('playing', playing => {
       this.setState({ playing })
-    })
-    this.status.on('started', started => {
-      this.setState({ started })
     })
     this.status.on('played', currentFrameNumber => {
       this.setState({ currentFrameNumber })
@@ -69,38 +67,32 @@ export default class FlipbookViewer extends Component {
 
   render () {
     const isLoading = this.getLoadedPercentage() < 100
+    const { currentFrameNumber, playing } = this.state
     const frameFrequency = {
       onFrameFrequency: this.onFrameFrequency,
       rate: this.state.fps,
       options: [12, 24, 30]
     }
-    const panZoomCLassNames = classnames('FlipbookViewer__pan-zoom', {
+    const panZoomClassNames = classnames('FlipbookViewer__pan-zoom', {
       'FlipbookViewer__pan-zoom--is-loading': isLoading
     })
 
     return (
       <div className="FlipbookViewer">
-        <SplitPane
-          split="horizontal"
-          defaultSize={40}
-          maxSize={320}
-          primary="second"
-          pane1ClassName=""
-          resizerClassName="FlipbookViewer__film-strip-grabber"
-        >
-          <div className={panZoomCLassNames}>
-            { isLoading && (
-              <div className="FlipbookViewer__loading-status">
-                <ProgressCircle percentage={ this.getLoadedPercentage() } />
-              </div>
-            )}
-            { isLoading === false && (
+        { isLoading === true && (
+          <div className="FlipbookViewer__loading-status">
+            <ProgressCircle percentage={ this.getLoadedPercentage() } />
+          </div>
+        )}
+        { isLoading === false && (
+          <div className="FlipbookViewer__media">
+            <div className={panZoomClassNames}>
               <PanZoom
                 frameFrequency={frameFrequency}
                 onScrub={this.scrub}
                 shuttler={this.shuttler}
-                playing={this.state.playing}
-                currentFrameNumber={this.state.currentFrameNumber}
+                playing={playing}
+                currentFrameNumber={currentFrameNumber}
                 totalFrames={this.props.totalFrames}
               >
                 <Flipbook
@@ -112,12 +104,15 @@ export default class FlipbookViewer extends Component {
                   totalFrames={this.props.totalFrames}
                 />
               </PanZoom>
-            )}
+            </div>
+            <FlipbookStrip
+              totalFrames={this.props.totalFrames}
+              shuttler={this.shuttler}
+              frames={this.props.frames}
+              currentFrameNumber={currentFrameNumber}
+            />
           </div>
-          <div className="FlipbookViewer__film-strip">
-            Draggable filmstrip area
-          </div>
-        </SplitPane>
+        ) }
       </div>
     )
   }

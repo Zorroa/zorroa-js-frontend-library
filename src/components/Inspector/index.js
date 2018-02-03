@@ -8,6 +8,7 @@ import './Pdf.scss'
 import './VolumeBar.scss'
 import './VideoRange.scss'
 import './FlipbookViewer.scss'
+import './FlipbookStrip.scss'
 export default Inspector
 
 /*
