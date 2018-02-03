@@ -5,7 +5,6 @@ export default class CanvasImage extends PureComponent {
     image: PropTypes.instanceOf(ImageBitmap),
     height: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
-    debug: PropTypes.bool,
     className: PropTypes.string,
     onClick: PropTypes.func
   }
