@@ -9,7 +9,6 @@ import permissions from './permissionsReducer'
 import jobs from './jobsReducer'
 import archivist from './archivistReducer'
 import users from './usersReducer'
-import flipbook from './flipbookReducer'
 
 export default combineReducers({
   app,
@@ -20,6 +19,5 @@ export default combineReducers({
   permissions,
   jobs,
   archivist,
-  users,
-  flipbook
+  users
 })
