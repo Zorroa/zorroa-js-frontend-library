@@ -24,8 +24,6 @@ export default class FlipbookViewer extends Component {
 
     if (element !== undefined && frames.length > 0) {
       element.scrollTo((element.scrollWidth - element.offsetWidth) * (currentFrameNumber / frames.length), 0)
-      // console.log((element.scrollWidth - element.offsetWidth) * (currentFrameNumber / frames.length))
-      // console.log(currentFrameNumber)
     }
 
     return (
