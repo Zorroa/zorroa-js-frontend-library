@@ -25,28 +25,28 @@ export default class TableContextMenu extends Component {
     onDismiss()
   }
 
-  moveColumnRight = (item) => {
+  moveColumnRight = () => {
     const { fields, selectedFieldIndex, updateFieldsFn, onDismiss } = this.props
     const shift = [...fields.slice(0, selectedFieldIndex), fields[selectedFieldIndex + 1], fields[selectedFieldIndex], ...fields.slice(selectedFieldIndex + 2)]
     updateFieldsFn(shift.map(field => field.field))
     onDismiss()
   }
 
-  moveColumnToStart = (item) => {
+  moveColumnToStart = () => {
     const { fields, selectedFieldIndex, updateFieldsFn, onDismiss } = this.props
     const shift = [ fields[selectedFieldIndex], ...fields.slice(0, selectedFieldIndex), ...fields.slice(selectedFieldIndex + 1) ]
     updateFieldsFn(shift.map(field => field.field))
     onDismiss()
   }
 
-  moveColumnToEnd = (item) => {
+  moveColumnToEnd = () => {
     const { fields, selectedFieldIndex, updateFieldsFn, onDismiss } = this.props
     const shift = [ ...fields.slice(0, selectedFieldIndex), ...fields.slice(selectedFieldIndex + 1), fields[selectedFieldIndex] ]
     updateFieldsFn(shift.map(field => field.field))
     onDismiss()
   }
 
-  removeColumn = (item) => {
+  removeColumn = () => {
     const { fields, selectedFieldIndex, updateFieldsFn, onDismiss } = this.props
     const shift = [ ...fields ]
     shift.splice(selectedFieldIndex, 1)
@@ -54,7 +54,7 @@ export default class TableContextMenu extends Component {
     onDismiss()
   }
 
-  freezeColumn = (item) => {
+  freezeColumn = () => {
     console.log('Freeze')
   }
 
