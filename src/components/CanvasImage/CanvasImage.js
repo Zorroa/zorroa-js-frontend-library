@@ -1,31 +1,5 @@
 import React, { PureComponent, PropTypes } from 'react'
-
-function fit ({
-  parentWidth,
-  parentHeight,
-  childWidth,
-  childHeight,
-  containBackground
-}) {
-  const doRatio = childWidth / childHeight
-  const containerRatio = parentWidth / parentHeight
-  const shouldContainBackground = containBackground ? (doRatio > containerRatio) : (doRatio < containerRatio)
-  let width = parentWidth
-  let height = parentHeight
-
-  if (shouldContainBackground) {
-    height = width / doRatio
-  } else {
-    width = height * doRatio
-  }
-
-  return {
-    width,
-    height,
-    x: (parentWidth - width) / 2,
-    y: (parentHeight - height) / 2
-  }
-}
+import size from '../../services/size'
 
 export default class CanvasImage extends PureComponent {
   static propTypes = {
@@ -73,14 +47,20 @@ export default class CanvasImage extends PureComponent {
     }
 
     if (props.height === undefined && canvas.height !== canvas.offsetHeight) {
+      // If the height is being dynamiclly set by CSS, ensure that the canvas'
+      // "drawable" pixels are set to the same size as the canvas takes up in
+      // the "offset" space
       canvas.height = canvas.offsetHeight
     }
 
-    if (props.width === undefined) {
+    if (props.width === undefined && canvas.width !== canvas.offsetWidth) {
+      // If the width is being dynamiclly set by CSS, ensure that the canvas'
+      // "drawable" pixels are set to the same size as the canvas takes up in
+      // the "offset" space
       canvas.width = canvas.offsetWidth
     }
 
-    const { width, height, x, y } = fit({
+    const { width, height, x, y } = size({
       childWidth: props.image.width,
       childHeight: props.image.height,
       parentWidth: canvas.offsetWidth,
@@ -112,10 +92,10 @@ export default class CanvasImage extends PureComponent {
       className
     }
 
-    const style = height === undefined || width === undefined ? {
-      width: '100%',
-      height: '100%'
-    } : undefined
+    const style = {
+      width: width ? `${width}px` : '100%',
+      height: height ? `${height}px` : '100%'
+    }
 
     return (
       <canvas
