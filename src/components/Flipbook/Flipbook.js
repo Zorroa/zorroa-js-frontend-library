@@ -14,7 +14,9 @@ export default class Flipbook extends PureComponent {
       number: PropTypes.number.isRequired
     })).isRequired,
     onFrameLoaded: PropTypes.func,
-    totalFrames: PropTypes.number.isRequired
+    totalFrames: PropTypes.number.isRequired,
+    height: PropTypes.number,
+    width: PropTypes.number
   }
 
   constructor (props) {
@@ -228,25 +230,6 @@ export default class Flipbook extends PureComponent {
     this.publishStatusTopic('played', frame.number)
   }
 
-  getCanvasDimensions () {
-    let width = Math.floor(window.innerWidth)
-    let height = Math.floor(window.innerHeight)
-
-    const frame = this.props.frames[0]
-    const aspectRatio = frame.imageBitmap.width / frame.imageBitmap.height
-
-    if (aspectRatio > 1) {
-      height = Math.round(width / aspectRatio)
-    } else {
-      width = Math.round(height * aspectRatio)
-    }
-
-    return {
-      height,
-      width
-    }
-  }
-
   startAnimationLoop () {
     this.publishStatusTopic('started', true) // TODO, this might not be the right place for this...
     this.publishStatusTopic('playing', true)
@@ -255,18 +238,24 @@ export default class Flipbook extends PureComponent {
 
   render () {
     const image = this.state.currentFrameImage
+    const { width, height } = this.props
 
     if (image === undefined) {
       return null
     }
 
+    const style = height === undefined || width === undefined ? {
+      width: '100%',
+      height: '100%'
+    } : undefined
+
     return (
-      <div className="Flipbook">
-        <div className="Flipbook__canvas">
+      <div className="Flipbook" style={style}>
+        <div className="Flipbook__canvas" style={style}>
           <CanvasImage
             image={image}
-            height={image.height}
-            width={image.width}
+            height={height}
+            width={width}
           />
         </div>
       </div>

@@ -1,12 +1,12 @@
 import React, { Component, PropTypes } from 'react'
 import classnames from 'classnames'
 import { PubSub } from '../../services/jsUtil'
-import { Flipbook } from '../Flipbook'
+import { Flipbook, withFlipbook } from '../Flipbook'
 import FlipbookStrip from './FlipbookStrip'
 import PanZoom from './PanZoom'
 import ProgressCircle from '../ProgressCircle'
 
-export default class FlipbookViewer extends Component {
+class FlipbookViewer extends Component {
   static propTypes = {
     onError: PropTypes.func,
     frames: PropTypes.arrayOf(PropTypes.shape({
@@ -117,3 +117,5 @@ export default class FlipbookViewer extends Component {
     )
   }
 }
+
+export default withFlipbook(FlipbookViewer)

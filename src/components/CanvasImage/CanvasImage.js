@@ -1,12 +1,40 @@
 import React, { PureComponent, PropTypes } from 'react'
 
+function fit ({
+  parentWidth,
+  parentHeight,
+  childWidth,
+  childHeight,
+  containBackground
+}) {
+  const doRatio = childWidth / childHeight
+  const containerRatio = parentWidth / parentHeight
+  const shouldContainBackground = containBackground ? (doRatio > containerRatio) : (doRatio < containerRatio)
+  let width = parentWidth
+  let height = parentHeight
+
+  if (shouldContainBackground) {
+    height = width / doRatio
+  } else {
+    width = height * doRatio
+  }
+
+  return {
+    width,
+    height,
+    x: (parentWidth - width) / 2,
+    y: (parentHeight - height) / 2
+  }
+}
+
 export default class CanvasImage extends PureComponent {
   static propTypes = {
     image: PropTypes.instanceOf(ImageBitmap),
-    height: PropTypes.number.isRequired,
-    width: PropTypes.number.isRequired,
+    height: PropTypes.number,
+    width: PropTypes.number,
     className: PropTypes.string,
-    onClick: PropTypes.func
+    onClick: PropTypes.func,
+    size: PropTypes.oneOf(['cover', 'contain'])
   }
 
   componentWillReceiveProps (nextProps) {
@@ -33,8 +61,9 @@ export default class CanvasImage extends PureComponent {
 
   drawImage (props) {
     const isImageProvided = props.image !== undefined
+    const canvas = this.canvas
 
-    if (this.canvas === null) {
+    if (canvas === null) {
       return
     }
 
@@ -43,25 +72,55 @@ export default class CanvasImage extends PureComponent {
       return
     }
 
-    this.canvas.getContext('2d').drawImage(
+    if (props.height === undefined && canvas.height !== canvas.offsetHeight) {
+      canvas.height = canvas.offsetHeight
+    }
+
+    if (props.width === undefined) {
+      canvas.width = canvas.offsetWidth
+    }
+
+    const { width, height, x, y } = fit({
+      childWidth: props.image.width,
+      childHeight: props.image.height,
+      parentWidth: canvas.offsetWidth,
+      parentHeight: canvas.offsetHeight,
+      containBackground: props.size !== 'cover'
+    })
+
+    canvas.getContext('2d').drawImage(
       props.image,
-      0,
-      0,
-      this.canvas.width,
-      this.canvas.height
+      x,
+      y,
+      width,
+      height
     )
   }
 
   render () {
+    const {
+      onClick,
+      height,
+      width,
+      className
+    } = this.props
+
     const canvasAttributes = {
-      onClick: this.props.onClick,
-      height: this.props.height,
-      width: this.props.width,
-      className: this.props.className
+      onClick,
+      height,
+      width,
+      className
     }
+
+    const style = height === undefined || width === undefined ? {
+      width: '100%',
+      height: '100%'
+    } : undefined
+
     return (
       <canvas
         ref={canvasRef => { this.canvas = canvasRef }}
+        style={style}
         {...canvasAttributes}
       />
     )

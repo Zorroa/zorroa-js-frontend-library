@@ -2,13 +2,10 @@ import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 
 import Pdf from './Pdf'
-import { withFlipbook } from '../Flipbook'
 import FlipbookViewer from './FlipbookViewer.js'
 import VideoViewer from './VideoViewer'
 import Image from './Image'
 import Asset from '../../models/Asset'
-
-const FlipbookViewerWrapped = withFlipbook(FlipbookViewer)
 
 class Inspector extends Component {
   static propTypes = {
@@ -34,7 +31,7 @@ class Inspector extends Component {
     let inspector = null
 
     if (asset.clipType() === 'flipbook') {
-      inspector = <FlipbookViewerWrapped clipParentId={asset.document.source.clip.parent} />
+      inspector = <FlipbookViewer clipParentId={asset.document.source.clip.parent} />
     } else if (mediaType.startsWith('image') &&
       imageFormats.findIndex(format => (mediaType.endsWith(format))) >= 0) {
       inspector = <Image url={url}

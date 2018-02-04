@@ -35,8 +35,7 @@ export default class FlipbookViewer extends Component {
               onClick={() => { this.scrub(frame.number) }}
               className="FlipbookStrip__frame-canvas"
               image={frame.imageBitmap}
-              height={frame.imageBitmap.height}
-              width={frame.imageBitmap.width}
+              size="cover"
             />
           )
         }) }
