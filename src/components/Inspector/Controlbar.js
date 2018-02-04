@@ -8,7 +8,6 @@ import { PubSub } from '../../services/jsUtil'
 export default class Controlbar extends PureComponent {
   static propTypes = {
     title: PropTypes.node,
-    titleWidth: PropTypes.number,
     onZoomIn: PropTypes.func,
     onZoomOut: PropTypes.func,
     onFit: PropTypes.func,
@@ -26,10 +25,6 @@ export default class Controlbar extends PureComponent {
       rate: PropTypes.number
     }),
     volume: PropTypes.number
-  }
-
-  static defaultProps = {
-    titleWidth: 0
   }
 
   constructor (props) {
@@ -70,10 +65,6 @@ export default class Controlbar extends PureComponent {
     const hasCurrentFrameNumber = Number.isInteger(this.props.currentFrameNumber) === true
     const hasShuttler = this.props.shuttler !== undefined
     return hasScrubHandler && hasTotalFramesCount && hasCurrentFrameNumber && hasShuttler
-  }
-
-  titleWidth () {
-    return this.props.titleWidth || (this.props.title ? this.props.title.length * 10 : 0)
   }
 
   toggleShowFpsOptions = () => {
