@@ -185,7 +185,7 @@ export default class Asset {
   }
 
   parentId () {
-    if (!this.document.source || !this.document.source.clip) return null
+    if (!this.document.source || !this.document.source.clip) return this.id
     return this.document.source.clip.parent
   }
 

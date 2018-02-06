@@ -16,7 +16,8 @@ export default class Flipbook extends PureComponent {
     onFrameLoaded: PropTypes.func,
     totalFrames: PropTypes.number.isRequired,
     height: PropTypes.number,
-    width: PropTypes.number
+    width: PropTypes.number,
+    size: PropTypes.oneOf(['cover', 'contain'])
   }
 
   constructor (props) {
@@ -238,7 +239,7 @@ export default class Flipbook extends PureComponent {
 
   render () {
     const image = this.state.currentFrameImage
-    const { width, height } = this.props
+    const { width, height, size } = this.props
 
     if (image === undefined) {
       return null
@@ -256,6 +257,7 @@ export default class Flipbook extends PureComponent {
             image={image}
             height={height}
             width={width}
+            size={size || 'contain'}
           />
         </div>
       </div>

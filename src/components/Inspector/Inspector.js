@@ -30,8 +30,8 @@ class Inspector extends Component {
     let warning = null
     let inspector = null
 
-    if (asset.clipType() === 'flipbook') {
-      inspector = <FlipbookViewer clipParentId={asset.document.source.clip.parent} />
+    if (asset.clipType() === 'flipbook' || mediaType === 'zorroa/x-flipbook') {
+      inspector = <FlipbookViewer clipParentId={asset.parentId()} />
     } else if (mediaType.startsWith('image') &&
       imageFormats.findIndex(format => (mediaType.endsWith(format))) >= 0) {
       inspector = <Image url={url}

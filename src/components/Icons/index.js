@@ -111,3 +111,30 @@ export class Gauge extends PureComponent {
     )
   }
 }
+
+export function Flipbook () {
+  return (
+    <svg
+      width="25"
+      height="25"
+      xmlns="http://www.w3.org/2000/svg"
+      xlinkHref="http://www.w3.org/1999/xlink"
+    >
+      <defs>
+        <path d="M8.5 3.1s-2.1-2-8.5-2v12.7c6.4 0 8.5 2 8.5 2s2-2 8.5-2V1c-6.4 0-8.5 2.1-8.5 2.1zm-6.4 0c2.7.3 4.4.9 5.3 1.4v8.6c-1-.5-2.6-1.2-5.3-1.4V3.1zM15 11.7c-2.7.2-4.4.9-5.3 1.4V4.5c1-.5 2.6-1.1 5.3-1.4v8.6z" id="a"/>
+      </defs>
+      <g fill="none" fillRule="evenodd">
+        <path fill="#FFD000" d="M0 0h25v25H0z"/>
+        <g transform="translate(4 4)">
+          <mask id="b" fill="#fff">
+            <use xlinkHref="#a"/>
+          </mask>
+          <use fill="#000" fillRule="nonzero" xlinkHref="#a"/>
+          <g mask="url(#b)" fill="#FFF">
+            <path d="M0 0h17v17H0z"/>
+          </g>
+        </g>
+      </g>
+    </svg>
+  )
+}

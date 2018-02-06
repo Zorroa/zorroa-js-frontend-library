@@ -1,69 +1,90 @@
 @import '../../styles/core-mixins.scss';
 
+$background: rgba($zorroa-color-white, 0.75);
+
 .Duration {
-  color: $zorroa-greyish-brown;
+  color: $zorroa-color-gray-dark-2;
   background: none;
 
   @include flexRow;
   @include flexAlignItemsCenter;
 
-}
+  &__duration {
+    padding-left: 2px;
+    padding-right: 4px;
+    height: 25px;
+    background-color: $background;
 
-.Duration-duration {
-  padding-left: 2px;
-  padding-right: 4px;
-  height: 25px;
-  background-color: rgba(256,256,256, 0.75);
-
-  .small & {
-    height: 15px;
-    font-size: 10px;
-  }
-}
-
-.Duration-playstop-badge {
-  padding: 4px;
-  margin: 1px;
-  background-color: rgba(256,256,256, 0.75);
-  width: 25px;
-  height: 25px;
-
-  .small & {
-    width: 15PX;
-    height: 15px;
+    .small & {
+      height: 15px;
+      font-size: 10px;
+    }
   }
 
-  @include flexRow;
-  @include flexAlignItemsCenter;
-  @include flexJustifyCenter;
+  &__playstop-badge {
+    padding: 4px;
+    margin: 1px;
+    background-color: $background;
+    width: 25px;
+    height: 25px;
 
-  @media (max-width: 56px) { visibility: hidden }
-}
+    .small & {
+      width: 15px;
+      height: 15px;
+    }
 
-.Duration-play {
-  width: 0;
-  height: 0;
-  border-top: 8px solid transparent;
-  border-bottom: 8px solid transparent;
-  border-left: 12px solid $zorroa-greyish-brown;
-  .Duration:hover &.video { border-left: 12px solid $zorroa-avocado-green; }
+    @include flexRow;
+    @include flexAlignItemsCenter;
+    @include flexJustifyCenter;
 
-  .small & {
-    border-top: 4px solid transparent;
-    border-bottom: 4px solid transparent;
-    border-left: 6px solid $zorroa-greyish-brown;
-    .Duration:hover &.video { border-left: 6px solid $zorroa-avocado-green; }
+    @media (max-width: 56px) { visibility: hidden }
   }
-}
 
-.Duration-stop {
-  width: 0;
-  height: 0;
-  border: 7px solid $zorroa-greyish-brown;
-  .Duration:hover &.video { border: 7px solid $zorroa-faded-red; }
+  &__icon {
+    height: 25px;
+    cursor: default;
+  }
 
-  .small & {
-    border: 4px solid $zorroa-greyish-brown;
-    .Duration:hover &.video { border: 4px solid $zorroa-faded-red; }
+  &__frame-count {
+    background-color: $background;
+    padding: 0 5px;
+    height: 25px;
+    cursor: default;
+  }
+
+  &__play {
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 12px solid $zorroa-color-gray-dark-2;
+    .Duration &.video:hover,
+    .Duration &.video:focus {
+      border-left-color: $zorroa-color-green-1;
+    }
+
+    .small & {
+      border-top-width: 4px;
+      border-bottom-width: 4px;
+      border-left-width: 6px;
+    }
+  }
+
+  &__stop {
+    width: 0;
+    height: 0;
+    border: 7px solid $zorroa-color-gray-dark-2;
+    .Duration &.video:hover,
+    .Duration &.video:focus {
+      border-color: $zorroa-color-pink-2;
+    }
+
+    .small & {
+      border-width: 4px;
+      .Duration &.video:hover,
+      .Duration &.video:focus {
+        border-clor: $zorroa-color-pink-2;
+      }
+    }
   }
 }

@@ -125,8 +125,9 @@ class Quickview extends Component {
   isFlipbook () {
     const asset = this.props.isolatedAsset
     const type = asset.clipType()
+    const mediaType = asset.mediaType()
 
-    return type === 'flipbook'
+    return type === 'flipbook' || mediaType === 'zorroa/x-flipbook'
   }
 
   getMediaType () {
@@ -187,7 +188,7 @@ class Quickview extends Component {
         { this.getMediaType() === 'flipbook' && (
           <div className="Quickview__flipbook">
             <FlipbookPlayer
-              clipParentId={asset.document.source.clip.parent}
+              clipParentId={asset.parentId()}
               height={height}
               width={width}
             />

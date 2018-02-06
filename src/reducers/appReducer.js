@@ -73,7 +73,8 @@ const initialState = {
     thumbSize: DEFAULT_THUMBSIZE,
     thumbLayout: 'masonry',
     videoVolume: 0.8,
-    showFolderCounts: 'filtered'
+    showFolderCounts: 'filtered',
+    flipbookFps: 30
   },
   allAssetCount: 0,
   showQuickview: false

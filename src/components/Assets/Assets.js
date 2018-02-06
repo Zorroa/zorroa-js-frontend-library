@@ -404,7 +404,7 @@ class Assets extends Component {
     })
 
     const isolatedParentId = isolatedParent && isolatedParent.parentId()
-    var { positions, multipage, collapsed } = (_ => {
+    var { positions, multipage, collapsed } = (() => {
       switch (layout) {
         case 'grid': return ComputeLayout.grid(assetSizes, width, thumbSize, showMultipage, isolatedParentId)
         case 'masonry': return ComputeLayout.masonry(assetSizes, width, thumbSize, showMultipage, isolatedParentId)
