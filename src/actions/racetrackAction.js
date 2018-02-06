@@ -10,7 +10,7 @@ import Widget, {
 } from '../models/Widget'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
-import { CollectionsWidgetInfo, SimpleSearchWidgetInfo, SortOrderWidgetInfo } from '../components/Racetrack/WidgetInfo'
+import { CollectionsWidgetInfo, SimpleSearchWidgetInfo, SortOrderWidgetInfo, SimilarHashWidgetInfo } from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
 import { selectFolderIds } from './folderAction'
 import { orderAssets } from './assetsAction'
@@ -64,6 +64,36 @@ function extractSimilar (search) {
   }
 }
 
+function shouldRecreateSearchSliverFromFolderSimilarity (widget, folder) {
+  const isFilterUndefined = typeof widget.sliver.filter === 'undefined'
+  const isSimilarityWidget = widget.type === SimilarHashWidgetInfo.type
+  const isFolderSimilarityAvailable = typeof folder.attrs.similar !== 'undefined'
+  return isSimilarityWidget && isFilterUndefined && isFolderSimilarityAvailable
+}
+
+function createSearchFromFolderSimilarity (folder) {
+  const similarityFilter = {
+    minScore: folder.attrs.similar.minScore,
+    hashes: folder.attrs.similar.ofsIds.map((ofsId, index) => ({
+      hash: (/^proxy\/([a-z0-9-]*)_(.*)/g).exec(ofsId)[1],
+      weight: folder.attrs.similar.weights[index]
+    }))
+  }
+
+  const assetSearch = new AssetSearch({
+    filter: {
+      similarity: {
+        [folder.attrs.similar.field]: similarityFilter
+      }
+    }
+  })
+
+  return {
+    sliver: assetSearch,
+    state: similarityFilter
+  }
+}
+
 // Merge widgets from multiple folders and restore search and related state
 export function restoreFolders (folders, upsert) {
   if (!folders || !folders.length) return
@@ -83,6 +113,7 @@ export function restoreFolders (folders, upsert) {
       missingWidgets = true
       continue
     }
+
     if (!order) order = folder.attrs && folder.attrs.order
     if (!folder.attrs || !folder.attrs.widgets) {
       missingWidgets = true
@@ -98,6 +129,16 @@ export function restoreFolders (folders, upsert) {
           break
         }
       }
+
+      // This is a hack to support the old similarity searches. Legacy similarity
+      // searches have the similarity hashes stored on the folder.attrs.similar
+      // property which no longer exists with the new way of doing things
+      if (shouldRecreateSearchSliverFromFolderSimilarity(widget, folder)) {
+        const {sliver, state} = createSearchFromFolderSimilarity(folder)
+        widget.sliver = sliver
+        widget.state = state
+      }
+
       if (!merged) widgets.push(widget)
     }
   }
