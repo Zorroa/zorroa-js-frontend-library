@@ -11,13 +11,21 @@ import {
   THUMB_FIELD_TEMPLATE, DRAG_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE,
   UX_LEVEL, EMBEDMODE_ENABLED, MONOCHROME, SHOW_IMPORT,
   SHOW_QUICKVIEW, HIDE_QUICKVIEW,
-  TABLE_LAYOUTS, SELECT_TABLE_LAYOUT, ADD_TABLE_LAYOUT, DELETE_TABLE_LAYOUT
+  TABLE_LAYOUTS, SELECT_TABLE_LAYOUT, ADD_TABLE_LAYOUT, DELETE_TABLE_LAYOUT,
+  FLIPBOOK_FPS
 } from '../constants/actionTypes'
 
 export const MIN_THUMBSIZE = 48
 export const MAX_THUMBSIZE = 480
 export const DELTA_THUMBSIZE = 48
 export const DEFAULT_THUMBSIZE = 128
+
+export function setFlipbookFps (fps) {
+  return {
+    type: FLIPBOOK_FPS,
+    payload: fps
+  }
+}
 
 export function showModal (props) {
   return {

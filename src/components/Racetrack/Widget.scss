@@ -2,18 +2,24 @@
 
 .Widget {
   position: relative;
-  outline: 0px solid transparent;
+  outline: none;
 }
 
 .Widget-body {
   filter: grayscale(100%) opacity(50%);
   min-width: 100%;
-  .dark & { color: $zorroa-whitegray; background-color: black; }
+  .dark & {
+    color: $zorroa-whitegray;
+    background-color: $zorroa-color-black;
+  }
 
   &.floatBody {
     z-index: 10000;
-    background-color: white;
-    .dark & { color: $zorroa-whitegray; background-color: black; }
+    background-color: $zorroa-color-white;
+    .dark & {
+      color: $zorroa-color-gray-light-2;
+      background-color: $zorroa-color-black;
+    }
     position: absolute;
     top: 100%;
     right: 0;

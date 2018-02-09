@@ -1,11 +1,12 @@
 import React, { PureComponent, PropTypes } from 'react'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
 import CanvasImage from '../CanvasImage'
 import { PubSub } from '../../services/jsUtil'
 
-export default class Flipbook extends PureComponent {
+class Flipbook extends PureComponent {
   static propTypes = {
     onError: PropTypes.func,
-    fps: PropTypes.number,
     status: PropTypes.instanceOf(PubSub),
     shuttler: PropTypes.instanceOf(PubSub),
     frames: PropTypes.arrayOf(PropTypes.shape({
@@ -13,11 +14,17 @@ export default class Flipbook extends PureComponent {
       imageBitmap: PropTypes.instanceOf(ImageBitmap),
       number: PropTypes.number.isRequired
     })).isRequired,
-    onFrameLoaded: PropTypes.func,
     totalFrames: PropTypes.number.isRequired,
     height: PropTypes.number,
     width: PropTypes.number,
-    size: PropTypes.oneOf(['cover', 'contain'])
+    size: PropTypes.oneOf(['cover', 'contain']),
+    fps: PropTypes.number.isRequired,
+    autoPlay: PropTypes.bool,
+    defaultFrame: PropTypes.number
+  }
+
+  static defaultProps = {
+    autoPlay: true
   }
 
   constructor (props) {
@@ -177,6 +184,7 @@ export default class Flipbook extends PureComponent {
     })
 
     this.props.shuttler.on('scrub', (frameNumber) => {
+      console.log('ON Scrub', frameNumber)
       this.jumpToFrame(frameNumber)
     })
   }
@@ -189,7 +197,14 @@ export default class Flipbook extends PureComponent {
 
   componentDidMount () {
     this.registerShuttlerHandles()
-    this.startAnimationLoop()
+
+    if (this.props.autoPlay === true) {
+      this.startAnimationLoop()
+    }
+
+    if (this.props.autoPlay === false && this.props.defaultFrame) {
+      this.jumpToFrame(this.props.defaultFrame)
+    }
   }
 
   /**
@@ -264,3 +279,9 @@ export default class Flipbook extends PureComponent {
     )
   }
 }
+
+export default connect(state => ({
+  fps: state.app.flipbookFps
+}), dispatch => ({
+  actions: bindActionCreators({}, dispatch)
+}))(Flipbook)

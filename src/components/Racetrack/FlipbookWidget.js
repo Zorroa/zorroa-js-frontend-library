@@ -1,0 +1,229 @@
+import React, { Component, PropTypes } from 'react'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import { FlipbookWidgetInfo } from './WidgetInfo'
+import { modifyRacetrackWidget } from '../../actions/racetrackAction'
+import { showModal, setFlipbookFps } from '../../actions/appActions'
+import { sortAssets } from '../../actions/assetsAction'
+import Widget from './Widget'
+import { FlipbookPlayer } from '../Flipbook'
+import Scrubber from '../Scrubber'
+import { PubSub } from '../../services/jsUtil'
+import classnames from 'classnames'
+import { defaultFpsFrequencies } from '../../constants/defaultState'
+import Duration from '../Duration'
+import Toggle from '../Toggle'
+
+class FlipbookWidget extends Component {
+  static propTypes = {
+    actions: PropTypes.shape({
+      setFlipbookFps: PropTypes.func.isRequired,
+      modifyRacetrackWidget: PropTypes.func.isRequired,
+      showModal: PropTypes.func.isRequired,
+      sortAssets: PropTypes.func.isRequired
+    }),
+    searchOrder: PropTypes.string,
+    id: PropTypes.number.isRequired,
+    isIconified: PropTypes.bool.isRequired,
+    isOpen: PropTypes.bool.isRequired,
+    onOpen: PropTypes.func,
+    floatBody: PropTypes.bool.isRequired,
+    aggs: PropTypes.object,
+    widget: PropTypes.object,
+    fps: PropTypes.number,
+    totalCount: PropTypes.number.isRequired
+  }
+
+  constructor (props) {
+    super(props)
+    this.shuttler = new PubSub()
+    this.status = new PubSub()
+    this.state = {
+      title: props.widget.state.title,
+      id: props.widget.state.id,
+      playing: false,
+      currentFrameNumber: false,
+      totalFrames: 0,
+      sortByFrame: props.searchOrder && props.searchOrder.field === 'source.clip.frame.start'
+    }
+  }
+
+  componentDidMount () {
+    this.status.on('playing', playing => {
+      this.setState({ playing })
+    })
+    this.status.on('played', currentFrameNumber => {
+      this.setState({ currentFrameNumber })
+    })
+  }
+
+  componentWillUnmount () {
+    this.status.off()
+    this.shuttler.off()
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (
+      nextProps.widget.state.title !== this.props.widget.state.title ||
+      nextProps.widget.state.id !== this.props.widget.state.id
+    ) {
+      this.setState(this.props.widget.state)
+    }
+  }
+
+  title () {
+    return this.state.title
+  }
+
+  onFlipbookLoad = event => {
+    this.setState({
+      totalFrames: event.totalFrames
+    })
+  }
+
+  onFpsRateChange = frequency => {
+    this.props.actions.setFlipbookFps(frequency)
+  }
+
+  startOrStopFlipbook = () => {
+    this.shuttler.publish('startOrStop')
+  }
+
+  handleOrderChange = event => {
+    this.setState({
+      sortByFrame: event.target.checked === true
+    })
+
+    if (event.target.checked === true) {
+      this.props.actions.sortAssets('source.clip.frame.start', true, {
+        silent: true
+      })
+      return
+    }
+
+    this.props.actions.sortAssets(undefined, undefined, {
+      silent: true
+    })
+  }
+
+  render () {
+    const { id, floatBody, isIconified, isOpen, onOpen } = this.props
+    const title = isOpen ? FlipbookWidgetInfo.title : undefined
+    const field = isOpen ? undefined : this.title()
+    const hasFrames = this.state.totalFrames > 0
+    const fpsGrabberPosition = defaultFpsFrequencies.indexOf(this.props.fps) + 1
+    const fpsGrabberStyle = {
+      width: `calc(${fpsGrabberPosition} / ${defaultFpsFrequencies.length} * 100%)`
+    }
+    const fpsGrabberTargetStyle = {
+      left: `calc(${fpsGrabberPosition - 1} / ${defaultFpsFrequencies.length} * 100%)`,
+      width: `calc(1 / ${defaultFpsFrequencies.length} * 100%)`
+    }
+
+    return (
+      <Widget
+        className="FlipbookWidget"
+        id={id}
+        floatBody={floatBody}
+        title={title}
+        field={field}
+        backgroundColor={FlipbookWidgetInfo.color}
+        isIconified={isIconified}
+        isOpen={isOpen}
+        onOpen={onOpen}
+        icon={FlipbookWidgetInfo.icon}
+      >
+        <div className="FlipbookWidget__body">
+          <div className="FlipbookWidget__player-container">
+            <FlipbookPlayer
+              clipParentId={this.state.id}
+              onLoad={this.onFlipbookLoad}
+              shuttler={this.shuttler}
+              status={this.status}
+              autoPlay={false}
+              defaultFrame={1}
+            />
+            <div className="FlipbookWidget__duration-container">
+              <Duration
+                onClick={this.startOrStopFlipbook}
+                playing={this.state.playing}
+                fps={this.props.fps}
+                frameCount={this.props.totalCount}
+              />
+            </div>
+          </div>
+          <div className={classnames('FlipbookWidget__scrubber FlipbookWidget__section', {
+            'FlipbookWidget__scrubber--visible': hasFrames
+          })}>
+            <Scrubber
+              shuttler={this.shuttler}
+              currentFrameNumber={this.state.currentFrameNumber}
+              totalFrames={this.state.totalFrames}
+              isPlaying={this.state.playing}
+              progress
+            />
+          </div>
+          <div className="FlipbookWidget__order FlipbookWidget__section">
+            <div className="FlipbookWidget__order-label">
+              Image Order
+            </div>
+            <div className="FlipbookWidget__order-toggle">
+              <Toggle
+                checked={this.state.sortByFrame}
+                onChange={this.handleOrderChange}
+                highlightColor="yellow"
+              />
+            </div>
+            <div className="FlipbookWidget__order-label">
+              Search Order
+            </div>
+          </div>
+          <div className="FlipbookWidget__fps-selector FlipbookWidget__section">
+            <div className="FlipbookWidget__fps-title">
+              Flipbook frame rate
+            </div>
+            <div className="FlipbookWidget__fps-grabber-container">
+              <div className="FlipbookWidget__fps-grabber" style={fpsGrabberStyle}>
+                <div className="FlipbookWidget__fps-grabber-target" style={fpsGrabberTargetStyle}>
+                  <div className="FlipbookWidget__fps-grabber-target-circle" />
+                </div>
+              </div>
+            </div>
+            <div className="FlipbookWidget__fps-rate-list">
+              { defaultFpsFrequencies.map((frequency, index) => {
+                return (
+                  <div
+                    key={index}
+                    className="FlipbookWidget__fps-rate"
+                    onClick={() => this.onFpsRateChange(frequency)}
+                  >
+                    { frequency } FPS
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      </Widget>
+    )
+  }
+}
+
+export default connect(
+  (state, ownProps) => ({
+    fps: state.app.flipbookFps,
+    aggs: state.assets.aggs,
+    totalCount: state.assets.totalCount,
+    searchOrder: state.assets.order && state.assets.order.find(order => order.field === 'source.clip.frame.start'),
+    widget: state.racetrack && state.racetrack.widgets && state.racetrack.widgets.find(
+      widget => ownProps.id === widget.id
+    )
+  }), dispatch => ({
+    actions: bindActionCreators({
+      sortAssets,
+      setFlipbookFps,
+      modifyRacetrackWidget,
+      showModal
+    }, dispatch)
+  })
+)(FlipbookWidget)

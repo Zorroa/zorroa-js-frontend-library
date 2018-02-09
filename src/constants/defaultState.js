@@ -7,3 +7,4 @@ export const defaultDragFields = []
 export const defaultThumbFieldTemplate = '%{image.width|video.width}x%{image.height|video.height} %{source.type}'
 export const defaultLightbarFieldTemplate = '%{source.type} %{source.filename} %{image.width|video.width}x%{image.height|video.height} %{source.date}'
 export const defaultTableLayouts = []
+export const defaultFpsFrequencies = [12, 24, 30]

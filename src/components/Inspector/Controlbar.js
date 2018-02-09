@@ -3,6 +3,7 @@ import { Gauge } from '../Icons'
 import classnames from 'classnames'
 
 import VolumeBar from './VolumeBar'
+import Scrubber from '../Scrubber'
 import { PubSub } from '../../services/jsUtil'
 
 export default class Controlbar extends PureComponent {
@@ -30,16 +31,7 @@ export default class Controlbar extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      showFpsOptions: false,
-      scrubbedFrameNumber: props.currentFrameNumber
-    }
-  }
-
-  componentWillReceiveProps (nextProps) {
-    if (this.state.scrubbedFrameNumber !== nextProps.currentFrameNumber) {
-      this.setState({
-        scrubbedFrameNumber: nextProps.currentFrameNumber
-      })
+      showFpsOptions: false
     }
   }
 
@@ -96,40 +88,16 @@ export default class Controlbar extends PureComponent {
     return 'high'
   }
 
-  setScrubbedFrameNumber = scrubbedFrameNumber => {
-    this.setState({
-      scrubbedFrameNumber
-    })
-  }
-
-  scrub = () => {
-    this.props.shuttler.publish('scrub', this.state.scrubbedFrameNumber)
-  }
-
-  onScrubSubmit = event => {
-    event.preventDefault()
-    this.scrub()
-  }
-
   render () {
     return (
       <div className="Controlbar">
         <div className="Controlbar__inner">
         { this.showScrubber() && (
-          <div className="Controlbar__section">
-            <form onSubmit={this.onScrubSubmit} className="Controlbar__scrubber">
-              Frame
-              <input
-                type="text"
-                className="Controlbar__scrubber-input"
-                value={this.state.scrubbedFrameNumber}
-                onFocus={() => { this.props.shuttler.publish('stop') }}
-                onChange={(event) => { this.setScrubbedFrameNumber(event.target.value) }}
-                onBlur={this.scrub}
-              />
-              of {this.props.totalFrames}
-            </form>
-          </div>
+          <Scrubber
+            shuttler={this.props.shuttler}
+            currentFrameNumber={this.props.currentFrameNumber}
+            totalFrames={this.props.totalFrames}
+          />
         ) }
           { this.props.title && <div className="Controlbar__title">{this.props.title}</div> }
           { this.showVideo() && (

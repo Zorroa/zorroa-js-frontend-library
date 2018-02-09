@@ -18,7 +18,23 @@ class FlipbookPlayer extends Component {
     loadedPercentage: PropTypes.number.isRequired,
     size: PropTypes.oneOf(['cover', 'contain']),
     status: PropTypes.instanceOf(PubSub),
-    shuttler: PropTypes.instanceOf(PubSub)
+    shuttler: PropTypes.instanceOf(PubSub),
+    onLoad: PropTypes.func,
+    autoPlay: PropTypes.bool,
+    defaultFrame: PropTypes.number
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (
+      typeof this.props.onLoad === 'function' &&
+      // this.props.frames.length !== nextProps.frames.length &&
+      // this.props.loadedPercentage !== nextProps.loadedPercentage &&
+      (nextProps.loadedPercentage >= 100 && nextProps.frames.length > 0)
+    ) {
+      this.props.onLoad({
+        totalFrames: nextProps.totalFrames
+      })
+    }
   }
 
   render () {
@@ -28,7 +44,9 @@ class FlipbookPlayer extends Component {
       totalFrames,
       size,
       shuttler,
-      status
+      status,
+      autoPlay,
+      defaultFrame
     } = this.props
     const isLoading = loadedPercentage < 100 || frames.length === 0
 
@@ -42,12 +60,13 @@ class FlipbookPlayer extends Component {
         )}
         { isLoading === false && (
           <Flipbook
-            fps={30}
             frames={frames}
             totalFrames={totalFrames}
             size={size}
             status={status}
             shuttler={shuttler}
+            autoPlay={autoPlay}
+            defaultFrame={defaultFrame}
           />
         )}
       </div>

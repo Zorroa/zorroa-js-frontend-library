@@ -88,7 +88,7 @@ class Lightbox extends Component {
       }
     }
     return (
-      <div className="lightbox">
+      <div className="lightbox dark">
         <Lightbar showMetadata={lightboxMetadata.show}
                   onMetadata={this.toggleMetadata}/>
         <div className="lightbox-body">

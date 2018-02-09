@@ -99,21 +99,6 @@ $options-menu-offset: $control-bar-height;
     @include flexRowCenter;
   }
 
-  &__scrubber {
-    width: $zorroa-metric-base * 15;
-    text-align: center;
-  }
-
-  &__scrubber-input {
-    border: 1px solid $zorroa-color-gray-dark-2;
-    background: transparent;
-    width: $zorroa-metric-base * 4;
-    font-size: 14px;
-    margin: 0 $zorroa-metric-base;
-    color: $zorroa-color-white;
-    text-align: center;
-  }
-
   &__section {
     @include flexRowCenter;
     padding: $control-bar-padding $zorroa-metric-base;

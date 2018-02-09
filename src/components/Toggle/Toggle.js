@@ -1,11 +1,19 @@
 import React, { PropTypes } from 'react'
 import classnames from 'classnames'
 
-const Toggle = ({checked, onChange, disabled, waiting, disabledTitle}) => {
+const Toggle = ({
+  checked,
+  onChange,
+  disabled,
+  waiting,
+  disabledTitle,
+  highlightColor
+}) => {
   const isDisabled = disabled === true
   const isWaiting = waiting === true
   const labelClasses = classnames('Toggle', {
-    'Toggle--disabled': isDisabled
+    'Toggle--disabled': isDisabled,
+    'Toggle--yellow': highlightColor === 'yellow'
   })
   const toggleSliderClasses = classnames('Toggle__slider Toggle__slider--round', {
     'Toggle__slider--disabled': isDisabled,
@@ -32,7 +40,8 @@ Toggle.propTypes = {
   disabled: PropTypes.bool,
   disabledTitle: PropTypes.string,
   onChange: PropTypes.func.isRequired,
-  waiting: PropTypes.bool
+  waiting: PropTypes.bool,
+  highlightColor: PropTypes.oneOf(['yellow'])
 }
 
 export default Toggle

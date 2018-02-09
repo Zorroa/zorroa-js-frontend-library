@@ -1,4 +1,8 @@
 .FlipbookPlayer {
+  // Think long and hard before changing the font size, you could introduce
+  // excess white space in certain layouts that weren't expecting any text.
+  font-size: 0;
+
   &,
   &__loading-status {
     display: flex;

@@ -2,12 +2,12 @@ import {
   MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS,
   ASSET_ORDER, ASSET_SORT, SELECT_FOLDERS,
   SELECT_JOBS, ANALYZE_SIMILAR, UNAUTH_USER, ISOLATE_PARENT, SIMILAR_MINSCORE,
-  UPSERT_RACETRACK_WIDGETS
+  UPSERT_RACETRACK_WIDGETS, ISOLATE_FLIPBOOK, DEISOLATE_FLIPBOOK
 } from '../constants/actionTypes'
 import Widget from '../models/Widget'
 import {
   SimilarHashWidgetInfo, CollectionsWidgetInfo, SortOrderWidgetInfo,
-  MultipageWidgetInfo, ImportSetWidgetInfo } from '../components/Racetrack/WidgetInfo'
+  MultipageWidgetInfo, ImportSetWidgetInfo, FlipbookWidgetInfo, FiletypeWidgetInfo } from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
 
 const initialState = {
@@ -83,6 +83,11 @@ export default function (state = initialState, action) {
     }
     case ASSET_ORDER:
     case ASSET_SORT: {
+      if (action.payload && action.payload.silent === true) {
+        // Do not add the sort order racebar if this is a "silent" change
+        return state
+      }
+
       const widgets = [...state.widgets]
       if (action.type === ASSET_SORT || (action.payload && action.payload.length > 0)) {
         // Actively sorting by another field, add a sort widget if needed
@@ -136,6 +141,48 @@ export default function (state = initialState, action) {
           widget.id = widgets[index].id
           widgets[index] = widget
         }
+        return {...state, widgets}
+      }
+      return state
+    }
+    case DEISOLATE_FLIPBOOK: {
+      const widgets = state.widgets.reduce((newWidgets, widget) => {
+        if (widget.type === FiletypeWidgetInfo.type) {
+          // Re-enable the FileType widget
+          newWidgets.push({
+            ...widget,
+            isEnabled: true
+          })
+
+          return newWidgets
+        } else if (widget.type !== FlipbookWidgetInfo.type) {
+          // Removes the FlipbookWidget by only adding non-Flipbook widgets
+          newWidgets.push(widget)
+        }
+
+        return newWidgets
+      }, [])
+      return {...state, widgets}
+    }
+    case ISOLATE_FLIPBOOK: {
+      const flipbook = action.payload
+
+      if (flipbook) {
+        const sortByPage = true
+        const index = state.widgets.findIndex(widget => (widget.type === FlipbookWidgetInfo.type))
+        const isEnabled = index >= 0 ? state.widgets[index].isEnabled : true
+        const widgetState = {
+          id: flipbook.id,
+          title: flipbook.document.source.filename
+        }
+        const widget = FlipbookWidgetInfo.create(
+          sortByPage,
+          flipbook,
+          isEnabled,
+          true,
+          widgetState
+        )
+        const widgets = [widget]
         return {...state, widgets}
       }
       return state

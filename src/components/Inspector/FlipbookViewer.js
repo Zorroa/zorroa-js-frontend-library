@@ -5,6 +5,10 @@ import { Flipbook, withFlipbook } from '../Flipbook'
 import FlipbookStrip from './FlipbookStrip'
 import PanZoom from './PanZoom'
 import ProgressCircle from '../ProgressCircle'
+import { setFlipbookFps } from '../../actions/appActions'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import { defaultFpsFrequencies } from '../../constants/defaultState.js'
 
 class FlipbookViewer extends Component {
   static propTypes = {
@@ -14,8 +18,12 @@ class FlipbookViewer extends Component {
       imageBitmap: PropTypes.instanceOf(ImageBitmap),
       number: PropTypes.number.isRequired
     })).isRequired,
+    actions: PropTypes.shape({
+      setFlipbookFps: PropTypes.func
+    }),
     totalFrames: PropTypes.number.isRequired,
-    loadedPercentage: PropTypes.number.isRequired
+    loadedPercentage: PropTypes.number.isRequired,
+    fps: PropTypes.number.isRequired
   }
 
   constructor (props) {
@@ -26,7 +34,6 @@ class FlipbookViewer extends Component {
 
     this.state = {
       playing: false,
-      fps: 30,
       currentFrameNumber: 0
     }
   }
@@ -51,12 +58,6 @@ class FlipbookViewer extends Component {
     }
   }
 
-  onFrameFrequency = fps => {
-    this.setState({
-      fps
-    })
-  }
-
   scrub = (frame) => {
     this.shuttler.publish('scrub', frame)
   }
@@ -65,13 +66,17 @@ class FlipbookViewer extends Component {
     return this.props.loadedPercentage
   }
 
+  onFrameFrequency = frameRate => {
+    this.props.actions.setFlipbookFps(frameRate)
+  }
+
   render () {
     const isLoading = this.getLoadedPercentage() < 100 || this.props.frames.length === 0
     const { currentFrameNumber, playing } = this.state
     const frameFrequency = {
       onFrameFrequency: this.onFrameFrequency,
-      rate: this.state.fps,
-      options: [12, 24, 30]
+      options: defaultFpsFrequencies,
+      rate: this.props.fps
     }
     const panZoomClassNames = classnames('FlipbookViewer__pan-zoom', {
       'FlipbookViewer__pan-zoom--is-loading': isLoading
@@ -96,7 +101,6 @@ class FlipbookViewer extends Component {
                 totalFrames={this.props.totalFrames}
               >
                 <Flipbook
-                  fps={this.state.fps}
                   onError={this.onError}
                   shuttler={this.shuttler}
                   status={this.status}
@@ -118,4 +122,15 @@ class FlipbookViewer extends Component {
   }
 }
 
-export default withFlipbook(FlipbookViewer)
+const ConnectedFlipbookViewer = connect(
+  (state) => ({
+    fps: state.app.flipbookFps
+  }),
+  dispatch => ({
+    actions: bindActionCreators({
+      setFlipbookFps
+    }, dispatch)
+  })
+)(FlipbookViewer)
+
+export default withFlipbook(ConnectedFlipbookViewer)

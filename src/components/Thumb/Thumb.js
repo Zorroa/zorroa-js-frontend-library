@@ -13,7 +13,7 @@ import FieldTemplate from '../FieldTemplate'
 
 // Extract thumb page info from an asset
 export function page (asset, width, height, origin) {
-  const url = asset && asset.atLeastProxyURL(origin, width, height) || ''
+  const url = asset && asset.closestProxyURL(origin, width, height) || ''
   const tproxy = asset && asset.tinyProxy()
   const backgroundColor = tproxy ? tproxy[4] : '#888'
   return { url, backgroundColor }

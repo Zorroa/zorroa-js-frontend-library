@@ -10,7 +10,7 @@ import User from '../../models/User'
 import Asset from '../../models/Asset'
 import Widget from '../../models/Widget'
 import Folder from '../../models/Folder'
-import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, updateParentTotals, unorderAssets, isolateParent } from '../../actions/assetsAction'
+import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, updateParentTotals, unorderAssets, isolateParent, isolateFlipbook } from '../../actions/assetsAction'
 import { resetRacetrackWidgets, restoreFolders } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
@@ -180,8 +180,8 @@ class Assets extends Component {
     }
   }
 
-  shouldBypassParentIsolation (asset) {
-    return asset.clipType() === 'flipbook'
+  shouldIsolateFlipbook (asset) {
+    return asset.mediaType() === 'zorroa/x-flipbook'
   }
 
   isolateToLightbox = (asset) => {
@@ -189,8 +189,12 @@ class Assets extends Component {
     const parentId = showMultipage && asset.parentId()
     const isolatedParentId = isolatedParent && isolatedParent.parentId()
     const stackCount = parentId && parentId !== isolatedParentId && parentTotals && parentTotals.get(parentId)
+    if (this.shouldIsolateFlipbook(asset)) {
+      this.props.actions.isolateFlipbook(asset)
+      return
+    }
 
-    if (stackCount > 1 && this.shouldBypassParentIsolation(asset) === false) {
+    if (stackCount > 1 || this.shouldIsolateFlipbook(asset)) {
       this.props.actions.isolateParent(asset)
       return
     }
@@ -736,6 +740,7 @@ export default connect(state => ({
   showQuickview: state.app.showQuickview
 }), dispatch => ({
   actions: bindActionCreators({
+    isolateFlipbook,
     isolateAssetId,
     isolateParent,
     selectAssetIds,
