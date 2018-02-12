@@ -19,6 +19,7 @@ $progress-bar-highlight-color: $zorroa-color-yellow-1;
     height: $progress-height;
     position: relative;
     margin: $zorroa-metric-base * 0.5;
+    cursor: pointer;
   }
 
   &__progress-dragger {

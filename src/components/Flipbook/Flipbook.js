@@ -184,7 +184,6 @@ class Flipbook extends PureComponent {
     })
 
     this.props.shuttler.on('scrub', (frameNumber) => {
-      console.log('ON Scrub', frameNumber)
       this.jumpToFrame(frameNumber)
     })
   }

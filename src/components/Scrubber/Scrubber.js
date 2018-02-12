@@ -8,19 +8,19 @@ export default class Scrubber extends PureComponent {
     shuttler: PropTypes.instanceOf(PubSub),
     currentFrameNumber: PropTypes.number,
     totalFrames: PropTypes.number.isRequired,
-    isPlaying: PropTypes.bool,
     progress: PropTypes.bool
   }
 
   constructor (props) {
     super(props)
     this.state = {
-      scrubbedFrameNumber: props.currentFrameNumber
+      scrubbedFrameNumber: props.currentFrameNumber,
+      isMouseDown: false
     }
   }
 
   componentWillReceiveProps (nextProps) {
-    if (this.state.scrubbedFrameNumber !== nextProps.currentFrameNumber) {
+    if (nextProps.currentFrameNumber !== this.props.currentFrameNumber) {
       this.setState({
         scrubbedFrameNumber: nextProps.currentFrameNumber
       })
@@ -33,17 +33,54 @@ export default class Scrubber extends PureComponent {
     })
   }
 
-  scrub = () => {
+  scrub = (scrubbedFrameNumber) => {
     if (typeof this.props.shuttler === undefined) {
       console.warn('Scrubbing without a shuttler, no change will be reflected in frame')
     } else {
-      this.props.shuttler.publish('scrub', this.state.scrubbedFrameNumber)
+      this.props.shuttler.publish('scrub', scrubbedFrameNumber)
     }
   }
 
   onScrubSubmit = event => {
     event.preventDefault()
-    this.scrub()
+    this.scrub(this.state.scrubbedFrameNumber)
+  }
+
+  onProgressMouseDown = event => {
+    event.preventDefault()
+    this.setState({
+      isMouseDown: true
+    })
+  }
+
+  onProgressMouseUp = event => {
+    event.preventDefault()
+    this.setState({
+      isMouseDown: false
+    })
+  }
+
+  onProgressMouseMove = event => {
+    event.preventDefault()
+
+    if (this.state.isMouseDown === false) {
+      return
+    }
+
+    const rectangle = event.currentTarget.getBoundingClientRect()
+    const rangeStart = rectangle.x
+    const rangePosition = event.clientX
+    const rangeEnd = event.currentTarget.offsetWidth + rectangle.x
+    const rangeDistance = rangeEnd - rangeStart
+
+    const rangePercentTraversed = (rangePosition - rangeStart) / rangeDistance
+    const scrubbedFrameNumber = Math.round(rangePercentTraversed * this.props.totalFrames)
+
+    if (scrubbedFrameNumber === this.props.currentFrameNumber) {
+      return
+    }
+
+    this.scrub(scrubbedFrameNumber)
   }
 
   render () {
@@ -56,14 +93,18 @@ export default class Scrubber extends PureComponent {
       left: `${completedPercentage}%`
     }
 
-    const progressBarClasses = classnames('Scrubber__progress-bar', {
-      'Scrubber__progress-bar--is-playing': this.props.isPlaying === true
-    })
+    const progressBarClasses = 'Scrubber__progress-bar'
 
     return (
       <form onSubmit={this.onScrubSubmit} className="Scrubber">
         { this.props.progress === true && (
-          <div className="Scrubber__progress" title={`Frame ${currentFrameNumber} of ${totalFrames}`}>
+          <div
+            className="Scrubber__progress"
+            title={`Frame ${currentFrameNumber} of ${totalFrames}`}
+            onMouseDown={this.onProgressMouseDown}
+            onMouseUp={this.onProgressMouseUp}
+            onMouseMove={this.onProgressMouseMove}
+          >
             <div style={draggerStyle} className="Scrubber__progress-dragger" />
             <div style={pastStyle} className={classnames(progressBarClasses, 'Scrubber__progress-bar--past')} />
             <div className={classnames(progressBarClasses, 'Scrubber__progress-bar--future')} />
@@ -74,7 +115,7 @@ export default class Scrubber extends PureComponent {
           <input
             type="text"
             className="Scrubber__scrubber-input"
-            value={this.state.scrubbedFrameNumber}
+            value={this.state.currentFrameNumber}
             onFocus={() => { typeof this.props.shuttler === 'function' && this.props.shuttler.publish('stop') }}
             onChange={(event) => { this.setScrubbedFrameNumber(event.target.value) }}
             onBlur={this.scrub}
