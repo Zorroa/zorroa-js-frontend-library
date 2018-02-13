@@ -9,9 +9,9 @@ import Jobs from './Jobs'
 import FieldList from '../../models/FieldList'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
-import CreateExport from '../Folders/CreateExport'
 import { exportAssets, getJob, markJobDownloaded } from '../../actions/jobActions'
 import { showModal, dialogAlertPromise } from '../../actions/appActions'
+import { updateExportInterface } from '../../actions/exportsAction'
 
 class ExportJobs extends Component {
   static propTypes = {
@@ -26,9 +26,10 @@ class ExportJobs extends Component {
   }
 
   exportAssets = () => {
-    const width = '460px'
-    const body = <CreateExport onCreate={this.createExport} />
-    this.props.actions.showModal({body, width})
+    this.props.actions.updateExportInterface({
+      // TODO: implement the createExport -> waitForExportAndDownload logic: onCreate: this.createExport,
+      shouldShow: true
+    })
   }
 
   createExport = (event, name, exportImages, exportTable) => {
@@ -53,7 +54,6 @@ class ExportJobs extends Component {
       // this code adapted from Jobs.refreshJobs()
       const waitForJob = (jobId) => {
         actions.getJob(exportId)
-        .then(data => new Promise(resolve => requestAnimationFrame(_ => resolve(data)))) // wait 1 frame for getJob() data to post to global state
         .then(response => {
           // We'll watch the app state to see if our job is finished, rather
           // than checking the response from getJob()
@@ -106,6 +106,7 @@ export default connect(state => ({
   jobs: state.jobs.all
 }), dispatch => ({
   actions: bindActionCreators({
+    updateExportInterface,
     showModal,
     exportAssets,
     getJob,

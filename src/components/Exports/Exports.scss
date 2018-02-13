@@ -1,0 +1,24 @@
+@import '../../styles/core-mixins.scss';
+
+.Exports {
+  &__body {
+    display: flex;
+    height: 80vw;
+  }
+
+  &__sidebar {
+    background: $zorroa-color-gray-light-2;
+    padding: 30px;
+    overflow: hidden;
+    overflow-y: scroll;
+    max-height: 100%;
+  }
+
+  &__field-group {
+    border: 0;
+  }
+
+  &__Exports__field-group {
+    border-bottom: 1px solid $zorroa-color-gray-light-1;
+  }
+}

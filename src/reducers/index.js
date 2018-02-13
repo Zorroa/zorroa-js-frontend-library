@@ -9,6 +9,7 @@ import permissions from './permissionsReducer'
 import jobs from './jobsReducer'
 import archivist from './archivistReducer'
 import users from './usersReducer'
+import exports from './exportsReducer'
 
 export default combineReducers({
   app,
@@ -19,5 +20,6 @@ export default combineReducers({
   permissions,
   jobs,
   archivist,
-  users
+  users,
+  exports
 })
