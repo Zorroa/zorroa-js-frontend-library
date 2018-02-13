@@ -11,12 +11,9 @@ export default class Scrubber extends PureComponent {
     progress: PropTypes.bool
   }
 
-  constructor (props) {
-    super(props)
-    this.state = {
-      scrubbedFrameNumber: props.currentFrameNumber,
-      isMouseDown: false
-    }
+  state = {
+    scrubbedFrameNumber: this.props.currentFrameNumber,
+    isMouseDown: false
   }
 
   componentWillReceiveProps (nextProps) {
@@ -115,10 +112,10 @@ export default class Scrubber extends PureComponent {
           <input
             type="text"
             className="Scrubber__scrubber-input"
-            value={this.state.currentFrameNumber}
+            value={this.state.scrubbedFrameNumber}
             onFocus={() => { typeof this.props.shuttler === 'function' && this.props.shuttler.publish('stop') }}
             onChange={(event) => { this.setScrubbedFrameNumber(event.target.value) }}
-            onBlur={this.scrub}
+            onBlur={() => { this.scrub(this.state.scrubbedFrameNumber) }}
           />
           of {totalFrames}
         </div>

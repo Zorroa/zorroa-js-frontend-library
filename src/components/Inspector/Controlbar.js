@@ -93,11 +93,13 @@ export default class Controlbar extends PureComponent {
       <div className="Controlbar">
         <div className="Controlbar__inner">
         { this.showScrubber() && (
-          <Scrubber
-            shuttler={this.props.shuttler}
-            currentFrameNumber={this.props.currentFrameNumber}
-            totalFrames={this.props.totalFrames}
-          />
+          <div className="Controlbar__section">
+            <Scrubber
+              shuttler={this.props.shuttler}
+              currentFrameNumber={this.props.currentFrameNumber}
+              totalFrames={this.props.totalFrames}
+            />
+          </div>
         ) }
           { this.props.title && <div className="Controlbar__title">{this.props.title}</div> }
           { this.showVideo() && (
