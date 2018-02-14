@@ -13,6 +13,8 @@ import classnames from 'classnames'
 import { defaultFpsFrequencies } from '../../constants/defaultState'
 import Duration from '../Duration'
 import Toggle from '../Toggle'
+import { resizeByAspectRatio } from '../../services/size'
+import { Asset } from '../../models/Asset'
 
 class FlipbookWidget extends Component {
   static propTypes = {
@@ -31,7 +33,8 @@ class FlipbookWidget extends Component {
     aggs: PropTypes.object,
     widget: PropTypes.object,
     fps: PropTypes.number,
-    totalCount: PropTypes.number.isRequired
+    totalCount: PropTypes.number.isRequired,
+    asset: PropTypes.instanceOf(Asset)
   }
 
   constructor (props) {
@@ -119,6 +122,11 @@ class FlipbookWidget extends Component {
       left: `calc(${fpsGrabberPosition - 1} / ${defaultFpsFrequencies.length} * 100%)`,
       width: `calc(1 / ${defaultFpsFrequencies.length} * 100%)`
     }
+    const flipbookDimensions = resizeByAspectRatio({
+      width: this.props.asset.document.image.width,
+      height: this.props.asset.document.image.height,
+      newWidth: 230 // The value 230 comes from the CSS
+    })
 
     return (
       <Widget
@@ -142,6 +150,8 @@ class FlipbookWidget extends Component {
               status={this.status}
               autoPlay={false}
               defaultFrame={1}
+              height={flipbookDimensions.height}
+              width={flipbookDimensions.width}
             />
             <div className="FlipbookWidget__duration-container">
               <Duration
@@ -216,6 +226,7 @@ export default connect(
   (state, ownProps) => ({
     fps: state.app.flipbookFps,
     aggs: state.assets.aggs,
+    asset: state.assets.all[0],
     totalCount: state.assets.totalCount,
     searchOrder: state.assets.order && state.assets.order.find(order => order.field === 'source.clip.frame.start'),
     widget: state.racetrack && state.racetrack.widgets && state.racetrack.widgets.find(

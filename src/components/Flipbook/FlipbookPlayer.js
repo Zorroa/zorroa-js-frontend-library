@@ -21,7 +21,9 @@ class FlipbookPlayer extends Component {
     shuttler: PropTypes.instanceOf(PubSub),
     onLoad: PropTypes.func,
     autoPlay: PropTypes.bool,
-    defaultFrame: PropTypes.number
+    defaultFrame: PropTypes.number,
+    width: PropTypes.number,
+    height: PropTypes.number
   }
 
   componentWillReceiveProps (nextProps) {
@@ -46,7 +48,9 @@ class FlipbookPlayer extends Component {
       shuttler,
       status,
       autoPlay,
-      defaultFrame
+      defaultFrame,
+      width,
+      height
     } = this.props
     const isLoading = loadedPercentage < 100 || frames.length === 0
 
@@ -67,6 +71,8 @@ class FlipbookPlayer extends Component {
             shuttler={shuttler}
             autoPlay={autoPlay}
             defaultFrame={defaultFrame}
+            height={height}
+            width={width}
           />
         )}
       </div>

@@ -32,6 +32,10 @@ $progress-bar-highlight-color: $zorroa-color-yellow-1;
     margin-top: $progress-height / -2;
     z-index: 2;
 
+    &--ended {
+      margin-left: $progress-dragger-width * -1;
+    }
+
     .dark & {
       border-color: $zorroa-color-black;
     }

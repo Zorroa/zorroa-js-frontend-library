@@ -6,7 +6,7 @@
  * to scale and center an image. This is useful for sizing content to fit within
  * canvas elements
  */
-export default function size ({
+export function size ({
   parentWidth,
   parentHeight,
   childWidth,
@@ -33,5 +33,24 @@ export default function size ({
     height,
     x,
     y
+  }
+}
+
+export function resizeByAspectRatio ({
+  height,
+  width,
+  newHeight,
+  newWidth
+}) {
+  if (newWidth !== undefined) {
+    return {
+      height: (height / width) * newWidth,
+      width: newWidth
+    }
+  }
+
+  return {
+    height: newHeight,
+    width: (height / width) * newHeight
   }
 }

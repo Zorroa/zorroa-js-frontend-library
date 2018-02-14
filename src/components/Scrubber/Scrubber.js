@@ -89,6 +89,9 @@ export default class Scrubber extends PureComponent {
     const draggerStyle = {
       left: `${completedPercentage}%`
     }
+    const draggerClasses = classnames('Scrubber__progress-dragger', {
+      'Scrubber__progress-dragger--ended': completedPercentage === 100
+    })
 
     const progressBarClasses = 'Scrubber__progress-bar'
 
@@ -102,7 +105,7 @@ export default class Scrubber extends PureComponent {
             onMouseUp={this.onProgressMouseUp}
             onMouseMove={this.onProgressMouseMove}
           >
-            <div style={draggerStyle} className="Scrubber__progress-dragger" />
+            <div style={draggerStyle} className={draggerClasses} />
             <div style={pastStyle} className={classnames(progressBarClasses, 'Scrubber__progress-bar--past')} />
             <div className={classnames(progressBarClasses, 'Scrubber__progress-bar--future')} />
           </div>

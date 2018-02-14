@@ -179,7 +179,7 @@ export default function (state = initialState, action) {
           sortByPage,
           flipbook,
           isEnabled,
-          true,
+          false,
           widgetState
         )
         const widgets = [widget]
