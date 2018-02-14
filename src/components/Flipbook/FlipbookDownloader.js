@@ -1,4 +1,5 @@
 import React, { PureComponent, PropTypes } from 'react'
+import { connect } from 'react-redux'
 import getImage from '../../services/getImage'
 import api from '../../api'
 
@@ -21,10 +22,11 @@ function getDisplayName (WrappedComponent) {
 }
 
 export default function withFlipbook (WrappedComponent) {
-  return class FlipbookDownloader extends PureComponent {
+  class FlipbookDownloader extends PureComponent {
     static displayName = `WithFlipbook(${getDisplayName(WrappedComponent)})`
     static propTypes = {
-      clipParentId: PropTypes.string.isRequired
+      clipParentId: PropTypes.string.isRequired,
+      origin: PropTypes.string.isRequired
     }
     constructor (props) {
       super(props)
@@ -44,6 +46,20 @@ export default function withFlipbook (WrappedComponent) {
       api
         .flipbook
         .get(this.props.clipParentId)
+        .then(framesAssets => {
+          return framesAssets.map(asset => {
+            return {
+              url: asset.atLeastProxyURL(this.props.origin, 300, 300),
+              number: asset.document.source.clip.frame.start
+            }
+          }).sort((a, b) => {
+            if (a.number > b.number) {
+              return 1
+            }
+
+            return -1
+          })
+        })
         .then(frames => {
           this.downloadableFrameCount = frames.length
 
@@ -96,4 +112,8 @@ export default function withFlipbook (WrappedComponent) {
       />
     }
   }
+
+  return connect(state => ({
+    origin: state.auth.origin
+  }))(FlipbookDownloader)
 }
