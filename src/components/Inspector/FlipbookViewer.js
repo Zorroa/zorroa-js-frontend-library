@@ -16,7 +16,7 @@ class FlipbookViewer extends Component {
     onError: PropTypes.func,
     frames: PropTypes.arrayOf(PropTypes.shape({
       url: PropTypes.string.isRequired,
-      imageBitmap: PropTypes.instanceOf(ImageBitmap),
+      imageBitmap: PropTypes.instanceOf(window.ImageBitmap),
       number: PropTypes.number.isRequired
     })).isRequired,
     actions: PropTypes.shape({

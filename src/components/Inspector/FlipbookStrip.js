@@ -6,7 +6,7 @@ export default class FlipbookViewer extends Component {
   static propTypes = {
     frames: PropTypes.arrayOf(PropTypes.shape({
       url: PropTypes.string.isRequired,
-      imageBitmap: PropTypes.instanceOf(ImageBitmap),
+      imageBitmap: PropTypes.instanceOf(window.ImageBitmap),
       number: PropTypes.number.isRequired
     })).isRequired,
     shuttler: PropTypes.instanceOf(PubSub).isRequired,

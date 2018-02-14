@@ -3,7 +3,7 @@ import size from '../../services/size'
 
 export default class CanvasImage extends PureComponent {
   static propTypes = {
-    image: PropTypes.instanceOf(ImageBitmap),
+    image: PropTypes.instanceOf(window.ImageBitmap),
     height: PropTypes.number,
     width: PropTypes.number,
     className: PropTypes.string,

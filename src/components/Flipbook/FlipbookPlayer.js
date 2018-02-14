@@ -11,7 +11,7 @@ class FlipbookPlayer extends Component {
     children: PropTypes.node,
     frames: PropTypes.arrayOf(PropTypes.shape({
       url: PropTypes.string.isRequired,
-      imageBitmap: PropTypes.instanceOf(ImageBitmap),
+      imageBitmap: PropTypes.instanceOf(window.ImageBitmap),
       number: PropTypes.number.isRequired
     })).isRequired,
     totalFrames: PropTypes.number.isRequired,
