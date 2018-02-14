@@ -107,7 +107,7 @@ class FlipbookWidget extends Component {
   }
 
   render () {
-    const { id, floatBody, isIconified, isOpen, onOpen } = this.props
+    const { id, floatBody, isIconified, isOpen, onOpen, fps } = this.props
     const title = isOpen ? FlipbookWidgetInfo.title : undefined
     const field = isOpen ? undefined : this.title()
     const hasFrames = this.state.totalFrames > 0
@@ -194,7 +194,10 @@ class FlipbookWidget extends Component {
                 return (
                   <div
                     key={index}
-                    className="FlipbookWidget__fps-rate"
+                    className={classnames('FlipbookWidget__fps-rate', {
+                      'FlipbookWidget__fps-rate--elapsed': index < defaultFpsFrequencies.indexOf(fps),
+                      'FlipbookWidget__fps-rate--active': index === defaultFpsFrequencies.indexOf(fps)
+                    })}
                     onClick={() => this.onFpsRateChange(frequency)}
                   >
                     { frequency } FPS

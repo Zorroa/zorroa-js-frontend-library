@@ -68,6 +68,16 @@ $fps-rate-offset: $zorroa-metric-base * 2;
     position: relative;
     width: 100%;
 
+    &::after {
+      position: absolute;
+      width: 50%;
+      left: 0;
+      border-top: 2px solid $zorroa-color-yellow-1;
+      content: ' ';
+      top: 50%;
+      margin-top: $fps-grabber-size / 2
+    }
+
     &::before {
       background-color: $zorroa-color-yellow-1;
       height: $fps-grabber-size;
@@ -107,6 +117,11 @@ $fps-rate-offset: $zorroa-metric-base * 2;
     border-top: 1px solid $zorroa-color-gray-dark-4;
     margin-top: $fps-rate-offset;
     cursor: pointer;
+
+    &--elapsed {
+      border-color: $zorroa-color-yellow-1;
+      border-width: 2px;
+    }
 
     .dark & {
       color: $zorroa-color-gray-light-2
