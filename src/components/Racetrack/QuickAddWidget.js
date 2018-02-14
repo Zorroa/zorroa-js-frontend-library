@@ -140,20 +140,31 @@ class QuickAddWidget extends Component {
                  className="QuickAddWidget-input"
                  placeholder="Quick Add - Widget"/>
         </div>
-        { widgetInfos.length ? (
+        { widgetInfos.length > 0 && (
           <div className="QuickAddWidget-list">
-            { widgetInfos.map(widgetInfo => (
-              <div onMouseDown={e => this.addWidget(widgetInfo, e)}
-                   style={{backgroundColor: widgetInfo.color}}
-                   className={classnames('QuickAddWidget-item', `widget-${widgetInfo.type}`,
-                     {selected: selectedWidgetInfo && widgetInfo.type === selectedWidgetInfo.type})}
-                   key={widgetInfo.type}>
-                <span className={`QuickAddWidget-item-icon ${widgetInfo.icon}`}></span>
-                <span>{widgetInfo.title}</span>
-              </div>
-            ))}
+            { widgetInfos.map(widgetInfo => {
+              if (widgetInfo.hideFromQuickAdd === true) {
+                return null
+              }
+
+              const quickAddWidgetItemClasses = classnames('QuickAddWidget-item', `widget-${widgetInfo.type}`, {
+                selected: selectedWidgetInfo && widgetInfo.type === selectedWidgetInfo.type
+              })
+
+              return (
+                <div
+                  onMouseDown={e => this.addWidget(widgetInfo, e)}
+                  style={{backgroundColor: widgetInfo.color}}
+                  className={quickAddWidgetItemClasses}
+                  key={widgetInfo.type}
+                >
+                  <span className={`QuickAddWidget-item-icon ${widgetInfo.icon}`} />
+                  <span>{widgetInfo.title}</span>
+                </div>
+              )
+            })}
           </div>
-        ) : <div/> }
+        ) }
       </div>
     )
   }

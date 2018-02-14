@@ -115,8 +115,11 @@ class Widget extends Component {
     return (
       <div className={widgetClasses} onBlur={this.onBlur} tabIndex={0} ref="widgetTab">
         <WidgetHeader {...WidgetHeaderParams}/>
-        { !isIconified && isOpen && (
-          <div className={classnames('Widget-body', {floatBody})}>
+        { !isIconified && (
+          <div className={classnames('Widget-body', {
+            floatBody,
+            'Widget-body-closed': isOpen === false
+          })}>
             { children }
           </div>
         )}

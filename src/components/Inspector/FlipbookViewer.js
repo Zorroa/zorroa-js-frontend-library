@@ -9,6 +9,7 @@ import { setFlipbookFps } from '../../actions/appActions'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { defaultFpsFrequencies } from '../../constants/defaultState.js'
+import Asset from '../../models/Asset'
 
 class FlipbookViewer extends Component {
   static propTypes = {
@@ -23,7 +24,8 @@ class FlipbookViewer extends Component {
     }),
     totalFrames: PropTypes.number.isRequired,
     loadedPercentage: PropTypes.number.isRequired,
-    fps: PropTypes.number.isRequired
+    fps: PropTypes.number.isRequired,
+    isolatedAsset: PropTypes.instanceOf(Asset)
   }
 
   constructor (props) {
@@ -106,6 +108,8 @@ class FlipbookViewer extends Component {
                   status={this.status}
                   frames={this.props.frames}
                   totalFrames={this.props.totalFrames}
+                  autoPlay={false}
+                  defaultFrame={this.props.isolatedAsset.document.source.clip.frame.start}
                 />
               </PanZoom>
             </div>
@@ -124,7 +128,8 @@ class FlipbookViewer extends Component {
 
 const ConnectedFlipbookViewer = connect(
   (state) => ({
-    fps: state.app.flipbookFps
+    fps: state.app.flipbookFps,
+    isolatedAsset: state.assets.all.find(asset => asset.id === state.assets.isolatedId)
   }),
   dispatch => ({
     actions: bindActionCreators({

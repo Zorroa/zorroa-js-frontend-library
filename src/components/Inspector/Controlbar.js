@@ -120,6 +120,7 @@ export default class Controlbar extends PureComponent {
           { this.showFrameFrequency() && (
             <div className="Controlbar__section Controlbar__section-options">
               <button
+                title="Change FPS"
                 className="Controlbar__button"
                 onClick={() => this.toggleShowFpsOptions()}
                >

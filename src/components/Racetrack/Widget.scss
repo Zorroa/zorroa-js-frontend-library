@@ -13,6 +13,11 @@
     background-color: $zorroa-color-black;
   }
 
+  &.Widget-body-closed {
+    visibility: hidden;
+    pointer-events: none;
+  }
+
   &.floatBody {
     z-index: 10000;
     background-color: $zorroa-color-white;

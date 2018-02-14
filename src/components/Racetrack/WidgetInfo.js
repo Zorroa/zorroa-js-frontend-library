@@ -173,5 +173,6 @@ export const FlipbookWidgetInfo = {
   element: <FlipbookWidget/>,
   create: createFlipbookWidget,
   fieldTypes: [],
-  color: '#FFD000'
+  color: '#FFD000',
+  hideFromQuickAdd: true
 }
