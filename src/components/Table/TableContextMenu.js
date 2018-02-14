@@ -75,8 +75,8 @@ export default class TableContextMenu extends Component {
        { fn: this.moveColumnRight, icon: 'icon-arrow-right2', label: 'Move column right', disabled: (index) => (index >= fields.length - 1) },
        { fn: this.moveColumnToStart, icon: 'icon-enter-left2', label: 'Move column to start', disabled: (index) => (index === 0) },
        { fn: this.moveColumnToEnd, icon: 'icon-enter-right2', label: 'Move to end', disabled: (index) => (index >= fields.length - 1) },
-       { fn: this.removeColumn, icon: 'icon-delete-column', label: 'Remove column', disabled: (index) => (false) },
-       { fn: this.freezeColumn, icon: 'icon-table-freeze', label: 'Freeze column', disabled: (index) => (true) }
+       { fn: this.removeColumn, icon: 'icon-delete-column', label: 'Remove column', disabled: () => (false) },
+       { fn: this.freezeColumn, icon: 'icon-table-freeze', label: 'Freeze column', disabled: () => (true) }
     ]
     return (
       <div>
