@@ -10,6 +10,8 @@ import {
   FormLabel
 } from '../Form'
 import ExportsSection from './ExportsSection'
+import ExportInformation from './ExportInformation'
+import ImageAssets from './ImageAssets'
 
 class Exports extends Component {
   static propTypes = {
@@ -60,57 +62,8 @@ class Exports extends Component {
         </ModalHeader>
         <form onSubmit={this.onSubmit} className="Exports__body">
           <div className="Exports__sidebar">
-            <ExportsSection
-              title="Export Information"
-              onToggle={this.onToggle}
-              isOpen={!!this.state.accordions.exportInformation}
-              id="exportInformation"
-            >
-              <FormLabel vertical label="Export Package Name" className="Exports__form-element">
-                <FormInput
-                  required
-                  value = { this.state.exportPackageName }
-                  type="text"
-                  onChange = { exportPackageName => { this.onChange({exportPackageName}) } }
-                />
-              </FormLabel>
-              <FormLabel vertical label="Load Export Profile" className="Exports__form-element">
-                <FormInput
-                  required
-                  value = { this.state.exportProfile }
-                  type="text"
-                  onChange = { exportProfile => { this.onChange({exportProfile}) } }
-                />
-              </FormLabel>
-            </ExportsSection>
-            <ExportsSection
-              title="Image Assets"
-              onToggle={this.onToggle}
-              isOpen={!!this.state.accordions.imageAssets}
-              id="imageAssets"
-            >
-              <FormLabel vertical label="Export Original Assets" className="Exports__form-element">
-                <FormInput
-                  required
-                  value = { this.state.imageAssets }
-                  type="text"
-                  onChange = { exportPackageName => { this.onChange({exportPackageName}) } }
-                />
-              </FormLabel>
-              <FormLabel vertical label="Exports Assets As" className="Exports__form-element">
-                <FormInput
-                  required
-                  value = { this.state.imageAssets }
-                  type="text"
-                  onChange = { exportProfile => { this.onChange({exportProfile}) } }
-                />
-              </FormLabel>
-            </ExportsSection>
-            <fieldset className="Exports__field-group">
-              <Heading>
-                Export Information
-              </Heading>
-            </fieldset>
+            <ExportInformation />
+            <ImageAssets />
           </div>
           <div className="Exports__mainbar">
             <section className="Exports__type-section">

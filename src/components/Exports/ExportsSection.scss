@@ -3,19 +3,20 @@
 $title-height: 20px;
 $title-margin: 20px;
 $total-title-height: $title-height + ($title-margin * 2);
-$toggle-height: 15px;
+$toggle-height: 16px;
 
 .ExportsSection {
   border: 0;
-  padding: 0 20px 0 0;
-  max-height: $total-title-height;
-  overflow: hidden;
+  padding: 0;
   position: relative;
   transition: max-height 400ms ease-in-out;
   border-bottom: 1px solid $zorroa-color-gray-dark-3;
 
-  &--opened {
-    max-height: 500px;
+  &__header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-content: center;
   }
 
   &__title {
@@ -24,12 +25,22 @@ $toggle-height: 15px;
     line-height: $title-height;
     height: $title-height;
     margin: $title-margin 0;
+    flex-grow: 1;
+  }
+
+  &__content {
+    transition: 400ms all ease-in-out;
+    max-height: 350px;
+    opacity: 1;
+    overflow: hidden;
+
+    &--closed {
+      max-height: 0;
+      opacity: 0;
+    }
   }
 
   &__toggle {
-    position: absolute;
-    top: ($total-title-height / 2) - ($toggle-height / 2);
-    right: 0;
     font-family: sans-sans-serif;
     border: 1px solid $zorroa-color-gray-dark-2;
     color: $zorroa-color-gray-dark-2;
@@ -37,9 +48,36 @@ $toggle-height: 15px;
     width: $toggle-height;
     height: $toggle-height;
     padding: 0;
+    margin-left: 20px;
     border-radius: 1px;
     font-size: 12px;
     line-height: 5px;
     text-align: center;
+    flex-shrink: 1;
+    position: relative;
+    box-sizing: content-box;
+    cursor: pointer;
+
+    &::before,
+    &::after {
+      border-top: 1px solid $zorroa-color-gray-dark-3;
+      content: '';
+      display: block;
+      position: absolute;
+      width: $toggle-height / 2;
+      top: $toggle-height / 2;
+      left: $toggle-height / 4;
+      transition: 400ms transform ease-in-out;
+    }
+
+    &::before {
+      transform: rotate(90deg) scale(0);
+    }
+
+    &--closed {
+      &::before {
+        transform: rotate(90deg) scale(1);
+      }
+    }
   }
 }

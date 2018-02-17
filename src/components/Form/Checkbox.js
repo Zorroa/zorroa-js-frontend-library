@@ -6,30 +6,9 @@ export default class FormInput extends Component {
   static propTypes = {
     children: PropTypes.node,
     className: PropTypes.string,
-    label: PropTypes.string,
-    vertical: PropTypes.bool,
     error: PropTypes.bool,
-    required: PropTypes.bool,
     onChange: PropTypes.func,
-    value: PropTypes.string,
-    type: PropTypes.oneOf([
-      'text',
-      'password',
-      'number',
-      'color',
-      'date',
-      'file',
-      'month',
-      'range',
-      'time',
-      'email',
-      'search',
-      'submit',
-      'tel',
-      'text',
-      'url',
-      'week'
-    ])
+    value: PropTypes.string
   }
 
   constructor (props) {
@@ -57,16 +36,15 @@ export default class FormInput extends Component {
   }
 
   render () {
-    const {type, required, className, error} = this.props
-    const inputClasses = classnames('FormInput__input', {
-      'FormInput__input--error': error === true
+    const {className, error} = this.props
+    const inputClasses = classnames('FormInput__radio', {
+      'FormInput__radio--error': error === true
     }, className)
 
     return (
       <input
         className={inputClasses}
-        type={type}
-        required={required}
+        type="checkbox"
         onChange={this.onChange}
         value={this.state.value}
       />

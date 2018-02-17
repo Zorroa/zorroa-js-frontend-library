@@ -4,6 +4,10 @@
   &__body {
     display: flex;
     height: 80vw;
+
+    .dark & {
+      background-color: $zorroa-color-black;
+    }
   }
 
   &__sidebar {
@@ -12,6 +16,11 @@
     overflow: hidden;
     overflow-y: scroll;
     max-height: 100%;
+    color: $zorroa-color-gray-dark-4;
+
+    .dark & {
+      background-color: $zorroa-color-gray-dark-1;
+    }
   }
 
   &__field-group {

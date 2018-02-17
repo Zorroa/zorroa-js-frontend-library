@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react'
-import Heading from '../Heading'
 import classnames from 'classnames'
+import { FormCheckbox } from '../Form'
 
 export default class ExportsSection extends Component {
   static propTypes = {
@@ -20,19 +20,30 @@ export default class ExportsSection extends Component {
   }
 
   render () {
+    const exportSectionClasses = classnames('ExportsSection', {
+      'ExportsSection--opened': this.props.isOpen === true
+    })
+    const toggleClasses = classnames('ExportsSection__toggle', {
+      'ExportsSection__toggle--opened': this.props.isOpen === true,
+      'ExportsSection__toggle--closed': this.props.isOpen === false
+    })
+    const toggleContentClasses = classnames('ExportsSection__content', {
+      'ExportsSection__content--closed': this.props.isOpen === false
+    })
+
     return (
-      <fieldset className={classnames('ExportsSection', {
-        'ExportsSection--opened': this.props.isOpen
-      })}>
-        <h2 className="ExportsSection__title">
-          {this.props.title}
-        </h2>
-        <button
-          className="ExportsSection__toggle"
-          onClick={this.toggleAccordion}>
-          +
-        </button>
-        <div className="ExportsSection__content">
+      <fieldset className={exportSectionClasses}>
+        <header className="ExportsSection__header">
+          <FormCheckbox />
+          <h2 className="ExportsSection__title">
+            {this.props.title}
+          </h2>
+          <button
+            className={toggleClasses}
+            onClick={this.toggleAccordion}>
+          </button>
+        </header>
+        <div className={toggleContentClasses}>
           {this.props.children}
         </div>
       </fieldset>
