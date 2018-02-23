@@ -17,10 +17,32 @@
     overflow-y: scroll;
     max-height: 100%;
     color: $zorroa-color-gray-dark-4;
+    width: 300px;
+    max-width: 300px;
 
     .dark & {
       background-color: $zorroa-color-gray-dark-1;
     }
+  }
+
+  &__mainbar {
+    margin: 0 20px;
+  }
+
+  &__form-element {
+    display: flex;
+    align-items: center;
+    align-content: center;
+    justify-content: flex-start;
+
+    &--nested {
+      align-items: flex-start;
+      align-content: flex-start;
+    }
+  }
+
+  &__form-select {
+    width: 130px;
   }
 
   &__field-group {
@@ -29,5 +51,41 @@
 
   &__Exports__field-group {
     border-bottom: 1px solid $zorroa-color-gray-light-1;
+  }
+
+  &__form-input {
+    width: 130px;
+  }
+
+  &__form-help {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+  }
+
+  &__form-help-label {
+    padding: 0 10px;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    color: $zorroa-color-gray-dark-4;
+  }
+
+  &__review-section {
+    display: flex;
+    padding: 10px 0;
+    border-bottom: 1px solid $zorroa-color-gray-dark-4;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  &__review-term {
+    width: 130px;
+  }
+
+  &__review-definition {
+    display: flex;
+    flex-direction: column;
   }
 }

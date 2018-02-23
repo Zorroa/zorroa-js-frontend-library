@@ -7,24 +7,19 @@ import ExportsSection from './ExportsSection'
 
 export default class ExportInformation extends Component {
   static propTypes = {
+    isOpen: PropTypes.bool,
+    onToggleAccordion: PropTypes.func.isRequired
   }
 
-  state = {
-    isOpen: true
-  }
-
-  onToggle = ({isOpen}) => {
-    this.setState({
-      isOpen
-    })
-  }
+  state = {}
 
   render () {
     return (
       <ExportsSection
         title="Export Information"
-        onToggle={this.onToggle}
-        isOpen={this.state.isOpen}
+        onToggleAccordion={this.props.onToggleAccordion}
+        isOpen
+        alwaysShow
       >
         <FormLabel vertical label="Export Package Name" className="Exports__form-element">
           <FormInput

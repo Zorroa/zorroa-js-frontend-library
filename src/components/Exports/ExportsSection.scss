@@ -9,7 +9,6 @@ $toggle-height: 16px;
   border: 0;
   padding: 0;
   position: relative;
-  transition: max-height 400ms ease-in-out;
   border-bottom: 1px solid $zorroa-color-gray-dark-3;
 
   &__header {
@@ -26,17 +25,32 @@ $toggle-height: 16px;
     height: $title-height;
     margin: $title-margin 0;
     flex-grow: 1;
+    color: $zorroa-color-gray-dark-2;
+
+    .dark & {
+      color: $zorroa-color-gray-light-1;
+    }
+  }
+
+  &__title-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-content: center;
+    flex-grow: 1;
   }
 
   &__content {
-    transition: 400ms all ease-in-out;
-    max-height: 350px;
-    opacity: 1;
-    overflow: hidden;
-
     &--closed {
-      max-height: 0;
-      opacity: 0;
+      height: 0;
+      visibility: hidden;
+      overflow-y: hidden;
+    }
+
+    &--disabled {
+      opacity: .5;
+      pointer-events: none;
+      cursor: not-allowed!important;
     }
   }
 
@@ -67,7 +81,7 @@ $toggle-height: 16px;
       width: $toggle-height / 2;
       top: $toggle-height / 2;
       left: $toggle-height / 4;
-      transition: 400ms transform ease-in-out;
+      transition: 250ms transform ease-in-out;
     }
 
     &::before {

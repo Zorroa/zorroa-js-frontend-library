@@ -1,6 +1,6 @@
 import React, { PropTypes, Component } from 'react'
 import classnames from 'classnames'
-import './Checkbox.scss'
+import './Radio.scss'
 
 export default class FormInput extends Component {
   static propTypes = {
@@ -8,7 +8,8 @@ export default class FormInput extends Component {
     className: PropTypes.string,
     error: PropTypes.bool,
     onChange: PropTypes.func,
-    checked: PropTypes.bool
+    checked: PropTypes.bool,
+    name: PropTypes.string.isRequired
   }
 
   constructor (props) {
@@ -22,7 +23,7 @@ export default class FormInput extends Component {
   componentWillReceiveProps (nextProps) {
     if (nextProps.checked !== this.state.checked) {
       this.setState({
-        checked: nextProps.checked === true
+        value: nextProps.checked === true
       })
     }
   }
@@ -34,22 +35,23 @@ export default class FormInput extends Component {
       this.props.onChange(checked)
     }
     this.setState({
-      checked
+      value: checked
     })
   }
 
   render () {
     const {className, error} = this.props
-    const inputClasses = classnames('FormInput__checkbox', {
-      'FormInput__checkbox--error': error === true
+    const inputClasses = classnames('FormInput__radio', {
+      'FormInput__radio--error': error === true
     }, className)
 
     return (
       <input
         className={inputClasses}
-        type="checkbox"
+        name={this.props.name}
+        type="radio"
         onChange={this.onChange}
-        checked={this.state.checked}
+        checked={this.props.checked}
       />
     )
   }

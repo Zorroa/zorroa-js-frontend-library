@@ -5,17 +5,32 @@ import { FormCheckbox } from '../Form'
 export default class ExportsSection extends Component {
   static propTypes = {
     title: PropTypes.string.isRequired,
-    isOpen: PropTypes.bool.isRequired,
     children: PropTypes.node,
-    onToggle: PropTypes.func.isRequired,
-    id: PropTypes.string.isRequired
+    isOpen: PropTypes.bool,
+    onToggleExport: PropTypes.func,
+    onToggleAccordion: PropTypes.func,
+    alwaysShow: PropTypes.bool
+  }
+
+  state = {
+    isExportable: this.props.alwaysShow === true // By default an always visible module is also going to be part of the export metadata
   }
 
   toggleAccordion = event => {
     event.preventDefault()
-    this.props.onToggle({
-      isOpen: !this.props.isOpen,
-      key: this.props.id
+
+    if (typeof this.props.onToggleAccordion === 'function') {
+      this.props.onToggleAccordion()
+    }
+  }
+
+  onCheckboxChange = (isChecked) => {
+    this.setState({
+      isExportable: isChecked === true
+    }, () => {
+      if (typeof onToggleExport === 'function') {
+        this.props.onToggleExport(isChecked === true)
+      }
     })
   }
 
@@ -25,19 +40,28 @@ export default class ExportsSection extends Component {
     })
     const toggleClasses = classnames('ExportsSection__toggle', {
       'ExportsSection__toggle--opened': this.props.isOpen === true,
-      'ExportsSection__toggle--closed': this.props.isOpen === false
+      'ExportsSection__toggle--closed': this.props.isOpen !== true
     })
     const toggleContentClasses = classnames('ExportsSection__content', {
-      'ExportsSection__content--closed': this.props.isOpen === false
+      'ExportsSection__content--closed': this.props.isOpen !== true,
+      'ExportsSection__content--enabled': this.state.isExportable === true,
+      'ExportsSection__content--disabled': this.state.isExportable === false
     })
 
     return (
       <fieldset className={exportSectionClasses}>
         <header className="ExportsSection__header">
-          <FormCheckbox />
-          <h2 className="ExportsSection__title">
-            {this.props.title}
-          </h2>
+          <label className="ExportsSection__title-group">
+            {this.props.alwaysShow !== true && (
+              <FormCheckbox
+                checked={this.state.isExportable}
+                onChange={this.onCheckboxChange}
+              />
+            )}
+            <h2 className="ExportsSection__title">
+              {this.props.title}
+            </h2>
+          </label>
           <button
             className={toggleClasses}
             onClick={this.toggleAccordion}>

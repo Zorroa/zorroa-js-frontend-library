@@ -12,6 +12,7 @@ export default class FormInput extends Component {
     required: PropTypes.bool,
     onChange: PropTypes.func,
     value: PropTypes.string,
+    inlineReset: PropTypes.bool,
     type: PropTypes.oneOf([
       'text',
       'password',
@@ -56,6 +57,12 @@ export default class FormInput extends Component {
     })
   }
 
+  resetInput = () => {
+    this.setState({
+      value: ''
+    })
+  }
+
   render () {
     const {type, required, className, error} = this.props
     const inputClasses = classnames('FormInput__input', {
@@ -63,13 +70,21 @@ export default class FormInput extends Component {
     }, className)
 
     return (
-      <input
-        className={inputClasses}
-        type={type}
-        required={required}
-        onChange={this.onChange}
-        value={this.state.value}
-      />
+      <div className={inputClasses}>
+        <input
+          className="FormInput__input-native"
+          type={type}
+          required={required}
+          onChange={this.onChange}
+          value={this.state.value}
+        />
+        { this.props.inlineReset && (
+          <span
+            className="icon-cancel-circle FormInput__input-inline-reset"
+            onClick={this.resetInput}
+          />
+        )}
+      </div>
     )
   }
 }

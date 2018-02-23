@@ -22,15 +22,44 @@
   }
 
   &__input {
+    margin-top: $form-element-top-margin;
+    margin-bottom: $form-element-bottom-margin;
+    position: relative;
+  }
+
+  &__input-inline-reset {
+    content: ' ';
+    display: block;
+    height: 100%;
+    line-height: 100%;
+    width: 10px;
+    margin-top: -5px;
+    color: $zorroa-color-gray-dark-2;
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    padding: 0 15px;
+    cursor: pointer;
+
+    &:hover,
+    &:focus {
+      color: $zorroa-color-black;
+
+      .dark & {
+        color: $zorroa-color-gray-dark-3;
+      }
+    }
+  }
+
+  &__input-native {
     border-radius: $form-element-border-radius;
     height: $form-element-height;
     line-height: 20px;
     padding: 10px;
     border: $form-element-border;
-    margin-top: $form-element-top-margin;
-    margin-bottom: $form-element-bottom-margin;
     font-size: 14px;
     background: none;
+    max-width: 100%;
 
     .dark & {
       color: $zorroa-dark-color-text;
