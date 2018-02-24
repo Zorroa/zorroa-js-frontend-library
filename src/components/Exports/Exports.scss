@@ -27,6 +27,7 @@
 
   &__mainbar {
     margin: 0 20px;
+    flex-grow: 1;
   }
 
   &__form-element {
@@ -87,5 +88,24 @@
   &__review-definition {
     display: flex;
     flex-direction: column;
+  }
+
+  &__form-buttons {
+    display: flex;
+    margin: 20px 0;
+  }
+
+  &__review-section--selected-assets {
+    flex-flow: row wrap
+  }
+
+  &__review-section-selected-asset {
+    margin: 10px;
+  }
+
+  &__review-section-selected-asset-row {
+    display: flex;
+    flex-flow: column wrap;
+    width: 100%;
   }
 }

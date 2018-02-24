@@ -228,7 +228,7 @@ export default class ImageExporter extends Component {
             afterLabel="Export assets as"
             className="Exports__form-element"
           >
-            <FormRadio onChange={() => this.toggleExportOriginal(false)} name="ImageExporter" />
+            <FormRadio onChange={() => this.toggleExportOriginal(false)} checked={!this.state.exportOriginal} name="ImageExporter" />
           </FormLabel>
           <FormLabel
             vertical

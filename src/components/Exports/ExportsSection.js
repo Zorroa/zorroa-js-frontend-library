@@ -24,11 +24,11 @@ export default class ExportsSection extends Component {
     }
   }
 
-  onCheckboxChange = (isChecked) => {
+  onCheckboxChange = isChecked => {
     this.setState({
       isExportable: isChecked === true
     }, () => {
-      if (typeof onToggleExport === 'function') {
+      if (typeof this.props.onToggleExport === 'function') {
         this.props.onToggleExport(isChecked === true)
       }
     })
