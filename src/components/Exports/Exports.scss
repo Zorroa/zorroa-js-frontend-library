@@ -51,6 +51,10 @@ $content-height: calc(80vw - 40px);
       align-items: flex-start;
       align-content: flex-start;
     }
+
+    &--inline {
+      margin-bottom: 0;
+    }
   }
 
   &__form-select {
@@ -145,6 +149,8 @@ $content-height: calc(80vw - 40px);
     opacity: 0;
     transition: 400ms ease-in-out transform, 400ms ease-in-out opacity;
     pointer-events: none;
+    display: flex;
+    align-items: center;
 
     &--visible {
       transform: translateX(0);
@@ -215,5 +221,10 @@ $content-height: calc(80vw - 40px);
   &__asset-preview-proxy {
     width: 100%;
     height: auto;
+  }
+
+  &__save-label {
+    margin-left: 10px;
+    display: inline-block;
   }
 }

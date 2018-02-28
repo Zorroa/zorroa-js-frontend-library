@@ -36,4 +36,16 @@
       color: $zorroa-color-gray-dark-2;
     }
   }
+
+  &--mini {
+    border-color: $zorroa-color-blue-1;
+    background: $zorroa-color-blue-1;
+    color: $zorroa-color-white;
+    height: 30px;
+    padding: 0 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+  }
 }

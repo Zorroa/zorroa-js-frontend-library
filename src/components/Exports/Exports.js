@@ -4,7 +4,11 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 import Modal from '../Modal'
 import ModalHeader from '../ModalHeader'
-import { updateExportInterface } from '../../actions/exportsAction'
+import {
+  updateExportInterface,
+  postExportProfiles,
+  loadExportProfiles
+} from '../../actions/exportsAction'
 import ZipExporter from './Exporters/ZipExporter'
 import ImageExporter from './Exporters/ImageExporter'
 import VideoClipExporter from './Exporters/VideoClipExporter'
@@ -20,6 +24,7 @@ import ExportPreviewerPdf from './Previewers/Pdf'
 import ExportPreviewerJson from './Previewers/Json'
 import ExportPreviewerCsv from './Previewers/Csv'
 import ExportsPreview from './ExportsPreview'
+import { Save as IconSave } from '../Icons'
 
 import {
   FILE_GROUP_IMAGES,
@@ -41,9 +46,23 @@ class Exports extends Component {
     selectedAssets: PropTypes.arrayOf(
       PropTypes.instanceOf(Asset)
     ),
+    exportProfiles: PropTypes.arrayOf(
+      PropTypes.shape({
+        presetName: PropTypes.string,
+        id: PropTypes.number,
+        processors: PropTypes.arrayOf(
+          PropTypes.shape({
+            args: PropTypes.arrayOf(PropTypes.object),
+            className: PropTypes.string
+          })
+        )
+      })
+    ),
     origin: PropTypes.string.isRequired,
     actions: PropTypes.shape({
-      updateExportInterface: PropTypes.func.isRequired
+      updateExportInterface: PropTypes.func.isRequired,
+      postExportProfiles: PropTypes.func.isRequired,
+      loadExportProfiles: PropTypes.func.isRequired
     })
   }
 
@@ -107,11 +126,14 @@ class Exports extends Component {
   state = {
     ...this.defaultProcessors,
     showPresetForm: false,
-    savedPresets: [],
     visibleExporter: 'ZipExporter',
     showDebugForm: false,
     presetId: undefined,
     newPresetName: `My Preset ${(new Date()).toLocaleDateString()}`
+  }
+
+  componentDidMount () {
+    this.props.actions.loadExportProfiles()
   }
 
   close = () => {
@@ -140,20 +162,19 @@ class Exports extends Component {
     })
   }
 
-  savePresets = () => {
-    this.setState(prevState => {
-      const presetId = prevState.savedPresets.length + 1
-      const savedPresets = [].concat(prevState.savedPresets, {
-        processors: this.serializeExporterArguments().processors,
-        presetName: this.state.newPresetName,
-        id: presetId
-      })
+  saveProfiles = () => {
+    const presetId = Math.random() * 10000000000
+    const savedProfiles = [].concat(this.props.exportProfiles, {
+      processors: this.serializeExporterArguments().processors,
+      presetName: this.state.newPresetName,
+      id: presetId
+    })
 
-      return {
-        savedPresets,
-        showPresetForm: false,
-        presetId
-      }
+    this.props.actions.postExportProfiles(savedProfiles)
+
+    this.setState({
+      showPresetForm: false,
+      presetId
     })
   }
 
@@ -221,6 +242,7 @@ class Exports extends Component {
   render () {
     const exporterArguments = this.serializeExporterArguments()
     const processors = exporterArguments.processors
+    const activePreset = this.props.exportProfiles.find(preset => preset.id === this.state.presetId)
 
     const body = (
       <div className="Exports">
@@ -236,7 +258,7 @@ class Exports extends Component {
               savedArguments={this.state.savedArguments}
               fileName={this.state.ZipExporter.arguments.fileName}
               presetId={this.state.presetId}
-              presets={this.state.savedPresets}
+              presets={this.props.exportProfiles}
               onSelectPreset={this.onSelectPreset}
             />
             <ImageExporter
@@ -294,9 +316,9 @@ class Exports extends Component {
               <dd className={classnames('Exports__review-definition', {
                 'Exports__review-definition--demphasized': this.state.presetId === undefined
               })}>
-                {this.state.presetId === undefined
+                {activePreset === undefined
                   ? 'No profile chosen'
-                  : this.state.savedPresets.find(preset => preset.id === this.state.presetId).presetName
+                  : activePreset.presetName
                 }
               </dd>
             </dl>
@@ -365,8 +387,11 @@ class Exports extends Component {
                 <FormButton look="minimal" onClick={this.close}>
                   Cancel
                 </FormButton>
-                <FormButton look="minimal" onClick={this.togglePresetFormVisibility}>
-                  Save Export Profile
+                <FormButton look="mini" onClick={this.togglePresetFormVisibility}>
+                  <IconSave />
+                  <span className="Exports__save-label">
+                    Save Export Profile
+                  </span>
                 </FormButton>
               </div>
               <div className={classnames('Exports__main-form-buttons', {
@@ -374,7 +399,7 @@ class Exports extends Component {
               })}>
                 <FormLabel
                   label="Name preset"
-                  className="Exports__form-element"
+                  className="Exports__form-element Exports__form-element--inline"
                 >
                   <FormInput
                     value={this.state.newPresetName}
@@ -383,7 +408,7 @@ class Exports extends Component {
                     onChange={(presetName) => this.setState({newPresetName: presetName})}
                   />
                 </FormLabel>
-                <FormButton onClick={this.savePresets}>
+                <FormButton onClick={this.saveProfiles}>
                   Save
                 </FormButton>
                 <FormButton look="minimal" onClick={this.togglePresetFormVisibility}>
@@ -458,10 +483,13 @@ export default connect(state => {
     ...assetCounts,
     selectedAssets,
     shouldShow: state.exports.shouldShow,
-    origin: state.auth.origin
+    origin: state.auth.origin,
+    exportProfiles: state.exports.exportProfiles
   }
 }, dispatch => ({
   actions: bindActionCreators({
-    updateExportInterface
+    updateExportInterface,
+    loadExportProfiles,
+    postExportProfiles
   }, dispatch)
 }))(Exports)
