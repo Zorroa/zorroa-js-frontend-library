@@ -1,17 +1,26 @@
 import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import classnames from 'classnames'
 import Modal from '../Modal'
 import ModalHeader from '../ModalHeader'
 import { updateExportInterface } from '../../actions/exportsAction'
-import ExportInformation from './ExportInformation'
-import ImageExporter from './ImageExporter'
-import VideoClipExporter from './VideoClipExporter'
-import FlipbookExporter from './FlipbookExporter'
-import PdfExporter from './PdfExporter'
-import MetadataExporter from './MetadataExporter'
-import { FormButton } from '../Form'
+import ZipExporter from './Exporters/ZipExporter'
+import ImageExporter from './Exporters/ImageExporter'
+import VideoClipExporter from './Exporters/VideoClipExporter'
+import FlipbookExporter from './Exporters/FlipbookExporter'
+import PdfExporter from './Exporters/PdfExporter'
+import MetadataExporter from './Exporters/MetadataExporter'
+import { FormButton, FormInput, FormLabel } from '../Form'
 import Asset from '../../models/Asset'
+import ExportPreviewerImage from './Previewers/Image'
+import ExportPreviewerFlipbook from './Previewers/Flipbook'
+import ExportPreviewerVideoClip from './Previewers/VideoClip'
+import ExportPreviewerPdf from './Previewers/Pdf'
+import ExportPreviewerJson from './Previewers/Json'
+import ExportPreviewerCsv from './Previewers/Csv'
+import ExportsPreview from './ExportsPreview'
+
 import {
   FILE_GROUP_IMAGES,
   FILE_GROUP_VECTORS,
@@ -21,18 +30,6 @@ import {
   groupExts
 } from '../../constants/fileTypes'
 
-function articulateQuality (quality) {
-  if (quality > 75) {
-    return 'Best'
-  }
-
-  if (quality > 50) {
-    return 'Good'
-  }
-
-  return 'Fast'
-}
-
 class Exports extends Component {
   static propTypes = {
     name: PropTypes.string,
@@ -41,22 +38,80 @@ class Exports extends Component {
     flipbookAssetCount: PropTypes.number.isRequired,
     documentAssetCount: PropTypes.number.isRequired,
     totalAssetCount: PropTypes.number.isRequired,
-    selectedAssets: PropTypes.oneOf(Asset),
+    selectedAssets: PropTypes.arrayOf(
+      PropTypes.instanceOf(Asset)
+    ),
     origin: PropTypes.string.isRequired,
     actions: PropTypes.shape({
       updateExportInterface: PropTypes.func.isRequired
     })
   }
 
-  state = {
-    visibleExporter: 'ExportInformation',
-    isExportInformationVisible: true,
-    showDebugForm: false,
-    ExportInformation: {
+  defaultProcessors = {
+    ImageExporter: {
       arguments: {
-        exportPackageName: `evi-export-${(new Date()).toLocaleDateString().replace(/\//g, '-')}`
-      }
+        exportOriginal: true,
+        format: 'jpg',
+        size: 256,
+        quality: 100
+      },
+      shouldExport: false
+    },
+    PdfExporter: {
+      arguments: {
+        size: 1200,
+        quality: 100,
+        exportOriginal: true,
+        mediaType: 'pdf',
+        pageMode: 'merge'
+      },
+      shouldExport: false,
+      format: 'multipage'
+    },
+    FlipbookExporter: {
+      arguments: {
+        quality: 100,
+        size: 1200,
+        exportImages: true,
+        exportMovies: true
+      },
+      shouldExport: false,
+      flipbookExportType: 'image'
+    },
+    CsvExporter: {
+      arguments: {},
+      shouldExport: false
+    },
+    JsonExporter: {
+      arguments: {},
+      shouldExport: false
+    },
+    VideoClipExporter: {
+      arguments: {
+        resolution: 720,
+        quality: 100,
+        aspectRatio: undefined,
+        format: 'mp4',
+        exportOriginal: true
+      },
+      shouldExport: false
+    },
+    ZipExporter: {
+      arguments: {
+        fileName: `evi-export-${(new Date()).toLocaleDateString().replace(/\//g, '-')}.zip`
+      },
+      shouldExport: true
     }
+  }
+
+  state = {
+    ...this.defaultProcessors,
+    showPresetForm: false,
+    savedPresets: [],
+    visibleExporter: 'ZipExporter',
+    showDebugForm: false,
+    presetId: undefined,
+    newPresetName: `My Preset ${(new Date()).toLocaleDateString()}`
   }
 
   close = () => {
@@ -66,7 +121,10 @@ class Exports extends Component {
   }
 
   onChange = newState => {
-    this.setState(newState)
+    this.setState({
+      ...newState,
+      presetId: undefined
+    })
   }
 
   toggleAccordion = (visibleExporter) => {
@@ -82,12 +140,43 @@ class Exports extends Component {
     })
   }
 
-  getMetadataExporter () {
-    return this.state.CsvExporter || this.state.JsonExporter
+  savePresets = () => {
+    this.setState(prevState => {
+      const presetId = prevState.savedPresets.length + 1
+      const savedPresets = [].concat(prevState.savedPresets, {
+        processors: this.serializeExporterArguments().processors,
+        presetName: this.state.newPresetName,
+        id: presetId
+      })
+
+      return {
+        savedPresets,
+        showPresetForm: false,
+        presetId
+      }
+    })
   }
 
-  serializeExporterArguments () {
-    const exporters = [
+  onSelectPreset = (preset) => {
+    const presets = preset
+      .processors
+      .reduce((accumulator, processor) => {
+        const className = processor.className
+        accumulator[className] = Object.assign({}, this.state[className], {
+          arguments: processor.args,
+          shouldExport: true
+        })
+        return accumulator
+      }, {...this.defaultProcessors})
+
+    this.setState({
+      ...presets,
+      presetId: preset.id
+    })
+  }
+
+  serializeExporterArguments = () => {
+    const processors = [
       'ImageExporter',
       'VideoClipExporter',
       'FlipbookExporter',
@@ -98,22 +187,40 @@ class Exports extends Component {
       const exporter = this.state[exporterName]
 
       if (exporter && exporter.shouldExport === true) {
-        accumulator[exporterName] = exporter.arguments
+        accumulator.push({
+          args: {...exporter.arguments},
+          className: exporterName
+        })
       }
 
       return accumulator
-    }, {})
+    }, [])
+
+    // Everything shoud be bundled in a nice .Zip file
+    processors.push({
+      className: 'ZipExporter',
+      args: {
+        fileName: this.state.ZipExporter.arguments.fileName
+      }
+    })
 
     return {
-      ...this.state.ExportInformation.arguments,
-      exporters
+      search: {
+        'TODO': 'get the actual search for exports'
+      },
+      processors
     }
   }
 
+  togglePresetFormVisibility = () => {
+    this.setState(prevState => ({
+      showPresetForm: !(prevState.showPresetForm === true)
+    }))
+  }
+
   render () {
-    const metadataExporterState = this.getMetadataExporter()
     const exporterArguments = this.serializeExporterArguments()
-    const exporters = exporterArguments.exporters
+    const processors = exporterArguments.processors
 
     const body = (
       <div className="Exports">
@@ -122,165 +229,167 @@ class Exports extends Component {
         </ModalHeader>
         <form onSubmit={this.onSubmit} className="Exports__body">
           <div className="Exports__sidebar">
-            <ExportInformation
-              isOpen={this.state.visibleExporter === 'ExportInformation'}
-              onToggleAccordion={() => this.toggleAccordion('ExportInformation')}
+            <ZipExporter
+              isOpen={this.state.visibleExporter === 'ZipExporter'}
+              onToggleAccordion={() => this.toggleAccordion('ZipExporter')}
               onChange={this.onChange}
-              exportPackageName={this.state.ExportInformation.arguments.exportPackageName}
+              savedArguments={this.state.savedArguments}
+              fileName={this.state.ZipExporter.arguments.fileName}
+              presetId={this.state.presetId}
+              presets={this.state.savedPresets}
+              onSelectPreset={this.onSelectPreset}
             />
             <ImageExporter
               isOpen={this.state.visibleExporter === 'ImageExporter'}
               onToggleAccordion={() => this.toggleAccordion('ImageExporter')}
               onChange={this.onChange}
+              arguments={this.state.ImageExporter.arguments}
+              shouldExport={this.state.ImageExporter.shouldExport}
             />
             <VideoClipExporter
               isOpen={this.state.visibleExporter === 'VideoClipExporter'}
               onToggleAccordion={() => this.toggleAccordion('VideoClipExporter')}
               onChange={this.onChange}
+              arguments={this.state.VideoClipExporter.arguments}
+              shouldExport={this.state.VideoClipExporter.shouldExport}
+
             />
             <FlipbookExporter
               isOpen={this.state.visibleExporter === 'FlipbookExporter'}
               onToggleAccordion={() => this.toggleAccordion('FlipbookExporter')}
               onChange={this.onChange}
+              arguments={this.state.FlipbookExporter.arguments}
+              shouldExport={this.state.FlipbookExporter.shouldExport}
             />
             <PdfExporter
               isOpen={this.state.visibleExporter === 'PdfExporter'}
               onToggleAccordion={() => this.toggleAccordion('PdfExporter')}
               onChange={this.onChange}
+              arguments={this.state.PdfExporter.arguments}
+              shouldExport={this.state.PdfExporter.shouldExport}
             />
             <MetadataExporter
               isOpen={this.state.visibleExporter === 'MetadataExporter'}
               onToggleAccordion={() => this.toggleAccordion('MetadataExporter')}
               onChange={this.onChange}
+              exporter={this.state.JsonExporter.shouldExport ? 'JsonExporter' : 'CsvExporter'}
+              shouldExport={this.state.JsonExporter.shouldExport || this.state.CsvExporter.shouldExport}
             />
           </div>
           <div className="Exports__mainbar">
-            <dl className="Exports__review-section">
+            <ExportsPreview
+              selectedAssets={this.props.selectedAssets}
+              origin={this.props.origin}
+            />
+            <dl className="Exports__review-section Exports__review-section--heading">
               <dt className="Exports__review-term">Assets</dt>
               <dd className="Exports__review-definition">{this.props.totalAssetCount}</dd>
             </dl>
-            <dl className="Exports__review-section">
+            <dl className="Exports__review-section Exports__review-section--heading">
               <dt className="Exports__review-term">Name</dt>
-              <dd className="Exports__review-definition">{exporterArguments.exportPackageName}</dd>
+              <dd className="Exports__review-definition">{this.state.ZipExporter.arguments.fileName}</dd>
             </dl>
-            {exporters.ImageExporter && (
-              <dl className="Exports__review-section">
-                <dt className="Exports__review-term">Image Assets</dt>
-                <dd className="Exports__review-definition">
-                  <span>
-                    {this.props.imageAssetCount} assets
-                  </span>
-                  <span>
-                    Export as: {exporters.ImageExporter.format.toUpperCase()}
-                  </span>
-                  <span>
-                    Quality: {articulateQuality(exporters.ImageExporter.quality)}
-                  </span>
-                  <span>
-                    Resize: {exporters.ImageExporter.size}px
-                  </span>
-                </dd>
-              </dl>
-            )}
-            {exporters.VideoClipExporter && (
-              <dl className="Exports__review-section">
-                <dt className="Exports__review-term">Movie Assets</dt>
-                <dd className="Exports__review-definition">
-                  <span>
-                    {this.props.movieAssetCount} assets
-                  </span>
-                  <span>
-                    Export as: {exporters.VideoClipExporter.format.toUpperCase()}
-                  </span>
-                  <span>
-                    Quality: {articulateQuality(exporters.VideoClipExporter.quality)}
-                  </span>
-                  <span>
-                    Aspect Ratio: {exporters.VideoClipExporter.aspectRatio || 'Original'}
-                  </span>
-                  <span>
-                    Resolution: {exporters.VideoClipExporter.resolution}p
-                  </span>
-                </dd>
-              </dl>
-            )}
-            {exporters.FlipbookExporter && (
-              <dl className="Exports__review-section">
-                <dt className="Exports__review-term">Flipbook Assets</dt>
-                <dd className="Exports__review-definition">
-                  <span>
-                    {this.props.flipbookAssetCount} assets
-                  </span>
-                  <span>
-                    Export as: {(({exportImages, exportMovies}) => {
-                      if (exportImages && exportMovies) {
-                        return 'Movie and Image Files'
-                      }
-
-                      if (exportMovies) {
-                        return 'Movie Files'
-                      }
-
-                      if (exportImages) {
-                        return 'Image Files'
-                      }
-                    })(exporters.FlipbookExporter)}
-                  </span>
-                  <span>
-                    Quality: {articulateQuality(exporters.FlipbookExporter.quality)}
-                  </span>
-                  <span>
-                    Size: {exporters.FlipbookExporter.size}px
-                  </span>
-                </dd>
-              </dl>
-            )}
-            {exporters.PdfExporter && (
-              <dl className="Exports__review-section">
-                <dt className="Exports__review-term">Document Assets</dt>
-                <dd className="Exports__review-definition">
-                  <span>
-                    {this.props.documentAssetCount} assets
-                  </span>
-                  <span>
-                    Export as: {(({pageMode, mediaType}) => {
-                      const formattedMediaType = mediaType.toUpperCase()
-
-                      if (pageMode === 'merge') {
-                        return `Combined ${formattedMediaType}`
-                      }
-
-                      return `Single page ${formattedMediaType}`
-                    })(exporters.PdfExporter)}
-                  </span>
-                  <span>
-                    Quality: {articulateQuality(exporters.PdfExporter.quality)}
-                  </span>
-                  <span>
-                    Size: {exporters.PdfExporter.size}px
-                  </span>
-                </dd>
-              </dl>
-            )}
-            {metadataExporterState && (
-              <dl className="Exports__review-section">
-                <dt className="Exports__review-term">Metadata</dt>
-                <dd className="Exports__review-definition">
-                  <span>
-                    Export as: {metadataExporterState.prettyName}
-                  </span>
-                </dd>
-              </dl>
-            )}
-            <div className="Exports__form-buttons">
-              <FormButton onClick={() => this.setState({
-                showDebugForm: true
+            <dl className="Exports__review-section Exports__review-section--heading">
+              <dt className="Exports__review-term">Profile</dt>
+              <dd className={classnames('Exports__review-definition', {
+                'Exports__review-definition--demphasized': this.state.presetId === undefined
               })}>
-                Export
-              </FormButton>
-              <FormButton look="minimal" onClick={this.close}>
-                Cancel
-              </FormButton>
+                {this.state.presetId === undefined
+                  ? 'No profile chosen'
+                  : this.state.savedPresets.find(preset => preset.id === this.state.presetId).presetName
+                }
+              </dd>
+            </dl>
+
+            {
+              processors.map((processor, index) => {
+                const key = `${processor.className}-${index}`
+                switch (processor.className) {
+                  case 'ImageExporter':
+                    return (
+                      <ExportPreviewerImage
+                        key={key}
+                        imageAssetCount={this.props.imageAssetCount}
+                        exporterArguments={processor.args}
+                      />
+                    )
+
+                  case 'VideoClipExporter':
+                    return (
+                      <ExportPreviewerVideoClip
+                        key={key}
+                        movieAssetCount={this.props.movieAssetCount}
+                        exporterArguments={processor.args}
+                      />
+                    )
+
+                  case 'FlipbookExporter':
+                    return (
+                      <ExportPreviewerFlipbook
+                        key={key}
+                        flipbookAssetCount={this.props.flipbookAssetCount}
+                        exporterArguments={processor.args}
+                      />
+                    )
+
+                  case 'PdfExporter':
+                    return (
+                      <ExportPreviewerPdf
+                        key={key}
+                        documentAssetCount={this.props.documentAssetCount}
+                        exporterArguments={processor.args}
+                      />
+                    )
+
+                  case 'JsonExporter':
+                    return (
+                      <ExportPreviewerJson key={key} />
+                    )
+
+                  case 'CsvExporter':
+                    return (
+                      <ExportPreviewerCsv key={key} />
+                    )
+                }
+              })
+            }
+            <div className="Exports__form-footer">
+              <div className={classnames('Exports__main-form-buttons', {
+                'Exports__main-form-buttons--visible': this.state.showPresetForm !== true
+              })}>
+                <FormButton onClick={() => this.setState({
+                  showDebugForm: true
+                })}>
+                  Export
+                </FormButton>
+                <FormButton look="minimal" onClick={this.close}>
+                  Cancel
+                </FormButton>
+                <FormButton look="minimal" onClick={this.togglePresetFormVisibility}>
+                  Save Export Profile
+                </FormButton>
+              </div>
+              <div className={classnames('Exports__main-form-buttons', {
+                'Exports__main-form-buttons--visible': this.state.showPresetForm === true
+              })}>
+                <FormLabel
+                  label="Name preset"
+                  className="Exports__form-element"
+                >
+                  <FormInput
+                    value={this.state.newPresetName}
+                    inlineReset
+                    className="Exports__form-input--inline"
+                    onChange={(presetName) => this.setState({newPresetName: presetName})}
+                  />
+                </FormLabel>
+                <FormButton onClick={this.savePresets}>
+                  Save
+                </FormButton>
+                <FormButton look="minimal" onClick={this.togglePresetFormVisibility}>
+                  Back
+                </FormButton>
+              </div>
             </div>
             { this.state.showDebugForm && (
               <section className="Exports__review-section">
@@ -293,13 +402,11 @@ class Exports extends Component {
     )
 
     return (
-      <div className="Exports">
-        <Modal
-          onModalUnderlayClick={this.close}
-          body={body}
-          width={'80vw'}
-        />
-      </div>
+      <Modal
+        onModalUnderlayClick={this.close}
+        body={body}
+        width={'830px'}
+      />
     )
   }
 }

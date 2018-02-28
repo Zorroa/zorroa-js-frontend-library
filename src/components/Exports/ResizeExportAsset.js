@@ -7,7 +7,7 @@ import {
 export default class ResizeExportAsset extends Component {
   static propTypes = {
     onChange: PropTypes.func.isRequired,
-    defaultSize: PropTypes.string.isRequired
+    defaultSize: PropTypes.number.isRequired
   }
 
   state = {

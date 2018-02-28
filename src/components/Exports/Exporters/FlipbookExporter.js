@@ -3,28 +3,52 @@ import {
   FormSelect,
   FormLabel,
   FormRadio
-} from '../Form'
-import ExportsSection from './ExportsSection'
-import ResizeExportAsset from './ResizeExportAsset'
+} from '../../Form'
+import ExportsSection from '../ExportsSection'
+import ResizeExportAsset from '../ResizeExportAsset'
 
 export default class FlipbookExporter extends Component {
   static propTypes = {
     onChange: PropTypes.func,
     onToggleAccordion: PropTypes.func.isRequired,
-    isOpen: PropTypes.bool
+    isOpen: PropTypes.bool,
+    shouldExport: PropTypes.bool,
+    arguments: PropTypes.shape({
+      quality: PropTypes.string.isRequired,
+      size: PropTypes.number.isRequired,
+      exportImages: PropTypes.number.isRequired,
+      exportMovies: PropTypes.bool.isRequired
+    })
   }
 
   state = {
     isOpen: true,
-    shouldExport: true,
-    exportOriginal: true,
+    shouldExport: this.props.shouldExport,
     flipbookExportType: 'image',
 
     // Exporter arguments
-    quality: 100,
-    size: 1200,
-    exportImages: true,
-    exportMovies: true
+    quality: this.props.arguments.quality,
+    size: this.props.arguments.size,
+    exportImages: this.props.arguments.exportImages,
+    exportMovies: this.props.arguments.exportMovies
+  }
+
+  componentWillReceiveProps (nextProps) {
+    const newState = {}
+    if (
+      nextProps.arguments.quality !== this.state.quality ||
+      nextProps.arguments.size !== this.state.size ||
+      nextProps.arguments.exportImages !== this.state.exportImages ||
+      nextProps.arguments.exportMovies !== this.state.exportMovies
+    ) {
+      newState.arguments = nextProps.arguments
+    }
+
+    if (nextProps.shouldExport !== this.state.shouldExport) {
+      newState.shouldExport = nextProps.shouldExport
+    }
+
+    this.setState(newState)
   }
 
   onChange = (options) => {
@@ -104,6 +128,7 @@ export default class FlipbookExporter extends Component {
         title="Flipbook Assets"
         onToggleExport={this.toggleCanExport}
         onToggleAccordion={this.props.onToggleAccordion}
+        isExportable={this.state.shouldExport}
         isOpen={this.props.isOpen}
       >
         <radiogroup>

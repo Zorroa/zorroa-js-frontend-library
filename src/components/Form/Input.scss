@@ -31,12 +31,12 @@
     content: ' ';
     display: block;
     height: 100%;
-    line-height: 100%;
+    line-height: $form-element-height!important; // Hack to override icon font classes
     width: 10px;
-    margin-top: -5px;
     color: $zorroa-color-gray-dark-2;
     position: absolute;
-    top: 50%;
+    top: 0;
+    text-align: center;
     right: 10px;
     padding: 0 15px;
     cursor: pointer;
@@ -60,6 +60,7 @@
     font-size: 14px;
     background: none;
     max-width: 100%;
+    width: 100%;
 
     .dark & {
       color: $zorroa-dark-color-text;

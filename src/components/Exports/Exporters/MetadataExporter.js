@@ -2,37 +2,58 @@ import React, { Component, PropTypes } from 'react'
 import {
   FormSelect,
   FormLabel
-} from '../Form'
-import ExportsSection from './ExportsSection'
+} from '../../Form'
+import ExportsSection from '../ExportsSection'
 
 export default class MetadataExporter extends Component {
   static propTypes = {
     onChange: PropTypes.func,
     onToggleAccordion: PropTypes.func.isRequired,
-    isOpen: PropTypes.bool
+    isOpen: PropTypes.bool,
+    shouldExport: PropTypes.bool,
+    exporter: PropTypes.oneOf(['JsonExporter', 'CsvExporter'])
   }
 
   state = {
     isOpen: true,
-    shouldExport: true,
-    resolution: 720,
-    quality: 100,
-    aspectRatio: undefined,
-    format: 'mp4',
-    exportOriginal: true
+    exporter: this.props.exporter,
+    shouldExport: this.props.shouldExport
   }
 
   onChange = (options) => {
     this.setState(options, () => {
       if (typeof this.props.onChange === 'function') {
         this.props.onChange({
-          [this.state.exporter]: {
+          CsvExporter: {
             arguments: {},
-            prettyName: this.state.exporter === 'JsonExporter' ? 'JSON' : 'CSV',
-            shouldExport: this.state.shouldExport
+            shouldExport: this.state.shouldExport && this.state.exporter === 'CsvExporter'
+          },
+          JsonExporter: {
+            arguments: {},
+            shouldExport: this.state.shouldExport && this.state.exporter === 'JsonExporter'
           }
         })
       }
+    })
+  }
+
+  componentWillReceiveProps (nextProps) {
+    const newState = {}
+
+    if (nextProps.exporter !== this.state.exporter) {
+      newState.exporter = nextProps.exporter
+    }
+
+    if (nextProps.shouldExport !== this.state.shouldExport) {
+      newState.shouldExport = nextProps.shouldExport
+    }
+
+    this.setState(newState)
+  }
+
+  toggleCanExport = shouldExport => {
+    this.onChange({
+      shouldExport
     })
   }
 
@@ -59,6 +80,7 @@ export default class MetadataExporter extends Component {
         onToggleExport={this.toggleCanExport}
         onToggleAccordion={this.props.onToggleAccordion}
         isOpen={this.props.isOpen}
+        isExportable={this.state.shouldExport}
       >
         <FormLabel
           vertical
@@ -70,7 +92,7 @@ export default class MetadataExporter extends Component {
             options={formatOptions}
             fieldLabel='label'
             fieldKey='value'
-            value={this.state.format}
+            value={this.state.exporter}
             onChange={({value}) => this.onChange({exporter: value})}
           >
           </FormSelect>

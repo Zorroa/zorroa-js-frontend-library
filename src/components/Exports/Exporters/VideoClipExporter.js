@@ -3,24 +3,54 @@ import {
   FormSelect,
   FormLabel,
   FormRadio
-} from '../Form'
-import ExportsSection from './ExportsSection'
+} from '../../Form'
+import ExportsSection from '../ExportsSection'
 
 export default class VideoClipExporter extends Component {
   static propTypes = {
     onChange: PropTypes.func,
     onToggleAccordion: PropTypes.func.isRequired,
-    isOpen: PropTypes.bool
+    isOpen: PropTypes.bool,
+    shouldExport: PropTypes.bool.isRequired,
+    arguments: PropTypes.shape({
+      resolution: PropTypes.string.isRequired,
+      quality: PropTypes.number.isRequired,
+      aspectRatio: PropTypes.string,
+      format: PropTypes.string.isRequired,
+      exportOriginal: PropTypes.bool.isRequired
+    })
   }
 
   state = {
     isOpen: true,
-    shouldExport: true,
-    resolution: 720,
-    quality: 100,
-    aspectRatio: undefined,
-    format: 'mp4',
-    exportOriginal: true
+    shouldExport: this.props.shouldExport,
+
+    // Arguments
+    resolution: this.props.arguments.resolution,
+    quality: this.props.arguments.quality,
+    aspectRatio: this.props.arguments.aspectRatio,
+    format: this.props.arguments.format,
+    exportOriginal: this.props.arguments.exportOriginal
+  }
+
+  componentWillReceiveProps (nextProps) {
+    const newState = {}
+
+    if (
+      nextProps.arguments.resolution !== this.state.resolution ||
+      nextProps.arguments.quality !== this.state.quality ||
+      nextProps.arguments.aspectRatio !== this.state.aspectRatio ||
+      nextProps.arguments.exportOriginal !== this.state.exportOriginal ||
+      nextProps.arguments.format !== this.state.format
+    ) {
+      newState.arguments = nextProps.arguments
+    }
+
+    if (nextProps.shouldExport !== this.state.shouldExport) {
+      newState.shouldExport = nextProps.shouldExport
+    }
+
+    this.setState(newState)
   }
 
   onChange = (options) => {
@@ -115,6 +145,7 @@ export default class VideoClipExporter extends Component {
         title="Movie Assets"
         onToggleExport={this.toggleCanExport}
         onToggleAccordion={this.props.onToggleAccordion}
+        isExportable={this.state.shouldExport}
         isOpen={this.props.isOpen}
       >
         <radiogroup>

@@ -12,7 +12,10 @@ export default class Select extends Component {
     error: PropTypes.bool,
     required: PropTypes.bool,
     onChange: PropTypes.func,
-    value: PropTypes.string,
+    value: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number
+    ]),
     deafultLabel: PropTypes.string
   }
 
@@ -35,24 +38,23 @@ export default class Select extends Component {
   onChange = (event) => {
     const value = event.target.value
     const fieldKey = this.props.fieldKey
-
     this.setState({
-      value
-    })
+      value: typeof this.props.value === 'number' ? Number(value) : value
+    }, () => {
+      if (this.props.deafultLabel !== undefined && value === '') {
+        return
+      }
 
-    if (this.props.deafultLabel !== undefined && value === '') {
-      return
-    }
+      if (typeof this.props.onChange !== 'function') {
+        return
+      }
 
-    if (typeof this.props.onChange !== 'function') {
-      return
-    }
-
-    this.props.onChange(
-      this.props.options.find(
-        option => (option[fieldKey] || '').toString() === value
+      this.props.onChange(
+        this.props.options.find(
+          option => (option[fieldKey] || '').toString() === value
+        )
       )
-    )
+    })
   }
 
   render () {

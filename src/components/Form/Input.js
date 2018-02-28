@@ -11,7 +11,10 @@ export default class FormInput extends Component {
     error: PropTypes.bool,
     required: PropTypes.bool,
     onChange: PropTypes.func,
-    value: PropTypes.string,
+    value: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number
+    ]),
     inlineReset: PropTypes.bool,
     type: PropTypes.oneOf([
       'text',
@@ -51,9 +54,10 @@ export default class FormInput extends Component {
 
   onChange = event => {
     const value = event.target.value
-    this.props.onChange(value)
     this.setState({
-      value
+      value: typeof this.props.value === 'number' ? Number(value) : value
+    }, () => {
+      this.props.onChange(this.state.value)
     })
   }
 

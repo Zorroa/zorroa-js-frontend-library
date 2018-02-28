@@ -9,11 +9,8 @@ export default class ExportsSection extends Component {
     isOpen: PropTypes.bool,
     onToggleExport: PropTypes.func,
     onToggleAccordion: PropTypes.func,
-    alwaysShow: PropTypes.bool
-  }
-
-  state = {
-    isExportable: this.props.alwaysShow === true // By default an always visible module is also going to be part of the export metadata
+    isExportable: PropTypes.bool,
+    isRequired: PropTypes.bool
   }
 
   toggleAccordion = event => {
@@ -25,13 +22,13 @@ export default class ExportsSection extends Component {
   }
 
   onCheckboxChange = isChecked => {
-    this.setState({
-      isExportable: isChecked === true
-    }, () => {
-      if (typeof this.props.onToggleExport === 'function') {
-        this.props.onToggleExport(isChecked === true)
-      }
-    })
+    if (typeof this.props.onToggleExport === 'function') {
+      this.props.onToggleExport(isChecked === true)
+    }
+  }
+
+  isExportable () {
+    return this.props.isRequired === true || this.props.isExportable === true
   }
 
   render () {
@@ -44,17 +41,17 @@ export default class ExportsSection extends Component {
     })
     const toggleContentClasses = classnames('ExportsSection__content', {
       'ExportsSection__content--closed': this.props.isOpen !== true,
-      'ExportsSection__content--enabled': this.state.isExportable === true,
-      'ExportsSection__content--disabled': this.state.isExportable === false
+      'ExportsSection__content--enabled': this.isExportable() === true,
+      'ExportsSection__content--disabled': this.isExportable() === false
     })
 
     return (
       <fieldset className={exportSectionClasses}>
         <header className="ExportsSection__header">
           <label className="ExportsSection__title-group">
-            {this.props.alwaysShow !== true && (
+            {this.props.isRequired !== true && (
               <FormCheckbox
-                checked={this.state.isExportable}
+                checked={this.isExportable()}
                 onChange={this.onCheckboxChange}
               />
             )}

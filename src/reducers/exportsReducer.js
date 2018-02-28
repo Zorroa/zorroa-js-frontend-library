@@ -3,7 +3,7 @@ import {
 } from '../constants/actionTypes'
 
 export const initialState = {
-  shouldShow: true // TODO set this to false before releasing
+  shouldShow: false
 }
 
 export default function (state = initialState, action) {
