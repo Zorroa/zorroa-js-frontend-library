@@ -5,7 +5,7 @@ import * as api from '../globals/api.js'
 import {
   AUTH_USER, UNAUTH_USER, AUTH_ORIGIN, AUTH_ERROR, USER_SETTINGS,
   AUTH_PERMISSIONS, AUTH_SYNC, METADATA_FIELDS,
-  AUTH_ONBOARDING, AUTH_HMAC,
+  AUTH_ONBOARDING, AUTH_HMAC, CLEAR_AUTH_ERROR,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
   SHOW_MULTIPAGE, VIDEO_VOLUME, AUTH_CHANGE_PASSWORD, AUTH_DEFAULTS,
   UX_LEVEL, MONOCHROME, THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE,
@@ -108,21 +108,19 @@ export function validateUser (user, origin) {
   return dispatch => {
     // Create a new archivist, if needed for a new host
     createArchivist(dispatch, origin)
-    if (user.id > 0) {
-      archivistGet(dispatch, '/api/v1/users/' + user.id, {
-        headers: { 'X-Requested-With': 'XMLHttpRequest' } // disable browser auth
+    archivistGet(dispatch, '/api/v1/who', {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' } // disable browser auth
+    })
+      .then(response => {
+        authorize(dispatch, response.data)
       })
-        .then(response => {
-          authorize(dispatch, response.data)
-        })
-        .catch(error => {
-          if (error && error.response && error.response.status === 401) {
-            dispatch({type: UNAUTH_USER, payload: error.response.data})
-          } else {
-            browserHistory.push('/signin')
-          }
-        })
-    }
+      .catch(error => {
+        if (error && error.response && error.response.status === 401) {
+          dispatch({type: UNAUTH_USER, payload: error.response.data})
+        } else {
+          browserHistory.push('/signin')
+        }
+      })
   }
 }
 
@@ -315,6 +313,13 @@ export function authError (msg, error) {
   return {
     type: AUTH_ERROR,
     payload
+  }
+}
+
+export function clearAuthError () {
+  return {
+    type: CLEAR_AUTH_ERROR,
+    payload: undefined
   }
 }
 

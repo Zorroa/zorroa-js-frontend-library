@@ -5,7 +5,7 @@ import { Link } from 'react-router'
 import classnames from 'classnames'
 
 import Logo from '../../Logo'
-import { signinUser, authError } from '../../../actions/authAction'
+import { signinUser, authError, clearAuthError } from '../../../actions/authAction'
 import { EULA_VERSION_ITEM } from '../../../constants/localStorageItems'
 
 // Update whenever legal agreement is changed.
@@ -58,7 +58,9 @@ class Signin extends Component {
   }
 
   clearError = () => {
-    this.props.actions.authError()
+    if (this.props.error) {
+      this.props.actions.clearAuthError()
+    }
   }
 
   signin = (event) => {
@@ -177,6 +179,7 @@ export default connect(state => ({
 }), dispatch => ({
   actions: bindActionCreators({
     signinUser,
-    authError
+    authError,
+    clearAuthError
   }, dispatch)
 }))(Signin)

@@ -1,6 +1,6 @@
 import {
   AUTH_USER, UNAUTH_USER, AUTH_ORIGIN, AUTH_ERROR, AUTH_PERMISSIONS, AUTH_HMAC,
-  AUTH_SYNC, AUTH_CHANGE_PASSWORD, AUTH_DEFAULTS, AUTH_ONBOARDING } from '../constants/actionTypes'
+  AUTH_SYNC, AUTH_CHANGE_PASSWORD, AUTH_DEFAULTS, AUTH_ONBOARDING, CLEAR_AUTH_ERROR} from '../constants/actionTypes'
 import User from '../models/User'
 import Permission from '../models/Permission'
 
@@ -18,6 +18,9 @@ export default function (state = initialState, action) {
       return { ...state, origin: action.payload }
     case AUTH_ERROR:
       return { ...state, error: action.payload }
+    case CLEAR_AUTH_ERROR: {
+      return { ...state, error: undefined }
+    }
     case AUTH_PERMISSIONS: {
       const user = new User(state.user)
       user.permissions = action.payload
