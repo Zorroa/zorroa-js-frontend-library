@@ -44,6 +44,10 @@ class Flipbook extends PureComponent {
     }
   }
 
+  componentWillUnmount () {
+    this.cancelAnimation()
+  }
+
   getNumberOfFrames () {
     return this.props.totalFrames
   }
