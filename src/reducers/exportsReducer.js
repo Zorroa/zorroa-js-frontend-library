@@ -5,14 +5,17 @@ import {
   LOAD_EXPORT_PROFILE_BLOB_ERROR,
   POST_EXPORT_PROFILE_BLOB,
   POST_EXPORT_PROFILE_BLOB_SUCCESS,
-  POST_EXPORT_PROFILE_BLOB_ERROR
+  POST_EXPORT_PROFILE_BLOB_ERROR,
+  POST_EXPORT_PROFILE_BLOB_CLEAR
 } from '../constants/actionTypes'
 
 export const initialState = {
   shouldShow: false,
   exportProfilesLoading: false,
   exportProfiles: [],
-  exportProfilesError: false
+  exportProfilesError: false,
+  exportProfilesSuccess: false,
+  exportProfilesPosting: false
 }
 
 export default function (state = initialState, action) {
@@ -39,17 +42,46 @@ export default function (state = initialState, action) {
     case POST_EXPORT_PROFILE_BLOB: {
       const exportProfilesPosting = true
       const exportProfilesPostingError = false
-      return { ...state, exportProfilesPosting, exportProfilesPostingError }
+      const exportProfilesSuccess = false
+      return {
+        ...state,
+        exportProfilesPosting,
+        exportProfilesPostingError,
+        exportProfilesSuccess
+      }
     }
     case POST_EXPORT_PROFILE_BLOB_SUCCESS: {
       const exportProfilesPosting = false
       const exportProfiles = action.payload.data
-      return { ...state, exportProfilesPosting, exportProfiles }
+      const exportProfilesSuccess = true
+
+      return {
+        ...state,
+        exportProfilesPosting,
+        exportProfilesSuccess,
+        exportProfiles
+      }
     }
     case POST_EXPORT_PROFILE_BLOB_ERROR: {
       const exportProfilesPosting = false
       const exportProfilesPostingError = true
-      return { ...state, exportProfilesPosting, exportProfilesPostingError }
+      return {
+        ...state,
+        exportProfilesPosting,
+        exportProfilesPostingError
+      }
+    }
+    case POST_EXPORT_PROFILE_BLOB_CLEAR: {
+      const exportProfilesPosting = false
+      const exportProfilesPostingError = false
+      const exportProfilesSuccess = false
+
+      return {
+        ...state,
+        exportProfilesPosting,
+        exportProfilesPostingError,
+        exportProfilesSuccess
+      }
     }
   }
 

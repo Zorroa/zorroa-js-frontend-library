@@ -15,7 +15,6 @@ export default class PdfExporter extends Component {
     shouldExport: PropTypes.bool.isRequired,
     format: PropTypes.string.isRequired,
     arguments: PropTypes.shape({
-      format: PropTypes.string.isRequired,
       mediaType: PropTypes.string.isRequired,
       pageMode: PropTypes.string.isRequired,
       size: PropTypes.number.isRequired,

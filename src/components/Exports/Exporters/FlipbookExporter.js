@@ -14,9 +14,9 @@ export default class FlipbookExporter extends Component {
     isOpen: PropTypes.bool,
     shouldExport: PropTypes.bool,
     arguments: PropTypes.shape({
-      quality: PropTypes.string.isRequired,
+      quality: PropTypes.number.isRequired,
       size: PropTypes.number.isRequired,
-      exportImages: PropTypes.number.isRequired,
+      exportImages: PropTypes.bool.isRequired,
       exportMovies: PropTypes.bool.isRequired
     })
   }

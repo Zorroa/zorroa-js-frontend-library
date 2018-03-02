@@ -13,7 +13,7 @@ export default class VideoClipExporter extends Component {
     isOpen: PropTypes.bool,
     shouldExport: PropTypes.bool.isRequired,
     arguments: PropTypes.shape({
-      resolution: PropTypes.string.isRequired,
+      resolution: PropTypes.number.isRequired,
       quality: PropTypes.number.isRequired,
       aspectRatio: PropTypes.string,
       format: PropTypes.string.isRequired,

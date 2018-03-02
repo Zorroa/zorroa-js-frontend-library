@@ -2,7 +2,11 @@ import {
   UPDATE_EXPORT_UI,
   LOAD_EXPORT_PROFILE_BLOB,
   LOAD_EXPORT_PROFILE_BLOB_SUCCESS,
-  LOAD_EXPORT_PROFILE_BLOB_ERROR
+  LOAD_EXPORT_PROFILE_BLOB_ERROR,
+  POST_EXPORT_PROFILE_BLOB_ERROR,
+  POST_EXPORT_PROFILE_BLOB_SUCCESS,
+  POST_EXPORT_PROFILE_BLOB_CLEAR,
+  POST_EXPORT_PROFILE_BLOB
 } from '../constants/actionTypes'
 import api from '../api'
 const APP_NAME = 'curator'
@@ -36,7 +40,7 @@ export function loadExportProfiles () {
 export function postExportProfiles (data) {
   return dispatch => {
     dispatch({
-      type: LOAD_EXPORT_PROFILE_BLOB
+      type: POST_EXPORT_PROFILE_BLOB
     })
 
     api
@@ -52,15 +56,23 @@ export function postExportProfiles (data) {
       })
       .then(response => {
         dispatch({
-          type: LOAD_EXPORT_PROFILE_BLOB_SUCCESS,
+          type: POST_EXPORT_PROFILE_BLOB_SUCCESS,
           payload: response
         })
       }, errorResponse => {
         dispatch({
-          type: LOAD_EXPORT_PROFILE_BLOB_ERROR,
+          type: POST_EXPORT_PROFILE_BLOB_ERROR,
           payload: errorResponse.data
         })
       })
+  }
+}
+
+export function clearPostExportLoadingStates () {
+  return dispatch => {
+    dispatch({
+      type: POST_EXPORT_PROFILE_BLOB_CLEAR
+    })
   }
 }
 

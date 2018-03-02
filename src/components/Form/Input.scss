@@ -9,6 +9,7 @@
   .dark & {
     color: $zorroa-dark-color-text;
   }
+
   &--vertical {
     flex-direction: column;
   }
@@ -25,6 +26,10 @@
     margin-top: $form-element-top-margin;
     margin-bottom: $form-element-bottom-margin;
     position: relative;
+
+    .dark & {
+      background-color: $zorroa-color-gray-dark-1;
+    }
   }
 
   &__input-inline-reset {
@@ -33,7 +38,7 @@
     height: 100%;
     line-height: $form-element-height!important; // Hack to override icon font classes
     width: 10px;
-    color: $zorroa-color-gray-dark-2;
+    color: $zorroa-color-gray-dark-4;
     position: absolute;
     top: 0;
     text-align: center;
@@ -63,7 +68,7 @@
     width: 100%;
 
     .dark & {
-      color: $zorroa-dark-color-text;
+      color: $zorroa-color-gray-dark-4;
     }
 
     &--error {

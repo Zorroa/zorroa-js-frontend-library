@@ -7,7 +7,8 @@ import ModalHeader from '../ModalHeader'
 import {
   updateExportInterface,
   postExportProfiles,
-  loadExportProfiles
+  loadExportProfiles,
+  clearPostExportLoadingStates
 } from '../../actions/exportsAction'
 import ZipExporter from './Exporters/ZipExporter'
 import ImageExporter from './Exporters/ImageExporter'
@@ -35,6 +36,8 @@ import {
   groupExts
 } from '../../constants/fileTypes'
 
+const SHOW_SUCCESS_MS = 2750
+
 class Exports extends Component {
   static propTypes = {
     name: PropTypes.string,
@@ -46,13 +49,16 @@ class Exports extends Component {
     selectedAssets: PropTypes.arrayOf(
       PropTypes.instanceOf(Asset)
     ),
+    exportProfilesError: PropTypes.bool.isRequired,
+    exportProfilesSuccess: PropTypes.bool.isRequired,
+    exportProfilesPosting: PropTypes.bool.isRequired,
     exportProfiles: PropTypes.arrayOf(
       PropTypes.shape({
         presetName: PropTypes.string,
         id: PropTypes.number,
         processors: PropTypes.arrayOf(
           PropTypes.shape({
-            args: PropTypes.arrayOf(PropTypes.object),
+            args: PropTypes.object,
             className: PropTypes.string
           })
         )
@@ -62,7 +68,8 @@ class Exports extends Component {
     actions: PropTypes.shape({
       updateExportInterface: PropTypes.func.isRequired,
       postExportProfiles: PropTypes.func.isRequired,
-      loadExportProfiles: PropTypes.func.isRequired
+      loadExportProfiles: PropTypes.func.isRequired,
+      clearPostExportLoadingStates: PropTypes.func.isRequired
     })
   }
 
@@ -127,13 +134,29 @@ class Exports extends Component {
     ...this.defaultProcessors,
     showPresetForm: false,
     visibleExporter: 'ZipExporter',
-    showDebugForm: false,
     presetId: undefined,
-    newPresetName: `My Preset ${(new Date()).toLocaleDateString()}`
+    newPresetName: `Preset ${(new Date()).toLocaleDateString()}`,
+    presetSaveCounter: 0
   }
 
   componentDidMount () {
     this.props.actions.loadExportProfiles()
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (this.props.exportProfilesPosting !== nextProps.exportProfilesPosting && // Must be a new prop
+      this.props.exportProfilesPosting === true && // Only change if it was in the middle of posting
+      this.state.showPresetForm === true // Only change if the form is already open
+    ) {
+      // Hide the form after a few seconds to show the success indicator
+      setTimeout(() => {
+        this.setState(prevState => ({
+          showPresetForm: false,
+          presetSaveCounter: prevState.presetSaveCounter + 1,
+          newPresetName: `Preset ${prevState.presetSaveCounter + 1}`
+        }))
+      }, SHOW_SUCCESS_MS)
+    }
   }
 
   close = () => {
@@ -147,6 +170,20 @@ class Exports extends Component {
       ...newState,
       presetId: undefined
     })
+  }
+
+  getSaveProfileState () {
+    if (this.props.exportProfilesError === true) {
+      return 'error'
+    }
+
+    if (this.props.exportProfilesSuccess === true) {
+      return 'success'
+    }
+
+    if (this.props.exportProfilesPosting === true) {
+      return 'loading'
+    }
   }
 
   toggleAccordion = (visibleExporter) => {
@@ -163,7 +200,7 @@ class Exports extends Component {
   }
 
   saveProfiles = () => {
-    const presetId = Math.random() * 10000000000
+    const presetId = Number.parseInt(Math.random() * 10000000000)
     const savedProfiles = [].concat(this.props.exportProfiles, {
       processors: this.serializeExporterArguments().processors,
       presetName: this.state.newPresetName,
@@ -173,7 +210,6 @@ class Exports extends Component {
     this.props.actions.postExportProfiles(savedProfiles)
 
     this.setState({
-      showPresetForm: false,
       presetId
     })
   }
@@ -234,6 +270,7 @@ class Exports extends Component {
   }
 
   togglePresetFormVisibility = () => {
+    this.props.actions.clearPostExportLoadingStates()
     this.setState(prevState => ({
       showPresetForm: !(prevState.showPresetForm === true)
     }))
@@ -288,6 +325,7 @@ class Exports extends Component {
               onToggleAccordion={() => this.toggleAccordion('PdfExporter')}
               onChange={this.onChange}
               arguments={this.state.PdfExporter.arguments}
+              format={this.state.PdfExporter.format}
               shouldExport={this.state.PdfExporter.shouldExport}
             />
             <MetadataExporter
@@ -379,48 +417,49 @@ class Exports extends Component {
               <div className={classnames('Exports__main-form-buttons', {
                 'Exports__main-form-buttons--visible': this.state.showPresetForm !== true
               })}>
-                <FormButton onClick={() => this.setState({
-                  showDebugForm: true
-                })}>
-                  Export
-                </FormButton>
-                <FormButton look="minimal" onClick={this.close}>
-                  Cancel
-                </FormButton>
-                <FormButton look="mini" onClick={this.togglePresetFormVisibility}>
-                  <IconSave />
-                  <span className="Exports__save-label">
-                    Save Export Profile
-                  </span>
-                </FormButton>
+                <div className="Exports__form-button-group">
+                  <FormButton onClick={() => console.log(this.exporterArguments)}>
+                    Export
+                  </FormButton>
+                  <FormButton look="minimal" onClick={this.close}>
+                    Cancel
+                  </FormButton>
+                </div>
+                <div className="Exports__form-button-group Exports__form-button-group--secondary">
+                  <FormButton look="mini" onClick={this.togglePresetFormVisibility}>
+                    <IconSave />
+                    <span className="Exports__save-label">
+                      Save Export Profile
+                    </span>
+                  </FormButton>
+                </div>
               </div>
               <div className={classnames('Exports__main-form-buttons', {
                 'Exports__main-form-buttons--visible': this.state.showPresetForm === true
               })}>
-                <FormLabel
-                  label="Name preset"
-                  className="Exports__form-element Exports__form-element--inline"
-                >
-                  <FormInput
-                    value={this.state.newPresetName}
-                    inlineReset
-                    className="Exports__form-input--inline"
-                    onChange={(presetName) => this.setState({newPresetName: presetName})}
-                  />
-                </FormLabel>
-                <FormButton onClick={this.saveProfiles}>
-                  Save
-                </FormButton>
-                <FormButton look="minimal" onClick={this.togglePresetFormVisibility}>
-                  Back
-                </FormButton>
+                <div className="Exports__form-button-group">
+                  <FormLabel
+                    label="Name preset"
+                    className="Exports__form-element Exports__form-element--inline"
+                  >
+                    <FormInput
+                      value={this.state.newPresetName}
+                      inlineReset
+                      className="Exports__form-input--inline"
+                      onChange={(presetName) => this.setState({newPresetName: presetName})}
+                    />
+                  </FormLabel>
+                </div>
+                <div className="Exports__form-button-group Exports__form-button-group--secondary">
+                  <FormButton state={this.getSaveProfileState()} onClick={this.saveProfiles}>
+                    Save
+                  </FormButton>
+                  <FormButton look="minimal" onClick={this.togglePresetFormVisibility}>
+                    Back
+                  </FormButton>
+                </div>
               </div>
             </div>
-            { this.state.showDebugForm && (
-              <section className="Exports__review-section">
-                <pre style={{fontFamily: 'monospace', overflowX: 'scroll'}}>{JSON.stringify(exporterArguments, undefined, 2)}</pre>
-              </section>
-            )}
           </div>
         </form>
       </div>
@@ -484,12 +523,16 @@ export default connect(state => {
     selectedAssets,
     shouldShow: state.exports.shouldShow,
     origin: state.auth.origin,
-    exportProfiles: state.exports.exportProfiles
+    exportProfiles: state.exports.exportProfiles,
+    exportProfilesError: state.exports.exportProfilesError,
+    exportProfilesSuccess: state.exports.exportProfilesSuccess,
+    exportProfilesPosting: state.exports.exportProfilesPosting
   }
 }, dispatch => ({
   actions: bindActionCreators({
     updateExportInterface,
     loadExportProfiles,
-    postExportProfiles
+    postExportProfiles,
+    clearPostExportLoadingStates
   }, dispatch)
 }))(Exports)

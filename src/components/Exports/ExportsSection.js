@@ -44,6 +44,9 @@ export default class ExportsSection extends Component {
       'ExportsSection__content--enabled': this.isExportable() === true,
       'ExportsSection__content--disabled': this.isExportable() === false
     })
+    const titleClasses = classnames('ExportsSection__title', {
+      'ExportsSection__title--required': this.props.isRequired === true
+    })
 
     return (
       <fieldset className={exportSectionClasses}>
@@ -55,7 +58,7 @@ export default class ExportsSection extends Component {
                 onChange={this.onCheckboxChange}
               />
             )}
-            <h2 className="ExportsSection__title">
+            <h2 className={titleClasses}>
               {this.props.title}
             </h2>
           </label>
