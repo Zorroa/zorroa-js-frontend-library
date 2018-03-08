@@ -180,7 +180,13 @@ export function searchAssets (query, lastQuery, force, isFirstPage, parentIds) {
       aggQuery.fields = ['_id']
       aggQuery.order = null
       promises.push(searchAssetsRequestProm(dispatch, aggQuery))
-      if (parentIds && parentIds.length) promises.push(updateParentTotals(query, parentIds))
+
+      if (parentIds && parentIds.length) {
+        promises.push(updateParentTotals(query, parentIds, {
+          isUnfiltered: true
+        }))
+        promises.push(updateParentTotals(query, parentIds))
+      }
     }
 
     return Promise.all(promises)
@@ -219,8 +225,10 @@ export function searchAssets (query, lastQuery, force, isFirstPage, parentIds) {
   }
 }
 
-export function updateParentTotals (query, parentIds) {
+export function updateParentTotals (query, parentIds, options = {}) {
   return dispatch => {
+    const isUnfiltered = options.isUnfiltered === true
+
     if (parentIds && parentIds.length) {
       const aggQuery = new AssetSearch(query)
       if (aggQuery.postFilter) {
@@ -231,7 +239,7 @@ export function updateParentTotals (query, parentIds) {
         }
       }
       const parentFilter = new AssetFilter({terms: { 'source.clip.parent.raw': parentIds }})
-      if (aggQuery.filter) {
+      if (aggQuery.filter && isUnfiltered === false) {
         aggQuery.filter.merge(parentFilter)
       } else {
         aggQuery.filter = parentFilter
@@ -244,13 +252,14 @@ export function updateParentTotals (query, parentIds) {
       aggQuery.size = 1
       aggQuery.fields = ['_id']
       aggQuery.order = null
-      console.log('Parent query: ' + JSON.stringify(aggQuery))
+
       searchAssetsRequestProm(dispatch, aggQuery)
         .then(response => {
           const aggs = response.data.aggregations
+          const aggsKey = isUnfiltered ? 'unfilteredAggs' : 'aggs'
           dispatch({
             type: ASSET_AGGS,
-            payload: { aggs }
+            payload: { [aggsKey]: aggs }
           })
         })
         .catch(error => {

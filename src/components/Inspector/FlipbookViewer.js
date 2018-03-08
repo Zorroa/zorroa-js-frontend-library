@@ -72,6 +72,19 @@ class FlipbookViewer extends Component {
     this.props.actions.setFlipbookFps(frameRate)
   }
 
+  getDefaultFrameFromIsolatedAsset () {
+    if (
+      this.props.isolatedAsset.document.source &&
+      this.props.isolatedAsset.document.source.clip &&
+      this.props.isolatedAsset.document.source.clip.frame &&
+      this.props.isolatedAsset.document.source.clip.frame.start
+    ) {
+      return this.props.isolatedAsset.document.source.clip.frame.start
+    }
+
+    return 1
+  }
+
   render () {
     const isLoading = this.getLoadedPercentage() < 100 || this.props.frames.length === 0
     const { currentFrameNumber, playing } = this.state
@@ -109,7 +122,7 @@ class FlipbookViewer extends Component {
                   frames={this.props.frames}
                   totalFrames={this.props.totalFrames}
                   autoPlay={false}
-                  defaultFrame={this.props.isolatedAsset.document.source.clip.frame.start}
+                  defaultFrame={this.getDefaultFrameFromIsolatedAsset()}
                 />
               </PanZoom>
             </div>

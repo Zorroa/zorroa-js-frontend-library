@@ -73,6 +73,18 @@ export default class Asset {
   mediaType () { return (this.document.source && this.document.source.mediaType) || 'unknown' }
   tinyProxy () { return (this.document.proxies && (this.document.proxies ? this.document.proxies.tinyProxy : null)) }
 
+  isContainer () {
+    const containerMediaTypes = [
+      'zorroa/x-flipbook'
+    ]
+
+    return (
+      this.document.source &&
+      this.document.source.mediaType &&
+      containerMediaTypes.includes(this.document.source.mediaType)
+    )
+  }
+
   width () {
     if (this.document.image) return this.document.image.width
     if (this.document.video) return this.document.video.width
@@ -185,7 +197,11 @@ export default class Asset {
   }
 
   parentId () {
-    if (!this.document.source || !this.document.source.clip) return this.id
+    if (this.isContainer()) {
+      return this.id
+    }
+
+    if (!this.document.source || !this.document.source.clip) return null
     return this.document.source.clip.parent
   }
 
