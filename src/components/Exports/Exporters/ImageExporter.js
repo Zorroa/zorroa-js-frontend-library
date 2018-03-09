@@ -29,7 +29,11 @@ export default class ImageExporter extends Component {
     exportOriginal: this.props.arguments.exportOriginal
   }
 
-  onChange = (options) => {
+  onChange = (options, overrideExportOriginal) => {
+    if (overrideExportOriginal !== undefined) {
+      options.exportOriginal = overrideExportOriginal
+    }
+
     this.setState(options, () => {
       if (typeof this.props.onChange === 'function') {
         this.props.onChange({
@@ -248,13 +252,13 @@ export default class ImageExporter extends Component {
       >
         <radiogroup>
           <FormLabel afterLabel="Export original assets" className="Exports__form-element">
-            <FormRadio onChange={() => this.toggleExportOriginal(true)} checked={this.state.exportOriginal} name="ImageExporter" />
+            <FormRadio onChange={() => this.toggleExportOriginal(true)} checked={this.state.exportOriginal === true} name="ImageExporter" />
           </FormLabel>
           <FormLabel
             afterLabel="Export assets as"
             className="Exports__form-element"
           >
-            <FormRadio onChange={() => this.toggleExportOriginal(false)} checked={!this.state.exportOriginal} name="ImageExporter" />
+            <FormRadio onChange={() => this.toggleExportOriginal(false)} checked={this.state.exportOriginal === false} name="ImageExporter" />
           </FormLabel>
           <FormLabel
             vertical
@@ -266,7 +270,7 @@ export default class ImageExporter extends Component {
               fieldLabel='label'
               fieldKey='value'
               value={this.state.quality}
-              onChange={({value}) => this.onChange({quality: value})}
+              onChange={({value}) => this.onChange({quality: value}, false)}
             >
             </FormSelect>
           </FormLabel>
@@ -281,13 +285,13 @@ export default class ImageExporter extends Component {
               fieldLabel='label'
               fieldKey='value'
               value={this.state.format}
-              onChange={({value}) => this.onChange({format: value})}
+              onChange={({value}) => this.onChange({format: value}, false)}
             >
             </FormSelect>
           </FormLabel>
           <ResizeExportAsset
             defaultSize={this.state.size}
-            onChange={(size) => this.onChange({size})}
+            onChange={(size) => this.onChange({size}, false)}
           />
         </radiogroup>
       </ExportsSection>
