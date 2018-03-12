@@ -10,7 +10,7 @@ export default function ExportPreviewerVideoClip (props) {
   return (
     <dl className="Exports__review-section">
       <dt className="Exports__review-term">Movie Assets</dt>
-      {movieAssetCount > 0 && (<dd className="Exports__review-definition">
+      {exporterArguments.exportOriginal === false && movieAssetCount > 0 && (<dd className="Exports__review-definition">
         <span>
           {movieAssetCount} assets
         </span>
@@ -27,6 +27,13 @@ export default function ExportPreviewerVideoClip (props) {
           Resolution: {exporterArguments.resolution}p
         </span>
       </dd>)}
+      {exporterArguments.exportOriginal === true && movieAssetCount > 0 && (
+        <dd className="Exports__review-definition">
+          <span>
+            Export {movieAssetCount} original source files
+          </span>
+        </dd>
+      )}
       {movieAssetCount === 0 && (<dd className="Exports__review-definition">
         None
       </dd>)}
