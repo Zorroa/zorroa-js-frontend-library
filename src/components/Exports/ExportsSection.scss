@@ -49,14 +49,8 @@ $toggle-height: 16px;
   }
 
   &__content {
-    transition: 300ms opacity ease-in-out, 300ms transform ease-in-out;
-
     &--closed {
-      opacity: 0;
-      overflow-y: hidden;
-      height: 0;
-      transform: scale(1.5);
-      transition: 300ms opacity ease-in-out 300ms, 300ms transform ease-in-out 300ms, 300ms height linear 300ms;
+      display: none;
     }
 
     &--disabled {

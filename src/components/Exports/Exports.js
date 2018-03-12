@@ -18,6 +18,7 @@ import PdfExporter from './Exporters/PdfExporter'
 import MetadataExporter from './Exporters/MetadataExporter'
 import { FormButton, FormInput, FormLabel } from '../Form'
 import Asset from '../../models/Asset'
+import AssetSearch from '../../models/AssetSearch'
 import ExportPreviewerImage from './Previewers/Image'
 import ExportPreviewerFlipbook from './Previewers/Flipbook'
 import ExportPreviewerVideoClip from './Previewers/VideoClip'
@@ -49,7 +50,7 @@ class Exports extends Component {
     selectedAssets: PropTypes.arrayOf(
       PropTypes.instanceOf(Asset)
     ),
-    exportProfilesError: PropTypes.bool.isRequired,
+    exportProfilesPostingError: PropTypes.bool.isRequired,
     exportProfilesSuccess: PropTypes.bool.isRequired,
     exportProfilesPosting: PropTypes.bool.isRequired,
     exportProfiles: PropTypes.arrayOf(
@@ -173,7 +174,7 @@ class Exports extends Component {
   }
 
   getSaveProfileState () {
-    if (this.props.exportProfilesError === true) {
+    if (this.props.exportProfilesPostingError === true) {
       return 'error'
     }
 
@@ -262,11 +263,19 @@ class Exports extends Component {
     })
 
     return {
-      search: {
-        'TODO': 'get the actual search for exports'
-      },
+      search: new AssetSearch({
+        filter: {
+          terms: {
+            _id: this.props.selectedAssets.map(selectedAsset => selectedAsset.id)
+          }
+        }
+      }),
       processors
     }
+  }
+
+  startExport = () => {
+    console.log(JSON.stringify(this.serializeExporterArguments(), undefined, 4))
   }
 
   togglePresetFormVisibility = () => {
@@ -418,7 +427,7 @@ class Exports extends Component {
                 'Exports__main-form-buttons--visible': this.state.showPresetForm !== true
               })}>
                 <div className="Exports__form-button-group">
-                  <FormButton onClick={() => console.log(this.exporterArguments)}>
+                  <FormButton onClick={this.startExport}>
                     Export
                   </FormButton>
                   <FormButton look="minimal" onClick={this.close}>
@@ -524,7 +533,7 @@ export default connect(state => {
     shouldShow: state.exports.shouldShow,
     origin: state.auth.origin,
     exportProfiles: state.exports.exportProfiles,
-    exportProfilesError: state.exports.exportProfilesError,
+    exportProfilesPostingError: state.exports.exportProfilesPostingError,
     exportProfilesSuccess: state.exports.exportProfilesSuccess,
     exportProfilesPosting: state.exports.exportProfilesPosting
   }

@@ -10,7 +10,7 @@ export default function ExportPreviewerPdf (props) {
   return (
     <dl className="Exports__review-section">
       <dt className="Exports__review-term">Document Assets</dt>
-      {documentAssetCount > 0 && (
+      {exporterArguments.exportOriginal === false && documentAssetCount > 0 && (
         <dd className="Exports__review-definition">
           <span>
             {documentAssetCount} assets
@@ -31,6 +31,13 @@ export default function ExportPreviewerPdf (props) {
           </span>
           <span>
             Size: {exporterArguments.size}px
+          </span>
+        </dd>
+      )}
+      {exporterArguments.exportOriginal === true && documentAssetCount > 0 && (
+        <dd className="Exports__review-definition">
+          <span>
+            Export {documentAssetCount} original source files
           </span>
         </dd>
       )}

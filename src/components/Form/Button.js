@@ -7,6 +7,7 @@ export default function FormButton (props) {
   const buttonClasses = classnames('FormButton', {
     'FormButton--disabled': props.disabled === true,
     'FormButton--minimal': props.look === 'minimal',
+    'FormButton--error': props.state === 'error',
     'FormButton--mini': props.look === 'mini'
   })
   const buttonStateClasses = classnames('FormButton__state', {
