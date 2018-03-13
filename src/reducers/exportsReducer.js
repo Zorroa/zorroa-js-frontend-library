@@ -15,7 +15,8 @@ export const initialState = {
   exportProfiles: [],
   exportProfilesError: false,
   exportProfilesSuccess: false,
-  exportProfilesPosting: false
+  exportProfilesPosting: false,
+  exportProfilesPostingError: false
 }
 
 export default function (state = initialState, action) {

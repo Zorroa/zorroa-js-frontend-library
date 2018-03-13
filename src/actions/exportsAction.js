@@ -77,13 +77,39 @@ export function clearPostExportLoadingStates () {
 }
 
 export function updateExportInterface ({
-  shouldShow
+  shouldShow,
+  packageName,
+  assetSearch
 }) {
   return dispatch => {
+    if (assetSearch) {
+      assetSearch.aggs = {
+        extension: {
+          terms: {
+            field: 'source.extension'
+          }
+        }
+      }
+
+      api
+        .search(assetSearch)
+        .then(response => {
+          console.log(response)
+          dispatch({
+            type: UPDATE_EXPORT_UI,
+            payload: {
+              shouldShow,
+              packageName,
+              exportAssets: response.assets
+            }
+          })
+        })
+    }
+
     dispatch({
       type: UPDATE_EXPORT_UI,
       payload: {
-        shouldShow: shouldShow
+        shouldShow
       }
     })
   }

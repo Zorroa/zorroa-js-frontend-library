@@ -65,6 +65,7 @@ class Exports extends Component {
         )
       })
     ),
+    packageName: PropTypes.string,
     origin: PropTypes.string.isRequired,
     actions: PropTypes.shape({
       updateExportInterface: PropTypes.func.isRequired,
@@ -74,70 +75,74 @@ class Exports extends Component {
     })
   }
 
-  defaultProcessors = {
-    ImageExporter: {
-      arguments: {
-        exportOriginal: true,
-        format: 'jpg',
-        size: 256,
-        quality: 100
-      },
-      shouldExport: false
-    },
-    PdfExporter: {
-      arguments: {
-        size: 1200,
-        quality: 100,
-        exportOriginal: true,
-        mediaType: 'pdf',
-        pageMode: 'merge'
-      },
-      shouldExport: false,
-      format: 'multipage'
-    },
-    FlipbookExporter: {
-      arguments: {
-        quality: 100,
-        size: 1200,
-        exportImages: true,
-        exportMovies: true
-      },
-      shouldExport: false,
-      flipbookExportType: 'image'
-    },
-    CsvExporter: {
-      arguments: {},
-      shouldExport: false
-    },
-    JsonExporter: {
-      arguments: {},
-      shouldExport: false
-    },
-    VideoClipExporter: {
-      arguments: {
-        resolution: 720,
-        quality: 100,
-        aspectRatio: undefined,
-        format: 'mp4',
-        exportOriginal: true
-      },
-      shouldExport: false
-    },
-    ZipExporter: {
-      arguments: {
-        fileName: `evi-export-${(new Date()).toLocaleDateString().replace(/\//g, '-')}.zip`
-      },
-      shouldExport: true
-    }
-  }
+  constructor (props) {
+    super(props)
 
-  state = {
-    ...this.defaultProcessors,
-    showPresetForm: false,
-    visibleExporter: 'ZipExporter',
-    presetId: undefined,
-    newPresetName: `Preset ${(new Date()).toLocaleDateString()}`,
-    presetSaveCounter: 0
+    this.defaultProcessors = {
+      ImageExporter: {
+        arguments: {
+          exportOriginal: true,
+          format: 'jpg',
+          size: 256,
+          quality: 100
+        },
+        shouldExport: false
+      },
+      PdfExporter: {
+        arguments: {
+          size: 1200,
+          quality: 100,
+          exportOriginal: true,
+          mediaType: 'pdf',
+          pageMode: 'merge'
+        },
+        shouldExport: false,
+        format: 'multipage'
+      },
+      FlipbookExporter: {
+        arguments: {
+          quality: 100,
+          size: 1200,
+          exportImages: true,
+          exportMovies: true
+        },
+        shouldExport: false,
+        flipbookExportType: 'image'
+      },
+      CsvExporter: {
+        arguments: {},
+        shouldExport: false
+      },
+      JsonExporter: {
+        arguments: {},
+        shouldExport: false
+      },
+      VideoClipExporter: {
+        arguments: {
+          resolution: 720,
+          quality: 100,
+          aspectRatio: undefined,
+          format: 'mp4',
+          exportOriginal: true
+        },
+        shouldExport: false
+      },
+      ZipExporter: {
+        arguments: {
+          fileName: props.packageName || `evi-export-${(new Date()).toLocaleDateString().replace(/\//g, '-')}.zip`
+        },
+        shouldExport: true
+      }
+    }
+
+    this.state = {
+      ...this.defaultProcessors,
+      showPresetForm: false,
+      visibleExporter: 'ZipExporter',
+      presetId: undefined,
+      newPresetName: `Preset ${(new Date()).toLocaleDateString()}`,
+      presetSaveCounter: 0
+    }
   }
 
   componentDidMount () {
@@ -533,6 +538,7 @@ export default connect(state => {
     shouldShow: state.exports.shouldShow,
     origin: state.auth.origin,
     exportProfiles: state.exports.exportProfiles,
+    packageName: state.exports.packageName,
     exportProfilesPostingError: state.exports.exportProfilesPostingError,
     exportProfilesSuccess: state.exports.exportProfilesSuccess,
     exportProfilesPosting: state.exports.exportProfilesPosting

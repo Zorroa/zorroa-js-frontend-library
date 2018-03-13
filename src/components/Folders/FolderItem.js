@@ -11,9 +11,11 @@ import AclEntry from '../../models/Acl'
 import FieldList from '../../models/FieldList'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
-import CreateExport from './CreateExport'
 import CreateFolder from './CreateFolder'
 import AssetPermissions from '../AssetPermissions'
+import {
+  updateExportInterface
+} from '../../actions/exportsAction'
 import {
   createFolder,
   addAssetIdsToFolderId,
@@ -264,23 +266,26 @@ class FolderItem extends Component {
 
   exportFolder = (event) => {
     this.dismissContextMenu(event)
-    const width = '340px'
-    const name = this.props.folder.name
-    const body = <CreateExport onCreate={this.createExport} name={name}/>
-    this.props.actions.showModal({body, width})
-  }
 
-  createExport = (event, name, exportImages, exportTable) => {
-    const { selectedFolderIds, folder, actions, selectedTableLayoutId, tableLayouts } = this.props
+    const {
+      selectedFolderIds,
+      folder
+    } = this.props
     const folderIds = selectedFolderIds.has(folder.id) ? new Set(this.props.selectedFolderIds) : [folder.id]
-    const filter = new AssetFilter({links: {folder: [...folderIds]}})
-    const search = new AssetSearch({filter})
-    const layout = tableLayouts.find(layout => layout.id === selectedTableLayoutId)
-    const tableFields = layout && layout.fields
-    const fields = exportTable && tableFields
-    actions.toggleCollapsible('exportJobs', true)
-    return actions.exportAssets(name, search, fields, exportImages)
-    .then(this.waitForExportAndDownload)
+    const filter = new AssetFilter({
+      links: {
+        folder: [...folderIds]
+      }
+    })
+    const assetSearch = new AssetSearch({filter})
+    this.props.actions.toggleCollapsible('exportJobs', true)
+
+    this.props.actions.updateExportInterface({
+      // TODO: implement the createExport -> waitForExportAndDownload logic: onCreate: this.createExport,
+      shouldShow: true,
+      packageName: name,
+      assetSearch
+    })
   }
 
   // duplicate code warning: keep this in sync with ExportJobs.waitForExportAndDownload (TODO: share this code)
@@ -721,6 +726,7 @@ export default connect(state => ({
     selectAssetIds,
     createTaxonomy,
     deleteTaxonomy,
-    toggleCollapsible
+    toggleCollapsible,
+    updateExportInterface
   }, dispatch)
 }))(FolderItem)
