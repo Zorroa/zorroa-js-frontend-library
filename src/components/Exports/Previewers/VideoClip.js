@@ -12,7 +12,7 @@ export default function ExportPreviewerVideoClip (props) {
       <dt className="Exports__review-term">Movie Assets</dt>
       {exporterArguments.exportOriginal === false && movieAssetCount > 0 && (<dd className="Exports__review-definition">
         <span>
-          {movieAssetCount} assets
+          {movieAssetCount.toLocaleString()} assets
         </span>
         <span>
           Export as: {exporterArguments.format.toUpperCase()}
@@ -30,7 +30,7 @@ export default function ExportPreviewerVideoClip (props) {
       {exporterArguments.exportOriginal === true && movieAssetCount > 0 && (
         <dd className="Exports__review-definition">
           <span>
-            Export {movieAssetCount} original source files
+            Export {movieAssetCount.toLocaleString()} original source files
           </span>
         </dd>
       )}

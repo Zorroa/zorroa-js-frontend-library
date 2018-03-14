@@ -3,10 +3,10 @@ import classnames from 'classnames'
 
 const ModalHeader = (props) => {
   const { children, icon, closeFn } = props
-  const style = {}
+  const modalClasses = classnames('ModalHeader', props.className)
   const iconClassNames = classnames('ModalHeader__icon', props.icon)
   return (
-    <div className='ModalHeader' style={style}>
+    <div className={modalClasses}>
       { icon !== undefined && (
         <div className={iconClassNames} />
       ) }
@@ -23,7 +23,8 @@ const ModalHeader = (props) => {
 ModalHeader.propTypes = {
   children: PropTypes.node,
   icon: PropTypes.string,
-  closeFn: PropTypes.func
+  closeFn: PropTypes.func,
+  className: PropTypes.string
 }
 
 export default ModalHeader

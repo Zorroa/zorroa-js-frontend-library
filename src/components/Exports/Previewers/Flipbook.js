@@ -13,7 +13,7 @@ export default function ExportPreviewerFlipbook (props) {
       {flipbookAssetCount > 0 && (
         <dd className="Exports__review-definition">
           <span>
-            {flipbookAssetCount} assets
+            {flipbookAssetCount.toLocaleString()} assets
           </span>
           <span>
             Export as: {(({exportImages, exportMovies}) => {

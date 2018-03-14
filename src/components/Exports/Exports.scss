@@ -6,8 +6,63 @@ $content-height: calc(80vw - 40px);
 .Exports {
   max-height: $max-height;
 
+  &::before,
+  &::after {
+    opacity: 0;
+    transition: 300ms ease-in-out opacity;
+  }
+
+  &--loading {
+    position: relative;
+
+    &::before,
+    &::after {
+      opacity: 1;
+    }
+
+    &::before {
+      background: linear-gradient(to bottom right, $zorroa-color-green-1, $zorroa-color-green-5);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-top: -100vh;
+      margin-left: -100vw;
+      width: 200vw;
+      height: 200vh;
+      content: ' ';
+      z-index: 2;
+      animation: spin 5000ms linear infinite;
+    }
+
+    &::after {
+      animation: spin 750ms linear infinite;
+      border: 3px solid rgba($zorroa-color-white, .5);
+      height: 120px;
+      width: 120px;
+      border-radius: 100%;
+      border-top-color: $zorroa-color-white;
+      content: ' ';
+      display: block;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-top: -60px;
+      margin-left: -60px;
+      z-index: 3;
+    }
+  }
+
+  &__header {
+    position: relative;
+    z-index: 3;
+  }
+
   &__body {
     display: flex;
+
+    &--loading {
+      display: none;
+    }
 
     .dark & {
       background-color: #000;
@@ -256,3 +311,5 @@ $content-height: calc(80vw - 40px);
     width: 5px;
   }
 }
+
+@keyframes spin { 100% { transform:rotate(360deg); } }

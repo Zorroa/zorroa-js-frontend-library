@@ -16,8 +16,7 @@ export default function post (search) {
       return {
         ...data,
         page: new Page(data.page),
-        assets: data.list.map(asset => new Asset(asset)),
-        size: 12
+        assets: data.list.map(asset => new Asset(asset))
       }
     })
 }

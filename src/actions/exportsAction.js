@@ -1,4 +1,6 @@
 import {
+  SHOW_EXPORT_UI,
+  HIDE_EXPORT_UI,
   UPDATE_EXPORT_UI,
   LOAD_EXPORT_PROFILE_BLOB,
   LOAD_EXPORT_PROFILE_BLOB_SUCCESS,
@@ -76,41 +78,61 @@ export function clearPostExportLoadingStates () {
   }
 }
 
+export function showExportInterface () {
+  return dispatch => {
+    dispatch({
+      type: SHOW_EXPORT_UI
+    })
+  }
+}
+
+export function hideExportInterface () {
+  return dispatch => {
+    dispatch({
+      type: HIDE_EXPORT_UI
+    })
+  }
+}
+
 export function updateExportInterface ({
-  shouldShow,
   packageName,
   assetSearch
 }) {
   return dispatch => {
-    if (assetSearch) {
-      assetSearch.aggs = {
-        extension: {
-          terms: {
-            field: 'source.extension'
-          }
+    // Aggs are not part of an export search query and can't return any data
+    // so it's safe to just overwrite the search
+    assetSearch.aggs = {
+      extension: {
+        terms: {
+          field: 'source.extension'
         }
       }
-
-      api
-        .search(assetSearch)
-        .then(response => {
-          console.log(response)
-          dispatch({
-            type: UPDATE_EXPORT_UI,
-            payload: {
-              shouldShow,
-              packageName,
-              exportAssets: response.assets
-            }
-          })
-        })
     }
 
+    // Only pull back enough assets to render a preview
+    assetSearch.size = 12
+
     dispatch({
-      type: UPDATE_EXPORT_UI,
-      payload: {
-        shouldShow
-      }
+      type: SHOW_EXPORT_UI
     })
+
+    api
+      .search(assetSearch)
+      .then(({aggregations, assets, page}) => {
+        dispatch({
+          type: UPDATE_EXPORT_UI,
+          payload: {
+            packageName,
+            exportAssets: assets,
+            totalAssetCount: page.totalCount,
+            documentCounts: {
+              extension: aggregations.extension.buckets.reduce((accumulator, bucket) => {
+                accumulator[bucket.key] = bucket.doc_count
+                return accumulator
+              }, {})
+            }
+          }
+        })
+      })
   }
 }

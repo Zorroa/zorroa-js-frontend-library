@@ -13,7 +13,7 @@ export default function ExportPreviewerPdf (props) {
       {exporterArguments.exportOriginal === false && documentAssetCount > 0 && (
         <dd className="Exports__review-definition">
           <span>
-            {documentAssetCount} assets
+            {documentAssetCount.toLocaleString()} assets
           </span>
           <span>
             Export as: {(({pageMode, mediaType}) => {
@@ -37,7 +37,7 @@ export default function ExportPreviewerPdf (props) {
       {exporterArguments.exportOriginal === true && documentAssetCount > 0 && (
         <dd className="Exports__review-definition">
           <span>
-            Export {documentAssetCount} original source files
+            Export {documentAssetCount.toLocaleString()} original source files
           </span>
         </dd>
       )}

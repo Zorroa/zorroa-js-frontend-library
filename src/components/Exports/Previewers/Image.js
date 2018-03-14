@@ -13,7 +13,7 @@ export default function ExportPreviewerImage (props) {
       {exporterArguments.exportOriginal === false && imageAssetCount > 0 && (
         <dd className="Exports__review-definition">
           <span>
-            {imageAssetCount} assets
+            {imageAssetCount.toLocaleString()} assets
           </span>
           <span>
             Export as: {exporterArguments.format.toUpperCase()}
@@ -29,7 +29,7 @@ export default function ExportPreviewerImage (props) {
       {exporterArguments.exportOriginal === true && imageAssetCount > 0 && (
         <dd className="Exports__review-definition">
           <span>
-            Export {imageAssetCount} original source files
+            Export {imageAssetCount.toLocaleString()} original source files
           </span>
         </dd>
       )}

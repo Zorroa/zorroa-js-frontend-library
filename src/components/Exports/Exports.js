@@ -5,7 +5,7 @@ import classnames from 'classnames'
 import Modal from '../Modal'
 import ModalHeader from '../ModalHeader'
 import {
-  updateExportInterface,
+  hideExportInterface,
   postExportProfiles,
   loadExportProfiles,
   clearPostExportLoadingStates
@@ -28,15 +28,6 @@ import ExportPreviewerCsv from './Previewers/Csv'
 import ExportsPreview from './ExportsPreview'
 import { Save as IconSave } from '../Icons'
 
-import {
-  FILE_GROUP_IMAGES,
-  FILE_GROUP_VECTORS,
-  FILE_GROUP_VIDEOS,
-  FILE_GROUP_FLIPBOOKS,
-  FILE_GROUP_DOCUMENTS,
-  groupExts
-} from '../../constants/fileTypes'
-
 const SHOW_SUCCESS_MS = 2750
 
 class Exports extends Component {
@@ -50,6 +41,7 @@ class Exports extends Component {
     selectedAssets: PropTypes.arrayOf(
       PropTypes.instanceOf(Asset)
     ),
+    isLoading: PropTypes.bool.isRequired,
     exportProfilesPostingError: PropTypes.bool.isRequired,
     exportProfilesSuccess: PropTypes.bool.isRequired,
     exportProfilesPosting: PropTypes.bool.isRequired,
@@ -68,7 +60,7 @@ class Exports extends Component {
     packageName: PropTypes.string,
     origin: PropTypes.string.isRequired,
     actions: PropTypes.shape({
-      updateExportInterface: PropTypes.func.isRequired,
+      hideExportInterface: PropTypes.func.isRequired,
       postExportProfiles: PropTypes.func.isRequired,
       loadExportProfiles: PropTypes.func.isRequired,
       clearPostExportLoadingStates: PropTypes.func.isRequired
@@ -166,9 +158,7 @@ class Exports extends Component {
   }
 
   close = () => {
-    this.props.actions.updateExportInterface({
-      shouldShow: false
-    })
+    this.props.actions.hideExportInterface()
   }
 
   onChange = newState => {
@@ -294,10 +284,12 @@ class Exports extends Component {
     const exporterArguments = this.serializeExporterArguments()
     const processors = exporterArguments.processors
     const activePreset = this.props.exportProfiles.find(preset => preset.id === this.state.presetId)
-
+    const exportsClassNames = classnames('Exports', {
+      'Exports--loading': this.props.isLoading
+    })
     const body = (
-      <div className="Exports">
-        <ModalHeader icon="icon-export" closeFn={this.close}>
+      <div className={exportsClassNames}>
+        <ModalHeader className="Exports__header" icon="icon-export" closeFn={this.close}>
           Create Export
         </ModalHeader>
         <form onSubmit={this.onSubmit} className="Exports__body">
@@ -357,7 +349,7 @@ class Exports extends Component {
             />
             <dl className="Exports__review-section Exports__review-section--heading">
               <dt className="Exports__review-term">Assets</dt>
-              <dd className="Exports__review-definition">{this.props.totalAssetCount}</dd>
+              <dd className="Exports__review-definition">{this.props.totalAssetCount.toLocaleString()}</dd>
             </dl>
             <dl className="Exports__review-section Exports__review-section--heading">
               <dt className="Exports__review-term">Name</dt>
@@ -489,63 +481,24 @@ class Exports extends Component {
   }
 }
 
-export default connect(state => {
-  const assets = state.assets
-  const selectedAssets = (assets.all || [])
-    .filter(asset => assets.selectedIds && assets.selectedIds.has(asset.id) === true)
-
-  const assetCounts = selectedAssets.reduce((accumulator, asset) => {
-    if ((assets.selectedIds instanceof Set) === false ||
-      assets.selectedIds.has(asset.id) === false
-    ) {
-      return accumulator
-    }
-
-    const assetExtension = asset.document.source.extension
-
-    accumulator.totalAssetCount += 1
-
-    if (groupExts[FILE_GROUP_IMAGES].includes(assetExtension) ||
-      groupExts[FILE_GROUP_VECTORS].includes(assetExtension)
-    ) {
-      accumulator.imageAssetCount += 1
-    }
-
-    if (groupExts[FILE_GROUP_VIDEOS].includes(assetExtension)) {
-      accumulator.movieAssetCount += 1
-    }
-
-    if (groupExts[FILE_GROUP_FLIPBOOKS].includes(assetExtension)) {
-      accumulator.flipbookAssetCount += 1
-    }
-
-    if (groupExts[FILE_GROUP_DOCUMENTS].includes(assetExtension)) {
-      accumulator.documentAssetCount += 1
-    }
-
-    return {...accumulator}
-  }, {
-    imageAssetCount: 0,
-    movieAssetCount: 0,
-    flipbookAssetCount: 0,
-    documentAssetCount: 0,
-    totalAssetCount: 0
-  })
-
-  return {
-    ...assetCounts,
-    selectedAssets,
-    shouldShow: state.exports.shouldShow,
-    origin: state.auth.origin,
-    exportProfiles: state.exports.exportProfiles,
-    packageName: state.exports.packageName,
-    exportProfilesPostingError: state.exports.exportProfilesPostingError,
-    exportProfilesSuccess: state.exports.exportProfilesSuccess,
-    exportProfilesPosting: state.exports.exportProfilesPosting
-  }
-}, dispatch => ({
+export default connect(state => ({
+  movieAssetCount: state.exports.videoAssetCount,
+  imageAssetCount: state.exports.imageAssetCount,
+  flipbookAssetCount: state.exports.flipbookAssetCount,
+  documentAssetCount: state.exports.documentAssetCount,
+  totalAssetCount: state.exports.totalAssetCount,
+  selectedAssets: state.exports.exportPreviewAssets,
+  shouldShow: state.exports.shouldShow,
+  origin: state.auth.origin,
+  exportProfiles: state.exports.exportProfiles,
+  packageName: state.exports.packageName,
+  exportProfilesPostingError: state.exports.exportProfilesPostingError,
+  exportProfilesSuccess: state.exports.exportProfilesSuccess,
+  exportProfilesPosting: state.exports.exportProfilesPosting,
+  isLoading: state.exports.isLoading
+}), dispatch => ({
   actions: bindActionCreators({
-    updateExportInterface,
+    hideExportInterface,
     loadExportProfiles,
     postExportProfiles,
     clearPostExportLoadingStates

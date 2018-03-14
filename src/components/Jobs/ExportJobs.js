@@ -30,9 +30,16 @@ class ExportJobs extends Component {
       return
     }
 
+    const { selectedAssetIds, query } = this.props
+    let assetSearch = query
+    if (selectedAssetIds && selectedAssetIds.size) {
+      assetSearch = new AssetSearch({ filter: new AssetFilter({ terms: {'_id': [...selectedAssetIds]} }) })
+    }
+
     this.props.actions.updateExportInterface({
       // TODO: implement the createExport -> waitForExportAndDownload logic: onCreate: this.createExport,
-      shouldShow: true
+      shouldShow: true,
+      assetSearch
     })
   }
 
