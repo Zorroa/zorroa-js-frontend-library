@@ -154,7 +154,7 @@ class Quickview extends Component {
 
     if (aspectRatio > 1) {
       height = Math.round(width / aspectRatio)
-    } else {
+    } else if (aspectRatio) {
       width = Math.round(height * aspectRatio)
     }
 
