@@ -104,7 +104,7 @@ export function archivistBaseURL () {
   return archivist && archivist.defaults.baseURL
 }
 
-export function validateUser (user, origin) {
+export function validateUser (origin) {
   return dispatch => {
     // Create a new archivist, if needed for a new host
     createArchivist(dispatch, origin)

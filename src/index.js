@@ -57,8 +57,9 @@ const origin = localStorage.getItem(ORIGIN_ITEM)
 if (user && origin) {
   // Initialize form to avoid faking user & host in state.auth triggering Searcher
   store.dispatch(signinDefaults(user.username, origin))
-  store.dispatch(validateUser(user, origin))
 }
+
+store.dispatch(validateUser(origin))
 
 log('creating dom node')
 const domNode = document.createElement('div')
