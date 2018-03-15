@@ -4,7 +4,7 @@ import { Flipbook as FlipbookIcon } from '../Icons'
 import classnames from 'classnames'
 
 export default function Duration (props) {
-  const isFlipbookDuration = props.frameCount !== undefined
+  const isFlipbookDuration = props.isFlipbookDuration === true
   return (<div className="Duration"
        onClick={ event => {
          event.stopPropagation() // prevent select when toggle video playback
@@ -26,7 +26,7 @@ export default function Duration (props) {
         { formatDuration(parseFormattedFloat(props.duration), props.fps) }
       </div>
     )}
-    {isFlipbookDuration && (
+    {props.frameCount && (
       <div className="Duration__frame-count" title={`${props.frameCount} frames in flipbook`}>
         { props.frameCount }
       </div>
@@ -36,6 +36,7 @@ export default function Duration (props) {
 
 Duration.propTypes = {
   duration: PropTypes.number,
+  isFlipbookDuration: PropTypes.bool,
   frameCount: PropTypes.number,
   fps: PropTypes.number,
   onClick: PropTypes.func,

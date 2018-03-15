@@ -154,6 +154,7 @@ class Thumb extends Component {
     if (asset.mediaType() === 'zorroa/x-flipbook') {
       pageBadge = (
         <Duration
+          isFlipbookDuration
           frameCount={childCount}
           onClick={this.onFlipbookDurationClick}
           playing={this.state.flipbookPlaying}
@@ -194,6 +195,7 @@ class Thumb extends Component {
     } else if (asset.mediaType() === 'zorroa/x-flipbook') {
       pageBadge = (
         <Duration
+          isFlipbookDuration
           frameCount={childCount}
           onClick={this.onFlipbookDurationClick}
           playing={this.state.flipbookPlaying}
@@ -212,7 +214,13 @@ class Thumb extends Component {
   renderBadges = (asset, origin, stackCount, childCount) => {
     const { badgeHeight, showMultipageBadges, thumbFieldTemplate } = this.props
     const { showBadge } = this.state
-    const iconBadge = showBadge ? <div className="Thumb-field"><FieldTemplate asset={asset} template={thumbFieldTemplate} extensionOnLeft={false}/></div> : null
+    const canShowBadge = showBadge && asset.isContainer() === false
+    const iconBadge = canShowBadge ? (
+        <div className="Thumb-field">
+          <FieldTemplate asset={asset} template={thumbFieldTemplate} extensionOnLeft={false}/>
+        </div>
+      )
+      : null
     const { pageBadge, parentURL } = showMultipageBadges
       ? this.renderMultipageBadges(asset, origin, stackCount, childCount)
       : this.renderMonopageBadges(asset, childCount)
