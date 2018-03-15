@@ -75,7 +75,7 @@ class FlipbookWidget extends Component {
   }
 
   title () {
-    return this.state.title
+    return 'FLIPBOOK'
   }
 
   onFlipbookLoad = event => {

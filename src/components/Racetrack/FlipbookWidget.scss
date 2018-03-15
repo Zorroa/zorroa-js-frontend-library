@@ -4,7 +4,11 @@ $fps-grabber-size: $zorroa-metric-base * 1.5;
 $fps-rate-offset: $zorroa-metric-base * 2;
 
 .FlipbookWidget {
-  width: $zorroa-metric-base * 25;
+  width: $zorroa-metric-base * 13;
+
+  &__body {
+    width: $zorroa-metric-base * 25;
+  }
 
   &__fps-rate-list {
     display: flex;

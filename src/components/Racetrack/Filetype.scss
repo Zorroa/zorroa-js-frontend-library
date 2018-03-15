@@ -94,7 +94,6 @@
 .Filetype-group {
   @include flexRow;
   @include flexAlignItemsCenter;
-  height: 14px;
   min-height: 14px;
   margin-bottom: 5px;
 }
