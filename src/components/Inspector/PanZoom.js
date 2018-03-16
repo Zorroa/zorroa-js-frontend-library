@@ -17,6 +17,9 @@ class PanZoom extends Component {
     onNextPage: PropTypes.func,
     onPrevPage: PropTypes.func,
     onScrub: PropTypes.func,
+    onLoop: PropTypes.func,
+    loopPaused: PropTypes.bool,
+    shouldLoop: PropTypes.bool,
     frameFrequency: PropTypes.object,
     shuttler: PropTypes.instanceOf(PubSub),
     playing: PropTypes.bool,
@@ -145,6 +148,9 @@ class PanZoom extends Component {
       showControls,
       onPrevPage,
       onNextPage,
+      onLoop,
+      loopPaused,
+      shouldLoop,
       onScrub,
       frameFrequency,
       onVolume,
@@ -175,19 +181,23 @@ class PanZoom extends Component {
                 { this.props.children }
               </div>
               { showControls && (
-                  <Controlbar title={title} titleWidth={titleWidth}
-                              onZoomOut={!zoomOutDisabled && this.zoomOut || null}
-                              onZoomIn={!zoomInDisabled && this.zoomIn || null}
-                              onFit={!zoomToFitDisabled && this.zoomToFit || null}
-                              onNextPage={onNextPage}
-                              onPrevPage={onPrevPage}
-                              onScrub={onScrub}
-                              onVolume={onVolume} volume={volume}
-                              shuttler={shuttler} playing={playing}
-                              frameFrequency={frameFrequency}
-                              totalFrames={totalFrames}
-                              currentFrameNumber={currentFrameNumber}
-                              />)
+                  <Controlbar
+                    title={title} titleWidth={titleWidth}
+                    onZoomOut={!zoomOutDisabled && this.zoomOut || null}
+                    onZoomIn={!zoomInDisabled && this.zoomIn || null}
+                    onFit={!zoomToFitDisabled && this.zoomToFit || null}
+                    onNextPage={onNextPage}
+                    onPrevPage={onPrevPage}
+                    onScrub={onScrub}
+                    onVolume={onVolume} volume={volume}
+                    shuttler={shuttler} playing={playing}
+                    frameFrequency={frameFrequency}
+                    totalFrames={totalFrames}
+                    currentFrameNumber={currentFrameNumber}
+                    onLoop={onLoop}
+                    shouldLoop={shouldLoop}
+                    loopPaused={loopPaused}
+                  />)
               }
             </div>
           )

@@ -82,7 +82,20 @@ export default class Asset {
       this.document.source &&
       this.document.source.mediaType &&
       containerMediaTypes.includes(this.document.source.mediaType)
-    )
+    ) === true
+  }
+
+  isContainedByParent () {
+    const containerTypes = [
+      'flipbook'
+    ]
+
+    return (
+      this.document.source &&
+      this.document.source.clip &&
+      this.document.source.clip.type &&
+      containerTypes.includes(this.document.source.clip.type)
+    ) === true
   }
 
   width () {

@@ -14,5 +14,7 @@
   &__frame-canvas {
     height: 100%;
     cursor: pointer;
+    border-right: 2px solid $zorroa-color-black;
+    border-left: 2px solid $zorroa-color-black;
   }
 }

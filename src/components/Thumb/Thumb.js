@@ -192,13 +192,14 @@ class Thumb extends Component {
       }
     } else if (asset.mediaType().includes('video')) {
       pageBadge = <Duration duration={asset.duration()}/>
-    } else if (asset.mediaType() === 'zorroa/x-flipbook') {
+    }
+
+    if (asset.mediaType() === 'zorroa/x-flipbook' || asset.clipType() === 'flipbook') {
       pageBadge = (
         <Duration
           isFlipbookDuration
           frameCount={childCount}
-          onClick={this.onFlipbookDurationClick}
-          playing={this.state.flipbookPlaying}
+          onClick={asset.isContainedByParent() ? undefined : this.onFlipbookDurationClick}
         />
       )
     }
@@ -214,7 +215,7 @@ class Thumb extends Component {
   renderBadges = (asset, origin, stackCount, childCount) => {
     const { badgeHeight, showMultipageBadges, thumbFieldTemplate } = this.props
     const { showBadge } = this.state
-    const canShowBadge = showBadge && asset.isContainer() === false
+    const canShowBadge = showBadge && asset.isContainer() === false && asset.isContainedByParent() === false
     const iconBadge = canShowBadge ? (
         <div className="Thumb-field">
           <FieldTemplate asset={asset} template={thumbFieldTemplate} extensionOnLeft={false}/>

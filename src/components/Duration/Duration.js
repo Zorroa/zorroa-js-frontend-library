@@ -16,11 +16,13 @@ export default function Duration (props) {
         <FlipbookIcon />
        </div>
      )}
-    <div className="Duration__playstop-badge">
-      { props.playing
-        ? (<div className={classnames('Duration__stop', {video: !!props.onClick})} />)
-        : (<div className={classnames('Duration__play', {video: !!props.onClick})} />) }
-    </div>
+     { typeof props.onClick === 'function' && (
+       <div className="Duration__playstop-badge">
+         { props.playing
+           ? (<div className={classnames('Duration__stop', {video: !!props.onClick})} />)
+           : (<div className={classnames('Duration__play', {video: !!props.onClick})} />) }
+       </div>
+     )}
     {props.duration !== undefined && (
       <div className="Duration__duration">
         { formatDuration(parseFormattedFloat(props.duration), props.fps) }

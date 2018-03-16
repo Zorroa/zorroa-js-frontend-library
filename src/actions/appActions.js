@@ -12,7 +12,7 @@ import {
   UX_LEVEL, EMBEDMODE_ENABLED, MONOCHROME, SHOW_IMPORT,
   SHOW_QUICKVIEW, HIDE_QUICKVIEW,
   TABLE_LAYOUTS, SELECT_TABLE_LAYOUT, ADD_TABLE_LAYOUT, DELETE_TABLE_LAYOUT,
-  FLIPBOOK_FPS
+  FLIPBOOK_FPS, SHOULD_LOOP
 } from '../constants/actionTypes'
 
 export const MIN_THUMBSIZE = 48
@@ -24,6 +24,13 @@ export function setFlipbookFps (fps) {
   return {
     type: FLIPBOOK_FPS,
     payload: fps
+  }
+}
+
+export function shouldLoop (shouldLoopSetting) {
+  return {
+    type: SHOULD_LOOP,
+    payload: shouldLoopSetting
   }
 }
 

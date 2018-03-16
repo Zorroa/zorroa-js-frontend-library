@@ -5,11 +5,12 @@ import { Flipbook, withFlipbook } from '../Flipbook'
 import FlipbookStrip from './FlipbookStrip'
 import PanZoom from './PanZoom'
 import ProgressCircle from '../ProgressCircle'
-import { setFlipbookFps } from '../../actions/appActions'
+import { setFlipbookFps, shouldLoop } from '../../actions/appActions'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { defaultFpsFrequencies } from '../../constants/defaultState.js'
 import Asset from '../../models/Asset'
+import keydown from 'react-keydown'
 
 class FlipbookViewer extends Component {
   static propTypes = {
@@ -20,8 +21,10 @@ class FlipbookViewer extends Component {
       number: PropTypes.number.isRequired
     })).isRequired,
     actions: PropTypes.shape({
-      setFlipbookFps: PropTypes.func
+      setFlipbookFps: PropTypes.func,
+      shouldLoop: PropTypes.func
     }),
+    shouldLoop: PropTypes.bool,
     totalFrames: PropTypes.number.isRequired,
     loadedPercentage: PropTypes.number.isRequired,
     fps: PropTypes.number.isRequired,
@@ -36,7 +39,8 @@ class FlipbookViewer extends Component {
 
     this.state = {
       playing: false,
-      currentFrameNumber: 0
+      currentFrameNumber: 0,
+      loopPaused: false
     }
   }
 
@@ -46,6 +50,9 @@ class FlipbookViewer extends Component {
     })
     this.status.on('played', currentFrameNumber => {
       this.setState({ currentFrameNumber })
+    })
+    this.status.on('loopPaused', loopPaused => {
+      this.setState({ loopPaused })
     })
   }
 
@@ -72,6 +79,25 @@ class FlipbookViewer extends Component {
     this.props.actions.setFlipbookFps(frameRate)
   }
 
+  @keydown('k')
+  nextFrame () {
+    this.shuttler.publish('frameForward')
+  }
+
+  @keydown('j')
+  previousFrame () {
+    this.shuttler.publish('frameBack')
+  }
+
+  @keydown('space')
+  startOrStop (event) {
+    if (event && typeof event.preventDefault === 'function') {
+      event.preventDefault()
+    }
+
+    this.shuttler.publish('startOrStop')
+  }
+
   getDefaultFrameFromIsolatedAsset () {
     if (
       this.props.isolatedAsset.document.source &&
@@ -83,6 +109,14 @@ class FlipbookViewer extends Component {
     }
 
     return 1
+  }
+
+  onLoopToggle = () => {
+    if (this.state.loopPaused) {
+      this.shuttler.publish('rewind')
+    }
+
+    this.props.actions.shouldLoop(!this.props.shouldLoop)
   }
 
   render () {
@@ -111,7 +145,10 @@ class FlipbookViewer extends Component {
                 frameFrequency={frameFrequency}
                 onScrub={this.scrub}
                 shuttler={this.shuttler}
+                onLoop={this.onLoopToggle}
                 playing={playing}
+                loopPaused={this.state.loopPaused}
+                shouldLoop={this.props.shouldLoop}
                 currentFrameNumber={currentFrameNumber}
                 totalFrames={this.props.totalFrames}
               >
@@ -142,11 +179,13 @@ class FlipbookViewer extends Component {
 const ConnectedFlipbookViewer = connect(
   (state) => ({
     fps: state.app.flipbookFps,
+    shouldLoop: state.app.shouldLoop,
     isolatedAsset: state.assets.all.find(asset => asset.id === state.assets.isolatedId)
   }),
   dispatch => ({
     actions: bindActionCreators({
-      setFlipbookFps
+      setFlipbookFps,
+      shouldLoop
     }, dispatch)
   })
 )(FlipbookViewer)

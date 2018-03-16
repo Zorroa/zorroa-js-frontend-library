@@ -3,6 +3,9 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import CanvasImage from '../CanvasImage'
 import { PubSub } from '../../services/jsUtil'
+import classnames from 'classnames'
+
+const ANIMATION_LOOP_PAUSE_MILLISECONDS = 2000
 
 class Flipbook extends PureComponent {
   static propTypes = {
@@ -20,6 +23,7 @@ class Flipbook extends PureComponent {
     size: PropTypes.oneOf(['cover', 'contain']),
     fps: PropTypes.number.isRequired,
     autoPlay: PropTypes.bool,
+    shouldLoop: PropTypes.bool,
     defaultFrame: PropTypes.number
   }
 
@@ -40,7 +44,8 @@ class Flipbook extends PureComponent {
     this.animationFrameNumber = undefined
 
     this.state = {
-      currentFrameImage: undefined
+      currentFrameImage: undefined,
+      isAnimationLoopPause: false
     }
   }
 
@@ -98,8 +103,23 @@ class Flipbook extends PureComponent {
       animationStartTime
     )
     const frame = this.getClosestFrameByFrameNumber(currentFrameNumber)
+    const isAnimationCompleted = currentFrameNumber > totalFrames
 
-    if (currentFrameNumber > totalFrames) {
+    if (isAnimationCompleted && this.props.shouldLoop === true) {
+      this.setState({
+        isAnimationLoopPause: true
+      }, () => {
+        this.cancelAnimation()
+        this.publishStatusTopic('loopPaused', true)
+      })
+
+      this.animationLoopPauseTimeoutId = setTimeout(() => {
+        this.startAnimationLoop()
+      }, ANIMATION_LOOP_PAUSE_MILLISECONDS)
+      return
+    }
+
+    if (isAnimationCompleted) {
       this.cancelAnimation()
       return
     }
@@ -133,17 +153,28 @@ class Flipbook extends PureComponent {
   shouldComponentUpdate (nextProps, nextState) {
     const didFramesChange = nextProps.frames !== this.props.frames
     const didSetNewFrame = nextState.currentFrameImage !== this.state.currentFrameImage
-    return (didFramesChange || didSetNewFrame)
+    const didAnimationLoopPauseChange = nextState.isAnimationLoopPause !== this.state.isAnimationLoopPause
+    return (didFramesChange || didSetNewFrame || didAnimationLoopPauseChange)
+  }
+
+  cancelAnimationFrame () {
+    cancelAnimationFrame(this.animationFrameId)
+    this.animationFrameId = undefined
+  }
+
+  clearAnimationPauseTimeout () {
+    this.publishStatusTopic('loopPaused', false)
+    clearTimeout(this.animationLoopPauseTimeoutId)
+    this.animationLoopPauseTimeoutId = undefined
   }
 
   cancelAnimation () {
     if (this.animationFrameId) {
-      cancelAnimationFrame(this.animationFrameId)
+      this.cancelAnimationFrame()
     }
 
     this.publishStatusTopic('playing', false)
     this.publishStatusTopic('started', false)
-    this.animationFrameId = undefined
   }
 
   registerShuttlerHandles () {
@@ -152,12 +183,18 @@ class Flipbook extends PureComponent {
     }
 
     this.props.shuttler.on('startOrStop', () => {
+      if (this.animationLoopPauseTimeoutId) {
+        this.clearAnimationPauseTimeout()
+      }
+
       if (this.animationFrameId) {
+        this.forcedFrameNumber = this.animationFrameNumber
         this.cancelAnimation()
         return
       }
 
       this.startAnimationLoop()
+      this.forcedFrameNumber = undefined
     })
 
     this.props.shuttler.on('stop', () => {
@@ -165,10 +202,18 @@ class Flipbook extends PureComponent {
     })
 
     this.props.shuttler.on('start', () => {
+      if (this.animationLoopPauseTimeoutId) {
+        this.clearAnimationPauseTimeout()
+      }
+
       this.startAnimationLoop()
     })
 
     this.props.shuttler.on('rewind', () => {
+      if (this.animationLoopPauseTimeoutId) {
+        this.clearAnimationPauseTimeout()
+      }
+
       this.jumpToFrame(0)
     })
 
@@ -250,9 +295,18 @@ class Flipbook extends PureComponent {
   }
 
   startAnimationLoop () {
-    this.publishStatusTopic('started', true) // TODO, this might not be the right place for this...
+    this.publishStatusTopic('started', true)
     this.publishStatusTopic('playing', true)
+    this.publishStatusTopic('loopPaused', false)
+
     this.animationLoop(this.getAnimationLoopParameters())
+    this.setState({
+      isAnimationLoopPause: false
+    })
+  }
+
+  isLoopPaused () {
+    return this.state.isAnimationLoopPause === true && this.props.shouldLoop === true
   }
 
   render () {
@@ -268,9 +322,13 @@ class Flipbook extends PureComponent {
       height: '100%'
     } : undefined
 
+    const flipbookCanvasClass = classnames('Flipbook__canvas', {
+      'Flipbook__canvas--paused': this.isLoopPaused()
+    })
+
     return (
       <div className="Flipbook" style={style}>
-        <div className="Flipbook__canvas" style={style}>
+        <div className={flipbookCanvasClass} style={style}>
           <CanvasImage
             image={image}
             height={height}
@@ -284,7 +342,8 @@ class Flipbook extends PureComponent {
 }
 
 export default connect(state => ({
-  fps: state.app.flipbookFps
+  fps: state.app.flipbookFps,
+  shouldLoop: state.app.shouldLoop
 }), dispatch => ({
   actions: bindActionCreators({}, dispatch)
 }))(Flipbook)

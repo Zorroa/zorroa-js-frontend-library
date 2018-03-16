@@ -20,6 +20,9 @@ export default class Controlbar extends PureComponent {
     onVolume: PropTypes.func,
     currentFrameNumber: PropTypes.number,
     totalFrames: PropTypes.number,
+    onLoop: PropTypes.func,
+    shouldLoop: PropTypes.func,
+    loopPaused: PropTypes.bool,
     frameFrequency: PropTypes.shape({
       onFrameFrequency: PropTypes.func,
       options: PropTypes.arrayOf(PropTypes.number),
@@ -49,6 +52,10 @@ export default class Controlbar extends PureComponent {
 
   showZoom () {
     return this.props.onZoomIn || this.props.onZoomOut || this.props.onFit
+  }
+
+  showLoop () {
+    return typeof this.props.onLoop === 'function'
   }
 
   showScrubber () {
@@ -133,6 +140,7 @@ export default class Controlbar extends PureComponent {
                         <li key={option} className="Controlbar__options-items">
                           <button
                             onClick={() => this.props.frameFrequency.onFrameFrequency(option)}
+                            title="Change playback frame rate"
                             className={classnames('Controlbar__options-button', {
                               'Controlbar__options-button--active': this.props.frameFrequency.rate === option
                             })}
@@ -146,6 +154,18 @@ export default class Controlbar extends PureComponent {
               )}
             </div>
           ) }
+          { this.showLoop() && (
+            <div className="Controlbar__section">
+              <button
+                onClick={this.props.onLoop}
+                title={ this.props.shouldLoop ? 'Disable Playback Loop' : 'Enable Playback Loop' }
+                className={classnames('Controlbar__loop-button', {
+                  'Controlbar__loop-button--loop-paused': this.props.loopPaused === true,
+                  'Controlbar__loop-button--active': this.props.shouldLoop === true
+                })}
+              >Toggle Loop</button>
+            </div>
+          )}
           { this.showVolume() && (
             <div className="Controlbar__section">
               <VolumeBar volume={this.props.volume} onVolume={this.props.onVolume}/>

@@ -59,6 +59,7 @@ class Assets extends Component {
     userSettings: PropTypes.object.isRequired,
     origin: PropTypes.string,
     actions: PropTypes.object,
+    isolatedId: PropTypes.string,
     showQuickview: PropTypes.bool.isRequired
   }
 
@@ -154,7 +155,13 @@ class Assets extends Component {
   @keydown('space')
   isolateToQuickview () {
     if (this.props.showQuickview === true) {
-      // Nothing to do here
+      // Nothing to do here, quick view is already open
+      return
+    }
+
+    if (this.props.isolatedId) {
+      // If something is already isolated don't do anything, it could be
+      // isolated to a Lightbox or some other piece of UI
       return
     }
 
@@ -722,6 +729,7 @@ export default connect(state => ({
   parentCounts: state.assets.parentCounts,
   parentTotals: state.assets.parentTotals,
   isolatedParent: state.assets.isolatedParent,
+  isolatedId: state.assets.isolatedId,
   selectedIds: state.assets.selectedIds,
   selectionCounter: state.assets.selectionCounter,
   totalCount: state.assets.totalCount,

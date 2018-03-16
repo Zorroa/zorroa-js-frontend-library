@@ -3,7 +3,7 @@ import {
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
   METADATA_FIELDS, ASSET_FIELDS,
   LIGHTBOX_METADATA, LIGHTBOX_PANNER,
-  SET_DRAGGING,
+  SET_DRAGGING, SHOULD_LOOP,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
   SHOW_MULTIPAGE, VIDEO_VOLUME,
   HOVER_FIELD, CLEAR_HOVER_FIELD,
@@ -73,12 +73,12 @@ const initialState = {
     thumbSize: DEFAULT_THUMBSIZE,
     thumbLayout: 'masonry',
     videoVolume: 0.8,
-    showFolderCounts: 'filtered',
-    flipbookFps: 30
+    showFolderCounts: 'filtered'
   },
   allAssetCount: 0,
   showQuickview: false,
-  flipbookFps: defaultFpsFrequencies[0]
+  flipbookFps: defaultFpsFrequencies[0],
+  shouldLoop: false
 }
 
 export default function app (state = initialState, action) {
@@ -229,6 +229,8 @@ export default function app (state = initialState, action) {
       return { ...state, showQuickview: false }
     case FLIPBOOK_FPS:
       return { ...state, flipbookFps: action.payload }
+    case SHOULD_LOOP:
+      return { ...state, shouldLoop: action.payload }
     default:
       return state
   }
