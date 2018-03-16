@@ -193,7 +193,6 @@ class Quickview extends Component {
           <div className="Quickview__flipbook">
             <FlipbookPlayer
               clipParentId={asset.parentId()}
-              height={height}
               width={width}
             />
           </div>
