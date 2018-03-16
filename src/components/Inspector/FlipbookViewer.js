@@ -153,6 +153,7 @@ class FlipbookViewer extends Component {
                 totalFrames={this.props.totalFrames}
               >
                 <Flipbook
+                  shouldLoop={this.props.shouldLoop}
                   onError={this.onError}
                   shuttler={this.shuttler}
                   status={this.status}

@@ -94,6 +94,10 @@ class Quickview extends Component {
 
   @keydown('space', 'esc')
   onEscape () {
+    if (event && typeof event.preventDefault === 'function') {
+      event.preventDefault()
+    }
+
     this.close()
   }
 

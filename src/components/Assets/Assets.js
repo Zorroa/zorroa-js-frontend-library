@@ -153,7 +153,11 @@ class Assets extends Component {
   }
 
   @keydown('space')
-  isolateToQuickview () {
+  isolateToQuickview (event) {
+    if (event && typeof event.preventDefault === 'function') {
+      event.preventDefault()
+    }
+
     if (this.props.showQuickview === true) {
       // Nothing to do here, quick view is already open
       return

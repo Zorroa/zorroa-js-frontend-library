@@ -342,8 +342,7 @@ class Flipbook extends PureComponent {
 }
 
 export default connect(state => ({
-  fps: state.app.flipbookFps,
-  shouldLoop: state.app.shouldLoop
+  fps: state.app.flipbookFps
 }), dispatch => ({
   actions: bindActionCreators({}, dispatch)
 }))(Flipbook)
