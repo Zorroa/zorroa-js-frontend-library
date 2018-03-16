@@ -5,7 +5,7 @@ import CanvasImage from '../CanvasImage'
 import { PubSub } from '../../services/jsUtil'
 import classnames from 'classnames'
 
-const ANIMATION_LOOP_PAUSE_MILLISECONDS = 2000
+const ANIMATION_LOOP_PAUSE_MILLISECONDS = 1000
 
 class Flipbook extends PureComponent {
   static propTypes = {
@@ -51,6 +51,10 @@ class Flipbook extends PureComponent {
 
   componentWillUnmount () {
     this.cancelAnimation()
+
+    if (this.animationLoopPauseTimeoutId) {
+      this.clearAnimationPauseTimeout()
+    }
   }
 
   getNumberOfFrames () {

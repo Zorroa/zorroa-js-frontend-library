@@ -50,7 +50,7 @@ $options-menu-offset: $control-bar-height;
     }
 
     &--loop-paused {
-      animation: spin 2000ms cubic-bezier(0.645, 0.045, 0.355, 1) infinite reverse; // This value is copied in the JS
+      animation: spin 1000ms cubic-bezier(0.645, 0.045, 0.355, 1) infinite reverse; // This value is copied in the JS
     }
   }
 
