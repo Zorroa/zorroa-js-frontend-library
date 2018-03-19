@@ -153,7 +153,7 @@ class Racebar extends Component {
       .map(k => WidgetInfo[k])
       .find(widgetInfo => (widgetInfo.type === widget.type))
     if (!widgetInfo.element) return
-    const isPinned = false
+    const isPinned = widget.isPinned === true
     const isEnabled = widget.isEnabled
     const isOpen = !this.props.isolatedId && this.state.openId === widget.id
     const onOpen = (e) => this.toggleOpen(widget, e)

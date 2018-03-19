@@ -29,7 +29,9 @@ const allExts = {
   m4v: 'Quicktime Video',
   ogg: 'Ogg Vorbis',
   mpg: 'Motion Picture Group',
-  mpeg: 'Motion Picture Group'
+  mpeg: 'Motion Picture Group',
+  // flipbook files
+  zfb: 'Zorroa Flipbook'
 
   // aac: 'Advanced Audio Coding',
   // mp3: 'Music File',
@@ -53,7 +55,8 @@ const allExts = {
 const groupExts = {
   'Image Files': ['gif', 'png', 'jpg', 'jpeg', 'tif', 'tiff', 'psd'], /*, 'geotiff' */
   'Vector Files': ['pdf', 'svg', 'ai', 'shp', 'cdr'],
-  'Video Files': ['mp4', 'm4v', 'mov', 'ogg', 'mpg', 'mpeg']
+  'Video Files': ['mp4', 'm4v', 'mov', 'ogg', 'mpg', 'mpeg'],
+  'Flipbooks': ['zfb']
   // 'Audio Files': ['aac', 'mp3'],
   // 'Design Source Files - sketch, Adobe': ['ai', 'indd', 'psd'],
   // 'Map Files': ['shp', 'kml', 'gdb', 'osm', 'geotiff'],

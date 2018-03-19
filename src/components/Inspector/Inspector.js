@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from 'react'
-import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import Pdf from './Pdf'
+import FlipbookViewer from './FlipbookViewer.js'
 import VideoViewer from './VideoViewer'
 import Image from './Image'
 import Asset from '../../models/Asset'
@@ -13,8 +13,7 @@ class Inspector extends Component {
     onNext: PropTypes.func,
     onPrev: PropTypes.func,
     origin: PropTypes.string,
-    thumbSize: PropTypes.number,
-    actions: PropTypes.object
+    thumbSize: PropTypes.number
   }
 
   state = {
@@ -27,10 +26,13 @@ class Inspector extends Component {
     const mediaType = error ? 'error' : asset.mediaType().toLowerCase()
     const url = asset.url(origin)
     const imageFormats = [ 'jpeg', 'jpg', 'png', 'gif' ]
+
     let warning = null
     let inspector = null
 
-    if (mediaType.startsWith('image') &&
+    if (asset.clipType() === 'flipbook' || mediaType === 'zorroa/x-flipbook') {
+      inspector = <FlipbookViewer clipParentId={asset.parentId()} />
+    } else if (mediaType.startsWith('image') &&
       imageFormats.findIndex(format => (mediaType.endsWith(format))) >= 0) {
       inspector = <Image url={url}
                          onNextPage={onNext} onPrevPage={onPrev} />
@@ -69,7 +71,4 @@ export default connect(state => ({
   origin: state.auth.origin,
   host: state.auth.host,
   thumbSize: state.app.thumbSize
-}), dispatch => ({
-  actions: bindActionCreators({
-  }, dispatch)
 }))(Inspector)

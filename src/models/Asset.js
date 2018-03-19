@@ -73,6 +73,31 @@ export default class Asset {
   mediaType () { return (this.document.source && this.document.source.mediaType) || 'unknown' }
   tinyProxy () { return (this.document.proxies && (this.document.proxies ? this.document.proxies.tinyProxy : null)) }
 
+  isContainer () {
+    const containerMediaTypes = [
+      'zorroa/x-flipbook'
+    ]
+
+    return (
+      this.document.source &&
+      this.document.source.mediaType &&
+      containerMediaTypes.includes(this.document.source.mediaType)
+    ) === true
+  }
+
+  isContainedByParent () {
+    const containerTypes = [
+      'flipbook'
+    ]
+
+    return (
+      this.document.source &&
+      this.document.source.clip &&
+      this.document.source.clip.type &&
+      containerTypes.includes(this.document.source.clip.type)
+    ) === true
+  }
+
   width () {
     if (this.document.image) return this.document.image.width
     if (this.document.video) return this.document.video.width
@@ -185,8 +210,20 @@ export default class Asset {
   }
 
   parentId () {
+    if (this.isContainer()) {
+      return this.id
+    }
+
     if (!this.document.source || !this.document.source.clip) return null
     return this.document.source.clip.parent
+  }
+
+  clipType () {
+    if (this.document.source === undefined || this.document.source.clip === undefined) {
+      return null
+    }
+
+    return this.document.source.clip.type
   }
 
   // Returns true if the asset is in any of the folder ids

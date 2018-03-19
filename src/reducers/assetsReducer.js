@@ -95,15 +95,36 @@ export default function (state = initialState, action) {
     }
 
     case ASSET_AGGS: {
-      const { aggs } = action.payload
-      if (aggs.parentCounts) {
+      const {
+        aggs, // These are parent aggregation counts where ES `post_filter` are treated as "pre" (i.e. `filter`) filter
+        unfilteredAggs // These are parent aggregation counts that ignore all filters except for the parent IDs
+      } = action.payload
+
+      // If the filtered aggregations parentCounts are available, set the state with those
+      if (aggs && aggs.parentCounts) {
         const parentTotals = new Map()
         aggs.parentCounts.buckets.forEach(bucket => {
           parentTotals.set(bucket.key, bucket.doc_count)
         })
         return { ...state, parentTotals }
       }
-      return { ...state, aggs }
+
+      // If the unfiltered aggregations parentCounts are available, set the state with those
+      if (unfilteredAggs && unfilteredAggs.parentCounts) {
+        const unfilteredParentTotals = new Map()
+        unfilteredAggs.parentCounts.buckets.forEach(bucket => {
+          unfilteredParentTotals.set(bucket.key, bucket.doc_count)
+        })
+        return { ...state, unfilteredParentTotals }
+      }
+
+      // Otherwsise try to use the regular aggs
+      if (aggs) {
+        return { ...state, aggs }
+      }
+
+      // And last, fall back to the unfiltered aggs
+      return { ...state, unfilteredAggs }
     }
 
     case ASSET_SEARCH_ERROR:

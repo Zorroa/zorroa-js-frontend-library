@@ -36,7 +36,6 @@ $zorroa-color-green-4: #51af5f;
 $zorroa-color-green-5: #55c39e;
 $zorroa-color-green-brand: #b7df4d;
 $zorroa-color-green-link: #82a626;
-$zorroa-color-green-usable: #73b61c;
 
 $zorroa-color-orange-1: #ee7f29;
 $zorroa-color-orange-2: #e88808;
@@ -56,12 +55,12 @@ $zorroa-color-purple-3: #8466b3;
 $zorroa-color-purple-4: #a672b6;
 $zorroa-color-purple-5: #757bd3;
 
-$zorroa-brown-1: #744e19;
-$zorroa-brown-2: #976a50;
-$zorroa-brown-3: #95794b;
+$zorroa-color-brown-1: #744e19;
+$zorroa-color-brown-2: #976a50;
+$zorroa-color-brown-3: #95794b;
 
-$zorroa-yellow-1: #ffd000;
-$zorroa-yellow-2: #f5cc6c;
+$zorroa-color-yellow-1: #ffd000;
+$zorroa-color-yellow-2: #f5cc6c;
 
 /*
 These are legacy colors. DO NOT use these anymore. Only colors starting
@@ -112,7 +111,7 @@ $zorroa-dark-hover     : rgba($zorroa-color-white,0.2);
 $zorroa-dropzone       : rgba($zorroa-color-green-2, 0.75);
 
 /* shared metrics */
-
+$zorroa-metric-base : 10px;
 $zorroa-Sidebar-width : 340px;
 
 

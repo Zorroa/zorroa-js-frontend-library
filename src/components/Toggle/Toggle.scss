@@ -1,9 +1,10 @@
 @import '../../styles/core-mixins.scss';
 
-$zorroa-color-toggle-unchecked: $zorroa-gray;
-$zorroa-color-toggle-checked: $zorroa-sickly-green;
-$zorroa-color-toggle-disabled: $zorroa-lightgray;
-$zorroa-dark-color-toggle-disabled: $zorroa-darkgray;
+$zorroa-color-toggle-unchecked: $zorroa-color-gray-dark-3;
+$zorroa-color-toggle-checked: $zorroa-color-green-1;
+$zorroa-color-toggle-checked-yellow: $zorroa-color-yellow-1;
+$zorroa-color-toggle-disabled: $zorroa-color-gray-dark-4;
+$zorroa-dark-color-toggle-disabled: $zorroa-color-gray-dark-2;
 
 .Toggle {
   position: relative;
@@ -15,8 +16,16 @@ $zorroa-dark-color-toggle-disabled: $zorroa-darkgray;
     background-color: $zorroa-color-toggle-checked;
   }
 
+  &.Toggle--yellow :checked + .Toggle__slider {
+    background-color: $zorroa-color-toggle-checked-yellow;
+  }
+
   :focus + .Toggle__slider {
     box-shadow: 0 0 1px $zorroa-color-toggle-checked;
+
+    .Toggle--yellow & {
+      box-shadow: 0 0 1px $zorroa-color-toggle-checked-yellow;
+    }
   }
 
   :checked + .Toggle__slider::before {
@@ -44,6 +53,10 @@ $animation-duration: 0.25s;
 
   :checked {
     background-color: $zorroa-color-toggle-checked;
+
+    .Toggle--yellow & {
+      background-color: $zorroa-color-toggle-checked-yellow;
+    }
   }
 
   &--round {
@@ -94,6 +107,10 @@ $animation-duration: 0.25s;
 
     :checked + & {
       background-color: $zorroa-color-toggle-checked;
+
+      .Toggle--yellow & {
+        background-color: $zorroa-color-toggle-checked-yellow;
+      }
     }
   }
 }

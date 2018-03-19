@@ -16,6 +16,11 @@ class PanZoom extends Component {
     showControls: PropTypes.bool,
     onNextPage: PropTypes.func,
     onPrevPage: PropTypes.func,
+    onScrub: PropTypes.func,
+    onLoop: PropTypes.func,
+    loopPaused: PropTypes.bool,
+    shouldLoop: PropTypes.bool,
+    frameFrequency: PropTypes.object,
     shuttler: PropTypes.instanceOf(PubSub),
     playing: PropTypes.bool,
     onVolume: PropTypes.func,
@@ -25,6 +30,8 @@ class PanZoom extends Component {
       y: PropTypes.number.isRequired,
       scale: PropTypes.number.isRequired
     }),
+    currentFrameNumber: PropTypes.number,
+    totalFrames: PropTypes.number,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object,
@@ -135,7 +142,25 @@ class PanZoom extends Component {
   }
 
   render () {
-    const { title, titleWidth, showControls, onPrevPage, onNextPage, onVolume, volume, shuttler, playing, userSettings } = this.props
+    const {
+      title,
+      titleWidth,
+      showControls,
+      onPrevPage,
+      onNextPage,
+      onLoop,
+      loopPaused,
+      shouldLoop,
+      onScrub,
+      frameFrequency,
+      onVolume,
+      volume,
+      shuttler,
+      playing,
+      userSettings,
+      totalFrames,
+      currentFrameNumber
+     } = this.props
     const { moving } = this.state
     const epsilon = 0.01
     const zoomOutDisabled = this.panner.scale <= PanZoom.minZoom + epsilon
@@ -156,14 +181,23 @@ class PanZoom extends Component {
                 { this.props.children }
               </div>
               { showControls && (
-                  <Controlbar title={title} titleWidth={titleWidth}
-                              onZoomOut={!zoomOutDisabled && this.zoomOut || null}
-                              onZoomIn={!zoomInDisabled && this.zoomIn || null}
-                              onFit={!zoomToFitDisabled && this.zoomToFit || null}
-                              onNextPage={onNextPage}
-                              onPrevPage={onPrevPage}
-                              onVolume={onVolume} volume={volume}
-                              shuttler={shuttler} playing={playing} />)
+                  <Controlbar
+                    title={title} titleWidth={titleWidth}
+                    onZoomOut={!zoomOutDisabled && this.zoomOut || null}
+                    onZoomIn={!zoomInDisabled && this.zoomIn || null}
+                    onFit={!zoomToFitDisabled && this.zoomToFit || null}
+                    onNextPage={onNextPage}
+                    onPrevPage={onPrevPage}
+                    onScrub={onScrub}
+                    onVolume={onVolume} volume={volume}
+                    shuttler={shuttler} playing={playing}
+                    frameFrequency={frameFrequency}
+                    totalFrames={totalFrames}
+                    currentFrameNumber={currentFrameNumber}
+                    onLoop={onLoop}
+                    shouldLoop={shouldLoop}
+                    loopPaused={loopPaused}
+                  />)
               }
             </div>
           )

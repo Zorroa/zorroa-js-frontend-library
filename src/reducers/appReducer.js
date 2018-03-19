@@ -3,7 +3,7 @@ import {
   ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
   METADATA_FIELDS, ASSET_FIELDS,
   LIGHTBOX_METADATA, LIGHTBOX_PANNER,
-  SET_DRAGGING,
+  SET_DRAGGING, SHOULD_LOOP,
   THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
   SHOW_MULTIPAGE, VIDEO_VOLUME,
   HOVER_FIELD, CLEAR_HOVER_FIELD,
@@ -13,7 +13,7 @@ import {
   SHOW_DIALOG_PROMPT, HIDE_DIALOG_PROMPT,
   THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE, DRAG_FIELD_TEMPLATE,
   UX_LEVEL, EMBEDMODE_ENABLED, MONOCHROME, SHOW_IMPORT, ARCHIVIST_SETTING,
-  SHOW_QUICKVIEW, HIDE_QUICKVIEW,
+  SHOW_QUICKVIEW, HIDE_QUICKVIEW, FLIPBOOK_FPS,
   TABLE_LAYOUTS, ADD_TABLE_LAYOUT, DELETE_TABLE_LAYOUT, SELECT_TABLE_LAYOUT
 } from '../constants/actionTypes'
 import { DEFAULT_THUMBSIZE } from '../actions/appActions'
@@ -22,7 +22,7 @@ import FieldList from '../models/FieldList'
 import {
   defaultMetadataFields, defaultLightbarFields, defaultThumbFields,
   defaultDragFields, defaultThumbFieldTemplate, defaultLightbarFieldTemplate,
-  defaultTableLayouts } from '../constants/defaultState'
+  defaultTableLayouts, defaultFpsFrequencies } from '../constants/defaultState'
 
 const initialState = {
   modal: null,
@@ -76,7 +76,9 @@ const initialState = {
     showFolderCounts: 'filtered'
   },
   allAssetCount: 0,
-  showQuickview: false
+  showQuickview: false,
+  flipbookFps: defaultFpsFrequencies[0],
+  shouldLoop: false
 }
 
 export default function app (state = initialState, action) {
@@ -225,6 +227,10 @@ export default function app (state = initialState, action) {
       return { ...state, showQuickview: true }
     case HIDE_QUICKVIEW:
       return { ...state, showQuickview: false }
+    case FLIPBOOK_FPS:
+      return { ...state, flipbookFps: action.payload }
+    case SHOULD_LOOP:
+      return { ...state, shouldLoop: action.payload }
     default:
       return state
   }

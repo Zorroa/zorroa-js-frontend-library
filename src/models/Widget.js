@@ -1,7 +1,7 @@
 import { SimpleSearchWidgetInfo, ExistsWidgetInfo, FacetWidgetInfo,
   MapWidgetInfo, DateRangeWidgetInfo, RangeWidgetInfo, SimilarHashWidgetInfo,
   FiletypeWidgetInfo, ColorWidgetInfo, CollectionsWidgetInfo,
-  SortOrderWidgetInfo, MultipageWidgetInfo, ImportSetWidgetInfo
+  SortOrderWidgetInfo, MultipageWidgetInfo, ImportSetWidgetInfo, FlipbookWidgetInfo
 } from '../components/Racetrack/WidgetInfo'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
@@ -234,4 +234,34 @@ export function createMultipageWidget (field, fieldType, asset, sortByPage, filt
   const order = sortByPage ? [{ field: sortField, ascending: true }] : undefined
   const sliver = new AssetSearch({filter, order})
   return new Widget({type: MultipageWidgetInfo.type, field, sliver, isEnabled, isPinned})
+}
+
+export function createFlipbookWidget (
+  sortByPage,
+  asset,
+  isEnabled,
+  isPinned,
+  state
+) {
+  const parentId = asset && asset.parentId()
+  const filter = new AssetFilter({
+    terms: {
+      'source.clip.parent.raw': [parentId]
+    }
+  })
+  const sortField = 'source.clip.frame.start'
+  const order = sortByPage ? [{
+    field: sortField,
+    ascending: true
+  }] : undefined
+  const sliver = new AssetSearch({filter, order})
+
+  return new Widget({
+    type: FlipbookWidgetInfo.type,
+    field: 'source.clip.parent',
+    sliver,
+    isEnabled,
+    isPinned,
+    state
+  })
 }

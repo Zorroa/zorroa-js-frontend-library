@@ -5,7 +5,7 @@ import {
   ASSET_SORT, ASSET_ORDER, ASSET_FIELDS,
   ASSET_PERMISSIONS, ASSET_SEARCHING,
   UPDATE_COMMAND, GET_COMMANDS,
-  ISOLATE_ASSET, SELECT_ASSETS, ISOLATE_PARENT,
+  ISOLATE_ASSET, SELECT_ASSETS, ISOLATE_PARENT, ISOLATE_FLIPBOOK, DEISOLATE_FLIPBOOK,
   SUGGEST_COMPLETIONS, ALL_ASSET_COUNT, SIMILAR_FIELDS, ASSET_DELETE
 } from '../constants/actionTypes'
 import Asset from '../models/Asset'
@@ -129,6 +129,19 @@ export function isolateParent (asset) {
   })
 }
 
+export function isolateFlipbook (asset) {
+  return ({
+    type: ISOLATE_FLIPBOOK,
+    payload: asset
+  })
+}
+
+export function deisolateFlipbook () {
+  return ({
+    type: DEISOLATE_FLIPBOOK
+  })
+}
+
 export function searchAssets (query, lastQuery, force, isFirstPage, parentIds) {
   return dispatch => {
     const promises = []
@@ -167,7 +180,13 @@ export function searchAssets (query, lastQuery, force, isFirstPage, parentIds) {
       aggQuery.fields = ['_id']
       aggQuery.order = null
       promises.push(searchAssetsRequestProm(dispatch, aggQuery))
-      if (parentIds && parentIds.length) promises.push(updateParentTotals(query, parentIds))
+
+      if (parentIds && parentIds.length) {
+        promises.push(updateParentTotals(query, parentIds, {
+          isUnfiltered: true
+        }))
+        promises.push(updateParentTotals(query, parentIds))
+      }
     }
 
     return Promise.all(promises)
@@ -206,8 +225,10 @@ export function searchAssets (query, lastQuery, force, isFirstPage, parentIds) {
   }
 }
 
-export function updateParentTotals (query, parentIds) {
+export function updateParentTotals (query, parentIds, options = {}) {
   return dispatch => {
+    const isUnfiltered = options.isUnfiltered === true
+
     if (parentIds && parentIds.length) {
       const aggQuery = new AssetSearch(query)
       if (aggQuery.postFilter) {
@@ -218,7 +239,7 @@ export function updateParentTotals (query, parentIds) {
         }
       }
       const parentFilter = new AssetFilter({terms: { 'source.clip.parent.raw': parentIds }})
-      if (aggQuery.filter) {
+      if (aggQuery.filter && isUnfiltered === false) {
         aggQuery.filter.merge(parentFilter)
       } else {
         aggQuery.filter = parentFilter
@@ -231,13 +252,14 @@ export function updateParentTotals (query, parentIds) {
       aggQuery.size = 1
       aggQuery.fields = ['_id']
       aggQuery.order = null
-      console.log('Parent query: ' + JSON.stringify(aggQuery))
+
       searchAssetsRequestProm(dispatch, aggQuery)
         .then(response => {
           const aggs = response.data.aggregations
+          const aggsKey = isUnfiltered ? 'unfilteredAggs' : 'aggs'
           dispatch({
             type: ASSET_AGGS,
-            payload: { aggs }
+            payload: { [aggsKey]: aggs }
           })
         })
         .catch(error => {
@@ -268,9 +290,17 @@ export function suggestQueryStrings (text) {
   }
 }
 
-export function sortAssets (field, ascending) {
+export function sortAssets (field, ascending, options = {}) {
+  const silent = options.silent === true
   if (!field || !field.length) return unorderAssets()
-  return ({ type: ASSET_SORT, payload: {field, ascending} })
+  return ({
+    type: ASSET_SORT,
+    payload: {
+      field,
+      ascending,
+      silent
+    }
+  })
 }
 
 export function orderAssets (order) {
