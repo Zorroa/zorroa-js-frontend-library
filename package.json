@@ -94,7 +94,7 @@
     "ease-component": "1.0.0",
     "latlon-geohash": "1.1.0",
     "lru-cache": "4.1.1",
-    "moment": "2.19.1",
+    "moment": "2.21.0",
     "react": "15.6.2",
     "react-addons-css-transition-group": "15.6.2",
     "react-axis": "0.2.5",
