@@ -9,27 +9,66 @@
   .dark & {
     color: $zorroa-dark-color-text;
   }
+
   &--vertical {
     flex-direction: column;
   }
 
   &__label {
     color: $zorroa-color-gray-dark-3;
+
+    .dark & {
+      color: $zorroa-color-gray-dark-4;
+    }
   }
 
   &__input {
+    margin-top: $form-element-top-margin;
+    margin-bottom: $form-element-bottom-margin;
+    position: relative;
+
+    .dark & {
+      background-color: $zorroa-color-gray-dark-1;
+    }
+  }
+
+  &__input-inline-reset {
+    content: ' ';
+    display: block;
+    height: 100%;
+    line-height: $form-element-height!important; // Hack to override icon font classes
+    width: 10px;
+    color: $zorroa-color-gray-dark-4;
+    position: absolute;
+    top: 0;
+    text-align: center;
+    right: 10px;
+    padding: 0 15px;
+    cursor: pointer;
+
+    &:hover,
+    &:focus {
+      color: $zorroa-color-black;
+
+      .dark & {
+        color: $zorroa-color-gray-dark-3;
+      }
+    }
+  }
+
+  &__input-native {
     border-radius: $form-element-border-radius;
     height: $form-element-height;
     line-height: 20px;
     padding: 10px;
     border: $form-element-border;
-    margin-top: $form-element-top-margin;
-    margin-bottom: $form-element-bottom-margin;
     font-size: 14px;
     background: none;
+    max-width: 100%;
+    width: 100%;
 
     .dark & {
-      color: $zorroa-dark-color-text;
+      color: $zorroa-color-gray-dark-4;
     }
 
     &--error {

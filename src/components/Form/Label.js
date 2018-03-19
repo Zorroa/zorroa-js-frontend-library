@@ -9,10 +9,17 @@ export default function FormLabel (props) {
 
   return (
     <label className={labelClasses}>
-      <span className="FormInput__label">
-        {props.label}
-      </span>
+      {props.label && (
+        <span className="FormInput__label">
+          {props.label}
+        </span>
+      )}
       {props.children}
+      {props.afterLabel && (
+        <span className="FormInput__label">
+          {props.afterLabel}
+        </span>
+      )}
     </label>
   )
 }
@@ -21,6 +28,7 @@ FormLabel.propTypes = {
   className: PropTypes.string,
   children: PropTypes.node,
   label: PropTypes.string,
+  afterLabel: PropTypes.string,
   vertical: PropTypes.bool,
   error: PropTypes.bool
 }

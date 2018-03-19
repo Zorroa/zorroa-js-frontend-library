@@ -4,7 +4,6 @@ import './Select.scss'
 
 export default class Select extends Component {
   static propTypes = {
-    children: PropTypes.node,
     className: PropTypes.string,
     options: PropTypes.arrayOf(PropTypes.object),
     fieldLabel: PropTypes.string,
@@ -13,7 +12,10 @@ export default class Select extends Component {
     error: PropTypes.bool,
     required: PropTypes.bool,
     onChange: PropTypes.func,
-    value: PropTypes.string,
+    value: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number
+    ]),
     deafultLabel: PropTypes.string
   }
 
@@ -36,20 +38,23 @@ export default class Select extends Component {
   onChange = (event) => {
     const value = event.target.value
     const fieldKey = this.props.fieldKey
-
     this.setState({
-      value
-    })
+      value: typeof this.props.value === 'number' ? Number(value) : value
+    }, () => {
+      if (this.props.deafultLabel !== undefined && value === '') {
+        return
+      }
 
-    if (this.props.deafultLabel !== undefined && value === '') {
-      return
-    }
+      if (typeof this.props.onChange !== 'function') {
+        return
+      }
 
-    this.props.onChange(
-      this.props.options.find(
-        option => option[fieldKey].toString() === value
+      this.props.onChange(
+        this.props.options.find(
+          option => (option[fieldKey] || '').toString() === value
+        )
       )
-    )
+    })
   }
 
   render () {
@@ -66,18 +71,18 @@ export default class Select extends Component {
           onChange={this.onChange}
           value={this.state.value}
         >
-          deafultLabel !== undefined && (
+          {deafultLabel !== undefined && (
             <option key={-1} value=''>
               {deafultLabel}
             </option>
-          )
+          )}
 
-          {this.props.options.map(option => {
+          {this.props.options.map((option, index) => {
             const label = option[this.props.fieldLabel]
             const key = option[this.props.fieldKey]
 
             return (
-              <option key={key} value={key}>
+              <option key={`${key}-${index}`} value={key}>
                 {label}
               </option>
             )

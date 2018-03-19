@@ -32,6 +32,7 @@ import Folder from '../../models/Folder'
 import CommandProgress from '../Workspace/CommandProgress'
 import Lightbox from '../Lightbox'
 import Quickview from '../Quickview'
+import Exports from '../Exports'
 import Feedback from '../Feedback'
 import Import, { LocalChooser } from '../Import'
 import Importer from '../Importer'
@@ -330,7 +331,7 @@ class Workspace extends Component {
   }
 
   render () {
-    const { app, isolatedId, selectedAssetIds, user,
+    const { app, isolatedId, selectedAssetIds, user, showExportsWizard,
       isAdministrator, isManager, isDeveloper, isSharer,
       searching, monochrome, isolatedJob, showQuickview } = this.props
 
@@ -482,6 +483,7 @@ class Workspace extends Component {
 
         { isolatedId && showQuickview === false && <Lightbox/> }
         { isolatedId && showQuickview === true && <Quickview/>}
+        { showExportsWizard && <Exports/>}
         { isolatedJob && <Importer/> }
 
         { this.renderModalTest() }
@@ -510,7 +512,8 @@ export default connect(state => ({
   isManager: state.auth.isManager,
   isDeveloper: state.auth.isDeveloper,
   isSharer: state.auth.isSharer,
-  monochrome: state.app.monochrome
+  monochrome: state.app.monochrome,
+  showExportsWizard: state.exports.shouldShow
 }), dispatch => ({
   actions: bindActionCreators({
     iconifyLeftSidebar,

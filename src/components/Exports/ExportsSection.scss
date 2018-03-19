@@ -1,0 +1,111 @@
+@import '../../styles/core-mixins.scss';
+
+$title-height: 20px;
+$title-margin: 20px;
+$total-title-height: $title-height + ($title-margin * 2);
+$toggle-height: 16px;
+
+.ExportsSection {
+  border: 0;
+  padding: 0;
+  position: relative;
+  border-bottom: 1px solid $zorroa-color-gray-dark-3;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-content: center;
+  }
+
+  &__title {
+    font-weight: 400;
+    font-size: 18px;
+    line-height: $title-height;
+    height: $title-height;
+    margin: $title-margin 0 $title-margin 10px;
+    flex-grow: 1;
+    color: $zorroa-color-gray-dark-2;
+
+    &--required {
+      margin-left: 0;
+    }
+
+    .dark & {
+      color: $zorroa-color-gray-light-1;
+    }
+  }
+
+  &__title-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-content: center;
+    flex-grow: 1;
+  }
+
+  &__content {
+    &--closed {
+      display: none;
+    }
+
+    &--disabled {
+      opacity: .5;
+      pointer-events: none;
+      cursor: not-allowed!important;
+    }
+  }
+
+  &__toggle {
+    font-family: sans-sans-serif;
+    border: 1px solid $zorroa-color-gray-dark-2;
+    color: $zorroa-color-gray-dark-2;
+    background: transparent;
+    width: $toggle-height;
+    height: $toggle-height;
+    padding: 0;
+    margin-left: 20px;
+    border-radius: 1px;
+    font-size: 12px;
+    line-height: 5px;
+    text-align: center;
+    flex-shrink: 1;
+    position: relative;
+    box-sizing: content-box;
+    cursor: pointer;
+
+    .dark & {
+      border-color: $zorroa-color-gray-dark-4;
+    }
+
+    &::before,
+    &::after {
+      border-top: 1px solid $zorroa-color-gray-dark-3;
+      content: '';
+      display: block;
+      position: absolute;
+      width: $toggle-height / 2;
+      top: $toggle-height / 2;
+      left: $toggle-height / 4;
+      transition: 250ms transform ease-in-out;
+
+      .dark & {
+        border-color: $zorroa-color-gray-dark-4;
+      }
+    }
+
+    &::before {
+      transform: rotate(90deg) scale(0);
+    }
+
+    &--closed {
+      &::before {
+        transform: rotate(90deg) scale(1);
+      }
+    }
+  }
+}
