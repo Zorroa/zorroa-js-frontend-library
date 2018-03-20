@@ -84,6 +84,37 @@ $content-height: calc(80vw - 40px);
     }
   }
 
+  &__sidebar-title {
+    font-size: 18px;
+    color: $zorroa-color-gray-dark-3;
+    margin: 10px 0;
+    font-weight: 400;
+
+    .dark {
+      color: $zorroa-color-gray-light-1;
+    }
+  }
+
+  &__sidebar-subtitle {
+    font-size: 16px;
+    color: $zorroa-color-gray-dark-3;
+    margin: 10px 0;
+    font-weight: 400;
+
+    .dark {
+      color: $zorroa-color-gray-light-1;
+    }
+  }
+
+  &__sidebar-paragraph {
+    font-size: 14px;
+    color: $zorroa-color-gray-dark-3;
+
+    .dark {
+      color: $zorroa-color-gray-light-1;
+    }
+  }
+
   &__mainbar {
     padding: 0 20px;
     flex-grow: 1;

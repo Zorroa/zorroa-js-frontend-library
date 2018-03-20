@@ -8,7 +8,8 @@ import {
   hideExportInterface,
   postExportProfiles,
   loadExportProfiles,
-  clearPostExportLoadingStates
+  clearPostExportLoadingStates,
+  exportRequest
 } from '../../actions/exportsAction'
 import ZipExporter from './Exporters/ZipExporter'
 import ImageExporter from './Exporters/ImageExporter'
@@ -33,6 +34,9 @@ const SHOW_SUCCESS_MS = 2750
 class Exports extends Component {
   static propTypes = {
     name: PropTypes.string,
+    userEmail: PropTypes.string.isRequired,
+    assetSearch: PropTypes.instanceOf(AssetSearch),
+    hasRestrictedAssets: PropTypes.bool.isRequired,
     imageAssetCount: PropTypes.number.isRequired,
     movieAssetCount: PropTypes.number.isRequired,
     flipbookAssetCount: PropTypes.number.isRequired,
@@ -57,13 +61,17 @@ class Exports extends Component {
         )
       })
     ),
+    exportRequestPosting: PropTypes.bool.isRequired,
+    exportRequestPostingError: PropTypes.bool.isRequired,
+    exportRequestPostingSuccess: PropTypes.bool.isRequired,
     packageName: PropTypes.string,
     origin: PropTypes.string.isRequired,
     actions: PropTypes.shape({
       hideExportInterface: PropTypes.func.isRequired,
       postExportProfiles: PropTypes.func.isRequired,
       loadExportProfiles: PropTypes.func.isRequired,
-      clearPostExportLoadingStates: PropTypes.func.isRequired
+      clearPostExportLoadingStates: PropTypes.func.isRequired,
+      exportRequest: PropTypes.func.isRequired
     })
   }
 
@@ -182,6 +190,20 @@ class Exports extends Component {
     }
   }
 
+  getExportRequestState () {
+    if (this.props.exportRequestPostingError === true) {
+      return 'error'
+    }
+
+    if (this.props.exportRequestPostingSuccess === true) {
+      return 'success'
+    }
+
+    if (this.props.exportRequestPosting === true) {
+      return 'loading'
+    }
+  }
+
   toggleAccordion = (visibleExporter) => {
     if (this.state.visibleExporter === visibleExporter) {
       this.setState({
@@ -258,13 +280,7 @@ class Exports extends Component {
     })
 
     return {
-      search: new AssetSearch({
-        filter: {
-          terms: {
-            _id: this.props.selectedAssets.map(selectedAsset => selectedAsset.id)
-          }
-        }
-      }),
+      search: this.props.assetSearch,
       processors
     }
   }
@@ -280,68 +296,108 @@ class Exports extends Component {
     }))
   }
 
+  startExportRequest = () => {
+    const folderId = this.getExportFolderId()
+    const email = this.props.userEmail
+
+    // CAUTION: Sometimes the root folder ID can be 0, so strict type checking is called for here
+    if (folderId !== undefined) {
+      this.props.actions.exportRequest({
+        folderId,
+        type: 'ExportRequest',
+        comment: `${email} has requested an export of folder ID ${folderId}.`,
+        emailCC: email
+      })
+
+      return
+    }
+
+    console.error('A folder must be selected in order to request an export')
+  }
+
+  getExportFolderId () {
+    return (
+      this.props.assetSearch &&
+      this.props.assetSearch.filter &&
+      this.props.assetSearch.filter.links &&
+      this.props.assetSearch.filter.links.folder &&
+      this.props.assetSearch.filter.links.folder[0]
+    )
+  }
+
   render () {
     const exporterArguments = this.serializeExporterArguments()
     const processors = exporterArguments.processors
-    const activePreset = this.props.exportProfiles.find(preset => preset.id === this.state.presetId)
+    const { exportProfiles, hasRestrictedAssets } = this.props
+    const activePreset = exportProfiles.find(preset => preset.id === this.state.presetId)
     const exportsClassNames = classnames('Exports', {
       'Exports--loading': this.props.isLoading
     })
     const body = (
       <div className={exportsClassNames}>
         <ModalHeader className="Exports__header" icon="icon-export" closeFn={this.close}>
-          Create Export
+         Create Export
         </ModalHeader>
         <form onSubmit={this.onSubmit} className="Exports__body">
-          <div className="Exports__sidebar">
-            <ZipExporter
-              isOpen={this.state.visibleExporter === 'ZipExporter'}
-              onToggleAccordion={() => this.toggleAccordion('ZipExporter')}
-              onChange={this.onChange}
-              savedArguments={this.state.savedArguments}
-              fileName={this.state.ZipExporter.arguments.fileName}
-              presetId={this.state.presetId}
-              presets={this.props.exportProfiles}
-              onSelectPreset={this.onSelectPreset}
-            />
-            <ImageExporter
-              isOpen={this.state.visibleExporter === 'ImageExporter'}
-              onToggleAccordion={() => this.toggleAccordion('ImageExporter')}
-              onChange={this.onChange}
-              arguments={this.state.ImageExporter.arguments}
-              shouldExport={this.state.ImageExporter.shouldExport}
-            />
-            <VideoClipExporter
-              isOpen={this.state.visibleExporter === 'VideoClipExporter'}
-              onToggleAccordion={() => this.toggleAccordion('VideoClipExporter')}
-              onChange={this.onChange}
-              arguments={this.state.VideoClipExporter.arguments}
-              shouldExport={this.state.VideoClipExporter.shouldExport}
+            { hasRestrictedAssets === false && (
+              <div className="Exports__sidebar">
+                <ZipExporter
+                  isOpen={this.state.visibleExporter === 'ZipExporter'}
+                  onToggleAccordion={() => this.toggleAccordion('ZipExporter')}
+                  onChange={this.onChange}
+                  savedArguments={this.state.savedArguments}
+                  fileName={this.state.ZipExporter.arguments.fileName}
+                  presetId={this.state.presetId}
+                  presets={this.props.exportProfiles}
+                  onSelectPreset={this.onSelectPreset}
+                />
+                <ImageExporter
+                  isOpen={this.state.visibleExporter === 'ImageExporter'}
+                  onToggleAccordion={() => this.toggleAccordion('ImageExporter')}
+                  onChange={this.onChange}
+                  arguments={this.state.ImageExporter.arguments}
+                  shouldExport={this.state.ImageExporter.shouldExport}
+                />
+                <VideoClipExporter
+                  isOpen={this.state.visibleExporter === 'VideoClipExporter'}
+                  onToggleAccordion={() => this.toggleAccordion('VideoClipExporter')}
+                  onChange={this.onChange}
+                  arguments={this.state.VideoClipExporter.arguments}
+                  shouldExport={this.state.VideoClipExporter.shouldExport}
 
-            />
-            <FlipbookExporter
-              isOpen={this.state.visibleExporter === 'FlipbookExporter'}
-              onToggleAccordion={() => this.toggleAccordion('FlipbookExporter')}
-              onChange={this.onChange}
-              arguments={this.state.FlipbookExporter.arguments}
-              shouldExport={this.state.FlipbookExporter.shouldExport}
-            />
-            <PdfExporter
-              isOpen={this.state.visibleExporter === 'PdfExporter'}
-              onToggleAccordion={() => this.toggleAccordion('PdfExporter')}
-              onChange={this.onChange}
-              arguments={this.state.PdfExporter.arguments}
-              format={this.state.PdfExporter.format}
-              shouldExport={this.state.PdfExporter.shouldExport}
-            />
-            <MetadataExporter
-              isOpen={this.state.visibleExporter === 'MetadataExporter'}
-              onToggleAccordion={() => this.toggleAccordion('MetadataExporter')}
-              onChange={this.onChange}
-              exporter={this.state.JsonExporter.shouldExport ? 'JsonExporter' : 'CsvExporter'}
-              shouldExport={this.state.JsonExporter.shouldExport || this.state.CsvExporter.shouldExport}
-            />
-          </div>
+                />
+                <FlipbookExporter
+                  isOpen={this.state.visibleExporter === 'FlipbookExporter'}
+                  onToggleAccordion={() => this.toggleAccordion('FlipbookExporter')}
+                  onChange={this.onChange}
+                  arguments={this.state.FlipbookExporter.arguments}
+                  shouldExport={this.state.FlipbookExporter.shouldExport}
+                />
+                <PdfExporter
+                  isOpen={this.state.visibleExporter === 'PdfExporter'}
+                  onToggleAccordion={() => this.toggleAccordion('PdfExporter')}
+                  onChange={this.onChange}
+                  arguments={this.state.PdfExporter.arguments}
+                  format={this.state.PdfExporter.format}
+                  shouldExport={this.state.PdfExporter.shouldExport}
+                />
+                <MetadataExporter
+                  isOpen={this.state.visibleExporter === 'MetadataExporter'}
+                  onToggleAccordion={() => this.toggleAccordion('MetadataExporter')}
+                  onChange={this.onChange}
+                  exporter={this.state.JsonExporter.shouldExport ? 'JsonExporter' : 'CsvExporter'}
+                  shouldExport={this.state.JsonExporter.shouldExport || this.state.CsvExporter.shouldExport}
+                />
+              </div>
+            ) }
+
+            { hasRestrictedAssets === true && (
+              <div className="Exports__sidebar">
+                <h2 className="Exports__sidebar-title">Export Request</h2>
+                <h3 className="Exports__sidebar-subtitle">Export Package Name</h3>
+                <p className="Exports__sidebar-paragraph">{this.state.ZipExporter.arguments.fileName}</p>
+              </div>
+            )}
           <div className="Exports__mainbar">
             <ExportsPreview
               selectedAssets={this.props.selectedAssets}
@@ -355,18 +411,19 @@ class Exports extends Component {
               <dt className="Exports__review-term">Name</dt>
               <dd className="Exports__review-definition">{this.state.ZipExporter.arguments.fileName}</dd>
             </dl>
-            <dl className="Exports__review-section Exports__review-section--heading">
-              <dt className="Exports__review-term">Profile</dt>
-              <dd className={classnames('Exports__review-definition', {
-                'Exports__review-definition--demphasized': this.state.presetId === undefined
-              })}>
-                {activePreset === undefined
-                  ? 'No profile chosen'
-                  : activePreset.presetName
-                }
-              </dd>
-            </dl>
-
+            {hasRestrictedAssets === false && (
+              <dl className="Exports__review-section Exports__review-section--heading">
+                <dt className="Exports__review-term">Profile</dt>
+                <dd className={classnames('Exports__review-definition', {
+                  'Exports__review-definition--demphasized': this.state.presetId === undefined
+                })}>
+                  {activePreset === undefined
+                    ? 'No profile chosen'
+                    : activePreset.presetName
+                  }
+                </dd>
+              </dl>
+            )}
             {
               processors.map((processor, index) => {
                 const key = `${processor.className}-${index}`
@@ -419,53 +476,69 @@ class Exports extends Component {
                 }
               })
             }
-            <div className="Exports__form-footer">
-              <div className={classnames('Exports__main-form-buttons', {
-                'Exports__main-form-buttons--visible': this.state.showPresetForm !== true
-              })}>
-                <div className="Exports__form-button-group">
-                  <FormButton onClick={this.startExport}>
-                    Export
-                  </FormButton>
-                  <FormButton look="minimal" onClick={this.close}>
-                    Cancel
-                  </FormButton>
+            { hasRestrictedAssets === false && (
+              <div className="Exports__form-footer">
+                <div className={classnames('Exports__main-form-buttons', {
+                  'Exports__main-form-buttons--visible': this.state.showPresetForm !== true
+                })}>
+                  <div className="Exports__form-button-group">
+                    <FormButton onClick={this.startExport}>
+                      Export
+                    </FormButton>
+                    <FormButton look="minimal" onClick={this.close}>
+                      Cancel
+                    </FormButton>
+                  </div>
+                  <div className="Exports__form-button-group Exports__form-button-group--secondary">
+                    <FormButton look="mini" onClick={this.togglePresetFormVisibility}>
+                      <IconSave />
+                      <span className="Exports__save-label">
+                        Save Export Profile
+                      </span>
+                    </FormButton>
+                  </div>
                 </div>
-                <div className="Exports__form-button-group Exports__form-button-group--secondary">
-                  <FormButton look="mini" onClick={this.togglePresetFormVisibility}>
-                    <IconSave />
-                    <span className="Exports__save-label">
-                      Save Export Profile
-                    </span>
-                  </FormButton>
+                <div className={classnames('Exports__main-form-buttons', {
+                  'Exports__main-form-buttons--visible': this.state.showPresetForm === true
+                })}>
+                  <div className="Exports__form-button-group">
+                    <FormLabel
+                      label="Name preset"
+                      className="Exports__form-element Exports__form-element--inline"
+                    >
+                      <FormInput
+                        value={this.state.newPresetName}
+                        inlineReset
+                        className="Exports__form-input--inline"
+                        onChange={(presetName) => this.setState({newPresetName: presetName})}
+                      />
+                    </FormLabel>
+                  </div>
+                  <div className="Exports__form-button-group Exports__form-button-group--secondary">
+                    <FormButton state={this.getSaveProfileState()} onClick={this.saveProfiles}>
+                      Save
+                    </FormButton>
+                    <FormButton look="minimal" onClick={this.togglePresetFormVisibility}>
+                      Back
+                    </FormButton>
+                  </div>
                 </div>
               </div>
-              <div className={classnames('Exports__main-form-buttons', {
-                'Exports__main-form-buttons--visible': this.state.showPresetForm === true
-              })}>
-                <div className="Exports__form-button-group">
-                  <FormLabel
-                    label="Name preset"
-                    className="Exports__form-element Exports__form-element--inline"
-                  >
-                    <FormInput
-                      value={this.state.newPresetName}
-                      inlineReset
-                      className="Exports__form-input--inline"
-                      onChange={(presetName) => this.setState({newPresetName: presetName})}
-                    />
-                  </FormLabel>
-                </div>
-                <div className="Exports__form-button-group Exports__form-button-group--secondary">
-                  <FormButton state={this.getSaveProfileState()} onClick={this.saveProfiles}>
-                    Save
-                  </FormButton>
-                  <FormButton look="minimal" onClick={this.togglePresetFormVisibility}>
-                    Back
-                  </FormButton>
+            )}
+            {hasRestrictedAssets === true && (
+              <div className="Exports__form-footer">
+                <div className="Exports__main-form-buttons Exports__main-form-buttons--visible">
+                  <div className="Exports__form-button-group">
+                    <FormButton state={this.getExportRequestState()} onClick={this.startExportRequest}>
+                      Request Export
+                    </FormButton>
+                    <FormButton look="minimal" onClick={this.close}>
+                      Cancel
+                    </FormButton>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </form>
       </div>
@@ -482,6 +555,9 @@ class Exports extends Component {
 }
 
 export default connect(state => ({
+  userEmail: state.auth.user.email,
+  assetSearch: state.exports.assetSearch,
+  hasRestrictedAssets: state.exports.hasRestrictedAssets,
   movieAssetCount: state.exports.videoAssetCount,
   imageAssetCount: state.exports.imageAssetCount,
   flipbookAssetCount: state.exports.flipbookAssetCount,
@@ -495,12 +571,17 @@ export default connect(state => ({
   exportProfilesPostingError: state.exports.exportProfilesPostingError,
   exportProfilesSuccess: state.exports.exportProfilesSuccess,
   exportProfilesPosting: state.exports.exportProfilesPosting,
-  isLoading: state.exports.isLoading
+  isLoading: state.exports.isLoading,
+  exportRequestPosting: state.exports.exportRequestPosting,
+  exportRequestPostingError: state.exports.exportRequestPostingError,
+  exportRequestPostingSuccess: state.exports.exportRequestPostingSuccess
+
 }), dispatch => ({
   actions: bindActionCreators({
     hideExportInterface,
     loadExportProfiles,
     postExportProfiles,
-    clearPostExportLoadingStates
+    clearPostExportLoadingStates,
+    exportRequest
   }, dispatch)
 }))(Exports)

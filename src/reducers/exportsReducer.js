@@ -8,7 +8,10 @@ import {
   POST_EXPORT_PROFILE_BLOB,
   POST_EXPORT_PROFILE_BLOB_SUCCESS,
   POST_EXPORT_PROFILE_BLOB_ERROR,
-  POST_EXPORT_PROFILE_BLOB_CLEAR
+  POST_EXPORT_PROFILE_BLOB_CLEAR,
+  EXPORT_REQUEST_START,
+  EXPORT_REQUEST_SUCCESS,
+  EXPORT_REQUEST_ERROR
 } from '../constants/actionTypes'
 import {
   FILE_GROUP_IMAGES,
@@ -17,6 +20,7 @@ import {
   FILE_GROUP_DOCUMENTS,
   groupExts
 } from '../constants/fileTypes'
+import AssetSearch from '../models/AssetSearch'
 
 export const initialState = {
   // Deterimines if the exports modal should be display
@@ -32,6 +36,11 @@ export const initialState = {
   exportProfilesPosting: false,
   exportProfilesPostingError: false,
 
+  // State for requesting a manual export
+  exportRequestPosting: false,
+  exportRequestPostingError: false,
+  exportRequestPostingSuccess: false,
+
   // State for asset search previews and statistics
   exportPreviewAssets: [],
   imageAssetCount: 0,
@@ -39,7 +48,9 @@ export const initialState = {
   flipbookAssetCount: 0,
   documentAssetCount: 0,
   totalAssetCount: 0,
-  isLoading: false
+  isLoading: false,
+  hasRestrictedAssets: false,
+  assetSearch: new AssetSearch()
 }
 
 export default function (state = initialState, action) {
@@ -52,21 +63,15 @@ export default function (state = initialState, action) {
       }
     }
     case HIDE_EXPORT_UI: {
-      return {
-        ...state,
-        shouldShow: false,
-        exportPreviewAssets: [],
-        imageAssetCount: 0,
-        movieAssetCount: 0,
-        flipbookAssetCount: 0,
-        documentAssetCount: 0,
-        totalAssetCount: 0,
-        isLoading: false
-      }
+      return initialState
     }
     case UPDATE_EXPORT_UI: {
-      const exportPreviewAssets = action.payload.exportAssets
-      const totalAssetCount = action.payload.totalAssetCount
+      const {
+        assetSearch,
+        hasRestrictedAssets,
+        totalAssetCount,
+        exportPreviewAssets
+      } = action.payload
       const assetGroupCounts = [
         FILE_GROUP_IMAGES,
         FILE_GROUP_VIDEOS,
@@ -90,6 +95,8 @@ export default function (state = initialState, action) {
         ...state,
         isLoading: false,
         exportPreviewAssets,
+        hasRestrictedAssets,
+        assetSearch,
         imageAssetCount: assetGroupCounts[FILE_GROUP_IMAGES] || 0,
         videoAssetCount: assetGroupCounts[FILE_GROUP_VIDEOS] || 0,
         flipbookAssetCount: assetGroupCounts[FILE_GROUP_FLIPBOOKS] || 0,
@@ -156,6 +163,43 @@ export default function (state = initialState, action) {
         exportProfilesSuccess
       }
     }
+    case EXPORT_REQUEST_START: {
+      const exportRequestPosting = true
+      const exportRequestPostingError = false
+      const exportRequestPostingSuccess = false
+
+      return {
+        ...state,
+        exportRequestPosting,
+        exportRequestPostingError,
+        exportRequestPostingSuccess
+      }
+    }
+    case EXPORT_REQUEST_SUCCESS: {
+      const exportRequestPosting = false
+      const exportRequestPostingError = false
+      const exportRequestPostingSuccess = true
+
+      return {
+        ...state,
+        exportRequestPosting,
+        exportRequestPostingError,
+        exportRequestPostingSuccess
+      }
+    }
+    case EXPORT_REQUEST_ERROR: {
+      const exportRequestPosting = false
+      const exportRequestPostingError = true
+      const exportRequestPostingSuccess = false
+
+      return {
+        ...state,
+        exportRequestPosting,
+        exportRequestPostingError,
+        exportRequestPostingSuccess
+      }
+    }
+
   }
 
   return state

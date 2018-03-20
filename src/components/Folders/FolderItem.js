@@ -98,6 +98,7 @@ class FolderItem extends Component {
     top: PropTypes.string,
 
     // state props
+    requestableExports: PropTypes.bool,
     selectedFolderIds: PropTypes.object,
     selectedAssetIds: PropTypes.object,
     folders: PropTypes.instanceOf(Map),
@@ -282,9 +283,9 @@ class FolderItem extends Component {
 
     this.props.actions.updateExportInterface({
       // TODO: implement the createExport -> waitForExportAndDownload logic: onCreate: this.createExport,
-      shouldShow: true,
       packageName: name,
-      assetSearch
+      assetSearch,
+      permissionIds: this.props.user.permissions.map(permission => permission.id)
     })
   }
 
@@ -462,13 +463,14 @@ class FolderItem extends Component {
     const subfolderCount = this.subfolderCount(folder.id)
     const subfolderLabel = subfolderCount === 0 ? 'No subfolders' : (subfolderCount === 1 ? '1 subfolder' : `${subfolderCount} subfolders`)
     const { contextMenuPos } = this.state
+    const requestableExports = this.props.requestableExports === true
 
     const selectedAssets = selectedAssetIds && selectedAssetIds.size > 0
     const selectedAssetsNotInFolder = selectedAssets && this.selectedAssetNotInSelectedFolder()
     const addableAssets = selectedAssetsNotInFolder && this.simpleFolderIds().length > 0
     const removableAssets = selectedAssets && this.selectedFolderContainsSelectedAssets()
     const writePermission = folder.hasAccess(user, AclEntry.WriteAccess)
-    const exportPermission = folder.hasAccess(user, AclEntry.ExportAccess)
+    const exportPermission = folder.hasAccess(user, AclEntry.ExportAccess) || requestableExports
     const canAddChild = singleFolderSelected && !folder.isDyhi() && folder.isSimpleCollection() && writePermission
     let canAddChildTitle = ''
     if (!singleFolderSelected) {
@@ -702,7 +704,8 @@ export default connect(state => ({
   uxLevel: state.app.uxLevel,
   userSettings: state.app.userSettings,
   jobs: state.jobs.all,
-  query: state.assets && state.assets.query
+  query: state.assets && state.assets.query,
+  requestableExports: true // TODO make this come from a server-side value or something
 }), dispatch => ({
   actions: bindActionCreators({
     createFolder,

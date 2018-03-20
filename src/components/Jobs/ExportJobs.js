@@ -39,7 +39,8 @@ class ExportJobs extends Component {
     this.props.actions.updateExportInterface({
       // TODO: implement the createExport -> waitForExportAndDownload logic: onCreate: this.createExport,
       shouldShow: true,
-      assetSearch
+      assetSearch,
+      permissionIds: this.props.user.permissions.map(permission => permission.id)
     })
   }
 
