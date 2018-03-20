@@ -11,7 +11,7 @@ const initialState = {
 export default function (state = initialState, action) {
   switch (action.type) {
     case AUTH_USER:
-      return { ...state, error: '', authenticated: action.payload.id > 0, user: action.payload }
+      return { ...state, error: '', authenticated: !!action.payload.id, user: action.payload }
     case UNAUTH_USER:
       return { ...state, authenticated: false }
     case AUTH_ORIGIN:
