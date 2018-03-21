@@ -200,7 +200,7 @@ export default function app (state = initialState, action) {
     case ARCHIVIST_SETTING: {
       const setting = action.payload
       // Update the dragTemplate if it has not already been set by userSettings
-      if (setting.name === 'archivist.export.dragTemplate' && !state.dragFieldTemplate) {
+      if (setting.name === 'curator.thumbnails.drag-template' && !state.dragFieldTemplate) {
         const dragFieldTemplate = setting.currentValue
         const dragFields = fieldsForVariables(parseVariables(dragFieldTemplate))
         return { ...state, dragFieldTemplate, dragFields }

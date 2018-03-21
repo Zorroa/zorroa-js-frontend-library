@@ -153,6 +153,9 @@ function authorize (dispatch, json, source) {
   dispatch({ type: AUTH_USER, payload: user })
   localStorage.setItem(USER_ITEM, JSON.stringify(user))
   const metadata = json.settings && json.settings.metadata
+  dispatch(archivistSetting('curator.lightbox.zoom-min'))
+  dispatch(archivistSetting('curator.lightbox.zoom-max'))
+
   // ignore all UI settings when selenium testing
   if (metadata && !api.getSeleniumTesting()) {
     dispatch({type: USER_SETTINGS, payload: {user, metadata}})
@@ -217,7 +220,7 @@ function authorize (dispatch, json, source) {
     if (metadata.dragFieldTemplate !== undefined) {
       dispatch({type: DRAG_FIELD_TEMPLATE, payload: metadata.dragFieldTemplate})
     } else {
-      dispatch(archivistSetting('archivist.export.dragTemplate'))
+      dispatch(archivistSetting('curator.thumbnails.drag-template'))
     }
     if (metadata.lightboxMetadata !== undefined) {
       dispatch({type: LIGHTBOX_METADATA, payload: metadata.lightboxMetadata})

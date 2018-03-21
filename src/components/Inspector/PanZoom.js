@@ -25,6 +25,8 @@ class PanZoom extends Component {
     playing: PropTypes.bool,
     onVolume: PropTypes.func,
     volume: PropTypes.number,
+    minZoom: PropTypes.number, // This coonfiguration won't always be configured
+    maxZoom: PropTypes.number, // This coonfiguration won't always be configured
     lightboxPanner: PropTypes.shape({
       x: PropTypes.number.isRequired,
       y: PropTypes.number.isRequired,
@@ -44,6 +46,13 @@ class PanZoom extends Component {
 
   state = {
     moving: false
+  }
+
+  constructor (props) {
+    super(props)
+
+    this.maxZoom = (props.maxZoom / 100) || 4
+    this.minZoom = (props.minZoom / 100) || 1 / this.maxZoom
   }
 
   componentWillMount () {
@@ -106,14 +115,11 @@ class PanZoom extends Component {
     this.startMoving()
   }
 
-  static maxZoom = 4
-  static minZoom = 1 / PanZoom.maxZoom
-
   zoom = (event) => {
     const { scale } = this.panner
     const scalePct = 1 + Math.abs(event.deltaY) * 0.005
     const scaleMult = (event.deltaY > 0 ? scalePct : 1 / scalePct)
-    const zoomFactor = Math.min(PanZoom.maxZoom, Math.max(PanZoom.minZoom, scale * scaleMult))
+    const zoomFactor = Math.min(this.maxZoom, Math.max(this.minZoom, scale * scaleMult))
     const topPadding = 0 // Note this value needs to also be changed in PanZoom.scss
     const leftPadding = 0 // Note this value needs to be also changed in PanZoom.scss
     this.panner.zoom(zoomFactor, {x: event.pageX - leftPadding, y: event.pageY - topPadding})
@@ -163,8 +169,8 @@ class PanZoom extends Component {
      } = this.props
     const { moving } = this.state
     const epsilon = 0.01
-    const zoomOutDisabled = this.panner.scale <= PanZoom.minZoom + epsilon
-    const zoomInDisabled = this.panner.scale >= PanZoom.maxZoom - epsilon
+    const zoomOutDisabled = this.panner.scale <= this.minZoom + epsilon
+    const zoomInDisabled = this.panner.scale >= this.maxZoom - epsilon
     const zoomToFitDisabled = this.panner.scale > (1 - epsilon) && this.panner.scale < (1 + epsilon)
     const style = {}
     style['transform'] = `translate(${this.panner.x}px, ${this.panner.y}px) scale(${this.panner.scale})`
@@ -210,7 +216,9 @@ class PanZoom extends Component {
 export default connect(state => ({
   lightboxPanner: state.app.lightboxPanner,
   user: state.auth.user,
-  userSettings: state.app.userSettings
+  userSettings: state.app.userSettings,
+  minZoom: parseInt(state.archivist.settings['curator.lightbox.zoom-min'].currentValue, 10),
+  maxZoom: parseInt(state.archivist.settings['curator.lightbox.zoom-max'].currentValue, 10)
 }), dispatch => ({
   actions: bindActionCreators({
     lightboxPanner,
