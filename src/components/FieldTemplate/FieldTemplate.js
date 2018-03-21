@@ -23,14 +23,17 @@ function metadataBadge (fieldTemplate, asset) {
   const text = fieldTemplate.replace(/%{[a-zA-Z0-9.|]*}/g, '%%')
   const texts = text.split('%%')
   const elems = texts.map((t, i) => (<div className="FieldTemplate-field" key={i}><div className="FieldTemplate-label">{t}</div>{fields[i]}</div>))
-  return <div className="FieldTemplate">{elems}</div>
+  return <div className="FieldTemplate-group">{elems}</div>
 }
 
-const FieldTemplate = (props) => (
-  <div className="FieldTemplate">
-    { metadataBadge(props.template, props.asset) }
-  </div>
-)
+const FieldTemplate = (props) => {
+  const templateGroups = props.template.split(';')
+  return (
+    <div className="FieldTemplate">
+      {templateGroups.map(template => metadataBadge(template, props.asset))}
+    </div>
+  )
+}
 
 FieldTemplate.propTypes = {
   asset: PropTypes.object.isRequired,
