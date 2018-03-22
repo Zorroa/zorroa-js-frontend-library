@@ -9,7 +9,8 @@ import {
   postExportProfiles,
   loadExportProfiles,
   clearPostExportLoadingStates,
-  exportRequest
+  exportRequest,
+  onlineStatus
 } from '../../actions/exportsAction'
 import ZipExporter from './Exporters/ZipExporter'
 import ImageExporter from './Exporters/ImageExporter'
@@ -61,6 +62,8 @@ class Exports extends Component {
         )
       })
     ),
+    onlineAssets: PropTypes.number.isRequired,
+    offlineAssets: PropTypes.number.isRequired,
     exportRequestPosting: PropTypes.bool.isRequired,
     exportRequestPostingError: PropTypes.bool.isRequired,
     exportRequestPostingSuccess: PropTypes.bool.isRequired,
@@ -71,7 +74,8 @@ class Exports extends Component {
       postExportProfiles: PropTypes.func.isRequired,
       loadExportProfiles: PropTypes.func.isRequired,
       clearPostExportLoadingStates: PropTypes.func.isRequired,
-      exportRequest: PropTypes.func.isRequired
+      exportRequest: PropTypes.func.isRequired,
+      onlineStatus: PropTypes.func.isRequired
     })
   }
 
@@ -147,6 +151,7 @@ class Exports extends Component {
 
   componentDidMount () {
     this.props.actions.loadExportProfiles()
+    this.props.actions.onlineStatus(new AssetSearch(this.props.assetSearch))
   }
 
   componentWillReceiveProps (nextProps) {
@@ -407,6 +412,18 @@ class Exports extends Component {
               <dt className="Exports__review-term">Assets</dt>
               <dd className="Exports__review-definition">{this.props.totalAssetCount.toLocaleString()}</dd>
             </dl>
+            {this.props.offlineAssets > 0 && (
+              <div>
+                <dl className="Exports__review-section Exports__review-section--heading">
+                  <dt className="Exports__review-term">Online Assets</dt>
+                  <dd className="Exports__review-definition">{this.props.onlineAssets.toLocaleString()}</dd>
+                </dl>
+                <dl className="Exports__review-section Exports__review-section--heading">
+                  <dt className="Exports__review-term">Offline Assets</dt>
+                  <dd className="Exports__review-definition">{this.props.offlineAssets.toLocaleString()}</dd>
+                </dl>
+              </div>
+            )}
             <dl className="Exports__review-section Exports__review-section--heading">
               <dt className="Exports__review-term">Name</dt>
               <dd className="Exports__review-definition">{this.state.ZipExporter.arguments.fileName}</dd>
@@ -571,17 +588,19 @@ export default connect(state => ({
   exportProfilesPostingError: state.exports.exportProfilesPostingError,
   exportProfilesSuccess: state.exports.exportProfilesSuccess,
   exportProfilesPosting: state.exports.exportProfilesPosting,
-  isLoading: state.exports.isLoading,
+  isLoading: state.exports.isLoading || state.exports.loadingOnlineStatuses,
   exportRequestPosting: state.exports.exportRequestPosting,
   exportRequestPostingError: state.exports.exportRequestPostingError,
-  exportRequestPostingSuccess: state.exports.exportRequestPostingSuccess
-
+  exportRequestPostingSuccess: state.exports.exportRequestPostingSuccess,
+  onlineAssets: state.exports.onlineAssets,
+  offlineAssets: state.exports.offlineAssets
 }), dispatch => ({
   actions: bindActionCreators({
     hideExportInterface,
     loadExportProfiles,
     postExportProfiles,
     clearPostExportLoadingStates,
-    exportRequest
+    exportRequest,
+    onlineStatus
   }, dispatch)
 }))(Exports)

@@ -21,7 +21,7 @@ export default class Controlbar extends PureComponent {
     currentFrameNumber: PropTypes.number,
     totalFrames: PropTypes.number,
     onLoop: PropTypes.func,
-    shouldLoop: PropTypes.func,
+    shouldLoop: PropTypes.bool,
     loopPaused: PropTypes.bool,
     frameFrequency: PropTypes.shape({
       onFrameFrequency: PropTypes.func,

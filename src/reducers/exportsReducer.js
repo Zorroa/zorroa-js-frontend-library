@@ -11,7 +11,10 @@ import {
   POST_EXPORT_PROFILE_BLOB_CLEAR,
   EXPORT_REQUEST_START,
   EXPORT_REQUEST_SUCCESS,
-  EXPORT_REQUEST_ERROR
+  EXPORT_REQUEST_ERROR,
+  EXPORT_ONLINE_STATUS_START,
+  EXPORT_ONLINE_STATUS_SUCCESS,
+  EXPORT_ONLINE_STATUS_ERROR
 } from '../constants/actionTypes'
 import {
   FILE_GROUP_IMAGES,
@@ -31,6 +34,13 @@ export const initialState = {
   exportProfilesLoading: false,
   exportProfilesError: false,
   exportProfilesSuccess: false,
+
+  // State for detecting online vs. offline (i.e. tape backup, Amazon Glacier, airgap, etc)
+  onlineAssets: 0,
+  offlineAssets: 0,
+  loadingOnlineStatuses: false,
+  loadingOnlineStatusesError: false,
+  loadingOnlineStatusesSuccess: false,
 
   // State for saving presets (profiles) to the server
   exportProfilesPosting: false,
@@ -59,7 +69,9 @@ export default function (state = initialState, action) {
       return {
         ...state,
         isLoading: true,
-        shouldShow: true
+        shouldShow: true,
+        assetSearch: action.payload.assetSearch,
+        packageName: action.payload.packageName
       }
     }
     case HIDE_EXPORT_UI: {
@@ -199,7 +211,50 @@ export default function (state = initialState, action) {
         exportRequestPostingSuccess
       }
     }
+    case EXPORT_ONLINE_STATUS_START: {
+      const onlineAssets = 0
+      const offlineAssets = 0
+      const loadingOnlineStatuses = true
+      const loadingOnlineStatusesError = false
+      const loadingOnlineStatusesSuccess = false
 
+      return {
+        ...state,
+        onlineAssets,
+        offlineAssets,
+        loadingOnlineStatuses,
+        loadingOnlineStatusesError,
+        loadingOnlineStatusesSuccess
+      }
+    }
+    case EXPORT_ONLINE_STATUS_SUCCESS: {
+      const onlineAssets = action.payload.totalOnline
+      const offlineAssets = action.payload.totalOffline
+      const loadingOnlineStatuses = false
+      const loadingOnlineStatusesError = false
+      const loadingOnlineStatusesSuccess = true
+
+      return {
+        ...state,
+        onlineAssets,
+        offlineAssets,
+        loadingOnlineStatuses,
+        loadingOnlineStatusesError,
+        loadingOnlineStatusesSuccess
+      }
+    }
+    case EXPORT_ONLINE_STATUS_ERROR: {
+      const loadingOnlineStatuses = false
+      const loadingOnlineStatusesError = true
+      const loadingOnlineStatusesSuccess = false
+
+      return {
+        ...state,
+        loadingOnlineStatuses,
+        loadingOnlineStatusesError,
+        loadingOnlineStatusesSuccess
+      }
+    }
   }
 
   return state

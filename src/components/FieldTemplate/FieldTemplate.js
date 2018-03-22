@@ -3,7 +3,7 @@ import React, { PropTypes } from 'react'
 import TableField from '../Table/TableField'
 import { parseVariables } from '../../services/jsUtil'
 
-function metadataBadge (fieldTemplate, asset) {
+function metadataBadge (fieldTemplate, asset, key) {
   if (!fieldTemplate || !asset) return
   const vars = parseVariables(fieldTemplate)
   if (!vars || !vars.length) return
@@ -22,15 +22,22 @@ function metadataBadge (fieldTemplate, asset) {
   // If template syntax changes, see also jsUtil.js:parseVariables
   const text = fieldTemplate.replace(/%{[a-zA-Z0-9.|]*}/g, '%%')
   const texts = text.split('%%')
-  const elems = texts.map((t, i) => (<div className="FieldTemplate-field" key={i}><div className="FieldTemplate-label">{t}</div>{fields[i]}</div>))
-  return <div className="FieldTemplate-group">{elems}</div>
+  const elems = texts.map((labelText, i) => (
+    <div className="FieldTemplate-field" key={i}>
+      <div className="FieldTemplate-label">
+        {labelText}
+      </div>
+      {fields[i]}
+    </div>
+  ))
+  return <div className="FieldTemplate-group" key={key}>{elems}</div>
 }
 
 const FieldTemplate = (props) => {
   const templateGroups = props.template.split(';')
   return (
     <div className="FieldTemplate">
-      {templateGroups.map(template => metadataBadge(template, props.asset))}
+      {templateGroups.map((template, key) => metadataBadge(template, props.asset, key))}
     </div>
   )
 }

@@ -11,12 +11,41 @@ import {
   POST_EXPORT_PROFILE_BLOB,
   EXPORT_REQUEST_START,
   EXPORT_REQUEST_SUCCESS,
-  EXPORT_REQUEST_ERROR
+  EXPORT_REQUEST_ERROR,
+  EXPORT_ONLINE_STATUS_START,
+  EXPORT_ONLINE_STATUS_SUCCESS,
+  EXPORT_ONLINE_STATUS_ERROR
+
 } from '../constants/actionTypes'
 import api from '../api'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
 const APP_NAME = 'curator'
+
+export function onlineStatus (requestPayload) {
+  return dispatch => {
+    dispatch({
+      type: EXPORT_ONLINE_STATUS_START
+    })
+
+    api
+      .localFileSystem
+      .online({
+        search: requestPayload
+      })
+      .then(response => {
+        dispatch({
+          type: EXPORT_ONLINE_STATUS_SUCCESS,
+          payload: response
+        })
+      }, errorResponse => {
+        dispatch({
+          type: EXPORT_ONLINE_STATUS_ERROR,
+          payload: errorResponse.data
+        })
+      })
+  }
+}
 
 export function exportRequest (requestPayload) {
   return dispatch => {
@@ -64,6 +93,14 @@ export function loadExportProfiles () {
           payload: response
         })
       }, errorResponse => {
+        if (errorResponse.excption === 'com.zorroa.sdk.client.exception.EntityNotFoundException') {
+          dispatch({
+            type: LOAD_EXPORT_PROFILE_BLOB_SUCCESS,
+            payload: []
+          })
+          return
+        }
+
         dispatch({
           type: LOAD_EXPORT_PROFILE_BLOB_ERROR,
           payload: errorResponse.data
@@ -107,14 +144,6 @@ export function clearPostExportLoadingStates () {
   return dispatch => {
     dispatch({
       type: POST_EXPORT_PROFILE_BLOB_CLEAR
-    })
-  }
-}
-
-export function showExportInterface () {
-  return dispatch => {
-    dispatch({
-      type: SHOW_EXPORT_UI
     })
   }
 }
@@ -164,7 +193,11 @@ export function updateExportInterface ({
     ])
 
     dispatch({
-      type: SHOW_EXPORT_UI
+      type: SHOW_EXPORT_UI,
+      payload: {
+        packageName,
+        assetSearch
+      }
     })
 
     exportPromises.then(([assetSearchResponse, restrictedAssetSearch]) => {
@@ -175,8 +208,6 @@ export function updateExportInterface ({
       dispatch({
         type: UPDATE_EXPORT_UI,
         payload: {
-          packageName,
-          assetSearch,
           exportPreviewAssets: assets,
           hasRestrictedAssets: availableSearchAssets >= totalAssetCount,
           totalAssetCount,
