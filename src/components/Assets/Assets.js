@@ -192,7 +192,7 @@ class Assets extends Component {
   }
 
   shouldIsolateFlipbook (asset) {
-    return asset.mediaType() === 'zorroa/x-flipbook' && this.props.showMultipage === false
+    return asset.isOfType('zorroa/x-flipbook') && this.props.showMultipage === false
   }
 
   isolateToLightbox = (asset) => {
@@ -200,12 +200,13 @@ class Assets extends Component {
     const parentId = showMultipage && asset.parentId()
     const isolatedParentId = isolatedParent && isolatedParent.parentId()
     const stackCount = parentId && parentId !== isolatedParentId && parentTotals && parentTotals.get(parentId)
+
     if (this.shouldIsolateFlipbook(asset)) {
       this.props.actions.isolateFlipbook(asset)
       return
     }
 
-    if (stackCount > 1 || this.shouldIsolateFlipbook(asset)) {
+    if (stackCount > 1) {
       this.props.actions.isolateParent(asset)
       return
     }

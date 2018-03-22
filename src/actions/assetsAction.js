@@ -18,12 +18,12 @@ import { archivistGet, archivistPut, archivistPost, archivistDelete } from './au
 export function requiredFields (fields, fieldTypes) {
   const required = [
     'id',
-    'source.filename', 'source.mediaType', 'source.extension',
-    'image.width', 'image.height', 'image.pages',
-    'video.width', 'video.height', 'video.pages', 'video.frameRate', 'video.frames', 'video.background'
+    'source.filename',
+    'source.mediaType',
+    'source.extension'
   ]
   const prefix = [
-    'links', 'clip', 'source.clip', 'pages', 'proxies'
+    'links', 'clip', 'media', 'pages', 'proxies'
   ]
 
   const req = new Set()
@@ -163,7 +163,7 @@ export function searchAssets (query, lastQuery, force, isFirstPage, parentIds) {
 
       // Filter out any child assets that have already been loaded after the first page
       if (!isFirstPage && parentIds && parentIds.length) {
-        const filter = new AssetFilter({terms: { 'source.clip.parent.raw': parentIds }})
+        const filter = new AssetFilter({terms: { 'media.clip.parent': parentIds }})
         mainQuery.merge(new AssetSearch({filter: new AssetFilter({must_not: [filter]})}))
       }
 
@@ -238,14 +238,14 @@ export function updateParentTotals (query, parentIds, options = {}) {
           aggQuery.filter = new AssetFilter(query.postFilter)
         }
       }
-      const parentFilter = new AssetFilter({terms: { 'source.clip.parent.raw': parentIds }})
+      const parentFilter = new AssetFilter({terms: { 'media.clip.parent': parentIds }})
       if (aggQuery.filter && isUnfiltered === false) {
         aggQuery.filter.merge(parentFilter)
       } else {
         aggQuery.filter = parentFilter
       }
       // Filter to children of visible parents
-      const parentAggs = { parentCounts: {terms: {field: 'source.clip.parent.raw', size: 1000}} }
+      const parentAggs = { parentCounts: {terms: {field: 'media.clip.parent', size: 1000}} }
       aggQuery.merge(new AssetSearch({ aggs: parentAggs }))
       aggQuery.postFilter = null
       aggQuery.from = 0

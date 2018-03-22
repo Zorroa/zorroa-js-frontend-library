@@ -47,7 +47,7 @@ class FlipbookWidget extends Component {
       playing: false,
       currentFrameNumber: false,
       totalFrames: 0,
-      sortByFrame: props.searchOrder && props.searchOrder.field === 'source.clip.frame.start'
+      sortByFrame: props.searchOrder && props.searchOrder.field === 'media.clip.frame.start'
     }
   }
 
@@ -98,7 +98,7 @@ class FlipbookWidget extends Component {
     })
 
     if (event.target.checked === true) {
-      this.props.actions.sortAssets('source.clip.frame.start', true, {
+      this.props.actions.sortAssets('media.clip.frame.start', true, {
         silent: true
       })
       return
@@ -110,6 +110,10 @@ class FlipbookWidget extends Component {
   }
 
   render () {
+    if (this.props.asset === undefined) {
+      return null
+    }
+
     const { id, floatBody, isIconified, isOpen, onOpen, fps } = this.props
     const title = isOpen ? FlipbookWidgetInfo.title : undefined
     const field = isOpen ? undefined : this.title()
@@ -123,8 +127,8 @@ class FlipbookWidget extends Component {
       width: `calc(1 / ${defaultFpsFrequencies.length} * 100%)`
     }
     const flipbookDimensions = resizeByAspectRatio({
-      width: this.props.asset.document.image.width,
-      height: this.props.asset.document.image.height,
+      width: this.props.asset.document.media.width,
+      height: this.props.asset.document.media.height,
       newWidth: 230 // The value 230 comes from the CSS
     })
 
@@ -228,7 +232,7 @@ export default connect(
     aggs: state.assets.aggs,
     asset: state.assets.all[0],
     totalCount: state.assets.totalCount,
-    searchOrder: state.assets.order && state.assets.order.find(order => order.field === 'source.clip.frame.start'),
+    searchOrder: state.assets.order && state.assets.order.find(order => order.field === 'media.clip.frame.start'),
     widget: state.racetrack && state.racetrack.widgets && state.racetrack.widgets.find(
       widget => ownProps.id === widget.id
     )

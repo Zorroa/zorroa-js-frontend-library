@@ -13,11 +13,12 @@ export function get (id) {
     .post('/api/v3/assets/_search', {
       'fields': [
         'proxies*',
-        'source*'
+        'source*',
+        'media*'
       ],
       'filter': {
         'terms': {
-          'source.clip.parent.raw': [
+          'media.clip.parent': [
             id
           ]
         }
@@ -31,5 +32,9 @@ export function get (id) {
         .data
         .list
         .map(flipbookChildAsset => new Asset(flipbookChildAsset))
+    })
+    .catch(error => {
+      console.error('Unable to retrieve Flipbook child assets', error)
+      return Promise.reject(error)
     })
 }

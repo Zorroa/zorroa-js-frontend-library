@@ -50,7 +50,7 @@ export default function withFlipbook (WrappedComponent) {
           return framesAssets.map(asset => {
             return {
               url: asset.atLeastProxyURL(this.props.origin, 300, 300),
-              number: asset.document.source.clip.frame.start
+              number: asset.document.media.clip.start
             }
           }).sort((a, b) => {
             if (a.number > b.number) {
@@ -81,11 +81,20 @@ export default function withFlipbook (WrappedComponent) {
                 return dataFrame
               })
           }))
-        }).then(framesWithBitmaps => {
+        })
+        .catch(error => {
+          console.error('Unable to download frame bitmaps for Flipbook', error)
+          return Promise.reject(error)
+        })
+        .then(framesWithBitmaps => {
           this.setState({
             frames: framesWithBitmaps,
             totalFrames: getTotalFrames(framesWithBitmaps)
           })
+        })
+        .catch(error => {
+          console.error('Unable to update frame files in state for Flipbook', error)
+          return Promise.reject(error)
         })
     }
 

@@ -79,12 +79,12 @@ class FlipbookViewer extends Component {
     this.props.actions.setFlipbookFps(frameRate)
   }
 
-  @keydown('k')
+  @keydown('.')
   nextFrame () {
     this.shuttler.publish('frameForward')
   }
 
-  @keydown('j')
+  @keydown(',')
   previousFrame () {
     this.shuttler.publish('frameBack')
   }
@@ -100,12 +100,12 @@ class FlipbookViewer extends Component {
 
   getDefaultFrameFromIsolatedAsset () {
     if (
-      this.props.isolatedAsset.document.source &&
-      this.props.isolatedAsset.document.source.clip &&
-      this.props.isolatedAsset.document.source.clip.frame &&
-      this.props.isolatedAsset.document.source.clip.frame.start
+      this.props.isolatedAsset.document.media &&
+      this.props.isolatedAsset.document.media.clip &&
+      this.props.isolatedAsset.document.media.clip.frame &&
+      this.props.isolatedAsset.document.media.clip.frame.start
     ) {
-      return this.props.isolatedAsset.document.source.clip.frame.start
+      return this.props.isolatedAsset.document.media.clip.frame.start
     }
 
     return 1
