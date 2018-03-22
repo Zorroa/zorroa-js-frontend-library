@@ -87,6 +87,13 @@ class Lightbox extends Component {
         hasNext = index < assets.length - 1
       }
     }
+    const metadataTitle = (
+      <div className="Lightbox-metadata-title">
+        <div className="Lightbox__metadata-icon icon-register"/>
+        <div>Metadata</div>
+      </div>
+    )
+
     return (
       <div className="lightbox">
         <Lightbar showMetadata={lightboxMetadata.show}
@@ -97,9 +104,13 @@ class Lightbox extends Component {
                      onPrev={hasPrev ? _ => this.isolateIndexOffset(-1) : null} />
         </div>
         { lightboxMetadata.show && (
-          <ResizableWindow onClose={this.closeMetadata} onMove={this.moveMetadata}
-                           {...lightboxMetadata}
-                           title={<div className="Lightbox-metadata-title"><div className="Lightbox__metadata-icon icon-register"/><div>Metadata</div></div>}>
+          <ResizableWindow
+            onClose={this.closeMetadata}
+            onMove={this.moveMetadata}
+            preventOutOfBounds
+             {...lightboxMetadata}
+             title={metadataTitle}
+           >
             <Metadata assetIds={new Set([isolatedId])} dark={true} height="100%"/>
           </ResizableWindow>
           )

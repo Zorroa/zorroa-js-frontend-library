@@ -25,28 +25,28 @@ export default class TableContextMenu extends Component {
     onDismiss()
   }
 
-  moveColumnRight = (item) => {
+  moveColumnRight = () => {
     const { fields, selectedFieldIndex, updateFieldsFn, onDismiss } = this.props
     const shift = [...fields.slice(0, selectedFieldIndex), fields[selectedFieldIndex + 1], fields[selectedFieldIndex], ...fields.slice(selectedFieldIndex + 2)]
     updateFieldsFn(shift.map(field => field.field))
     onDismiss()
   }
 
-  moveColumnToStart = (item) => {
+  moveColumnToStart = () => {
     const { fields, selectedFieldIndex, updateFieldsFn, onDismiss } = this.props
     const shift = [ fields[selectedFieldIndex], ...fields.slice(0, selectedFieldIndex), ...fields.slice(selectedFieldIndex + 1) ]
     updateFieldsFn(shift.map(field => field.field))
     onDismiss()
   }
 
-  moveColumnToEnd = (item) => {
+  moveColumnToEnd = () => {
     const { fields, selectedFieldIndex, updateFieldsFn, onDismiss } = this.props
     const shift = [ ...fields.slice(0, selectedFieldIndex), ...fields.slice(selectedFieldIndex + 1), fields[selectedFieldIndex] ]
     updateFieldsFn(shift.map(field => field.field))
     onDismiss()
   }
 
-  removeColumn = (item) => {
+  removeColumn = () => {
     const { fields, selectedFieldIndex, updateFieldsFn, onDismiss } = this.props
     const shift = [ ...fields ]
     shift.splice(selectedFieldIndex, 1)
@@ -54,7 +54,7 @@ export default class TableContextMenu extends Component {
     onDismiss()
   }
 
-  freezeColumn = (item) => {
+  freezeColumn = () => {
     console.log('Freeze')
   }
 
@@ -75,8 +75,8 @@ export default class TableContextMenu extends Component {
        { fn: this.moveColumnRight, icon: 'icon-arrow-right2', label: 'Move column right', disabled: (index) => (index >= fields.length - 1) },
        { fn: this.moveColumnToStart, icon: 'icon-enter-left2', label: 'Move column to start', disabled: (index) => (index === 0) },
        { fn: this.moveColumnToEnd, icon: 'icon-enter-right2', label: 'Move to end', disabled: (index) => (index >= fields.length - 1) },
-       { fn: this.removeColumn, icon: 'icon-delete-column', label: 'Remove column', disabled: (index) => (false) },
-       { fn: this.freezeColumn, icon: 'icon-table-freeze', label: 'Freeze column', disabled: (index) => (true) }
+       { fn: this.removeColumn, icon: 'icon-delete-column', label: 'Remove column', disabled: () => (false) },
+       { fn: this.freezeColumn, icon: 'icon-table-freeze', label: 'Freeze column', disabled: () => (true) }
     ]
     return (
       <div>
