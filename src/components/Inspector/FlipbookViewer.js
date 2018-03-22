@@ -102,10 +102,9 @@ class FlipbookViewer extends Component {
     if (
       this.props.isolatedAsset.document.media &&
       this.props.isolatedAsset.document.media.clip &&
-      this.props.isolatedAsset.document.media.clip.frame &&
-      this.props.isolatedAsset.document.media.clip.frame.start
+      this.props.isolatedAsset.document.media.clip.start
     ) {
-      return this.props.isolatedAsset.document.media.clip.frame.start
+      return this.props.isolatedAsset.document.media.clip.start
     }
 
     return 1
