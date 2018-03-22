@@ -123,10 +123,8 @@ class Exports extends Component {
       },
       VideoClipExporter: {
         arguments: {
-          resolution: 720,
-          quality: 100,
-          aspectRatio: undefined,
-          format: 'mp4',
+          resolution: '960:540',
+          quality: 'default',
           exportOriginal: true
         },
         shouldExport: false

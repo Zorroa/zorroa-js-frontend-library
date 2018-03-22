@@ -1,11 +1,15 @@
 export function articulateQuality (quality) {
-  if (quality > 75) {
+  if (quality === 'best') {
     return 'Best'
   }
 
-  if (quality > 50) {
+  if (quality === 'default') {
     return 'Good'
   }
 
-  return 'Fast'
+  if (quality === 'fast') {
+    return 'Fast'
+  }
+
+  return quality
 }

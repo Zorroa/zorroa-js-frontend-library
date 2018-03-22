@@ -92,58 +92,35 @@ export default class VideoClipExporter extends Component {
     const qualityOptions = [
       {
         label: 'Best',
-        value: 100
+        value: 'best'
       }, {
         label: 'Good',
-        value: 75
+        value: 'default'
       },
       {
         label: 'Fast',
-        value: 50
+        value: 'fast'
       }
     ]
     const resolutionOptions = [
       {
         label: '540p - Standard',
-        value: 540
+        value: '960:540'
       },
       {
         label: '720p - HD',
-        value: 720
+        value: '1280:720'
       },
       {
         label: '1080p - Full HD',
-        value: 1080
+        value: '1920:1080'
       },
       {
         label: '2160p - 4K',
-        value: 2160
+        value: '2160:1440'
       }
     ]
-    const aspectRatioOptions = [
-      {
-        label: '4:3',
-        value: '4:3'
-      },
-      {
-        label: '16:9',
-        value: '16:9'
-      }
-    ]
-    const formatOptions = [
-      {
-        label: 'MPEG-4',
-        value: 'mp4'
-      },
-      {
-        label: 'MOV (QuickTime)',
-        value: 'mov'
-      },
-      {
-        label: 'WebM',
-        value: 'webm'
-      }
-    ]
+
     return (
       <ExportsSection
         title="Movie Assets"
@@ -192,38 +169,6 @@ export default class VideoClipExporter extends Component {
             >
             </FormSelect>
           </FormLabel>
-          <FormLabel
-            vertical
-            label="Aspect Ratio"
-            className="Exports__form-element Exports__form-element--nested"
-          >
-            <FormSelect
-              className="Exports__form-select"
-              options={aspectRatioOptions}
-              fieldLabel='label'
-              fieldKey='value'
-              value={this.state.aspectRatio}
-              deafultLabel="Original aspect ratio"
-              onChange={({value}) => this.onChange({aspectRatio: value}, false)}
-            >
-            </FormSelect>
-          </FormLabel>
-          <FormLabel
-            vertical
-            label="Format"
-            className="Exports__form-element Exports__form-element--nested"
-          >
-            <FormSelect
-              className="Exports__form-select"
-              options={formatOptions}
-              fieldLabel='label'
-              fieldKey='value'
-              value={this.state.format}
-              onChange={({value}) => this.onChange({format: value}, false)}
-            >
-            </FormSelect>
-          </FormLabel>
-
         </radiogroup>
       </ExportsSection>
     )

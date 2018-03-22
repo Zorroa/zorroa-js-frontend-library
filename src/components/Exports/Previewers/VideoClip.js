@@ -15,16 +15,10 @@ export default function ExportPreviewerVideoClip (props) {
           {movieAssetCount.toLocaleString()} assets
         </span>
         <span>
-          Export as: {exporterArguments.format.toUpperCase()}
-        </span>
-        <span>
           Quality: {articulateQuality(exporterArguments.quality)}
         </span>
         <span>
-          Aspect Ratio: {exporterArguments.aspectRatio || 'Original'}
-        </span>
-        <span>
-          Resolution: {exporterArguments.resolution}p
+          Resolution: {exporterArguments.resolution.replace(':', '×')}
         </span>
       </dd>)}
       {exporterArguments.exportOriginal === true && movieAssetCount > 0 && (
