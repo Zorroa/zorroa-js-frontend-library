@@ -1,7 +1,7 @@
 @import '../../styles/core-mixins.scss';
 
-$max-height: 80vw;
-$content-height: calc(80vw - 40px);
+$max-height: 80vh;
+$content-height: calc(80vh - 40px);
 
 .Exports {
   max-height: $max-height;
