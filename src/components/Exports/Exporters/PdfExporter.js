@@ -65,17 +65,6 @@ export default class PdfExporter extends Component {
     let pageMode = 'merge'
 
     if (format === 'singlepage') {
-      mediaType = 'pdf'
-      pageMode = 'separate'
-    }
-
-    if (format === 'tiff') {
-      mediaType = 'tiff'
-      pageMode = 'merge'
-    }
-
-    if (format === 'jpg') {
-      mediaType = 'jpg'
       pageMode = 'separate'
     }
 
@@ -144,14 +133,6 @@ export default class PdfExporter extends Component {
       {
         label: 'Single PDFs',
         value: 'singlepage'
-      },
-      {
-        label: 'Multipage TIFFs',
-        value: 'tiff'
-      },
-      {
-        label: 'JPGs',
-        value: 'jpg'
       }
     ]
 

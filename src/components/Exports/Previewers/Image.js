@@ -1,5 +1,8 @@
 import React, {PropTypes} from 'react'
-import { articulateQuality } from '../utils'
+import {
+  articulateQuality,
+  pluralize
+} from '../utils'
 
 export default function ExportPreviewerImage (props) {
   const {
@@ -13,7 +16,7 @@ export default function ExportPreviewerImage (props) {
       {exporterArguments.exportOriginal === false && imageAssetCount > 0 && (
         <dd className="Exports__review-definition">
           <span>
-            {imageAssetCount.toLocaleString()} assets
+            {imageAssetCount.toLocaleString()} {pluralize(imageAssetCount, 'asset', 'assets')}
           </span>
           <span>
             Export as: {exporterArguments.format.toUpperCase()}
@@ -29,7 +32,7 @@ export default function ExportPreviewerImage (props) {
       {exporterArguments.exportOriginal === true && imageAssetCount > 0 && (
         <dd className="Exports__review-definition">
           <span>
-            Export {imageAssetCount.toLocaleString()} original source files
+            Export {imageAssetCount.toLocaleString()} original source {pluralize(imageAssetCount, 'file', 'files')}
           </span>
         </dd>
       )}

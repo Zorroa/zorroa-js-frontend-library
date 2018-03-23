@@ -14,8 +14,7 @@ export default class VideoClipExporter extends Component {
     shouldExport: PropTypes.bool.isRequired,
     arguments: PropTypes.shape({
       resolution: PropTypes.number.isRequired,
-      quality: PropTypes.number.isRequired,
-      aspectRatio: PropTypes.string,
+      quality: PropTypes.string.isRequired,
       format: PropTypes.string.isRequired,
       exportOriginal: PropTypes.bool.isRequired
     })
@@ -28,7 +27,6 @@ export default class VideoClipExporter extends Component {
     // Arguments
     resolution: this.props.arguments.resolution,
     quality: this.props.arguments.quality,
-    aspectRatio: this.props.arguments.aspectRatio,
     format: this.props.arguments.format,
     exportOriginal: this.props.arguments.exportOriginal
   }
@@ -39,7 +37,6 @@ export default class VideoClipExporter extends Component {
     if (
       nextProps.arguments.resolution !== this.state.resolution ||
       nextProps.arguments.quality !== this.state.quality ||
-      nextProps.arguments.aspectRatio !== this.state.aspectRatio ||
       nextProps.arguments.exportOriginal !== this.state.exportOriginal ||
       nextProps.arguments.format !== this.state.format
     ) {
@@ -65,7 +62,6 @@ export default class VideoClipExporter extends Component {
             arguments: {
               resolution: this.state.resolution,
               quality: this.state.quality,
-              aspectRatio: this.state.aspectRatio,
               format: this.state.format,
               exportOriginal: this.state.exportOriginal
             },
@@ -92,10 +88,10 @@ export default class VideoClipExporter extends Component {
     const qualityOptions = [
       {
         label: 'Best',
-        value: 'best'
+        value: 'veryslow'
       }, {
         label: 'Good',
-        value: 'default'
+        value: 'medium'
       },
       {
         label: 'Fast',

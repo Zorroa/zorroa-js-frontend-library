@@ -1,5 +1,8 @@
 import React, {PropTypes} from 'react'
-import { articulateQuality } from '../utils'
+import {
+  articulateQuality,
+  pluralize
+} from '../utils'
 
 export default function ExportPreviewerPdf (props) {
   const {
@@ -13,7 +16,7 @@ export default function ExportPreviewerPdf (props) {
       {exporterArguments.exportOriginal === false && documentAssetCount > 0 && (
         <dd className="Exports__review-definition">
           <span>
-            {documentAssetCount.toLocaleString()} assets
+            {documentAssetCount.toLocaleString()} {pluralize(documentAssetCount, 'asset', 'assets')}
           </span>
           <span>
             Export as: {(({pageMode, mediaType}) => {
@@ -37,7 +40,7 @@ export default function ExportPreviewerPdf (props) {
       {exporterArguments.exportOriginal === true && documentAssetCount > 0 && (
         <dd className="Exports__review-definition">
           <span>
-            Export {documentAssetCount.toLocaleString()} original source files
+            Export {documentAssetCount.toLocaleString()} original source {pluralize(documentAssetCount, 'file', 'files')}
           </span>
         </dd>
       )}

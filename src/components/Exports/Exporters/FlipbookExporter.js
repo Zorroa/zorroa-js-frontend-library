@@ -5,7 +5,6 @@ import {
   FormRadio
 } from '../../Form'
 import ExportsSection from '../ExportsSection'
-import ResizeExportAsset from '../ResizeExportAsset'
 
 export default class FlipbookExporter extends Component {
   static propTypes = {
@@ -15,9 +14,9 @@ export default class FlipbookExporter extends Component {
     shouldExport: PropTypes.bool,
     arguments: PropTypes.shape({
       quality: PropTypes.number.isRequired,
-      size: PropTypes.number.isRequired,
       exportImages: PropTypes.bool.isRequired,
-      exportMovies: PropTypes.bool.isRequired
+      exportMovies: PropTypes.bool.isRequired,
+      frameRate: PropTypes.number.isRequired
     })
   }
 
@@ -28,16 +27,16 @@ export default class FlipbookExporter extends Component {
 
     // Exporter arguments
     quality: this.props.arguments.quality,
-    size: this.props.arguments.size,
     exportImages: this.props.arguments.exportImages,
-    exportMovies: this.props.arguments.exportMovies
+    exportMovies: this.props.arguments.exportMovies,
+    frameRate: this.props.arguments.frameRate
   }
 
   componentWillReceiveProps (nextProps) {
     const newState = {}
     if (
       nextProps.arguments.quality !== this.state.quality ||
-      nextProps.arguments.size !== this.state.size ||
+      nextProps.arguments.frameRate !== this.state.frameRate ||
       nextProps.arguments.exportImages !== this.state.exportImages ||
       nextProps.arguments.exportMovies !== this.state.exportMovies
     ) {
@@ -57,10 +56,10 @@ export default class FlipbookExporter extends Component {
         this.props.onChange({
           FlipbookExporter: {
             arguments: {
-              size: this.state.size,
               quality: this.state.quality,
               exportImages: this.state.exportImages,
-              exportMovies: this.state.exportMovies
+              exportMovies: this.state.exportMovies,
+              frameRate: this.state.frameRate
             },
             shouldExport: this.state.shouldExport
           }
@@ -102,14 +101,14 @@ export default class FlipbookExporter extends Component {
     const qualityOptions = [
       {
         label: 'Best',
-        value: 100
+        value: 'veryslow'
       }, {
         label: 'Good',
-        value: 75
+        value: 'medium'
       },
       {
         label: 'Fast',
-        value: 50
+        value: 'fast'
       }
     ]
     const flipbookOptions = [
@@ -122,6 +121,16 @@ export default class FlipbookExporter extends Component {
         value: 'movie'
       }
     ]
+    const frameRateOptions = [{
+      label: '12',
+      value: 12
+    }, {
+      label: '24',
+      value: 24
+    }, {
+      label: '30',
+      value: 30
+    }]
 
     return (
       <ExportsSection
@@ -179,10 +188,21 @@ export default class FlipbookExporter extends Component {
             >
             </FormSelect>
           </FormLabel>
-          <ResizeExportAsset
-            defaultSize={this.state.size}
-            onChange={(size) => this.onChange({size})}
-          />
+          <FormLabel
+            vertical
+            label="Frame Rate"
+            className="Exports__form-element Exports__form-element--nested"
+          >
+            <FormSelect
+              className="Exports__form-select"
+              options={frameRateOptions}
+              fieldLabel='label'
+              fieldKey='value'
+              value={this.state.frameRate}
+              onChange={({value}) => this.onChange({frameRate: value})}
+            >
+            </FormSelect>
+          </FormLabel>
         </radiogroup>
       </ExportsSection>
     )

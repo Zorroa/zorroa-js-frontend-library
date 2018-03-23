@@ -87,7 +87,7 @@ class Exports extends Component {
         arguments: {
           exportOriginal: true,
           format: 'jpg',
-          size: 256,
+          size: 1024,
           quality: 100
         },
         shouldExport: false
@@ -106,9 +106,9 @@ class Exports extends Component {
       FlipbookExporter: {
         arguments: {
           quality: 100,
-          size: 1200,
           exportImages: true,
-          exportMovies: true
+          exportMovies: true,
+          frameRate: 30
         },
         shouldExport: false,
         flipbookExportType: 'image'
@@ -124,7 +124,7 @@ class Exports extends Component {
       VideoClipExporter: {
         arguments: {
           resolution: '960:540',
-          quality: 'default',
+          quality: 'medium',
           exportOriginal: true
         },
         shouldExport: false

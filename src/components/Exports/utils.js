@@ -1,9 +1,9 @@
 export function articulateQuality (quality) {
-  if (quality === 'best') {
+  if (quality === 'veryslow') {
     return 'Best'
   }
 
-  if (quality === 'default') {
+  if (quality === 'medium') {
     return 'Good'
   }
 
@@ -11,5 +11,21 @@ export function articulateQuality (quality) {
     return 'Fast'
   }
 
-  return quality
+  if (quality > 75) {
+    return 'Best'
+  }
+
+  if (quality > 50) {
+    return 'Good'
+  }
+
+  if (quality >= 0) {
+    return 'Fast'
+  }
+
+  return (quality).toString()
+}
+
+export function pluralize (count, singular, plural) {
+  return count === 1 ? singular : plural
 }

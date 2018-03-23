@@ -1,5 +1,5 @@
 import React, {PropTypes} from 'react'
-import { articulateQuality } from '../utils'
+import { articulateQuality, pluralize } from '../utils'
 
 export default function ExportPreviewerFlipbook (props) {
   const {
@@ -13,7 +13,7 @@ export default function ExportPreviewerFlipbook (props) {
       {flipbookAssetCount > 0 && (
         <dd className="Exports__review-definition">
           <span>
-            {flipbookAssetCount.toLocaleString()} assets
+            {flipbookAssetCount.toLocaleString()} {pluralize(flipbookAssetCount, 'asset', 'assets')}
           </span>
           <span>
             Export as: {(({exportImages, exportMovies}) => {
@@ -34,7 +34,7 @@ export default function ExportPreviewerFlipbook (props) {
             Quality: {articulateQuality(exporterArguments.quality)}
           </span>
           <span>
-            Size: {exporterArguments.size}px
+            Frame Rate: {exporterArguments.frameRate}
           </span>
         </dd>
       )}
@@ -50,7 +50,7 @@ export default function ExportPreviewerFlipbook (props) {
 ExportPreviewerFlipbook.propTypes = {
   flipbookAssetCount: PropTypes.number.isRequired,
   exporterArguments: PropTypes.shape({
-    quality: PropTypes.number.isRequired,
+    quality: PropTypes.string.isRequired,
     size: PropTypes.number.isRequired,
     exportImages: PropTypes.bool.isRequired,
     exportMovies: PropTypes.bool.isRequired
