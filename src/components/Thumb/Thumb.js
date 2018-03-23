@@ -215,7 +215,7 @@ class Thumb extends Component {
   renderBadges = (asset, origin, stackCount, childCount) => {
     const { badgeHeight, showMultipageBadges, thumbFieldTemplate } = this.props
     const { showBadge } = this.state
-    const canShowBadge = showBadge && asset.isContainer() === false && asset.isContainedByParent() === false
+    const canShowBadge = showBadge
     const iconBadge = canShowBadge ? (
         <div className="Thumb-field">
           <FieldTemplate asset={asset} template={thumbFieldTemplate} extensionOnLeft={false}/>
