@@ -181,6 +181,14 @@ class Flipbook extends PureComponent {
     this.publishStatusTopic('started', false)
   }
 
+  getCurrentFrameIndexFromFrameNumber () {
+    const currentFrameIndex = this
+      .props
+      .frames.findIndex(frame => this.animationFrameNumber === frame.number)
+
+    return currentFrameIndex
+  }
+
   registerShuttlerHandles () {
     if (this.props.shuttler === undefined) {
       return
@@ -227,13 +235,25 @@ class Flipbook extends PureComponent {
     })
 
     this.props.shuttler.on('frameForward', () => {
-      const nextFrameNumber = this.animationFrameNumber + 1
-      this.jumpToFrame(nextFrameNumber)
+      const nextFrame = this
+        .props
+        .frames[this.getCurrentFrameIndexFromFrameNumber() + 1]
+
+      // There might not be a next frame, for example if the current frame is the last frame
+      if (nextFrame) {
+        this.jumpToFrame(nextFrame.number)
+      }
     })
 
     this.props.shuttler.on('frameBack', () => {
-      const previousFrameNumber = this.animationFrameNumber - 1
-      this.jumpToFrame(previousFrameNumber)
+      const previousFrame = this
+        .props
+        .frames[this.getCurrentFrameIndexFromFrameNumber() - 1]
+
+      // There might not be a next frame, for example if the current frame is the last frame
+      if (previousFrame) {
+        this.jumpToFrame(previousFrame.number)
+      }
     })
 
     this.props.shuttler.on('scrub', (frameNumber) => {
