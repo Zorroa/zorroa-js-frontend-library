@@ -259,30 +259,33 @@ class Exports extends Component {
 
   serializeExporterArguments = () => {
     const fileName = this.state.ZipExportPackager.arguments.fileName
+    const fullyQualifiedProcessorNames = {
+      ImageExporter: 'com.zorroa.core.exporter.ImageExporter',
+      VideoClipExporter: 'com.zorroa.core.exporter.VideoExporter',
+      FlipbookExporter: 'com.zorroa.core.exporter.FlipbookExporter',
+      PdfExporter: 'com.zorroa.core.exporter.PdfExporter',
+      CsvExporter: 'com.zorroa.core.exporter.CsvExporter',
+      JsonExporter: 'com.zorroa.core.exporter.JsonExporter'
+    }
 
-    const processors = [
-      'ImageExporter',
-      'VideoClipExporter',
-      'FlipbookExporter',
-      'PdfExporter',
-      'CsvExporter',
-      'JsonExporter'
-    ].reduce((accumulator, exporterName) => {
-      const exporter = this.state[exporterName]
+    const processors = Object
+      .keys(fullyQualifiedProcessorNames)
+      .reduce((accumulator, exporterName) => {
+        const exporter = this.state[exporterName]
 
-      if (exporter && exporter.shouldExport === true) {
-        accumulator.push({
-          args: {...exporter.arguments},
-          className: exporterName
-        })
-      }
+        if (exporter && exporter.shouldExport === true) {
+          accumulator.push({
+            args: {...exporter.arguments},
+            className: `${fullyQualifiedProcessorNames[exporterName]}`
+          })
+        }
 
-      return accumulator
-    }, [])
+        return accumulator
+      }, [])
 
     // Everything shoud be bundled in a nice .Zip file
     processors.push({
-      className: 'ZipExportPackager',
+      className: 'com.zorroa.core.exporter.ZipExportPackager',
       args: {
         fileName
       }
