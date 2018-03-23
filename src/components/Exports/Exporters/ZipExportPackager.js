@@ -6,7 +6,7 @@ import {
 } from '../../Form'
 import ExportsSection from '../ExportsSection'
 
-export default class ZipExporter extends Component {
+export default class ZipExportPackager extends Component {
   static propTypes = {
     isOpen: PropTypes.bool,
     onChange: PropTypes.func,
@@ -29,7 +29,7 @@ export default class ZipExporter extends Component {
     this.setState(options, () => {
       if (typeof this.props.onChange === 'function') {
         this.props.onChange({
-          ZipExporter: {
+          ZipExportPackager: {
             arguments: {
               fileName: this.state.fileName
             }

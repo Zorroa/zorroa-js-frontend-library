@@ -79,7 +79,6 @@ export default function (state = initialState, action) {
     }
     case UPDATE_EXPORT_UI: {
       const {
-        assetSearch,
         hasRestrictedAssets,
         totalAssetCount,
         exportPreviewAssets
@@ -108,7 +107,6 @@ export default function (state = initialState, action) {
         isLoading: false,
         exportPreviewAssets,
         hasRestrictedAssets,
-        assetSearch,
         imageAssetCount: assetGroupCounts[FILE_GROUP_IMAGES] || 0,
         videoAssetCount: assetGroupCounts[FILE_GROUP_VIDEOS] || 0,
         flipbookAssetCount: assetGroupCounts[FILE_GROUP_FLIPBOOKS] || 0,

@@ -5,6 +5,7 @@ import user from './user.js'
 import blob from './blob.js'
 import search from './search.js'
 import * as request from './request.js'
+import * as exports from './exports.js'
 
 export default {
   flipbook,
@@ -13,5 +14,6 @@ export default {
   user,
   search,
   request,
-  localFileSystem
+  localFileSystem,
+  exports
 }

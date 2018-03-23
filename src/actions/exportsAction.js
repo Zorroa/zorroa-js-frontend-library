@@ -14,14 +14,46 @@ import {
   EXPORT_REQUEST_ERROR,
   EXPORT_ONLINE_STATUS_START,
   EXPORT_ONLINE_STATUS_SUCCESS,
-  EXPORT_ONLINE_STATUS_ERROR
-
+  EXPORT_ONLINE_STATUS_ERROR,
+  CREATE_EXPORT_START,
+  CREATE_EXPORT_SUCCESS,
+  CREATE_EXPORT_ERROR
 } from '../constants/actionTypes'
 import api from '../api'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
 const APP_NAME = 'curator'
 
+/**
+ * This starts off the backend Exporters
+ */
+export function createExport (requestPayload) {
+  return dispatch => {
+    dispatch({
+      type: CREATE_EXPORT_START
+    })
+
+    api
+      .exports
+      .post(requestPayload)
+      .then(response => {
+        dispatch({
+          type: CREATE_EXPORT_SUCCESS,
+          payload: response
+        })
+      }, errorResponse => {
+        dispatch({
+          type: CREATE_EXPORT_ERROR,
+          payload: errorResponse.data
+        })
+      })
+  }
+}
+
+/**
+ * Detects what files in a given search are online (i.e. the Archivist has access
+ * to them) vs. offline (i.e. they're on a tape drive or airgapped).
+ */
 export function onlineStatus (requestPayload) {
   return dispatch => {
     dispatch({
@@ -47,6 +79,10 @@ export function onlineStatus (requestPayload) {
   }
 }
 
+/**
+ * Sends a manual export request. This will then be evaulated and acted upon
+ * based on some kind of external workflow that we don't care about.
+ */
 export function exportRequest (requestPayload) {
   return dispatch => {
     dispatch({
@@ -75,6 +111,9 @@ export function exportRequest (requestPayload) {
   }
 }
 
+/**
+ * This loads up a user's favorite export settings so that they can be used again
+ */
 export function loadExportProfiles () {
   return dispatch => {
     dispatch({

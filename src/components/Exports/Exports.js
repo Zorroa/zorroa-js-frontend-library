@@ -11,9 +11,10 @@ import {
   loadExportProfiles,
   clearPostExportLoadingStates,
   exportRequest,
-  onlineStatus
+  onlineStatus,
+  createExport
 } from '../../actions/exportsAction'
-import ZipExporter from './Exporters/ZipExporter'
+import ZipExportPackager from './Exporters/ZipExportPackager'
 import ImageExporter from './Exporters/ImageExporter'
 import VideoClipExporter from './Exporters/VideoClipExporter'
 import FlipbookExporter from './Exporters/FlipbookExporter'
@@ -77,7 +78,8 @@ class Exports extends Component {
       loadExportProfiles: PropTypes.func.isRequired,
       clearPostExportLoadingStates: PropTypes.func.isRequired,
       exportRequest: PropTypes.func.isRequired,
-      onlineStatus: PropTypes.func.isRequired
+      onlineStatus: PropTypes.func.isRequired,
+      createExport: PropTypes.func.isRequired
     })
   }
 
@@ -131,7 +133,7 @@ class Exports extends Component {
         },
         shouldExport: false
       },
-      ZipExporter: {
+      ZipExportPackager: {
         arguments: {
           fileName: props.packageName || `evi-export-${(new Date()).toLocaleDateString().replace(/\//g, '-')}.zip`
         },
@@ -142,7 +144,7 @@ class Exports extends Component {
     this.state = {
       ...this.defaultProcessors,
       showPresetForm: false,
-      visibleExporter: 'ZipExporter',
+      visibleExporter: 'ZipExportPackager',
       presetId: undefined,
       newPresetName: `Preset ${(new Date()).toLocaleDateString()}`,
       presetSaveCounter: 0
@@ -256,6 +258,8 @@ class Exports extends Component {
   }
 
   serializeExporterArguments = () => {
+    const fileName = this.state.ZipExportPackager.arguments.fileName
+
     const processors = [
       'ImageExporter',
       'VideoClipExporter',
@@ -278,20 +282,21 @@ class Exports extends Component {
 
     // Everything shoud be bundled in a nice .Zip file
     processors.push({
-      className: 'ZipExporter',
+      className: 'ZipExportPackager',
       args: {
-        fileName: this.state.ZipExporter.arguments.fileName
+        fileName
       }
     })
 
     return {
       search: this.props.assetSearch,
+      name: this.props.packageName || fileName,
       processors
     }
   }
 
   startExport = () => {
-    console.log(JSON.stringify(this.serializeExporterArguments(), undefined, 4))
+    this.props.actions.createExport(this.serializeExporterArguments())
   }
 
   togglePresetFormVisibility = () => {
@@ -346,12 +351,12 @@ class Exports extends Component {
         <form onSubmit={this.onSubmit} className="Exports__body">
             { hasRestrictedAssets === false && (
               <div className="Exports__sidebar">
-                <ZipExporter
-                  isOpen={this.state.visibleExporter === 'ZipExporter'}
-                  onToggleAccordion={() => this.toggleAccordion('ZipExporter')}
+                <ZipExportPackager
+                  isOpen={this.state.visibleExporter === 'ZipExportPackager'}
+                  onToggleAccordion={() => this.toggleAccordion('ZipExportPackager')}
                   onChange={this.onChange}
                   savedArguments={this.state.savedArguments}
-                  fileName={this.state.ZipExporter.arguments.fileName}
+                  fileName={this.state.ZipExportPackager.arguments.fileName}
                   presetId={this.state.presetId}
                   presets={this.props.exportProfiles}
                   onSelectPreset={this.onSelectPreset}
@@ -400,7 +405,7 @@ class Exports extends Component {
               <div className="Exports__sidebar">
                 <h2 className="Exports__sidebar-title">Export Request</h2>
                 <h3 className="Exports__sidebar-subtitle">Export Package Name</h3>
-                <p className="Exports__sidebar-paragraph">{this.state.ZipExporter.arguments.fileName}</p>
+                <p className="Exports__sidebar-paragraph">{this.state.ZipExportPackager.arguments.fileName}</p>
               </div>
             )}
           <div className="Exports__mainbar">
@@ -434,7 +439,7 @@ class Exports extends Component {
             )}
             <dl className="Exports__review-section Exports__review-section--heading">
               <dt className="Exports__review-term">Name</dt>
-              <dd className="Exports__review-definition">{this.state.ZipExporter.arguments.fileName}</dd>
+              <dd className="Exports__review-definition">{this.state.ZipExportPackager.arguments.fileName}</dd>
             </dl>
             {hasRestrictedAssets === false && (
               <dl className="Exports__review-section Exports__review-section--heading">
@@ -610,6 +615,7 @@ export default connect(state => ({
     postExportProfiles,
     clearPostExportLoadingStates,
     exportRequest,
+    createExport,
     onlineStatus
   }, dispatch)
 }))(Exports)
