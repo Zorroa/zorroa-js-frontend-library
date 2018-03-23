@@ -4,7 +4,7 @@ import AssetSearch from './AssetSearch'
 import Permission from './Permission'
 
 export default class Folder {
-  static ROOT_ID = 0
+  static ROOT_ID = '00000000-0000-0000-0000-000000000000'
 
   static Filters = {
     browsing: folder => { return folder.isDyhi() },

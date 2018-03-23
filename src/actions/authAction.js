@@ -153,8 +153,11 @@ function authorize (dispatch, json, source) {
   dispatch({ type: AUTH_USER, payload: user })
   localStorage.setItem(USER_ITEM, JSON.stringify(user))
   const metadata = json.settings && json.settings.metadata
+
+  // TODO: load these all up in one HTTP request to conserve number of concurrent outgoing connections
   dispatch(archivistSetting('curator.lightbox.zoom-min'))
   dispatch(archivistSetting('curator.lightbox.zoom-max'))
+  dispatch(archivistSetting('archivist.export.maxAssetCount'))
 
   // ignore all UI settings when selenium testing
   if (metadata && !api.getSeleniumTesting()) {

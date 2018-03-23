@@ -1,0 +1,14 @@
+@import '../../styles/colors.scss';
+
+.FlashMessage {
+  background: $zorroa-color-blue-3;
+  border: 1px solid $zorroa-color-blue-2;
+  padding: 10px;
+  margin: 10px 0;
+  max-width: 100%;
+
+  &--warning {
+    background: $zorroa-color-yellow-1;
+    border-color: $zorroa-color-yellow-2;
+  }
+}

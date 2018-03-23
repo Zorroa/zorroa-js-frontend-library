@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 import Modal from '../Modal'
 import ModalHeader from '../ModalHeader'
+import FlashMessage from '../FlashMessage'
 import {
   hideExportInterface,
   postExportProfiles,
@@ -62,6 +63,7 @@ class Exports extends Component {
         )
       })
     ),
+    maxExportableAssets: PropTypes.number.isRequired,
     onlineAssets: PropTypes.number.isRequired,
     offlineAssets: PropTypes.number.isRequired,
     exportRequestPosting: PropTypes.bool.isRequired,
@@ -402,6 +404,14 @@ class Exports extends Component {
               </div>
             )}
           <div className="Exports__mainbar">
+            { this.props.totalAssetCount > this.props.maxExportableAssets && (
+              <FlashMessage look="warning">
+                The current export contains {this.props.totalAssetCount.toLocaleString()} assets. A
+                maximum of {this.props.maxExportableAssets.toLocaleString()} assets can be exported
+                at a given time. The remaining {(this.props.totalAssetCount -
+                this.props.maxExportableAssets).toLocaleString() } will be ignored.
+              </FlashMessage>
+            )}
             <ExportsPreview
               selectedAssets={this.props.selectedAssets}
               origin={this.props.origin}
@@ -591,7 +601,8 @@ export default connect(state => ({
   exportRequestPostingError: state.exports.exportRequestPostingError,
   exportRequestPostingSuccess: state.exports.exportRequestPostingSuccess,
   onlineAssets: state.exports.onlineAssets,
-  offlineAssets: state.exports.offlineAssets
+  offlineAssets: state.exports.offlineAssets,
+  maxExportableAssets: parseInt(state.archivist.settings['archivist.export.maxAssetCount'].currentValue, 10)
 }), dispatch => ({
   actions: bindActionCreators({
     hideExportInterface,
