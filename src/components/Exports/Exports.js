@@ -48,6 +48,7 @@ class Exports extends Component {
     selectedAssets: PropTypes.arrayOf(
       PropTypes.instanceOf(Asset)
     ),
+    errorMessage: PropTypes.string,
     isLoading: PropTypes.bool.isRequired,
     exportProfilesPostingError: PropTypes.bool.isRequired,
     exportProfilesSuccess: PropTypes.bool.isRequired,
@@ -64,6 +65,9 @@ class Exports extends Component {
         )
       })
     ),
+    loadingCreateExport: PropTypes.bool.isRequired,
+    loadingCreateExportError: PropTypes.bool.isRequired,
+    loadingCreateExportSuccess: PropTypes.bool.isRequired,
     maxExportableAssets: PropTypes.number.isRequired,
     onlineAssets: PropTypes.number.isRequired,
     offlineAssets: PropTypes.number.isRequired,
@@ -207,6 +211,20 @@ class Exports extends Component {
     }
 
     if (this.props.exportRequestPosting === true) {
+      return 'loading'
+    }
+  }
+
+  getCreateExportState () {
+    if (this.props.loadingCreateExportError === true) {
+      return 'error'
+    }
+
+    if (this.props.loadingCreateExportSuccess === true) {
+      return 'success'
+    }
+
+    if (this.props.loadingCreateExport === true) {
       return 'loading'
     }
   }
@@ -420,6 +438,27 @@ class Exports extends Component {
                 this.props.maxExportableAssets).toLocaleString() } will be ignored.
               </FlashMessage>
             )}
+            { this.props.loadingCreateExportSuccess && (
+              <FlashMessage look="success">
+                We’re processing your export. It may take some time to complete,
+                but you can close this window at any time and we’ll notify you
+                when the export is complete.
+              </FlashMessage>
+            )}
+            { this.props.errorMessage && (
+              <FlashMessage look="error">
+                <p>
+                  Whoops, something went wrong on our server. Feel free to try this
+                  request again. If the problem persists, you can report the error
+                  message below.
+                </p>
+                {this.props.errorMessage && (
+                  <p>
+                    {this.props.errorMessage}
+                  </p>
+                )}
+              </FlashMessage>
+            )}
             <ExportsPreview
               selectedAssets={this.props.selectedAssets}
               origin={this.props.origin}
@@ -515,7 +554,7 @@ class Exports extends Component {
                   'Exports__main-form-buttons--visible': this.state.showPresetForm !== true
                 })}>
                   <div className="Exports__form-button-group">
-                    <FormButton onClick={this.startExport}>
+                    <FormButton state={this.getCreateExportState()} onClick={this.startExport}>
                       Export
                     </FormButton>
                     <FormButton look="minimal" onClick={this.close}>
@@ -608,8 +647,12 @@ export default connect(state => ({
   exportRequestPosting: state.exports.exportRequestPosting,
   exportRequestPostingError: state.exports.exportRequestPostingError,
   exportRequestPostingSuccess: state.exports.exportRequestPostingSuccess,
+  loadingCreateExport: state.exports.loadingCreateExport,
+  loadingCreateExportError: state.exports.loadingCreateExportError,
+  loadingCreateExportSuccess: state.exports.loadingCreateExportSuccess,
   onlineAssets: state.exports.onlineAssets,
   offlineAssets: state.exports.offlineAssets,
+  errorMessage: state.exports.errorMessage,
   maxExportableAssets: parseInt(state.archivist.settings['archivist.export.maxAssetCount'].currentValue, 10)
 }), dispatch => ({
   actions: bindActionCreators({

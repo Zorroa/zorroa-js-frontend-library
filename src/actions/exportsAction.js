@@ -44,7 +44,7 @@ export function createExport (requestPayload) {
       }, errorResponse => {
         dispatch({
           type: CREATE_EXPORT_ERROR,
-          payload: errorResponse.data
+          payload: errorResponse.response.data
         })
       })
   }
@@ -105,7 +105,7 @@ export function exportRequest (requestPayload) {
       }, errorResponse => {
         dispatch({
           type: EXPORT_REQUEST_ERROR,
-          payload: errorResponse.data
+          payload: errorResponse.response.data
         })
       })
   }
@@ -173,7 +173,7 @@ export function postExportProfiles (data) {
       }, errorResponse => {
         dispatch({
           type: POST_EXPORT_PROFILE_BLOB_ERROR,
-          payload: errorResponse.data
+          payload: errorResponse.response.data
         })
       })
   }

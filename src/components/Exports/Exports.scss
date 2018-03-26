@@ -118,6 +118,7 @@ $content-height: calc(80vh - 40px);
   &__mainbar {
     padding: 0 20px;
     flex-grow: 1;
+    flex-shrink: 1000;
     height: $content-height;
     overflow: hidden;
     overflow-y: scroll;

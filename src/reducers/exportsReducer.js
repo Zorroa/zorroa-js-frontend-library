@@ -14,7 +14,10 @@ import {
   EXPORT_REQUEST_ERROR,
   EXPORT_ONLINE_STATUS_START,
   EXPORT_ONLINE_STATUS_SUCCESS,
-  EXPORT_ONLINE_STATUS_ERROR
+  EXPORT_ONLINE_STATUS_ERROR,
+  CREATE_EXPORT_START,
+  CREATE_EXPORT_SUCCESS,
+  CREATE_EXPORT_ERROR
 } from '../constants/actionTypes'
 import {
   FILE_GROUP_IMAGES,
@@ -28,6 +31,9 @@ import AssetSearch from '../models/AssetSearch'
 export const initialState = {
   // Deterimines if the exports modal should be display
   shouldShow: false,
+
+  // Generic container for error messages
+  errorMessage: undefined,
 
   // State for loading presets (profiles) from the server
   exportProfiles: [],
@@ -50,6 +56,11 @@ export const initialState = {
   exportRequestPosting: false,
   exportRequestPostingError: false,
   exportRequestPostingSuccess: false,
+
+  // State for executing an export
+  loadingCreateExport: false,
+  loadingCreateExportError: false,
+  loadingCreateExportSuccess: false,
 
   // State for asset search previews and statistics
   exportPreviewAssets: [],
@@ -165,24 +176,28 @@ export default function (state = initialState, action) {
       const exportProfilesPosting = false
       const exportProfilesPostingError = false
       const exportProfilesSuccess = false
+      const errorMessage = action.payload && action.payload.message
 
       return {
         ...state,
         exportProfilesPosting,
         exportProfilesPostingError,
-        exportProfilesSuccess
+        exportProfilesSuccess,
+        errorMessage
       }
     }
     case EXPORT_REQUEST_START: {
       const exportRequestPosting = true
       const exportRequestPostingError = false
       const exportRequestPostingSuccess = false
+      const errorMessage = undefined
 
       return {
         ...state,
         exportRequestPosting,
         exportRequestPostingError,
-        exportRequestPostingSuccess
+        exportRequestPostingSuccess,
+        errorMessage
       }
     }
     case EXPORT_REQUEST_SUCCESS: {
@@ -201,12 +216,14 @@ export default function (state = initialState, action) {
       const exportRequestPosting = false
       const exportRequestPostingError = true
       const exportRequestPostingSuccess = false
+      const errorMessage = action.payload && action.payload.message
 
       return {
         ...state,
         exportRequestPosting,
         exportRequestPostingError,
-        exportRequestPostingSuccess
+        exportRequestPostingSuccess,
+        errorMessage
       }
     }
     case EXPORT_ONLINE_STATUS_START: {
@@ -253,6 +270,47 @@ export default function (state = initialState, action) {
         loadingOnlineStatusesSuccess
       }
     }
+    case CREATE_EXPORT_START: {
+      const loadingCreateExport = true
+      const loadingCreateExportError = false
+      const loadingCreateExportSuccess = false
+      const errorMessage = undefined
+
+      return {
+        ...state,
+        loadingCreateExport,
+        loadingCreateExportError,
+        loadingCreateExportSuccess,
+        errorMessage
+      }
+    }
+    case CREATE_EXPORT_SUCCESS: {
+      const loadingCreateExport = false
+      const loadingCreateExportError = false
+      const loadingCreateExportSuccess = true
+
+      return {
+        ...state,
+        loadingCreateExport,
+        loadingCreateExportError,
+        loadingCreateExportSuccess
+      }
+    }
+    case CREATE_EXPORT_ERROR: {
+      const loadingCreateExport = false
+      const loadingCreateExportError = true
+      const loadingCreateExportSuccess = false
+      const errorMessage = action.payload && action.payload.message
+
+      return {
+        ...state,
+        loadingCreateExport,
+        loadingCreateExportError,
+        loadingCreateExportSuccess,
+        errorMessage
+      }
+    }
+
   }
 
   return state

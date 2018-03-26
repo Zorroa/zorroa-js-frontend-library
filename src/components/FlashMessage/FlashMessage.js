@@ -2,15 +2,19 @@ import React, { PropTypes } from 'react'
 import classnames from 'classnames'
 
 export default function FlashMessage (props) {
-  const flashMessageClasses = classnames('FlashMessage', {
-    'FlashMessage--warning': props.look === 'warning'
+  const flashMessageBodyClasses = classnames('FlashMessage__body', {
+    'FlashMessage__body--warning': props.look === 'warning',
+    'FlashMessage__body--error': props.look === 'error',
+    'FlashMessage__body--success': props.look === 'success'
   })
 
   return (
-    <div
-      className={flashMessageClasses}
-    >
-      {props.children}
+    <div className="FlashMessage">
+      <div
+        className={flashMessageBodyClasses}
+      >
+        {props.children}
+      </div>
     </div>
   )
 }
@@ -18,6 +22,8 @@ export default function FlashMessage (props) {
 FlashMessage.propTypes = {
   children: PropTypes.node,
   look: PropTypes.oneOf([
-    'warning'
-  ])
+    'warning',
+    'error',
+    'success'
+  ]).isRequired
 }
