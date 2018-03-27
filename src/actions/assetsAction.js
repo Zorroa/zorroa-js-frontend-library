@@ -341,7 +341,6 @@ export function getAssetFields () {
 }
 
 export function findSimilarFields (assetFields) {
-  console.log('Find similar fields...')
   if (!assetFields || !Object.keys(assetFields).length) {
     return ({
       type: SIMILAR_FIELDS,
@@ -350,20 +349,22 @@ export function findSimilarFields (assetFields) {
   }
   return dispatch => {
     let fields = []
-    if (assetFields.string) fields = fields.concat(assetFields.string.filter(field => field.toLowerCase().startsWith('similar')))
-    if (assetFields.hash) fields = fields.concat(assetFields.hash.filter(field => field.toLowerCase().startsWith('similar')))
-    if (!fields.length) {
+
+    if (Array.isArray(assetFields.similarity) && assetFields.similarity.length > 0) {
+      fields = fields.concat(assetFields.similarity)
+    } else {
       dispatch({
         type: SIMILAR_FIELDS,
         payload: null
       })
     }
+
     const aggs = {}
     fields.forEach(field => { aggs[field] = { filter: { exists: { field: field } } } })
     const query = new AssetSearch({aggs, size: 1, fields: ['source.basename']})
+
     searchAssetsRequestProm(dispatch, query)
       .then(response => {
-        console.log('Found similar field aggs: ' + JSON.stringify(response.data))
         dispatch({
           type: SIMILAR_FIELDS,
           payload: response.data
