@@ -40,17 +40,20 @@ export default class FormInput extends Component {
 
   render () {
     const {className, error} = this.props
-    const inputClasses = classnames('FormInput__checkbox', {
-      'FormInput__checkbox--error': error === true
+    const inputClasses = classnames('FormInput__checkbox-virtual', {
+      'FormInput__checkbox-virtual': error === true
     }, className)
 
     return (
-      <input
-        className={inputClasses}
-        type="checkbox"
-        onChange={this.onChange}
-        checked={this.state.checked}
-      />
+      <div className="FormInput__checkbox">
+        <input
+          className="FormInput__checkbox-native"
+          type="checkbox"
+          onChange={this.onChange}
+          checked={this.state.checked}
+        />
+        <span className={inputClasses} />
+      </div>
     )
   }
 }
