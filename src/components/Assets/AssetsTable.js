@@ -245,14 +245,35 @@ class AssetsTable extends Component {
                        onTag={this.createTagFacet} />
   }
 
+  getReasonsForDisabledDeleteAction ({
+    isLastLayout,
+    isReadOnly
+  }) {
+    if (isLastLayout) {
+      return 'Cannot delete the last saved layout'
+    }
+
+    if (isReadOnly) {
+      return 'Cannot delete a read-only layout'
+    }
+  }
+
   renderSettings (fields, layout) {
     const { tableLayouts, user, assetFields, selectedTableLayoutId } = this.props
     if (!this.state.showSettings) return
-    const layoutActions = [
-      { label: 'Duplicate', fn: this.duplicateTableLayout, disabled: false },
-      { label: 'Share', fn: this.shareTableLayout, disabled: true },
-      { label: 'Delete', fn: this.deleteTableLayout, disabled: tableLayouts.length <= 1 || !selectedLayoutHasWritePermission }
-    ]
+    const layoutActions = [{
+      label: 'Duplicate',
+      fn: this.duplicateTableLayout,
+      disabled: false
+    }, {
+      label: 'Delete',
+      fn: this.deleteTableLayout,
+      disabled: tableLayouts.length <= 1 || !selectedLayoutHasWritePermission,
+      disabledReason: this.getReasonsForDisabledDeleteAction({
+        isLastLayout: tableLayouts.length <= 1,
+        isReadOnly: !selectedLayoutHasWritePermission
+      })
+    }]
     const selectedLayoutHasWritePermission = layout && layout.hasAccess(user, AclEntry.WriteAccess)
     const allFieldNames = []
     Object.keys(assetFields).forEach(type => assetFields[type].forEach(field => allFieldNames.push(field)))
