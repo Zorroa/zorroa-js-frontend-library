@@ -41,18 +41,21 @@ export default class FormInput extends Component {
 
   render () {
     const {className, error} = this.props
-    const inputClasses = classnames('FormInput__radio', {
+    const inputClasses = classnames('FormInput__radio-virtual', {
       'FormInput__radio--error': error === true
     }, className)
 
     return (
-      <input
-        className={inputClasses}
-        name={this.props.name}
-        type="radio"
-        onChange={this.onChange}
-        checked={this.props.checked}
-      />
+      <div className="FormInput__radio">
+        <input
+          className={'FormInput__radio-native'}
+          name={this.props.name}
+          type="radio"
+          onChange={this.onChange}
+          checked={this.props.checked}
+        />
+        <span className={inputClasses} />
+      </div>
     )
   }
 }
