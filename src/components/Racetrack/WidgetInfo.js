@@ -59,7 +59,8 @@ export const ColorWidgetInfo = {
   icon: 'icon-eyedropper',
   title: 'Colors',
   description: 'Search by color',
-  fieldTypes: [ 'nested' ],
+  fieldTypes: [],
+  fieldRegex: /^analysis\.hueSimilarity\..+/i,
   element: <Color/>,
   create: createColorWidget,
   color: '#EE7F29'

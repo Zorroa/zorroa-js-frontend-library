@@ -19,6 +19,7 @@ import { selectAssetIds, findSimilarFields, assetsForIds } from '../../actions/a
 import { resetRacetrackWidgets } from '../../actions/racetrackAction'
 import { equalSets } from '../../services/jsUtil'
 import { createSimilarityWidget } from '../../models/Widget'
+import decamelize from 'decamelize'
 
 class Header extends Component {
   static propTypes = {
@@ -154,19 +155,35 @@ class Header extends Component {
     const { selectedIds, similarFields, widgets } = this.props
 
     const displayName = (field) => {
-      const name = field.replace(/\.(raw|byte|point|bit)$/, '').replace(/^.*\./, '')
-      const remap = { mxnet: 'image (MX)', resnet: 'image (RN)', tensorflow: 'image (TF)', rgb: 'color (RGB)', hsv: 'color (HSV)', lab: 'color (LAB)', hsl: 'color (HSL)' }
-      const rname = remap[name.toLowerCase()]
-      if (rname) return rname
-      return name
+      const parsedNamespaces = field.split('.')
+      const name = decamelize(parsedNamespaces[1], ' ')
+      const representation = parsedNamespaces[2]
+
+      if (parsedNamespaces.length < 2) {
+        return field
+      }
+
+      return `${name} (${representation})`
     }
 
     const displayIcon = (field) => {
       if (!field || !field.length) return ''
       const name = displayName(field).toLowerCase()
       if (name.startsWith('image')) return 'icon-picture2'
-      if (name.startsWith('color')) return 'icon-eyedropper'
-      if (name.includes('hsv') || name.includes('hsl') || name.includes('lab') || name.includes('rgb') || name.includes('color')) return 'icon-eyedropper'
+      if (name.includes('hue')) return 'icon-eyedropper'
+      if ([
+        'hue',
+        'saturation',
+        'luminance',
+        'lightness',
+        'rgb',
+        'lab',
+        'hsv',
+        'hsl',
+        'color'
+      ].some(colorHint => name.includes(colorHint))) {
+        return 'icon-eyedropper'
+      }
       if (name.includes('face')) return 'icon-group'
       return 'icon-similarity'
     }
