@@ -13,6 +13,9 @@ import {
 import { archivistGet, archivistPost, archivistRequest } from './authAction'
 import Processor from '../models/Processor'
 import { selectId } from '../services/jsUtil'
+import api from '../api'
+import downloadjs from 'downloadjs'
+import getFile from '../services/getFile'
 
 const jobEndpoint = '/api/v1/jobs'
 const importEndpoint = '/api/v1/imports'
@@ -76,10 +79,9 @@ export function getPipelines () {
 
 export function getJobs (jobFilter, from, count) {
   return dispatch => {
-    console.log('Get jobs: ' + JSON.stringify(jobFilter) + ' from=' + from + ' count=' + count)
     const request = {
-      method: 'get',
-      url: jobEndpoint,
+      method: 'post',
+      url: '/api/v1/jobs/_search',
       data: jobFilter,
       params: { from, count },
       headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -122,6 +124,40 @@ export function getJob (jobId) {
 
 export function markJobDownloaded (jobId) {
   return ({ type: MARK_JOB_DOWNLOADED, payload: jobId })
+}
+
+export function downloadFilesForJob (jobId, origin) {
+  return dispatch => {
+    api
+      .job(jobId)
+      .files
+      .get()
+      .then(files => {
+        return Promise.all(files.map(file => {
+          const {
+            jobId,
+            id,
+            mimeType,
+            name
+          } = file
+          const downloadUrl = `${origin}/api/v1/exports/${jobId}/_files/${id}/_stream`
+
+          return getFile(downloadUrl).then(downloadedFile => {
+            downloadjs(
+              downloadedFile,
+              name,
+              mimeType
+            )
+          })
+        }))
+      })
+      .then(() => {
+        dispatch({
+          type: MARK_JOB_DOWNLOADED,
+          payload: jobId
+        })
+      })
+  }
 }
 
 export function cancelJobId (jobId) {

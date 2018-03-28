@@ -282,46 +282,9 @@ class FolderItem extends Component {
     this.props.actions.toggleCollapsible('exportJobs', true)
 
     this.props.actions.updateExportInterface({
-      // TODO: implement the createExport -> waitForExportAndDownload logic: onCreate: this.createExport,
       packageName: name,
       assetSearch,
       permissionIds: this.props.user.permissions.map(permission => permission.id)
-    })
-  }
-
-  // duplicate code warning: keep this in sync with ExportJobs.waitForExportAndDownload (TODO: share this code)
-  waitForExportAndDownload = (exportId) => {
-    const { actions } = this.props
-    let timeout = 100
-    return new Promise(resolve => {
-      // wait until export job is done, then auto-download it
-      // this code adapted from Jobs.refreshJobs()
-      const waitForJob = (jobId) => {
-        actions.getJob(exportId)
-        .then(data => new Promise(resolve => requestAnimationFrame(_ => resolve(data)))) // wait 1 frame for getJob() data to post to global state
-        .then(response => {
-          // We'll watch the app state to see if our job is finished, rather
-          // than checking the response from getJob()
-          const job = this.props.jobs && this.props.jobs[jobId]
-          if (job && job.isFinished()) {
-            resolve(job)
-          } else {
-            timeout = Math.min(5000, timeout * 2) // try often at first, but back off for long jobs
-            setTimeout(_ => waitForJob(jobId), timeout)
-          }
-        })
-      }
-      waitForJob(exportId)
-    })
-    .then(job => {
-      const retval = window.open(job.exportStream(this.props.origin))
-      if (!retval) {
-        actions.dialogAlertPromise('Export complete',
-          'Your export package is ready for download, using the Exports panel on the left. ' +
-          'You can enable automatic downloads for future exports by allowing popus for this site.')
-        return
-      }
-      actions.markJobDownloaded(job.id)
     })
   }
 

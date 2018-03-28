@@ -4,6 +4,7 @@ import * as localFileSystem from './localFileSystem.js'
 import user from './user.js'
 import blob from './blob.js'
 import search from './search.js'
+import job from './job.js'
 import * as request from './request.js'
 import * as exports from './exports.js'
 
@@ -15,5 +16,6 @@ export default {
   search,
   request,
   localFileSystem,
-  exports
+  exports,
+  job
 }

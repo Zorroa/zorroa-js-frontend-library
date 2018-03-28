@@ -137,17 +137,12 @@ class Exports extends Component {
           exportOriginal: true
         },
         shouldExport: false
-      },
-      ZipExportPackager: {
-        arguments: {
-          fileName: props.packageName || `evi-export-${(new Date()).toLocaleDateString().replace(/\//g, '-')}.zip`
-        },
-        shouldExport: true
       }
     }
 
     this.state = {
       ...this.defaultProcessors,
+      fileName: props.packageName || 'zorroa-export',
       showPresetForm: false,
       visibleExporter: 'ZipExportPackager',
       presetId: undefined,
@@ -277,7 +272,7 @@ class Exports extends Component {
   }
 
   serializeExporterArguments = () => {
-    const fileName = this.state.ZipExportPackager.arguments.fileName
+    const fileName = this.state.fileName
     const fullyQualifiedProcessorNames = {
       ImageExporter: 'com.zorroa.core.exporter.ImageExporter',
       VideoClipExporter: 'com.zorroa.core.exporter.VideoExporter',
@@ -302,17 +297,10 @@ class Exports extends Component {
         return accumulator
       }, [])
 
-    // Everything shoud be bundled in a nice .Zip file
-    processors.push({
-      className: 'com.zorroa.core.exporter.ZipExportPackager',
-      args: {
-        fileName
-      }
-    })
-
     return {
       search: this.props.assetSearch,
       name: this.props.packageName || fileName,
+      compress: true,
       processors
     }
   }
@@ -378,7 +366,7 @@ class Exports extends Component {
                   onToggleAccordion={() => this.toggleAccordion('ZipExportPackager')}
                   onChange={this.onChange}
                   savedArguments={this.state.savedArguments}
-                  fileName={this.state.ZipExportPackager.arguments.fileName}
+                  fileName={this.state.fileName}
                   presetId={this.state.presetId}
                   presets={this.props.exportProfiles}
                   onSelectPreset={this.onSelectPreset}
@@ -427,7 +415,7 @@ class Exports extends Component {
               <div className="Exports__sidebar">
                 <h2 className="Exports__sidebar-title">Export Request</h2>
                 <h3 className="Exports__sidebar-subtitle">Export Package Name</h3>
-                <p className="Exports__sidebar-paragraph">{this.state.ZipExportPackager.arguments.fileName}</p>
+                <p className="Exports__sidebar-paragraph">{this.state.fileName}</p>
               </div>
             )}
           <div className="Exports__mainbar">
@@ -482,7 +470,7 @@ class Exports extends Component {
             )}
             <dl className="Exports__review-section Exports__review-section--heading">
               <dt className="Exports__review-term">Name</dt>
-              <dd className="Exports__review-definition">{this.state.ZipExportPackager.arguments.fileName}</dd>
+              <dd className="Exports__review-definition">{this.state.fileName}</dd>
             </dl>
             {hasRestrictedAssets === false && (
               <dl className="Exports__review-section Exports__review-section--heading">
