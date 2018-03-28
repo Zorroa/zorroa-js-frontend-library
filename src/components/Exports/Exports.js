@@ -14,6 +14,7 @@ import {
   onlineStatus,
   createExport
 } from '../../actions/exportsAction'
+import { getClassFromNamespace } from './utils'
 import ZipExportPackager from './Exporters/ZipExportPackager'
 import ImageExporter from './Exporters/ImageExporter'
 import VideoClipExporter from './Exporters/VideoClipExporter'
@@ -41,7 +42,7 @@ class Exports extends Component {
     assetSearch: PropTypes.instanceOf(AssetSearch),
     hasRestrictedAssets: PropTypes.bool.isRequired,
     imageAssetCount: PropTypes.number.isRequired,
-    movieAssetCount: PropTypes.number.isRequired,
+    videoAssetCount: PropTypes.number.isRequired,
     flipbookAssetCount: PropTypes.number.isRequired,
     documentAssetCount: PropTypes.number.isRequired,
     totalAssetCount: PropTypes.number.isRequired,
@@ -499,7 +500,7 @@ class Exports extends Component {
             {
               processors.map((processor, index) => {
                 const key = `${processor.className}-${index}`
-                switch (processor.className) {
+                switch (getClassFromNamespace(processor.className)) {
                   case 'ImageExporter':
                     return (
                       <ExportPreviewerImage
@@ -513,7 +514,7 @@ class Exports extends Component {
                     return (
                       <ExportPreviewerVideoClip
                         key={key}
-                        movieAssetCount={this.props.movieAssetCount}
+                        movieAssetCount={this.props.videoAssetCount}
                         exporterArguments={processor.args}
                       />
                     )
@@ -630,7 +631,7 @@ export default connect(state => ({
   userEmail: state.auth.user.email,
   assetSearch: state.exports.assetSearch,
   hasRestrictedAssets: state.exports.hasRestrictedAssets,
-  movieAssetCount: state.exports.videoAssetCount,
+  videoAssetCount: state.exports.videoAssetCount,
   imageAssetCount: state.exports.imageAssetCount,
   flipbookAssetCount: state.exports.flipbookAssetCount,
   documentAssetCount: state.exports.documentAssetCount,

@@ -29,3 +29,8 @@ export function articulateQuality (quality) {
 export function pluralize (count, singular, plural) {
   return count === 1 ? singular : plural
 }
+
+export function getClassFromNamespace (namespace) {
+  const parsedNamespaces = namespace.split('.')
+  return parsedNamespaces[parsedNamespaces.length - 1]
+}
