@@ -28,7 +28,6 @@ import {
   deleteTaxonomy
 } from '../../actions/folderAction'
 import { showModal, hideModal, dialogAlertPromise, dialogConfirmPromise, toggleCollapsible } from '../../actions/appActions'
-import { exportAssets, getJob, markJobDownloaded } from '../../actions/jobActions'
 import { restoreFolders } from '../../actions/racetrackAction'
 import { setAssetPermissions, deleteAsset, searchAssets, selectAssetIds } from '../../actions/assetsAction'
 import { isolateSelectId } from '../../services/jsUtil'
@@ -278,6 +277,9 @@ class FolderItem extends Component {
         folder: [...folderIds]
       }
     })
+    const folders = this.props.folders
+    const firstFolder = folders.get(folderIds.values().next().value)
+    const name = firstFolder.name.replace(/\s/gi, '_')
     const assetSearch = new AssetSearch({filter})
     this.props.actions.toggleCollapsible('exportJobs', true)
 
@@ -675,9 +677,6 @@ export default connect(state => ({
     addAssetIdsToFolderId,
     removeAssetIdsFromFolderId,
     dropFolderId,
-    exportAssets,
-    getJob,
-    markJobDownloaded,
     showModal,
     hideModal,
     dialogAlertPromise,

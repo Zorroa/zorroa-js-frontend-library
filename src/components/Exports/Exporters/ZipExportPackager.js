@@ -29,11 +29,7 @@ export default class ZipExportPackager extends Component {
     this.setState(options, () => {
       if (typeof this.props.onChange === 'function') {
         this.props.onChange({
-          ZipExportPackager: {
-            arguments: {
-              fileName: this.state.fileName
-            }
-          }
+          fileName: this.state.fileName
         })
       }
     })

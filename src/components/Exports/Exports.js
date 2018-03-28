@@ -14,6 +14,7 @@ import {
   onlineStatus,
   createExport
 } from '../../actions/exportsAction'
+import { getJobs } from '../../actions/jobActions'
 import { getClassFromNamespace } from './utils'
 import ZipExportPackager from './Exporters/ZipExportPackager'
 import ImageExporter from './Exporters/ImageExporter'
@@ -32,6 +33,7 @@ import ExportPreviewerJson from './Previewers/Json'
 import ExportPreviewerCsv from './Previewers/Csv'
 import ExportsPreview from './ExportsPreview'
 import { Save as IconSave } from '../Icons'
+import { JobFilter } from '../../models/Job'
 
 const SHOW_SUCCESS_MS = 2750
 
@@ -39,6 +41,7 @@ class Exports extends Component {
   static propTypes = {
     name: PropTypes.string,
     userEmail: PropTypes.string.isRequired,
+    userId: PropTypes.string.isRequired,
     assetSearch: PropTypes.instanceOf(AssetSearch),
     hasRestrictedAssets: PropTypes.bool.isRequired,
     imageAssetCount: PropTypes.number.isRequired,
@@ -84,7 +87,8 @@ class Exports extends Component {
       clearPostExportLoadingStates: PropTypes.func.isRequired,
       exportRequest: PropTypes.func.isRequired,
       onlineStatus: PropTypes.func.isRequired,
-      createExport: PropTypes.func.isRequired
+      createExport: PropTypes.func.isRequired,
+      getJobs: PropTypes.func.isRequired
     })
   }
 
@@ -169,6 +173,15 @@ class Exports extends Component {
           newPresetName: `Preset ${prevState.presetSaveCounter + 1}`
         }))
       }, SHOW_SUCCESS_MS)
+    }
+
+    if (this.props.loadingCreateExportSuccess === false &&
+      nextProps.loadingCreateExportSuccess === true
+    ) {
+      const { userId } = this.props
+      const type = 'Exports'
+      const jobFilter = new JobFilter({ type, userId })
+      this.props.actions.getJobs(jobFilter, 0, 30)
     }
   }
 
@@ -617,6 +630,7 @@ class Exports extends Component {
 
 export default connect(state => ({
   userEmail: state.auth.user.email,
+  userId: state.auth.user.id,
   assetSearch: state.exports.assetSearch,
   hasRestrictedAssets: state.exports.hasRestrictedAssets,
   videoAssetCount: state.exports.videoAssetCount,
@@ -651,6 +665,7 @@ export default connect(state => ({
     clearPostExportLoadingStates,
     exportRequest,
     createExport,
-    onlineStatus
+    onlineStatus,
+    getJobs
   }, dispatch)
 }))(Exports)
