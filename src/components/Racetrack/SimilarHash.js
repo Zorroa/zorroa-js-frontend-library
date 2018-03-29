@@ -9,6 +9,7 @@ import { modifyRacetrackWidget, similarMinScore } from '../../actions/racetrackA
 import { equalSets } from '../../services/jsUtil'
 import Widget from './Widget'
 import Asset from '../../models/Asset'
+import fieldNamespaceToName from '../../services/fieldNamespaceToName'
 
 class SimilarHash extends Component {
   static propTypes = {
@@ -123,7 +124,7 @@ class SimilarHash extends Component {
     const disabled = !selectedAssetIds || !selectedAssetIds.size || equalSets(new Set([...similarAssetsIds]), selectedAssetIds)
     const widget = widgets && widgets.find(widget => widget.id === id)
     widget.state = this.state
-    const field = widget && widget.field && widget.field.replace(/^similarity\./, '').replace(/^Similarity\./, '').replace(/\.raw$/, '')
+    const field = widget && widget.field && fieldNamespaceToName(widget.field, false)
 
     return (
       <Widget className="SimilarHash"

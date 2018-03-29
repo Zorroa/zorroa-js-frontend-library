@@ -19,7 +19,7 @@ import { selectAssetIds, findSimilarFields, assetsForIds } from '../../actions/a
 import { resetRacetrackWidgets } from '../../actions/racetrackAction'
 import { equalSets } from '../../services/jsUtil'
 import { createSimilarityWidget } from '../../models/Widget'
-import decamelize from 'decamelize'
+import fieldNamespaceToName from '../../services/fieldNamespaceToName'
 
 class Header extends Component {
   static propTypes = {
@@ -154,21 +154,9 @@ class Header extends Component {
     const { similarField, isSelectedHashValid } = this.state
     const { selectedIds, similarFields, widgets } = this.props
 
-    const displayName = (field) => {
-      const parsedNamespaces = field.split('.')
-      const name = decamelize(parsedNamespaces[1], ' ')
-      const representation = parsedNamespaces[2]
-
-      if (parsedNamespaces.length < 2) {
-        return field
-      }
-
-      return `${name} (${representation})`
-    }
-
     const displayIcon = (field) => {
       if (!field || !field.length) return ''
-      const name = displayName(field).toLowerCase()
+      const name = fieldNamespaceToName(field).toLowerCase()
       if (name.startsWith('image')) return 'icon-picture2'
       if (name.includes('hue')) return 'icon-eyedropper'
       if ([
@@ -212,7 +200,7 @@ class Header extends Component {
               <div className="Editbar-similar-menu-item" key={field} onClick={_ => this.selectSimilarField(field) } title={field}>
                 <div className={`Editbar-similar-menu-item-selected${similarField === field ? ' icon-check' : ''}`}/>
                 <div className={`Editbar-similar-icon ${displayIcon(field)}`}/>
-                <div className="Editbar-similar-menu-item-label">{ displayName(field) }</div>
+                <div className="Editbar-similar-menu-item-label">{ fieldNamespaceToName(field) }</div>
               </div>
             ))}
           </DropdownMenu>
