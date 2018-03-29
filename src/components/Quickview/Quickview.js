@@ -7,6 +7,7 @@ import Asset from '../../models/Asset'
 import Modal from '../Modal'
 import ModalHeader from '../ModalHeader'
 import Video from '../Video'
+import { FlipbookPlayer } from '../Flipbook'
 import { isolateAssetId } from '../../actions/assetsAction'
 import { hideQuickview } from '../../actions/appActions'
 import { PubSub } from '../../services/jsUtil'
@@ -92,7 +93,11 @@ class Quickview extends Component {
   }
 
   @keydown('space', 'esc')
-  onEscape () {
+  onEscape (event) {
+    if (event && typeof event.preventDefault === 'function') {
+      event.preventDefault()
+    }
+
     this.close()
   }
 
@@ -121,19 +126,39 @@ class Quickview extends Component {
     return mediaType === 'video'
   }
 
+  isFlipbook () {
+    const asset = this.props.isolatedAsset
+    const type = asset.clipType()
+    const mediaType = asset.mediaType()
+
+    return type === 'flipbook' || mediaType === 'zorroa/x-flipbook'
+  }
+
+  getMediaType () {
+    if (this.isVideo()) {
+      return 'video'
+    }
+
+    if (this.isFlipbook()) {
+      return 'flipbook'
+    }
+
+    return 'generic'
+  }
+
   onError = () => {
     console.error('There was a problem loading the video.')
   }
 
   render () {
-    let width = Math.floor(window.innerWidth * 0.8)
-    let height = Math.floor(window.innerHeight * 0.8)
+    let width = Math.floor(window.innerWidth * 0.75)
+    let height = Math.floor(window.innerHeight * 0.75)
     const asset = this.props.isolatedAsset
     const aspectRatio = asset.proxyAspect()
 
     if (aspectRatio > 1) {
       height = Math.round(width / aspectRatio)
-    } else {
+    } else if (aspectRatio) {
       width = Math.round(height * aspectRatio)
     }
 
@@ -149,7 +174,7 @@ class Quickview extends Component {
             </div>
           )
         }
-        { this.isVideo() ? (
+        { this.getMediaType() === 'video' && (
           <div className="Quickview__video">
             <Video
               url={asset.url(this.props.origin)}
@@ -163,7 +188,16 @@ class Quickview extends Component {
               status={(new PubSub())}
             />
           </div>
-        ) : (
+        )}
+        { this.getMediaType() === 'flipbook' && (
+          <div className="Quickview__flipbook">
+            <FlipbookPlayer
+              clipParentId={asset.parentId()}
+              width={width}
+            />
+          </div>
+        )}
+        { this.getMediaType() === 'generic' && (
           <div
             className="Quickview__image"
             style={{

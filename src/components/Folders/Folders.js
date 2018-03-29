@@ -3,7 +3,6 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 import LRUCache from 'lru-cache'
-
 import User from '../../models/User'
 import Folder from '../../models/Folder'
 import AclEntry from '../../models/Acl'
@@ -40,7 +39,7 @@ export const NO_COUNTS = 'none'
 class Folders extends Component {
   static propTypes = {
     // input props
-    rootId: PropTypes.number,
+    rootId: PropTypes.string,
     rootName: PropTypes.string,
     filter: PropTypes.func,
     onSelect: PropTypes.func,

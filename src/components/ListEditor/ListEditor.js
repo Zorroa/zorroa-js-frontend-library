@@ -46,7 +46,7 @@ export default class ListEditor extends Component {
               >
                 <IconCancelCircle />
               </button>
-              <div className="ListEditor__label">
+              <div className="ListEditor__label" title={label}>
                 {label}
               </div>
             </li>

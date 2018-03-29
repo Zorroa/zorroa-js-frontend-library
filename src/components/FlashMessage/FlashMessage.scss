@@ -1,0 +1,46 @@
+@import '../../styles/colors.scss';
+
+.FlashMessage {
+  position: relative;
+
+  &__body {
+    background: $zorroa-color-blue-3;
+    border: 1px solid $zorroa-color-blue-2;
+    padding: 10px;
+    margin: 10px 0;
+    max-width: 100%;
+    color: $zorroa-color-white;
+    z-index: 2;
+    box-shadow: 5px 5px 10px rgba($zorroa-color-black, .3);
+    animation-duration: 400ms;
+    animation-name: slidein;
+    animation-timing-function: ease-in-out;
+
+    &--success {
+      background: $zorroa-color-green-1;
+      border-color: $zorroa-color-green-4;
+    }
+
+    &--warning {
+      background: $zorroa-color-yellow-1;
+      border-color: $zorroa-color-yellow-2;
+    }
+
+    &--error {
+      background: $zorroa-color-pink-2;
+      border-color: $zorroa-color-pink-1;
+    }
+  }
+}
+
+@keyframes slidein {
+  from {
+    transform: translateY(400px), scale(0);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0), scale(100%);
+    opacity: 1;
+  }
+}

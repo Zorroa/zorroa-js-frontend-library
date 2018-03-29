@@ -20,4 +20,5 @@ import './Collections.scss'
 import './SortOrder.scss'
 import './ImportSet.scss'
 import './Multipage.scss'
+import './FlipbookWidget.scss'
 export default Racetrack

@@ -11,14 +11,16 @@ export default class FormInput extends Component {
     error: PropTypes.bool,
     required: PropTypes.bool,
     onChange: PropTypes.func,
-    value: PropTypes.string,
+    value: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number
+    ]),
+    inlineReset: PropTypes.bool,
     type: PropTypes.oneOf([
       'text',
       'password',
       'number',
       'color',
-      'checkbox',
-      'radio',
       'date',
       'file',
       'month',
@@ -52,9 +54,16 @@ export default class FormInput extends Component {
 
   onChange = event => {
     const value = event.target.value
-    this.props.onChange(value)
     this.setState({
-      value
+      value: typeof this.props.value === 'number' ? Number(value) : value
+    }, () => {
+      this.props.onChange(this.state.value)
+    })
+  }
+
+  resetInput = () => {
+    this.setState({
+      value: ''
     })
   }
 
@@ -65,13 +74,21 @@ export default class FormInput extends Component {
     }, className)
 
     return (
-      <input
-        className={inputClasses}
-        type={type}
-        required={required}
-        onChange={this.onChange}
-        value={this.state.value}
-      />
+      <div className={inputClasses}>
+        <input
+          className="FormInput__input-native"
+          type={type}
+          required={required}
+          onChange={this.onChange}
+          value={this.state.value}
+        />
+        { this.props.inlineReset && (
+          <span
+            className="icon-cancel-circle FormInput__input-inline-reset"
+            onClick={this.resetInput}
+          />
+        )}
+      </div>
     )
   }
 }

@@ -11,11 +11,12 @@ import Collections from './Collections'
 import SortOrder from './SortOrder'
 import ImportSet from './ImportSet'
 import Multipage from './Multipage'
+import FlipbookWidget from './FlipbookWidget'
 import { createFacetWidget, createMapWidget, createColorWidget,
   createDateRangeWidget, createRangeWidget, createSimilarityWidget,
   createFiletypeWidget, createExistsWidget, createSearchWidget,
   createCollectionsWidget, createSortOrderWidget,
-  createMultipageWidget, createImportSetWidget
+  createMultipageWidget, createImportSetWidget, createFlipbookWidget
 } from '../../models/Widget'
 
 // Pick colors from the style guide
@@ -58,7 +59,8 @@ export const ColorWidgetInfo = {
   icon: 'icon-eyedropper',
   title: 'Colors',
   description: 'Search by color',
-  fieldTypes: [ 'nested' ],
+  fieldTypes: [],
+  fieldRegex: /^analysis\.hueSimilarity\..+/i,
   element: <Color/>,
   create: createColorWidget,
   color: '#EE7F29'
@@ -162,4 +164,16 @@ export const MultipageWidgetInfo = {
   create: createMultipageWidget,
   fieldTypes: [],
   color: '#579760'
+}
+
+export const FlipbookWidgetInfo = {
+  type: 'FLIPBOOK',
+  icon: 'icon-stack-empty',
+  title: 'Flipbook',
+  description: 'Restrict to a single Flipbook',
+  element: <FlipbookWidget/>,
+  create: createFlipbookWidget,
+  fieldTypes: [],
+  color: '#FFD000',
+  hideFromQuickAdd: true
 }

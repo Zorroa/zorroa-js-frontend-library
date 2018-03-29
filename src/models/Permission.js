@@ -1,5 +1,5 @@
 export default class Permission {
-  static GroupType = 'group'
+  static GroupType = 'zorroa' // This is named `zorroa` to prevent namespace clashes when in an SSO enviroment
   static UserType = 'user'
 
   static Developer = 'developer'

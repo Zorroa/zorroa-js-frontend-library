@@ -11,9 +11,11 @@ import AclEntry from '../../models/Acl'
 import FieldList from '../../models/FieldList'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
-import CreateExport from './CreateExport'
 import CreateFolder from './CreateFolder'
 import AssetPermissions from '../AssetPermissions'
+import {
+  updateExportInterface
+} from '../../actions/exportsAction'
 import {
   createFolder,
   addAssetIdsToFolderId,
@@ -26,7 +28,6 @@ import {
   deleteTaxonomy
 } from '../../actions/folderAction'
 import { showModal, hideModal, dialogAlertPromise, dialogConfirmPromise, toggleCollapsible } from '../../actions/appActions'
-import { exportAssets, getJob, markJobDownloaded } from '../../actions/jobActions'
 import { restoreFolders } from '../../actions/racetrackAction'
 import { setAssetPermissions, deleteAsset, searchAssets, selectAssetIds } from '../../actions/assetsAction'
 import { isolateSelectId } from '../../services/jsUtil'
@@ -96,6 +97,7 @@ class FolderItem extends Component {
     top: PropTypes.string,
 
     // state props
+    requestableExports: PropTypes.bool,
     selectedFolderIds: PropTypes.object,
     selectedAssetIds: PropTypes.object,
     folders: PropTypes.instanceOf(Map),
@@ -264,58 +266,27 @@ class FolderItem extends Component {
 
   exportFolder = (event) => {
     this.dismissContextMenu(event)
-    const width = '340px'
-    const name = this.props.folder.name
-    const body = <CreateExport onCreate={this.createExport} name={name}/>
-    this.props.actions.showModal({body, width})
-  }
 
-  createExport = (event, name, exportImages, exportTable) => {
-    const { selectedFolderIds, folder, actions, selectedTableLayoutId, tableLayouts } = this.props
+    const {
+      selectedFolderIds,
+      folder
+    } = this.props
     const folderIds = selectedFolderIds.has(folder.id) ? new Set(this.props.selectedFolderIds) : [folder.id]
-    const filter = new AssetFilter({links: {folder: [...folderIds]}})
-    const search = new AssetSearch({filter})
-    const layout = tableLayouts.find(layout => layout.id === selectedTableLayoutId)
-    const tableFields = layout && layout.fields
-    const fields = exportTable && tableFields
-    actions.toggleCollapsible('exportJobs', true)
-    return actions.exportAssets(name, search, fields, exportImages)
-    .then(this.waitForExportAndDownload)
-  }
-
-  // duplicate code warning: keep this in sync with ExportJobs.waitForExportAndDownload (TODO: share this code)
-  waitForExportAndDownload = (exportId) => {
-    const { actions } = this.props
-    let timeout = 100
-    return new Promise(resolve => {
-      // wait until export job is done, then auto-download it
-      // this code adapted from Jobs.refreshJobs()
-      const waitForJob = (jobId) => {
-        actions.getJob(exportId)
-        .then(data => new Promise(resolve => requestAnimationFrame(_ => resolve(data)))) // wait 1 frame for getJob() data to post to global state
-        .then(response => {
-          // We'll watch the app state to see if our job is finished, rather
-          // than checking the response from getJob()
-          const job = this.props.jobs && this.props.jobs[jobId]
-          if (job && job.isFinished()) {
-            resolve(job)
-          } else {
-            timeout = Math.min(5000, timeout * 2) // try often at first, but back off for long jobs
-            setTimeout(_ => waitForJob(jobId), timeout)
-          }
-        })
+    const filter = new AssetFilter({
+      links: {
+        folder: [...folderIds]
       }
-      waitForJob(exportId)
     })
-    .then(job => {
-      const retval = window.open(job.exportStream(this.props.origin))
-      if (!retval) {
-        actions.dialogAlertPromise('Export complete',
-          'Your export package is ready for download, using the Exports panel on the left. ' +
-          'You can enable automatic downloads for future exports by allowing popus for this site.')
-        return
-      }
-      actions.markJobDownloaded(job.id)
+    const folders = this.props.folders
+    const firstFolder = folders.get(folderIds.values().next().value)
+    const name = firstFolder.name.replace(/\s/gi, '_')
+    const assetSearch = new AssetSearch({filter})
+    this.props.actions.toggleCollapsible('exportJobs', true)
+
+    this.props.actions.updateExportInterface({
+      packageName: name,
+      assetSearch,
+      permissionIds: this.props.user.permissions.map(permission => permission.id)
     })
   }
 
@@ -457,13 +428,14 @@ class FolderItem extends Component {
     const subfolderCount = this.subfolderCount(folder.id)
     const subfolderLabel = subfolderCount === 0 ? 'No subfolders' : (subfolderCount === 1 ? '1 subfolder' : `${subfolderCount} subfolders`)
     const { contextMenuPos } = this.state
+    const requestableExports = this.props.requestableExports === true
 
     const selectedAssets = selectedAssetIds && selectedAssetIds.size > 0
     const selectedAssetsNotInFolder = selectedAssets && this.selectedAssetNotInSelectedFolder()
     const addableAssets = selectedAssetsNotInFolder && this.simpleFolderIds().length > 0
     const removableAssets = selectedAssets && this.selectedFolderContainsSelectedAssets()
     const writePermission = folder.hasAccess(user, AclEntry.WriteAccess)
-    const exportPermission = folder.hasAccess(user, AclEntry.ExportAccess)
+    const exportPermission = folder.hasAccess(user, AclEntry.ExportAccess) || requestableExports
     const canAddChild = singleFolderSelected && !folder.isDyhi() && folder.isSimpleCollection() && writePermission
     let canAddChildTitle = ''
     if (!singleFolderSelected) {
@@ -697,16 +669,14 @@ export default connect(state => ({
   uxLevel: state.app.uxLevel,
   userSettings: state.app.userSettings,
   jobs: state.jobs.all,
-  query: state.assets && state.assets.query
+  query: state.assets && state.assets.query,
+  requestableExports: true // TODO make this come from a server-side value or something
 }), dispatch => ({
   actions: bindActionCreators({
     createFolder,
     addAssetIdsToFolderId,
     removeAssetIdsFromFolderId,
     dropFolderId,
-    exportAssets,
-    getJob,
-    markJobDownloaded,
     showModal,
     hideModal,
     dialogAlertPromise,
@@ -721,6 +691,7 @@ export default connect(state => ({
     selectAssetIds,
     createTaxonomy,
     deleteTaxonomy,
-    toggleCollapsible
+    toggleCollapsible,
+    updateExportInterface
   }, dispatch)
 }))(FolderItem)

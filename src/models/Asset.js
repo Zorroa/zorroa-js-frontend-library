@@ -70,8 +70,40 @@ export default class Asset {
     return `${origin}/api/v1/ofs/${id}`
   }
 
-  mediaType () { return (this.document.source && this.document.source.mediaType) || 'unknown' }
+  mediaType () {
+    return (this.document.source && this.document.source.mediaType) || 'unknown'
+  }
+
+  isOfType (mimeType) {
+    return this.mediaType().toLowerCase().startsWith(mimeType.toLowerCase())
+  }
+
   tinyProxy () { return (this.document.proxies && (this.document.proxies ? this.document.proxies.tinyProxy : null)) }
+
+  isContainer () {
+    const containerMediaTypes = [
+      'zorroa/x-flipbook'
+    ]
+
+    return (
+      this.document.source &&
+      this.document.source.mediaType &&
+      containerMediaTypes.includes(this.document.source.mediaType)
+    ) === true
+  }
+
+  isContainedByParent () {
+    const containerTypes = [
+      'flipbook'
+    ]
+
+    return (
+      this.document.media &&
+      this.document.media.clip &&
+      this.document.media.clip.type &&
+      containerTypes.includes(this.document.media.clip.type)
+    ) === true
+  }
 
   width () {
     if (this.document.image) return this.document.image.width
@@ -92,42 +124,44 @@ export default class Asset {
   backgroundColor () { return this.tinyProxy() ? this.tinyProxy()[5] : getRandomColor() }
 
   pageCount () {
-    if (this.document.source && this.document.source.clip && this.document.source.clip.pages) return this.document.source.clip.pages
-    if (this.document.document && this.document.document.pages) return this.document.document.pages
-    if (this.document.image && this.document.image.pages) return this.document.image.pages
-    if (this.document.video && this.document.video.pages) return this.document.video.pages
+    if (this.document.media && this.document.media.clip && this.document.media.clip.pages) return this.document.media.clip.pages
   }
 
   startPage () {
-    if (this.document.source && this.document.source.clip && this.document.source.clip.page) return this.document.source.clip.page.start
+    return this.document.media && this.document.media.start
   }
 
   stopPage () {
-    if (this.document.source && this.document.source.clip && this.document.source.clip.page) return this.document.source.clip.page.stop
+    return this.document.media && this.document.media.stop
   }
 
   frameRate () {    // frames per second
-    if (this.document.video) return this.document.video.frameRate
+    return this.document.media && this.document.media.frameRate
   }
   frames () {       // total # frames in the source video -- the entire film, not the clip
-    if (this.document.video) return this.document.video.frames
+    return this.document.media && this.document.media.frames
   }
   frameRange () {   // number of frames in this clip -- a subset of frames()
-    if (this.document.video) return this.stopFrame() - this.startFrame()
+    return this.stopFrame() - this.startFrame()
   }
   duration () {     // seconds in this clip -- a subset of the entire film
-    if (this.document.video) return this.frameRange() / (this.frameRate() || 30)
+    this.frameRange() / (this.frameRate() || 30)
+  }
+  isClip () {
+    return !!(this.document.media && this.document.media.clip)
   }
   startFrame () {   // start frame for this clip -- >= 0
-    if (this.document.video) {
-      if (this.document.source.clip && this.document.source.clip.frame) return this.document.source.clip.frame.start
+    if (this.isOfType('video')) {
+      if (this.isClip()) {
+        return this.document.media.clip.start
+      }
       return 0
     }
   }
   stopFrame () {    // stop frame for this clip -- <= frames()
-    if (this.document.video) {
-      if (this.document.source.clip && this.document.source.clip.frame) return this.document.source.clip.frame.stop
-      return this.document.video.frames - 1
+    if (this.isOfType('video')) {
+      if (this.isClip()) return this.document.media.clip.stop
+      return this.document.media && this.document.media.frames - 1
     }
   }
   validVideo () {
@@ -185,8 +219,20 @@ export default class Asset {
   }
 
   parentId () {
-    if (!this.document.source || !this.document.source.clip) return null
-    return this.document.source.clip.parent
+    if (this.isContainer()) {
+      return this.id
+    }
+
+    if (!this.document.media || !this.document.media.clip) return null
+    return this.document.media.clip.parent
+  }
+
+  clipType () {
+    if (this.document.media === undefined || this.document.media.clip === undefined) {
+      return null
+    }
+
+    return this.document.media.clip.type
   }
 
   // Returns true if the asset is in any of the folder ids

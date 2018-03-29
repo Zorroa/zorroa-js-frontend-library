@@ -16,15 +16,24 @@ class PanZoom extends Component {
     showControls: PropTypes.bool,
     onNextPage: PropTypes.func,
     onPrevPage: PropTypes.func,
+    onScrub: PropTypes.func,
+    onLoop: PropTypes.func,
+    loopPaused: PropTypes.bool,
+    shouldLoop: PropTypes.bool,
+    frameFrequency: PropTypes.object,
     shuttler: PropTypes.instanceOf(PubSub),
     playing: PropTypes.bool,
     onVolume: PropTypes.func,
     volume: PropTypes.number,
+    minZoom: PropTypes.number, // This coonfiguration won't always be configured
+    maxZoom: PropTypes.number, // This coonfiguration won't always be configured
     lightboxPanner: PropTypes.shape({
       x: PropTypes.number.isRequired,
       y: PropTypes.number.isRequired,
       scale: PropTypes.number.isRequired
     }),
+    currentFrameNumber: PropTypes.number,
+    totalFrames: PropTypes.number,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object,
@@ -37,6 +46,13 @@ class PanZoom extends Component {
 
   state = {
     moving: false
+  }
+
+  constructor (props) {
+    super(props)
+
+    this.maxZoom = (props.maxZoom / 100) || 4
+    this.minZoom = (props.minZoom / 100) || 1 / this.maxZoom
   }
 
   componentWillMount () {
@@ -99,14 +115,11 @@ class PanZoom extends Component {
     this.startMoving()
   }
 
-  static maxZoom = 4
-  static minZoom = 1 / PanZoom.maxZoom
-
   zoom = (event) => {
     const { scale } = this.panner
     const scalePct = 1 + Math.abs(event.deltaY) * 0.005
     const scaleMult = (event.deltaY > 0 ? scalePct : 1 / scalePct)
-    const zoomFactor = Math.min(PanZoom.maxZoom, Math.max(PanZoom.minZoom, scale * scaleMult))
+    const zoomFactor = Math.min(this.maxZoom, Math.max(this.minZoom, scale * scaleMult))
     const topPadding = 0 // Note this value needs to also be changed in PanZoom.scss
     const leftPadding = 0 // Note this value needs to be also changed in PanZoom.scss
     this.panner.zoom(zoomFactor, {x: event.pageX - leftPadding, y: event.pageY - topPadding})
@@ -135,11 +148,29 @@ class PanZoom extends Component {
   }
 
   render () {
-    const { title, titleWidth, showControls, onPrevPage, onNextPage, onVolume, volume, shuttler, playing, userSettings } = this.props
+    const {
+      title,
+      titleWidth,
+      showControls,
+      onPrevPage,
+      onNextPage,
+      onLoop,
+      loopPaused,
+      shouldLoop,
+      onScrub,
+      frameFrequency,
+      onVolume,
+      volume,
+      shuttler,
+      playing,
+      userSettings,
+      totalFrames,
+      currentFrameNumber
+     } = this.props
     const { moving } = this.state
     const epsilon = 0.01
-    const zoomOutDisabled = this.panner.scale <= PanZoom.minZoom + epsilon
-    const zoomInDisabled = this.panner.scale >= PanZoom.maxZoom - epsilon
+    const zoomOutDisabled = this.panner.scale <= this.minZoom + epsilon
+    const zoomInDisabled = this.panner.scale >= this.maxZoom - epsilon
     const zoomToFitDisabled = this.panner.scale > (1 - epsilon) && this.panner.scale < (1 + epsilon)
     const style = {}
     style['transform'] = `translate(${this.panner.x}px, ${this.panner.y}px) scale(${this.panner.scale})`
@@ -156,14 +187,23 @@ class PanZoom extends Component {
                 { this.props.children }
               </div>
               { showControls && (
-                  <Controlbar title={title} titleWidth={titleWidth}
-                              onZoomOut={!zoomOutDisabled && this.zoomOut || null}
-                              onZoomIn={!zoomInDisabled && this.zoomIn || null}
-                              onFit={!zoomToFitDisabled && this.zoomToFit || null}
-                              onNextPage={onNextPage}
-                              onPrevPage={onPrevPage}
-                              onVolume={onVolume} volume={volume}
-                              shuttler={shuttler} playing={playing} />)
+                  <Controlbar
+                    title={title} titleWidth={titleWidth}
+                    onZoomOut={!zoomOutDisabled && this.zoomOut || null}
+                    onZoomIn={!zoomInDisabled && this.zoomIn || null}
+                    onFit={!zoomToFitDisabled && this.zoomToFit || null}
+                    onNextPage={onNextPage}
+                    onPrevPage={onPrevPage}
+                    onScrub={onScrub}
+                    onVolume={onVolume} volume={volume}
+                    shuttler={shuttler} playing={playing}
+                    frameFrequency={frameFrequency}
+                    totalFrames={totalFrames}
+                    currentFrameNumber={currentFrameNumber}
+                    onLoop={onLoop}
+                    shouldLoop={shouldLoop}
+                    loopPaused={loopPaused}
+                  />)
               }
             </div>
           )
@@ -176,7 +216,9 @@ class PanZoom extends Component {
 export default connect(state => ({
   lightboxPanner: state.app.lightboxPanner,
   user: state.auth.user,
-  userSettings: state.app.userSettings
+  userSettings: state.app.userSettings,
+  minZoom: parseInt(state.archivist.settings['curator.lightbox.zoom-min'].currentValue, 10),
+  maxZoom: parseInt(state.archivist.settings['curator.lightbox.zoom-max'].currentValue, 10)
 }), dispatch => ({
   actions: bindActionCreators({
     lightboxPanner,

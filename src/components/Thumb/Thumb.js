@@ -8,11 +8,12 @@ import Asset from '../../models/Asset'
 
 import { addSiblings, isolateSelectId, replaceVariables, valuesForFields, parseVariables, PubSub } from '../../services/jsUtil'
 import Video from '../Video'
+import { FlipbookPlayer } from '../Flipbook'
 import FieldTemplate from '../FieldTemplate'
 
 // Extract thumb page info from an asset
 export function page (asset, width, height, origin) {
-  const url = asset && asset.atLeastProxyURL(origin, width, height) || ''
+  const url = asset && asset.closestProxyURL(origin, width, height) || ''
   const tproxy = asset && asset.tinyProxy()
   const backgroundColor = tproxy ? tproxy[4] : '#888'
   return { url, backgroundColor }
@@ -104,6 +105,7 @@ class Thumb extends Component {
     allAssets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     origin: PropTypes.string,
     parentTotals: PropTypes.instanceOf(Map),
+    unfilteredParentTotals: PropTypes.instanceOf(Map),
     showMultipage: PropTypes.bool,
     selectedAssetIds: PropTypes.instanceOf(Set),
     thumbFieldTemplate: PropTypes.string.isRequired,
@@ -117,6 +119,9 @@ class Thumb extends Component {
       videoStarted: false,
       videoPlaying: false,
       doVideoPreview: false,
+      flipbookStarted: false,
+      flipbookPlaying: false,
+      doFlipbookPreview: false,
       showBadge: false
     }
 
@@ -130,18 +135,35 @@ class Thumb extends Component {
     this.status.on('playing', videoPlaying => { this.setState({ videoPlaying }) })
   }
 
+  onVideoDurationClick = () => {
+    const doVideoPreview = true
+    this.setState({ doVideoPreview }, () => this.shuttler.publish('startOrStop'))
+  }
+
+  onFlipbookDurationClick = () => {
+    const doFlipbookPreview = true
+    this.setState({ doFlipbookPreview }, () => this.shuttler.publish('startOrStop'))
+  }
+
   // Extract badging info from an asset.
-  renderMonopageBadges = (asset) => {
+  renderMonopageBadges = (asset, childCount) => {
     const startPage = asset.startPage()
     const stopPage = asset.stopPage()
     let pageBadge
-    if (asset.mediaType().includes('video')) {
+
+    if (asset.mediaType() === 'zorroa/x-flipbook') {
+      pageBadge = (
+        <Duration
+          isFlipbookDuration
+          frameCount={childCount}
+          onClick={this.onFlipbookDurationClick}
+          playing={this.state.flipbookPlaying}
+        />
+      )
+    } else if (asset.mediaType().includes('video')) {
       pageBadge = (
         <Duration duration={asset.duration()}
-                  onClick={_ => {
-                    this.setState({ doVideoPreview: true },
-                      _ => this.shuttler.publish('startOrStop'))
-                  }}
+                  onClick={this.onVideoDurationClick}
                   playing={this.state.videoStarted}/>
       )
     } else if (startPage && (!stopPage || startPage === stopPage)) {
@@ -152,7 +174,7 @@ class Thumb extends Component {
     return { pageBadge }
   }
 
-  renderMultipageBadges = (asset, origin, stackCount) => {
+  renderMultipageBadges = (asset, origin, stackCount, childCount) => {
     let pageBadge, parentURL
 
     const pageCount = asset.pageCount() || stackCount
@@ -172,6 +194,16 @@ class Thumb extends Component {
       pageBadge = <Duration duration={asset.duration()}/>
     }
 
+    if (asset.mediaType() === 'zorroa/x-flipbook' || asset.clipType() === 'flipbook') {
+      pageBadge = (
+        <Duration
+          isFlipbookDuration
+          frameCount={childCount}
+          onClick={asset.isContainedByParent() ? undefined : this.onFlipbookDurationClick}
+        />
+      )
+    }
+
     // Show the icon & inset if we have any page badging
     if (pageBadge) {
       parentURL = asset.smallestParentProxyURL(origin)
@@ -180,13 +212,19 @@ class Thumb extends Component {
     return { pageBadge, parentURL }
   }
 
-  renderBadges = (asset, origin, stackCount) => {
+  renderBadges = (asset, origin, stackCount, childCount) => {
     const { badgeHeight, showMultipageBadges, thumbFieldTemplate } = this.props
     const { showBadge } = this.state
-    const iconBadge = showBadge ? <div className="Thumb-field"><FieldTemplate asset={asset} template={thumbFieldTemplate} extensionOnLeft={false}/></div> : null
+    const canShowBadge = showBadge
+    const iconBadge = canShowBadge ? (
+        <div className="Thumb-field">
+          <FieldTemplate asset={asset} template={thumbFieldTemplate} extensionOnLeft={false}/>
+        </div>
+      )
+      : null
     const { pageBadge, parentURL } = showMultipageBadges
-      ? this.renderMultipageBadges(asset, origin, stackCount)
-      : this.renderMonopageBadges(asset)
+      ? this.renderMultipageBadges(asset, origin, stackCount, childCount)
+      : this.renderMonopageBadges(asset, childCount)
 
     if (!pageBadge && !iconBadge) return { }
 
@@ -220,8 +258,20 @@ class Thumb extends Component {
     this.setState({ showBadge: false })
   }
 
+  canDisplayInset () {
+    return this.props.asset.mediaType() !== 'zorroa/x-flipbook'
+  }
+
   render () {
-    const {pages, isSelected, onClick, onDoubleClick, dragparams, parentTotals} = this.props
+    const {
+      pages,
+      isSelected,
+      onClick,
+      onDoubleClick,
+      dragparams,
+      parentTotals,
+      unfilteredParentTotals
+    } = this.props
     const {width, height, x, y} = this.props.dim      // Original thumb rect
     if (!width || !height) return null
 
@@ -232,14 +282,30 @@ class Thumb extends Component {
 
     // Fall back to pages.length while waiting for parentTotals to return
     const stackCount = parentId && parentTotals && parentTotals.get(parentId) || (pages && pages.length)
+    const childCount = parentId && unfilteredParentTotals && unfilteredParentTotals.get(parentId)
 
-    const { parentURL, badges } = this.renderBadges(asset, origin, stackCount)
+    const { parentURL, badges } = this.renderBadges(asset, origin, stackCount, childCount)
+    const shouldRenderFlipbook = this.state.doFlipbookPreview && asset.mediaType() === 'zorroa/x-flipbook'
+    const backgroundSize = this.props.thumbLayout === 'masonry' ? 'cover' : 'contain'
 
     if (!parentURL) {
       const { url, backgroundColor } = pages[0]
       const shouldRenderVideo = this.state.doVideoPreview && asset.mediaType().includes('video')
-      const shouldRenderImageThumb = !this.state.videoPlaying
+      const shouldRenderImageThumbForVideo = !this.state.videoPlaying
       const loading = require('../Inspector/loading-ring.svg')
+
+      let loadingPlaceholder = null
+
+      if (
+        (shouldRenderVideo === true && shouldRenderImageThumbForVideo === true)
+      ) {
+        loadingPlaceholder = (
+          <div className='Thumb-video-waiting flexCenter fullWidth fullHeight' style={{ position: 'absolute', top: '0', left: 0 }}>
+            <ImageThumb url={url} backgroundColor={backgroundColor}/>
+            {shouldRenderVideo && <img className='Thumb-video-waiting-spinner' src={loading} style={{ position: 'relative' }}/>}
+          </div>
+        )
+      }
 
       return (
         <div className={classnames('Thumb', {isSelected})}
@@ -259,20 +325,25 @@ class Thumb extends Component {
                    startFrame={asset.startFrame()}
                    stopFrame={asset.stopFrame()}
                    onError={this.vidError}>
-              { shouldRenderImageThumb ? (
-                <div className='Thumb-video-waiting flexCenter fullWidth fullHeight' style={{ position: 'absolute', top: '0', left: 0 }}>
-                  <ImageThumb url={url} backgroundColor={backgroundColor}/>
-                  <img className='Thumb-video-waiting-spinner' src={loading} style={{ position: 'relative' }}/>
-                </div>
-                )
-                : null }
+              { loadingPlaceholder }
               { this.renderOverlays() }
               { badges }
             </Video>
+          ) || shouldRenderFlipbook && (
+            <div className="Thumb-flipbook">
+              <FlipbookPlayer
+                shuttler={this.shuttler}
+                status={this.status}
+                clipParentId={asset.parentId()}
+                size={backgroundSize}
+              >
+                { badges }
+              </FlipbookPlayer>
+              </div>
           ) || (
             <ImageThumb
               url={url}
-              backgroundSize={ this.props.thumbLayout === 'masonry' ? 'cover' : 'contain' }
+              backgroundSize={backgroundSize}
               backgroundColor={backgroundColor}
             >
               { this.renderOverlays() }
@@ -291,7 +362,19 @@ class Thumb extends Component {
            onMouseEnter={this.onMouseEnter}
            onMouseLeave={this.onMouseLeave}
            {...dragparams}>
-        { pages.slice(0, 3).reverse().map((page, rindex) => {
+
+           { shouldRenderFlipbook && (
+             <FlipbookPlayer
+               shuttler={this.shuttler}
+               status={this.status}
+               clipParentId={asset.parentId()}
+               size={backgroundSize}
+             >
+               { badges }
+             </FlipbookPlayer>
+           )}
+
+        { shouldRenderFlipbook === false && pages.slice(0, 3).reverse().map((page, rindex) => {
           const { url, backgroundColor } = page
           const index = Math.min(3, pages.length) - rindex - 1
           return (
@@ -306,9 +389,11 @@ class Thumb extends Component {
             </div>
           )
         })}
-        <div className="Thumb-inset">
-          <ImageThumb url={parentURL}/>
-        </div>
+        { this.canDisplayInset() && (
+          <div className="Thumb-inset">
+            <ImageThumb url={parentURL}/>
+          </div>
+        )}
         { this.renderOverlays() }
       </div>
     )
@@ -320,6 +405,7 @@ export default connect(state => ({
   dragFieldTemplate: state.app.dragFieldTemplate,
   origin: state.auth.origin,
   parentTotals: state.assets.parentTotals,
+  unfilteredParentTotals: state.assets.unfilteredParentTotals,
   selectedAssetIds: state.assets.selectedIds,
   showMultipage: state.app.showMultipage,
   thumbFieldTemplate: state.app.thumbFieldTemplate,

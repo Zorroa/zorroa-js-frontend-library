@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'zorroa-icons';
-  src:  url('fonts/zorroa-icons.eot?9int5n');
-  src:  url('fonts/zorroa-icons.eot?9int5n#iefix') format('embedded-opentype'),
-    url('fonts/zorroa-icons.woff2?9int5n') format('woff2'),
-    url('fonts/zorroa-icons.ttf?9int5n') format('truetype'),
-    url('fonts/zorroa-icons.woff?9int5n') format('woff'),
-    url('fonts/zorroa-icons.svg?9int5n#zorroa-icons') format('svg');
+  src:  url('fonts/zorroa-icons.eot?efyxyj');
+  src:  url('fonts/zorroa-icons.eot?efyxyj#iefix') format('embedded-opentype'),
+    url('fonts/zorroa-icons.woff2?efyxyj') format('woff2'),
+    url('fonts/zorroa-icons.ttf?efyxyj') format('truetype'),
+    url('fonts/zorroa-icons.woff?efyxyj') format('woff'),
+    url('fonts/zorroa-icons.svg?efyxyj#zorroa-icons') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -43,6 +43,9 @@
 .icon-crop_free:before {
   content: "\e3c2";
 }
+.icon-sync:before {
+  content: "\e627";
+}
 .icon-add_circle:before {
   content: "\e986";
 }
@@ -71,31 +74,31 @@
   content: "\e928";
 }
 .icon-database-download:before {
-  content: "\e989";
+  content: "\e99e";
 }
 .icon-table-freeze:before {
   content: "\e99d";
 }
 .icon-signal-lowest:before {
-  content: "\e992";
+  content: "\e993";
   color: #4d4948;
 }
 .icon-signal-low .path1:before {
-  content: "\e991";
+  content: "\e992";
   color: rgb(238, 127, 41);
 }
 .icon-signal-low .path2:before {
-  content: "\e993";
+  content: "\e99f";
   margin-left: -1em;
   color: rgb(77, 73, 72);
 }
 .icon-signal-low .path3:before {
-  content: "\e99e";
+  content: "\e9ad";
   margin-left: -1em;
   color: rgb(77, 73, 72);
 }
 .icon-signal-low .path4:before {
-  content: "\e99f";
+  content: "\e9ae";
   margin-left: -1em;
   color: rgb(77, 73, 72);
 }
@@ -137,7 +140,7 @@
   color: #73b61c;
 }
 .icon-delete-column:before {
-  content: "\e990";
+  content: "\e991";
 }
 .icon-circle-add .path1:before {
   content: "\e98c";
@@ -330,6 +333,9 @@
 }
 .icon-tagcloud:before {
   content: "\e913";
+}
+.icon-book-alt2:before {
+  content: "\e9af";
 }
 .icon-layers2:before {
   content: "\e9a3";
@@ -550,14 +556,11 @@
 .icon-search:before {
   content: "\e904";
 }
-.icon-eye2:before {
-  content: "\e988";
+.icon-document-download:before {
+  content: "\e989";
 }
-.icon-server:before {
-  content: "\e96b";
-}
-.icon-database:before {
-  content: "\e96b";
+.icon-document-information:before {
+  content: "\e990";
 }
 .icon-search3:before {
   content: "\e965";
@@ -582,6 +585,15 @@
 }
 .icon-layout4:before {
   content: "\e903";
+}
+.icon-eye2:before {
+  content: "\e988";
+}
+.icon-server:before {
+  content: "\e96b";
+}
+.icon-database:before {
+  content: "\e96b";
 }
 .icon-heartbeat:before {
   content: "\e98d";
@@ -685,6 +697,9 @@
 .icon-register:before {
   content: "\e6d1";
 }
+.icon-papers:before {
+  content: "\e6d4";
+}
 .icon-document2:before {
   content: "\e6d9";
 }
@@ -720,6 +735,9 @@
 }
 .icon-linearicons:before {
   content: "\e80a";
+}
+.icon-speed-slow:before {
+  content: "\e834";
 }
 .icon-rocket:before {
   content: "\e837";

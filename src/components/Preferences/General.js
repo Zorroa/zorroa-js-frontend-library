@@ -58,7 +58,7 @@ class General extends Component {
     this.props.actions.archivistInfo()
     this.props.actions.archivistHealth()
     this.props.actions.archivistMetrics()
-    this.props.actions.archivistSetting('archivist.export.dragTemplate')
+    this.props.actions.archivistSetting('curator.thumbnails.drag-template')
   }
 
   dismiss = (event) => {
@@ -108,7 +108,7 @@ class General extends Component {
 
   defaultDragTemplate = () => {
     const { settings } = this.props
-    const dragTemplateSetting = settings && settings['archivist.export.dragTemplate']
+    const dragTemplateSetting = settings && settings['curator.thumbnails.drag-template']
     return dragTemplateSetting && dragTemplateSetting.currentValue
   }
 

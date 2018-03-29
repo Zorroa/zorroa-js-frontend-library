@@ -1,15 +1,15 @@
 @import '../../styles/core-mixins.scss';
 
 .FieldTemplate {
+  @include flexCol;
+}
+
+.FieldTemplate-group {
   @include flexRow;
-  @include flexAlignItemsCenter;
 }
 
 .FieldTemplate-field {
   @include flexRow;
-  @include flexAlignItemsCenter;
-  //font-size: 13px;
-  //line-height: 1.4em;
 }
 
 .FieldTemplate-label {

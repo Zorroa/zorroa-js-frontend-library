@@ -5,7 +5,7 @@ import {
   ASSET_SORT, ASSET_ORDER, ASSET_FIELDS,
   ASSET_PERMISSIONS, ASSET_SEARCHING,
   UPDATE_COMMAND, GET_COMMANDS,
-  ISOLATE_ASSET, SELECT_ASSETS, ISOLATE_PARENT,
+  ISOLATE_ASSET, SELECT_ASSETS, ISOLATE_PARENT, ISOLATE_FLIPBOOK, DEISOLATE_FLIPBOOK,
   SUGGEST_COMPLETIONS, ALL_ASSET_COUNT, SIMILAR_FIELDS, ASSET_DELETE
 } from '../constants/actionTypes'
 import Asset from '../models/Asset'
@@ -18,12 +18,12 @@ import { archivistGet, archivistPut, archivistPost, archivistDelete } from './au
 export function requiredFields (fields, fieldTypes) {
   const required = [
     'id',
-    'source.filename', 'source.mediaType', 'source.extension',
-    'image.width', 'image.height', 'image.pages',
-    'video.width', 'video.height', 'video.pages', 'video.frameRate', 'video.frames', 'video.background'
+    'source.filename',
+    'source.mediaType',
+    'source.extension'
   ]
   const prefix = [
-    'links', 'clip', 'source.clip', 'pages', 'proxies'
+    'links', 'clip', 'media', 'pages', 'proxies'
   ]
 
   const req = new Set()
@@ -129,6 +129,19 @@ export function isolateParent (asset) {
   })
 }
 
+export function isolateFlipbook (asset) {
+  return ({
+    type: ISOLATE_FLIPBOOK,
+    payload: asset
+  })
+}
+
+export function deisolateFlipbook () {
+  return ({
+    type: DEISOLATE_FLIPBOOK
+  })
+}
+
 export function searchAssets (query, lastQuery, force, isFirstPage, parentIds) {
   return dispatch => {
     const promises = []
@@ -150,7 +163,7 @@ export function searchAssets (query, lastQuery, force, isFirstPage, parentIds) {
 
       // Filter out any child assets that have already been loaded after the first page
       if (!isFirstPage && parentIds && parentIds.length) {
-        const filter = new AssetFilter({terms: { 'source.clip.parent.raw': parentIds }})
+        const filter = new AssetFilter({terms: { 'media.clip.parent': parentIds }})
         mainQuery.merge(new AssetSearch({filter: new AssetFilter({must_not: [filter]})}))
       }
 
@@ -167,7 +180,13 @@ export function searchAssets (query, lastQuery, force, isFirstPage, parentIds) {
       aggQuery.fields = ['_id']
       aggQuery.order = null
       promises.push(searchAssetsRequestProm(dispatch, aggQuery))
-      if (parentIds && parentIds.length) promises.push(updateParentTotals(query, parentIds))
+
+      if (parentIds && parentIds.length) {
+        promises.push(updateParentTotals(query, parentIds, {
+          isUnfiltered: true
+        }))
+        promises.push(updateParentTotals(query, parentIds))
+      }
     }
 
     return Promise.all(promises)
@@ -206,8 +225,10 @@ export function searchAssets (query, lastQuery, force, isFirstPage, parentIds) {
   }
 }
 
-export function updateParentTotals (query, parentIds) {
+export function updateParentTotals (query, parentIds, options = {}) {
   return dispatch => {
+    const isUnfiltered = options.isUnfiltered === true
+
     if (parentIds && parentIds.length) {
       const aggQuery = new AssetSearch(query)
       if (aggQuery.postFilter) {
@@ -217,27 +238,28 @@ export function updateParentTotals (query, parentIds) {
           aggQuery.filter = new AssetFilter(query.postFilter)
         }
       }
-      const parentFilter = new AssetFilter({terms: { 'source.clip.parent.raw': parentIds }})
-      if (aggQuery.filter) {
+      const parentFilter = new AssetFilter({terms: { 'media.clip.parent': parentIds }})
+      if (aggQuery.filter && isUnfiltered === false) {
         aggQuery.filter.merge(parentFilter)
       } else {
         aggQuery.filter = parentFilter
       }
       // Filter to children of visible parents
-      const parentAggs = { parentCounts: {terms: {field: 'source.clip.parent.raw', size: 1000}} }
+      const parentAggs = { parentCounts: {terms: {field: 'media.clip.parent', size: 1000}} }
       aggQuery.merge(new AssetSearch({ aggs: parentAggs }))
       aggQuery.postFilter = null
       aggQuery.from = 0
       aggQuery.size = 1
       aggQuery.fields = ['_id']
       aggQuery.order = null
-      console.log('Parent query: ' + JSON.stringify(aggQuery))
+
       searchAssetsRequestProm(dispatch, aggQuery)
         .then(response => {
           const aggs = response.data.aggregations
+          const aggsKey = isUnfiltered ? 'unfilteredAggs' : 'aggs'
           dispatch({
             type: ASSET_AGGS,
-            payload: { aggs }
+            payload: { [aggsKey]: aggs }
           })
         })
         .catch(error => {
@@ -268,9 +290,17 @@ export function suggestQueryStrings (text) {
   }
 }
 
-export function sortAssets (field, ascending) {
+export function sortAssets (field, ascending, options = {}) {
+  const silent = options.silent === true
   if (!field || !field.length) return unorderAssets()
-  return ({ type: ASSET_SORT, payload: {field, ascending} })
+  return ({
+    type: ASSET_SORT,
+    payload: {
+      field,
+      ascending,
+      silent
+    }
+  })
 }
 
 export function orderAssets (order) {
@@ -311,7 +341,6 @@ export function getAssetFields () {
 }
 
 export function findSimilarFields (assetFields) {
-  console.log('Find similar fields...')
   if (!assetFields || !Object.keys(assetFields).length) {
     return ({
       type: SIMILAR_FIELDS,
@@ -320,20 +349,22 @@ export function findSimilarFields (assetFields) {
   }
   return dispatch => {
     let fields = []
-    if (assetFields.string) fields = fields.concat(assetFields.string.filter(field => field.toLowerCase().startsWith('similar')))
-    if (assetFields.hash) fields = fields.concat(assetFields.hash.filter(field => field.toLowerCase().startsWith('similar')))
-    if (!fields.length) {
+
+    if (Array.isArray(assetFields.similarity) && assetFields.similarity.length > 0) {
+      fields = fields.concat(assetFields.similarity)
+    } else {
       dispatch({
         type: SIMILAR_FIELDS,
         payload: null
       })
     }
+
     const aggs = {}
     fields.forEach(field => { aggs[field] = { filter: { exists: { field: field } } } })
     const query = new AssetSearch({aggs, size: 1, fields: ['source.basename']})
+
     searchAssetsRequestProm(dispatch, query)
       .then(response => {
-        console.log('Found similar field aggs: ' + JSON.stringify(response.data))
         dispatch({
           type: SIMILAR_FIELDS,
           payload: response.data

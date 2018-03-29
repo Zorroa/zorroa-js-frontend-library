@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from 'react'
-import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import Pdf from './Pdf'
+import FlipbookViewer from './FlipbookViewer.js'
 import VideoViewer from './VideoViewer'
 import Image from './Image'
 import Asset from '../../models/Asset'
@@ -13,8 +13,7 @@ class Inspector extends Component {
     onNext: PropTypes.func,
     onPrev: PropTypes.func,
     origin: PropTypes.string,
-    thumbSize: PropTypes.number,
-    actions: PropTypes.object
+    thumbSize: PropTypes.number
   }
 
   state = {
@@ -30,22 +29,24 @@ class Inspector extends Component {
     let warning = null
     let inspector = null
 
-    if (mediaType.startsWith('image') &&
+    if (asset.clipType() === 'flipbook' || asset.isOfType('zorroa/x-flipbook')) {
+      inspector = <FlipbookViewer clipParentId={asset.parentId()} />
+    } else if (asset.isOfType('image') &&
       imageFormats.findIndex(format => (mediaType.endsWith(format))) >= 0) {
       inspector = <Image url={url}
                          onNextPage={onNext} onPrevPage={onPrev} />
-    } else if (mediaType.startsWith('video') && asset.validVideo()) {
+    } else if (asset.isOfType('video') && asset.validVideo()) {
       inspector = <VideoViewer url={url} backgroundURL={asset.backgroundURL(origin)}
                          frames={asset.frames()} frameRate={asset.frameRate()}
                          startFrame={asset.startFrame()} stopFrame={asset.stopFrame()}
                          onError={error => this.setState({error})} />
-    } else if (mediaType === 'application/pdf' && asset.pageCount()) {
+    } else if (asset.isOfType('application/pdf') && asset.pageCount()) {
       const rangeChunkSize = 65536 * 64
       inspector = <Pdf path={asset.rawValue('source.path')}
                        page={asset.startPage()} thumbSize={thumbSize}
                        documentInitParameters={{url, withCredentials: true, rangeChunkSize}} />
     } else {
-      const message = error ? (error.code === 4 ? 'Cannot open video file' : error.message) : (mediaType.startsWith('video') ? 'Invalid video file' : undefined)
+      const message = error ? (error.code === 4 ? 'Cannot open video file' : error.message) : (asset.isOfType('video') ? 'Invalid video file' : undefined)
       const proxy = asset.biggestProxy()
       inspector = <Image url={asset.largestProxyURL(origin)} />
       warning = (
@@ -69,7 +70,4 @@ export default connect(state => ({
   origin: state.auth.origin,
   host: state.auth.host,
   thumbSize: state.app.thumbSize
-}), dispatch => ({
-  actions: bindActionCreators({
-  }, dispatch)
 }))(Inspector)

@@ -3,6 +3,9 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 import copy from 'copy-to-clipboard'
+import downloadjs from 'downloadjs'
+import api from '../../api'
+import getImage from '../../services/getImage'
 
 import User from '../../models/User'
 import Asset from '../../models/Asset'
@@ -19,6 +22,7 @@ class Lightbar extends Component {
     showMetadata: PropTypes.bool.isRequired,
     onMetadata: PropTypes.func.isRequired,
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
+    asset: PropTypes.instanceOf(Asset),
     isolatedId: PropTypes.string,
     lightbarFieldTemplate: PropTypes.string,
     origin: PropTypes.string,
@@ -42,10 +46,46 @@ class Lightbar extends Component {
   }
 
   isolatedAssetURL () {
-    const { isolatedId, assets, origin } = this.props
-    const asset = assets.find(asset => (asset.id === isolatedId))
+    const { asset, origin } = this.props
     if (!asset) return
     return asset.url(origin)
+  }
+
+  onDownload = () => {
+    const { asset, origin } = this.props
+    const assetSource = asset.document.source
+    const { mediaType, filename, clip } = assetSource
+
+    if (clip && clip.type === 'flipbook') {
+      api
+        .flipbook
+        .get(clip.parent)
+        .then(assets => {
+          return Promise.all(assets.map(childAsset => {
+            const options = {
+              format: 'blob'
+            }
+            const imageUrl = childAsset.url(origin)
+            return getImage(imageUrl, options)
+              .then((image) => ({
+                image,
+                ...childAsset
+              }))
+          }))
+        })
+        .then(assetImages => {
+          assetImages.forEach(assetImage => {
+            downloadjs(
+              assetImage.image,
+              assetImage.document.source.filename,
+              assetImage.document.source.mediaType
+            )
+          })
+        })
+      return
+    }
+
+    downloadjs(this.isolatedAssetURL(), filename, mediaType)
   }
 
   copyIsolatedAssetLink = () => {
@@ -79,9 +119,8 @@ class Lightbar extends Component {
   }
 
   render () {
-    const { assets, isolatedId, user, showMetadata, onMetadata, lightbarFieldTemplate } = this.props
+    const { assets, asset, isolatedId, user, showMetadata, onMetadata, lightbarFieldTemplate } = this.props
     const { actionWidth, lightbarHeight, copyingLink, showFolders, addingToCollection } = this.state
-    const asset = assets.find(asset => (asset.id === isolatedId))
     return (
       <div className="Lightbar" style={{height: lightbarHeight}}>
         <div className="Lightbar-metadata">
@@ -89,10 +128,10 @@ class Lightbar extends Component {
           <FieldTemplate asset={asset} template={lightbarFieldTemplate} extensionOnLeft={true}/>
         </div>
         <div className="Lightbar-actions" style={{width: actionWidth, minWidth: actionWidth}}>
-          <a href={this.isolatedAssetURL()} className='Lightbar-action' download={this.isolatedAssetURL()}>
+          <div className='Lightbar-action' onClick={this.onDownload}>
             <i className='Lightbar__icon icon-download2'/>
             <span className='Lightbar-action-text Lightbar-action-download'>Download</span>
-          </a>
+          </div>
           <div onClick={!copyingLink && this.copyIsolatedAssetLink} className='Lightbar-action'>
             <i className='Lightbar__icon icon-link2'/>
             <span className='Lightbar-action-text Lightbar-action-get-link'>Get Link</span>
@@ -118,6 +157,7 @@ class Lightbar extends Component {
 
 export default connect(state => ({
   assets: state.assets.all,
+  asset: state.assets.all.find(asset => asset.id === state.assets.isolatedId),
   isolatedId: state.assets.isolatedId,
   lightbarFieldTemplate: state.app.lightbarFieldTemplate,
   origin: state.auth.origin,

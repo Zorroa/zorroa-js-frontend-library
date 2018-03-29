@@ -6,7 +6,11 @@ import classnames from 'classnames'
 import Job, { JobFilter } from '../../models/Job'
 import User from '../../models/User'
 import ProgressBar from '../ProgressBar'
-import { getJobs, markJobDownloaded } from '../../actions/jobActions'
+import {
+  getJobs,
+  markJobDownloaded,
+  downloadFilesForJob
+} from '../../actions/jobActions'
 import { epochUTCString } from '../../services/jsUtil'
 
 const SORT_NAME = 'name'
@@ -23,7 +27,11 @@ class Jobs extends Component {
     isolateJob: PropTypes.func,
     user: PropTypes.instanceOf(User).isRequired,
     origin: PropTypes.string,
-    actions: PropTypes.object
+    actions: PropTypes.shape({
+      getJobs: PropTypes.func.isRequired,
+      markJobDownloaded: PropTypes.func.isRequired,
+      downloadFilesForJob: PropTypes.func.isRequired
+    }).isRequired
   }
 
   state = {
@@ -38,6 +46,14 @@ class Jobs extends Component {
     this.monitorJobs()
   }
 
+  componentDidUpdate (prevProps) {
+    if (prevProps.jobs !== this.props.jobs &&
+      this.monitorJobsInterval === null
+    ) {
+      this.monitorJobs()
+    }
+  }
+
   componentWillUnmount () {
     clearInterval(this.monitorJobsInterval)
     this.monitorJobsInterval = null
@@ -49,14 +65,23 @@ class Jobs extends Component {
       this.monitorJobsInterval = null
     }
     const { jobs, jobType } = this.props
-    if (!jobs || !Object.keys(jobs).length) {
+    const hasNoJobs = !jobs
+    const hasNoJobsForType = Object
+      .keys(jobs)
+      .some(jobKey => {
+        const job = jobs[jobKey]
+        job.type === jobType
+      }) === false
+
+    if (hasNoJobs || hasNoJobsForType) {
       this.refreshJobs()
-      return
     }
-    const containsActiveJob = Object.keys(jobs).findIndex(jobId => {
+
+    const containsActiveJob = Object.keys(jobs).some(jobId => {
       const job = jobs[jobId]
       return (job.type === jobType && job.state === Job.Active)
-    }) >= 0
+    }) === true
+
     if (containsActiveJob) {
       this.monitorJobsInterval = setInterval(this.refreshJobs, 5000)
     }
@@ -82,7 +107,7 @@ class Jobs extends Component {
     this.setState({ filterString: '' })
   }
 
-  sortJobs = (field) => {
+  sortJobs = field => {
     let { sortField, sortAscending } = this.state
     if (field === sortField) {
       sortAscending = !sortAscending
@@ -93,18 +118,17 @@ class Jobs extends Component {
     }
   }
 
-  sortOrderClassname = (field) => {
+  sortOrderClassname = field => {
     const { sortField, sortAscending } = this.state
     const icon = field === sortField ? `icon-sort-${sortAscending ? 'asc' : 'desc'}` : 'icon-sort'
     return `Jobs-header-sort ${icon}`
   }
 
-  markDownloaded = (job) => {
-    this.props.actions.markJobDownloaded(job.id)
+  downloadFilesForJob = job => {
+    this.props.actions.downloadFilesForJob(job.id, this.props.origin)
   }
 
   renderStatus (job) {
-    const { origin } = this.props
     return (
       <div className="Jobs-status" style={{width: '25%', maxWidth: '25%'}}>
         { job.state === Job.Active && job.progress && (
@@ -113,6 +137,7 @@ class Jobs extends Component {
                          successPct={job.progress.success}
                          errorPct={job.progress.failed}
                          warningPct={job.progress.skipped}
+                         fast
                          pendingPct={job.progress.waiting}/>
           </div>
         )}
@@ -124,10 +149,10 @@ class Jobs extends Component {
           </div>
         )}
         { (job.type === Job.Export && job.state !== Job.Active && (
-          <a className={classnames('Jobs-download', 'icon-download2', {notDownloaded: job.notDownloaded})}
-             onClick={_ => this.markDownloaded(job)}
+          <button className={classnames('Jobs-download', 'icon-download2', {notDownloaded: job.notDownloaded})}
+             onClick={() => this.downloadFilesForJob(job)}
              title="Download export"
-             href={job.exportStream(origin)} download={job.name} />
+          />
         ))}
       </div>
     )
@@ -223,6 +248,7 @@ export default connect(state => ({
 }), dispatch => ({
   actions: bindActionCreators({
     getJobs,
-    markJobDownloaded
+    markJobDownloaded,
+    downloadFilesForJob
   }, dispatch)
 }))(Jobs)

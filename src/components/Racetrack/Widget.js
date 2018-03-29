@@ -4,9 +4,15 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 import WidgetHeader from './WidgetHeader'
-import { CollectionsWidgetInfo, SortOrderWidgetInfo, MultipageWidgetInfo, ImportSetWidgetInfo } from './WidgetInfo'
+import {
+  CollectionsWidgetInfo,
+  SortOrderWidgetInfo,
+  MultipageWidgetInfo,
+  ImportSetWidgetInfo,
+  FlipbookWidgetInfo
+} from './WidgetInfo'
 import { iconifyRightSidebar } from '../../actions/appActions'
-import { sortAssets, isolateParent } from '../../actions/assetsAction'
+import { sortAssets, isolateParent, deisolateFlipbook } from '../../actions/assetsAction'
 import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { selectJobIds } from '../../actions/jobActions'
@@ -64,6 +70,7 @@ class Widget extends Component {
     if (widget && widget.type === CollectionsWidgetInfo.type) this.props.actions.selectFolderIds()
     if (widget && widget.type === ImportSetWidgetInfo.type) this.props.actions.selectJobIds()
     if (widget && widget.type === MultipageWidgetInfo.type) this.props.actions.isolateParent()
+    if (widget && widget.type === FlipbookWidgetInfo.type) this.props.actions.deisolateFlipbook()
     this.props.actions.removeRacetrackWidgetIds([this.props.id])
   }
 
@@ -108,8 +115,11 @@ class Widget extends Component {
     return (
       <div className={widgetClasses} onBlur={this.onBlur} tabIndex={0} ref="widgetTab">
         <WidgetHeader {...WidgetHeaderParams}/>
-        { !isIconified && isOpen && (
-          <div className={classnames('Widget-body', {floatBody})}>
+        { !isIconified && (
+          <div className={classnames('Widget-body', {
+            floatBody,
+            'Widget-body-closed': isOpen === false
+          })}>
             { children }
           </div>
         )}
@@ -131,7 +141,8 @@ export default connect(
       selectJobIds,
       modifyRacetrackWidget,
       removeRacetrackWidgetIds,
-      isolateParent
+      isolateParent,
+      deisolateFlipbook
     }, dispatch)
   })
 )(Widget)

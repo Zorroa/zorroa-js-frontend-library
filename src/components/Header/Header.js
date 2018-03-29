@@ -19,6 +19,7 @@ import { selectAssetIds, findSimilarFields, assetsForIds } from '../../actions/a
 import { resetRacetrackWidgets } from '../../actions/racetrackAction'
 import { equalSets } from '../../services/jsUtil'
 import { createSimilarityWidget } from '../../models/Widget'
+import fieldNamespaceToName from '../../services/fieldNamespaceToName'
 
 class Header extends Component {
   static propTypes = {
@@ -153,20 +154,24 @@ class Header extends Component {
     const { similarField, isSelectedHashValid } = this.state
     const { selectedIds, similarFields, widgets } = this.props
 
-    const displayName = (field) => {
-      const name = field.replace(/\.(raw|byte|point|bit)$/, '').replace(/^.*\./, '')
-      const remap = { mxnet: 'image (MX)', resnet: 'image (RN)', tensorflow: 'image (TF)', rgb: 'color (RGB)', hsv: 'color (HSV)', lab: 'color (LAB)', hsl: 'color (HSL)' }
-      const rname = remap[name.toLowerCase()]
-      if (rname) return rname
-      return name
-    }
-
     const displayIcon = (field) => {
       if (!field || !field.length) return ''
-      const name = displayName(field).toLowerCase()
+      const name = fieldNamespaceToName(field).toLowerCase()
       if (name.startsWith('image')) return 'icon-picture2'
-      if (name.startsWith('color')) return 'icon-eyedropper'
-      if (name.includes('hsv') || name.includes('hsl') || name.includes('lab') || name.includes('rgb') || name.includes('color')) return 'icon-eyedropper'
+      if (name.includes('hue')) return 'icon-eyedropper'
+      if ([
+        'hue',
+        'saturation',
+        'luminance',
+        'lightness',
+        'rgb',
+        'lab',
+        'hsv',
+        'hsl',
+        'color'
+      ].some(colorHint => name.includes(colorHint))) {
+        return 'icon-eyedropper'
+      }
       if (name.includes('face')) return 'icon-group'
       return 'icon-similarity'
     }
@@ -195,7 +200,7 @@ class Header extends Component {
               <div className="Editbar-similar-menu-item" key={field} onClick={_ => this.selectSimilarField(field) } title={field}>
                 <div className={`Editbar-similar-menu-item-selected${similarField === field ? ' icon-check' : ''}`}/>
                 <div className={`Editbar-similar-icon ${displayIcon(field)}`}/>
-                <div className="Editbar-similar-menu-item-label">{ displayName(field) }</div>
+                <div className="Editbar-similar-menu-item-label">{ fieldNamespaceToName(field) }</div>
               </div>
             ))}
           </DropdownMenu>

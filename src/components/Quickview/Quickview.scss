@@ -6,4 +6,13 @@
     background-size: cover;
     background-position: center center;
   }
+
+  &__flipbook {
+    display: flex;
+    justify-items: center;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    height: 70vh;
+  }
 }

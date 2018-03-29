@@ -10,7 +10,7 @@ import User from '../../models/User'
 import Asset from '../../models/Asset'
 import Widget from '../../models/Widget'
 import Folder from '../../models/Folder'
-import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, updateParentTotals, unorderAssets, isolateParent } from '../../actions/assetsAction'
+import { isolateAssetId, selectAssetIds, sortAssets, searchAssets, updateParentTotals, unorderAssets, isolateParent, isolateFlipbook } from '../../actions/assetsAction'
 import { resetRacetrackWidgets, restoreFolders } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
@@ -59,6 +59,7 @@ class Assets extends Component {
     userSettings: PropTypes.object.isRequired,
     origin: PropTypes.string,
     actions: PropTypes.object,
+    isolatedId: PropTypes.string,
     showQuickview: PropTypes.bool.isRequired
   }
 
@@ -152,9 +153,19 @@ class Assets extends Component {
   }
 
   @keydown('space')
-  isolateToQuickview () {
+  isolateToQuickview (event) {
+    if (event && typeof event.preventDefault === 'function') {
+      event.preventDefault()
+    }
+
     if (this.props.showQuickview === true) {
-      // Nothing to do here
+      // Nothing to do here, quick view is already open
+      return
+    }
+
+    if (this.props.isolatedId) {
+      // If something is already isolated don't do anything, it could be
+      // isolated to a Lightbox or some other piece of UI
       return
     }
 
@@ -180,20 +191,31 @@ class Assets extends Component {
     }
   }
 
+  shouldIsolateFlipbook (asset) {
+    return asset.isOfType('zorroa/x-flipbook') && this.props.showMultipage === false
+  }
+
   isolateToLightbox = (asset) => {
     const { showMultipage, parentTotals, isolatedParent } = this.props
     const parentId = showMultipage && asset.parentId()
     const isolatedParentId = isolatedParent && isolatedParent.parentId()
     const stackCount = parentId && parentId !== isolatedParentId && parentTotals && parentTotals.get(parentId)
+
+    if (this.shouldIsolateFlipbook(asset)) {
+      this.props.actions.isolateFlipbook(asset)
+      return
+    }
+
     if (stackCount > 1) {
       this.props.actions.isolateParent(asset)
-    } else {
-      // Select the isolated asset, which is DE-selected on the second click
-      this.skipNextSelectionScroll = true
-      const event = { shiftKey: false, metaKey: false }
-      this.select(asset, event)
-      this.props.actions.isolateAssetId(asset.id)
+      return
     }
+
+    // Select the isolated asset, which is DE-selected on the second click
+    this.skipNextSelectionScroll = true
+    const event = { shiftKey: false, metaKey: false }
+    this.select(asset, event)
+    this.props.actions.isolateAssetId(asset.id)
   }
 
   toggleShowTable = () => {
@@ -398,7 +420,7 @@ class Assets extends Component {
     })
 
     const isolatedParentId = isolatedParent && isolatedParent.parentId()
-    var { positions, multipage, collapsed } = (_ => {
+    var { positions, multipage, collapsed } = (() => {
       switch (layout) {
         case 'grid': return ComputeLayout.grid(assetSizes, width, thumbSize, showMultipage, isolatedParentId)
         case 'masonry': return ComputeLayout.masonry(assetSizes, width, thumbSize, showMultipage, isolatedParentId)
@@ -413,6 +435,9 @@ class Assets extends Component {
     const parentIds = showMultipage && multipage && Object.keys(multipage)
     if (parentsModified) {
       this.props.actions.updateParentTotals(query, parentIds)
+      this.props.actions.updateParentTotals(query, parentIds, {
+        isUnfiltered: true
+      })
     }
 
     this.clearAssetsLayoutTimer()
@@ -709,6 +734,7 @@ export default connect(state => ({
   parentCounts: state.assets.parentCounts,
   parentTotals: state.assets.parentTotals,
   isolatedParent: state.assets.isolatedParent,
+  isolatedId: state.assets.isolatedId,
   selectedIds: state.assets.selectedIds,
   selectionCounter: state.assets.selectionCounter,
   totalCount: state.assets.totalCount,
@@ -730,6 +756,7 @@ export default connect(state => ({
   showQuickview: state.app.showQuickview
 }), dispatch => ({
   actions: bindActionCreators({
+    isolateFlipbook,
     isolateAssetId,
     isolateParent,
     selectAssetIds,

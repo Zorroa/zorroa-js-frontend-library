@@ -22,7 +22,8 @@ export default class TableSettings extends Component {
     layoutActions: PropTypes.arrayOf(PropTypes.shape({
       label: PropTypes.string.isRequired,
       fn: PropTypes.func.isRequired,
-      disabled: PropTypes.bool.isRequired
+      disabled: PropTypes.bool.isRequired,
+      disabledReason: PropTypes.string
     })),
     updateFieldsFn: PropTypes.func,
     renameTableLayoutFn: PropTypes.func,
@@ -143,7 +144,7 @@ export default class TableSettings extends Component {
         <div className="TableSettings-actions">
           { layoutActions.map(action => (
             <div className={classnames('TableSettings-action', {disabled: action.disabled})}
-                 onClick={!action.disabled && action.fn} key={action.label}>
+                 onClick={!action.disabled && action.fn} key={action.label} title={action.disabledReason}>
               {action.label} Table layout
             </div>
           ))}

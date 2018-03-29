@@ -1,7 +1,7 @@
 import { SimpleSearchWidgetInfo, ExistsWidgetInfo, FacetWidgetInfo,
   MapWidgetInfo, DateRangeWidgetInfo, RangeWidgetInfo, SimilarHashWidgetInfo,
   FiletypeWidgetInfo, ColorWidgetInfo, CollectionsWidgetInfo,
-  SortOrderWidgetInfo, MultipageWidgetInfo, ImportSetWidgetInfo
+  SortOrderWidgetInfo, MultipageWidgetInfo, ImportSetWidgetInfo, FlipbookWidgetInfo
 } from '../components/Racetrack/WidgetInfo'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
@@ -225,13 +225,43 @@ export function fieldUsedInWidget (field, widget) {
 }
 
 export function createMultipageWidget (field, fieldType, asset, sortByPage, filterMultipage, isEnabled, isPinned) {
-  field = 'source.clip.parent'
-  const sortField = `source.clip.${asset && asset.document && asset.document.video ? 'frame' : 'page'}.start`
+  field = 'media.clip.parent'
+  const sortField = `media.clip.start`
   if (filterMultipage !== 'exists' && filterMultipage !== 'missing') filterMultipage = 'exists'
-  const existsFilter = (filterMultipage === 'exists' || filterMultipage === 'missing') && new AssetFilter({ [filterMultipage]: ['source.clip.parent'] })
+  const existsFilter = (filterMultipage === 'exists' || filterMultipage === 'missing') && new AssetFilter({ [filterMultipage]: ['media.clip.parent'] })
   const parentId = asset && asset.parentId()
-  const filter = parentId && parentId.length ? new AssetFilter({terms: {'source.clip.parent.raw': [parentId]}}) : existsFilter
+  const filter = parentId && parentId.length ? new AssetFilter({terms: {'media.clip.parent': [parentId]}}) : existsFilter
   const order = sortByPage ? [{ field: sortField, ascending: true }] : undefined
   const sliver = new AssetSearch({filter, order})
   return new Widget({type: MultipageWidgetInfo.type, field, sliver, isEnabled, isPinned})
+}
+
+export function createFlipbookWidget (
+  sortByPage,
+  asset,
+  isEnabled,
+  isPinned,
+  state
+) {
+  const parentId = asset && asset.parentId()
+  const filter = new AssetFilter({
+    terms: {
+      'media.clip.parent.raw': [parentId]
+    }
+  })
+  const sortField = 'media.clip.start'
+  const order = sortByPage ? [{
+    field: sortField,
+    ascending: true
+  }] : undefined
+  const sliver = new AssetSearch({filter, order})
+
+  return new Widget({
+    type: FlipbookWidgetInfo.type,
+    field: 'media.clip.parent',
+    sliver,
+    isEnabled,
+    isPinned,
+    state
+  })
 }

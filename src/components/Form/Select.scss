@@ -6,18 +6,44 @@
   border: $form-element-border;
   border-radius: $form-element-border-radius;
   max-width: 300px;
+  position: relative;
+
+  &::after {
+    content: ' ';
+    display: block;
+    height: 20px;
+    width: 1px;
+    position: absolute;
+    top: 0;
+    right: 30px;
+    height: 100%;
+    border-left: $form-element-border;
+  }
 }
 
 .FormInput__select-native {
   font-size: 14px;
   background: none;
+  background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20width%3D%2215%22%20height%3D%229%22%3E%3Cdefs%3E%3Cpath%20id%3D%22a%22%20d%3D%22M0%204l.1-.3h.6l6.8%206.8%206.8-6.8a.4.4%200%200%201%20.6.6l-7.1%207c-.2.2-.4.2-.6%200l-7-7C0%204.2%200%204%200%204z%22%2F%3E%3C%2Fdefs%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%20transform%3D%22translate%280%20-3%29%22%3E%3Cmask%20id%3D%22b%22%20fill%3D%22%23fff%22%3E%3Cuse%20xlink%3Ahref%3D%22%23a%22%2F%3E%3C%2Fmask%3E%3Cuse%20fill%3D%22%23000%22%20fill-rule%3D%22nonzero%22%20xlink%3Ahref%3D%22%23a%22%2F%3E%3Cg%20fill%3D%22gray%22%20mask%3D%22url%28%23b%29%22%3E%3Cpath%20d%3D%22M0%200h15v15H0z%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E');
+  background-position: calc(100% - 7px) center;
+  background-repeat: no-repeat;
   border: 0;
   height: $form-element-height - $form-element-border-size;
-  width: calc(100% - 20px);
-  margin: 0 10px;
+  width: 100%;
+  margin: 0;
   outline: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  text-overflow: '';
+  outline: 0;
+  padding: 0 10px;
+
+  &:focus {
+    outline: 0;
+    border: 0;
+  }
 
   .dark & {
-    color: $zorroa-color-gray-dark-3;
+    color: $zorroa-color-gray-dark-4;
   }
 }
