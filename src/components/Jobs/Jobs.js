@@ -47,7 +47,9 @@ class Jobs extends Component {
   }
 
   componentDidUpdate () {
-    this.monitorJobs()
+    if (this.monitorJobsInterval === null) {
+      this.monitorJobs()
+    }
   }
 
   componentWillUnmount () {
@@ -63,12 +65,13 @@ class Jobs extends Component {
     const { jobs, jobType } = this.props
     if (!jobs || !Object.keys(jobs).length) {
       this.refreshJobs()
-      return
     }
+
     const containsActiveJob = Object.keys(jobs).some(jobId => {
       const job = jobs[jobId]
       return (job.type === jobType && job.state === Job.Active)
     }) === true
+
     if (containsActiveJob) {
       this.monitorJobsInterval = setInterval(this.refreshJobs, 5000)
     }

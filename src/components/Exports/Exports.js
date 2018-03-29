@@ -103,7 +103,7 @@ class Exports extends Component {
           size: 1024,
           quality: 100
         },
-        shouldExport: false
+        shouldExport: true
       },
       PdfExporter: {
         arguments: {
@@ -113,7 +113,7 @@ class Exports extends Component {
           mediaType: 'pdf',
           pageMode: 'merge'
         },
-        shouldExport: false,
+        shouldExport: true,
         format: 'multipage'
       },
       FlipbookExporter: {
@@ -123,16 +123,16 @@ class Exports extends Component {
           exportMovies: true,
           frameRate: 30
         },
-        shouldExport: false,
+        shouldExport: true,
         flipbookExportType: 'image'
       },
       CsvExporter: {
         arguments: {},
-        shouldExport: false
+        shouldExport: true
       },
       JsonExporter: {
         arguments: {},
-        shouldExport: false
+        shouldExport: true
       },
       VideoClipExporter: {
         arguments: {
@@ -140,7 +140,7 @@ class Exports extends Component {
           quality: 'medium',
           exportOriginal: true
         },
-        shouldExport: false
+        shouldExport: true
       }
     }
 
@@ -452,11 +452,11 @@ class Exports extends Component {
                 <p>
                   Whoops, something went wrong on our server. Feel free to try this
                   request again. If the problem persists, you can report the error
-                  message below.
+                  message below:
                 </p>
                 {this.props.errorMessage && (
                   <p>
-                    {this.props.errorMessage}
+                    “{this.props.errorMessage} ”
                   </p>
                 )}
               </FlashMessage>
