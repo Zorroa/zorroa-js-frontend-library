@@ -48,7 +48,6 @@ export const groupExts = {
   [FILE_GROUP_IMAGES]: ['gif', 'png', 'jpg', 'jpeg', 'tif', 'tiff', 'psd'], /*, 'geotiff' */
   [FILE_GROUP_VECTORS]: ['pdf', 'svg', 'ai', 'shp', 'cdr'],
   [FILE_GROUP_VIDEOS]: ['mp4', 'm4v', 'mov', 'ogg', 'mpg', 'mpeg'],
-  [FILE_GROUP_FLIPBOOKS]: ['zfb'],
   [FILE_GROUP_DOCUMENTS]: ['pdf']
   // 'Audio Files': ['aac', 'mp3'],
   // 'Design Source Files - sketch, Adobe': ['ai', 'indd', 'psd'],
