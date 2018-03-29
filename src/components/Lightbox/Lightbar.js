@@ -53,18 +53,18 @@ class Lightbar extends Component {
 
   onDownload = () => {
     const { asset, origin } = this.props
-    const assetSource = asset.document.source
-    const { mediaType, filename, clip } = assetSource
+    const { source } = asset.document
+    const { mediaType, filename } = source
+    const options = {
+      format: 'blob'
+    }
 
-    if (clip && clip.type === 'flipbook') {
+    if (asset.clipType() === 'flipbook') {
       api
         .flipbook
-        .get(clip.parent)
+        .get(asset.parentId())
         .then(assets => {
           return Promise.all(assets.map(childAsset => {
-            const options = {
-              format: 'blob'
-            }
             const imageUrl = childAsset.url(origin)
             return getImage(imageUrl, options)
               .then((image) => ({
@@ -74,18 +74,27 @@ class Lightbar extends Component {
           }))
         })
         .then(assetImages => {
-          assetImages.forEach(assetImage => {
-            downloadjs(
-              assetImage.image,
-              assetImage.document.source.filename,
-              assetImage.document.source.mediaType
-            )
+          assetImages.forEach((assetImage, index) => {
+            setTimeout(() => {
+              downloadjs(
+                assetImage.image,
+                assetImage.document.source.filename,
+                assetImage.document.source.mediaType
+              )
+            }, index * 1000)
           })
         })
       return
     }
 
-    downloadjs(this.isolatedAssetURL(), filename, mediaType)
+    getImage(this.isolatedAssetURL(), options)
+      .then(image => {
+        downloadjs(
+          image,
+          filename,
+          mediaType
+        )
+      })
   }
 
   copyIsolatedAssetLink = () => {
