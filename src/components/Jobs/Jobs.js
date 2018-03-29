@@ -43,15 +43,7 @@ class Jobs extends Component {
   monitorJobsInterval = null
 
   componentDidMount () {
-    this.monitorJobs()
-  }
-
-  componentDidUpdate (prevProps) {
-    if (prevProps.jobs !== this.props.jobs &&
-      this.monitorJobsInterval === null
-    ) {
-      this.monitorJobs()
-    }
+    this.monitorJobsInterval = setInterval(this.monitorJobs, 5000)
   }
 
   componentWillUnmount () {
@@ -60,10 +52,6 @@ class Jobs extends Component {
   }
 
   monitorJobs = () => {
-    if (this.monitorJobsInterval) {
-      clearInterval(this.monitorJobsInterval)
-      this.monitorJobsInterval = null
-    }
     const { jobs, jobType } = this.props
     const hasNoJobs = !jobs
     const hasNoJobsForType = Object
@@ -73,17 +61,13 @@ class Jobs extends Component {
         job.type === jobType
       }) === false
 
-    if (hasNoJobs || hasNoJobsForType) {
-      this.refreshJobs()
-    }
-
     const containsActiveJob = Object.keys(jobs).some(jobId => {
       const job = jobs[jobId]
       return (job.type === jobType && job.state === Job.Active)
     }) === true
 
-    if (containsActiveJob) {
-      this.monitorJobsInterval = setInterval(this.refreshJobs, 5000)
+    if (hasNoJobs || hasNoJobsForType || containsActiveJob) {
+      this.refreshJobs()
     }
   }
 

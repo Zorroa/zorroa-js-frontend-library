@@ -22,7 +22,6 @@ import {
 import {
   FILE_GROUP_IMAGES,
   FILE_GROUP_VIDEOS,
-  FILE_GROUP_FLIPBOOKS,
   FILE_GROUP_DOCUMENTS,
   groupExts
 } from '../constants/fileTypes'
@@ -97,7 +96,6 @@ export default function (state = initialState, action) {
       const assetGroupCounts = [
         FILE_GROUP_IMAGES,
         FILE_GROUP_VIDEOS,
-        FILE_GROUP_FLIPBOOKS,
         FILE_GROUP_DOCUMENTS
       ].reduce((accumulatorGroupCounts, groupKey) => {
         accumulatorGroupCounts[groupKey] = groupExts[groupKey]
@@ -120,7 +118,7 @@ export default function (state = initialState, action) {
         hasRestrictedAssets,
         imageAssetCount: assetGroupCounts[FILE_GROUP_IMAGES] || 0,
         videoAssetCount: assetGroupCounts[FILE_GROUP_VIDEOS] || 0,
-        flipbookAssetCount: assetGroupCounts[FILE_GROUP_FLIPBOOKS] || 0,
+        flipbookAssetCount: 0, // TODO: Figure out how to count Flipbooks (or rather count clips by type)
         documentAssetCount: assetGroupCounts[FILE_GROUP_DOCUMENTS] || 0,
         totalAssetCount
       }

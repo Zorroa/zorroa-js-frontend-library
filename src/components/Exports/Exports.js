@@ -337,7 +337,7 @@ class Exports extends Component {
     if (folderId !== undefined) {
       this.props.actions.exportRequest({
         folderId,
-        type: 'ExportRequest',
+        type: 'Export',
         comment: `${email} has requested an export of folder ID ${folderId}.`,
         emailCC: email
       })
