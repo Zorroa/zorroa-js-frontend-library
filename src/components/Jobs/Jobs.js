@@ -46,8 +46,10 @@ class Jobs extends Component {
     this.monitorJobs()
   }
 
-  componentDidUpdate () {
-    if (this.monitorJobsInterval === null) {
+  componentDidUpdate (prevProps) {
+    if (prevProps.jobs !== this.props.jobs &&
+      this.monitorJobsInterval === null
+    ) {
       this.monitorJobs()
     }
   }
@@ -63,7 +65,15 @@ class Jobs extends Component {
       this.monitorJobsInterval = null
     }
     const { jobs, jobType } = this.props
-    if (!jobs || !Object.keys(jobs).length) {
+    const hasNoJobs = !jobs
+    const hasNoJobsForType = Object
+      .keys(jobs)
+      .some(jobKey => {
+        const job = jobs[jobKey]
+        job.type === jobType
+      }) === false
+
+    if (hasNoJobs || hasNoJobsForType) {
       this.refreshJobs()
     }
 
