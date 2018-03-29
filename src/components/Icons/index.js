@@ -152,7 +152,6 @@ export function Save () {
         <use fill="#000" fillRule="nonzero" xlinkHref="#a"/>
         <g fill="#fff" mask="url(#b)">
           <path d="M0 0h15v15H0z"/>
->>>>>>> jd/exports
         </g>
       </g>
     </svg>
