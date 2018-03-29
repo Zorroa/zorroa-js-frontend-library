@@ -108,7 +108,8 @@ class Video extends Component {
   onProgress = () => {
     this.progressQueued = false
     if (!this.player) return
-    const { frames, stopFrame, frameRate, status } = this.props
+    const { frames, stopFrame, status } = this.props
+    const frameRate = this.normalizeFrameRate(this.props.frameRate)
     const { started } = this.state
     const lastPlayed = this.state.played
     const played = this.player.currentTime / (frames / frameRate)
@@ -218,9 +219,20 @@ class Video extends Component {
     this.scrub(frame)
   }
 
+  normalizeFrameRate (frameRate) {
+    const NTSC_FRAME_RATE = '23.98' // This number is technically 23.976, but some systems round up apparantly
+    if (frameRate.toFixed(2) === NTSC_FRAME_RATE) {
+      // Normalize FPS for NTSC frame rate to align with caption dialog's 24 FPS rate
+      return 24
+    }
+
+    return frameRate
+  }
+
   scrub = (frame) => {
     if (!this.player) return
-    const { frames, stopFrame, frameRate, status } = this.props
+    const { frames, stopFrame, status } = this.props
+    const frameRate = this.normalizeFrameRate(this.props.frameRate)
     const played = frame / (frames - 1)
     if (played >= stopFrame / (frames - 1)) this.stop()
     this.setState({ played })
