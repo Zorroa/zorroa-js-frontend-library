@@ -28,17 +28,19 @@ export default class FlipbookViewer extends Component {
 
     return (
       <div className="FlipbookStrip" ref={ (element) => { this.element = element } }>
-        { frames.map(frame => {
-          return (
-            <CanvasImage
-              key={`${frame.number}-${frame.url}`}
-              onClick={() => { this.scrub(frame.number) }}
-              className="FlipbookStrip__frame-canvas"
-              image={frame.imageBitmap}
-              size="cover"
-            />
-          )
-        }) }
+        <div className="FlipbookStrip__container">
+          { frames.map(frame => {
+            return (
+              <CanvasImage
+                key={`${frame.number}-${frame.url}`}
+                onClick={() => { this.scrub(frame.number) }}
+                className="FlipbookStrip__frame-canvas"
+                image={frame.imageBitmap}
+                size="cover"
+              />
+            )
+          }) }
+        </div>
       </div>
     )
   }
