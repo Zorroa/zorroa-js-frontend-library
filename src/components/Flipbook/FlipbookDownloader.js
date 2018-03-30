@@ -38,11 +38,26 @@ export default function withFlipbook (WrappedComponent) {
       }
 
       this.downloadableFrameCount = 0
+    }
 
+    componentDidMount () {
       this.downloadBitmapImages()
     }
 
+    componentWillReceiveProps (nextProps) {
+      if (nextProps.clipParentId !== this.props.clipParentId) {
+        this.downloadBitmapImages()
+        this.setState({
+          frames: [],
+          totalFrames: 0,
+          loadImagesCount: 0
+        })
+      }
+    }
+
     downloadBitmapImages () {
+      this.downloadableFrameCount = 0
+
       api
         .flipbook
         .get(this.props.clipParentId)

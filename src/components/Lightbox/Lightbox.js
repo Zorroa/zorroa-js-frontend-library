@@ -100,6 +100,7 @@ class Lightbox extends Component {
                   onMetadata={this.toggleMetadata}/>
         <div className="lightbox-body">
           <Inspector asset={asset}
+                     key={asset.id} // This `key` ensures a full re-render of the Inspector when the asset changes
                      onNext={hasNext ? _ => this.isolateIndexOffset(1) : null}
                      onPrev={hasPrev ? _ => this.isolateIndexOffset(-1) : null} />
         </div>

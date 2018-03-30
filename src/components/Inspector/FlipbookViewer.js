@@ -56,6 +56,17 @@ class FlipbookViewer extends Component {
     })
   }
 
+  componentWillReceiveProps (nextProps) {
+    if (
+      nextProps.isolatedAsset !== this.props.isolatedAsset &&
+      nextProps.isolatedAsset.clipType() === 'flipbook' &&
+      nextProps.isolatedAsset.document.media && nextProps.isolatedAsset.document.media.clip
+    ) {
+      // TODO: This might need to occur at a lower level ??
+      // this.shuttler.publish('scrub', nextProps.isolatedAsset.document.media.clip.start)
+    }
+  }
+
   componentWillUnmount () {
     this.status.off()
     this.shuttler.off()
