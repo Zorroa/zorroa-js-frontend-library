@@ -56,8 +56,8 @@ export default function user (userId) {
     },
 
     password: {
-      put: (password) => {
-        return putPassword(client, password)
+      put: (password, oldPassword) => {
+        return putPassword(client, password, oldPassword)
       }
     },
 

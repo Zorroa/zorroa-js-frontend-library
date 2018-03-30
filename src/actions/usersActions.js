@@ -194,7 +194,7 @@ function updateUserPassword (user) {
   return api
     .user(user.id)
     .password
-    .put(user.password)
+    .put(user.password, user.oldPassword)
 }
 
 export function updateUser (user) {

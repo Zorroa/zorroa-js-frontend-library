@@ -61,12 +61,8 @@
     }
   }
 
-  &__error {
-    margin: 20px 0;
-    border: 1px solid $zorroa-color-danger;
-    color: $zorroa-color-danger;
-    padding: 20px;
-    margin: 20px;
+  &__errors {
+    margin: 20px 20px;
   }
 
   &__form-actions {

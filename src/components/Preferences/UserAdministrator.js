@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import './UserAdministrator.scss'
-
+import FlashMessage from '../FlashMessage'
 import UserTable from './UserTable'
 import Heading from '../Heading'
 import ListEditor from '../ListEditor'
@@ -43,6 +43,8 @@ class UserAdministrator extends Component {
     createUserErrorMessage: PropTypes.string.isRequired,
     users: PropTypes.arrayOf(userShape),
     user: userShape,
+    updateUserError: PropTypes.bool.isRequired,
+    updateUserErrorMessage: PropTypes.bool.isRequired,
     availablePermissions: PropTypes.arrayOf(PropTypes.instanceOf(Permission)),
     actions: PropTypes.shape({
       disableUser: PropTypes.func.isRequired,
@@ -149,7 +151,11 @@ class UserAdministrator extends Component {
   }
 
   hasNetworkErrors () {
-    return this.props.loadUsersError === true || this.props.createUserError === true
+    return (
+      this.props.loadUsersError === true ||
+      this.props.createUserError === true ||
+      this.props.updateUserError === true
+    )
   }
 
   resetUser = event => {
@@ -215,14 +221,19 @@ class UserAdministrator extends Component {
           this.hasNetworkErrors() && (
             <div className="UserAdministrator__errors">
               {this.props.loadUsersError && (
-                <div className="UserAdministrator__error">
+                <FlashMessage look="error">
                   Unable to load the users list. Please close this window and try again
-                </div>
+                </FlashMessage>
               )}
               {this.props.createUserError && (
-                <div className="UserAdministrator__error">
+                <FlashMessage look="error">
                   {this.props.createUserErrorMessage}
-                </div>
+                </FlashMessage>
+              )}
+              {this.props.updateUserError && (
+                <FlashMessage look="error">
+                  {this.props.updateUserErrorMessage || 'Unable to udpate the user'}
+                </FlashMessage>
               )}
             </div>
           )
@@ -333,7 +344,9 @@ export default connect(state => ({
   createUserError: state.users.createUserError,
   createUserErrorMessage: state.users.createUserErrorMessage,
   loadUsersError: state.users.loadUsersError,
-  authorizedUserId: state.auth.user.id
+  authorizedUserId: state.auth.user.id,
+  updateUserError: state.users.updateUserError,
+  updateUserErrorMessage: state.users.updateUserErrorMessage
 }), dispatch => ({
   actions: bindActionCreators({
     disableUser,

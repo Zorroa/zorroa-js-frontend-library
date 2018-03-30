@@ -35,7 +35,8 @@ const initialState = {
   user: {},
   isLoadingUser: false,
   isUpdatingUser: false,
-  updateUserError: false
+  updateUserError: false,
+  updateUserErrorMessage: ''
 }
 
 function removeFromArray (array, item) {
@@ -248,10 +249,12 @@ export default function (state = initialState, action) {
     case UPDATE_USER_ERROR: {
       const isUpdatingUser = false
       const updateUserError = true
+      const updateUserErrorMessage = action.payload.message
       return {
         ...state,
         isUpdatingUser,
-        updateUserError
+        updateUserError,
+        updateUserErrorMessage
       }
     }
     case UPDATE_USER_SUCCESS: {
