@@ -62,8 +62,7 @@ class FlipbookViewer extends Component {
       nextProps.isolatedAsset.clipType() === 'flipbook' &&
       nextProps.isolatedAsset.document.media && nextProps.isolatedAsset.document.media.clip
     ) {
-      // TODO: This might need to occur at a lower level ??
-      // this.shuttler.publish('scrub', nextProps.isolatedAsset.document.media.clip.start)
+      this.shuttler.publish('scrub', nextProps.isolatedAsset.document.media.clip.start)
     }
   }
 

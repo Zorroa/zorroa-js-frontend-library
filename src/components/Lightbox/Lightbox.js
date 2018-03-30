@@ -94,15 +94,23 @@ class Lightbox extends Component {
       </div>
     )
 
+    // By using an inspectorKey that's set to an asset ID, we force a re-render
+    // of the inspector when the asset changes. This is essential to ensure child
+    // canvas elements get the correct and latest render output. We also assume
+    // that if a parent ID is shared between assets a full re-render isn't needed.
+    const inspectorKey = asset.parentId() || asset.id
+
     return (
       <div className="lightbox dark">
         <Lightbar showMetadata={lightboxMetadata.show}
                   onMetadata={this.toggleMetadata}/>
         <div className="lightbox-body">
-          <Inspector asset={asset}
-                     key={asset.id} // This `key` ensures a full re-render of the Inspector when the asset changes
-                     onNext={hasNext ? _ => this.isolateIndexOffset(1) : null}
-                     onPrev={hasPrev ? _ => this.isolateIndexOffset(-1) : null} />
+          <Inspector
+            asset={asset}
+            key={inspectorKey}
+            onNext={hasNext ? () => this.isolateIndexOffset(1) : null}
+            onPrev={hasPrev ? () => this.isolateIndexOffset(-1) : null}
+          />
         </div>
         { lightboxMetadata.show && (
           <ResizableWindow
