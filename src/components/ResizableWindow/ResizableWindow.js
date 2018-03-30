@@ -15,7 +15,7 @@ export default class ResizableWindow extends Component {
     width: PropTypes.number,
     height: PropTypes.number,
     children: PropTypes.node,
-    preventOutOfBounds: PropTypes.boolean
+    preventOutOfBounds: PropTypes.bool
   }
 
   static defaultProps = {
