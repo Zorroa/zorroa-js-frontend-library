@@ -193,11 +193,12 @@ class Assets extends Component {
 
   shouldIsolateFlipbook (asset) {
     const { showMultipage, isolatedParent } = this.props
+    const isolatedParentId = isolatedParent && isolatedParent.parentId()
 
     return (
       asset.clipType() === 'flipbook' &&
       showMultipage === true &&
-      (isolatedParent && isolatedParent.parentId() !== asset.parentId())
+      (isolatedParentId !== asset.parentId())
     )
   }
 
