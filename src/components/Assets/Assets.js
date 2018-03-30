@@ -192,7 +192,13 @@ class Assets extends Component {
   }
 
   shouldIsolateFlipbook (asset) {
-    return asset.isOfType('zorroa/x-flipbook') && this.props.showMultipage === false
+    const { showMultipage, isolatedParent } = this.props
+
+    return (
+      asset.clipType() === 'flipbook' &&
+      showMultipage === true &&
+      (isolatedParent && isolatedParent.parentId() !== asset.parentId())
+    )
   }
 
   isolateToLightbox = (asset) => {

@@ -5,7 +5,7 @@ import {
   UPDATE_COMMAND, GET_COMMANDS,
   ISOLATE_ASSET, SELECT_ASSETS, ASSET_DELETE,
   ADD_ASSETS_TO_FOLDER, REMOVE_ASSETS_FROM_FOLDER,
-  SUGGEST_COMPLETIONS, UNAUTH_USER, ISOLATE_PARENT,
+  SUGGEST_COMPLETIONS, UNAUTH_USER, ISOLATE_PARENT, ISOLATE_FLIPBOOK,
   ALL_ASSET_COUNT, SIMILAR_FIELDS
 } from '../constants/actionTypes'
 
@@ -251,6 +251,10 @@ export default function (state = initialState, action) {
     }
 
     case ISOLATE_PARENT: {
+      return { ...state, isolatedParent: action.payload }
+    }
+
+    case ISOLATE_FLIPBOOK: {
       return { ...state, isolatedParent: action.payload }
     }
 
