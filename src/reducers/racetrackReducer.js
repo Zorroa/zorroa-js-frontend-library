@@ -172,7 +172,7 @@ export default function (state = initialState, action) {
         const index = state.widgets.findIndex(widget => (widget.type === FlipbookWidgetInfo.type))
         const isEnabled = index >= 0 ? state.widgets[index].isEnabled : true
         const widgetState = {
-          id: flipbook.id,
+          id: flipbook.parentId(),
           title: flipbook.document.source.filename
         }
         const widget = FlipbookWidgetInfo.create(
