@@ -92,16 +92,16 @@ class Multipage extends Component {
                 <div className="Multipage-parent-close icon-cancel-circle" onClick={this.closeParent}/>
               </div>
               <div className="Multipage-sort">
-                <div className="Multipage-label" onClick={_ => this.sortPages(false)}>Search Order</div>
-                <Toggle checked={sortByPage} onChange={_ => this.sortPages(!sortByPage)} />
-                <div className="Multipage-label" onClick={_ => this.sortPages(true)}>Page Order</div>
+                <div className="Multipage-label" onClick={() => this.sortPages(true)}>Page Order</div>
+                <Toggle checked={sortByPage} onChange={() => this.sortPages(!sortByPage)} />
+                <div className="Multipage-label" onClick={() => this.sortPages(false)}>Search Order</div>
               </div>
             </div>
           ) : (
             <div className="Multipage-toggle">
-              <div className="Multipage-label" onClick={_ => this.setFilter('missing')}>Monopage</div>
+              <div className="Multipage-label" onClick={() => this.setFilter('exists')}>Multipage</div>
               <Toggle checked={filterMultipage === 'exists'} onChange={this.filterMultipage} />
-              <div className="Multipage-label" onClick={_ => this.setFilter('exists')}>Multipage</div>
+              <div className="Multipage-label" onClick={() => this.setFilter('missing')}>Monopage</div>
             </div>
           )}
       </Widget>
