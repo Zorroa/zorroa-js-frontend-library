@@ -260,8 +260,15 @@ export default function (state = initialState, action) {
     case UPDATE_USER_SUCCESS: {
       const isUpdatingUser = false
       const updateUserError = false
+      const user = action.payload
+      const users = [
+        ...state.users
+      ]
+      const oldUserIndex = users.findIndex(oldUser => oldUser.id === user.id)
+      users[oldUserIndex] = user
       return {
         ...state,
+        users,
         isUpdatingUser,
         updateUserError
       }

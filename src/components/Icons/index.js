@@ -121,16 +121,16 @@ export function Flipbook () {
       xlinkHref="http://www.w3.org/1999/xlink"
     >
       <defs>
-        <path d="M8.5 3.1s-2.1-2-8.5-2v12.7c6.4 0 8.5 2 8.5 2s2-2 8.5-2V1c-6.4 0-8.5 2.1-8.5 2.1zm-6.4 0c2.7.3 4.4.9 5.3 1.4v8.6c-1-.5-2.6-1.2-5.3-1.4V3.1zM15 11.7c-2.7.2-4.4.9-5.3 1.4V4.5c1-.5 2.6-1.1 5.3-1.4v8.6z" id="a"/>
+        <path d="M8.5 3.1s-2.1-2-8.5-2v12.7c6.4 0 8.5 2 8.5 2s2-2 8.5-2V1c-6.4 0-8.5 2.1-8.5 2.1zm-6.4 0c2.7.3 4.4.9 5.3 1.4v8.6c-1-.5-2.6-1.2-5.3-1.4V3.1zM15 11.7c-2.7.2-4.4.9-5.3 1.4V4.5c1-.5 2.6-1.1 5.3-1.4v8.6z" id="c"/>
       </defs>
       <g fill="none" fillRule="evenodd">
         <path fill="#FFD000" d="M0 0h25v25H0z"/>
         <g transform="translate(4 4)">
-          <mask id="b" fill="#fff">
-            <use xlinkHref="#a"/>
+          <mask id="d" fill="#fff">
+            <use xlinkHref="#c"/>
           </mask>
-          <use fill="#000" fillRule="nonzero" xlinkHref="#a"/>
-          <g mask="url(#b)" fill="#FFF">
+          <use fill="#000" fillRule="nonzero" xlinkHref="#c"/>
+          <g mask="url(#d)" fill="#FFF">
             <path d="M0 0h17v17H0z"/>
           </g>
         </g>
@@ -143,14 +143,14 @@ export function Save () {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" xlinkHref="http://www.w3.org/1999/xlink" width="15" height="15">
       <defs>
-        <path id="a" d="M12.3 0H2C.9 0 0 .8 0 1.9V13c0 1 .8 1.9 1.9 1.9H13c1 0 1.9-.8 1.9-1.9V3L12.3 0zm-1 5.6c0 .5-.5 1-1 1H4.7a1 1 0 0 1-1-1V1h7.5v4.7zm-1-3.7H8.4v3.7h2V2z"/>
+        <path id="e" d="M12.3 0H2C.9 0 0 .8 0 1.9V13c0 1 .8 1.9 1.9 1.9H13c1 0 1.9-.8 1.9-1.9V3L12.3 0zm-1 5.6c0 .5-.5 1-1 1H4.7a1 1 0 0 1-1-1V1h7.5v4.7zm-1-3.7H8.4v3.7h2V2z"/>
       </defs>
       <g fill="none" fillRule="evenodd">
-        <mask id="b" fill="#fff">
-          <use xlinkHref="#a"/>
+        <mask id="f" fill="#fff">
+          <use xlinkHref="#e"/>
         </mask>
-        <use fill="#000" fillRule="nonzero" xlinkHref="#a"/>
-        <g fill="#fff" mask="url(#b)">
+        <use fill="#000" fillRule="nonzero" xlinkHref="#e"/>
+        <g fill="#fff" mask="url(#f)">
           <path d="M0 0h15v15H0z"/>
         </g>
       </g>

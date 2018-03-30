@@ -24,7 +24,7 @@ import {
 } from '../../actions/usersActions'
 
 const userShape = PropTypes.shape({
-  id: PropTypes.number,
+  id: PropTypes.string,
   email: PropTypes.string,
   firstName: PropTypes.string,
   lastName: PropTypes.string,
@@ -45,6 +45,8 @@ class UserAdministrator extends Component {
     user: userShape,
     updateUserError: PropTypes.bool.isRequired,
     updateUserErrorMessage: PropTypes.bool.isRequired,
+    isUpdatingUser: PropTypes.bool.isRequired,
+    isCreatingUser: PropTypes.bool.isRequired,
     availablePermissions: PropTypes.arrayOf(PropTypes.instanceOf(Permission)),
     actions: PropTypes.shape({
       disableUser: PropTypes.func.isRequired,
@@ -53,6 +55,27 @@ class UserAdministrator extends Component {
       resetUser: PropTypes.func.isRequired,
       updateUser: PropTypes.func.isRequired
     })
+  }
+
+  state = {
+    showSubmitSuccess: false
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (
+      (nextProps.isUpdatingUser === false && this.props.isUpdatingUser === true && nextProps.updateUserError === false) ||
+      (nextProps.isCreatingUser === false && this.props.isCreatingUser === true && nextProps.createUserError === false)
+    ) {
+      this.setState({
+        showSubmitSuccess: true
+      }, () => {
+        setTimeout(() => {
+          this.setState({
+            showSubmitSuccess: false
+          })
+        }, 2000)
+      })
+    }
   }
 
   buildEditableUser = editedUser => {
@@ -211,6 +234,16 @@ class UserAdministrator extends Component {
     })
   }
 
+  getSubmitState () {
+    if (this.state.showSubmitSuccess === true) {
+      return 'success'
+    }
+
+    if (this.props.isCreatingUser === true || this.props.isUpdatingUser) {
+      return 'loading'
+    }
+  }
+
   render () {
     const { user } = this.props
     const isPasswordChangeInvalid = this.isPasswordValid() === false && user.confirmPassword !== undefined
@@ -323,7 +356,7 @@ class UserAdministrator extends Component {
             </fieldset>
           </div>
           <div className="UserAdministrator__form-actions">
-            <Button type="submit">
+            <Button state={this.getSubmitState()} type="submit">
               {this.isCreatingNewUser() ? 'Create User' : 'Save Edits' }
             </Button>
             {this.isCreatingNewUser() === false && (
@@ -346,7 +379,9 @@ export default connect(state => ({
   loadUsersError: state.users.loadUsersError,
   authorizedUserId: state.auth.user.id,
   updateUserError: state.users.updateUserError,
-  updateUserErrorMessage: state.users.updateUserErrorMessage
+  updateUserErrorMessage: state.users.updateUserErrorMessage,
+  isUpdatingUser: state.users.isUpdatingUser,
+  isCreatingUser: state.users.isCreatingUser
 }), dispatch => ({
   actions: bindActionCreators({
     disableUser,
