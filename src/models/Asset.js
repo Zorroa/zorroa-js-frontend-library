@@ -80,18 +80,6 @@ export default class Asset {
 
   tinyProxy () { return (this.document.proxies && (this.document.proxies ? this.document.proxies.tinyProxy : null)) }
 
-  isContainer () {
-    const containerMediaTypes = [
-      'zorroa/x-flipbook'
-    ]
-
-    return (
-      this.document.source &&
-      this.document.source.mediaType &&
-      containerMediaTypes.includes(this.document.source.mediaType)
-    ) === true
-  }
-
   isContainedByParent () {
     const containerTypes = [
       'flipbook'
@@ -219,10 +207,6 @@ export default class Asset {
   }
 
   parentId () {
-    if (this.isContainer()) {
-      return this.id
-    }
-
     if (!this.document.media || !this.document.media.clip) return null
     return this.document.media.clip.parent
   }
