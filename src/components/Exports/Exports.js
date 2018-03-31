@@ -34,6 +34,7 @@ import ExportPreviewerCsv from './Previewers/Csv'
 import ExportsPreview from './ExportsPreview'
 import { Save as IconSave } from '../Icons'
 import { JobFilter } from '../../models/Job'
+import moment from 'moment'
 
 const SHOW_SUCCESS_MS = 2750
 
@@ -146,7 +147,7 @@ class Exports extends Component {
 
     this.state = {
       ...this.defaultProcessors,
-      fileName: props.packageName || 'zorroa-export',
+      fileName: `zorroa-export-${moment().format('YYYYMMDD')}-${props.packageName || 'untitled'}-${moment().format('x')}`,
       showPresetForm: false,
       visibleExporter: 'ZipExportPackager',
       presetId: undefined,
