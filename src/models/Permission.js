@@ -7,6 +7,8 @@ export default class Permission {
   static Administrator = 'administrator'
   static Everyone = 'everyone'
   static Share = 'share'
+  static Librarian = 'librarian'
+  static Export = 'export'
 
   constructor (json) {
     this.id = json.id

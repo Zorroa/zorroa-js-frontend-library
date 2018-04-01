@@ -42,6 +42,7 @@ class Exports extends Component {
   static propTypes = {
     name: PropTypes.string,
     userEmail: PropTypes.string.isRequired,
+    userFullName: PropTypes.string.isRequired,
     userId: PropTypes.string.isRequired,
     assetSearch: PropTypes.instanceOf(AssetSearch),
     hasRestrictedAssets: PropTypes.bool.isRequired,
@@ -53,6 +54,7 @@ class Exports extends Component {
     selectedAssets: PropTypes.arrayOf(
       PropTypes.instanceOf(Asset)
     ),
+    metadataFields: PropTypes.arrayOf(PropTypes.string).isRequired,
     errorMessage: PropTypes.string,
     isLoading: PropTypes.bool.isRequired,
     exportProfilesPostingError: PropTypes.bool.isRequired,
@@ -118,18 +120,22 @@ class Exports extends Component {
         arguments: {
           quality: 'medium',
           exportImages: true,
-          exportMovie: true,
+          exportMovies: true,
           frameRate: 30
         },
         shouldExport: true,
         flipbookExportType: 'image'
       },
       CsvExporter: {
-        arguments: {},
+        arguments: {
+          fields: props.metadataFields
+        },
         shouldExport: true
       },
       JsonExporter: {
-        arguments: {},
+        arguments: {
+          fields: props.metadataFields
+        },
         shouldExport: true
       },
       VideoClipExporter: {
@@ -328,6 +334,11 @@ class Exports extends Component {
     }))
   }
 
+  canRequestExport () {
+    const folderId = this.getExportFolderId()
+    return folderId !== undefined
+  }
+
   startExportRequest = () => {
     const folderId = this.getExportFolderId()
     const email = this.props.userEmail
@@ -335,7 +346,7 @@ class Exports extends Component {
 
     // Export Request from [user's first name] for [folder name]
     // CAUTION: Sometimes the root folder ID can be 0, so strict type checking is called for here
-    if (folderId !== undefined) {
+    if (this.canRequestExport()) {
       this.props.actions.exportRequest({
         folderId,
         type: 'Export',
@@ -604,7 +615,12 @@ class Exports extends Component {
               <div className="Exports__form-footer">
                 <div className="Exports__main-form-buttons Exports__main-form-buttons--visible">
                   <div className="Exports__form-button-group">
-                    <FormButton state={this.getExportRequestState()} onClick={this.startExportRequest}>
+                    <FormButton
+                      title={this.canRequestExport() ? '' : 'Only folders can be exported'}
+                      disabled={this.canRequestExport() === false}
+                      state={this.getExportRequestState()}
+                      onClick={this.startExportRequest}
+                    >
                       Request Export
                     </FormButton>
                     <FormButton look="minimal" onClick={this.close}>
@@ -658,6 +674,7 @@ export default connect(state => ({
   onlineAssets: state.exports.onlineAssets,
   offlineAssets: state.exports.offlineAssets,
   errorMessage: state.exports.errorMessage,
+  metadataFields: state.app.userSettings.metadataFields,
   maxExportableAssets: parseInt(state.archivist.settings['archivist.export.maxAssetCount'].currentValue, 10)
 }), dispatch => ({
   actions: bindActionCreators({

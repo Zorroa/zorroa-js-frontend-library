@@ -14,7 +14,6 @@ import { archivistGet, archivistPost, archivistRequest } from './authAction'
 import Processor from '../models/Processor'
 import { selectId } from '../services/jsUtil'
 import api from '../api'
-import downloadjs from 'downloadjs'
 import getFile from '../services/getFile'
 
 const jobEndpoint = '/api/v1/jobs'
@@ -136,19 +135,10 @@ export function downloadFilesForJob (jobId, origin) {
         return Promise.all(files.map(file => {
           const {
             jobId,
-            id,
-            mimeType,
-            name
+            id
           } = file
           const downloadUrl = `${origin}/api/v1/exports/${jobId}/_files/${id}/_stream`
-
-          return getFile(downloadUrl).then(downloadedFile => {
-            downloadjs(
-              downloadedFile,
-              name,
-              mimeType
-            )
-          })
+          window.open(downloadUrl, '_blank')
         }))
       })
       .then(() => {

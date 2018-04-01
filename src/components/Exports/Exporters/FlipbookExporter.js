@@ -15,7 +15,7 @@ export default class FlipbookExporter extends Component {
     arguments: PropTypes.shape({
       quality: PropTypes.number.isRequired,
       exportImages: PropTypes.bool.isRequired,
-      exportMovie: PropTypes.bool.isRequired,
+      exportMovies: PropTypes.bool.isRequired,
       frameRate: PropTypes.number.isRequired
     })
   }
@@ -28,7 +28,7 @@ export default class FlipbookExporter extends Component {
     // Exporter arguments
     quality: this.props.arguments.quality,
     exportImages: this.props.arguments.exportImages,
-    exportMovie: this.props.arguments.exportMovie,
+    exportMovies: this.props.arguments.exportMovies,
     frameRate: this.props.arguments.frameRate
   }
 
@@ -38,7 +38,7 @@ export default class FlipbookExporter extends Component {
       nextProps.arguments.quality !== this.state.quality ||
       nextProps.arguments.frameRate !== this.state.frameRate ||
       nextProps.arguments.exportImages !== this.state.exportImages ||
-      nextProps.arguments.exportMovie !== this.state.exportMovie
+      nextProps.arguments.exportMovies !== this.state.exportMovies
     ) {
       newState.arguments = nextProps.arguments
     }
@@ -58,7 +58,7 @@ export default class FlipbookExporter extends Component {
             arguments: {
               quality: this.state.quality,
               exportImages: this.state.exportImages,
-              exportMovie: this.state.exportMovie,
+              exportMovies: this.state.exportMovies,
               frameRate: this.state.frameRate
             },
             shouldExport: this.state.shouldExport
@@ -81,17 +81,17 @@ export default class FlipbookExporter extends Component {
 
     if (argumment === 'image') {
       options.exportImages = true
-      options.exportMovie = false
+      options.exportMovies = false
     }
 
     if (argumment === 'movie') {
       options.exportImages = false
-      options.exportMovie = true
+      options.exportMovies = true
     }
 
     if (argumment === 'all') {
       options.exportImages = true
-      options.exportMovie = true
+      options.exportMovies = true
     }
 
     this.onChange(options)

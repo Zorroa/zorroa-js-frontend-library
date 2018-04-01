@@ -206,7 +206,13 @@ class Jobs extends Component {
                    className={classnames('Jobs-job', {isSelected: selectedJobIds.has(job.id), isSelectable: isolateJob || selectJob})}
                    onClick={e => selectJob && selectJob(job, e)}
                    onDoubleClick={_ => isolateJob && isolateJob(job)}>
-                <div className="Jobs-job-name" style={{width: '50%', maxWidth: '50%'}}>{job.name}</div>
+                <div
+                  title={job.name}
+                  className="Jobs-job-name"
+                  style={{width: '50%', maxWidth: '50%'}}
+                >
+                  {job.name}
+                </div>
                 <div
                   className="Jobs-job-date"
                   title={epochUTCString(job.timeStarted)}

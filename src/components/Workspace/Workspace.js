@@ -69,6 +69,7 @@ class Workspace extends Component {
     isManager: PropTypes.bool,
     isDeveloper: PropTypes.bool,
     isSharer: PropTypes.bool,
+    isExporter: PropTypes.bool.isRequired,
     monochrome: PropTypes.bool,
     showQuickview: PropTypes.bool.isRequired
   }
@@ -331,9 +332,21 @@ class Workspace extends Component {
   }
 
   render () {
-    const { app, isolatedId, selectedAssetIds, user, showExportsWizard,
-      isAdministrator, isManager, isDeveloper, isSharer,
-      searching, monochrome, isolatedJob, showQuickview } = this.props
+    const {
+      app,
+      isolatedId,
+      selectedAssetIds,
+      user,
+      showExportsWizard,
+      isAdministrator,
+      isManager,
+      isDeveloper,
+      isExporter,
+      searching,
+      monochrome,
+      isolatedJob,
+      showQuickview
+    } = this.props
 
     const LibraryParams = () => ({
       header: (<span>Library</span>),
@@ -433,7 +446,7 @@ class Workspace extends Component {
                 <ImportJobs/>
               </Collapsible>
             )}
-            { (isAdministrator || isManager || isDeveloper || isSharer) && (
+            { (isAdministrator || isManager || isDeveloper || isExporter || isAdministrator) && (
               <Collapsible {...ExportJobsParams()}>
                 <ExportJobs/>
               </Collapsible>
@@ -514,6 +527,7 @@ export default connect(state => ({
   isManager: state.auth.isManager,
   isDeveloper: state.auth.isDeveloper,
   isSharer: state.auth.isSharer,
+  isExporter: state.auth.isExporter,
   monochrome: state.app.monochrome,
   showExportsWizard: state.exports.shouldShow
 }), dispatch => ({
