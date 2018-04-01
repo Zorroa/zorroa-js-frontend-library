@@ -43,6 +43,7 @@ class Jobs extends Component {
   monitorJobsInterval = null
 
   componentDidMount () {
+    this.refreshJobs()
     this.monitorJobsInterval = setInterval(this.monitorJobs, 5000)
   }
 
