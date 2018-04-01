@@ -262,7 +262,7 @@ class Explorer extends Component {
   renderField (field, namespace, name, depth, hasChildren, isOpen, isSelected, isFavorite, widgetIcon, order) {
     const { fieldTypes } = this.props
     const fieldType = fieldTypes[field]
-    const sortableTypes = [ 'string', 'keywords-auto', 'long', 'double', 'integer', 'date' ]
+    const sortableTypes = [ 'string', 'keywords', 'long', 'double', 'integer', 'date' ]
     const isLeaf = this.isLeaf(field, namespace)
     const isSortable = isLeaf && sortableTypes.findIndex(type => (type === fieldType)) >= 0
     const itemClass = namespace.replace('.', '-')

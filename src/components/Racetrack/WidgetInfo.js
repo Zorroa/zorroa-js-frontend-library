@@ -28,7 +28,7 @@ export const SimpleSearchWidgetInfo = {
   title: 'Search',
   description: 'Fuzzy text search on keywords or specific fields',
   create: createSearchWidget,
-  fieldTypes: [ 'string', 'keywords-auto' ],
+  fieldTypes: [ 'string', 'keywords' ],
   color: '#77804d'
 }
 
@@ -39,7 +39,7 @@ export const FacetWidgetInfo = {
   description: 'Match keywords and specific values for specific fields',
   element: <Facet/>,
   create: createFacetWidget,
-  fieldTypes: [ 'string', 'keywords-auto', 'long', 'double', 'integer', 'date', 'boolean' ],
+  fieldTypes: [ 'string', 'keywords', 'long', 'double', 'integer', 'date', 'boolean' ],
   color: '#824196'
 }
 
