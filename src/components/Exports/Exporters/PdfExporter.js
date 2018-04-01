@@ -15,10 +15,7 @@ export default class PdfExporter extends Component {
     shouldExport: PropTypes.bool.isRequired,
     format: PropTypes.string.isRequired,
     arguments: PropTypes.shape({
-      mediaType: PropTypes.string.isRequired,
       pageMode: PropTypes.string.isRequired,
-      size: PropTypes.number.isRequired,
-      quality: PropTypes.number.isRequired,
       exportOriginal: PropTypes.bool.isRequired
     })
   }
@@ -29,10 +26,7 @@ export default class PdfExporter extends Component {
     format: this.props.format,
 
     // Arguments
-    size: this.props.arguments.size,
-    quality: this.props.arguments.quality,
     exportOriginal: this.props.arguments.exportOriginal,
-    mediaType: this.props.arguments.mediaType,
     pageMode: this.props.arguments.pageMode
   }
 
@@ -40,10 +34,7 @@ export default class PdfExporter extends Component {
     const newState = {}
 
     if (
-      nextProps.arguments.size !== this.state.size ||
-      nextProps.arguments.quality !== this.state.quality ||
       nextProps.arguments.exportOriginal !== this.state.exportOriginal ||
-      nextProps.arguments.mediaType !== this.state.mediaType ||
       nextProps.arguments.pageMode !== this.state.pageMode
     ) {
       newState.arguments = nextProps.arguments
@@ -61,7 +52,6 @@ export default class PdfExporter extends Component {
   }
 
   onFormatChange = format => {
-    let mediaType = 'pdf'
     let pageMode = 'merge'
 
     if (format === 'singlepage') {
@@ -69,9 +59,7 @@ export default class PdfExporter extends Component {
     }
 
     this.onChange({
-      mediaType,
-      pageMode,
-      format
+      pageMode
     }, false)
   }
 
@@ -85,9 +73,6 @@ export default class PdfExporter extends Component {
         this.props.onChange({
           PdfExporter: {
             arguments: {
-              size: this.state.size,
-              quality: this.state.quality,
-              mediaType: this.state.mediaType,
               pageMode: this.state.pageMode,
               exportOriginal: this.state.exportOriginal
             },
@@ -111,28 +96,14 @@ export default class PdfExporter extends Component {
   }
 
   render () {
-    const qualityOptions = [
-      {
-        label: 'Best',
-        value: 100
-      }, {
-        label: 'Good',
-        value: 75
-      },
-      {
-        label: 'Fast',
-        value: 50
-      }
-    ]
-
     const formatOptions = [
       {
         label: 'Combined PDF',
-        value: 'multipage'
+        value: 'merge'
       },
       {
         label: 'Single PDFs',
-        value: 'singlepage'
+        value: 'seperate'
       }
     ]
 
@@ -163,28 +134,10 @@ export default class PdfExporter extends Component {
               options={formatOptions}
               fieldLabel='label'
               fieldKey='value'
-              value={this.state.format}
+              value={this.state.pageMode}
               onChange={({value}) => this.onFormatChange(value)}
             />
           </FormLabel>
-          <FormLabel
-            vertical
-            label="Quality"
-            className="Exports__form-element Exports__form-element--nested"
-          >
-            <FormSelect
-              className="Exports__form-select"
-              options={qualityOptions}
-              fieldLabel='label'
-              fieldKey='value'
-              value={this.state.quality}
-              onChange={({value}) => this.onChange({quality: value}, false)}
-            />
-          </FormLabel>
-          <ResizeExportAsset
-            defaultSize={this.state.size}
-            onChange={(size) => this.onChange({size}, false)}
-          />
         </radiogroup>
       </ExportsSection>
     )

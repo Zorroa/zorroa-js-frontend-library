@@ -207,7 +207,11 @@ class Jobs extends Component {
                    onClick={e => selectJob && selectJob(job, e)}
                    onDoubleClick={_ => isolateJob && isolateJob(job)}>
                 <div className="Jobs-job-name" style={{width: '50%', maxWidth: '50%'}}>{job.name}</div>
-                <div className="Jobs-job-date" style={{width: '25%', maxWidth: '25%'}}>{epochUTCString(job.timeStarted)}</div>
+                <div
+                  className="Jobs-job-date"
+                  title={epochUTCString(job.timeStarted)}
+                  style={{width: '25%', maxWidth: '25%'}}
+                >{epochUTCString(job.timeStarted)}</div>
                 { this.renderStatus(job) }
               </div>
             )) }

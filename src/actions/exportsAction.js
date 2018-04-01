@@ -209,6 +209,18 @@ export function updateExportInterface ({
         terms: {
           field: 'source.extension'
         }
+      },
+      clipType: {
+        terms: {
+          field: 'media.clip.type'
+        },
+        aggs: {
+          parent: {
+            terms: {
+              field: 'media.clip.parent.raw'
+            }
+          }
+        }
       }
     }
 
@@ -250,6 +262,12 @@ export function updateExportInterface ({
           exportPreviewAssets: assets,
           hasRestrictedAssets: availableSearchAssets >= totalAssetCount,
           totalAssetCount,
+          clipParentCounts: {
+            type: aggregations.clipType.buckets.reduce((accumulator, bucket) => {
+              accumulator[bucket.key] = bucket.parent.buckets.length
+              return accumulator
+            }, {})
+          },
           documentCounts: {
             extension: aggregations.extension.buckets.reduce((accumulator, bucket) => {
               accumulator[bucket.key] = bucket.doc_count

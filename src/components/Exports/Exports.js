@@ -108,10 +108,7 @@ class Exports extends Component {
       },
       PdfExporter: {
         arguments: {
-          size: 1200,
-          quality: 100,
           exportOriginal: true,
-          mediaType: 'pdf',
           pageMode: 'merge'
         },
         shouldExport: true,
@@ -119,9 +116,9 @@ class Exports extends Component {
       },
       FlipbookExporter: {
         arguments: {
-          quality: 100,
+          quality: 'medium',
           exportImages: true,
-          exportMovies: true,
+          exportMovie: true,
           frameRate: 30
         },
         shouldExport: true,
@@ -137,8 +134,9 @@ class Exports extends Component {
       },
       VideoClipExporter: {
         arguments: {
-          resolution: '960:540',
+          scale: '960:540',
           quality: 'medium',
+          format: 'mp4',
           exportOriginal: true
         },
         shouldExport: true
@@ -333,13 +331,15 @@ class Exports extends Component {
   startExportRequest = () => {
     const folderId = this.getExportFolderId()
     const email = this.props.userEmail
+    const fullName = this.props.userFullName
 
+    // Export Request from [user's first name] for [folder name]
     // CAUTION: Sometimes the root folder ID can be 0, so strict type checking is called for here
     if (folderId !== undefined) {
       this.props.actions.exportRequest({
         folderId,
         type: 'Export',
-        comment: `${email} has requested an export of folder ID ${folderId}.`,
+        comment: `${fullName} (${email}) has requested an export of "${this.props.packageName}" (folder ID: ${folderId}).`,
         emailCC: email
       })
 
@@ -512,11 +512,11 @@ class Exports extends Component {
                       />
                     )
 
-                  case 'VideoClipExporter':
+                  case 'VideoExporter':
                     return (
                       <ExportPreviewerVideoClip
                         key={key}
-                        movieAssetCount={this.props.videoAssetCount}
+                        videoAssetCount={this.props.videoAssetCount}
                         exporterArguments={processor.args}
                       />
                     )
@@ -631,6 +631,7 @@ class Exports extends Component {
 
 export default connect(state => ({
   userEmail: state.auth.user.email,
+  userFullName: (`${state.auth.user.firstName} ${state.auth.user.lastName}`).trim() || state.auth.user.email.split('@')[0],
   userId: state.auth.user.id,
   assetSearch: state.exports.assetSearch,
   hasRestrictedAssets: state.exports.hasRestrictedAssets,

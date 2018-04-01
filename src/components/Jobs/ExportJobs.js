@@ -36,6 +36,7 @@ class ExportJobs extends Component {
     }
 
     this.props.actions.updateExportInterface({
+      packageName: '',
       assetSearch,
       permissionIds: this.props.user.permissions.map(permission => permission.id)
     })

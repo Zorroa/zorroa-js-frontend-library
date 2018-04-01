@@ -64,7 +64,7 @@ export const initialState = {
   // State for asset search previews and statistics
   exportPreviewAssets: [],
   imageAssetCount: 0,
-  movieAssetCount: 0,
+  videoAssetCount: 0,
   flipbookAssetCount: 0,
   documentAssetCount: 0,
   totalAssetCount: 0,
@@ -118,7 +118,7 @@ export default function (state = initialState, action) {
         hasRestrictedAssets,
         imageAssetCount: assetGroupCounts[FILE_GROUP_IMAGES] || 0,
         videoAssetCount: assetGroupCounts[FILE_GROUP_VIDEOS] || 0,
-        flipbookAssetCount: 0, // TODO: Figure out how to count Flipbooks (or rather count clips by type)
+        flipbookAssetCount: action.payload.clipParentCounts.type.flipbook || 0,
         documentAssetCount: assetGroupCounts[FILE_GROUP_DOCUMENTS] || 0,
         totalAssetCount
       }

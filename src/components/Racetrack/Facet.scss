@@ -65,8 +65,8 @@
     overflow-y: auto;
 
     .Facet-value-table-row:nth-child(odd) {
-      background-color: $zorroa-nearwhite;
-      .dark & { background-color: $zorroa-mattblack; }
+      background-color: $zorroa-color-gray-light-2;
+      .dark & { background-color: $zorroa-color-gray-dark-2; }
     }
 
     .Facet-value-table-row {
@@ -79,7 +79,7 @@
         .dark & { background-color: $zorroa-dark-hover; }
       }
       &.selected {
-        background-color: $zorroa-selected;
+        background-color: $zorroa-color-gray-dark-3;
         .dark & { background-color: $zorroa-dark-selected; }
       }
     }

@@ -16,12 +16,12 @@ export default function ExportPreviewerFlipbook (props) {
             {flipbookAssetCount.toLocaleString()} {pluralize(flipbookAssetCount, 'asset', 'assets')}
           </span>
           <span>
-            Export as: {(({exportImages, exportMovies}) => {
-              if (exportImages && exportMovies) {
+            Export as: {(({exportImages, exportMovie}) => {
+              if (exportImages && exportMovie) {
                 return 'Movie and Image Files'
               }
 
-              if (exportMovies) {
+              if (exportMovie) {
                 return 'Movie Files'
               }
 
@@ -34,7 +34,7 @@ export default function ExportPreviewerFlipbook (props) {
             Quality: {articulateQuality(exporterArguments.quality)}
           </span>
           <span>
-            Frame Rate: {exporterArguments.frameRate}
+            Frame Rate: {exporterArguments.frameRate.toLocaleString()}
           </span>
         </dd>
       )}
@@ -50,9 +50,9 @@ export default function ExportPreviewerFlipbook (props) {
 ExportPreviewerFlipbook.propTypes = {
   flipbookAssetCount: PropTypes.number.isRequired,
   exporterArguments: PropTypes.shape({
-    quality: PropTypes.string.isRequired,
-    size: PropTypes.number.isRequired,
+    quality: PropTypes.number.isRequired,
+    frameRate: PropTypes.number.isRequired,
     exportImages: PropTypes.bool.isRequired,
-    exportMovies: PropTypes.bool.isRequired
+    exportMovie: PropTypes.bool.isRequired
   }).isRequired
 }

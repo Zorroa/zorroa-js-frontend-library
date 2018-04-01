@@ -13,7 +13,7 @@ export default class VideoClipExporter extends Component {
     isOpen: PropTypes.bool,
     shouldExport: PropTypes.bool.isRequired,
     arguments: PropTypes.shape({
-      resolution: PropTypes.string.isRequired,
+      scale: PropTypes.string.isRequired,
       quality: PropTypes.string.isRequired,
       format: PropTypes.string.isRequired,
       exportOriginal: PropTypes.bool.isRequired
@@ -25,7 +25,7 @@ export default class VideoClipExporter extends Component {
     shouldExport: this.props.shouldExport,
 
     // Arguments
-    resolution: this.props.arguments.resolution,
+    scale: this.props.arguments.scale,
     quality: this.props.arguments.quality,
     format: this.props.arguments.format,
     exportOriginal: this.props.arguments.exportOriginal
@@ -35,7 +35,7 @@ export default class VideoClipExporter extends Component {
     const newState = {}
 
     if (
-      nextProps.arguments.resolution !== this.state.resolution ||
+      nextProps.arguments.scale !== this.state.scale ||
       nextProps.arguments.quality !== this.state.quality ||
       nextProps.arguments.exportOriginal !== this.state.exportOriginal ||
       nextProps.arguments.format !== this.state.format
@@ -60,7 +60,7 @@ export default class VideoClipExporter extends Component {
         this.props.onChange({
           VideoClipExporter: {
             arguments: {
-              resolution: this.state.resolution,
+              scale: this.state.scale,
               quality: this.state.quality,
               format: this.state.format,
               exportOriginal: this.state.exportOriginal
@@ -98,7 +98,7 @@ export default class VideoClipExporter extends Component {
         value: 'fast'
       }
     ]
-    const resolutionOptions = [
+    const scaleOptions = [
       {
         label: '540p - Standard',
         value: '960:540'
@@ -157,11 +157,11 @@ export default class VideoClipExporter extends Component {
           >
             <FormSelect
               className="Exports__form-select"
-              options={resolutionOptions}
+              options={scaleOptions}
               fieldLabel='label'
               fieldKey='value'
-              value={this.state.resolution}
-              onChange={({value}) => this.onChange({resolution: value}, false)}
+              value={this.state.scale}
+              onChange={({value}) => this.onChange({scale: value}, false)}
             >
             </FormSelect>
           </FormLabel>

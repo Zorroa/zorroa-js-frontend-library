@@ -6,32 +6,32 @@ import {
 
 export default function ExportPreviewerVideoClip (props) {
   const {
-    movieAssetCount,
+    videoAssetCount,
     exporterArguments
   } = props
 
   return (
     <dl className="Exports__review-section">
       <dt className="Exports__review-term">Movie Assets</dt>
-      {exporterArguments.exportOriginal === false && movieAssetCount > 0 && (<dd className="Exports__review-definition">
+      {exporterArguments.exportOriginal === false && videoAssetCount > 0 && (<dd className="Exports__review-definition">
         <span>
-          {movieAssetCount.toLocaleString()} {pluralize(movieAssetCount, 'asset', 'assets')}
+          {videoAssetCount.toLocaleString()} {pluralize(videoAssetCount, 'asset', 'assets')}
         </span>
         <span>
           Quality: {articulateQuality(exporterArguments.quality)}
         </span>
         <span>
-          Resolution: {exporterArguments.resolution.replace(':', '×')}
+          Resolution: {exporterArguments.scale.replace(':', '×')}
         </span>
       </dd>)}
-      {exporterArguments.exportOriginal === true && movieAssetCount > 0 && (
+      {exporterArguments.exportOriginal === true && videoAssetCount > 0 && (
         <dd className="Exports__review-definition">
           <span>
-            Export {movieAssetCount.toLocaleString()} original source {pluralize(movieAssetCount, 'file', 'files')}
+            Export {videoAssetCount.toLocaleString()} original source {pluralize(videoAssetCount, 'file', 'files')}
           </span>
         </dd>
       )}
-      {movieAssetCount === 0 && (<dd className="Exports__review-definition">
+      {videoAssetCount === 0 && (<dd className="Exports__review-definition">
         None
       </dd>)}
     </dl>
@@ -39,11 +39,11 @@ export default function ExportPreviewerVideoClip (props) {
 }
 
 ExportPreviewerVideoClip.propTypes = {
-  movieAssetCount: PropTypes.number.isRequired,
+  videoAssetCount: PropTypes.number.isRequired,
   exporterArguments: PropTypes.shape({
     format: PropTypes.string.isRequired,
-    quality: PropTypes.number.isRequired,
+    quality: PropTypes.string.isRequired,
     aspectRatio: PropTypes.string,
-    resolution: PropTypes.number.isRequired
+    scale: PropTypes.string.isRequired
   }).isRequired
 }
