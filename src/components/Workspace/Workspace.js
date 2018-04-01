@@ -428,7 +428,7 @@ class Workspace extends Component {
             <Collapsible {...MetadataParams()}>
               <Metadata assetIds={selectedAssetIds} height="60vh" dark={monochrome} />
             </Collapsible>
-            { (isAdministrator || isManager || isDeveloper) && (
+            { /* disable imports */ false && (isAdministrator || isManager || isDeveloper) && (
               <Collapsible {...ImportJobsParams()}>
                 <ImportJobs/>
               </Collapsible>
@@ -472,14 +472,16 @@ class Workspace extends Component {
         {/*
           The following items are all position:fixed and full-screen,
           their order may not matter in theory. Having modals last might be good though.
-        */}
 
-        <div className={classnames('App-dropzone', {isDroppable})}
-             onDragOver={this.dragOver}
-             onDragLeave={this.dragLeave}
-             onDrop={this.createLocalImport}>
-          Drop Assets to Import
-        </div>
+          Disable local upload until we can set a pipeline.
+
+          <div className={classnames('App-dropzone', {isDroppable})}
+               onDragOver={this.dragOver}
+               onDragLeave={this.dragLeave}
+               onDrop={this.createLocalImport}>
+            Drop Assets to Import
+          </div>
+        */}
 
         { isolatedId && showQuickview === false && <Lightbox/> }
         { isolatedId && showQuickview === true && <Quickview/>}
