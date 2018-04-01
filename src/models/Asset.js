@@ -219,9 +219,13 @@ export default class Asset {
     return this.document.media.clip.type
   }
 
+  folders () {
+    return this.document && this.document.zorroa && this.document.zorroa.links && this.document.zorroa.links.folder
+  }
+
   // Returns true if the asset is in any of the folder ids
   memberOfAnyFolderIds (folderIds) {
-    const folders = this.document && this.document.links && this.document.links.folder
+    const folders = this.folders()
     if (!folders || !folders.length) return false
     for (const folderId of folderIds) {
       const index = folders.findIndex(id => (id === folderId))
@@ -232,7 +236,7 @@ export default class Asset {
 
   // Returns true if the asset is in all of the folder ids
   memberOfAllFolderIds (folderIds) {
-    const folders = this.document && this.document.links && this.document.links.folder
+    const folders = this.folders()
     if (!folders || !folders.length) return false
     for (const folderId of folderIds) {
       const index = folders.findIndex(id => (id === folderId))
@@ -242,23 +246,24 @@ export default class Asset {
   }
 
   addFolderIds (folderIds) {
-    const folders = this.document && this.document.links && this.document.links.folder
+    const folders = this.folders()
     if (!folders || !folders.length) {
-      if (!this.document.links) this.document.links = {}
-      this.document.links.folder = [...folderIds]
+      if (!this.document.zorroa) this.document.zorroa = {}
+      if (!this.document.zorroa.links) this.document.zorroa.links = {}
+      this.document.zorroa.links.folder = [...folderIds]
     } else {
       const newFolderIds = new Set([...folderIds])
       folderIds.forEach(id => newFolderIds.add(id))
-      this.document.links.folder = [...newFolderIds]
+      this.document.zorroa.links.folder = [...newFolderIds]
     }
   }
 
   removeFolderIds (folderIds) {
-    const folders = this.document && this.document.links && this.document.links.folder
+    const folders = this.folders()
     if (folders && folders.length) {
       const newFolderIds = new Set([...folders])
       folderIds.forEach(id => newFolderIds.delete(id))
-      this.document.links.folder = [...newFolderIds]
+      this.document.zorroa.links.folder = [...newFolderIds]
     }
   }
 
