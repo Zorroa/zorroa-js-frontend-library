@@ -2,6 +2,14 @@ import React, { Component, PropTypes } from 'react'
 import CanvasImage from '../CanvasImage'
 import { PubSub } from '../../services/jsUtil'
 
+function resize (srcWidth, srcHeight, maxWidth, maxHeight) {
+  const ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight)
+  return {
+    width: Math.round(srcWidth * ratio * 100) / 100,
+    height: Math.round(srcHeight * ratio * 100) / 100
+  }
+};
+
 export default class FlipbookViewer extends Component {
   static propTypes = {
     frames: PropTypes.arrayOf(PropTypes.shape({
@@ -30,6 +38,8 @@ export default class FlipbookViewer extends Component {
       <div className="FlipbookStrip" ref={ (element) => { this.element = element } }>
         <div className="FlipbookStrip__container">
           { frames.map(frame => {
+            const size = resize(frame.imageBitmap.width, frame.imageBitmap.height, 1000, 200)
+
             return (
               <CanvasImage
                 key={`${frame.number}-${frame.url}`}
@@ -37,6 +47,8 @@ export default class FlipbookViewer extends Component {
                 className="FlipbookStrip__frame-canvas"
                 image={frame.imageBitmap}
                 size="cover"
+                height={size.height}
+                width={size.width}
               />
             )
           }) }
