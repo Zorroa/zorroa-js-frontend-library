@@ -59,11 +59,13 @@ describe('Jobs', function () {
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.assets-footer'), 15000))
   })
 
-  it('open import panel', function () {
+  // 4/1/2018: Disable for ARL release without Import panel or DnD
+  xit('open import panel', function () {
     return openJobsPanel('Import')
   })
 
-  it('select an import and clear its widget', function () {
+  // 4/1/2018: Disable for ARL release without Import panel or DnD
+  xit('select an import and clear its widget', function () {
     return driver.then(_ => openJobsPanel('Import'))
       .then(_ => { DEBUG && console.log('Find the base import') })
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Jobs-job')))

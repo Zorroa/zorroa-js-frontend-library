@@ -5,7 +5,6 @@ import {
   FormRadio
 } from '../../Form'
 import ExportsSection from '../ExportsSection'
-import ResizeExportAsset from '../ResizeExportAsset'
 
 export default class PdfExporter extends Component {
   static propTypes = {

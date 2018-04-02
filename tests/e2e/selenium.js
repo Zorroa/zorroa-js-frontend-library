@@ -95,7 +95,7 @@ const USE_GRID = (ZORROA_GRID_PORT !== undefined)
 export const BASE_URL = USE_GRID ? `http://10.8.0.1:${ZORROA_GRID_PORT}` : 'http://localhost:8080'
 
 // let selenium tests run. jest's default is an unreasonable 5 seconds
-jasmine.DEFAULT_TIMEOUT_INTERVAL = (DEBUG && !USE_SAUCE) ? 120000 : 180000
+jasmine.DEFAULT_TIMEOUT_INTERVAL = (DEBUG && !USE_SAUCE) ? 180000 : 200000
 
 var allTestsPassed = true
 var failedTests = []
@@ -126,7 +126,7 @@ var suite = null
 export var driver = null
 
 const browserDriverConfig = {
-  chrome: { driver: 'selenium-webdriver/chrome', pathModule: 'chromedriver' /*, maxSession: 2 */ },
+  chrome: { driver: 'selenium-webdriver/chrome', pathModule: 'chromedriver' },
   firefox: { driver: 'selenium-webdriver/firefox', pathModule: 'geckodriver' }
 }
 
@@ -204,7 +204,7 @@ export function startBrowserAndDriver (_suite) {
 // ----------------------------------------------------------------------
 export function stopBrowserAndDriver () {
   return driver
-  .then(_ => { console.log(`Test ${suite.description} stopping at ${new Date}`) })
+  .then(_ => { console.log(`Test ${suite.description} stopping at ${new Date()}`) })
   .then(_ => driver.sleep(100)) // for my own peace of mind; this helps prevent console.log output from appearing after the test results
   .then(_ => new Promise((resolve, reject) => {
     testStopDate = Date.now()
@@ -423,8 +423,8 @@ export function login () {
   .then(_ => driver.executeScript('console.log(JSON.stringify(window.zorroa))'))
   .then(_ => driver.executeScript('window.zorroa.setSeleniumTesting(true)'))
   .then(_ => driver.findElement(By.css('input[name="username"]')).sendKeys('selenium'))
-  .then(_ => driver.findElement(By.css('input[name="password"]')).sendKeys('z0rr0@12'))
-  .then(_ => driver.findElement(By.css('input[name="host"]')).sendKeys('dev.zorroa.com:8066'))
+  .then(_ => driver.findElement(By.css('input[name="password"]')).sendKeys('ERialOwEaLSP'))
+  .then(_ => driver.findElement(By.css('input[name="host"]')).sendKeys('t39.pool.zorroa.com:8066'))
   .then(_ => driver.findElement(By.css('input[name="ssl"]')).isSelected())
   .then(isSelected => !isSelected && driver.findElement(By.css('input[name="ssl"]')).click())
   .then(_ => driver.findElement(By.css('input[name="eula"]')).isSelected())
@@ -647,7 +647,6 @@ export function getTagNamed (tagName) {
   return driver.then(_ => { DEBUG && (console.log(`getTagNamed ${tagName}`)) })
   .then(_ => driver.findElement(By.xpath(xpath)))
 }
-
 
 // ----------------------------------------------------------------------
 // Get a whole bunch of elements at once.

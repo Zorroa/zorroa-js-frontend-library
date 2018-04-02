@@ -14,7 +14,6 @@ import { archivistGet, archivistPost, archivistRequest } from './authAction'
 import Processor from '../models/Processor'
 import { selectId } from '../services/jsUtil'
 import api from '../api'
-import getFile from '../services/getFile'
 
 const jobEndpoint = '/api/v1/jobs'
 const importEndpoint = '/api/v1/imports'

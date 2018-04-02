@@ -7,9 +7,14 @@ import {
 import Folder from '../models/Folder'
 import TrashedFolder from '../models/TrashedFolder'
 
+const folderId0 = '00000000-0000-0000-0000-000000000000'
+const folderId1 = 'a578c2a1-8d0e-1bfe-902c-12e2e01d3e01'
+const folderId2 = 'a578c2a1-8d0e-1bfe-902c-12e2e01d3e02'
+const folderId3 = 'a578c2a1-8d0e-1bfe-902c-12e2e01d3e00'
+
 describe('foldersReducer', () => {
   it('TOGGLE_FOLDER adds to open folder', () => {
-    const folderId = 3
+    const folderId = folderId1
     const isOpen = true
     let openFolderIds = new Set()
     openFolderIds['add'](folderId)
@@ -18,7 +23,7 @@ describe('foldersReducer', () => {
   })
 
   it('TOGGLE_FOLDER deletes open folder', () => {
-    const folderId = 3
+    const folderId = folderId1
     const isOpen = false
     let openFolderIds = new Set()
     openFolderIds['delete'](folderId)
@@ -29,13 +34,13 @@ describe('foldersReducer', () => {
   it('GET_FOLDER_CHILDREN returns child list', () => {
     let beforeState = createInitialState()
 
-    var child1 = new Folder({ id: 1, name: '1' })
-    var child2 = new Folder({ id: 2, name: '2' })
+    var child1 = new Folder({ id: folderId1, name: '1' })
+    var child2 = new Folder({ id: folderId2, name: '2' })
 
     let afterState = createInitialState()
     afterState.all.set(child1.id, child1)
     afterState.all.set(child2.id, child2)
-    afterState.all.get(0).childIds = new Set([child1.id, child2.id])
+    afterState.all.get(folderId0).childIds = new Set([child1.id, child2.id])
 
     expect(foldersReducer(beforeState,
       {
@@ -46,45 +51,45 @@ describe('foldersReducer', () => {
   })
 
   it('SELECT_FOLDERS adds to selected set', () => {
-    const selectedFolderIds = new Set([1, 3, 5])
+    const selectedFolderIds = new Set([folderId1, folderId2, folderId3])
     expect(foldersReducer({}, { type: SELECT_FOLDERS, payload: selectedFolderIds }))
       .toEqual({ selectedFolderIds })
   })
 
   it('CREATE_FOLDER adds a new folder', () => {
-    const foo = new Folder({ id: 1, name: 'Foo', parentId: 0 })
+    const foo = new Folder({ id: folderId1, name: 'Foo', parentId: folderId0 })
     let afterState = createInitialState()
     afterState.all.set(foo.id, foo)
-    afterState.all.get(0).childIds = new Set([1])
-    afterState.all.get(0).childCount = 1
-    afterState.modifiedIds = new Set([1])
+    afterState.all.get(folderId0).childIds = new Set([folderId1])
+    afterState.all.get(folderId0).childCount = 1
+    afterState.modifiedIds = new Set([folderId1])
     expect(foldersReducer(initialState, { type: CREATE_FOLDER, payload: foo }))
       .toEqual(afterState)
   })
 
   it('UPDATE_FOLDER changes a folder', () => {
-    const foo = new Folder({ id: 1, name: 'Foo', parentId: 0 })
-    const bar = new Folder({ id: 1, name: 'Bar', parentId: 0 })
+    const foo = new Folder({ id: folderId1, name: 'Foo', parentId: folderId0 })
+    const bar = new Folder({ id: folderId1, name: 'Bar', parentId: folderId0 })
     let afterState = createInitialState()
     afterState.all.set(foo.id, foo)
-    afterState.all.get(0).childIds = new Set([1])
-    afterState.all.get(0).childCount = 1
+    afterState.all.get(folderId0).childIds = new Set([folderId1])
+    afterState.all.get(folderId0).childCount = 1
     const nextState = foldersReducer(initialState, { type: CREATE_FOLDER, payload: foo })
     let finalState = createInitialState()
     finalState.all.set(foo.id, bar)
-    finalState.all.get(0).childIds = new Set([1])
-    finalState.all.get(0).childCount = 1
-    finalState.modifiedIds = new Set([1])
+    finalState.all.get(folderId0).childIds = new Set([folderId1])
+    finalState.all.get(folderId0).childCount = 1
+    finalState.modifiedIds = new Set([folderId1])
     expect(foldersReducer(nextState, { type: UPDATE_FOLDER, payload: bar }))
       .toEqual(finalState)
   })
 
   it('DELETE_FOLDER removes a folder', () => {
-    const foo = new Folder({ id: 1, name: 'Foo', parentId: 0 })
+    const foo = new Folder({ id: folderId1, name: 'Foo', parentId: folderId0 })
 
     let beforeState = createInitialState()
     beforeState.all.set(foo.id, foo)
-    beforeState.all.get(0).childIds = new Set([1])
+    beforeState.all.get(folderId0).childIds = new Set([folderId1])
 
     let afterState = createInitialState()
 
@@ -95,25 +100,25 @@ describe('foldersReducer', () => {
 
 describe('folder trash reducer', () => {
   it('TRASHED_FOLDERS returns list of TrashedFolders', () => {
-    const trashedFolders = [ new TrashedFolder({ id: 1, folderId: 2, name: 'foo' }) ]
+    const trashedFolders = [ new TrashedFolder({ id: folderId1, folderId: folderId2, name: 'foo' }) ]
     expect(foldersReducer({}, { type: TRASHED_FOLDERS, payload: trashedFolders }))
       .toEqual({ trashedFolders })
   })
 
   it('EMPTY_FOLDER_TRASH to clear out the trash', () => {
-    const trashedFolders = [ new TrashedFolder({ id: 1, folderId: 2, name: 'foo' }) ]
+    const trashedFolders = [ new TrashedFolder({ id: folderId1, folderId: folderId2, name: 'foo' }) ]
     expect(foldersReducer({trashedFolders}, { type: EMPTY_FOLDER_TRASH, payload: null }))
       .toEqual({ trashedFolders: null })
   })
 
   it('RESTORE_TRASHED_FOLDERS clears parent list and trashedFolders', () => {
-    const parent = new Folder({id: 5, name: 'parent'})
-    const folder = new Folder({id: 3, name: 'foo', parentId: parent.id})
+    const parent = new Folder({id: folderId2, name: 'parent'})
+    const folder = new Folder({id: folderId3, name: 'foo', parentId: parent.id})
     parent.childIds = new Set([folder.id])
     const all = new Map()
     all.set(parent.id, parent)
     all.set(folder.id, folder)
-    const trashedFolder = new TrashedFolder({ id: 7, folderId: folder.id, parentId: parent.id })
+    const trashedFolder = new TrashedFolder({ id: folderId1, folderId: folder.id, parentId: parent.id })
     const trashedFolders = [ trashedFolder ]
     const afterParent = new Folder(parent)
     const afterAll = new Map()
@@ -124,7 +129,7 @@ describe('folder trash reducer', () => {
   })
 
   it('DELETE_TRASHED_FOLDERS nulls out trashedFolders', () => {
-    const trashedFolders = [ new TrashedFolder({ id: 1, folderId: 2, name: 'foo' }) ]
+    const trashedFolders = [ new TrashedFolder({ id: folderId1, folderId: folderId2, name: 'foo' }) ]
     expect(foldersReducer({trashedFolders}, { type: DELETE_TRASHED_FOLDERS, payload: null }))
       .toEqual({ trashedFolders: null })
   })

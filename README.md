@@ -156,29 +156,46 @@ Tips for making testing quicker & easier:
 - `npm test <name>`
   - Runs all tests matching `<name>`. For example: "`npm test home`" will run only homePage.test.js
 
-### Setting up a new dev.zorroa.com
+### Selenium Testing
 
-* provision new archivist
-** ssh ansible@cm.zorroa.com
-** cd ansible
-** ansible-playbook provision-zorroa-archivist
-* change SSL to use dev.zorroa.com not pool in config/application.properties
-** server.ssl.key-store = /opt/zorroa/zorroa-archivist/config/zorroa.p12
-** server.ssl.key-alias = zorroa.com
-* restart server for update
-** sudo systemctl restart zorroa-archivist
-* update password for admin
-* add selenium user
-** selenium@zorroa.com
-** Add developer permissions
-* import /zorroa-data/imageTests/pdf with regular
-** Do this FIRST so those files are at the end of the default sort
-* add Disney pipeline
-* import /zorroa-data/disney/Database
-* Create a dyhi in /Film (not in /Library) with the following fields:
-** Disney.films
-** Disney.characterName
-** Disney.documentType
+We use Selenium to run integration tests that click buttons and test for result conditions.
+Selenium uses an OpenVPN grid called zorroa-shub, which is different than the main zorroa VPN.
+Any machine on this VPN is a potential Selenium grid node. You can start and stop the Selenium
+grid using the scripts in tests/selenium. The scripts in here will copy themselves to a remote
+grid node and start up the driver.
+
+To debug the Selenium grid:
+
+* You can view the status of the Selenium hub with tests/selenium/openHub.sh which opens in your last browser window
+* Start TeamViewer and open up a window on the grid node.
+** The password is in LastPass
+** You can watch tests running on this TeamViewer shell and verify that the driver is loaded
+* First run the tests entirely locally, without using Selenium using `./node_modules/.bin/jest e2e`
+** You can isolate tests by using, e.g. `./node_modules/.bin/jest folder-dnd`
+** You can further isolate tests by skipping them by changing it() to xit()
+* The run the test locally but using the Selenium grid using `npm run test`
+** You can do the same sort of regex scoping as with jest
+* Then run the test on Travis by pushing a commit to GH and checking on https://travis-ci.com/Zorroa/zorroa-js-curator
+
+#### To update the chromium Driver
+
+To update to a new chrome driver after updating Chrome on the grid machines:
+
+* Update tests/selenium/startNode.sh CHROMEDRIVER_VERSION
+* Update package.json
+* Try to shrinkwrap again
+
+The Chromium driver is run after copying startNode.sh to the remote machine and running it.
+On OSX, there should be a gear in the status bar that cycles until the driver is loaded.
+
+#### Configuring t<version>.pool.zorroa.com
+
+The jest testing system uses the repository in, e.g. t39.pool.version.com to run unit tests.
+After importing the standard test repository:
+
+* Add a selenium user with the appropriate password (see tests/e2e/selenium.js)
+* Add a simple import for the selenium user which can just have all the assets.
+* Add the following permissions to the selenium user: administrator, developer
 
 ### Resources for writing tests:
 

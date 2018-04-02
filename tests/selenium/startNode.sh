@@ -7,7 +7,7 @@
 
 SERVER=selenium-server-standalone-3.4.0.jar
 CHROMEDRIVER=chromedriver
-CHROMEDRIVER_VERSION=2.33
+CHROMEDRIVER_VERSION=2.36
 HUB_IP=10.8.0.1
 HUB_PORT=4444
 HUB=http://$HUB_IP:$HUB_PORT
@@ -57,7 +57,7 @@ logfile=selenium-node-$(date "+%Y_%m_%d_%Hh_%Mm_%Ss").log
 # find out how much mem on this system. This is mac specific
 CPU_GH=$(sysctl hw.cpufrequency | awk '{print $2/1000000000}')
 MEM_GB=$(sysctl hw.memsize | awk '{print int($2/1023**3)}')
-MAX_CPU_INSTS=$(( $CPU_GH * $CPU_GH ))
+MAX_CPU_INSTS=$(( $CPU_GH * $CPU_GH  ))
 MAX_MEM_INSTS=$(( $MEM_GB / 2 - 1 ))
 MAX_INSTS=$(( $MAX_CPU_INSTS > $MAX_MEM_INSTS ? $MAX_MEM_INSTS : $MAX_CPU_INSTS ))
 # OPTS string from http://www.software-testing-tutorials-automation.com/2016/04/usage-of-maxsession-in-grid-2-to-set.html

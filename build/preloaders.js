@@ -7,6 +7,7 @@ module.exports = function getPreloaders (env) {
     preloaders.push(
       {
         test: /\.(js|jsx)$/,
+        enforce: 'pre',
         loader: 'eslint',
         exclude: /(node_modules|bower_components)/,
         include: paths.appSrc

@@ -71,7 +71,8 @@ class Workspace extends Component {
     isSharer: PropTypes.bool,
     isExporter: PropTypes.bool.isRequired,
     monochrome: PropTypes.bool,
-    showQuickview: PropTypes.bool.isRequired
+    showQuickview: PropTypes.bool.isRequired,
+    showExportsWizard: PropTypes.bool
   }
 
   state = {
@@ -403,7 +404,7 @@ class Workspace extends Component {
     const commandSuccessPct = command && command.totalCount ? 100 * command.successCount / command.totalCount : 0
     const commandErrorPct = command && command.totalCount ? 100 * command.errorCount / command.totalCount : 0
 
-    const { isDroppable, showReloader } = this.state
+    const { showReloader } = this.state
     return (
 
       <div onDragEnter={this.dragEnter} className={classnames('App', 'Workspace', 'fullHeight', {isDragging: app.dragInfo, dark: monochrome, embedMode: app.embedModeEnabled})}>

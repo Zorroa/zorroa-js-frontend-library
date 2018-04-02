@@ -73,6 +73,7 @@ class Folders extends Component {
 
     this.folderSortCache = new LRUCache({ max: 1000 })
 
+    this.modifiedFolderIds = new Set()
     this.foldersVisible = new Set()
     this.pendingFullRequest = false
     this.pendingSearchRequest = false
@@ -107,7 +108,7 @@ class Folders extends Component {
   // list of modified and visible folders to construct a batch of work at the
   // last possible second -- sort of an implicit queue.
 
-  requestFolderCounts = () => {
+  requestFolderCounts = (forceFilter) => {
     const { modifiedFolderIds, query, folderCounts, filteredCounts, userSettings } = this.props
 
     // Find the set of modified visible folders for full counts.
@@ -133,7 +134,8 @@ class Folders extends Component {
     }
 
     // Compute a batch of filtered folder counts to request
-    if (userSettings.showFolderCounts === FILTERED_COUNTS && query && !query.empty() && !this.pendingSearchRequest) {
+    // if we are starting a new query or if forced by add/remove asset
+    if (userSettings.showFolderCounts === FILTERED_COUNTS && query && (!query.empty() || forceFilter) && !this.pendingSearchRequest) {
       // Note that filteredCounts is cleared in the foldersReducer whenever
       // the search has changed, so checking for a valid value is sufficient.
       const visibleSearchCountIds = [...this.foldersVisible].filter(id => !filteredCounts.has(id))
@@ -200,6 +202,10 @@ class Folders extends Component {
     if (nextProps.userSettings.showFolderCounts !== this.showFolderCounts) {
       this.showFolderCounts = nextProps.userSettings.showFolderCounts
       this.queueFolderCounts()
+    }
+    if (!equalSets(this.modifiedFolderIds, nextProps.modifiedFolderIds)) {
+      this.modifiedFolderIds = new Set(nextProps.modifiedFolderIds)
+      this.queueFolderCounts(true /* forceFilter */)
     }
   }
 
@@ -451,8 +457,8 @@ class Folders extends Component {
       folderList.length - 1
     )
 
-    let renderedFolders = []
-    let prevFoldersVisible = new Set([...this.foldersVisible])
+    const renderedFolders = []
+    const prevFoldersVisible = new Set(this.foldersVisible)
     this.foldersVisible.clear()
 
     for (let i = startIndex; i <= stopIndex; i++) {

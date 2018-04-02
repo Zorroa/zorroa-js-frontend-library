@@ -240,16 +240,34 @@ export default function (state = initialState, action) {
 
     case ADD_ASSETS_TO_FOLDER: {
       const folder = state.all && state.all.get(action.payload.folderId)
-      const modifiedIds = new Set(state.modifiedIds)
-      _addAncestorIds(folder, modifiedIds, state.all)
-      return { ...state, modifiedIds }
+      if (folder) {
+        var filteredCounts = state.filteredCounts
+        if (filteredCounts.has(folder.id)) {
+          filteredCounts = new Map(filteredCounts)
+          filteredCounts.delete(folder.id)
+        }
+        const modifiedIds = new Set(state.modifiedIds)
+        _addAncestorIds(folder, modifiedIds, state.all)
+        return { ...state, modifiedIds, filteredCounts }
+      }
+      // ERROR!
+      break
     }
 
     case REMOVE_ASSETS_FROM_FOLDER: {
       const folder = state.all && state.all.get(action.payload.folderId)
-      const modifiedIds = new Set(state.modifiedIds)
-      _addAncestorIds(folder, modifiedIds, state.all)
-      return { ...state, modifiedIds }
+      if (folder) {
+        var filteredCounts1 = state.filteredCounts
+        if (filteredCounts1.has(folder.id)) {
+          filteredCounts1 = new Map(filteredCounts)
+          filteredCounts1.delete(folder.id)
+        }
+        const modifiedIds = new Set(state.modifiedIds)
+        _addAncestorIds(folder, modifiedIds, state.all)
+        return { ...state, modifiedIds, filteredCounts: filteredCounts1 }
+      }
+      // ERROR!
+      break
     }
 
     case ASSET_DELETE: {

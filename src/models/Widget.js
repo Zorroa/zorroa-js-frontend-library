@@ -53,7 +53,7 @@ export function widgetTypeForField (field, type) {
   if (type === 'string' && parents[0].toLowerCase() === 'similarity' && parents.length === 3) {
     return SimilarHashWidgetInfo.type
   }
-  if (type === 'nested' && parents[0] === 'colors' && parents.length === 1) {
+  if (type === 'string' && field === 'proxies.tinyProxy') {
     return ColorWidgetInfo.type
   }
   if ((type === 'string' || type === 'keywords') && parents[0] === 'source' && parents.length === 2 && parents[1] === 'extension') {

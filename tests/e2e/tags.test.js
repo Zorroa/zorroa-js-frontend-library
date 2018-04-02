@@ -103,28 +103,28 @@ describe('Tags', function () {
     .then(_ => { DEBUG && console.log('standard tags exist?') })
     .then(_ => driver.findElements(By.css('.Explorer-item')))
       .then(elements => {
-        expect(elements.length).toBeGreaterThan(10)
+        expect(elements.length).toBeGreaterThan(5)
         let proms = elements.map(ele => ele.getText())
         return Promise.all(proms)
       })
       .then(eleTexts => {
-        let expectedTexts = ['Colors', 'Image', 'Keywords', 'Proxies', 'Source', 'Video']
+        let expectedTexts = ['Media', 'Zorroa', 'Proxies', 'Source', 'Analysis']
         // console.log({expectedTexts, eleTexts})
         let hasExpectedTexts = expectedTexts.map(text => eleTexts.includes(text))
         // console.log({hasExpectedTexts})
         expect(hasExpectedTexts.every(x=>x)).toBe(true)
       })
 
-    .then(_ => { DEBUG && console.log('Image tag has Aspect child?') })
-    .then(_ => selenium.getTagNamed('Image').then(tag => documentTag = tag))
+    .then(_ => { DEBUG && console.log('Media tag has Aspect child?') })
+    .then(_ => selenium.getTagNamed('Media').then(tag => documentTag = tag))
     .then(_ => documentTag.getAttribute('class'))
     .then(classes => {
       driver.then(_ => { DEBUG && console.log({classes}) })
       if (!(new RegExp(`\\bisLeaf\\b`).test(classes))) return documentTag.click()
     })
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Explorer-item-image-aspect.isLeaf')))
-    .then(_ => selenium.getTagNamed('Image').then(ele => ele.click()))
-    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('Explorer-item-image-aspect.isOpen'), 5000))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Explorer-item-media-aspect.isLeaf')))
+    .then(_ => selenium.getTagNamed('Media').then(ele => ele.click()))
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('Explorer-item-media-aspect.isOpen'), 5000))
   })
 
   it('search for some hidden tags', function () {
@@ -140,7 +140,7 @@ describe('Tags', function () {
         // on dev, the only aspect tags are document.aspect and image.iptc.aspect
         // with those, there are between 2 and 5 Explorer-item element visible,
         // depending on which parents are open
-        expect(elements.length).toBeGreaterThan(1)
+        expect(elements.length).toBeGreaterThan(0)
         expect(elements.length).toBeLessThan(6)
         return false
       })
@@ -149,7 +149,7 @@ describe('Tags', function () {
     .then(_ => selenium.clickSelector(By.css('.Explorer-cancel-filter')))
     .then(_ => driver.findElements(By.css('.Explorer-item')))
       .then(elements => {
-        expect(elements.length).toBeGreaterThan(10)
+        expect(elements.length).toBeGreaterThan(5)
         return false
       })
   })
@@ -160,14 +160,22 @@ describe('Tags', function () {
     .then(_ => openAllTags())
     .then(_ => selenium.waitForIdle(5000))
 
-    .then(_ => { DEBUG && console.log('make sure colors tag bring up color widget') })
-    .then(_ => selenium.getTagNamed('Colors'))
+    .then(_ => { DEBUG && console.log('make sure proxies tag bring up color widget') })
+    .then(_ => { DEBUG && console.log('open proxy tag') })
+    .then(_ => selenium.getTagNamed('Proxies').then(ele => ele.click()))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Explorer-item-proxies.isOpen')))
+    .then(_ => selenium.expectSelectorHasClassToBe(true, By.css('.Explorer-item-proxies-tinyProxy'), 'isLeaf'))
+    .then(_ => selenium.expectSelectorVisibleToBe(true, By.css('.Explorer-item-proxies-tinyProxy.isLeaf')))
+    .then(_ => selenium.getTagNamed('Tiny Proxy'))
       .then(ele => ele.findElement(By.css('.Explorer-item-widget')))
       .then(ele => ele.click())
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Color')), 5000)
-    // .then(_ => selenium.expectSelectorHasClassToBe(true, By.css('.Explorer-item-colors'), '.isSelected'))
-    .then(_ => selenium.clickSelector(By.css('.Explorer-item-colors .Explorer-left')))
+    .then(_ => { DEBUG && console.log('delete color widget') })
+    .then(_ => driver.findElement(By.css('.Widget.Color .WidgetHeader-close')))
+      .then(ele => ele.click())
     .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Racebar-widget .Widget')))
+
+    // .then(_ => selenium.expectSelectorHasClassToBe(true, By.css('.Explorer-item-colors'), '.isSelected'))
 
     .then(_ => { DEBUG && console.log('open source tag folder') })
     .then(_ => selenium.getTagNamed('Source').then(ele => ele.click()))
@@ -205,10 +213,10 @@ describe('Tags', function () {
     .then(_ => selenium.clickSelector(By.css('.Explorer-favorites')))
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Explorer-favorites.isSelected'), 5000))
 
-    .then(_ => { DEBUG && console.log('make sure source.date tag brings up date widget') })
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Explorer-item-source-date')))
-    .then(_ => selenium.expectSelectorHasClassToBe(true, By.css('.Explorer-item-source-date'), 'isLeaf'))
-    .then(_ => selenium.clickSelector(By.css('.Explorer-item-source-date .Explorer-item-widget')))
+    .then(_ => { DEBUG && console.log('make sure source.timeCreated tag brings up date widget') })
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Explorer-item-source-timeCreated')))
+    .then(_ => selenium.expectSelectorHasClassToBe(true, By.css('.Explorer-item-source-timeCreated'), 'isLeaf'))
+    .then(_ => selenium.clickSelector(By.css('.Explorer-item-source-timeCreated .Explorer-item-widget')))
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.DateRange')))
     .then(_ => { DEBUG && console.log('delete daterange widget') })
     .then(_ => driver.findElement(By.css('.Widget.DateRange .WidgetHeader-close')))
@@ -225,13 +233,23 @@ describe('Tags', function () {
       .then(ele => ele.click())
     .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Racebar-widget .Widget')))
 
-    .then(_ => { DEBUG && console.log('make sure source.extension tag brings up range widget') })
+    .then(_ => { DEBUG && console.log('make sure source.extension tag brings up filetype widget') })
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Explorer-item-source-extension')))
     .then(_ => selenium.expectSelectorHasClassToBe(true, By.css('.Explorer-item-source-extension'), 'isLeaf'))
     .then(_ => selenium.clickSelector(By.css('.Explorer-item-source-extension .Explorer-item-widget')))
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Filetype')))
     .then(_ => { DEBUG && console.log('delete Filetype widget') })
     .then(_ => driver.findElement(By.css('.Widget.Filetype .WidgetHeader-close')))
+      .then(ele => ele.click())
+    .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Racebar-widget .Widget')))
+
+    .then(_ => { DEBUG && console.log('make sure source.keywords tag brings up facet widget') })
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Explorer-item-source-keywords')))
+    .then(_ => selenium.expectSelectorHasClassToBe(true, By.css('.Explorer-item-source-keywords'), 'isLeaf'))
+    .then(_ => selenium.clickSelector(By.css('.Explorer-item-source-keywords .Explorer-item-widget')))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Facet')))
+    .then(_ => { DEBUG && console.log('delete Facet widget') })
+    .then(_ => driver.findElement(By.css('.Widget.Facet .WidgetHeader-close')))
       .then(ele => ele.click())
     .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Racebar-widget .Widget')))
 

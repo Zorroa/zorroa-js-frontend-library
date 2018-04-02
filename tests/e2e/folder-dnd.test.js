@@ -2,9 +2,28 @@ require('babel-register')({})
 // import * as assert from 'assert'
 import * as selenium from './selenium.js'
 var driver
-const { By, Key, until } = selenium.webdriver
+const { By, Key } = selenium.webdriver
 
 const DEBUG = true
+
+function toggleFiletype (type) {
+  // const allTypes = [ 'Image', 'Video', 'Vector', 'Document', 'Flipbook' ]
+  return driver
+  .then(_ => { DEBUG && console.log('------ check filetype widget') })
+
+  .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Racebar-add-widget')))
+  .then(_ => selenium.clickSelector(By.css('.Racebar-add-widget')))
+  .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.widget-FILETYPE')))
+  .then(_ => selenium.clickSelector(By.css('.widget-FILETYPE')))
+
+  .then(selenium.waitForIdle)
+  .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Filetype'), 5000))
+  .then(_ => selenium.clickSelector(By.css(`.Filetype-group-${type} .Check`)))
+  .then(selenium.waitForIdle)
+  .then(_ => driver.findElement(By.css('.WidgetHeader-toggle')))
+  .then(ele => ele.click())
+  .then(selenium.waitForIdle)
+}
 
 describe('Folder dnd', function () {
   // For all jest functions that are passed a function parameter
@@ -109,21 +128,60 @@ describe('Folder dnd', function () {
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.assets-footer'), 15000))
   })
 
-  function pageDown(by) {
+  function pageDown (by) {
     return driver.then(_ => {
       return driver.findElement(by)
       .then(ele => {
         return ele.getSize()
-        .then(size => { return driver.actions().mouseMove(ele, {x:size.width - 5, y: size.height - 5}).click().sendKeys(Key.PAGE_DOWN, Key.PAGE_DOWN, Key.PAGE_DOWN, Key.PAGE_DOWN, Key.PAGE_DOWN).perform() })
+        .then(size => { return driver.actions().mouseMove(ele, {x: size.width - 5, y: size.height - 5}).click().sendKeys(Key.PAGE_DOWN, Key.PAGE_DOWN, Key.PAGE_DOWN, Key.PAGE_DOWN, Key.PAGE_DOWN).perform() })
       })
     })
     .then(_ => driver.sleep(100))
   }
 
-  it ('empty trash', function() {
-    return driver.then(_ => openHomePanel())
-    .then(_ => selenium.waitForIdle())
-    .then(_ => emptyTrash())
+  it('check collection widget', function () {
+    let myUserFolder
+    const myUserName = `selenium-collect-${Date.now()}`
+    return driver
+      .then(_ => { DEBUG && console.log('------ check collection widget') })
+      .then(_ => openHomePanel())
+      .then(_ => { DEBUG && console.log('Add a "selenium" user folder') })
+      // using the add folder button this time
+      .then(_ => selenium.clickSelector(By.css('.Folders-controls-add')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.modal .CreateFolder')))
+      .then(_ => driver.findElement(By.css('.CreateFolder-input-title-input')).then(ele => ele.sendKeys(myUserName)))
+      .then(_ => selenium.clickSelector(By.css('.CreateFolder-save')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.modal .CreateFolder')))
+      .then(_ => selenium.waitForIdle())
+
+      .then(_ => { DEBUG && console.log('find the new "selenium" user folder') })
+
+      .then(_ => { DEBUG && console.log('wait til folder count says 0') })
+      .then(_ => driver.wait(_ => {
+        return driver.then(_ => selenium.getFolderNamed(myUserName).then(e => { myUserFolder = e }))
+        .then(_ => myUserFolder.findElement(By.css('.FolderItem-count')))
+        .then(ele => ele.getText())
+        .then(t => t === '0')
+      }, 15000))
+      .then(_ => { DEBUG && console.log('find & toggle the Home folder ' + myUserName) })
+      // Toggle open the users folder
+      .then(_ => { DEBUG && console.log('toggle the Users folder ' + myUserFolder.id) })
+      .then(_ => myUserFolder.click())
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Folders-selected'), 5000))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Widget.Collections'), 5000))
+      .then(_ => driver.findElement(By.css('.WidgetHeader-close')))
+      .then(ele => ele.click())
+      .then(_ => selenium.waitForIdle())
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Widget.Collections'), 5000))
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Folders-selected'), 5000))
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Widget'), 5000))
+      .then(_ => { DEBUG && console.log('remove "selenium" folder') })
+      .then(_ => selenium.getFolderNamed(myUserName).then(e => { myUserFolder = e }))
+      .then(_ => driver.actions().click(myUserFolder, 2).perform()) // right-click
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.FolderItem-context-remove-folder')))
+      .then(_ => selenium.clickSelector(By.css('.FolderItem-context-remove-folder')))
+      .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.FolderItem-context-remove-folder'), 5000))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Home-collapsible .Trash'), 15000))
   })
 
   it('add & remove assets + dnd', function () {
@@ -135,27 +193,8 @@ describe('Folder dnd', function () {
     let sub3Folder
 
     return driver.then(_ => openHomePanel())
-
-    // The Film folder is a DyHi created manualy on the first dev instance
-    // To create, go to the admin gui, create a folder named Film, and give it these attrs:
-    // Attr: Disney.films
-    // Attr: Disney.characterName
-    // Attr: Disney.documentType
-    // Don’t forget to hit SAVE!
-    //
-    // General approach: 1. make new folder, 2. double click on folder, 3. hit lighting bolt, 4. set dyhi fields, 5. hit save.
-    // Must have capitalization of fields correct.
-    // To get field names, either select an asset in Curator and use User > Developer to poke around the expandable asset (look under document), or, in the admin ui, you can go to the asset page and look at the full JSON.
-    // There are rest endpoints for creating dyhis
-    // Used in admin gui and by the curl commands in /zorroa-data/onboard/new-customer.sh
-    // Magic enum values are the hardest part.
-
-    .then(_ => { DEBUG && console.log('Open Film & scroll down') })
-    .then(_ => selenium.getFolderNamed('Film'))
-      .then(folderEle => folderEle.findElement(By.css('.FolderItem-toggle')))
-      .then(ele => ele.click())
     .then(_ => selenium.waitForIdle())
-
+    .then(_ => toggleFiletype('Image'))
     .then(_ => { DEBUG && console.log('Add a "selenium" user folder') })
     // using the add folder button this time
     .then(_ => selenium.clickSelector(By.css('.Folders-controls-add')))
@@ -175,6 +214,7 @@ describe('Folder dnd', function () {
       .then(t => t === '0')
     }, 15000))
 
+    .then(_ => selenium.waitForIdle())
     .then(_ => { DEBUG && console.log('add an asset to the new folder') })
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Thumb')))
     .then(_ => selenium.clickSelector(By.css('.Thumb')))
@@ -190,16 +230,17 @@ describe('Folder dnd', function () {
     .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.FolderItem-context-add-assets'), 5000))
     .then(_ => selenium.waitForIdle())
 
-    .then(_ => { DEBUG && console.log('wait til folder count says > 1') })
-    .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
+    .then(_ => { DEBUG && console.log('wait til folder count says 1') })
+    // .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
     .then(_ => driver.wait(_ => {
       return driver.then(_ => selenium.getFolderNamed(myUserName).then(e => { myUserFolder = e }))
       .then(_ => myUserFolder.findElement(By.css('.FolderItem-count')))
       .then(ele => ele.getText())
-      .then(t => parseInt(t, 10) > 0)
+      .then(t => parseInt(String(t), 10) > 0)
     }, 15000))
 
     // remove the asset from the new folder (asset should still be selected) // TODO: remove not working
+    .then(_ => selenium.waitForIdle())
     .then(_ => { DEBUG && console.log('remove the asset from the new folder') })
     .then(_ => myUserFolder.click())
     .then(_ => selenium.waitForIdle())
@@ -211,7 +252,7 @@ describe('Folder dnd', function () {
     .then(_ => selenium.waitForIdle())
 
     .then(_ => { DEBUG && console.log('wait til folder count says 0') })
-    .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
+    // .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
     .then(_ => driver.wait(_ => {
       return driver.then(_ => selenium.getFolderNamed(myUserName))
       .then(folderEle => folderEle.findElement(By.css('.FolderItem-count')).getText())
@@ -220,6 +261,7 @@ describe('Folder dnd', function () {
 
     .then(_ => { DEBUG && console.log('add a sub-folder sub1 of selenium ' + Date.now()) })
     // using the menu this time
+    .then(_ => selenium.waitForIdle())
     .then(_ => selenium.getFolderNamed(myUserName))
       .then(folderEle => driver.actions().click(folderEle, 2).perform()) // right-click
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.FolderItem-context-create-subfolder')))
@@ -230,7 +272,7 @@ describe('Folder dnd', function () {
     .then(_ => selenium.clickSelector(By.css('.CreateFolder-save')))
     .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.modal .CreateFolder')))
     .then(_ => selenium.waitForIdle())
-    .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
+    // .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
 
     .then(_ => { DEBUG && console.log('add a sub-folder sub2 of selenium') })
     .then(_ => selenium.getFolderNamed(myUserName))
@@ -243,7 +285,8 @@ describe('Folder dnd', function () {
     .then(_ => selenium.clickSelector(By.css('.CreateFolder-save')))
     .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.modal .CreateFolder')))
     .then(_ => selenium.waitForIdle())
-    .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
+    // .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
+    // .then(_ => selenium.waitForIdle())
 
     .then(_ => { DEBUG && console.log('add a sub-folder sub3 of sub1') })
     .then(_ => selenium.getFolderNamed('sub1'))
@@ -263,7 +306,7 @@ describe('Folder dnd', function () {
     .then(_ => selenium.clickSelector(By.css('.CreateFolder-save')))
     .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.modal .CreateFolder')))
     .then(_ => selenium.waitForIdle())
-    .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
+    // .then(_ => pageDown(By.css('.Folders-scroll'))) // scroll down
 
     // // this doesn't work yet
     // .then(_ => { DEBUG && console.log('move sub3 to be under sub2') })
@@ -344,7 +387,11 @@ describe('Folder dnd', function () {
     .then(_ => selenium.clickSelector(By.css('.FolderItem-context-remove-folder')))
     .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.FolderItem-context-remove-folder'), 5000))
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Home-collapsible .Trash'), 15000))
+  })
 
-    .then(emptyTrash)
+  it('empty trash', function () {
+    return driver.then(_ => openHomePanel())
+    .then(_ => selenium.waitForIdle())
+    .then(_ => emptyTrash())
   })
 })

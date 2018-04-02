@@ -33,6 +33,6 @@ describe('authReducer', () => {
     const outfitted = new User(user)
     outfitted.permissions = permissions
     expect(authReducer({ user }, { type: AUTH_PERMISSIONS, payload: permissions }))
-      .toEqual({ user: outfitted, isAdministrator: false, isDeveloper: false, isManager: false, isSharer: false })
+      .toEqual({ user: outfitted, isAdministrator: false, isDeveloper: false, isManager: false, isSharer: false, isExporter: false, isLibrarian: false })
   })
 })
