@@ -18,6 +18,7 @@ const COLOR_RESIZER_HEIGHT = 5
 const LUMA_OVERLAY_THRESHOLD = 0.5
 
 const HASHES = [
+  'analysis.hueSimilarity.shash',
   'similarity.hue',
   'similarity.combined',
   'similarity.hsv',
@@ -63,7 +64,7 @@ class Color extends Component {
   resolveHashType = (hsvHash, colors) => {
     let resolvedHash = hsvHash
     if (resolvedHash === 'similarity.combined') {
-      if (colors.length <= 2) resolvedHash = 'similarity.hue'
+      if (colors.length <= 2) resolvedHash = 'analysis.hueSimilarity.shash'
       else resolvedHash = 'similarity.dephsv'
     }
     return resolvedHash
@@ -243,6 +244,7 @@ class Color extends Component {
         const vhash = subHash(colors, normal, 2, HSV_RANGE[2], VL, colors.length > 2 ? 0.5 : 1, false)
         return hhash + shash + vhash
 
+      case 'analysis.hueSimilarity.shash':
       case 'similarity.hue':
         const hueHash = subHash(colors, normal, 0, HSV_RANGE[0], HL, remap(colors.length, 1, 5, 1, 0.5), true)
         return hueHash
