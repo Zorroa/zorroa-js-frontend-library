@@ -112,7 +112,7 @@ export default class Asset {
   backgroundColor () { return this.tinyProxy() ? this.tinyProxy()[5] : getRandomColor() }
 
   pageCount () {
-    if (this.document.media && this.document.media.clip && this.document.media.clip.pages) return this.document.media.clip.pages
+    if (this.document.media && this.document.media.pages) return this.document.media.pages
   }
 
   startPage () {
