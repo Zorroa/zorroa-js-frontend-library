@@ -51,6 +51,17 @@
     border-color: $zorroa-color-pink-1;
   }
 
+  &--disabled {
+    &,
+    &:hover {
+      background-color: $zorroa-color-gray-dark-3;
+      border-color: $zorroa-color-gray-dark-4;
+      color: $zorroa-color-gray-dark-4;
+      cursor: not-allowed;
+      opacity: .5;
+    }
+  }
+
   &--mini {
     border-color: $zorroa-color-blue-1;
     background: $zorroa-color-blue-1;

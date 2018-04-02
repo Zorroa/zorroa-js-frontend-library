@@ -26,6 +26,7 @@ export default function FormButton (props) {
       type={props.type || 'button'}
       disabled={props.disabled}
       onClick={props.onClick}
+      title={props.title}
     >
       { (isNormalLook || props.look === 'mini') && (
         <span
@@ -46,5 +47,6 @@ FormButton.propTypes = {
   type: PropTypes.oneOf(['button', 'submit', 'reset']),
   look: PropTypes.oneOf(['normal', 'minimal', 'mini']),
   onClick: PropTypes.func,
-  disabled: PropTypes.bool
+  disabled: PropTypes.bool,
+  title: PropTypes.string
 }

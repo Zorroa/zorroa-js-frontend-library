@@ -459,6 +459,13 @@ class Exports extends Component {
                 when the export is complete.
               </FlashMessage>
             )}
+            { hasRestrictedAssets && this.canRequestExport() === false && (
+              <FlashMessage look="warning">
+                <p>
+                  To export, choose a folder and right-click for export options.
+                </p>
+              </FlashMessage>
+            )}
             { this.props.errorMessage && (
               <FlashMessage look="error">
                 <p>
@@ -616,7 +623,7 @@ class Exports extends Component {
                 <div className="Exports__main-form-buttons Exports__main-form-buttons--visible">
                   <div className="Exports__form-button-group">
                     <FormButton
-                      title={this.canRequestExport() ? '' : 'Only folders can be exported'}
+                      title={this.canRequestExport() ? '' : 'To export, choose a folder and right-click for export options'}
                       disabled={this.canRequestExport() === false}
                       state={this.getExportRequestState()}
                       onClick={this.startExportRequest}
