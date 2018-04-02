@@ -87,11 +87,11 @@ $content-height: calc(80vh - 40px);
   &__sidebar-title {
     font-size: 18px;
     color: $zorroa-color-gray-dark-3;
-    margin: 10px 0;
+    margin: 10px 0 20px;
     font-weight: 400;
 
-    .dark {
-      color: $zorroa-color-gray-light-1;
+    .dark & {
+      color: $zorroa-color-gray-dark-4;
     }
   }
 
@@ -101,17 +101,18 @@ $content-height: calc(80vh - 40px);
     margin: 10px 0;
     font-weight: 400;
 
-    .dark {
-      color: $zorroa-color-gray-light-1;
+    .dark & {
+      color: $zorroa-color-gray-dark-4;
     }
   }
 
   &__sidebar-paragraph {
     font-size: 14px;
     color: $zorroa-color-gray-dark-3;
+    font-weight: 300;
 
-    .dark {
-      color: $zorroa-color-gray-light-1;
+    .dark & {
+      color: $zorroa-color-gray-dark-4;
     }
   }
 
