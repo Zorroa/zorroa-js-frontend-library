@@ -75,7 +75,7 @@ class Header extends Component {
         const isSelectedHashValid = false
         this.setState({isSelectedHashValid})
       }
-    } else {
+    } else if (!selectedIds || !selectedIds.size) {
       const isSelectedHashValid = false
       this.setState({isSelectedHashValid})
     }
