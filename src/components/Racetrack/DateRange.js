@@ -123,8 +123,10 @@ class DateRange extends Component {
       .then(_ => this.modifySliver())
   }
 
-  setInterval = (interval) => {
-    const minStr = moment().startOf(interval).format(format)
+  setInterval = interval => {
+    // Subtract 1 of $interval. For example if interval === 'month' this
+    // will subtract 1 month from the current date
+    const minStr = moment().subtract(1, interval).format(format)
     const maxStr = moment().format(format)
     const min = moment(minStr, format).toDate()
     const max = moment(maxStr, format).toDate()
@@ -193,7 +195,14 @@ class DateRange extends Component {
         </div>
         <div className="DateRange-settings">
           <div className="DateRange-label">Last:</div>
-          {intervals.map(interval => <div className="DateRange-setting" key={interval} onClick={_ => this.setInterval(interval)}>{interval}</div>)}
+          {intervals.map(interval => (
+            <div
+              className="DateRange-setting"
+              key={interval}
+              onClick={() => this.setInterval(interval)
+            }>
+              {interval}
+            </div>))}
         </div>
       </Widget>
     )
