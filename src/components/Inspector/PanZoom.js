@@ -172,10 +172,15 @@ class PanZoom extends Component {
     const zoomOutDisabled = this.panner.scale <= this.minZoom + epsilon
     const zoomInDisabled = this.panner.scale >= this.maxZoom - epsilon
     const zoomToFitDisabled = this.panner.scale > (1 - epsilon) && this.panner.scale < (1 + epsilon)
-    const style = {}
-    style['transform'] = `translate(${this.panner.x}px, ${this.panner.y}px) scale(${this.panner.scale})`
-    style['transformOrigin'] = 'top left'
-    style['imageRendering'] = (moving && userSettings.fastLightboxPanning) ? 'pixelated' : 'auto'
+    const pannerX = Math.round(this.panner.x)
+    const pannerY = Math.round(this.panner.y)
+    const pannerScale = this.panner.scale
+    const style = {
+      transform: `translate(${pannerX}px, ${pannerY}px) scale(${pannerScale})`,
+      transformOrigin: 'top left',
+      willChange: 'transform',
+      imageRendering: moving && userSettings.fastLightboxPanning ? 'pixelated' : 'auto'
+    }
     return (
       <Measure>
         {({width, height}) => {

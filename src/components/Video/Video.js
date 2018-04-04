@@ -48,7 +48,9 @@ class Video extends Component {
     userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object,
     shuttler: PropTypes.instanceOf(PubSub).isRequired,
-    status: PropTypes.instanceOf(PubSub).isRequired
+    status: PropTypes.instanceOf(PubSub).isRequired,
+    width: PropTypes.number,
+    height: PropTypes.number
   }
 
   static defaultProps = {
@@ -271,7 +273,7 @@ class Video extends Component {
   }
 
   render () {
-    const { url, videoVolume } = this.props
+    const { url, videoVolume, width, height } = this.props
     const { started } = this.state
     const exts = [ 'mp4', 'm4v', 'webm', 'ogv', 'ogg' ]
     const svg = require('../Inspector/loading-ring.svg')
@@ -285,7 +287,8 @@ class Video extends Component {
                autoPlay={started}
                onEnded={ this.stop }
                onError={this.onError}
-               width="100%" height="100%"
+               width={width || '100%'}
+               height={height || '100%'}
                ref={player => { this.player = player }}>
           { exts.map(ext => <source key={ext} src={`${url}?ext=${ext}`} type={`video/${ext}`}/>) }
           <source key="raw" src={url}/>

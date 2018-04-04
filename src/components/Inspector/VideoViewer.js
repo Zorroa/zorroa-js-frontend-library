@@ -119,6 +119,8 @@ class VideoViewer extends Component {
                  onError={onError}
                  shuttler={this.shuttler}
                  status={this.status}
+                 height={window.innerHeight}
+                 width={window.innerWidth}
             />
           </PanZoom>
         </div>
@@ -156,4 +158,3 @@ Duration.propTypes = {
   frameRate: PropTypes.number.isRequired,
   className: PropTypes.string
 }
-
