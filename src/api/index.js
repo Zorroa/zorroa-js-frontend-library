@@ -17,5 +17,5 @@ export default {
   request,
   localFileSystem,
   exports,
-  job
+  job,
 }

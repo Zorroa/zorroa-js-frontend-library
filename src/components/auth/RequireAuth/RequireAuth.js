@@ -1,39 +1,39 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 
-export default function (ComposedComponent, url = '/') {
+export default function(ComposedComponent, url = '/') {
   class Authentication extends Component {
-    static get contextTypes () {
+    static get contextTypes() {
       return {
-        router: PropTypes.object
+        router: PropTypes.object,
       }
     }
 
     static propTypes = {
-      authenticated: PropTypes.bool
+      authenticated: PropTypes.bool,
     }
 
-    componentWillMount () {
+    componentWillMount() {
       if (!this.props.authenticated) {
         this.context.router.push(url)
       }
     }
 
-    componentWillUpdate (nextProps) {
+    componentWillUpdate(nextProps) {
       if (!nextProps.authenticated) {
         this.context.router.push(url)
       }
     }
 
-    render () {
+    render() {
       if (!this.props.authenticated) {
-        return <div/>
+        return <div />
       }
       return <ComposedComponent {...this.props} />
     }
   }
 
-  function mapStateToProps (state) {
+  function mapStateToProps(state) {
     return { authenticated: state.auth.authenticated }
   }
 

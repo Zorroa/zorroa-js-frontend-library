@@ -13,9 +13,7 @@ import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import CreateFolder from './CreateFolder'
 import AssetPermissions from '../AssetPermissions'
-import {
-  updateExportInterface
-} from '../../actions/exportsAction'
+import { updateExportInterface } from '../../actions/exportsAction'
 import {
   createFolder,
   addAssetIdsToFolderId,
@@ -25,24 +23,35 @@ import {
   updateFolderPermissions,
   dropFolderId,
   createTaxonomy,
-  deleteTaxonomy
+  deleteTaxonomy,
 } from '../../actions/folderAction'
-import { showModal, hideModal, dialogAlertPromise, dialogConfirmPromise, toggleCollapsible } from '../../actions/appActions'
+import {
+  showModal,
+  hideModal,
+  dialogAlertPromise,
+  dialogConfirmPromise,
+  toggleCollapsible,
+} from '../../actions/appActions'
 import { restoreFolders } from '../../actions/racetrackAction'
-import { setAssetPermissions, deleteAsset, searchAssets, selectAssetIds } from '../../actions/assetsAction'
+import {
+  setAssetPermissions,
+  deleteAsset,
+  searchAssets,
+  selectAssetIds,
+} from '../../actions/assetsAction'
 import { isolateSelectId } from '../../services/jsUtil'
 import { FILTERED_COUNTS, FULL_COUNTS, NO_COUNTS } from './Folders'
 
 // Renders folder children as Collapsible elements.
 const folderSource = {
-  dragStart (props) {
+  dragStart(props) {
     const { folder, selectedFolderIds } = props
     const folderIds = isolateSelectId(folder.id, selectedFolderIds)
-    return {folderIds}
-  }
+    return { folderIds }
+  },
 }
 
-function dropTarget (props) {
+function dropTarget(props) {
   const { folder, dragInfo, assets, folders, user } = props
   if (!dragInfo) return false
   if (dragInfo.type === 'ASSET' && dragInfo.assetIds) {
@@ -54,20 +63,33 @@ function dropTarget (props) {
 }
 
 const target = {
-  drop (props) {
+  drop(props) {
     const { dragInfo, folder, folders, user } = props
     if (!dragInfo) return
     switch (dragInfo.type) {
       case 'ASSET':
-        console.log('Drop ' + JSON.stringify([...dragInfo.assetIds]) + ' on ' + props.folder.id)
+        console.log(
+          'Drop ' +
+            JSON.stringify([...dragInfo.assetIds]) +
+            ' on ' +
+            props.folder.id,
+        )
         props.actions.addAssetIdsToFolderId(dragInfo.assetIds, props.folder.id)
         break
       case 'FOLDER':
         const parentId = dropTarget(props) ? folder.id : folder.parentId
         const parent = folders.get(parentId)
-        console.log('Drop ' + JSON.stringify([...dragInfo.folderIds]) + ' on ' + props.folder.id)
+        console.log(
+          'Drop ' +
+            JSON.stringify([...dragInfo.folderIds]) +
+            ' on ' +
+            props.folder.id,
+        )
         dragInfo.folderIds.forEach(folderId => {
-          if (parent && parent.canAddChildFolderIds([folderId], folders, user)) {
+          if (
+            parent &&
+            parent.canAddChildFolderIds([folderId], folders, user)
+          ) {
             const folder = new Folder(props.folders.get(folderId))
             folder.parentId = parentId
             props.actions.updateFolder(folder)
@@ -75,7 +97,7 @@ const target = {
         })
         break
     }
-  }
+  },
 }
 
 @DragSource('FOLDER', folderSource)
@@ -117,19 +139,21 @@ class FolderItem extends Component {
     actions: PropTypes.object,
     userSettings: PropTypes.object.isRequired,
     jobs: PropTypes.object,
-    query: PropTypes.instanceOf(AssetSearch)
+    query: PropTypes.instanceOf(AssetSearch),
   }
 
   state = {
     isContextMenuVisible: false,
-    contextMenuPos: { x: 0, y: 0 }
+    contextMenuPos: { x: 0, y: 0 },
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     // Update the drop folder id if the hover status changed to
     // avoid multiple hovered items and state change on mouse move
     if (!this.props.dragHover && nextProps.dragHover) {
-      const id = dropTarget(nextProps) ? nextProps.folder.id : nextProps.folder.parentId
+      const id = dropTarget(nextProps)
+        ? nextProps.folder.id
+        : nextProps.folder.parentId
       if (nextProps.dropFolderId !== id) {
         this.props.actions.dropFolderId(id)
         console.log('Set drop folder id to ' + nextProps.folder.parentId)
@@ -137,53 +161,62 @@ class FolderItem extends Component {
     }
   }
 
-  showContextMenu = (event) => {
+  showContextMenu = event => {
     event.preventDefault()
     this.setState({
       isContextMenuVisible: true,
-      contextMenuPos: { x: event.pageX, y: event.pageY }
+      contextMenuPos: { x: event.pageX, y: event.pageY },
     })
   }
 
-  dismissContextMenu = (event) => {
+  dismissContextMenu = event => {
     if (event) event.preventDefault()
     this.setState({ isContextMenuVisible: false })
   }
 
-  restoreFolder = (event) => {
+  restoreFolder = event => {
     event.preventDefault()
     const { folder, actions } = this.props
     actions.restoreFolders([folder])
     this.dismissContextMenu(event)
   }
 
-  assetPermissions = (event) => {
+  assetPermissions = event => {
     event.preventDefault()
     this.dismissContextMenu(event)
     const width = '300px'
-    const body = <AssetPermissions title="Folder Asset Permissions"
-                                   onApply={this.setAssetPermissions}
-                                   onCancel={this.props.actions.hideModal}/>
-    this.props.actions.showModal({body, width})
+    const body = (
+      <AssetPermissions
+        title="Folder Asset Permissions"
+        onApply={this.setAssetPermissions}
+        onCancel={this.props.actions.hideModal}
+      />
+    )
+    this.props.actions.showModal({ body, width })
   }
 
-  setAssetPermissions = (acl) => {
+  setAssetPermissions = acl => {
     this.props.actions.hideModal()
     const { folder } = this.props
-    const filter = new AssetFilter({links: {folder: [folder.id]}})
-    const search = new AssetSearch({filter})
+    const filter = new AssetFilter({ links: { folder: [folder.id] } })
+    const search = new AssetSearch({ filter })
     this.props.actions.setAssetPermissions(search, acl)
   }
 
-  createChild = (event) => {
+  createChild = event => {
     this.dismissContextMenu(event)
     const width = '300px'
-    const body = <CreateFolder title='Create Collection'
-                               name=""
-                               acl={this.props.folder.acl} includeAssets={true}
-                               includePermissions={false}
-                               onCreate={this.createChildFolder}/>
-    this.props.actions.showModal({body, width})
+    const body = (
+      <CreateFolder
+        title="Create Collection"
+        name=""
+        acl={this.props.folder.acl}
+        includeAssets={true}
+        includePermissions={false}
+        onCreate={this.createChildFolder}
+      />
+    )
+    this.props.actions.showModal({ body, width })
   }
 
   createChildFolder = (name, acl, assetIds) => {
@@ -192,19 +225,23 @@ class FolderItem extends Component {
     this.props.actions.createFolder(folder, assetIds)
   }
 
-  moveTo = (event) => {
+  moveTo = event => {
     console.log('Move folder to...')
     this.dismissContextMenu(event)
   }
 
-  favorite = (event) => {
+  favorite = event => {
     console.log('Favorite folder')
     this.dismissContextMenu(event)
   }
 
-  removeFolder = (event) => {
+  removeFolder = event => {
     const { selectedFolderIds, folder } = this.props
-    const folderIds = new Set(selectedFolderIds && selectedFolderIds.has(folder.id) ? [...selectedFolderIds] : [folder.id])
+    const folderIds = new Set(
+      selectedFolderIds && selectedFolderIds.has(folder.id)
+        ? [...selectedFolderIds]
+        : [folder.id],
+    )
     this.props.actions.deleteFolderIds(folderIds)
     this.dismissContextMenu(event)
   }
@@ -218,75 +255,95 @@ class FolderItem extends Component {
     const folder = new Folder(this.props.folder)
     folder.name = name
     this.props.actions.updateFolder(folder)
-    if (acl && (!folder.acl || JSON.stringify(acl) !== JSON.stringify(folder.acl))) {
+    if (
+      acl &&
+      (!folder.acl || JSON.stringify(acl) !== JSON.stringify(folder.acl))
+    ) {
       folder.acl = acl
       this.props.actions.updateFolderPermissions(folder.id, acl)
     }
   }
 
-  rename = (event) => {
+  rename = event => {
     const { folder, user } = this.props
     this.dismissContextMenu(event)
     const width = '300px'
     const { timeCreated, timeModified, name } = this.props.folder
-    const date = timeModified > timeCreated ? `Modified ${new Date(timeModified).toLocaleString('en-US')}` : `Created ${new Date(timeCreated).toLocaleString('en-US')}`
+    const date =
+      timeModified > timeCreated
+        ? `Modified ${new Date(timeModified).toLocaleString('en-US')}`
+        : `Created ${new Date(timeCreated).toLocaleString('en-US')}`
     const writePermission = folder.hasAccess(user, AclEntry.WriteAccess)
     const readPermission = folder.hasAccess(user, AclEntry.ReadAccess)
-    const body = <CreateFolder title='Rename Folder'
-                               date={date}
-                               name={name}
-                               includeAssets={false}
-                               includePermissions={false}
-                               onCreate={this.editFolder}
-                               onDelete={writePermission && this.deleteFolder}
-                               onLink={readPermission && this.getLink}/>
-    this.props.actions.showModal({body, width})
+    const body = (
+      <CreateFolder
+        title="Rename Folder"
+        date={date}
+        name={name}
+        includeAssets={false}
+        includePermissions={false}
+        onCreate={this.editFolder}
+        onDelete={writePermission && this.deleteFolder}
+        onLink={readPermission && this.getLink}
+      />
+    )
+    this.props.actions.showModal({ body, width })
   }
 
   setPermissions = (name, acl) => {
-    const folderIds = new Set([...this.props.selectedFolderIds, this.props.folder.id])
+    const folderIds = new Set([
+      ...this.props.selectedFolderIds,
+      this.props.folder.id,
+    ])
     folderIds.forEach(id => {
       this.props.actions.updateFolderPermissions(id, acl)
     })
   }
 
-  permissions = (event) => {
+  permissions = event => {
     this.dismissContextMenu(event)
     const width = '300px'
     const { selectedFolderIds, folder } = this.props
-    let count = selectedFolderIds ? (selectedFolderIds.size + (selectedFolderIds.has(folder.id) ? 0 : 1)) : 0
+    let count = selectedFolderIds
+      ? selectedFolderIds.size + (selectedFolderIds.has(folder.id) ? 0 : 1)
+      : 0
     const acl = count === 1 ? folder.acl : []
-    const body = <CreateFolder title='Set Permissions'
-                               acl={acl}
-                               includeAssets={false}
-                               includePermissions={true}
-                               onCreate={this.setPermissions}/>
-    this.props.actions.showModal({body, width})
+    const body = (
+      <CreateFolder
+        title="Set Permissions"
+        acl={acl}
+        includeAssets={false}
+        includePermissions={true}
+        onCreate={this.setPermissions}
+      />
+    )
+    this.props.actions.showModal({ body, width })
   }
 
-  exportFolder = (event) => {
+  exportFolder = event => {
     this.dismissContextMenu(event)
 
-    const {
-      selectedFolderIds,
-      folder
-    } = this.props
-    const folderIds = selectedFolderIds.has(folder.id) ? new Set(this.props.selectedFolderIds) : [folder.id]
+    const { selectedFolderIds, folder } = this.props
+    const folderIds = selectedFolderIds.has(folder.id)
+      ? new Set(this.props.selectedFolderIds)
+      : [folder.id]
     const filter = new AssetFilter({
       links: {
-        folder: [...folderIds]
-      }
+        folder: [...folderIds],
+      },
     })
     const folders = this.props.folders
     const firstFolder = folders.get(folderIds.values().next().value)
     const name = firstFolder.name.replace(/\s/gi, '_')
-    const assetSearch = new AssetSearch({filter})
+    const assetSearch = new AssetSearch({ filter })
     this.props.actions.toggleCollapsible('exportJobs', true)
 
     this.props.actions.updateExportInterface({
       packageName: name,
       assetSearch,
-      permissionIds: this.props.user.permissions.map(permission => permission.id)
+      permissionIds: this.props.user.permissions.map(
+        permission => permission.id,
+      ),
     })
   }
 
@@ -313,42 +370,54 @@ class FolderItem extends Component {
 
     const selectedFolderIds = this.simpleFolderIds()
     if (!selectedFolderIds || selectedFolderIds.length > 1) {
-      actions.dialogAlertPromise('Unsafe delete',
-        'For safety, asset delete is only allowed from 1 folder at a time.')
+      actions.dialogAlertPromise(
+        'Unsafe delete',
+        'For safety, asset delete is only allowed from 1 folder at a time.',
+      )
       return
     }
     if (selectedAssetIds.size > 20) {
-      actions.dialogAlertPromise('Unsafe delete',
-        'For safety, asset delete is limited to 20 assets.')
+      actions.dialogAlertPromise(
+        'Unsafe delete',
+        'For safety, asset delete is limited to 20 assets.',
+      )
       return
     }
 
-    return actions.dialogConfirmPromise('Delete Assets',
-      'This cannot be undone. Are you sure you want to permanently delete these assets?')
-    .then(_ => {
-      const folderId = selectedFolderIds[0]
-      const promises = [...selectedAssetIds].map(assetId => actions.deleteAsset(assetId, folderId))
-      return Promise.all(promises)
-      /* eslint-disable handle-callback-err */ // error is handled in actions.deleteAsset, and also here (we just don't need the error object)
-      .catch(() => {
-        actions.dialogAlertPromise('Delete errors',
-          'There was an error deleting some or all assets. Check the browser dev console for a complete list.')
+    return actions
+      .dialogConfirmPromise(
+        'Delete Assets',
+        'This cannot be undone. Are you sure you want to permanently delete these assets?',
+      )
+      .then(_ => {
+        const folderId = selectedFolderIds[0]
+        const promises = [...selectedAssetIds].map(assetId =>
+          actions.deleteAsset(assetId, folderId),
+        )
+        return (
+          Promise.all(promises) // error is handled in actions.deleteAsset, and also here (we just don't need the error object)
+            /* eslint-disable handle-callback-err */ .catch(() => {
+              actions.dialogAlertPromise(
+                'Delete errors',
+                'There was an error deleting some or all assets. Check the browser dev console for a complete list.',
+              )
+            })
+            /* eslint-enable handle-callback-err */
+            .then(() => {
+              // Anything else? Flush or update query? Delete folder?
+            })
+        )
       })
-      /* eslint-enable handle-callback-err */
-      .then(() => {
-        // Anything else? Flush or update query? Delete folder?
-      })
-    })
   }
 
   createTaxonomy = () => {
-    const {actions, folder} = this.props
+    const { actions, folder } = this.props
     this.dismissContextMenu(event)
     actions.createTaxonomy(folder.id)
   }
 
   deleteTaxonomy = () => {
-    const {actions, folder} = this.props
+    const { actions, folder } = this.props
     this.dismissContextMenu(event)
     actions.deleteTaxonomy(folder.id)
   }
@@ -375,7 +444,7 @@ class FolderItem extends Component {
     const simpleFolderIds = this.simpleFolderIds()
     if (!simpleFolderIds.length) return false
     for (const assetId of selectedAssetIds) {
-      const index = assets.findIndex(asset => (asset.id === assetId))
+      const index = assets.findIndex(asset => asset.id === assetId)
       if (index < 0) continue
       const asset = assets[index]
       if (!asset.memberOfAllFolderIds(simpleFolderIds)) return true
@@ -389,7 +458,7 @@ class FolderItem extends Component {
     const simpleFolderIds = this.simpleFolderIds()
     if (!simpleFolderIds.length) return false
     for (const assetId of selectedAssetIds) {
-      const index = assets.findIndex(asset => (asset.id === assetId))
+      const index = assets.findIndex(asset => asset.id === assetId)
       if (index < 0) continue
       const asset = assets[index]
       if (asset.memberOfAnyFolderIds(simpleFolderIds)) return true
@@ -399,7 +468,7 @@ class FolderItem extends Component {
 
   // Count direct folder descendents, which is known, unlike recursive,
   // which only includes folders that have been opened and thier children
-  subfolderCount (folderId) {
+  subfolderCount(folderId) {
     const { folders } = this.props
     let count = 0
     folders.forEach(folder => {
@@ -409,34 +478,60 @@ class FolderItem extends Component {
   }
 
   // Keep the context menu from running off the bottom of the screen
-  constrainContextMenu = (ctxMenu) => {
+  constrainContextMenu = ctxMenu => {
     if (!ctxMenu) return
     const { contextMenuPos } = this.state
     if (contextMenuPos.y + ctxMenu.clientHeight > window.innerHeight) {
-      this.setState({ contextMenuPos: { ...contextMenuPos, y: window.innerHeight - ctxMenu.clientHeight } })
+      this.setState({
+        contextMenuPos: {
+          ...contextMenuPos,
+          y: window.innerHeight - ctxMenu.clientHeight,
+        },
+      })
     }
   }
 
-  renderContextMenu () {
-    const { folder, selectedFolderIds, selectedAssetIds, user, isAdministrator, isManager, uxLevel } = this.props
+  renderContextMenu() {
+    const {
+      folder,
+      selectedFolderIds,
+      selectedAssetIds,
+      user,
+      isAdministrator,
+      isManager,
+      uxLevel,
+    } = this.props
     if (!this.state.isContextMenuVisible) {
       return
     }
     // Make sure to include this folder, even if it isn't selected
-    let count = selectedFolderIds ? (selectedFolderIds.size + (selectedFolderIds.has(folder.id) ? 0 : 1)) : 0
+    let count = selectedFolderIds
+      ? selectedFolderIds.size + (selectedFolderIds.has(folder.id) ? 0 : 1)
+      : 0
     const singleFolderSelected = count <= 1
     const subfolderCount = this.subfolderCount(folder.id)
-    const subfolderLabel = subfolderCount === 0 ? 'No subfolders' : (subfolderCount === 1 ? '1 subfolder' : `${subfolderCount} subfolders`)
+    const subfolderLabel =
+      subfolderCount === 0
+        ? 'No subfolders'
+        : subfolderCount === 1 ? '1 subfolder' : `${subfolderCount} subfolders`
     const { contextMenuPos } = this.state
     const requestableExports = this.props.requestableExports === true
 
     const selectedAssets = selectedAssetIds && selectedAssetIds.size > 0
-    const selectedAssetsNotInFolder = selectedAssets && this.selectedAssetNotInSelectedFolder()
-    const addableAssets = selectedAssetsNotInFolder && this.simpleFolderIds().length > 0
-    const removableAssets = selectedAssets && this.selectedFolderContainsSelectedAssets()
+    const selectedAssetsNotInFolder =
+      selectedAssets && this.selectedAssetNotInSelectedFolder()
+    const addableAssets =
+      selectedAssetsNotInFolder && this.simpleFolderIds().length > 0
+    const removableAssets =
+      selectedAssets && this.selectedFolderContainsSelectedAssets()
     const writePermission = folder.hasAccess(user, AclEntry.WriteAccess)
-    const exportPermission = folder.hasAccess(user, AclEntry.ExportAccess) || requestableExports
-    const canAddChild = singleFolderSelected && !folder.isDyhi() && folder.isSimpleCollection() && writePermission
+    const exportPermission =
+      folder.hasAccess(user, AclEntry.ExportAccess) || requestableExports
+    const canAddChild =
+      singleFolderSelected &&
+      !folder.isDyhi() &&
+      folder.isSimpleCollection() &&
+      writePermission
     let canAddChildTitle = ''
     if (!singleFolderSelected) {
       canAddChildTitle = 'Select a single folder as parent'
@@ -462,117 +557,180 @@ class FolderItem extends Component {
       removableAssetTitle = 'Selected assets are not in selected folder'
     }
     const deleteAssetsTitle = 'Delete assets'
-    let removeFolderTitle = writePermission ? 'Move folder to trash' : 'No write permission'
+    let removeFolderTitle = writePermission
+      ? 'Move folder to trash'
+      : 'No write permission'
 
     // FIXME: Get Link, Move to, and Favorite are disabled until implemented
     return (
       <div>
-        <div onClick={this.dismissContextMenu} className="FolderItem-context-menu-background" onContextMenu={this.dismissContextMenu} />
-        <div className="FolderItem-context-menu"
-             onContextMenu={this.dismissContextMenu}
-             style={{ top: contextMenuPos.y, left: contextMenuPos.x }}
-             ref={ this.constrainContextMenu }>
-          { singleFolderSelected &&
-          <div className="FolderItem-context-item FolderItem-context-subfolders disabled"
-               onContextMenu={this.dismissContextMenu}>
-            <div className="icon-folder-subfolders"/>
-            <div>{subfolderLabel}</div>
-          </div> }
-          { singleFolderSelected && !folder.isDyhi() && (
-            folder.isPrivate(user, user.permissions) ? (
-              <div className="FolderItem-context-item FolderItem-context-private disabled"
-                   onContextMenu={this.dismissContextMenu}>
-                <div className="icon-private"/>
+        <div
+          onClick={this.dismissContextMenu}
+          className="FolderItem-context-menu-background"
+          onContextMenu={this.dismissContextMenu}
+        />
+        <div
+          className="FolderItem-context-menu"
+          onContextMenu={this.dismissContextMenu}
+          style={{ top: contextMenuPos.y, left: contextMenuPos.x }}
+          ref={this.constrainContextMenu}>
+          {singleFolderSelected && (
+            <div
+              className="FolderItem-context-item FolderItem-context-subfolders disabled"
+              onContextMenu={this.dismissContextMenu}>
+              <div className="icon-folder-subfolders" />
+              <div>{subfolderLabel}</div>
+            </div>
+          )}
+          {singleFolderSelected &&
+            !folder.isDyhi() &&
+            (folder.isPrivate(user, user.permissions) ? (
+              <div
+                className="FolderItem-context-item FolderItem-context-private disabled"
+                onContextMenu={this.dismissContextMenu}>
+                <div className="icon-private" />
                 <div>My Collection</div>
               </div>
             ) : (
-              <div className="FolderItem-context-item FolderItem-context-public disabled"
-                   onContextMenu={this.dismissContextMenu}>
-                <div className="icon-public"/>
+              <div
+                className="FolderItem-context-item FolderItem-context-public disabled"
+                onContextMenu={this.dismissContextMenu}>
+                <div className="icon-public" />
                 <div>Shared Collection</div>
               </div>
             ))}
-          { singleFolderSelected && writePermission &&
-          <div onClick={this.rename}
-               className="FolderItem-context-item FolderItem-context-edit"
-               onContextMenu={this.dismissContextMenu}>
-            <div className="icon-pencil"/>
-            <div>Rename Folder...</div>
-          </div> }
-          { (isManager || isAdministrator) && uxLevel > 0 && (!singleFolderSelected || writePermission) && (
-            <div onClick={this.permissions}
-                 className="FolderItem-context-item FolderItem-context-edit"
-                 onContextMenu={this.dismissContextMenu}>
-              <div className="icon-public"/>
-              <div>Share Folder...</div>
-            </div>
-          )}
-          { singleFolderSelected && isAdministrator &&
-          <div onClick={this.assetPermissions}
-               className="FolderItem-context-item FolderItem-context-asset-permissions"
-               onContextMenu={this.dismissContextMenu}>
-            <div className="icon-link2"/><div>Share Asset...</div></div> }
-          { singleFolderSelected && exportPermission &&
-          <div onClick={this.exportFolder}
-               className="FolderItem-context-item FolderItem-context-export"
-               onContextMenu={this.dismissContextMenu}>
-            <div className="icon-export"/>
-            <div>Export Assets</div>
-          </div> }
-          { singleFolderSelected && !folder.isDyhi() && folder.isSmartCollection() &&
-          <div onClick={this.restoreFolder}
-               className="FolderItem-context-item FolderItem-context-restore-widgets"
-               onContextMenu={this.dismissContextMenu}>
-            <div className="icon-settings_backup_restore"/><div>Restore Widgets</div></div> }
-          { singleFolderSelected && !folder.isDyhi() && folder.isSimpleCollection() && writePermission &&
-            <div onClick={canAddChild && this.createChild}
-                 className="FolderItem-context-item FolderItem-context-create-subfolder"
-                 onContextMenu={this.dismissContextMenu}>
-              <div title={canAddChildTitle}
-                   className={classnames('icon-folder-add', {disabled: !canAddChild})} />
-              <div>Create Sub-folder</div>
-            </div> }
-          { singleFolderSelected && folder.taxonomyRoot && isAdministrator &&
-            <div onClick={this.deleteTaxonomy}
-                 title="Delete taxonomy to remove folder keywords"
-                 className="FolderItem-context-item FolderItem-context-taxonomy"
-                 onContextMenu={this.dismissContextMenu}>
-              <div className="icon-site-map"/>
-              <div>Delete Taxonomy</div>
-            </div>
-          }
-          { singleFolderSelected && !folder.taxonomyRoot && isAdministrator &&
-          <div onClick={this.createTaxonomy}
-               title="Create taxonomy to add keywords for this folder"
-               className="FolderItem-context-item FolderItem-context-taxonomy"
-               onContextMenu={this.dismissContextMenu}>
-            <div className="icon-site-map"/>
-            <div>Create Taxonomy</div>
-          </div>
-          }
-          <div onClick={addableAssets && this.addAssetsToFolders}
-               title={addableAssetTitle}
-               className={classnames('FolderItem-context-item FolderItem-context-add-assets', {disabled: !addableAssets})}>
-            <div className="icon-plus"/>
+          {singleFolderSelected &&
+            writePermission && (
+              <div
+                onClick={this.rename}
+                className="FolderItem-context-item FolderItem-context-edit"
+                onContextMenu={this.dismissContextMenu}>
+                <div className="icon-pencil" />
+                <div>Rename Folder...</div>
+              </div>
+            )}
+          {(isManager || isAdministrator) &&
+            uxLevel > 0 &&
+            (!singleFolderSelected || writePermission) && (
+              <div
+                onClick={this.permissions}
+                className="FolderItem-context-item FolderItem-context-edit"
+                onContextMenu={this.dismissContextMenu}>
+                <div className="icon-public" />
+                <div>Share Folder...</div>
+              </div>
+            )}
+          {singleFolderSelected &&
+            isAdministrator && (
+              <div
+                onClick={this.assetPermissions}
+                className="FolderItem-context-item FolderItem-context-asset-permissions"
+                onContextMenu={this.dismissContextMenu}>
+                <div className="icon-link2" />
+                <div>Share Asset...</div>
+              </div>
+            )}
+          {singleFolderSelected &&
+            exportPermission && (
+              <div
+                onClick={this.exportFolder}
+                className="FolderItem-context-item FolderItem-context-export"
+                onContextMenu={this.dismissContextMenu}>
+                <div className="icon-export" />
+                <div>Export Assets</div>
+              </div>
+            )}
+          {singleFolderSelected &&
+            !folder.isDyhi() &&
+            folder.isSmartCollection() && (
+              <div
+                onClick={this.restoreFolder}
+                className="FolderItem-context-item FolderItem-context-restore-widgets"
+                onContextMenu={this.dismissContextMenu}>
+                <div className="icon-settings_backup_restore" />
+                <div>Restore Widgets</div>
+              </div>
+            )}
+          {singleFolderSelected &&
+            !folder.isDyhi() &&
+            folder.isSimpleCollection() &&
+            writePermission && (
+              <div
+                onClick={canAddChild && this.createChild}
+                className="FolderItem-context-item FolderItem-context-create-subfolder"
+                onContextMenu={this.dismissContextMenu}>
+                <div
+                  title={canAddChildTitle}
+                  className={classnames('icon-folder-add', {
+                    disabled: !canAddChild,
+                  })}
+                />
+                <div>Create Sub-folder</div>
+              </div>
+            )}
+          {singleFolderSelected &&
+            folder.taxonomyRoot &&
+            isAdministrator && (
+              <div
+                onClick={this.deleteTaxonomy}
+                title="Delete taxonomy to remove folder keywords"
+                className="FolderItem-context-item FolderItem-context-taxonomy"
+                onContextMenu={this.dismissContextMenu}>
+                <div className="icon-site-map" />
+                <div>Delete Taxonomy</div>
+              </div>
+            )}
+          {singleFolderSelected &&
+            !folder.taxonomyRoot &&
+            isAdministrator && (
+              <div
+                onClick={this.createTaxonomy}
+                title="Create taxonomy to add keywords for this folder"
+                className="FolderItem-context-item FolderItem-context-taxonomy"
+                onContextMenu={this.dismissContextMenu}>
+                <div className="icon-site-map" />
+                <div>Create Taxonomy</div>
+              </div>
+            )}
+          <div
+            onClick={addableAssets && this.addAssetsToFolders}
+            title={addableAssetTitle}
+            className={classnames(
+              'FolderItem-context-item FolderItem-context-add-assets',
+              { disabled: !addableAssets },
+            )}>
+            <div className="icon-plus" />
             <div>Add Assets</div>
           </div>
-          <div onClick={removableAssets && this.removeAssetsFromFolders}
-               title={removableAssetTitle}
-               className={classnames('FolderItem-context-item FolderItem-context-remove-assets', {disabled: !removableAssets})}>
-            <div className="icon-removeasset"/>
+          <div
+            onClick={removableAssets && this.removeAssetsFromFolders}
+            title={removableAssetTitle}
+            className={classnames(
+              'FolderItem-context-item FolderItem-context-remove-assets',
+              { disabled: !removableAssets },
+            )}>
+            <div className="icon-removeasset" />
             <div>Remove Assets</div>
           </div>
-          <div onClick={removableAssets && this.deleteAssets}
-               title={deleteAssetsTitle}
-               className={classnames('FolderItem-context-item FolderItem-context-delete-assets', {disabled: !removableAssets})}>
-            <div className="icon-cross"/>
+          <div
+            onClick={removableAssets && this.deleteAssets}
+            title={deleteAssetsTitle}
+            className={classnames(
+              'FolderItem-context-item FolderItem-context-delete-assets',
+              { disabled: !removableAssets },
+            )}>
+            <div className="icon-cross" />
             <div>Delete Assets</div>
           </div>
-          <div onClick={writePermission && this.removeFolder}
-               title={removeFolderTitle}
-               className={classnames('FolderItem-context-item FolderItem-context-remove-folder', {disabled: !writePermission})}
-               onContextMenu={this.dismissContextMenu}>
-            <div className="icon-trash2"/>
+          <div
+            onClick={writePermission && this.removeFolder}
+            title={removeFolderTitle}
+            className={classnames(
+              'FolderItem-context-item FolderItem-context-remove-folder',
+              { disabled: !writePermission },
+            )}
+            onContextMenu={this.dismissContextMenu}>
+            <div className="icon-trash2" />
             <div>Trash Folder</div>
           </div>
         </div>
@@ -580,118 +738,183 @@ class FolderItem extends Component {
     )
   }
 
-  renderCount () {
-    const { folder, counts, allAssetCount, filteredCounts, userSettings } = this.props
+  renderCount() {
+    const {
+      folder,
+      counts,
+      allAssetCount,
+      filteredCounts,
+      userSettings,
+    } = this.props
     let count = counts && counts.get(folder.id)
     let filteredCount = filteredCounts && filteredCounts.get(folder.id)
     if (allAssetCount) {
       if (count === allAssetCount) count = 'all'
       if (filteredCount === allAssetCount) filteredCount = 'all'
     }
-    if (count === undefined) return <div/>
-    if (count === filteredCount) return <div className="FolderItem-count">{count}</div>
+    if (count === undefined) return <div />
+    if (count === filteredCount)
+      return <div className="FolderItem-count">{count}</div>
     switch (userSettings.showFolderCounts) {
-      case NO_COUNTS: return <div/>
-      case FULL_COUNTS: return <div className="FolderItem-count">{count}</div>
+      case NO_COUNTS:
+        return <div />
+      case FULL_COUNTS:
+        return <div className="FolderItem-count">{count}</div>
       case FILTERED_COUNTS:
       default:
         return (
           <div className="FolderItem-counts">
-            <div className={classnames('FolderItem-filtered-count', {isZero: filteredCount === 0})}>{filteredCount}</div>
-            { filteredCount !== undefined && <div>/</div> }
+            <div
+              className={classnames('FolderItem-filtered-count', {
+                isZero: filteredCount === 0,
+              })}>
+              {filteredCount}
+            </div>
+            {filteredCount !== undefined && <div>/</div>}
             <div className="FolderItem-count">{count}</div>
           </div>
         )
     }
   }
 
-  renderPermission () {
+  renderPermission() {
     const { folder, user } = this.props
-    const permisionIcon = folder.isPublic(user, user.permissions) ? 'icon-public' : undefined
+    const permisionIcon = folder.isPublic(user, user.permissions)
+      ? 'icon-public'
+      : undefined
     if (folder.isPublic(user, user.permissions)) {
-      return <div className={classnames('FolderItem-permission', permisionIcon)}/>
+      return (
+        <div className={classnames('FolderItem-permission', permisionIcon)} />
+      )
     }
   }
 
-  render () {
-    const { folder, depth, isOpen, hasChildren, isSelected, onToggle, onSelect, dropparams, dropFolderId, top } = this.props
+  render() {
+    const {
+      folder,
+      depth,
+      isOpen,
+      hasChildren,
+      isSelected,
+      onToggle,
+      onSelect,
+      dropparams,
+      dropFolderId,
+      top,
+    } = this.props
     const dragHover = this.props.dragHover || dropFolderId === folder.id
-    const icon = folder.isLaunchpad() ? 'icon-rocket' : (folder.isDyhi() ? 'icon-foldercog' : (folder.isSmartCollection() ? 'icon-collections-smart' : 'icon-folder'))
+    const icon = folder.isLaunchpad()
+      ? 'icon-rocket'
+      : folder.isDyhi()
+        ? 'icon-foldercog'
+        : folder.isSmartCollection() ? 'icon-collections-smart' : 'icon-folder'
     const draggable = !folder.isDyhi() || folder.dyhiRoot
     const isDropTarget = dropTarget(this.props)
-    const dragparams = { ...this.props.dragparams, draggable }  // disable drag
+    const dragparams = { ...this.props.dragparams, draggable } // disable drag
     return (
-      <div className={classnames('FolderItem', { isOpen, hasChildren, isSelected, isDropTarget: dropTarget(this.props), dragHover })}
-           style={{ paddingLeft: `${(depth - 1) * 10}px`, top }}>
-        { this.renderContextMenu() }
-        <div className={classnames('FolderItem-toggle', {hasChildren})}
-             onClick={event => { onToggle(folder); return false }}>
-          {hasChildren ? <i className='FolderItem-toggleArrow icon-triangle-down'/> : null}
+      <div
+        className={classnames('FolderItem', {
+          isOpen,
+          hasChildren,
+          isSelected,
+          isDropTarget: dropTarget(this.props),
+          dragHover,
+        })}
+        style={{ paddingLeft: `${(depth - 1) * 10}px`, top }}>
+        {this.renderContextMenu()}
+        <div
+          className={classnames('FolderItem-toggle', { hasChildren })}
+          onClick={event => {
+            onToggle(folder)
+            return false
+          }}>
+          {hasChildren ? (
+            <i className="FolderItem-toggleArrow icon-triangle-down" />
+          ) : null}
         </div>
-        <div className={classnames('FolderItem-select')} {...dragparams}
-             onClick={event => onSelect(event, folder)}
-             onContextMenu={this.showContextMenu}>
+        <div
+          className={classnames('FolderItem-select')}
+          {...dragparams}
+          onClick={event => onSelect(event, folder)}
+          onContextMenu={this.showContextMenu}>
           <div className="flexRow flexAlignItemsCenter">
-            <i className={`FolderItem-icon ${icon}`}/>
-            <div className='FolderItem-text' key={folder.id}>
+            <i className={`FolderItem-icon ${icon}`} />
+            <div className="FolderItem-text" key={folder.id}>
               {folder.name}
             </div>
           </div>
           <div className="flexRow flexAlignItemsCenter">
-            { this.renderPermission() }
-            { folder.taxonomyRoot && <div className="FolderItem-taxonomy icon-site-map" title="Taxonomy adds folder name to keywords"/> }
-            { this.renderCount() }
+            {this.renderPermission()}
+            {folder.taxonomyRoot && (
+              <div
+                className="FolderItem-taxonomy icon-site-map"
+                title="Taxonomy adds folder name to keywords"
+              />
+            )}
+            {this.renderCount()}
           </div>
         </div>
-        <div className={classnames('FolderItem-dropzone', {isDropTarget, dragHover})} {...dropparams}/>
+        <div
+          className={classnames('FolderItem-dropzone', {
+            isDropTarget,
+            dragHover,
+          })}
+          {...dropparams}
+        />
       </div>
     )
   }
 }
 
-export default connect(state => ({
-  assets: state.assets.all,
-  allAssetCount: state.assets.allAssetCount,
-  folders: state.folders.all,
-  counts: state.folders.counts,
-  filteredCounts: state.folders.filteredCounts,
-  taxonomies: state.folders.taxonomies,
-  selectedFolderIds: state.folders.selectedFolderIds,
-  selectedAssetIds: state.assets.selectedIds,
-  dropFolderId: state.folders.dropFolderId,
-  user: state.auth.user,
-  origin: state.auth.origin,
-  dragInfo: state.app.dragInfo,
-  selectedTableLayoutId: state.app.selectedTableLayoutId,
-  tableLayouts: state.app.tableLayouts,
-  isManager: state.auth.isManager,
-  isAdministrator: state.auth.isAdministrator,
-  uxLevel: state.app.uxLevel,
-  userSettings: state.app.userSettings,
-  jobs: state.jobs.all,
-  query: state.assets && state.assets.query,
-  requestableExports: true // TODO make this come from a server-side value or something
-}), dispatch => ({
-  actions: bindActionCreators({
-    createFolder,
-    addAssetIdsToFolderId,
-    removeAssetIdsFromFolderId,
-    dropFolderId,
-    showModal,
-    hideModal,
-    dialogAlertPromise,
-    dialogConfirmPromise,
-    deleteFolderIds,
-    updateFolder,
-    updateFolderPermissions,
-    restoreFolders,
-    setAssetPermissions,
-    deleteAsset,
-    searchAssets,
-    selectAssetIds,
-    createTaxonomy,
-    deleteTaxonomy,
-    toggleCollapsible,
-    updateExportInterface
-  }, dispatch)
-}))(FolderItem)
+export default connect(
+  state => ({
+    assets: state.assets.all,
+    allAssetCount: state.assets.allAssetCount,
+    folders: state.folders.all,
+    counts: state.folders.counts,
+    filteredCounts: state.folders.filteredCounts,
+    taxonomies: state.folders.taxonomies,
+    selectedFolderIds: state.folders.selectedFolderIds,
+    selectedAssetIds: state.assets.selectedIds,
+    dropFolderId: state.folders.dropFolderId,
+    user: state.auth.user,
+    origin: state.auth.origin,
+    dragInfo: state.app.dragInfo,
+    selectedTableLayoutId: state.app.selectedTableLayoutId,
+    tableLayouts: state.app.tableLayouts,
+    isManager: state.auth.isManager,
+    isAdministrator: state.auth.isAdministrator,
+    uxLevel: state.app.uxLevel,
+    userSettings: state.app.userSettings,
+    jobs: state.jobs.all,
+    query: state.assets && state.assets.query,
+    requestableExports: true, // TODO make this come from a server-side value or something
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        createFolder,
+        addAssetIdsToFolderId,
+        removeAssetIdsFromFolderId,
+        dropFolderId,
+        showModal,
+        hideModal,
+        dialogAlertPromise,
+        dialogConfirmPromise,
+        deleteFolderIds,
+        updateFolder,
+        updateFolderPermissions,
+        restoreFolders,
+        setAssetPermissions,
+        deleteAsset,
+        searchAssets,
+        selectAssetIds,
+        createTaxonomy,
+        deleteTaxonomy,
+        toggleCollapsible,
+        updateExportInterface,
+      },
+      dispatch,
+    ),
+  }),
+)(FolderItem)

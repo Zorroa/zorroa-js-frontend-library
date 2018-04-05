@@ -17,7 +17,7 @@ import {
   EXPORT_ONLINE_STATUS_ERROR,
   CREATE_EXPORT_START,
   CREATE_EXPORT_SUCCESS,
-  CREATE_EXPORT_ERROR
+  CREATE_EXPORT_ERROR,
 } from '../constants/actionTypes'
 import api from '../api'
 import AssetSearch from '../models/AssetSearch'
@@ -27,26 +27,26 @@ const APP_NAME = 'curator'
 /**
  * This starts off the backend Exporters
  */
-export function createExport (requestPayload) {
+export function createExport(requestPayload) {
   return dispatch => {
     dispatch({
-      type: CREATE_EXPORT_START
+      type: CREATE_EXPORT_START,
     })
 
-    api
-      .exports
-      .post(requestPayload)
-      .then(response => {
+    api.exports.post(requestPayload).then(
+      response => {
         dispatch({
           type: CREATE_EXPORT_SUCCESS,
-          payload: response
+          payload: response,
         })
-      }, errorResponse => {
+      },
+      errorResponse => {
         dispatch({
           type: CREATE_EXPORT_ERROR,
-          payload: errorResponse.response.data
+          payload: errorResponse.response.data,
         })
-      })
+      },
+    )
   }
 }
 
@@ -54,28 +54,30 @@ export function createExport (requestPayload) {
  * Detects what files in a given search are online (i.e. the Archivist has access
  * to them) vs. offline (i.e. they're on a tape drive or airgapped).
  */
-export function onlineStatus (requestPayload) {
+export function onlineStatus(requestPayload) {
   return dispatch => {
     dispatch({
-      type: EXPORT_ONLINE_STATUS_START
+      type: EXPORT_ONLINE_STATUS_START,
     })
 
-    api
-      .localFileSystem
+    api.localFileSystem
       .online({
-        search: requestPayload
+        search: requestPayload,
       })
-      .then(response => {
-        dispatch({
-          type: EXPORT_ONLINE_STATUS_SUCCESS,
-          payload: response
-        })
-      }, errorResponse => {
-        dispatch({
-          type: EXPORT_ONLINE_STATUS_ERROR,
-          payload: errorResponse.data
-        })
-      })
+      .then(
+        response => {
+          dispatch({
+            type: EXPORT_ONLINE_STATUS_SUCCESS,
+            payload: response,
+          })
+        },
+        errorResponse => {
+          dispatch({
+            type: EXPORT_ONLINE_STATUS_ERROR,
+            payload: errorResponse.data,
+          })
+        },
+      )
   }
 }
 
@@ -83,75 +85,83 @@ export function onlineStatus (requestPayload) {
  * Sends a manual export request. This will then be evaulated and acted upon
  * based on some kind of external workflow that we don't care about.
  */
-export function exportRequest (requestPayload) {
+export function exportRequest(requestPayload) {
   return dispatch => {
     dispatch({
-      type: EXPORT_REQUEST_START
+      type: EXPORT_REQUEST_START,
     })
 
-    api
-      .request
+    api.request
       .post({
         folderId: requestPayload.folderId,
         type: requestPayload.type,
         emailCC: [requestPayload.emailCC],
-        comment: requestPayload.comment
+        comment: requestPayload.comment,
       })
-      .then(response => {
-        dispatch({
-          type: EXPORT_REQUEST_SUCCESS,
-          payload: response
-        })
-      }, errorResponse => {
-        dispatch({
-          type: EXPORT_REQUEST_ERROR,
-          payload: errorResponse.response.data
-        })
-      })
+      .then(
+        response => {
+          dispatch({
+            type: EXPORT_REQUEST_SUCCESS,
+            payload: response,
+          })
+        },
+        errorResponse => {
+          dispatch({
+            type: EXPORT_REQUEST_ERROR,
+            payload: errorResponse.response.data,
+          })
+        },
+      )
   }
 }
 
 /**
  * This loads up a user's favorite export settings so that they can be used again
  */
-export function loadExportProfiles () {
+export function loadExportProfiles() {
   return dispatch => {
     dispatch({
-      type: LOAD_EXPORT_PROFILE_BLOB
+      type: LOAD_EXPORT_PROFILE_BLOB,
     })
 
     api
       .blob(APP_NAME)
       .get({
         feature: 'exports',
-        name: 'profiles'
+        name: 'profiles',
       })
-      .then(response => {
-        dispatch({
-          type: LOAD_EXPORT_PROFILE_BLOB_SUCCESS,
-          payload: response
-        })
-      }, errorResponse => {
-        if (errorResponse.excption === 'com.zorroa.sdk.client.exception.EntityNotFoundException') {
+      .then(
+        response => {
           dispatch({
             type: LOAD_EXPORT_PROFILE_BLOB_SUCCESS,
-            payload: []
+            payload: response,
           })
-          return
-        }
+        },
+        errorResponse => {
+          if (
+            errorResponse.excption ===
+            'com.zorroa.sdk.client.exception.EntityNotFoundException'
+          ) {
+            dispatch({
+              type: LOAD_EXPORT_PROFILE_BLOB_SUCCESS,
+              payload: [],
+            })
+            return
+          }
 
-        dispatch({
-          type: LOAD_EXPORT_PROFILE_BLOB_ERROR,
-          payload: errorResponse.data
-        })
-      })
+          dispatch({
+            type: LOAD_EXPORT_PROFILE_BLOB_ERROR,
+            payload: errorResponse.data,
+          })
+        },
+      )
   }
 }
 
-export function postExportProfiles (data) {
+export function postExportProfiles(data) {
   return dispatch => {
     dispatch({
-      type: POST_EXPORT_PROFILE_BLOB
+      type: POST_EXPORT_PROFILE_BLOB,
     })
 
     api
@@ -162,43 +172,46 @@ export function postExportProfiles (data) {
         payload: {
           data,
           version: 1,
-          dateUpdated: Number(new Date())
-        }
+          dateUpdated: Number(new Date()),
+        },
       })
-      .then(response => {
-        dispatch({
-          type: POST_EXPORT_PROFILE_BLOB_SUCCESS,
-          payload: response
-        })
-      }, errorResponse => {
-        dispatch({
-          type: POST_EXPORT_PROFILE_BLOB_ERROR,
-          payload: errorResponse.response.data
-        })
-      })
+      .then(
+        response => {
+          dispatch({
+            type: POST_EXPORT_PROFILE_BLOB_SUCCESS,
+            payload: response,
+          })
+        },
+        errorResponse => {
+          dispatch({
+            type: POST_EXPORT_PROFILE_BLOB_ERROR,
+            payload: errorResponse.response.data,
+          })
+        },
+      )
   }
 }
 
-export function clearPostExportLoadingStates () {
+export function clearPostExportLoadingStates() {
   return dispatch => {
     dispatch({
-      type: POST_EXPORT_PROFILE_BLOB_CLEAR
+      type: POST_EXPORT_PROFILE_BLOB_CLEAR,
     })
   }
 }
 
-export function hideExportInterface () {
+export function hideExportInterface() {
   return dispatch => {
     dispatch({
-      type: HIDE_EXPORT_UI
+      type: HIDE_EXPORT_UI,
     })
   }
 }
 
-export function updateExportInterface ({
+export function updateExportInterface({
   packageName,
   assetSearch,
-  permissionIds
+  permissionIds,
 }) {
   return dispatch => {
     const assetSearchAggregations = new AssetSearch(assetSearch)
@@ -207,21 +220,21 @@ export function updateExportInterface ({
     assetSearchAggregations.aggs = {
       extension: {
         terms: {
-          field: 'source.extension'
-        }
+          field: 'source.extension',
+        },
       },
       clipType: {
         terms: {
-          field: 'media.clip.type'
+          field: 'media.clip.type',
         },
         aggs: {
           parent: {
             terms: {
-              field: 'media.clip.parent.raw'
-            }
-          }
-        }
-      }
+              field: 'media.clip.parent.raw',
+            },
+          },
+        },
+      },
     }
 
     // Only pull back enough assets to render a preview
@@ -232,27 +245,29 @@ export function updateExportInterface ({
     const restrictedAssetSearch = new AssetSearch(assetSearch)
     const restrictedFilter = new AssetFilter({
       terms: {
-        'zorroa.permissions.export': Array.isArray(permissionIds) ? permissionIds : []
-      }
+        'zorroa.permissions.export': Array.isArray(permissionIds)
+          ? permissionIds
+          : [],
+      },
     })
 
     restrictedAssetSearch.filter.merge(restrictedFilter)
 
     const exportPromises = Promise.all([
       api.search(assetSearchAggregations),
-      api.search(restrictedAssetSearch)
+      api.search(restrictedAssetSearch),
     ])
 
     dispatch({
       type: SHOW_EXPORT_UI,
       payload: {
         packageName,
-        assetSearch
-      }
+        assetSearch,
+      },
     })
 
     exportPromises.then(([assetSearchResponse, restrictedAssetSearch]) => {
-      const {aggregations, assets, page} = assetSearchResponse
+      const { aggregations, assets, page } = assetSearchResponse
       const totalAssetCount = page.totalCount
       const availableSearchAssets = restrictedAssetSearch.page.totalCount
 
@@ -263,18 +278,24 @@ export function updateExportInterface ({
           hasRestrictedAssets: availableSearchAssets >= totalAssetCount,
           totalAssetCount,
           clipParentCounts: {
-            type: aggregations.clipType.buckets.reduce((accumulator, bucket) => {
-              accumulator[bucket.key] = bucket.parent.buckets.length
-              return accumulator
-            }, {})
+            type: aggregations.clipType.buckets.reduce(
+              (accumulator, bucket) => {
+                accumulator[bucket.key] = bucket.parent.buckets.length
+                return accumulator
+              },
+              {},
+            ),
           },
           documentCounts: {
-            extension: aggregations.extension.buckets.reduce((accumulator, bucket) => {
-              accumulator[bucket.key] = bucket.doc_count
-              return accumulator
-            }, {})
-          }
-        }
+            extension: aggregations.extension.buckets.reduce(
+              (accumulator, bucket) => {
+                accumulator[bucket.key] = bucket.doc_count
+                return accumulator
+              },
+              {},
+            ),
+          },
+        },
       })
     })
   }

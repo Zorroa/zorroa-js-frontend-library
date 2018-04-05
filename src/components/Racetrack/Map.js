@@ -13,7 +13,8 @@ import { MapWidgetInfo } from './WidgetInfo'
 import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import { unCamelCase } from '../../services/jsUtil'
 
-const accessToken = 'pk.eyJ1IjoiZGFud2V4bGVyIiwiYSI6IldaWnNGM28ifQ.e18uSb539LjXseysIC7KSw'
+const accessToken =
+  'pk.eyJ1IjoiZGFud2V4bGVyIiwiYSI6IldaWnNGM28ifQ.e18uSb539LjXseysIC7KSw'
 // const mapboxStyle = 'mapbox://styles/mapbox/streets-v8'
 const mapboxStyle = 'mapbox://styles/mapbox/light-v9'
 
@@ -28,52 +29,61 @@ class Map extends Component {
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     selectedAssetIds: PropTypes.instanceOf(Set),
     aggs: PropTypes.object,
-    widgets: PropTypes.arrayOf(PropTypes.object)
+    widgets: PropTypes.arrayOf(PropTypes.object),
   }
 
   state = {
     locationField: '',
     searchField: '',
-    term: undefined
+    term: undefined,
   }
 
   // Store the map location as class properties, but not component state
   // because we don't want to update the map when these change. Instead
   // we simply need to retain the current values to use in the render JSX
-  center = { lng: -122.268, lat: 37.872 }    // Zorroa Berkeley!
+  center = { lng: -122.268, lat: 37.872 } // Zorroa Berkeley!
   zoom = 0
 
-  componentWillMount () {
+  componentWillMount() {
     this.componentWillReceiveProps(this.props)
   }
 
-  componentWillReceiveProps (props) {
+  componentWillReceiveProps(props) {
     const { id, widgets } = props
-    const index = widgets && widgets.findIndex(widget => (id === widget.id))
+    const index = widgets && widgets.findIndex(widget => id === widget.id)
     const widget = widgets && widgets[index]
     let locationField, searchField
     if (widget && widget.sliver) {
       if (widget.sliver.filter && widget.sliver.filter.terms) {
         const fieldRaw = widget.field
-        searchField = fieldRaw && fieldRaw.endsWith('.raw') ? fieldRaw.slice(0, fieldRaw.length - 4) : fieldRaw
+        searchField =
+          fieldRaw && fieldRaw.endsWith('.raw')
+            ? fieldRaw.slice(0, fieldRaw.length - 4)
+            : fieldRaw
       }
       if (widget.sliver.aggs) {
         locationField = widget.sliver.aggs.map.geohash_grid.field
       }
-      this.setState({locationField, searchField})
+      this.setState({ locationField, searchField })
     }
   }
 
-  modifySliver (locationField, searchField, term) {
+  modifySliver(locationField, searchField, term) {
     const { id, widgets } = this.props
-    const index = widgets && widgets.findIndex(widget => (id === widget.id))
+    const index = widgets && widgets.findIndex(widget => id === widget.id)
     const oldWidget = widgets && widgets[index]
     let isEnabled, isPinned
     if (oldWidget) {
       isEnabled = oldWidget.isEnabled
       isPinned = oldWidget.isPinned
     }
-    const widget = createMapWidget(locationField, 'point', term, isEnabled, isPinned)
+    const widget = createMapWidget(
+      locationField,
+      'point',
+      term,
+      isEnabled,
+      isPinned,
+    )
     widget.id = this.props.id
     this.props.actions.modifyRacetrackWidget(widget)
   }
@@ -87,120 +97,152 @@ class Map extends Component {
     this.zoom = map.getZoom()
   }
 
-  selectAsset (asset) {
+  selectAsset(asset) {
     const term = asset.value(this.state.searchField)
-    this.setState({term})
+    this.setState({ term })
     console.log('Select marker for asset ' + asset.id + ' with ' + term)
     const { locationField, searchField } = this.state
     this.modifySliver(locationField, searchField, term)
   }
 
-  clearTerm = (event) => {
-    this.setState({term: null})
+  clearTerm = event => {
+    this.setState({ term: null })
     const { locationField, searchField } = this.state
     this.modifySliver(locationField, searchField, null)
   }
 
-  aggBuckets () {
+  aggBuckets() {
     const { id, aggs } = this.props
-    return aggs && (id in aggs) && aggs[id].map.buckets
+    return aggs && id in aggs && aggs[id].map.buckets
   }
 
-  render () {
-    const { id, floatBody, isOpen, onOpen, isIconified, assets, selectedAssetIds } = this.props
+  render() {
+    const {
+      id,
+      floatBody,
+      isOpen,
+      onOpen,
+      isIconified,
+      assets,
+      selectedAssetIds,
+    } = this.props
     const { locationField, searchField, term } = this.state
-    const field = Asset.lastNamespace(unCamelCase(searchField || locationField || '<Select Fields>'))
-    const locationAssets = assets && assets.filter(asset => (asset.value(locationField)))
-    const selectedAssets = assets && selectedAssetIds && locationAssets.filter(asset => (selectedAssetIds.has(asset.id)))
+    const field = Asset.lastNamespace(
+      unCamelCase(searchField || locationField || '<Select Fields>'),
+    )
+    const locationAssets =
+      assets && assets.filter(asset => asset.value(locationField))
+    const selectedAssets =
+      assets &&
+      selectedAssetIds &&
+      locationAssets.filter(asset => selectedAssetIds.has(asset.id))
     const geohashes = this.aggBuckets()
     const geohashCircleProperties = {
       'circle-color': '#82a626',
       'circle-blur': 0.5,
       'circle-opacity': 0.5,
-      'circle-radius': 4
+      'circle-radius': 4,
     }
     const locationCircleProperties = {
       'circle-color': '#627621',
       'circle-opacity': 0.75,
       'circle-blur': 0.95,
-      'circle-radius': 6
+      'circle-radius': 6,
     }
     const selectedCircleProperties = {
       'circle-color': '#ce2d3f',
       'circle-opacity': 1,
       'circle-blur': 0,
-      'circle-radius': 7
+      'circle-radius': 7,
     }
     return (
-      <Widget className="Map"
-              id={id}
-              isOpen={isOpen}
-              onOpen={onOpen}
-              floatBody={floatBody}
-              icon={MapWidgetInfo.icon}
-              field={field}
-              backgroundColor={MapWidgetInfo.color}
-              isIconified={isIconified}>
-        <ReactMapboxGl containerStyle={{height: '500px', width: '500px'}}
-                       style={mapboxStyle}
-                       center={[this.center.lng, this.center.lat]}
-                       zoom={[this.zoom]}
-                       onMove={this.onMove} onZoom={this.onZoom}
-                       accessToken={accessToken} >
+      <Widget
+        className="Map"
+        id={id}
+        isOpen={isOpen}
+        onOpen={onOpen}
+        floatBody={floatBody}
+        icon={MapWidgetInfo.icon}
+        field={field}
+        backgroundColor={MapWidgetInfo.color}
+        isIconified={isIconified}>
+        <ReactMapboxGl
+          containerStyle={{ height: '500px', width: '500px' }}
+          style={mapboxStyle}
+          center={[this.center.lng, this.center.lat]}
+          zoom={[this.zoom]}
+          onMove={this.onMove}
+          onZoom={this.onZoom}
+          accessToken={accessToken}>
           <GeoJSONLayer
             before="marker"
             data={geoJSON}
-            circleLayout={{visibility: 'none'}}
+            circleLayout={{ visibility: 'none' }}
             fillPaint={{
               'fill-opacity': 0.3,
               'fill-color': '#efd91b',
               'fill-antialias': true,
-              'fill-outline-color': '#808080'
+              'fill-outline-color': '#808080',
             }}
-            lineLayout={{visibility: 'none'}}
-            linePaint={{'line-opacity': 0.75}}/>
-          { locationAssets && (
-            <Layer type="circle" id="marker2" paint={locationCircleProperties} before="marker3">
-              { locationAssets.map(asset => {
+            lineLayout={{ visibility: 'none' }}
+            linePaint={{ 'line-opacity': 0.75 }}
+          />
+          {locationAssets && (
+            <Layer
+              type="circle"
+              id="marker2"
+              paint={locationCircleProperties}
+              before="marker3">
+              {locationAssets.map(asset => {
                 const location = asset.value(locationField)
                 const coords = location && JSON.parse(location)
                 return (
-                  <Feature key={asset.id}
-                           onClick={this.selectAsset.bind(this, asset)}
-                           coordinates={coords}/>
+                  <Feature
+                    key={asset.id}
+                    onClick={this.selectAsset.bind(this, asset)}
+                    coordinates={coords}
+                  />
                 )
               })}
             </Layer>
           )}
-          { selectedAssets && (
+          {selectedAssets && (
             <Layer type="circle" id="marker3" paint={selectedCircleProperties}>
-              { selectedAssets.map(asset => {
+              {selectedAssets.map(asset => {
                 const location = asset.value(locationField)
                 const coords = location && JSON.parse(location)
                 return (
-                  <Feature key={asset.id}
-                           onClick={this.selectAsset.bind(this, asset)}
-                           coordinates={coords}/>
+                  <Feature
+                    key={asset.id}
+                    onClick={this.selectAsset.bind(this, asset)}
+                    coordinates={coords}
+                  />
                 )
               })}
             </Layer>
           )}
-          { geohashes && (
-            <Layer type="circle" id="marker" paint={geohashCircleProperties} before="marker2">
-              { geohashes.map(bucket => {
+          {geohashes && (
+            <Layer
+              type="circle"
+              id="marker"
+              paint={geohashCircleProperties}
+              before="marker2">
+              {geohashes.map(bucket => {
                 const latlon = Geohash.decode(bucket.key)
                 const coords = [latlon.lon, latlon.lat]
-                return <Feature key={bucket.key} coordinates={coords}/>
+                return <Feature key={bucket.key} coordinates={coords} />
               })}
             </Layer>
           )}
         </ReactMapboxGl>
-        { term ? (
+        {term ? (
           <div onClick={this.clearTerm} className="selected-term">
             <div>{term} selected</div>
-            <span className="icon-cancel-circle"/>
-          </div>) : <div/>
-        }
+            <span className="icon-cancel-circle" />
+          </div>
+        ) : (
+          <div />
+        )}
       </Widget>
     )
   }
@@ -211,8 +253,9 @@ export default connect(
     assets: state.assets.all,
     selectedAssetIds: state.assets.selectedIds,
     aggs: state.assets && state.assets.aggs,
-    widgets: state.racetrack && state.racetrack.widgets
-  }), dispatch => ({
-    actions: bindActionCreators({ modifyRacetrackWidget }, dispatch)
-  })
+    widgets: state.racetrack && state.racetrack.widgets,
+  }),
+  dispatch => ({
+    actions: bindActionCreators({ modifyRacetrackWidget }, dispatch),
+  }),
 )(Map)

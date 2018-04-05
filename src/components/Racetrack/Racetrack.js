@@ -9,31 +9,42 @@ class Racetrack extends Component {
   static propTypes = {
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
     isIconified: PropTypes.bool.isRequired,
-    hoverFields: PropTypes.instanceOf(Set)
+    hoverFields: PropTypes.instanceOf(Set),
   }
 
-  renderWidget (widget, isIconified) {
+  renderWidget(widget, isIconified) {
     const widgetInfo = Object.keys(WidgetInfo)
       .map(k => WidgetInfo[k])
-      .find(widgetInfo => (widgetInfo.type === widget.type))
-    if (!widget.isPinned) console.log('Rendering closed racetrack widget: ' + widget.type)
+      .find(widgetInfo => widgetInfo.type === widget.type)
+    if (!widget.isPinned)
+      console.log('Rendering closed racetrack widget: ' + widget.type)
     const isPinned = true
     const isEnabled = widget.isEnabled
     const isOpen = true
     const floatBody = false
-    return cloneElement(widgetInfo.element, {id: widget.id, isIconified, isPinned, isEnabled, isOpen, floatBody})
+    return cloneElement(widgetInfo.element, {
+      id: widget.id,
+      isIconified,
+      isPinned,
+      isEnabled,
+      isOpen,
+      floatBody,
+    })
   }
 
-  render () {
+  render() {
     const { widgets, isIconified, hoverFields } = this.props
     const openedWidgets = widgets && widgets.filter(widget => widget.isPinned)
     if (!openedWidgets || !openedWidgets.length) return
     return (
       <div className="Racetrack">
-        {openedWidgets.map((widget) => (
-          <div key={widget.id}
-               className={classnames('Racetrack-widget', {hoverField: hoverFields.has(removeRaw(widget.field))})} >
-            { this.renderWidget(widget, isIconified) }
+        {openedWidgets.map(widget => (
+          <div
+            key={widget.id}
+            className={classnames('Racetrack-widget', {
+              hoverField: hoverFields.has(removeRaw(widget.field)),
+            })}>
+            {this.renderWidget(widget, isIconified)}
           </div>
         ))}
       </div>
@@ -43,9 +54,7 @@ class Racetrack extends Component {
 
 const mapStateToProps = state => ({
   widgets: state.racetrack.widgets,
-  hoverFields: state.app.hoverFields
+  hoverFields: state.app.hoverFields,
 })
 
-export default connect(
-  mapStateToProps
-)(Racetrack)
+export default connect(mapStateToProps)(Racetrack)

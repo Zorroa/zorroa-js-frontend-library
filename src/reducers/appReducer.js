@@ -1,28 +1,61 @@
 import {
-  SHOW_MODAL, HIDE_MODAL, SORT_FOLDERS,
-  ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
-  METADATA_FIELDS, ASSET_FIELDS,
-  LIGHTBOX_METADATA, LIGHTBOX_PANNER,
-  SET_DRAGGING, SHOULD_LOOP,
-  THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
-  SHOW_MULTIPAGE, VIDEO_VOLUME,
-  HOVER_FIELD, CLEAR_HOVER_FIELD,
-  USER_SETTINGS, UNAUTH_USER,
-  SHOW_DIALOG_ALERT, HIDE_DIALOG_ALERT,
-  SHOW_DIALOG_CONFIRM, HIDE_DIALOG_CONFIRM,
-  SHOW_DIALOG_PROMPT, HIDE_DIALOG_PROMPT,
-  THUMB_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE, DRAG_FIELD_TEMPLATE,
-  UX_LEVEL, EMBEDMODE_ENABLED, MONOCHROME, SHOW_IMPORT, ARCHIVIST_SETTING,
-  SHOW_QUICKVIEW, HIDE_QUICKVIEW, FLIPBOOK_FPS,
-  TABLE_LAYOUTS, ADD_TABLE_LAYOUT, DELETE_TABLE_LAYOUT, SELECT_TABLE_LAYOUT
+  SHOW_MODAL,
+  HIDE_MODAL,
+  SORT_FOLDERS,
+  ICONIFY_LEFT_SIDEBAR,
+  ICONIFY_RIGHT_SIDEBAR,
+  TOGGLE_COLLAPSIBLE,
+  METADATA_FIELDS,
+  ASSET_FIELDS,
+  LIGHTBOX_METADATA,
+  LIGHTBOX_PANNER,
+  SET_DRAGGING,
+  SHOULD_LOOP,
+  THUMB_SIZE,
+  THUMB_LAYOUT,
+  SHOW_TABLE,
+  TABLE_HEIGHT,
+  SHOW_MULTIPAGE,
+  VIDEO_VOLUME,
+  HOVER_FIELD,
+  CLEAR_HOVER_FIELD,
+  USER_SETTINGS,
+  UNAUTH_USER,
+  SHOW_DIALOG_ALERT,
+  HIDE_DIALOG_ALERT,
+  SHOW_DIALOG_CONFIRM,
+  HIDE_DIALOG_CONFIRM,
+  SHOW_DIALOG_PROMPT,
+  HIDE_DIALOG_PROMPT,
+  THUMB_FIELD_TEMPLATE,
+  LIGHTBAR_FIELD_TEMPLATE,
+  DRAG_FIELD_TEMPLATE,
+  UX_LEVEL,
+  EMBEDMODE_ENABLED,
+  MONOCHROME,
+  SHOW_IMPORT,
+  ARCHIVIST_SETTING,
+  SHOW_QUICKVIEW,
+  HIDE_QUICKVIEW,
+  FLIPBOOK_FPS,
+  TABLE_LAYOUTS,
+  ADD_TABLE_LAYOUT,
+  DELETE_TABLE_LAYOUT,
+  SELECT_TABLE_LAYOUT,
 } from '../constants/actionTypes'
 import { DEFAULT_THUMBSIZE } from '../actions/appActions'
 import { parseVariables, fieldsForVariables } from '../services/jsUtil'
 import FieldList from '../models/FieldList'
 import {
-  defaultMetadataFields, defaultLightbarFields, defaultThumbFields,
-  defaultDragFields, defaultThumbFieldTemplate, defaultLightbarFieldTemplate,
-  defaultTableLayouts, defaultFpsFrequencies } from '../constants/defaultState'
+  defaultMetadataFields,
+  defaultLightbarFields,
+  defaultThumbFields,
+  defaultDragFields,
+  defaultThumbFieldTemplate,
+  defaultLightbarFieldTemplate,
+  defaultTableLayouts,
+  defaultFpsFrequencies,
+} from '../constants/defaultState'
 
 const initialState = {
   modal: null,
@@ -46,13 +79,13 @@ const initialState = {
     'proxies.proxies': false,
     jobErrors: false,
     jobPipelines: true,
-    jobTasks: false
+    jobTasks: false,
   },
-  metadataFields: [ ...defaultMetadataFields ],
-  lightbarFields: [ ...defaultLightbarFields ],
-  thumbFields: [ ...defaultThumbFields ],
-  dragFields: [ ...defaultDragFields ],
-  tableLayouts: [ ...defaultTableLayouts ],
+  metadataFields: [...defaultMetadataFields],
+  lightbarFields: [...defaultLightbarFields],
+  thumbFields: [...defaultThumbFields],
+  dragFields: [...defaultDragFields],
+  tableLayouts: [...defaultTableLayouts],
   selectedTableLayoutId: undefined,
   lightboxMetadata: { show: false, left: 20, top: 80, width: 300, height: 500 },
   thumbSize: DEFAULT_THUMBSIZE,
@@ -67,21 +100,21 @@ const initialState = {
   lightbarFieldTemplate: defaultLightbarFieldTemplate,
   dragFieldTemplate: undefined,
   userSettings: {
-    metadataFields: [ ...defaultMetadataFields ],
+    metadataFields: [...defaultMetadataFields],
     showTable: false,
     tableHeight: 300,
     thumbSize: DEFAULT_THUMBSIZE,
     thumbLayout: 'masonry',
     videoVolume: 0.8,
-    showFolderCounts: 'filtered'
+    showFolderCounts: 'filtered',
   },
   allAssetCount: 0,
   showQuickview: false,
   flipbookFps: defaultFpsFrequencies[0],
-  shouldLoop: false
+  shouldLoop: false,
 }
 
-export default function app (state = initialState, action) {
+export default function app(state = initialState, action) {
   switch (action.type) {
     case SHOW_MODAL:
       return { ...state, modal: action.payload }
@@ -106,17 +139,27 @@ export default function app (state = initialState, action) {
     case TOGGLE_COLLAPSIBLE:
       const { collapsibleName, isOpen } = action.payload
       const collapsibleOpen = state.collapsibleOpen
-      return { ...state, collapsibleOpen: { ...collapsibleOpen, [collapsibleName]: isOpen } }
+      return {
+        ...state,
+        collapsibleOpen: { ...collapsibleOpen, [collapsibleName]: isOpen },
+      }
     case ASSET_FIELDS: {
       // Remove any metadata or table fields that are not in the current repo
       const fieldSet = new Set()
       const fields = action.payload
-      Object.keys(fields).forEach(type => { fields[type].forEach(field => { fieldSet.add(field) }) })
-      const metadataFields = state.metadataFields.filter(field => fieldSet.has(field))
+      Object.keys(fields).forEach(type => {
+        fields[type].forEach(field => {
+          fieldSet.add(field)
+        })
+      })
+      const metadataFields = state.metadataFields.filter(field =>
+        fieldSet.has(field),
+      )
       let tableLayouts = []
       state.tableLayouts.forEach(fieldList => {
         const dup = new FieldList(fieldList)
-        if (dup.fields) dup.fields = dup.fields.filter(field => fieldSet.has(field))
+        if (dup.fields)
+          dup.fields = dup.fields.filter(field => fieldSet.has(field))
         tableLayouts.push(dup)
       })
       return { ...state, metadataFields, tableLayouts }
@@ -126,13 +169,19 @@ export default function app (state = initialState, action) {
     case TABLE_LAYOUTS:
       return { ...state, tableLayouts: action.payload }
     case ADD_TABLE_LAYOUT: {
-      const tableLayouts = [ ...state.tableLayouts, action.payload ]
-      return { ...state, tableLayouts, selectedTableLayoutId: action.payload.id }
+      const tableLayouts = [...state.tableLayouts, action.payload]
+      return {
+        ...state,
+        tableLayouts,
+        selectedTableLayoutId: action.payload.id,
+      }
     }
     case DELETE_TABLE_LAYOUT: {
       const layoutId = action.payload
-      const index = state.tableLayouts.findIndex(layout => layout.id === layoutId)
-      const tableLayouts = [ ...state.tableLayouts ]
+      const index = state.tableLayouts.findIndex(
+        layout => layout.id === layoutId,
+      )
+      const tableLayouts = [...state.tableLayouts]
       if (index >= 0) tableLayouts.splice(index, 1)
       let selectedTableLayoutId = state.selectedTableLayoutId
       if (state.selectedTableLayoutId === layoutId) {
@@ -143,7 +192,12 @@ export default function app (state = initialState, action) {
     }
     case SELECT_TABLE_LAYOUT: {
       const selectedTableLayoutId = action.payload
-      if (state.tableLayouts && state.tableLayouts.findIndex(layout => layout.id === selectedTableLayoutId) >= 0) {
+      if (
+        state.tableLayouts &&
+        state.tableLayouts.findIndex(
+          layout => layout.id === selectedTableLayoutId,
+        ) >= 0
+      ) {
         return { ...state, selectedTableLayoutId }
       } else if (state.tableLayouts && state.tableLayouts.length) {
         return { ...state, selectedTableLayoutId: state.tableLayouts[0].id }
@@ -189,18 +243,27 @@ export default function app (state = initialState, action) {
     }
     case LIGHTBAR_FIELD_TEMPLATE: {
       const lightbarFieldTemplate = action.payload
-      const lightbarFields = fieldsForVariables(parseVariables(lightbarFieldTemplate))
+      const lightbarFields = fieldsForVariables(
+        parseVariables(lightbarFieldTemplate),
+      )
       return { ...state, lightbarFieldTemplate, lightbarFields }
     }
     case DRAG_FIELD_TEMPLATE: {
       const dragFieldTemplate = action.payload
-      const dragFields = dragFieldTemplate && dragFieldTemplate.length && fieldsForVariables(parseVariables(dragFieldTemplate)) || defaultDragFields
+      const dragFields =
+        (dragFieldTemplate &&
+          dragFieldTemplate.length &&
+          fieldsForVariables(parseVariables(dragFieldTemplate))) ||
+        defaultDragFields
       return { ...state, dragFieldTemplate, dragFields }
     }
     case ARCHIVIST_SETTING: {
       const setting = action.payload
       // Update the dragTemplate if it has not already been set by userSettings
-      if (setting.name === 'curator.thumbnails.drag-template' && !state.dragFieldTemplate) {
+      if (
+        setting.name === 'curator.thumbnails.drag-template' &&
+        !state.dragFieldTemplate
+      ) {
         const dragFieldTemplate = setting.currentValue
         const dragFields = fieldsForVariables(parseVariables(dragFieldTemplate))
         return { ...state, dragFieldTemplate, dragFields }
@@ -220,7 +283,10 @@ export default function app (state = initialState, action) {
       // This ensures we don't erase default settings.
       const oldUserSettings = state.userSettings
       const newUserSettings = action.payload.metadata
-      return { ...state, userSettings: { ...oldUserSettings, ...newUserSettings } }
+      return {
+        ...state,
+        userSettings: { ...oldUserSettings, ...newUserSettings },
+      }
     case UNAUTH_USER:
       return initialState
     case SHOW_QUICKVIEW:

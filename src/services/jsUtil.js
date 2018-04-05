@@ -1,29 +1,38 @@
-export function unCamelCase (str) {
+export function unCamelCase(str) {
   if (!str) return
   let buf
   // Convert upper and lower underscore to camel case,
   // skipping fields with leading underscore, e.g. _byte
-  if (str.indexOf('_') > 0 && (str === str.toUpperCase() || str === str.toLowerCase())) {
+  if (
+    str.indexOf('_') > 0 &&
+    (str === str.toUpperCase() || str === str.toLowerCase())
+  ) {
     // convert all-upper-under to camelcase
-    buf = str.toLowerCase().replace(/[-_]([a-z,A-Z])/g, function (g) { return g[1].toUpperCase() })
+    buf = str.toLowerCase().replace(/[-_]([a-z,A-Z])/g, function(g) {
+      return g[1].toUpperCase()
+    })
   } else {
     buf = str
   }
 
-  return buf
-    // insert a space between lower & upper
-    .replace(/([a-z])([A-Z])/g, '$1 $2')
-    // space before last upper in a sequence followed by lower
-    .replace(/\b([A-Z]+)([A-Z])([a-z])/, '$1 $2$3')
-    // uppercase the first character
-    .replace(/^./, function (str) { return str.toUpperCase() })
+  return (
+    buf
+      // insert a space between lower & upper
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      // space before last upper in a sequence followed by lower
+      .replace(/\b([A-Z]+)([A-Z])([a-z])/, '$1 $2$3')
+      // uppercase the first character
+      .replace(/^./, function(str) {
+        return str.toUpperCase()
+      })
+  )
 }
 
-export function isValidEmail (email) {
+export function isValidEmail(email) {
   return /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email)
 }
 
-export function formatDuration (seconds, fps) {
+export function formatDuration(seconds, fps) {
   if (seconds === undefined) return '??:??'
   const date = new Date(seconds * 1000)
   const hh = pad(date.getUTCHours())
@@ -38,7 +47,7 @@ export function formatDuration (seconds, fps) {
   return `${mm}:${ss}`
 }
 
-export function epochUTCString (msec) {
+export function epochUTCString(msec) {
   const d = new Date(msec)
   return d.toUTCString()
 }
@@ -46,7 +55,7 @@ export function epochUTCString (msec) {
 // SPE's time code format is hours:minutes:seconds:frames
 const timeRE = /(\d+):(\d+):(\d+):(\d+)/
 //
-export function parseTimecodeMS (timecodeStr) {
+export function parseTimecodeMS(timecodeStr) {
   const matches = timeRE.exec(timecodeStr)
   if (matches.length !== 5) return 0
   const numbers = matches.slice(1).map(x => parseInt(x, 10))
@@ -58,27 +67,27 @@ export function parseTimecodeMS (timecodeStr) {
   return time
 }
 
-export function lerp (x, min, max) {
+export function lerp(x, min, max) {
   return min + (max - min) * x
 }
 
-export function unlerp (x, min, max) {
+export function unlerp(x, min, max) {
   return (x - min) / (max - min)
 }
 
-export function remap (x, min1, max1, min2, max2) {
+export function remap(x, min1, max1, min2, max2) {
   return min2 + (max2 - min2) * ((x - min1) / (max1 - min1))
 }
 
-export function clamp (v, min, max) {
+export function clamp(v, min, max) {
   return Math.max(min, Math.min(max, v))
 }
 
-function pad (string, digits) {
+function pad(string, digits) {
   return ('0' + string).slice(-(digits || 2))
 }
 
-export function parseFormattedFloat (obj) {
+export function parseFormattedFloat(obj) {
   if (!obj) return
   if (typeof obj === 'number') return obj
   if (typeof obj === 'string') {
@@ -86,16 +95,20 @@ export function parseFormattedFloat (obj) {
   }
 }
 
-export function humanFileSize (size) {
+export function humanFileSize(size) {
   if (size === undefined || size === null) return '----'
   const i = Math.floor(Math.log(size) / Math.log(1024))
-  return (size / Math.pow(1024, i)).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i]
+  return (
+    (size / Math.pow(1024, i)).toFixed(2) * 1 +
+    ' ' +
+    ['B', 'kB', 'MB', 'GB', 'TB'][i]
+  )
 }
 
 // Returns a set ids that either contains the currently selected ids
 // or the isolated id depending on whether the isolated id is in the
 // selected set.
-export function isolateSelectId (id, selectedIds) {
+export function isolateSelectId(id, selectedIds) {
   if (selectedIds && selectedIds.size && selectedIds.has(id)) {
     return selectedIds
   }
@@ -104,10 +117,10 @@ export function isolateSelectId (id, selectedIds) {
 
 // Add all sibling assets in allAssets to assetIds.
 // WARNING: requires multiple passes over allAssets.
-export function addSiblings (assetIds, allAssets) {
+export function addSiblings(assetIds, allAssets) {
   const parentIds = new Set()
   assetIds.forEach(id => {
-    const index = allAssets.findIndex(asset => (asset.id === id))
+    const index = allAssets.findIndex(asset => asset.id === id)
     const parentId = allAssets[index].parentId()
     if (parentId) parentIds.add(parentId)
   })
@@ -117,7 +130,7 @@ export function addSiblings (assetIds, allAssets) {
   })
 }
 
-export function equalSets (as, bs) {
+export function equalSets(as, bs) {
   if (!as && !bs) return true
   if ((!as && bs) || (!bs && as)) return false
   if (as.size !== bs.size) return false
@@ -131,15 +144,21 @@ export function equalSets (as, bs) {
 // selectedIds - current set of selected ids
 //
 // returns newly selected set using standard UI selection behavior
-export function selectId (id, shiftKey, metaKey, items, selectedIds) {
+export function selectId(id, shiftKey, metaKey, items, selectedIds) {
   let ids = null
   if (shiftKey) {
-    const firstSelectedIndex = items.findIndex(item => (selectedIds.has(item.id) || selectedIds.has(item.folderId)))
+    const firstSelectedIndex = items.findIndex(
+      item => selectedIds.has(item.id) || selectedIds.has(item.folderId),
+    )
     if (firstSelectedIndex >= 0) {
-      const selectedIndex = items.findIndex(f => (id === f.id || id === f.folderId))
+      const selectedIndex = items.findIndex(
+        f => id === f.id || id === f.folderId,
+      )
       const minIndex = Math.min(selectedIndex, firstSelectedIndex)
       const maxIndex = Math.max(selectedIndex, firstSelectedIndex)
-      const contigIds = items.slice(minIndex, maxIndex + 1).map(item => (item.folderId || item.id))
+      const contigIds = items
+        .slice(minIndex, maxIndex + 1)
+        .map(item => item.folderId || item.id)
       ids = new Set(contigIds)
     } else {
       ids = new Set([id])
@@ -160,12 +179,12 @@ export function selectId (id, shiftKey, metaKey, items, selectedIds) {
 
 // Parse a string into a list of variable names, e.g.: 'foo %{bar} %{bam}' returns ['bar', 'bam']
 // If template syntax changes, see also FieldTemplate.js
-export function parseVariables (template) {
+export function parseVariables(template) {
   return template.match(/%{[a-zA-Z0-9.|]*}/g)
 }
 
 // Replace the variables in the string template with values
-export function replaceVariables (template, values) {
+export function replaceVariables(template, values) {
   if (!values) return template
   let str = template
   Object.keys(values).forEach(key => {
@@ -176,7 +195,7 @@ export function replaceVariables (template, values) {
   return str
 }
 
-export function valuesForFields (vars, asset) {
+export function valuesForFields(vars, asset) {
   const values = {}
   if (!vars || !vars.length) return values
   vars.forEach(re => {
@@ -193,7 +212,7 @@ export function valuesForFields (vars, asset) {
   return values
 }
 
-export function fieldsForVariables (vars) {
+export function fieldsForVariables(vars) {
   if (!vars || !vars.length) return []
   const fields = []
   vars.forEach(re => {
@@ -225,7 +244,12 @@ just like Promise.all()
 Resolves with an array of the results, in the same order as 'data'
 Rejects with the first error that occurs
 */
-export function makePromiseQueue (data, mkPromiseFn, optNumInflight, optProgressFn) {
+export function makePromiseQueue(
+  data,
+  mkPromiseFn,
+  optNumInflight,
+  optProgressFn,
+) {
   return new Promise((resolve, reject) => {
     const n = data.length
     optNumInflight = optNumInflight || Math.round(Math.sqrt(n))
@@ -236,17 +260,17 @@ export function makePromiseQueue (data, mkPromiseFn, optNumInflight, optProgress
     let nextDataToProcess = 0
     let totalFinished = 0
 
-    let start = (idx) => {
+    let start = idx => {
       nextDataToProcess++
       mkPromiseFn(data[idx])
-      .then((results) => {
-        totalFinished++
-        dataResults[idx] = results
-        if (optProgressFn) optProgressFn(totalFinished, n)
-        if (totalFinished >= n) resolve(dataResults)
-        if (nextDataToProcess < n) start(nextDataToProcess)
-      })
-      .catch(err => reject(err))
+        .then(results => {
+          totalFinished++
+          dataResults[idx] = results
+          if (optProgressFn) optProgressFn(totalFinished, n)
+          if (totalFinished >= n) resolve(dataResults)
+          if (nextDataToProcess < n) start(nextDataToProcess)
+        })
+        .catch(err => reject(err))
     }
 
     for (var i = 0; i < optNumInflight; i++) start(i)
@@ -256,8 +280,10 @@ export function makePromiseQueue (data, mkPromiseFn, optNumInflight, optProgress
 /* ----------------------------------------------------------------------
 Return a promise that resolves after the given number of milliseconds
 */
-export function makeDelayPromise (msToWait, optResolveVal) {
-  return new Promise((resolve) => setTimeout(_ => resolve(optResolveVal), msToWait))
+export function makeDelayPromise(msToWait, optResolveVal) {
+  return new Promise(resolve =>
+    setTimeout(_ => resolve(optResolveVal), msToWait),
+  )
 }
 
 /* ----------------------------------------------------------------------
@@ -265,28 +291,34 @@ Return a promise that times out & rejects after the given number of milliseconds
 optRejectVal is optional, the value to pass to reject()
 https://www.promisejs.org/patterns/
 */
-export function makeTimeoutPromise (promise, msToWait, optRejectVal) {
-  var rejectVal = (optRejectVal !== undefined) ? optRejectVal : 'timeout'
+export function makeTimeoutPromise(promise, msToWait, optRejectVal) {
+  var rejectVal = optRejectVal !== undefined ? optRejectVal : 'timeout'
   return Promise.race([
     promise,
-    makeDelayPromise(msToWait).then(_ => Promise.reject(rejectVal))
+    makeDelayPromise(msToWait).then(_ => Promise.reject(rejectVal)),
   ])
 }
 
-function normalizeStringByCaseAndWhitespace (string) {
-  const whitespace = /\s/ig
-  return string.trim().toLowerCase().replace(whitespace, ' ')
+function normalizeStringByCaseAndWhitespace(string) {
+  const whitespace = /\s/gi
+  return string
+    .trim()
+    .toLowerCase()
+    .replace(whitespace, ' ')
 }
 
 /* ----------------------------------------------------------------------
 Looks at an array of values, and attempts to deduplicate values where the
 only differnce is casing or whitespace
 */
-export function deduplicateStringsByCaseAndWhitespace (strings) {
+export function deduplicateStringsByCaseAndWhitespace(strings) {
   return strings.reduce((accumulator, string) => {
     const normalizedSuggestText = normalizeStringByCaseAndWhitespace(string)
     const isNormalizedValueDuplicated = accumulator.some(deduplicatedString => {
-      return normalizeStringByCaseAndWhitespace(deduplicatedString) === normalizedSuggestText
+      return (
+        normalizeStringByCaseAndWhitespace(deduplicatedString) ===
+        normalizedSuggestText
+      )
     })
     if (!isNormalizedValueDuplicated) {
       accumulator.push(string)

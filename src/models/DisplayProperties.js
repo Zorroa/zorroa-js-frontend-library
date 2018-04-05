@@ -3,13 +3,15 @@
 // or to edit asset fields.
 
 export default class DisplayProperties {
-  constructor (json) {
+  constructor(json) {
     this.name = json.name
     this.label = json.label
     this.toolTip = json.toolTip
     this.readOnly = json.readOnly
     this.required = json.required
-    this.children = json.children ? json.children.map(item => (new DisplayProperties(item))) : null
+    this.children = json.children
+      ? json.children.map(item => new DisplayProperties(item))
+      : null
     this.widget = json.widget
     this.options = json.options
     this.value = json.value
@@ -21,20 +23,20 @@ export default class DisplayProperties {
 }
 
 // Return existing or create a new propertry in th passed-in array
-function _getOrAdd (name, displayProperties) {
-  const index = displayProperties.findIndex(d => (d.name === name))
+function _getOrAdd(name, displayProperties) {
+  const index = displayProperties.findIndex(d => d.name === name)
   let dp = null
   if (index >= 0) {
     dp = displayProperties[index]
   } else {
-    dp = new DisplayProperties({name})
+    dp = new DisplayProperties({ name })
     displayProperties.push(dp)
   }
   return dp
 }
 
 // Create hierarchical DisplayProperties for field rendering
-export function displayPropertiesForFields (fields) {
+export function displayPropertiesForFields(fields) {
   let displayProperties = []
   for (let field of fields) {
     const namespaces = field.split('.')
@@ -55,7 +57,7 @@ import { unCamelCase } from '../services/jsUtil'
 //   { title, field, displayProperties }
 // Section titles are inserted with field=null and arrays are
 // expanded into array[i] titles.
-function _flatten (displayProperties, field, asset, list) {
+function _flatten(displayProperties, field, asset, list) {
   if (displayProperties.children && displayProperties.children.length) {
     const rawValue = asset.rawValue(field)
     const isArray = Array.isArray(rawValue)
@@ -64,22 +66,26 @@ function _flatten (displayProperties, field, asset, list) {
       rawValue.forEach((child, i) => {
         const title = unCamelCase(`${displayProperties.name}[${i}]`)
         list.push({ title, field, displayProperties })
-        displayProperties.children.forEach(child => _flatten(child, `${field}.${i}.${child.name}`, asset, list))
+        displayProperties.children.forEach(child =>
+          _flatten(child, `${field}.${i}.${child.name}`, asset, list),
+        )
       })
     } else {
       // Add a title entry for the section, then all children
       const title = unCamelCase(displayProperties.name)
-      list.push({title, field, displayProperties})
-      displayProperties.children.forEach(child => _flatten(child, `${field}.${child.name}`, asset, list))
+      list.push({ title, field, displayProperties })
+      displayProperties.children.forEach(child =>
+        _flatten(child, `${field}.${child.name}`, asset, list),
+      )
     }
   } else {
     // Field entry, no extra titles
     const title = unCamelCase(displayProperties.name)
-    list.push({title, field, displayProperties})
+    list.push({ title, field, displayProperties })
   }
 }
 
-export function flatDisplayPropertiesForFields (fields, asset) {
+export function flatDisplayPropertiesForFields(fields, asset) {
   const displayProperties = displayPropertiesForFields(fields)
   const list = []
   displayProperties.forEach(dp => _flatten(dp, dp.name, asset, list))

@@ -1,10 +1,27 @@
 import React, { PropTypes } from 'react'
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Text, Sector } from 'recharts'
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Text,
+  Sector,
+} from 'recharts'
 
 const OTHER_BUCKET = 'Other'
 
 const renderPieLabel = (section, terms, otherIsSelected, bucketKey) => {
-  const { cx, cy, midAngle, innerRadius, outerRadius, percent, name, fill } = section
+  const {
+    cx,
+    cy,
+    midAngle,
+    innerRadius,
+    outerRadius,
+    percent,
+    name,
+    fill,
+  } = section
   const RADIAN = Math.PI / 180
   const sin = Math.sin(-RADIAN * midAngle)
   const cos = Math.cos(-RADIAN * midAngle)
@@ -25,32 +42,52 @@ const renderPieLabel = (section, terms, otherIsSelected, bucketKey) => {
   return (
     <svg>
       <svg>
-        {
-          percent > 0.05 &&
-          <text x={x0} y={y0}
-                textAnchor="middle"
-                className="PieChart-pct" dominantBaseline="central">
+        {percent > 0.05 && (
+          <text
+            x={x0}
+            y={y0}
+            textAnchor="middle"
+            className="PieChart-pct"
+            dominantBaseline="central">
             {`${(percent * 100).toFixed(0)}%`}
           </text>
-        }
-        {
-          percent > 0.025 && terms.indexOf(name) < 0 && !(name === OTHER_BUCKET && otherIsSelected) &&
-          <svg>
-            <text x={ex} y={ey}
-                  textAnchor={textAnchor}
-                  className="PieChart-label" dominantBaseline="central">
-              { bucketKey ? bucketKey(name) : name }
-            </text>
-            <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none"/>
-          </svg>
-        }
+        )}
+        {percent > 0.025 &&
+          terms.indexOf(name) < 0 &&
+          !(name === OTHER_BUCKET && otherIsSelected) && (
+            <svg>
+              <text
+                x={ex}
+                y={ey}
+                textAnchor={textAnchor}
+                className="PieChart-label"
+                dominantBaseline="central">
+                {bucketKey ? bucketKey(name) : name}
+              </text>
+              <path
+                d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`}
+                stroke={fill}
+                fill="none"
+              />
+            </svg>
+          )}
       </svg>
     </svg>
   )
 }
 
-const renderActivePieSectionShape = (section) => {
-  const { cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle, fill, name } = section
+const renderActivePieSectionShape = section => {
+  const {
+    cx,
+    cy,
+    midAngle,
+    innerRadius,
+    outerRadius,
+    startAngle,
+    endAngle,
+    fill,
+    name,
+  } = section
   const RADIAN = Math.PI / 180
   const sin = Math.sin(-RADIAN * midAngle)
   const cos = Math.cos(-RADIAN * midAngle)
@@ -85,34 +122,58 @@ const renderActivePieSectionShape = (section) => {
         outerRadius={outerRadius + 10}
         fill={fill}
       />
-      <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none"/>
-      <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none"/>
-      <text x={ex + (cos >= 0 ? 1 : -1) * 12}
-            y={ey}
-            textAnchor={textAnchor}
-            className="PieChart-label active"
-            dominantBaseline="central">
+      <path
+        d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`}
+        stroke={fill}
+        fill="none"
+      />
+      <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
+      <text
+        x={ex + (cos >= 0 ? 1 : -1) * 12}
+        y={ey}
+        textAnchor={textAnchor}
+        className="PieChart-label active"
+        dominantBaseline="central">
         {name}
       </text>
     </g>
   )
 }
 
-const PieChartWrapper = (props) => {
-  const { field, COLORS, data, activeIndex, animate, terms, otherIsSelected, bucketKey } = props
+const PieChartWrapper = props => {
+  const {
+    field,
+    COLORS,
+    data,
+    activeIndex,
+    animate,
+    terms,
+    otherIsSelected,
+    bucketKey,
+  } = props
   return (
     <div className="PieChart">
       <ResponsiveContainer>
         <PieChart width={300} height={300}>
-          <Pie innerRadius={30} outerRadius={60} paddingAngle={0}
-               isAnimationActive={animate}
-               animationBegin={100}
-               animationDuration={500}
-               activeIndex={activeIndex} activeShape={renderActivePieSectionShape}
-               label={section => renderPieLabel(section, terms, otherIsSelected, bucketKey)} labelLine={false}
-               data={data} onClick={props.onSelectPieSection}>
-            { data.map((entry, index) => <Cell key={index} fill={COLORS[index % COLORS.length]}/>) }
-            <Tooltip/>
+          <Pie
+            innerRadius={30}
+            outerRadius={60}
+            paddingAngle={0}
+            isAnimationActive={animate}
+            animationBegin={100}
+            animationDuration={500}
+            activeIndex={activeIndex}
+            activeShape={renderActivePieSectionShape}
+            label={section =>
+              renderPieLabel(section, terms, otherIsSelected, bucketKey)
+            }
+            labelLine={false}
+            data={data}
+            onClick={props.onSelectPieSection}>
+            {data.map((entry, index) => (
+              <Cell key={index} fill={COLORS[index % COLORS.length]} />
+            ))}
+            <Tooltip />
           </Pie>
           <Text>{field}</Text>
         </PieChart>
@@ -125,15 +186,17 @@ PieChartWrapper.propTypes = {
   field: PropTypes.string,
   COLORS: PropTypes.arrayOf(PropTypes.string),
   animate: PropTypes.bool,
-  data: PropTypes.arrayOf(PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    value: PropTypes.number.isRequired
-  })).isRequired,
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      value: PropTypes.number.isRequired,
+    }),
+  ).isRequired,
   activeIndex: PropTypes.arrayOf(PropTypes.number),
   terms: PropTypes.arrayOf(PropTypes.string),
   otherIsSelected: PropTypes.bool,
   onSelectPieSection: PropTypes.func,
-  bucketKey: PropTypes.func
+  bucketKey: PropTypes.func,
 }
 
 export default PieChartWrapper

@@ -50,14 +50,14 @@ class Video extends Component {
     shuttler: PropTypes.instanceOf(PubSub).isRequired,
     status: PropTypes.instanceOf(PubSub).isRequired,
     width: PropTypes.number,
-    height: PropTypes.number
+    height: PropTypes.number,
   }
 
   static defaultProps = {
-    frameRate: 30
+    frameRate: 30,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     props.shuttler.on('load', this.load)
@@ -74,7 +74,7 @@ class Video extends Component {
       started: false,
       playing: false,
       played: 0,
-      lastPlayed: 0
+      lastPlayed: 0,
     }
 
     this.startQueued = false
@@ -83,15 +83,15 @@ class Video extends Component {
 
   resize = () => this.forceUpdate()
 
-  componentDidMount () {
+  componentDidMount() {
     window.addEventListener('resize', this.resize)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     window.removeEventListener('resize', this.resize)
   }
 
-  componentWillReceiveProps () {
+  componentWillReceiveProps() {
     // Force a video.load() after render of new video source
     if (!this._initialized) {
       this.player.load()
@@ -99,7 +99,9 @@ class Video extends Component {
     }
   }
 
-  load = () => { this._initialized = false }
+  load = () => {
+    this._initialized = false
+  }
 
   // Make sure we only have one progress loop running at a time
   _queueProgress = () => {
@@ -153,7 +155,7 @@ class Video extends Component {
       }
       if (!this.state.started) {
         this.props.status.publish('started', true)
-        this.setState({started: true}, this._queueProgress)
+        this.setState({ started: true }, this._queueProgress)
       }
     }
 
@@ -211,17 +213,23 @@ class Video extends Component {
 
   frameBack = () => {
     if (this.state.started) this.stop()
-    const frame = Math.max(0, Math.floor(this.state.played * this.props.frames) - 1)
+    const frame = Math.max(
+      0,
+      Math.floor(this.state.played * this.props.frames) - 1,
+    )
     this.scrub(frame)
   }
 
   frameForward = () => {
     if (this.state.started) this.stop()
-    const frame = Math.min(Math.floor(this.state.played * this.props.frames) + 1, this.props.frames - 1)
+    const frame = Math.min(
+      Math.floor(this.state.played * this.props.frames) + 1,
+      this.props.frames - 1,
+    )
     this.scrub(frame)
   }
 
-  normalizeFrameRate (frameRate) {
+  normalizeFrameRate(frameRate) {
     const NTSC_FRAME_RATE = '23.98' // This number is technically 23.976, but some systems round up apparantly
     if (frameRate.toFixed(2) === NTSC_FRAME_RATE) {
       // Normalize FPS for NTSC frame rate to align with caption dialog's 24 FPS rate
@@ -231,7 +239,7 @@ class Video extends Component {
     return frameRate
   }
 
-  scrub = (frame) => {
+  scrub = frame => {
     if (!this.player) return
     const { frames, stopFrame, status } = this.props
     const frameRate = this.normalizeFrameRate(this.props.frameRate)
@@ -242,11 +250,11 @@ class Video extends Component {
     try {
       this.player.currentTime = played * frames / frameRate
     } catch (e) {
-      console.log('Player isn\'t ready to seek: ' + e)
+      console.log("Player isn't ready to seek: " + e)
     }
   }
 
-  clipTime (t) {
+  clipTime(t) {
     const { frames, startFrame, stopFrame } = this.props
     return clamp((t * frames - startFrame) / (stopFrame - startFrame), 0, 1)
   }
@@ -258,7 +266,7 @@ class Video extends Component {
     this._initialized = true
   }
 
-  onError = (err) => {
+  onError = err => {
     const { onError } = this.props
     // This error handler is called for extensions that don't match.
     // We don't care about that unless all extensions fail.
@@ -272,41 +280,54 @@ class Video extends Component {
     }
   }
 
-  render () {
+  render() {
     const { url, videoVolume, width, height } = this.props
     const { started } = this.state
-    const exts = [ 'mp4', 'm4v', 'webm', 'ogv', 'ogg' ]
+    const exts = ['mp4', 'm4v', 'webm', 'ogv', 'ogg']
     const svg = require('../Inspector/loading-ring.svg')
 
     if (this.player) this.player.volume = videoVolume
 
     return (
-      <div className='Video'>
-        <video className="Video-video"
-               onCanPlay={this.init}
-               autoPlay={started}
-               onEnded={ this.stop }
-               onError={this.onError}
-               width={width || '100%'}
-               height={height || '100%'}
-               ref={player => { this.player = player }}>
-          { exts.map(ext => <source key={ext} src={`${url}?ext=${ext}`} type={`video/${ext}`}/>) }
-          <source key="raw" src={url}/>
+      <div className="Video">
+        <video
+          className="Video-video"
+          onCanPlay={this.init}
+          autoPlay={started}
+          onEnded={this.stop}
+          onError={this.onError}
+          width={width || '100%'}
+          height={height || '100%'}
+          ref={player => {
+            this.player = player
+          }}>
+          {exts.map(ext => (
+            <source key={ext} src={`${url}?ext=${ext}`} type={`video/${ext}`} />
+          ))}
+          <source key="raw" src={url} />
         </video>
-        { (!this.player || this.player.readyState < 1) && <img className="Video-loading" src={svg}/> }
-        { this.props.children }
+        {(!this.player || this.player.readyState < 1) && (
+          <img className="Video-loading" src={svg} />
+        )}
+        {this.props.children}
       </div>
     )
   }
 }
 
-export default connect(state => ({
-  user: state.auth.user,
-  userSettings: state.app.userSettings,
-  videoVolume: state.app.videoVolume
-}), dispatch => ({
-  actions: bindActionCreators({
-    setVideoVolume,
-    saveUserSettings
-  }, dispatch)
-}))(Video)
+export default connect(
+  state => ({
+    user: state.auth.user,
+    userSettings: state.app.userSettings,
+    videoVolume: state.app.videoVolume,
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        setVideoVolume,
+        saveUserSettings,
+      },
+      dispatch,
+    ),
+  }),
+)(Video)

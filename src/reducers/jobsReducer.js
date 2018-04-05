@@ -1,19 +1,29 @@
 import {
-  EXPORT_ASSETS, IMPORT_ASSETS,
-  GET_JOBS, GET_JOB, GET_PIPELINES, ISOLATE_JOB, SELECT_JOBS,
-  QUEUE_UPLOAD_FILE_ENTRIES, DEQUEUE_UPLOADED_FILE_ENTRIES,
-  MARK_JOB_DOWNLOADED, GET_PROCESSORS,
-  RESTART_JOB, CANCEL_JOB, UNAUTH_USER } from '../constants/actionTypes'
+  EXPORT_ASSETS,
+  IMPORT_ASSETS,
+  GET_JOBS,
+  GET_JOB,
+  GET_PIPELINES,
+  ISOLATE_JOB,
+  SELECT_JOBS,
+  QUEUE_UPLOAD_FILE_ENTRIES,
+  DEQUEUE_UPLOADED_FILE_ENTRIES,
+  MARK_JOB_DOWNLOADED,
+  GET_PROCESSORS,
+  RESTART_JOB,
+  CANCEL_JOB,
+  UNAUTH_USER,
+} from '../constants/actionTypes'
 import Job from '../models/Job'
 
 export const initialState = {
   all: {},
   processors: [],
   fileEntries: new Map(),
-  selectedIds: new Set()
+  selectedIds: new Set(),
 }
 
-export default function (state = initialState, action) {
+export default function(state = initialState, action) {
   switch (action.type) {
     case EXPORT_ASSETS: {
       const job = action.payload
@@ -24,7 +34,7 @@ export default function (state = initialState, action) {
 
     case IMPORT_ASSETS: {
       const job = action.payload
-      job.state = Job.Active      // Workaround 0.34 Archivist bug
+      job.state = Job.Active // Workaround 0.34 Archivist bug
       const all = { ...state.all, [job.id]: job }
       return { ...state, all }
     }

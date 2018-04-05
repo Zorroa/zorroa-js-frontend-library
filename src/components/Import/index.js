@@ -1,4 +1,9 @@
-import Import, { CLOUD_IMPORT, SERVER_IMPORT, LOCAL_IMPORT, SERVER_PATH_IMPORT } from './Import'
+import Import, {
+  CLOUD_IMPORT,
+  SERVER_IMPORT,
+  LOCAL_IMPORT,
+  SERVER_PATH_IMPORT,
+} from './Import'
 import LocalChooser from './LocalChooser'
 import './Import.scss'
 import './ImportSource.scss'

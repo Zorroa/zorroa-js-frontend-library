@@ -1,9 +1,5 @@
 import React, { Component, PropTypes } from 'react'
-import {
-  FormSelect,
-  FormLabel,
-  FormRadio
-} from '../../Form'
+import { FormSelect, FormLabel, FormRadio } from '../../Form'
 import ExportsSection from '../ExportsSection'
 
 export default class VideoClipExporter extends Component {
@@ -16,8 +12,8 @@ export default class VideoClipExporter extends Component {
       scale: PropTypes.string.isRequired,
       quality: PropTypes.string.isRequired,
       format: PropTypes.string.isRequired,
-      exportOriginal: PropTypes.bool.isRequired
-    })
+      exportOriginal: PropTypes.bool.isRequired,
+    }),
   }
 
   state = {
@@ -28,10 +24,10 @@ export default class VideoClipExporter extends Component {
     scale: this.props.arguments.scale,
     quality: this.props.arguments.quality,
     format: this.props.arguments.format,
-    exportOriginal: this.props.arguments.exportOriginal
+    exportOriginal: this.props.arguments.exportOriginal,
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     const newState = {}
 
     if (
@@ -63,10 +59,10 @@ export default class VideoClipExporter extends Component {
               scale: this.state.scale,
               quality: this.state.quality,
               format: this.state.format,
-              exportOriginal: this.state.exportOriginal
+              exportOriginal: this.state.exportOriginal,
             },
-            shouldExport: this.state.shouldExport
-          }
+            shouldExport: this.state.shouldExport,
+          },
         })
       }
     })
@@ -74,47 +70,48 @@ export default class VideoClipExporter extends Component {
 
   toggleCanExport = shouldExport => {
     this.onChange({
-      shouldExport
+      shouldExport,
     })
   }
 
   toggleExportOriginal = exportOriginal => {
     this.onChange({
-      exportOriginal
+      exportOriginal,
     })
   }
 
-  render () {
+  render() {
     const qualityOptions = [
       {
         label: 'Best',
-        value: 'veryslow'
-      }, {
+        value: 'veryslow',
+      },
+      {
         label: 'Good',
-        value: 'medium'
+        value: 'medium',
       },
       {
         label: 'Fast',
-        value: 'fast'
-      }
+        value: 'fast',
+      },
     ]
     const scaleOptions = [
       {
         label: '540p - Standard',
-        value: '960:540'
+        value: '960:540',
       },
       {
         label: '720p - HD',
-        value: '1280:720'
+        value: '1280:720',
       },
       {
         label: '1080p - Full HD',
-        value: '1920:1080'
+        value: '1920:1080',
       },
       {
         label: '2160p - 4K',
-        value: '2160:1440'
-      }
+        value: '2160:1440',
+      },
     ]
 
     return (
@@ -123,47 +120,51 @@ export default class VideoClipExporter extends Component {
         onToggleExport={this.toggleCanExport}
         onToggleAccordion={this.props.onToggleAccordion}
         isExportable={this.state.shouldExport}
-        isOpen={this.props.isOpen}
-      >
+        isOpen={this.props.isOpen}>
         <radiogroup>
-          <FormLabel afterLabel="Export original assets" className="Exports__form-element">
-            <FormRadio onChange={() => this.toggleExportOriginal(true)} checked={this.state.exportOriginal === true} name="VideoClipExporter" />
+          <FormLabel
+            afterLabel="Export original assets"
+            className="Exports__form-element">
+            <FormRadio
+              onChange={() => this.toggleExportOriginal(true)}
+              checked={this.state.exportOriginal === true}
+              name="VideoClipExporter"
+            />
           </FormLabel>
           <FormLabel
             afterLabel="Export assets as"
-            className="Exports__form-element"
-          >
-            <FormRadio onChange={() => this.toggleExportOriginal(false)} checked={this.state.exportOriginal === false} name="VideoClipExporter" />
+            className="Exports__form-element">
+            <FormRadio
+              onChange={() => this.toggleExportOriginal(false)}
+              checked={this.state.exportOriginal === false}
+              name="VideoClipExporter"
+            />
           </FormLabel>
           <FormLabel
             vertical
             label="Quality"
-            className="Exports__form-element Exports__form-element--nested"
-          >
+            className="Exports__form-element Exports__form-element--nested">
             <FormSelect
               className="Exports__form-select"
               options={qualityOptions}
-              fieldLabel='label'
-              fieldKey='value'
+              fieldLabel="label"
+              fieldKey="value"
               value={this.state.quality}
-              onChange={({value}) => this.onChange({quality: value}, false)}
-            >
-            </FormSelect>
+              onChange={({ value }) => this.onChange({ quality: value }, false)}
+            />
           </FormLabel>
           <FormLabel
             vertical
             label="Resolution"
-            className="Exports__form-element Exports__form-element--nested"
-          >
+            className="Exports__form-element Exports__form-element--nested">
             <FormSelect
               className="Exports__form-select"
               options={scaleOptions}
-              fieldLabel='label'
-              fieldKey='value'
+              fieldLabel="label"
+              fieldKey="value"
               value={this.state.scale}
-              onChange={({value}) => this.onChange({scale: value}, false)}
-            >
-            </FormSelect>
+              onChange={({ value }) => this.onChange({ scale: value }, false)}
+            />
           </FormLabel>
         </radiogroup>
       </ExportsSection>

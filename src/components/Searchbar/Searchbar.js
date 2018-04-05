@@ -18,22 +18,22 @@ class Searchbar extends Component {
     suggestions: PropTypes.arrayOf(PropTypes.object),
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
     userSettings: PropTypes.object.isRequired,
-    order: PropTypes.arrayOf(PropTypes.object)
+    order: PropTypes.arrayOf(PropTypes.object),
   }
 
   state = {
-    queryString: this.props.query && this.props.query.query
+    queryString: this.props.query && this.props.query.query,
   }
 
-  setStatePromise = (newState) => {
+  setStatePromise = newState => {
     return new Promise(resolve => this.setState(newState, resolve))
   }
 
-  componentDidUpdate () {
+  componentDidUpdate() {
     const { query } = this.props
     const { queryString } = this.state
     if (query && query.query !== queryString) {
-      this.setState({queryString: query.query})
+      this.setState({ queryString: query.query })
     }
   }
 
@@ -41,20 +41,24 @@ class Searchbar extends Component {
   // lastAction is 'type' or 'select' - whatever the user did to cause us to get here
   // (when 'type': start the search timer; when 'select': no timer)
   suggest = (suggestion, lastAction) => {
-    if (lastAction === 'type') this.props.actions.suggestQueryStrings(suggestion)
+    if (lastAction === 'type')
+      this.props.actions.suggestQueryStrings(suggestion)
   }
 
   // Submit a new query string, replacing the first SimpleSearch widget
   // if one already exists, or adding a new one if none in racetrack.
-  search = (query) => {
+  search = query => {
     const sliver = new AssetSearch({ query })
     const widget = new Widget({ type: SimpleSearchWidgetInfo.type, sliver })
-    const index = this.props.widgets && this.props.widgets.findIndex(widget => (
-      widget.type === SimpleSearchWidgetInfo.type))
+    const index =
+      this.props.widgets &&
+      this.props.widgets.findIndex(
+        widget => widget.type === SimpleSearchWidgetInfo.type,
+      )
     let widgets = [...this.props.widgets]
     if (index < 0) {
       widgets.push(widget)
-    } else if (index >= 0 && !query || !query.length) {
+    } else if ((index >= 0 && !query) || !query.length) {
       widgets.splice(index, 1)
     } else {
       widgets[index] = widget
@@ -62,33 +66,40 @@ class Searchbar extends Component {
     this.props.actions.resetRacetrackWidgets(widgets)
   }
 
-  render () {
+  render() {
     const { query, suggestions, error } = this.props
     const { queryString } = this.state
-    const value = query && query.query && query.query !== queryString ? query.query
-      : (query && query.query === undefined && queryString ? '' : undefined)
-    const title = 'quikc~ brwn~ foks~\n+fox, -hen\nquick AND brown || !hen\n"exact match"\nqu?ck bro*\nmetaField:"quick brown"\nmulti.fiel\\*:(hen fox)\ncount:[10 TO *]'
+    const value =
+      query && query.query && query.query !== queryString
+        ? query.query
+        : query && query.query === undefined && queryString ? '' : undefined
+    const title =
+      'quikc~ brwn~ foks~\n+fox, -hen\nquick AND brown || !hen\n"exact match"\nqu?ck bro*\nmetaField:"quick brown"\nmulti.fiel\\*:(hen fox)\ncount:[10 TO *]'
     return (
       <div className="Searchbar">
         <div className="Searchbar-body flexCenter" title={title}>
-          <Suggestions suggestions={suggestions}
-                       query={query}
-                       value={value}
-                       onChange={this.suggest}
-                       onSelect={this.search} />
+          <Suggestions
+            suggestions={suggestions}
+            query={query}
+            value={value}
+            onChange={this.suggest}
+            onSelect={this.search}
+          />
         </div>
-        { error && <div className="Searchbar-error">Search syntax error</div> }
+        {error && <div className="Searchbar-error">Search syntax error</div>}
       </div>
     )
   }
 }
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({
-    resetRacetrackWidgets,
-    suggestQueryStrings
-  },
-  dispatch)
+  actions: bindActionCreators(
+    {
+      resetRacetrackWidgets,
+      suggestQueryStrings,
+    },
+    dispatch,
+  ),
 })
 
 const mapStateToProps = state => ({
@@ -97,9 +108,7 @@ const mapStateToProps = state => ({
   totalCount: state.assets && state.assets.totalCount,
   suggestions: state.assets && state.assets.suggestions,
   widgets: state.racetrack && state.racetrack.widgets,
-  userSettings: state.app.userSettings
+  userSettings: state.app.userSettings,
 })
 
-export default connect(
-  mapStateToProps, mapDispatchToProps
-)(Searchbar)
+export default connect(mapStateToProps, mapDispatchToProps)(Searchbar)

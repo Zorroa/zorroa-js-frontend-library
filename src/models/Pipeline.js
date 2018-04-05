@@ -1,16 +1,17 @@
 export default class Pipeline {
-  constructor ({id, type, name, description, processors}) {
+  constructor({ id, type, name, description, processors }) {
     this.id = id
     this.type = type
     this.name = name
     this.description = description
     this.id = id
-    this.processors = processors && processors.map(json => new ProcessorRef(json))
+    this.processors =
+      processors && processors.map(json => new ProcessorRef(json))
   }
 }
 
 export class ProcessorRef {
-  constructor ({ className, args, language, execute, filters }) {
+  constructor({ className, args, language, execute, filters }) {
     this.className = className
     this.args = args
     this.language = language
@@ -20,7 +21,7 @@ export class ProcessorRef {
 }
 
 export class ProcessorFilter {
-  constructor ({ expr }) {
+  constructor({ expr }) {
     this.expr = expr
   }
 }

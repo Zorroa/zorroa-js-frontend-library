@@ -8,7 +8,7 @@ export default class ListEditor extends Component {
     keyField: PropTypes.string.isRequired,
     labelField: PropTypes.string.isRequired,
     items: PropTypes.array.isRequired,
-    disabled: PropTypes.bool
+    disabled: PropTypes.bool,
   }
 
   onClick = (event, item) => {
@@ -16,13 +16,8 @@ export default class ListEditor extends Component {
     this.props.onClick(item)
   }
 
-  render () {
-    const {
-      keyField,
-      items,
-      labelField,
-      disabled
-    } = this.props
+  render() {
+    const { keyField, items, labelField, disabled } = this.props
     const isDisabled = disabled === true
 
     return (
@@ -31,7 +26,7 @@ export default class ListEditor extends Component {
           const label = item[labelField]
           const key = item[keyField]
           const buttonClasses = classnames('ListEditor__button', {
-            'ListEditor__button--disabled': isDisabled
+            'ListEditor__button--disabled': isDisabled,
           })
 
           return (
@@ -40,10 +35,9 @@ export default class ListEditor extends Component {
                 disabled={isDisabled}
                 className={buttonClasses}
                 title={isDisabled ? "This can't be removed" : `Remove ${label}`}
-                onClick={(event) => {
+                onClick={event => {
                   this.onClick(event, item)
-                }}
-              >
+                }}>
                 <IconCancelCircle />
               </button>
               <div className="ListEditor__label" title={label}>

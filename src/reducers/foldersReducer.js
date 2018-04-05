@@ -1,11 +1,26 @@
 import {
-  GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, UPDATE_FOLDER,
-  DELETE_FOLDER, ADD_ASSETS_TO_FOLDER, REMOVE_ASSETS_FROM_FOLDER,
-  TOGGLE_FOLDER, UNAUTH_USER, FOLDER_COUNTS, DROP_FOLDER_ID,
-  TRASHED_FOLDERS, EMPTY_FOLDER_TRASH, COUNT_TRASHED_FOLDERS,
-  RESTORE_TRASHED_FOLDERS, DELETE_TRASHED_FOLDERS,
-  CLEAR_MODIFIED_FOLDERS, ASSET_SEARCH, ASSET_DELETE,
-  CREATE_TAXONOMY, DELETE_TAXONOMY, UPDATE_FOLDER_PERMISSIONS
+  GET_FOLDER_CHILDREN,
+  SELECT_FOLDERS,
+  CREATE_FOLDER,
+  UPDATE_FOLDER,
+  DELETE_FOLDER,
+  ADD_ASSETS_TO_FOLDER,
+  REMOVE_ASSETS_FROM_FOLDER,
+  TOGGLE_FOLDER,
+  UNAUTH_USER,
+  FOLDER_COUNTS,
+  DROP_FOLDER_ID,
+  TRASHED_FOLDERS,
+  EMPTY_FOLDER_TRASH,
+  COUNT_TRASHED_FOLDERS,
+  RESTORE_TRASHED_FOLDERS,
+  DELETE_TRASHED_FOLDERS,
+  CLEAR_MODIFIED_FOLDERS,
+  ASSET_SEARCH,
+  ASSET_DELETE,
+  CREATE_TAXONOMY,
+  DELETE_TAXONOMY,
+  UPDATE_FOLDER_PERMISSIONS,
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import * as assert from 'assert'
@@ -16,10 +31,12 @@ import * as assert from 'assert'
 
 export var createInitialState = () => ({
   // Folder model data from the server
-  all: new Map([[ Folder.ROOT_ID, new Folder({ id: Folder.ROOT_ID, name: 'Root' }) ]]),
+  all: new Map([
+    [Folder.ROOT_ID, new Folder({ id: Folder.ROOT_ID, name: 'Root' })],
+  ]),
 
   // Total counts of folders for the full repository
-  counts: new Map([[ Folder.ROOT_ID, 0 ]]),
+  counts: new Map([[Folder.ROOT_ID, 0]]),
 
   // Filtered counts of folders for the current search
   filteredCounts: new Map(),
@@ -37,17 +54,17 @@ export var createInitialState = () => ({
   modifiedIds: new Set(),
 
   // Id of active drop target, set by FolderItem for display in Folders of active section
-  dropFolderId: -1
+  dropFolderId: -1,
 })
 export const initialState = createInitialState()
 
-export default function (state = initialState, action) {
+export default function(state = initialState, action) {
   switch (action.type) {
     case TOGGLE_FOLDER:
       const { folderId, isOpen } = action.payload
       assert.ok(folderId >= Folder.ROOT_ID)
       let openFolderIds = new Set(state.openFolderIds)
-      openFolderIds[ isOpen ? 'add' : 'delete' ](folderId)
+      openFolderIds[isOpen ? 'add' : 'delete'](folderId)
       return { ...state, openFolderIds }
 
     case GET_FOLDER_CHILDREN:
@@ -104,7 +121,7 @@ export default function (state = initialState, action) {
           }
           newParent.childIds.add(folder.id)
           all.set(newParent.id, newParent)
-          const openAncestors = (id) => {
+          const openAncestors = id => {
             openFolderIds.add(id)
             const folder = all.get(id)
             if (folder && folder.parentId) openAncestors(folder.parentId)
@@ -113,7 +130,7 @@ export default function (state = initialState, action) {
         }
         const modifiedIds = new Set(state.modifiedIds)
         _addAncestorIds(folder, modifiedIds, state.all)
-        return {...state, all, openFolderIds, modifiedIds}
+        return { ...state, all, openFolderIds, modifiedIds }
       }
       break
     }
@@ -136,12 +153,15 @@ export default function (state = initialState, action) {
           newOldParent.childCount--
           const newOldParentChildIds = new Set(oldParent.childIds)
           newOldParentChildIds.delete(folder.id)
-          if (newOldParentChildIds.size) newOldParent.childIds = newOldParentChildIds
+          if (newOldParentChildIds.size)
+            newOldParent.childIds = newOldParentChildIds
           all.set(oldParent.id, newOldParent)
 
           // Add to new parent child list
           const newParent = new Folder(parent)
-          const newParentChildIds = parent.childIds ? new Set(parent.childIds) : new Set()
+          const newParentChildIds = parent.childIds
+            ? new Set(parent.childIds)
+            : new Set()
           newParentChildIds.add(folder.id)
           newParent.childIds = newParentChildIds
           newParent.childCount++
@@ -154,15 +174,18 @@ export default function (state = initialState, action) {
         all.set(folder.id, folder)
         openFolderIds.add(parent.id) // make sure we can see the updated folder immediately
         if (parent && parent.parentId) {
-          for (let grandparent = state.all.get(parent.parentId); grandparent;
-               grandparent = state.all.get(grandparent.parentId)) {
+          for (
+            let grandparent = state.all.get(parent.parentId);
+            grandparent;
+            grandparent = state.all.get(grandparent.parentId)
+          ) {
             openFolderIds.add(grandparent.id)
           }
         }
         const modifiedIds = new Set(state.modifiedIds)
         _addAncestorIds(oldFolder, modifiedIds, state.all)
         _addAncestorIds(folder, modifiedIds, state.all)
-        return {...state, all, openFolderIds, modifiedIds}
+        return { ...state, all, openFolderIds, modifiedIds }
       }
       break
     }
@@ -176,7 +199,7 @@ export default function (state = initialState, action) {
         all.set(folder.id, folder)
         const modifiedIds = new Set(state.modifiedIds)
         modifiedIds.add(folder.id)
-        return {...state, all, modifiedIds}
+        return { ...state, all, modifiedIds }
       }
       break
     }
@@ -201,7 +224,13 @@ export default function (state = initialState, action) {
           openFolderIds.delete(id)
           selectedFolderIds.delete(id)
         }
-        return { ...state, all, openFolderIds, selectedFolderIds, trashedFolders: null }
+        return {
+          ...state,
+          all,
+          openFolderIds,
+          selectedFolderIds,
+          trashedFolders: null,
+        }
       }
       break
     }
@@ -287,10 +316,12 @@ export default function (state = initialState, action) {
       let all = new Map(state.all) // copy folder map
       const trashedFolderIds = action.payload
       trashedFolderIds.forEach(trashedFolderId => {
-        const trashedFolder = state.trashedFolders.find(trashedFolder => (trashedFolder.id === trashedFolderId))
+        const trashedFolder = state.trashedFolders.find(
+          trashedFolder => trashedFolder.id === trashedFolderId,
+        )
         if (trashedFolder) {
           const parent = state.all.get(trashedFolder.parentId)
-          const newParent = new Folder(parent)  // new folder with undefined children to force re-load
+          const newParent = new Folder(parent) // new folder with undefined children to force re-load
           all.set(newParent.id, newParent)
         }
       })
@@ -335,7 +366,7 @@ export default function (state = initialState, action) {
   return state
 }
 
-function _addAncestorIds (folder, set, folders) {
+function _addAncestorIds(folder, set, folders) {
   if (!folder || folder.id === Folder.ROOT_ID) return
   set.add(folder.id)
   const parent = folders.get(folder.parentId)

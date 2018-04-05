@@ -1,21 +1,29 @@
 import React, { PropTypes } from 'react'
 
-const TutorialVideos = (props) => (
+const TutorialVideos = props => (
   <div className="TutorialVideos">
-    <div onClick={props.onDismiss} className="TutorialVideos-cancel icon-cross"/>
+    <div
+      onClick={props.onDismiss}
+      className="TutorialVideos-cancel icon-cross"
+    />
     <div className="TutorialVideos-title">
-      While we're waiting for your assets to be analyzed, let's watch some tutorials
+      While we're waiting for your assets to be analyzed, let's watch some
+      tutorials
     </div>
     <video
       src="https://www.youtube.com/watch?v=7r9E6bn5bxY&list=PLQqS0BVI3mPGufVivRzSuxqHhb-y92I7m"
       controls={true}
-      width="60vw" height="34vw"
+      width="60vw"
+      height="34vw"
     />
     <div className="TutorialVideos-footer">
-      Tutorials, release notes, and documentation can always be accessed via the HELP menu
+      Tutorials, release notes, and documentation can always be accessed via the
+      HELP menu
     </div>
     <div className="TutorialVideos-dismiss">
-      <div onClick={props.onDismiss} className="TutorialVideos-dismiss-button disabled">
+      <div
+        onClick={props.onDismiss}
+        className="TutorialVideos-dismiss-button disabled">
         Dismiss
       </div>
     </div>
@@ -23,7 +31,7 @@ const TutorialVideos = (props) => (
 )
 
 TutorialVideos.propTypes = {
-  onDismiss: PropTypes.func.isRequired
+  onDismiss: PropTypes.func.isRequired,
 }
 
 export default TutorialVideos

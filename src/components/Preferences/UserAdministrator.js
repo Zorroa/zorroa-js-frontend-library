@@ -7,12 +7,7 @@ import FlashMessage from '../FlashMessage'
 import UserTable from './UserTable'
 import Heading from '../Heading'
 import ListEditor from '../ListEditor'
-import {
-  FormInput,
-  FormLabel,
-  FormSelect,
-  FormButton as Button
-} from '../Form'
+import { FormInput, FormLabel, FormSelect, FormButton as Button } from '../Form'
 import Permission from '../../models/Permission'
 
 import {
@@ -20,7 +15,7 @@ import {
   createUser,
   buildUser,
   resetUser,
-  updateUser
+  updateUser,
 } from '../../actions/usersActions'
 
 const userShape = PropTypes.shape({
@@ -30,9 +25,11 @@ const userShape = PropTypes.shape({
   lastName: PropTypes.string,
   password: PropTypes.string,
   confirmPassword: PropTypes.string,
-  permissions: PropTypes.arrayOf(PropTypes.shape({
-    fullName: PropTypes.string.isRequired
-  }))
+  permissions: PropTypes.arrayOf(
+    PropTypes.shape({
+      fullName: PropTypes.string.isRequired,
+    }),
+  ),
 })
 
 class UserAdministrator extends Component {
@@ -53,28 +50,35 @@ class UserAdministrator extends Component {
       createUser: PropTypes.func.isRequired,
       buildUser: PropTypes.func.isRequired,
       resetUser: PropTypes.func.isRequired,
-      updateUser: PropTypes.func.isRequired
-    })
+      updateUser: PropTypes.func.isRequired,
+    }),
   }
 
   state = {
-    showSubmitSuccess: false
+    showSubmitSuccess: false,
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (
-      (nextProps.isUpdatingUser === false && this.props.isUpdatingUser === true && nextProps.updateUserError === false) ||
-      (nextProps.isCreatingUser === false && this.props.isCreatingUser === true && nextProps.createUserError === false)
+      (nextProps.isUpdatingUser === false &&
+        this.props.isUpdatingUser === true &&
+        nextProps.updateUserError === false) ||
+      (nextProps.isCreatingUser === false &&
+        this.props.isCreatingUser === true &&
+        nextProps.createUserError === false)
     ) {
-      this.setState({
-        showSubmitSuccess: true
-      }, () => {
-        setTimeout(() => {
-          this.setState({
-            showSubmitSuccess: false
-          })
-        }, 2000)
-      })
+      this.setState(
+        {
+          showSubmitSuccess: true,
+        },
+        () => {
+          setTimeout(() => {
+            this.setState({
+              showSubmitSuccess: false,
+            })
+          }, 2000)
+        },
+      )
     }
   }
 
@@ -82,17 +86,17 @@ class UserAdministrator extends Component {
     this.props.actions.buildUser(editedUser)
   }
 
-  isCreatingNewUser () {
+  isCreatingNewUser() {
     return this.props.user.id === undefined
   }
 
-  hasModifiedUser () {
+  hasModifiedUser() {
     const editableFields = [
       'email',
       'firstName',
       'lastName',
       'password',
-      'confirmPassword'
+      'confirmPassword',
     ]
 
     if (this.isCreatingNewUser() === true) {
@@ -117,21 +121,26 @@ class UserAdministrator extends Component {
     }
   }
 
-  isPasswordValid () {
+  isPasswordValid() {
     const { user } = this.props
     const mustCreateNewPassword = this.isCreatingNewUser()
-    const isPasswordEntered = user.password !== undefined && user.confirmPassword !== undefined
+    const isPasswordEntered =
+      user.password !== undefined && user.confirmPassword !== undefined
     const doPasswordsMatch = user.password === user.confirmPassword
-    const mustEnterOldPassword = this.isEditingOwnAccount() && user.oldPassword === undefined
+    const mustEnterOldPassword =
+      this.isEditingOwnAccount() && user.oldPassword === undefined
 
     if (mustCreateNewPassword === false && isPasswordEntered === false) {
       return true
     }
 
-    const isPasswordChangeValid = (
-      (mustCreateNewPassword === true && isPasswordEntered === true && doPasswordsMatch === true) ||
-      (isPasswordEntered === true && doPasswordsMatch === true && mustEnterOldPassword === false)
-    )
+    const isPasswordChangeValid =
+      (mustCreateNewPassword === true &&
+        isPasswordEntered === true &&
+        doPasswordsMatch === true) ||
+      (isPasswordEntered === true &&
+        doPasswordsMatch === true &&
+        mustEnterOldPassword === false)
 
     return isPasswordChangeValid
   }
@@ -157,7 +166,7 @@ class UserAdministrator extends Component {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        permissionIds
+        permissionIds,
       })
     } else {
       this.props.actions.updateUser({
@@ -168,12 +177,12 @@ class UserAdministrator extends Component {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        permissions: permissionIds
+        permissions: permissionIds,
       })
     }
   }
 
-  hasNetworkErrors () {
+  hasNetworkErrors() {
     return (
       this.props.loadUsersError === true ||
       this.props.createUserError === true ||
@@ -183,7 +192,8 @@ class UserAdministrator extends Component {
 
   resetUser = event => {
     event.preventDefault()
-    const warningMessage = 'You have unsaved changes. Are you sure you want to discard them?'
+    const warningMessage =
+      'You have unsaved changes. Are you sure you want to discard them?'
 
     if (this.hasModifiedUser() && window.confirm(warningMessage) === false) {
       return
@@ -197,44 +207,49 @@ class UserAdministrator extends Component {
       return
     }
 
-    const permissions = this.props.user.permissions.filter(assignedPermission => {
-      return permission.fullName !== assignedPermission.fullName
-    })
+    const permissions = this.props.user.permissions.filter(
+      assignedPermission => {
+        return permission.fullName !== assignedPermission.fullName
+      },
+    )
 
     this.props.actions.buildUser({
-      permissions
+      permissions,
     })
   }
 
-  isEditingOwnAccount () {
+  isEditingOwnAccount() {
     return this.props.user.id === this.props.authorizedUserId
   }
 
-  onPermissionSelected = (permission) => {
+  onPermissionSelected = permission => {
     const permissions = this.props.user.permissions || []
     permissions.push(permission)
     this.props.actions.buildUser({
-      permissions
+      permissions,
     })
   }
 
-  getUnassignedPermissions () {
+  getUnassignedPermissions() {
     const assignedPermissions = this.props.user.permissions
     const availablePermissions = this.props.availablePermissions
-    const hasNoAssignedPermissions = assignedPermissions === undefined || assignedPermissions.length === 0
+    const hasNoAssignedPermissions =
+      assignedPermissions === undefined || assignedPermissions.length === 0
 
     if (hasNoAssignedPermissions) {
       return availablePermissions
     }
 
     return availablePermissions.filter(permission => {
-      return assignedPermissions.find(assignedPermission => {
-        return assignedPermission.fullName === permission.fullName
-      }) === undefined
+      return (
+        assignedPermissions.find(assignedPermission => {
+          return assignedPermission.fullName === permission.fullName
+        }) === undefined
+      )
     })
   }
 
-  getSubmitState () {
+  getSubmitState() {
     if (this.state.showSubmitSuccess === true) {
       return 'success'
     }
@@ -244,123 +259,165 @@ class UserAdministrator extends Component {
     }
   }
 
-  render () {
+  render() {
     const { user } = this.props
-    const isPasswordChangeInvalid = this.isPasswordValid() === false && user.confirmPassword !== undefined
+    const isPasswordChangeInvalid =
+      this.isPasswordValid() === false && user.confirmPassword !== undefined
 
     return (
       <div className="UserAdministrator">
-        {
-          this.hasNetworkErrors() && (
-            <div className="UserAdministrator__errors">
-              {this.props.loadUsersError && (
-                <FlashMessage look="error">
-                  Unable to load the users list. Please close this window and try again
-                </FlashMessage>
-              )}
-              {this.props.createUserError && (
-                <FlashMessage look="error">
-                  {this.props.createUserErrorMessage}
-                </FlashMessage>
-              )}
-              {this.props.updateUserError && (
-                <FlashMessage look="error">
-                  {this.props.updateUserErrorMessage || 'Unable to udpate the user'}
-                </FlashMessage>
-              )}
-            </div>
-          )
-        }
+        {this.hasNetworkErrors() && (
+          <div className="UserAdministrator__errors">
+            {this.props.loadUsersError && (
+              <FlashMessage look="error">
+                Unable to load the users list. Please close this window and try
+                again
+              </FlashMessage>
+            )}
+            {this.props.createUserError && (
+              <FlashMessage look="error">
+                {this.props.createUserErrorMessage}
+              </FlashMessage>
+            )}
+            {this.props.updateUserError && (
+              <FlashMessage look="error">
+                {this.props.updateUserErrorMessage ||
+                  'Unable to udpate the user'}
+              </FlashMessage>
+            )}
+          </div>
+        )}
         <form className="UserAdministrator__form" onSubmit={this.onSubmit}>
           <Heading size="large" level="h2">
-            {this.isCreatingNewUser() ? 'Create User' : 'Edit User' }
+            {this.isCreatingNewUser() ? 'Create User' : 'Edit User'}
           </Heading>
           <div className="UserAdministrator__fields">
             <fieldset className="UserAdministrator__field-group">
-              <FormLabel vertical label="Email (used For username)" className="UserAdministrator__form-element">
+              <FormLabel
+                vertical
+                label="Email (used For username)"
+                className="UserAdministrator__form-element">
                 <FormInput
                   required
-                  value = { user.email }
+                  value={user.email}
                   type="email"
-                  onChange = { email => { this.buildEditableUser({email}) } }
+                  onChange={email => {
+                    this.buildEditableUser({ email })
+                  }}
                 />
               </FormLabel>
-              <FormLabel vertical label="First Name" className="UserAdministrator__form-element">
+              <FormLabel
+                vertical
+                label="First Name"
+                className="UserAdministrator__form-element">
                 <FormInput
                   required
-                  value = { user.firstName }
-                  onChange = { firstName => { this.buildEditableUser({firstName}) } }
+                  value={user.firstName}
+                  onChange={firstName => {
+                    this.buildEditableUser({ firstName })
+                  }}
                 />
               </FormLabel>
-              <FormLabel vertical label="Last Name" className="UserAdministrator__form-element">
+              <FormLabel
+                vertical
+                label="Last Name"
+                className="UserAdministrator__form-element">
                 <FormInput
                   required
-                  value = { user.lastName }
-                  onChange = { lastName => { this.buildEditableUser({lastName}) } }
+                  value={user.lastName}
+                  onChange={lastName => {
+                    this.buildEditableUser({ lastName })
+                  }}
                 />
               </FormLabel>
             </fieldset>
             <fieldset className="UserAdministrator__field-group">
-              { this.isEditingOwnAccount() && (
-                <FormLabel vertical error={isPasswordChangeInvalid} label="Original Password" className="UserAdministrator__form-element">
+              {this.isEditingOwnAccount() && (
+                <FormLabel
+                  vertical
+                  error={isPasswordChangeInvalid}
+                  label="Original Password"
+                  className="UserAdministrator__form-element">
                   <FormInput
-                    onChange = { password => { this.buildEditableUser({oldPassword: password}) } }
-                    value = { user.oldPassword }
+                    onChange={password => {
+                      this.buildEditableUser({ oldPassword: password })
+                    }}
+                    value={user.oldPassword}
                     error={isPasswordChangeInvalid}
                     type="password"
                   />
                 </FormLabel>
               )}
-              <FormLabel vertical error={isPasswordChangeInvalid} label="Password" className="UserAdministrator__form-element">
+              <FormLabel
+                vertical
+                error={isPasswordChangeInvalid}
+                label="Password"
+                className="UserAdministrator__form-element">
                 <FormInput
-                  onChange = { password => { this.buildEditableUser({password}) } }
-                  value = { user.password }
+                  onChange={password => {
+                    this.buildEditableUser({ password })
+                  }}
+                  value={user.password}
                   error={isPasswordChangeInvalid}
                   type="password"
                 />
               </FormLabel>
-              <FormLabel vertical error={isPasswordChangeInvalid} label="Confirm Password" className="UserAdministrator__form-element">
+              <FormLabel
+                vertical
+                error={isPasswordChangeInvalid}
+                label="Confirm Password"
+                className="UserAdministrator__form-element">
                 <FormInput
-                  onChange = { confirmPassword => { this.buildEditableUser({confirmPassword}) } }
-                  value = { user.confirmPassword }
+                  onChange={confirmPassword => {
+                    this.buildEditableUser({ confirmPassword })
+                  }}
+                  value={user.confirmPassword}
                   error={isPasswordChangeInvalid}
                   type="password"
                 />
-                { isPasswordChangeInvalid && (
+                {isPasswordChangeInvalid && (
                   <span>
-                    {this.isEditingOwnAccount() === false && 'Passwords don’t match'}
-                    {this.isEditingOwnAccount() === true && 'Passwords don’t match or you must enter your old password'}
+                    {this.isEditingOwnAccount() === false &&
+                      'Passwords don’t match'}
+                    {this.isEditingOwnAccount() === true &&
+                      'Passwords don’t match or you must enter your old password'}
                   </span>
                 )}
               </FormLabel>
             </fieldset>
             <fieldset className="UserAdministrator__field-group UserAdministrator__field-group--permissions">
-              <FormLabel vertical label="Permissions" className="UserAdministrator__form-element">
-                { Array.isArray(user.permissions) && user.permissions.length > 0 && (
-                  <ListEditor
-                    onClick={this.onPermissionDelete}
-                    items={user.permissions}
-                    labelField='fullName'
-                    keyField='id'
-                    disabled={this.isEditingOwnAccount()}
-                  />
-                )}
+              <FormLabel
+                vertical
+                label="Permissions"
+                className="UserAdministrator__form-element">
+                {Array.isArray(user.permissions) &&
+                  user.permissions.length > 0 && (
+                    <ListEditor
+                      onClick={this.onPermissionDelete}
+                      items={user.permissions}
+                      labelField="fullName"
+                      keyField="id"
+                      disabled={this.isEditingOwnAccount()}
+                    />
+                  )}
                 <FormSelect
                   options={this.getUnassignedPermissions()}
                   onChange={this.onPermissionSelected}
-                  fieldKey='id'
-                  fieldLabel='fullName'
-                  deafultLabel='Select Permissions'
+                  fieldKey="id"
+                  fieldLabel="fullName"
+                  deafultLabel="Select Permissions"
                 />
               </FormLabel>
             </fieldset>
           </div>
           <div className="UserAdministrator__form-actions">
             <Button state={this.getSubmitState()} type="submit">
-              {this.isCreatingNewUser() ? 'Create User' : 'Save Edits' }
+              {this.isCreatingNewUser() ? 'Create User' : 'Save Edits'}
             </Button>
             {this.isCreatingNewUser() === false && (
-              <Button onClick={this.resetUser} look="minimal">Cancel</Button>
+              <Button onClick={this.resetUser} look="minimal">
+                Cancel
+              </Button>
             )}
           </div>
         </form>
@@ -370,24 +427,30 @@ class UserAdministrator extends Component {
   }
 }
 
-export default connect(state => ({
-  availablePermissions: state.permissions.all,
-  user: state.users.user,
-  users: state.users.users,
-  createUserError: state.users.createUserError,
-  createUserErrorMessage: state.users.createUserErrorMessage,
-  loadUsersError: state.users.loadUsersError,
-  authorizedUserId: state.auth.user.id,
-  updateUserError: state.users.updateUserError,
-  updateUserErrorMessage: state.users.updateUserErrorMessage,
-  isUpdatingUser: state.users.isUpdatingUser,
-  isCreatingUser: state.users.isCreatingUser
-}), dispatch => ({
-  actions: bindActionCreators({
-    disableUser,
-    createUser,
-    buildUser,
-    resetUser,
-    updateUser
-  }, dispatch)
-}))(UserAdministrator)
+export default connect(
+  state => ({
+    availablePermissions: state.permissions.all,
+    user: state.users.user,
+    users: state.users.users,
+    createUserError: state.users.createUserError,
+    createUserErrorMessage: state.users.createUserErrorMessage,
+    loadUsersError: state.users.loadUsersError,
+    authorizedUserId: state.auth.user.id,
+    updateUserError: state.users.updateUserError,
+    updateUserErrorMessage: state.users.updateUserErrorMessage,
+    isUpdatingUser: state.users.isUpdatingUser,
+    isCreatingUser: state.users.isCreatingUser,
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        disableUser,
+        createUser,
+        buildUser,
+        resetUser,
+        updateUser,
+      },
+      dispatch,
+    ),
+  }),
+)(UserAdministrator)

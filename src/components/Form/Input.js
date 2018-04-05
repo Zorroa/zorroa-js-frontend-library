@@ -11,10 +11,7 @@ export default class FormInput extends Component {
     error: PropTypes.bool,
     required: PropTypes.bool,
     onChange: PropTypes.func,
-    value: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.number
-    ]),
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     inlineReset: PropTypes.bool,
     type: PropTypes.oneOf([
       'text',
@@ -32,46 +29,53 @@ export default class FormInput extends Component {
       'tel',
       'text',
       'url',
-      'week'
-    ])
+      'week',
+    ]),
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = {
-      value: props.value || ''
+      value: props.value || '',
     }
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (nextProps.value !== this.state.value) {
       this.setState({
-        value: nextProps.value || ''
+        value: nextProps.value || '',
       })
     }
   }
 
   onChange = event => {
     const value = event.target.value
-    this.setState({
-      value: typeof this.props.value === 'number' ? Number(value) : value
-    }, () => {
-      this.props.onChange(this.state.value)
-    })
+    this.setState(
+      {
+        value: typeof this.props.value === 'number' ? Number(value) : value,
+      },
+      () => {
+        this.props.onChange(this.state.value)
+      },
+    )
   }
 
   resetInput = () => {
     this.setState({
-      value: ''
+      value: '',
     })
   }
 
-  render () {
-    const {type, required, className, error} = this.props
-    const inputClasses = classnames('FormInput__input', {
-      'FormInput__input--error': error === true
-    }, className)
+  render() {
+    const { type, required, className, error } = this.props
+    const inputClasses = classnames(
+      'FormInput__input',
+      {
+        'FormInput__input--error': error === true,
+      },
+      className,
+    )
 
     return (
       <div className={inputClasses}>
@@ -82,7 +86,7 @@ export default class FormInput extends Component {
           onChange={this.onChange}
           value={this.state.value}
         />
-        { this.props.inlineReset && (
+        {this.props.inlineReset && (
           <span
             className="icon-cancel-circle FormInput__input-inline-reset"
             onClick={this.resetInput}

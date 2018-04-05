@@ -1,5 +1,14 @@
 export default class CloudproxySettings {
-  constructor ({ startNow, archivistUrl, hmacKey, authUser, paths, schedule, threads, pipelineId }) {
+  constructor({
+    startNow,
+    archivistUrl,
+    hmacKey,
+    authUser,
+    paths,
+    schedule,
+    threads,
+    pipelineId,
+  }) {
     this.startNow = startNow
     this.archivistUrl = archivistUrl
     this.hmacKey = hmacKey
@@ -10,7 +19,7 @@ export default class CloudproxySettings {
     this.pipelineId = pipelineId
   }
 
-  isScheduled () {
+  isScheduled() {
     return this.startNow || (this.schedule && this.schedule.length)
   }
 }

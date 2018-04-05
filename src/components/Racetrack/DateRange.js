@@ -28,7 +28,7 @@ class DateRange extends Component {
     isOpen: PropTypes.bool.isRequired,
     onOpen: PropTypes.func,
     floatBody: PropTypes.bool.isRequired,
-    widgets: PropTypes.arrayOf(PropTypes.object)
+    widgets: PropTypes.arrayOf(PropTypes.object),
   }
 
   resizer = null
@@ -38,32 +38,43 @@ class DateRange extends Component {
     min: null, // min threshold (greater than)
     max: null, // max threshold (less than)
     minStr: null,
-    maxStr: null
+    maxStr: null,
   }
 
-  setStatePromise = (newState) => {
+  setStatePromise = newState => {
     return new Promise(resolve => this.setState(newState, resolve))
   }
 
   // If the query is changed elsewhere, e.g. from the Searchbar,
   // capture the new props and update our local state to match.
-  syncWithAppState (nextProps) {
+  syncWithAppState(nextProps) {
     const { id, widgets } = nextProps
-    const index = widgets && widgets.findIndex(widget => (id === widget.id))
+    const index = widgets && widgets.findIndex(widget => id === widget.id)
     const widget = widgets && widgets[index]
     if (widget) {
       const field = widget.field
-      if (field && widget.sliver && widget.sliver.filter && widget.sliver.filter.range) {
+      if (
+        field &&
+        widget.sliver &&
+        widget.sliver.filter &&
+        widget.sliver.filter.range
+      ) {
         const range = widget.sliver.filter.range[field]
         if (range) {
           const minStr = range.gte
           const maxStr = range.lte
           const min = moment(minStr, format).toDate()
           const max = moment(maxStr, format).toDate()
-          this.setState({field, min, max, minStr, maxStr})
+          this.setState({ field, min, max, minStr, maxStr })
         }
       } else if (!this.state.field || this.state.field !== field) {
-        this.setState({field, min: null, max: null, minStr: null, maxStr: null})
+        this.setState({
+          field,
+          min: null,
+          max: null,
+          minStr: null,
+          maxStr: null,
+        })
       }
     } else if (nextProps.aggs) {
       const field = this.aggField(nextProps)
@@ -74,13 +85,13 @@ class DateRange extends Component {
           const maxStr = range.max
           const min = moment(minStr, format).toDate()
           const max = moment(maxStr, format).toDate()
-          this.setState({field, min, max, minStr, maxStr})
+          this.setState({ field, min, max, minStr, maxStr })
         }
       }
     }
   }
 
-  aggField = (props) => {
+  aggField = props => {
     const { aggs, id } = props
     if (!aggs) return
     const agg = aggs[id]
@@ -90,7 +101,7 @@ class DateRange extends Component {
     return keys[idx]
   }
 
-  aggRange = (field) => {
+  aggRange = field => {
     const { aggs, id } = this.props
     if (!aggs) return
     const agg = aggs[id]
@@ -98,47 +109,52 @@ class DateRange extends Component {
     return agg[field]
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     this.syncWithAppState(nextProps)
   }
 
-  componentWillMount () {
+  componentWillMount() {
     this.resizer = new Resizer()
     this.syncWithAppState(this.props)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.resizer.release()
   }
 
   setMin = (optDate, dateStr) => {
     if (!optDate) return
-    this.setStatePromise({ min: optDate, minStr: dateStr })
-      .then(_ => this.modifySliver())
+    this.setStatePromise({ min: optDate, minStr: dateStr }).then(_ =>
+      this.modifySliver(),
+    )
   }
 
   setMax = (optDate, dateStr) => {
     if (!optDate) return
-    this.setStatePromise({ max: optDate, maxStr: dateStr })
-      .then(_ => this.modifySliver())
+    this.setStatePromise({ max: optDate, maxStr: dateStr }).then(_ =>
+      this.modifySliver(),
+    )
   }
 
   setInterval = interval => {
     // Subtract 1 of $interval. For example if interval === 'month' this
     // will subtract 1 month from the current date
-    const minStr = moment().subtract(1, interval).format(format)
+    const minStr = moment()
+      .subtract(1, interval)
+      .format(format)
     const maxStr = moment().format(format)
     const min = moment(minStr, format).toDate()
     const max = moment(maxStr, format).toDate()
     if (minStr !== this.state.minStr || maxStr !== this.state.maxStr) {
-      this.setStatePromise({ min, max, minStr, maxStr })
-        .then(_ => this.modifySliver())
+      this.setStatePromise({ min, max, minStr, maxStr }).then(_ =>
+        this.modifySliver(),
+      )
     }
   }
 
   modifySliver = () => {
     const { id, widgets } = this.props
-    const index = widgets && widgets.findIndex(widget => (id === widget.id))
+    const index = widgets && widgets.findIndex(widget => id === widget.id)
     const oldWidget = widgets && widgets[index]
     let isEnabled, isPinned
     if (oldWidget) {
@@ -147,12 +163,19 @@ class DateRange extends Component {
     }
     const { field, min, max, minStr, maxStr } = this.state
     if (!field || !min || !max || !minStr || !maxStr) return
-    const widget = createDateRangeWidget(field, 'date', minStr, maxStr, isEnabled, isPinned)
+    const widget = createDateRangeWidget(
+      field,
+      'date',
+      minStr,
+      maxStr,
+      isEnabled,
+      isPinned,
+    )
     widget.id = this.props.id
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
-  render () {
+  render() {
     const { isIconified, id, floatBody, isOpen, onOpen } = this.props
     const { field } = this.state
     const lastName = Asset.lastNamespace(unCamelCase(field))
@@ -161,16 +184,17 @@ class DateRange extends Component {
     const intervals = ['day', 'week', 'month', 'year']
 
     return (
-      <Widget className='DateRange'
-              id={id}
-              isOpen={isOpen}
-              onOpen={onOpen}
-              floatBody={floatBody}
-              title={title}
-              field={label}
-              backgroundColor={DateRangeWidgetInfo.color}
-              isIconified={isIconified}
-              icon={DateRangeWidgetInfo.icon}>
+      <Widget
+        className="DateRange"
+        id={id}
+        isOpen={isOpen}
+        onOpen={onOpen}
+        floatBody={floatBody}
+        title={title}
+        field={label}
+        backgroundColor={DateRangeWidgetInfo.color}
+        isIconified={isIconified}
+        icon={DateRangeWidgetInfo.icon}>
         <div className="DateRange-body">
           <div className="DateRange-row flexRowCenter">
             <DateTimePicker
@@ -190,7 +214,9 @@ class DateRange extends Component {
               onChange={this.setMax}
               value={this.state.max}
             />
-            <div className="DateRange-go" onClick={this.modifySliver}>GO</div>
+            <div className="DateRange-go" onClick={this.modifySliver}>
+              GO
+            </div>
           </div>
         </div>
         <div className="DateRange-settings">
@@ -199,10 +225,10 @@ class DateRange extends Component {
             <div
               className="DateRange-setting"
               key={interval}
-              onClick={() => this.setInterval(interval)
-            }>
+              onClick={() => this.setInterval(interval)}>
               {interval}
-            </div>))}
+            </div>
+          ))}
         </div>
       </Widget>
     )
@@ -210,15 +236,13 @@ class DateRange extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({ modifyRacetrackWidget }, dispatch)
+  actions: bindActionCreators({ modifyRacetrackWidget }, dispatch),
 })
 
 const mapStateToProps = state => ({
   aggs: state.assets && state.assets.aggs,
   query: state.assets.query,
-  widgets: state.racetrack && state.racetrack.widgets
+  widgets: state.racetrack && state.racetrack.widgets,
 })
 
-export default connect(
-  mapStateToProps, mapDispatchToProps
-)(DateRange)
+export default connect(mapStateToProps, mapDispatchToProps)(DateRange)

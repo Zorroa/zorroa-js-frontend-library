@@ -4,15 +4,15 @@ import { archivistGet } from './authAction'
 
 const rootEndpoint = '/api/v1/permissions'
 
-export function getAllPermissions () {
+export function getAllPermissions() {
   return dispatch => {
     console.log('Load all permissions')
     archivistGet(dispatch, rootEndpoint)
       .then(response => {
-        const permissions = response.data.map(json => (new Permission(json)))
+        const permissions = response.data.map(json => new Permission(json))
         dispatch({
           type: GET_ALL_PERMISSIONS,
-          payload: permissions
+          payload: permissions,
         })
       })
       .catch(error => {

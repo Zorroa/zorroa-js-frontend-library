@@ -5,8 +5,4 @@ import withFlipbook from './FlipbookDownloader'
 import './Flipbook.scss'
 import './FlipbookPlayer.scss'
 
-export {
-  Flipbook,
-  FlipbookPlayer,
-  withFlipbook
-}
+export { Flipbook, FlipbookPlayer, withFlipbook }

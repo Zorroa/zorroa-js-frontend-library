@@ -12,44 +12,44 @@ class DisplayOptions extends Component {
     selectedFields: PropTypes.arrayOf(PropTypes.string).isRequired, // Pre-selected fields
     onDismiss: PropTypes.func,
     onUpdate: PropTypes.func.isRequired,
-    singleSelection: PropTypes.bool,                  // true forces radio mode
-    title: PropTypes.string.isRequired,               // E.g. 'Explorer Display Options'
-    fieldTypes: PropTypes.arrayOf(PropTypes.string),  // Optional list of types, e.g. ['point']
-    fieldRegex: PropTypes.object,                     // Optional regex for matched fields
-    fields: PropTypes.object,                         // state.assets.fields
-    actions: PropTypes.object
+    singleSelection: PropTypes.bool, // true forces radio mode
+    title: PropTypes.string.isRequired, // E.g. 'Explorer Display Options'
+    fieldTypes: PropTypes.arrayOf(PropTypes.string), // Optional list of types, e.g. ['point']
+    fieldRegex: PropTypes.object, // Optional regex for matched fields
+    fields: PropTypes.object, // state.assets.fields
+    actions: PropTypes.object,
   }
 
   state = {
-    openedNamespace: '',                            // E.g. Foo.bar
-    checkedNamespaces: this.props.selectedFields,   // Array of field names
-    fieldFilter: ''                                 // Filter input state
+    openedNamespace: '', // E.g. Foo.bar
+    checkedNamespaces: this.props.selectedFields, // Array of field names
+    fieldFilter: '', // Filter input state
   }
 
-  componentWillMount () {
+  componentWillMount() {
     this.props.actions.getAssetFields()
     const fields = this.allFields()
     if (fields.length === 1) {
-      this.props.onUpdate(null, {checkedNamespaces: fields})
+      this.props.onUpdate(null, { checkedNamespaces: fields })
       this.cancel(null)
     }
   }
 
   // Update clicked, invoked callbacks to apply state and dismiss
-  update (event) {
+  update(event) {
     this.props.onUpdate(event, this.state)
     this.cancel(event)
   }
 
   // Cancel or close clicked, dismiss without update
-  cancel (event) {
+  cancel(event) {
     this.props.actions.hideModal()
     if (this.props.onDismiss) {
       this.props.onDismiss(event)
     }
   }
 
-  filter = (event) => {
+  filter = event => {
     const fieldFilter = event.target.value ? event.target.value : ''
     this.setState({ fieldFilter })
   }
@@ -59,14 +59,14 @@ class DisplayOptions extends Component {
   }
 
   // Unfold the namespace to show children
-  openNamespace (openedNamespace) {
+  openNamespace(openedNamespace) {
     this.setState({ openedNamespace })
   }
 
   // Select the namespace and update state.checkedNamespaces
-  toggleNamespace (namespace) {
+  toggleNamespace(namespace) {
     const index = this.state.checkedNamespaces.indexOf(namespace)
-    let checkedNamespaces = [ ...this.state.checkedNamespaces ]
+    let checkedNamespaces = [...this.state.checkedNamespaces]
     if (index >= 0) {
       checkedNamespaces.splice(index, 1)
     } else if (this.props.singleSelection) {
@@ -95,16 +95,19 @@ class DisplayOptions extends Component {
   }
 
   // Return the field names for the specified namespace
-  namesForNamespace (namespace) {
+  namesForNamespace(namespace) {
     let names = new Set()
     const { openedNamepsace, fieldFilter } = this.state
     const length = namespace ? namespace.length : 0
     const lcFieldFilter = fieldFilter.toLowerCase()
     this.allFields().forEach(field => {
-      if ((!length || field.startsWith(namespace)) &&
+      if (
+        (!length || field.startsWith(namespace)) &&
         (!length || (field.length > length && field[length] === '.')) &&
-        (field.startsWith(openedNamepsace) ||       // always show selected
-        !lcFieldFilter.length || field.toLowerCase().includes(lcFieldFilter))) {
+        (field.startsWith(openedNamepsace) || // always show selected
+          !lcFieldFilter.length ||
+          field.toLowerCase().includes(lcFieldFilter))
+      ) {
         // Strip off the prefix and slice off any tail past the next dot
         const tail = field.slice(length ? length + 1 : 0)
         const index = tail.indexOf('.')
@@ -114,19 +117,23 @@ class DisplayOptions extends Component {
         }
       }
     })
-    return [ ...names ].sort((a, b) => {
-      return a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'})
+    return [...names].sort((a, b) => {
+      return a.localeCompare(b, undefined, {
+        numeric: true,
+        sensitivity: 'base',
+      })
     })
   }
 
   // Fields only change during an active server import.
   // We could optimize this by storing the result statically,
   // if we knew how to flush the cache during an import.
-  allFields () {
+  allFields() {
     const { fields, fieldTypes, fieldRegex } = this.props
     const allFields = []
     for (let key in fields) {
-      if (fieldTypes && fieldTypes.length && fieldTypes.indexOf(key) < 0) continue
+      if (fieldTypes && fieldTypes.length && fieldTypes.indexOf(key) < 0)
+        continue
       const typeFields = fields[key]
       for (let field of typeFields) {
         if (fieldRegex && !field.match(fieldRegex)) continue
@@ -138,7 +145,7 @@ class DisplayOptions extends Component {
 
   // Count the number of children for each parent namespace.
   // Parent checkbox state counts number of selected children.
-  allChildCounts () {
+  allChildCounts() {
     const counts = {}
     this.allFields().forEach(field => {
       const parents = field.split('.')
@@ -151,7 +158,7 @@ class DisplayOptions extends Component {
   }
 
   // Count the number of currently selected children of this namespace
-  checkedChildren (namespace) {
+  checkedChildren(namespace) {
     let count = 0
     const { checkedNamespaces } = this.state
     for (let name of checkedNamespaces) {
@@ -163,7 +170,7 @@ class DisplayOptions extends Component {
   }
 
   // Compare the currently checked child count against the total child count
-  parentState (namespace, childCounts) {
+  parentState(namespace, childCounts) {
     const count = this.checkedChildren(namespace)
     if (count === 0) {
       return 'OFF'
@@ -177,86 +184,145 @@ class DisplayOptions extends Component {
   //   name = Bam
   //   namespace = Foo.bar
   //   childCounts is a precomputed version of this.allChildCounts
-  renderName (name, namespace, childCounts) {
+  renderName(name, namespace, childCounts) {
     const { singleSelection } = this.props
     const { openedNamespace } = this.state
     const key = namespace && namespace.length ? namespace + '.' + name : name
     const hasChildren = this.namesForNamespace(key).length > 0
     const selected = openedNamespace.startsWith(key)
-    const disable = hasChildren && this.state.openedNamespace && namespace !== openedNamespace
-    const parentState = hasChildren ? this.parentState(key, childCounts) : 'NONE'
-    const checked = parentState === 'ON' || this.state.checkedNamespaces.indexOf(key) >= 0
+    const disable =
+      hasChildren && this.state.openedNamespace && namespace !== openedNamespace
+    const parentState = hasChildren
+      ? this.parentState(key, childCounts)
+      : 'NONE'
+    const checked =
+      parentState === 'ON' || this.state.checkedNamespaces.indexOf(key) >= 0
     const checkable = !singleSelection || !hasChildren
     const indeterminate = parentState === 'MIXED'
     const keyClass = key.replace(/\./g, '-')
-    const classname = classnames('DisplayOptions-namespace', 'flexRow',
-      'flexJustifySpaceBetween', 'flexAlignItemsCenter', `DisplayOptions-namespace-${keyClass}`,
-      { selected: selected, disable: disable, hasChildren: hasChildren })
+    const classname = classnames(
+      'DisplayOptions-namespace',
+      'flexRow',
+      'flexJustifySpaceBetween',
+      'flexAlignItemsCenter',
+      `DisplayOptions-namespace-${keyClass}`,
+      { selected: selected, disable: disable, hasChildren: hasChildren },
+    )
     return (
-      <div key={key} onClick={hasChildren && this.openNamespace.bind(this, key)} className={classname}>
+      <div
+        key={key}
+        onClick={hasChildren && this.openNamespace.bind(this, key)}
+        className={classname}>
         <div>
-          { checkable &&
-          <input checked={checked} type="checkbox"
-                 className={classnames({indeterminate})} id={key} name={key}
-                 onChange={this.toggleNamespace.bind(this, key)}/>
-          }
-          <label htmlFor={key}><span/>{unCamelCase(name)}</label>
+          {checkable && (
+            <input
+              checked={checked}
+              type="checkbox"
+              className={classnames({ indeterminate })}
+              id={key}
+              name={key}
+              onChange={this.toggleNamespace.bind(this, key)}
+            />
+          )}
+          <label htmlFor={key}>
+            <span />
+            {unCamelCase(name)}
+          </label>
         </div>
-        { hasChildren && <div className={classnames('DisplayOptions-namespace', 'childArrow', 'icon-arrow-down8', { selected: selected })} /> }
+        {hasChildren && (
+          <div
+            className={classnames(
+              'DisplayOptions-namespace',
+              'childArrow',
+              'icon-arrow-down8',
+              { selected: selected },
+            )}
+          />
+        )}
       </div>
     )
   }
 
-  render () {
+  render() {
     const { openedNamespace, fieldFilter } = this.state
     const { title, singleSelection, fieldTypes } = this.props
     const names = this.namesForNamespace()
     const childCounts = this.allChildCounts()
-    const disabled = (singleSelection && this.state.checkedNamespaces.length !== 1) || (!names || names.length === 0)
-    const openedNamespaces = openedNamespace && openedNamespace.length ? openedNamespace.split('.') : []
+    const disabled =
+      (singleSelection && this.state.checkedNamespaces.length !== 1) ||
+      (!names || names.length === 0)
+    const openedNamespaces =
+      openedNamespace && openedNamespace.length
+        ? openedNamespace.split('.')
+        : []
     return (
       <div>
         <div className="DisplayOptions flexCol">
           <div className="DisplayOptions-header">
-            <div className="DisplayOptions-settings icon-cog"/>
+            <div className="DisplayOptions-settings icon-cog" />
             <div className="DisplayOptions-title">{title}</div>
-            <div className="flexOn"/>
-            <div className="DisplayOptions-close icon-cross" onClick={this.cancel.bind(this)}/>
+            <div className="flexOn" />
+            <div
+              className="DisplayOptions-close icon-cross"
+              onClick={this.cancel.bind(this)}
+            />
           </div>
           <div className="DisplayOptions-subheader flexRow flexAlignItemsEnd">
-            <input type="text" onChange={this.filter} value={fieldFilter} placeholder="Filter Fields" />
+            <input
+              type="text"
+              onChange={this.filter}
+              value={fieldFilter}
+              placeholder="Filter Fields"
+            />
             <button className="icon-search" />
-            <button onClick={this.viewAllMetadata} className="DisplayOptions-subheader-viewall">View All Metadata<span className="icon-new-tab"/> </button>
+            <button
+              onClick={this.viewAllMetadata}
+              className="DisplayOptions-subheader-viewall">
+              View All Metadata<span className="icon-new-tab" />{' '}
+            </button>
           </div>
           <div className="DisplayOptions-body fullWidth flexRow flexOn">
-
             {/* Always show the first level namespaces */}
             <div className="DisplayOptions-body-col flexCol">
-              { (names && names.length) || !fieldTypes ? (
-                names.map(name => (this.renderName(name, null, childCounts)))
+              {(names && names.length) || !fieldTypes ? (
+                names.map(name => this.renderName(name, null, childCounts))
               ) : (
                 <div className="DisplayOptions-body-empty flexCol flexAlignItemsCenter">
                   <div className="icon-emptybox" />
                   <div>No fields match the required types:</div>
                   <div className="flexRow">
-                    { fieldTypes.map(type => (<div key={type} className="DisplayOptions-body-field-type">{type}</div>)) }
+                    {fieldTypes.map(type => (
+                      <div
+                        key={type}
+                        className="DisplayOptions-body-field-type">
+                        {type}
+                      </div>
+                    ))}
                   </div>
                 </div>
-              ) }
+              )}
             </div>
 
-            { /* Iterate over child namespaces, if something is opened */ }
-            { openedNamespaces.map((name, i) => {
+            {/* Iterate over child namespaces, if something is opened */}
+            {openedNamespaces.map((name, i) => {
               const namespace = openedNamespaces.slice(0, i + 1).join('.')
               return (
                 <div key={i} className="DisplayOptions-body-col flexCol">
-                  { this.namesForNamespace(namespace).map(name => (this.renderName(name, namespace, childCounts))) }
+                  {this.namesForNamespace(namespace).map(name =>
+                    this.renderName(name, namespace, childCounts),
+                  )}
                 </div>
               )
             })}
           </div>
           <div className="DisplayOptions-footer flexRow fullWidth flexJustifyCenter">
-            <button className={classnames('default', 'DisplayOptions-update', { disabled })} onClick={!disabled && this.update.bind(this)}>Update</button>
+            <button
+              className={classnames('default', 'DisplayOptions-update', {
+                disabled,
+              })}
+              onClick={!disabled && this.update.bind(this)}>
+              Update
+            </button>
             <button onClick={this.cancel.bind(this)}>Cancel</button>
           </div>
         </div>
@@ -265,11 +331,17 @@ class DisplayOptions extends Component {
   }
 }
 
-export default connect(state => ({
-  fields: state.assets.fields
-}), dispatch => ({
-  actions: bindActionCreators({
-    getAssetFields,
-    hideModal
-  }, dispatch)
-}))(DisplayOptions)
+export default connect(
+  state => ({
+    fields: state.assets.fields,
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        getAssetFields,
+        hideModal,
+      },
+      dispatch,
+    ),
+  }),
+)(DisplayOptions)

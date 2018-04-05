@@ -10,7 +10,7 @@ export default class ExportsSection extends Component {
     onToggleExport: PropTypes.func,
     onToggleAccordion: PropTypes.func,
     isExportable: PropTypes.bool,
-    isRequired: PropTypes.bool
+    isRequired: PropTypes.bool,
   }
 
   toggleAccordion = event => {
@@ -27,25 +27,25 @@ export default class ExportsSection extends Component {
     }
   }
 
-  isExportable () {
+  isExportable() {
     return this.props.isRequired === true || this.props.isExportable === true
   }
 
-  render () {
+  render() {
     const exportSectionClasses = classnames('ExportsSection', {
-      'ExportsSection--opened': this.props.isOpen === true
+      'ExportsSection--opened': this.props.isOpen === true,
     })
     const toggleClasses = classnames('ExportsSection__toggle', {
       'ExportsSection__toggle--opened': this.props.isOpen === true,
-      'ExportsSection__toggle--closed': this.props.isOpen !== true
+      'ExportsSection__toggle--closed': this.props.isOpen !== true,
     })
     const toggleContentClasses = classnames('ExportsSection__content', {
       'ExportsSection__content--closed': this.props.isOpen !== true,
       'ExportsSection__content--enabled': this.isExportable() === true,
-      'ExportsSection__content--disabled': this.isExportable() === false
+      'ExportsSection__content--disabled': this.isExportable() === false,
     })
     const titleClasses = classnames('ExportsSection__title', {
-      'ExportsSection__title--required': this.props.isRequired === true
+      'ExportsSection__title--required': this.props.isRequired === true,
     })
 
     return (
@@ -58,18 +58,11 @@ export default class ExportsSection extends Component {
                 onChange={this.onCheckboxChange}
               />
             )}
-            <h2 className={titleClasses}>
-              {this.props.title}
-            </h2>
+            <h2 className={titleClasses}>{this.props.title}</h2>
           </label>
-          <button
-            className={toggleClasses}
-            onClick={this.toggleAccordion}>
-          </button>
+          <button className={toggleClasses} onClick={this.toggleAccordion} />
         </header>
-        <div className={toggleContentClasses}>
-          {this.props.children}
-        </div>
+        <div className={toggleContentClasses}>{this.props.children}</div>
       </fieldset>
     )
   }

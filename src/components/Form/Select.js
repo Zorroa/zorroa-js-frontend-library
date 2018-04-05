@@ -12,67 +12,70 @@ export default class Select extends Component {
     error: PropTypes.bool,
     required: PropTypes.bool,
     onChange: PropTypes.func,
-    value: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.number
-    ]),
-    deafultLabel: PropTypes.string
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    deafultLabel: PropTypes.string,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = {
-      value: props.value || ''
+      value: props.value || '',
     }
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (nextProps.value !== this.state.value) {
       this.setState({
-        value: nextProps.value || ''
+        value: nextProps.value || '',
       })
     }
   }
 
-  onChange = (event) => {
+  onChange = event => {
     const value = event.target.value
     const fieldKey = this.props.fieldKey
-    this.setState({
-      value: typeof this.props.value === 'number' ? Number(value) : value
-    }, () => {
-      if (this.props.deafultLabel !== undefined && value === '') {
-        return
-      }
+    this.setState(
+      {
+        value: typeof this.props.value === 'number' ? Number(value) : value,
+      },
+      () => {
+        if (this.props.deafultLabel !== undefined && value === '') {
+          return
+        }
 
-      if (typeof this.props.onChange !== 'function') {
-        return
-      }
+        if (typeof this.props.onChange !== 'function') {
+          return
+        }
 
-      this.props.onChange(
-        this.props.options.find(
-          option => (option[fieldKey] || '').toString() === value
+        this.props.onChange(
+          this.props.options.find(
+            option => (option[fieldKey] || '').toString() === value,
+          ),
         )
-      )
-    })
+      },
+    )
   }
 
-  render () {
-    const {required, className, error, deafultLabel} = this.props
-    const inputClasses = classnames('FormInput__select', {
-      'FormInput__select--error': error === true
-    }, className)
+  render() {
+    const { required, className, error, deafultLabel } = this.props
+    const inputClasses = classnames(
+      'FormInput__select',
+      {
+        'FormInput__select--error': error === true,
+      },
+      className,
+    )
 
     return (
       <div className={inputClasses}>
         <select
-          className='FormInput__select-native'
+          className="FormInput__select-native"
           required={required}
           onChange={this.onChange}
-          value={this.state.value}
-        >
+          value={this.state.value}>
           {deafultLabel !== undefined && (
-            <option key={-1} value=''>
+            <option key={-1} value="">
               {deafultLabel}
             </option>
           )}

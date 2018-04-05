@@ -8,10 +8,10 @@ export default class CanvasImage extends PureComponent {
     width: PropTypes.number,
     className: PropTypes.string,
     onClick: PropTypes.func,
-    size: PropTypes.oneOf(['cover', 'contain'])
+    size: PropTypes.oneOf(['cover', 'contain']),
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     const isDifferentImage = nextProps.image !== this.props.image
 
     if (isDifferentImage) {
@@ -19,21 +19,21 @@ export default class CanvasImage extends PureComponent {
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.drawImage(this.props)
   }
 
-  shouldComponentUpdate (nextProps) {
+  shouldComponentUpdate(nextProps) {
     // CAUTION: a new `nextProps.image` should NEVER trigger an update. The
     // canvas is the leaf node of the DOM here, changing an image does
     // not change the DOM, since the canvas exposes a totally seperate API
 
     const isHeightChanged = nextProps.height !== this.props.height
     const isWidthChanged = nextProps.width !== this.props.width
-    return (isHeightChanged || isWidthChanged)
+    return isHeightChanged || isWidthChanged
   }
 
-  drawImage (props) {
+  drawImage(props) {
     const isImageProvided = props.image !== undefined
     const canvas = this.canvas
 
@@ -65,41 +65,32 @@ export default class CanvasImage extends PureComponent {
       childHeight: props.image.height,
       parentWidth: canvas.offsetWidth,
       parentHeight: canvas.offsetHeight,
-      containBackground: props.size !== 'cover'
+      containBackground: props.size !== 'cover',
     })
 
-    canvas.getContext('2d').drawImage(
-      props.image,
-      x,
-      y,
-      width,
-      height
-    )
+    canvas.getContext('2d').drawImage(props.image, x, y, width, height)
   }
 
-  render () {
-    const {
-      onClick,
-      height,
-      width,
-      className
-    } = this.props
+  render() {
+    const { onClick, height, width, className } = this.props
 
     const canvasAttributes = {
       onClick,
       height,
       width,
-      className
+      className,
     }
 
     const style = {
       width: width ? `${width}px` : '100%',
-      height: height ? `${height}px` : '100%'
+      height: height ? `${height}px` : '100%',
     }
 
     return (
       <canvas
-        ref={canvasRef => { this.canvas = canvasRef }}
+        ref={canvasRef => {
+          this.canvas = canvasRef
+        }}
         style={style}
         {...canvasAttributes}
       />

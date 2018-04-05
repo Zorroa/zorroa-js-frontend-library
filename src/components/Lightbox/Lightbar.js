@@ -28,24 +28,24 @@ class Lightbar extends Component {
     origin: PropTypes.string,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
-    actions: PropTypes.object
+    actions: PropTypes.object,
   }
 
   state = {
     copyingLink: false,
     showFolders: false,
-    addingToCollection: false
+    addingToCollection: false,
   }
 
-  closeLightbox () {
+  closeLightbox() {
     this.props.actions.isolateAssetId()
   }
 
-  release = (event) => {
-    this.forceUpdate()    // force redraw to clear isDragging CSS classnames
+  release = event => {
+    this.forceUpdate() // force redraw to clear isDragging CSS classnames
   }
 
-  isolatedAssetURL () {
+  isolatedAssetURL() {
     const { asset, origin } = this.props
     if (!asset) return
     return asset.url(origin)
@@ -56,22 +56,22 @@ class Lightbar extends Component {
     const { source } = asset.document
     const { mediaType, filename } = source
     const options = {
-      format: 'blob'
+      format: 'blob',
     }
 
     if (asset.clipType() === 'flipbook') {
-      api
-        .flipbook
+      api.flipbook
         .get(asset.parentId())
         .then(assets => {
-          return Promise.all(assets.map(childAsset => {
-            const imageUrl = childAsset.url(origin)
-            return getImage(imageUrl, options)
-              .then((image) => ({
+          return Promise.all(
+            assets.map(childAsset => {
+              const imageUrl = childAsset.url(origin)
+              return getImage(imageUrl, options).then(image => ({
                 image,
-                ...childAsset
+                ...childAsset,
               }))
-          }))
+            }),
+          )
         })
         .then(assetImages => {
           assetImages.forEach((assetImage, index) => {
@@ -79,7 +79,7 @@ class Lightbar extends Component {
               downloadjs(
                 assetImage.image,
                 assetImage.document.source.filename,
-                assetImage.document.source.mediaType
+                assetImage.document.source.mediaType,
               )
             }, index * 1000)
           })
@@ -87,14 +87,9 @@ class Lightbar extends Component {
       return
     }
 
-    getImage(this.isolatedAssetURL(), options)
-      .then(image => {
-        downloadjs(
-          image,
-          filename,
-          mediaType
-        )
-      })
+    getImage(this.isolatedAssetURL(), options).then(image => {
+      downloadjs(image, filename, mediaType)
+    })
   }
 
   copyIsolatedAssetLink = () => {
@@ -109,7 +104,7 @@ class Lightbar extends Component {
     }, 3000)
   }
 
-  showFolders = (event) => {
+  showFolders = event => {
     this.setState({ showFolders: !this.state.showFolders })
     event.preventDefault()
   }
@@ -127,55 +122,117 @@ class Lightbar extends Component {
     }, 3000)
   }
 
-  render () {
-    const { assets, asset, isolatedId, user, showMetadata, onMetadata, lightbarFieldTemplate } = this.props
-    const { actionWidth, lightbarHeight, copyingLink, showFolders, addingToCollection } = this.state
+  render() {
+    const {
+      assets,
+      asset,
+      isolatedId,
+      user,
+      showMetadata,
+      onMetadata,
+      lightbarFieldTemplate,
+    } = this.props
+    const {
+      actionWidth,
+      lightbarHeight,
+      copyingLink,
+      showFolders,
+      addingToCollection,
+    } = this.state
     return (
-      <div className="Lightbar" style={{height: lightbarHeight}}>
+      <div className="Lightbar" style={{ height: lightbarHeight }}>
         <div className="Lightbar-metadata">
-          <div onClick={onMetadata} className={classnames('Lightbar__settings', 'icon-arrow-down', {'Lightbar__settings--is-open': showMetadata})} />
-          <FieldTemplate asset={asset} template={lightbarFieldTemplate} extensionOnLeft={true}/>
+          <div
+            onClick={onMetadata}
+            className={classnames('Lightbar__settings', 'icon-arrow-down', {
+              'Lightbar__settings--is-open': showMetadata,
+            })}
+          />
+          <FieldTemplate
+            asset={asset}
+            template={lightbarFieldTemplate}
+            extensionOnLeft={true}
+          />
         </div>
-        <div className="Lightbar-actions" style={{width: actionWidth, minWidth: actionWidth}}>
-          <div className='Lightbar-action' onClick={this.onDownload}>
-            <i className='Lightbar__icon icon-download2'/>
-            <span className='Lightbar-action-text Lightbar-action-download'>Download</span>
+        <div
+          className="Lightbar-actions"
+          style={{ width: actionWidth, minWidth: actionWidth }}>
+          <div className="Lightbar-action" onClick={this.onDownload}>
+            <i className="Lightbar__icon icon-download2" />
+            <span className="Lightbar-action-text Lightbar-action-download">
+              Download
+            </span>
           </div>
-          <div onClick={!copyingLink && this.copyIsolatedAssetLink} className='Lightbar-action'>
-            <i className='Lightbar__icon icon-link2'/>
-            <span className='Lightbar-action-text Lightbar-action-get-link'>Get Link</span>
-            { copyingLink && <div className="Lightbar-performed-action">Copied URL to clipboard</div> }
-          </div>
-          <div onClick={this.showFolders} className='Lightbar-action'>
-            <span className='Lightbar-action-text Lightbar-action-add-to-collection'>Add to Collection</span>
-            <i className='Lightbar__context icon-chevron-down'/>
-            { showFolders && (
-              <div className="Lightbar-folders" onClick={e => { e.stopPropagation() }}>
-                <Folders filterName="simple" onSelect={this.addToCollection}
-                         filter={f => (!f.isDyhi() && !f.search && (f.childCount || f.canAddAssetIds(new Set([isolatedId]), assets, user)))} />
+          <div
+            onClick={!copyingLink && this.copyIsolatedAssetLink}
+            className="Lightbar-action">
+            <i className="Lightbar__icon icon-link2" />
+            <span className="Lightbar-action-text Lightbar-action-get-link">
+              Get Link
+            </span>
+            {copyingLink && (
+              <div className="Lightbar-performed-action">
+                Copied URL to clipboard
               </div>
             )}
-            { addingToCollection && <div className="Lightbar-performed-action">{addingToCollection}</div> }
           </div>
-          <div className="Lightbar-close icon-cross" onClick={this.closeLightbox.bind(this)} />
+          <div onClick={this.showFolders} className="Lightbar-action">
+            <span className="Lightbar-action-text Lightbar-action-add-to-collection">
+              Add to Collection
+            </span>
+            <i className="Lightbar__context icon-chevron-down" />
+            {showFolders && (
+              <div
+                className="Lightbar-folders"
+                onClick={e => {
+                  e.stopPropagation()
+                }}>
+                <Folders
+                  filterName="simple"
+                  onSelect={this.addToCollection}
+                  filter={f =>
+                    !f.isDyhi() &&
+                    !f.search &&
+                    (f.childCount ||
+                      f.canAddAssetIds(new Set([isolatedId]), assets, user))
+                  }
+                />
+              </div>
+            )}
+            {addingToCollection && (
+              <div className="Lightbar-performed-action">
+                {addingToCollection}
+              </div>
+            )}
+          </div>
+          <div
+            className="Lightbar-close icon-cross"
+            onClick={this.closeLightbox.bind(this)}
+          />
         </div>
       </div>
     )
   }
 }
 
-export default connect(state => ({
-  assets: state.assets.all,
-  asset: state.assets.all.find(asset => asset.id === state.assets.isolatedId),
-  isolatedId: state.assets.isolatedId,
-  lightbarFieldTemplate: state.app.lightbarFieldTemplate,
-  origin: state.auth.origin,
-  user: state.auth.user,
-  userSettings: state.app.userSettings
-}), dispatch => ({
-  actions: bindActionCreators({
-    isolateAssetId,
-    addAssetIdsToFolderId,
-    saveUserSettings
-  }, dispatch)
-}))(Lightbar)
+export default connect(
+  state => ({
+    assets: state.assets.all,
+    asset: state.assets.all.find(asset => asset.id === state.assets.isolatedId),
+    isolatedId: state.assets.isolatedId,
+    lightbarFieldTemplate: state.app.lightbarFieldTemplate,
+    origin: state.auth.origin,
+    user: state.auth.user,
+    userSettings: state.app.userSettings,
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        isolateAssetId,
+        addAssetIdsToFolderId,
+        saveUserSettings,
+      },
+      dispatch,
+    ),
+  }),
+)(Lightbar)

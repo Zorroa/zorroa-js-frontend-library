@@ -8,8 +8,17 @@ import FieldList from '../../models/FieldList'
 import AssetSearch from '../../models/AssetSearch'
 import AssetFilter from '../../models/AssetFilter'
 import TrashedFolder from '../../models/TrashedFolder'
-import { searchAssets, getAssetFields, requiredFields } from '../../actions/assetsAction'
-import { MapWidgetInfo, CollectionsWidgetInfo, SortOrderWidgetInfo, ImportSetWidgetInfo } from './WidgetInfo'
+import {
+  searchAssets,
+  getAssetFields,
+  requiredFields,
+} from '../../actions/assetsAction'
+import {
+  MapWidgetInfo,
+  CollectionsWidgetInfo,
+  SortOrderWidgetInfo,
+  ImportSetWidgetInfo,
+} from './WidgetInfo'
 
 // Searcher is a singleton. It combines AssetSearches from the Racetrack
 // and Folders and submits a new query to the Archivist server.
@@ -30,28 +39,32 @@ class Searcher extends Component {
     thumbFields: PropTypes.arrayOf(PropTypes.string),
     dragFields: PropTypes.arrayOf(PropTypes.string),
     jobs: PropTypes.object,
-    actions: PropTypes.object.isRequired
+    actions: PropTypes.object.isRequired,
   }
 
   state = {
-    importFinished: false
+    importFinished: false,
   }
 
-  componentWillMount () {
+  componentWillMount() {
     this.props.actions.getAssetFields()
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     this.updateImportFinished(nextProps)
   }
 
-  updateImportFinished (nextProps) {
+  updateImportFinished(nextProps) {
     const oldJobs = jobsOfType(this.props.jobs, Job.Import)
     const newJobs = jobsOfType(nextProps.jobs, Job.Import)
     if (oldJobs && newJobs) {
-      const oldFieldCount = this.props.fieldTypes && Object.keys(this.props.fieldTypes).length
-      const newFieldCount = nextProps.fieldTypes && Object.keys(nextProps.fieldTypes).length
-      let importFinished = oldJobs.length && (oldJobs.length !== newJobs.length || oldFieldCount !== newFieldCount)
+      const oldFieldCount =
+        this.props.fieldTypes && Object.keys(this.props.fieldTypes).length
+      const newFieldCount =
+        nextProps.fieldTypes && Object.keys(nextProps.fieldTypes).length
+      let importFinished =
+        oldJobs.length &&
+        (oldJobs.length !== newJobs.length || oldFieldCount !== newFieldCount)
       oldJobs.forEach(oldJob => {
         if (oldJob.state === Job.Active) {
           const newJob = newJobs.find(job => job.id === oldJob.id)
@@ -60,7 +73,7 @@ class Searcher extends Component {
           }
         }
       })
-      this.setState({importFinished})
+      this.setState({ importFinished })
       if (importFinished) {
         this.props.actions.getAssetFields()
       }
@@ -83,29 +96,43 @@ class Searcher extends Component {
       let postFilter = new AssetFilter()
       for (let widget of widgets) {
         if (!widget) continue
-        if (widget.type === CollectionsWidgetInfo.type) foldersDisabled = !widget.isEnabled
-        if (widget.type === SortOrderWidgetInfo.type) orderDisabled = !widget.isEnabled
-        if (widget.type === ImportSetWidgetInfo.type) importsDisabled = !widget.isEnabled
+        if (widget.type === CollectionsWidgetInfo.type)
+          foldersDisabled = !widget.isEnabled
+        if (widget.type === SortOrderWidgetInfo.type)
+          orderDisabled = !widget.isEnabled
+        if (widget.type === ImportSetWidgetInfo.type)
+          importsDisabled = !widget.isEnabled
         if (!widget.sliver) continue
         let sliver = widget.sliver
         if (sliver.aggs) {
           if (widget.isEnabled) postFilter.merge(widget.sliver.filter)
           // Return a filter comprised of all widget filters except one
-          const allOtherFilters = (widget) => {
+          const allOtherFilters = widget => {
             let allOther = new AssetFilter()
             for (let w of widgets) {
-              if (w !== widget && w.isEnabled && w.sliver && w.sliver.filter && w.sliver.aggs) {
+              if (
+                w !== widget &&
+                w.isEnabled &&
+                w.sliver &&
+                w.sliver.filter &&
+                w.sliver.aggs
+              ) {
                 allOther.merge(w.sliver.filter)
               }
             }
             return allOther
           }
-          const allOthers = widget.type === MapWidgetInfo.type ? new AssetFilter() : allOtherFilters(widget).convertToBool()
-          let aggs = {[widget.id]: {filter: allOthers, aggs: sliver.aggs}}
-          sliver = new AssetSearch({aggs})
+          const allOthers =
+            widget.type === MapWidgetInfo.type
+              ? new AssetFilter()
+              : allOtherFilters(widget).convertToBool()
+          let aggs = { [widget.id]: { filter: allOthers, aggs: sliver.aggs } }
+          sliver = new AssetSearch({ aggs })
         }
         // Search for aggs even if widget is disabled to update contents, e.g. facets
-        const search = widget.isEnabled ? sliver : new AssetSearch({aggs: sliver.aggs})
+        const search = widget.isEnabled
+          ? sliver
+          : new AssetSearch({ aggs: sliver.aggs })
         assetSearch.merge(search)
       }
       assetSearch.postFilter = postFilter
@@ -116,14 +143,14 @@ class Searcher extends Component {
 
     // Add a filter for selected folders
     if (!foldersDisabled && nonTrashedFolderIds && nonTrashedFolderIds.length) {
-      const filter = new AssetFilter({links: {folder: nonTrashedFolderIds}})
-      assetSearch.merge(new AssetSearch({filter}))
+      const filter = new AssetFilter({ links: { folder: nonTrashedFolderIds } })
+      assetSearch.merge(new AssetSearch({ filter }))
     }
 
     // Add a filter for the selected imports
     if (!importsDisabled && selectedJobIds.size) {
-      const filter = new AssetFilter({links: {import: [...selectedJobIds]}})
-      assetSearch.merge(new AssetSearch({filter}))
+      const filter = new AssetFilter({ links: { import: [...selectedJobIds] } })
+      assetSearch.merge(new AssetSearch({ filter }))
     }
 
     return assetSearch
@@ -134,7 +161,9 @@ class Searcher extends Component {
     if (trashedFolders && trashedFolders.length) {
       nonTrashedFolderIds = []
       selectedFolderIds.forEach(id => {
-        const index = trashedFolders.findIndex(trashedFolder => (trashedFolder.folderId === id))
+        const index = trashedFolders.findIndex(
+          trashedFolder => trashedFolder.folderId === id,
+        )
         if (index < 0) nonTrashedFolderIds.push(id)
       })
     } else {
@@ -143,40 +172,84 @@ class Searcher extends Component {
     return nonTrashedFolderIds
   }
 
-  render () {
+  render() {
     const {
-      widgets, actions, selectedFolderIds, query,
-      trashedFolders, order,
-      showMultipage, selectedJobIds,
-      metadataFields, lightbarFields, thumbFields, dragFields, fieldTypes,
-      selectedTableLayoutId, tableLayouts
+      widgets,
+      actions,
+      selectedFolderIds,
+      query,
+      trashedFolders,
+      order,
+      showMultipage,
+      selectedJobIds,
+      metadataFields,
+      lightbarFields,
+      thumbFields,
+      dragFields,
+      fieldTypes,
+      selectedTableLayoutId,
+      tableLayouts,
     } = this.props
     if (!fieldTypes) return null
 
     // Server does not support searching of trashed folders
-    const nonTrashedFolderIds = Searcher.nonTrashedFolderIds(selectedFolderIds, trashedFolders)
-    const assetSearch = Searcher.build(widgets, nonTrashedFolderIds, selectedJobIds, order)
+    const nonTrashedFolderIds = Searcher.nonTrashedFolderIds(
+      selectedFolderIds,
+      trashedFolders,
+    )
+    const assetSearch = Searcher.build(
+      widgets,
+      nonTrashedFolderIds,
+      selectedJobIds,
+      order,
+    )
 
     // Limit results to favorited fields, since we only display values
     // in those fields in the Table and Lightbar
-    const layout = tableLayouts.find(layout => layout.id === selectedTableLayoutId)
-    const tableFields = layout && layout.fields || []
-    const fields = requiredFields([...metadataFields, ...tableFields, ...lightbarFields, ...thumbFields, ...dragFields], fieldTypes)
+    const layout = tableLayouts.find(
+      layout => layout.id === selectedTableLayoutId,
+    )
+    const tableFields = (layout && layout.fields) || []
+    const fields = requiredFields(
+      [
+        ...metadataFields,
+        ...tableFields,
+        ...lightbarFields,
+        ...thumbFields,
+        ...dragFields,
+      ],
+      fieldTypes,
+    )
     assetSearch.fields = [...fields]
 
     // Do not send the query unless it is different than the last returned query
     // FIXME: If assetSearch.empty() filtered counts == total, but tricky to flush cache
     // FIXME: Count trashed folders once the server adds support
     const skip = new Set(['fields', 'from', 'size', 'scroll'])
-    const missingField = this.inflightQuery ? this.inflightQuery.missingField(assetSearch.fields) : (!query || query.missingField(assetSearch.fields))
-    const searchModified = this.inflightQuery ? !this.inflightQuery.equals(assetSearch, skip) : (!query || !assetSearch.equals(query, skip))
+    const missingField = this.inflightQuery
+      ? this.inflightQuery.missingField(assetSearch.fields)
+      : !query || query.missingField(assetSearch.fields)
+    const searchModified = this.inflightQuery
+      ? !this.inflightQuery.equals(assetSearch, skip)
+      : !query || !assetSearch.equals(query, skip)
     const switchedMultipage = this.showMultipage !== showMultipage
     this.showMultipage = showMultipage
-    if (searchModified || missingField || this.state.importFinished || switchedMultipage) {
+    if (
+      searchModified ||
+      missingField ||
+      this.state.importFinished ||
+      switchedMultipage
+    ) {
       assetSearch.size = AssetSearch.autoPageSize
       const force = this.state.importFinished || switchedMultipage
       const isFirstPage = true
-      actions.searchAssets(assetSearch, query, force, isFirstPage, showMultipage && [])
+      actions.searchAssets(
+        assetSearch,
+        query,
+        force,
+        isFirstPage,
+        showMultipage && [],
+      )
       this.inflightQuery = assetSearch
       if (query) {
         // FIXME: Disable saving search to user settings to avoid conflicts
@@ -184,16 +257,20 @@ class Searcher extends Component {
       }
     }
 
-    if (this.inflightQuery && query && this.inflightQuery.equals(query)) this.inflightQuery = null
-    return null   // Just reacting to new slivers
+    if (this.inflightQuery && query && this.inflightQuery.equals(query))
+      this.inflightQuery = null
+    return null // Just reacting to new slivers
   }
 }
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({
-    searchAssets,
-    getAssetFields
-  }, dispatch)
+  actions: bindActionCreators(
+    {
+      searchAssets,
+      getAssetFields,
+    },
+    dispatch,
+  ),
 })
 
 const mapStateToProps = state => ({
@@ -211,9 +288,7 @@ const mapStateToProps = state => ({
   thumbFields: state.app.thumbFields,
   dragFields: state.app.dragFields,
   jobs: state.jobs.all,
-  selectedJobIds: state.jobs.selectedIds
+  selectedJobIds: state.jobs.selectedIds,
 })
 
-export default connect(
-  mapStateToProps, mapDispatchToProps
-)(Searcher)
+export default connect(mapStateToProps, mapDispatchToProps)(Searcher)

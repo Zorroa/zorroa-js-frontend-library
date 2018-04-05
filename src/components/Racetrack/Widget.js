@@ -9,11 +9,18 @@ import {
   SortOrderWidgetInfo,
   MultipageWidgetInfo,
   ImportSetWidgetInfo,
-  FlipbookWidgetInfo
+  FlipbookWidgetInfo,
 } from './WidgetInfo'
 import { iconifyRightSidebar } from '../../actions/appActions'
-import { sortAssets, isolateParent, deisolateFlipbook } from '../../actions/assetsAction'
-import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
+import {
+  sortAssets,
+  isolateParent,
+  deisolateFlipbook,
+} from '../../actions/assetsAction'
+import {
+  modifyRacetrackWidget,
+  removeRacetrackWidgetIds,
+} from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { selectJobIds } from '../../actions/jobActions'
 
@@ -34,7 +41,7 @@ class Widget extends Component {
     widgets: PropTypes.arrayOf(PropTypes.object),
     uxLevel: PropTypes.number,
     monochrome: PropTypes.bool,
-    actions: PropTypes.object
+    actions: PropTypes.object,
   }
 
   toggleEnabled = () => {
@@ -60,24 +67,29 @@ class Widget extends Component {
 
   widget = () => {
     const { id, widgets } = this.props
-    const index = widgets && widgets.findIndex(widget => (id === widget.id))
+    const index = widgets && widgets.findIndex(widget => id === widget.id)
     return widgets && index >= 0 && widgets[index]
   }
 
   removeFilter = () => {
     const widget = this.widget()
-    if (widget && widget.type === SortOrderWidgetInfo.type) this.props.actions.sortAssets()
-    if (widget && widget.type === CollectionsWidgetInfo.type) this.props.actions.selectFolderIds()
-    if (widget && widget.type === ImportSetWidgetInfo.type) this.props.actions.selectJobIds()
-    if (widget && widget.type === MultipageWidgetInfo.type) this.props.actions.isolateParent()
-    if (widget && widget.type === FlipbookWidgetInfo.type) this.props.actions.deisolateFlipbook()
+    if (widget && widget.type === SortOrderWidgetInfo.type)
+      this.props.actions.sortAssets()
+    if (widget && widget.type === CollectionsWidgetInfo.type)
+      this.props.actions.selectFolderIds()
+    if (widget && widget.type === ImportSetWidgetInfo.type)
+      this.props.actions.selectJobIds()
+    if (widget && widget.type === MultipageWidgetInfo.type)
+      this.props.actions.isolateParent()
+    if (widget && widget.type === FlipbookWidgetInfo.type)
+      this.props.actions.deisolateFlipbook()
     this.props.actions.removeRacetrackWidgetIds([this.props.id])
   }
 
   // Release focus on the element when focus is moved outside.
   // From: https://gist.github.com/pstoica/4323d3e6e37e8a23dd59
   // Timeout explanation: https://stackoverflow.com/questions/11592966/get-the-newly-focussed-element-if-any-from-the-onblur-event/11592974#11592974
-  onBlur = (e) => {
+  onBlur = e => {
     const currentTarget = e.currentTarget
     setTimeout(_ => {
       if (!currentTarget.contains(document.activeElement)) {
@@ -87,13 +99,24 @@ class Widget extends Component {
     })
   }
 
-  render () {
-    const { children, icon, title, field, backgroundColor, isIconified, floatBody, isOpen, onOpen, uxLevel } = this.props
+  render() {
+    const {
+      children,
+      icon,
+      title,
+      field,
+      backgroundColor,
+      isIconified,
+      floatBody,
+      isOpen,
+      onOpen,
+      uxLevel,
+    } = this.props
     const widget = this.widget()
     const advanced = uxLevel > 0
     const isEnabled = !advanced || (widget && widget.isEnabled)
     const isPinned = advanced && widget && widget.isPinned
-    const maxWidth = onOpen ? 360 : undefined   // Implicitly use onOpen to restrict width of Racebar widgets
+    const maxWidth = onOpen ? 360 : undefined // Implicitly use onOpen to restrict width of Racebar widgets
     const WidgetHeaderParams = {
       icon,
       title,
@@ -107,20 +130,32 @@ class Widget extends Component {
       onClose: this.removeFilter,
       enableToggleFn: advanced ? this.toggleEnabled : null,
       pinnedToggleFn: advanced ? this.togglePinned : null,
-      collapseToggleFn: onOpen
+      collapseToggleFn: onOpen,
     }
 
     const { className } = this.props
-    const widgetClasses = classnames('Widget', 'flexCol', {'parent': children, floatBody, isOpen, isIconified, isEnabled, [className]: !!className})
+    const widgetClasses = classnames('Widget', 'flexCol', {
+      parent: children,
+      floatBody,
+      isOpen,
+      isIconified,
+      isEnabled,
+      [className]: !!className,
+    })
     return (
-      <div className={widgetClasses} onBlur={this.onBlur} tabIndex={0} ref="widgetTab">
-        <WidgetHeader {...WidgetHeaderParams}/>
-        { !isIconified && (
-          <div className={classnames('Widget-body', {
-            floatBody,
-            'Widget-body-closed': isOpen === false
-          })}>
-            { children }
+      <div
+        className={widgetClasses}
+        onBlur={this.onBlur}
+        tabIndex={0}
+        ref="widgetTab">
+        <WidgetHeader {...WidgetHeaderParams} />
+        {!isIconified && (
+          <div
+            className={classnames('Widget-body', {
+              floatBody,
+              'Widget-body-closed': isOpen === false,
+            })}>
+            {children}
           </div>
         )}
       </div>
@@ -132,17 +167,21 @@ export default connect(
   state => ({
     widgets: state.racetrack && state.racetrack.widgets,
     uxLevel: state.app.uxLevel,
-    monochrome: state.app.monochrome
-  }), dispatch => ({
-    actions: bindActionCreators({
-      iconifyRightSidebar,
-      sortAssets,
-      selectFolderIds,
-      selectJobIds,
-      modifyRacetrackWidget,
-      removeRacetrackWidgetIds,
-      isolateParent,
-      deisolateFlipbook
-    }, dispatch)
-  })
+    monochrome: state.app.monochrome,
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        iconifyRightSidebar,
+        sortAssets,
+        selectFolderIds,
+        selectJobIds,
+        modifyRacetrackWidget,
+        removeRacetrackWidgetIds,
+        isolateParent,
+        deisolateFlipbook,
+      },
+      dispatch,
+    ),
+  }),
 )(Widget)

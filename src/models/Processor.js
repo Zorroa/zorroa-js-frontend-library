@@ -1,5 +1,5 @@
 export default class Processor {
-  constructor (json) {
+  constructor(json) {
     this.id = json.id
     this.filters = json.filters
     this.description = json.description
@@ -15,27 +15,27 @@ export default class Processor {
     this.pluginLanguage = json.pluginLanguage
   }
 
-  ref (args) {
+  ref(args) {
     return new ProcessorRef({
       args: args,
       className: this.name,
-      language: this.pluginLanguage
+      language: this.pluginLanguage,
     })
   }
 }
 
 export class ProcessorRef {
-  constructor (json) {
+  constructor(json) {
     this.className = json.className
     this.args = json.args
     this.language = json.language
-    this.execute = json.execute && json.execute.map(p => (new ProcessorRef(p)))
-    this.filters = json.filters && json.filters.map(f => (new ProcessorFilter(f)))
+    this.execute = json.execute && json.execute.map(p => new ProcessorRef(p))
+    this.filters = json.filters && json.filters.map(f => new ProcessorFilter(f))
   }
 }
 
 export class ProcessorFilter {
-  constructor (json) {
+  constructor(json) {
     this.expr = json.expr
     this.drop = json.drop
   }

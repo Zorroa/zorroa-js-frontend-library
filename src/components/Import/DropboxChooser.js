@@ -12,17 +12,17 @@ export default class DropboxChooser extends Component {
   static propTypes = {
     onSelect: PropTypes.func.isRequired,
     onBack: PropTypes.func.isRequired,
-    accessToken: PropTypes.string.isRequired
+    accessToken: PropTypes.string.isRequired,
   }
 
   state = {
     files: new Map(),
     rootId: ROOT_ID,
     cursor: '',
-    loading: false
+    loading: false,
   }
 
-  componentWillMount () {
+  componentWillMount() {
     this.loadFiles(ROOT_PATH, this.state.rootId)
   }
 
@@ -32,10 +32,11 @@ export default class DropboxChooser extends Component {
     // fetch and render the files in the users root directory.
     const { accessToken } = this.props
     const dbx = new Dropbox({ accessToken })
-    dbx.usersGetCurrentAccount()
-      .then((response) => {
+    dbx
+      .usersGetCurrentAccount()
+      .then(response => {
         console.log(response)
-        this.setState({userAccount: response})
+        this.setState({ userAccount: response })
       })
       .catch(error => {
         console.log('Error getting Dropbox account: ' + error)
@@ -44,9 +45,10 @@ export default class DropboxChooser extends Component {
         return
       })
 
-    this.setState({loading: true})
-    dbx.filesListFolder({path})
-      .then((response) => {
+    this.setState({ loading: true })
+    dbx
+      .filesListFolder({ path })
+      .then(response => {
         const files = new Map(this.state.files)
         const childIds = new Set()
         response.entries.forEach(f => {
@@ -56,47 +58,63 @@ export default class DropboxChooser extends Component {
             name: f.name,
             path: f.path_lower,
             parentId,
-            metadata: f
+            metadata: f,
           }
           files.set(f.id, item)
           childIds.add(f.id)
         })
         const parent = files.get(parentId)
-        const newParent = parent ? { ...parent } : { id: ROOT_ID, path: ROOT_PATH, name: '/' }
+        const newParent = parent
+          ? { ...parent }
+          : { id: ROOT_ID, path: ROOT_PATH, name: '/' }
         newParent.childIds = childIds
         files.set(parentId, newParent)
         const cursor = response.cursor
-        this.setState({files, cursor, loading: false})
+        this.setState({ files, cursor, loading: false })
       })
-      .catch((error) => {
+      .catch(error => {
         console.log(error)
-        this.setState({files: new Map(), loading: false})
+        this.setState({ files: new Map(), loading: false })
       })
   }
 
-  loadDirectory = (id) => {
+  loadDirectory = id => {
     const file = this.state.files.get(id)
     if (file && file.metadata && file.metadata.path_lower.length > 1) {
       this.loadFiles(file.metadata.path_lower, id)
     }
   }
 
-  setRoot = (id) => {
-    this.setState({rootId: id})
+  setRoot = id => {
+    this.setState({ rootId: id })
     this.loadDirectory(id)
   }
 
-  render () {
+  render() {
     const { files, loading, rootId, userAccount } = this.state
-    const title = (userAccount && userAccount.name ? userAccount.name.display_name + '\'s' : 'Unknown') + ' Dropbox'
-    const icon = loading ? <img className="DropboxChooser-icon" src={spin} alt="Loading Dropbox"/> : <div className="DropboxChooser-icon icon-folder-subfolders" title={title}/>
+    const title =
+      (userAccount && userAccount.name
+        ? userAccount.name.display_name + "'s"
+        : 'Unknown') + ' Dropbox'
+    const icon = loading ? (
+      <img className="DropboxChooser-icon" src={spin} alt="Loading Dropbox" />
+    ) : (
+      <div
+        className="DropboxChooser-icon icon-folder-subfolders"
+        title={title}
+      />
+    )
     return (
       <div className="DropboxChooser">
-        <Finder items={files} rootId={rootId} loading={loading}
-                onSelect={this.props.onSelect}
-                rootIcon={icon}
-                onRoot={this.setRoot}
-                onOpen={this.loadDirectory} />
+        <Finder
+          items={files}
+          rootId={rootId}
+          loading={loading}
+          onSelect={this.props.onSelect}
+          rootIcon={icon}
+          onRoot={this.setRoot}
+          onOpen={this.loadDirectory}
+        />
       </div>
     )
   }

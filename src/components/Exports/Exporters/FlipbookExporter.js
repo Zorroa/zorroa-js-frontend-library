@@ -1,9 +1,5 @@
 import React, { Component, PropTypes } from 'react'
-import {
-  FormSelect,
-  FormLabel,
-  FormRadio
-} from '../../Form'
+import { FormSelect, FormLabel, FormRadio } from '../../Form'
 import ExportsSection from '../ExportsSection'
 
 export default class FlipbookExporter extends Component {
@@ -16,8 +12,8 @@ export default class FlipbookExporter extends Component {
       quality: PropTypes.number.isRequired,
       exportImages: PropTypes.bool.isRequired,
       exportMovies: PropTypes.bool.isRequired,
-      frameRate: PropTypes.number.isRequired
-    })
+      frameRate: PropTypes.number.isRequired,
+    }),
   }
 
   state = {
@@ -29,10 +25,10 @@ export default class FlipbookExporter extends Component {
     quality: this.props.arguments.quality,
     exportImages: this.props.arguments.exportImages,
     exportMovies: this.props.arguments.exportMovies,
-    frameRate: this.props.arguments.frameRate
+    frameRate: this.props.arguments.frameRate,
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     const newState = {}
     if (
       nextProps.arguments.quality !== this.state.quality ||
@@ -50,7 +46,7 @@ export default class FlipbookExporter extends Component {
     this.setState(newState)
   }
 
-  onChange = (options) => {
+  onChange = options => {
     this.setState(options, () => {
       if (typeof this.props.onChange === 'function') {
         this.props.onChange({
@@ -59,10 +55,10 @@ export default class FlipbookExporter extends Component {
               quality: this.state.quality,
               exportImages: this.state.exportImages,
               exportMovies: this.state.exportMovies,
-              frameRate: this.state.frameRate
+              frameRate: this.state.frameRate,
             },
-            shouldExport: this.state.shouldExport
-          }
+            shouldExport: this.state.shouldExport,
+          },
         })
       }
     })
@@ -70,13 +66,13 @@ export default class FlipbookExporter extends Component {
 
   toggleCanExport = shouldExport => {
     this.onChange({
-      shouldExport
+      shouldExport,
     })
   }
 
   controlFlipbookArguments = argumment => {
     const options = {
-      flipbookExportType: argumment
+      flipbookExportType: argumment,
     }
 
     if (argumment === 'image') {
@@ -97,40 +93,45 @@ export default class FlipbookExporter extends Component {
     this.onChange(options)
   }
 
-  render () {
+  render() {
     const qualityOptions = [
       {
         label: 'Best',
-        value: 'veryslow'
-      }, {
+        value: 'veryslow',
+      },
+      {
         label: 'Good',
-        value: 'medium'
+        value: 'medium',
       },
       {
         label: 'Fast',
-        value: 'fast'
-      }
+        value: 'fast',
+      },
     ]
     const flipbookOptions = [
       {
         label: 'Individual Images',
-        value: 'image'
+        value: 'image',
       },
       {
         label: 'Flipbook Movie',
-        value: 'movie'
-      }
+        value: 'movie',
+      },
     ]
-    const frameRateOptions = [{
-      label: '12',
-      value: 12
-    }, {
-      label: '24',
-      value: 24
-    }, {
-      label: '30',
-      value: 30
-    }]
+    const frameRateOptions = [
+      {
+        label: '12',
+        value: 12,
+      },
+      {
+        label: '24',
+        value: 24,
+      },
+      {
+        label: '30',
+        value: 30,
+      },
+    ]
 
     return (
       <ExportsSection
@@ -138,10 +139,11 @@ export default class FlipbookExporter extends Component {
         onToggleExport={this.toggleCanExport}
         onToggleAccordion={this.props.onToggleAccordion}
         isExportable={this.state.shouldExport}
-        isOpen={this.props.isOpen}
-      >
+        isOpen={this.props.isOpen}>
         <radiogroup>
-          <FormLabel afterLabel="Export flipbook movie and images" className="Exports__form-element">
+          <FormLabel
+            afterLabel="Export flipbook movie and images"
+            className="Exports__form-element">
             <FormRadio
               onChange={() => this.controlFlipbookArguments('all')}
               checked={this.state.flipbookExportType === 'all'}
@@ -150,8 +152,7 @@ export default class FlipbookExporter extends Component {
           </FormLabel>
           <FormLabel
             afterLabel="Export assets as"
-            className="Exports__form-element"
-          >
+            className="Exports__form-element">
             <FormRadio
               onChange={() => this.controlFlipbookArguments('image')}
               checked={this.state.flipbookExportType !== 'all'}
@@ -161,47 +162,41 @@ export default class FlipbookExporter extends Component {
           <FormLabel
             vertical
             label=""
-            className="Exports__form-element Exports__form-element--nested"
-          >
+            className="Exports__form-element Exports__form-element--nested">
             <FormSelect
               className="Exports__form-select"
               options={flipbookOptions}
-              fieldLabel='label'
-              fieldKey='value'
+              fieldLabel="label"
+              fieldKey="value"
               value={this.state.flipbookExportType}
-              onChange={({value}) => this.controlFlipbookArguments(value)}
-            >
-            </FormSelect>
+              onChange={({ value }) => this.controlFlipbookArguments(value)}
+            />
           </FormLabel>
           <FormLabel
             vertical
             label="Quality"
-            className="Exports__form-element Exports__form-element--nested"
-          >
+            className="Exports__form-element Exports__form-element--nested">
             <FormSelect
               className="Exports__form-select"
               options={qualityOptions}
-              fieldLabel='label'
-              fieldKey='value'
+              fieldLabel="label"
+              fieldKey="value"
               value={this.state.quality}
-              onChange={({value}) => this.onChange({quality: value})}
-            >
-            </FormSelect>
+              onChange={({ value }) => this.onChange({ quality: value })}
+            />
           </FormLabel>
           <FormLabel
             vertical
             label="Frame Rate"
-            className="Exports__form-element Exports__form-element--nested"
-          >
+            className="Exports__form-element Exports__form-element--nested">
             <FormSelect
               className="Exports__form-select"
               options={frameRateOptions}
-              fieldLabel='label'
-              fieldKey='value'
+              fieldLabel="label"
+              fieldKey="value"
               value={this.state.frameRate}
-              onChange={({value}) => this.onChange({frameRate: value})}
-            >
-            </FormSelect>
+              onChange={({ value }) => this.onChange({ frameRate: value })}
+            />
           </FormLabel>
         </radiogroup>
       </ExportsSection>

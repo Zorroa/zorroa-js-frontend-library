@@ -1,8 +1,5 @@
 import React, { Component, PropTypes } from 'react'
-import {
-  FormSelect,
-  FormLabel
-} from '../../Form'
+import { FormSelect, FormLabel } from '../../Form'
 import ExportsSection from '../ExportsSection'
 
 export default class MetadataExporter extends Component {
@@ -11,33 +8,35 @@ export default class MetadataExporter extends Component {
     onToggleAccordion: PropTypes.func.isRequired,
     isOpen: PropTypes.bool,
     shouldExport: PropTypes.bool,
-    exporter: PropTypes.oneOf(['JsonExporter', 'CsvExporter'])
+    exporter: PropTypes.oneOf(['JsonExporter', 'CsvExporter']),
   }
 
   state = {
     isOpen: true,
     exporter: this.props.exporter,
-    shouldExport: this.props.shouldExport
+    shouldExport: this.props.shouldExport,
   }
 
-  onChange = (options) => {
+  onChange = options => {
     this.setState(options, () => {
       if (typeof this.props.onChange === 'function') {
         this.props.onChange({
           CsvExporter: {
             arguments: {},
-            shouldExport: this.state.shouldExport && this.state.exporter === 'CsvExporter'
+            shouldExport:
+              this.state.shouldExport && this.state.exporter === 'CsvExporter',
           },
           JsonExporter: {
             arguments: {},
-            shouldExport: this.state.shouldExport && this.state.exporter === 'JsonExporter'
-          }
+            shouldExport:
+              this.state.shouldExport && this.state.exporter === 'JsonExporter',
+          },
         })
       }
     })
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     const newState = {}
 
     if (nextProps.exporter !== this.state.exporter) {
@@ -53,26 +52,26 @@ export default class MetadataExporter extends Component {
 
   toggleCanExport = shouldExport => {
     this.onChange({
-      shouldExport
+      shouldExport,
     })
   }
 
   toggleCanExport = shouldExport => {
     this.onChange({
-      shouldExport
+      shouldExport,
     })
   }
 
-  render () {
+  render() {
     const formatOptions = [
       {
         label: 'CSV',
-        value: 'CsvExporter'
+        value: 'CsvExporter',
       },
       {
         label: 'JSON',
-        value: 'JsonExporter'
-      }
+        value: 'JsonExporter',
+      },
     ]
     return (
       <ExportsSection
@@ -80,22 +79,19 @@ export default class MetadataExporter extends Component {
         onToggleExport={this.toggleCanExport}
         onToggleAccordion={this.props.onToggleAccordion}
         isOpen={this.props.isOpen}
-        isExportable={this.state.shouldExport}
-      >
+        isExportable={this.state.shouldExport}>
         <FormLabel
           vertical
           label="Format"
-          className="Exports__form-element Exports__form-element--nested"
-        >
+          className="Exports__form-element Exports__form-element--nested">
           <FormSelect
             className="Exports__form-select"
             options={formatOptions}
-            fieldLabel='label'
-            fieldKey='value'
+            fieldLabel="label"
+            fieldKey="value"
             value={this.state.exporter}
-            onChange={({value}) => this.onChange({exporter: value})}
-          >
-          </FormSelect>
+            onChange={({ value }) => this.onChange({ exporter: value })}
+          />
         </FormLabel>
       </ExportsSection>
     )

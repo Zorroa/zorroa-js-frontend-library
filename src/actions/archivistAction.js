@@ -1,14 +1,20 @@
-import { ARCHIVIST_INFO, ARCHIVIST_HEALTH, ARCHIVIST_METRICS, ARCHIVIST_SETTING, ARCHIVIST_SETTINGS } from '../constants/actionTypes'
+import {
+  ARCHIVIST_INFO,
+  ARCHIVIST_HEALTH,
+  ARCHIVIST_METRICS,
+  ARCHIVIST_SETTING,
+  ARCHIVIST_SETTINGS,
+} from '../constants/actionTypes'
 import { archivistGet, archivistPut } from './authAction'
 
-export function archivistInfo () {
+export function archivistInfo() {
   return dispatch => {
     console.log('Update archivist info')
     archivistGet(dispatch, '/info')
       .then(response => {
         dispatch({
           type: ARCHIVIST_INFO,
-          payload: response.data
+          payload: response.data,
         })
       })
       .catch(error => {
@@ -17,14 +23,14 @@ export function archivistInfo () {
   }
 }
 
-export function archivistHealth () {
+export function archivistHealth() {
   return dispatch => {
     console.log('Update archivist health')
     archivistGet(dispatch, '/health')
       .then(response => {
         dispatch({
           type: ARCHIVIST_HEALTH,
-          payload: response.data
+          payload: response.data,
         })
       })
       .catch(error => {
@@ -33,14 +39,14 @@ export function archivistHealth () {
   }
 }
 
-export function archivistMetrics () {
+export function archivistMetrics() {
   return dispatch => {
     console.log('Update archivist metrics')
     archivistGet(dispatch, '/metrics')
       .then(response => {
         dispatch({
           type: ARCHIVIST_METRICS,
-          payload: response.data
+          payload: response.data,
         })
       })
       .catch(error => {
@@ -49,14 +55,14 @@ export function archivistMetrics () {
   }
 }
 
-export function archivistSetting (name) {
+export function archivistSetting(name) {
   return dispatch => {
     console.log('Get archivist setting ' + name)
     archivistGet(dispatch, `/api/v1/settings/${name}`)
       .then(response => {
         dispatch({
           type: ARCHIVIST_SETTING,
-          payload: response.data
+          payload: response.data,
         })
       })
       .catch(error => {
@@ -65,14 +71,14 @@ export function archivistSetting (name) {
   }
 }
 
-export function archivistSettings () {
+export function archivistSettings() {
   return dispatch => {
     console.log('Get all archivist settings')
     archivistGet(dispatch, '/api/v1/settings')
       .then(response => {
         dispatch({
           type: ARCHIVIST_SETTINGS,
-          payload: response.data
+          payload: response.data,
         })
       })
       .catch(error => {
@@ -81,14 +87,14 @@ export function archivistSettings () {
   }
 }
 
-export function setArchivistSettings (settings) {
+export function setArchivistSettings(settings) {
   return dispatch => {
     console.log('Set archivist settings: ' + JSON.stringify(settings))
     archivistPut(dispatch, '/api/v1/settings', settings)
       .then(response => {
         dispatch({
           type: ARCHIVIST_SETTINGS,
-          payload: response.data
+          payload: response.data,
         })
       })
       .catch(error => {

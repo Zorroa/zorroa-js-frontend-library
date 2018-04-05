@@ -18,7 +18,7 @@ import {
   LOAD_USER_SUCCESS,
   UPDATE_USER,
   UPDATE_USER_ERROR,
-  UPDATE_USER_SUCCESS
+  UPDATE_USER_SUCCESS,
 } from '../constants/actionTypes'
 import User from '../models/User'
 
@@ -36,20 +36,20 @@ const initialState = {
   isLoadingUser: false,
   isUpdatingUser: false,
   updateUserError: false,
-  updateUserErrorMessage: ''
+  updateUserErrorMessage: '',
 }
 
-function removeFromArray (array, item) {
+function removeFromArray(array, item) {
   if (typeof item === 'object') {
     console.warn('Remove from array may behave unpredictiblity with objects')
   }
 
   return array
-    .map(element => element === item ? undefined : element)
+    .map(element => (element === item ? undefined : element))
     .filter(element => element !== undefined)
 }
 
-export default function (state = initialState, action) {
+export default function(state = initialState, action) {
   switch (action.type) {
     case LOAD_USERS: {
       const isLoadingUsers = true
@@ -57,7 +57,7 @@ export default function (state = initialState, action) {
       return {
         ...state,
         isLoadingUsers,
-        loadUsersError
+        loadUsersError,
       }
     }
     case LOAD_USERS_ERROR: {
@@ -66,7 +66,7 @@ export default function (state = initialState, action) {
       return {
         ...state,
         isLoadingUsers,
-        loadUsersError
+        loadUsersError,
       }
     }
     case LOAD_USERS_SUCCESS: {
@@ -77,26 +77,34 @@ export default function (state = initialState, action) {
         ...state,
         isLoadingUsers,
         loadUsersError,
-        users
+        users,
       }
     }
     case DISABLE_USER: {
       // Using array.concat to adhere with non-mutability of state
-      const usersBeingDisabled = state.usersBeingDisabled.concat([action.payload])
+      const usersBeingDisabled = state.usersBeingDisabled.concat([
+        action.payload,
+      ])
       return {
         ...state,
-        usersBeingDisabled
+        usersBeingDisabled,
       }
     }
     case DISABLE_USER_ERROR: {
-      const usersBeingDisabled = removeFromArray(state.usersBeingEnabled, action.payload)
+      const usersBeingDisabled = removeFromArray(
+        state.usersBeingEnabled,
+        action.payload,
+      )
       return {
         ...state,
-        usersBeingDisabled
+        usersBeingDisabled,
       }
     }
     case DISABLE_USER_SUCCESS: {
-      const usersBeingDisabled = removeFromArray(state.usersBeingEnabled, action.payload)
+      const usersBeingDisabled = removeFromArray(
+        state.usersBeingEnabled,
+        action.payload,
+      )
 
       const users = state.users.map(user => {
         if (user.id !== action.payload) {
@@ -111,7 +119,7 @@ export default function (state = initialState, action) {
       return {
         ...state,
         usersBeingDisabled,
-        users
+        users,
       }
     }
     case ENABLE_USER: {
@@ -119,18 +127,24 @@ export default function (state = initialState, action) {
       const usersBeingEnabled = state.usersBeingEnabled.concat([action.payload])
       return {
         ...state,
-        usersBeingEnabled
+        usersBeingEnabled,
       }
     }
     case ENABLE_USER_ERROR: {
-      const usersBeingEnabled = removeFromArray(state.usersBeingEnabled, action.payload)
+      const usersBeingEnabled = removeFromArray(
+        state.usersBeingEnabled,
+        action.payload,
+      )
       return {
         ...state,
-        usersBeingEnabled
+        usersBeingEnabled,
       }
     }
     case ENABLE_USER_SUCCESS: {
-      const usersBeingEnabled = removeFromArray(state.usersBeingEnabled, action.payload)
+      const usersBeingEnabled = removeFromArray(
+        state.usersBeingEnabled,
+        action.payload,
+      )
       const users = state.users.map(user => {
         if (user.id !== action.payload) {
           return user
@@ -144,19 +158,19 @@ export default function (state = initialState, action) {
       return {
         ...state,
         usersBeingEnabled,
-        users
+        users,
       }
     }
     case BUILD_USER: {
       return {
         ...state,
-        user: Object.assign({}, state.user, action.payload)
+        user: Object.assign({}, state.user, action.payload),
       }
     }
     case RESET_USER: {
       return {
         ...state,
-        user: action.payload
+        user: action.payload,
       }
     }
     case CREATE_USER: {
@@ -165,15 +179,19 @@ export default function (state = initialState, action) {
       return {
         ...state,
         isCreatingUser,
-        createUserError
+        createUserError,
       }
     }
     case CREATE_USER_ERROR: {
       const isCreatingUser = false
       const createUserError = true
-      let createUserErrorMessage = 'Unable to save the user. Ensure all data is valid and that your network works.'
+      let createUserErrorMessage =
+        'Unable to save the user. Ensure all data is valid and that your network works.'
       console.log(action)
-      if (action.payload.exception === 'com.zorroa.sdk.client.exception.DuplicateElementException') {
+      if (
+        action.payload.exception ===
+        'com.zorroa.sdk.client.exception.DuplicateElementException'
+      ) {
         createUserErrorMessage = action.payload.message
       }
 
@@ -181,7 +199,7 @@ export default function (state = initialState, action) {
         ...state,
         isCreatingUser,
         createUserError,
-        createUserErrorMessage
+        createUserErrorMessage,
       }
     }
     case CREATE_USER_SUCCESS: {
@@ -194,7 +212,7 @@ export default function (state = initialState, action) {
         isCreatingUser,
         users,
         user,
-        createUserError
+        createUserError,
       }
     }
     case LOAD_USER: {
@@ -203,7 +221,7 @@ export default function (state = initialState, action) {
       return {
         ...state,
         isLoadingUser,
-        loadUserError
+        loadUserError,
       }
     }
     case LOAD_USER_ERROR: {
@@ -213,7 +231,7 @@ export default function (state = initialState, action) {
       return {
         ...state,
         isLoadingUser,
-        loadUserError
+        loadUserError,
       }
     }
     case LOAD_USER_SUCCESS: {
@@ -233,7 +251,7 @@ export default function (state = initialState, action) {
         isLoadingUser,
         users,
         user: userPayload,
-        loadUserError
+        loadUserError,
       }
     }
     case UPDATE_USER: {
@@ -243,7 +261,7 @@ export default function (state = initialState, action) {
       return {
         ...state,
         isUpdatingUser,
-        updateUserError
+        updateUserError,
       }
     }
     case UPDATE_USER_ERROR: {
@@ -254,26 +272,23 @@ export default function (state = initialState, action) {
         ...state,
         isUpdatingUser,
         updateUserError,
-        updateUserErrorMessage
+        updateUserErrorMessage,
       }
     }
     case UPDATE_USER_SUCCESS: {
       const isUpdatingUser = false
       const updateUserError = false
       const user = action.payload
-      const users = [
-        ...state.users
-      ]
+      const users = [...state.users]
       const oldUserIndex = users.findIndex(oldUser => oldUser.id === user.id)
       users[oldUserIndex] = user
       return {
         ...state,
         users,
         isUpdatingUser,
-        updateUserError
+        updateUserError,
       }
     }
-
   }
 
   return state

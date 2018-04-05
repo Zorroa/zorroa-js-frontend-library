@@ -6,26 +6,24 @@ export default class GDriveChooser extends Component {
   static propTypes = {
     onSelect: PropTypes.func.isRequired,
     onBack: PropTypes.func.isRequired,
-    accessToken: PropTypes.string.isRequired
+    accessToken: PropTypes.string.isRequired,
   }
 
   state = {
     files: new Map(),
     rootId: ROOT_ID,
-    loading: false
+    loading: false,
   }
 
-  setRoot = (id) => {
-    this.setState({rootId: id})
+  setRoot = id => {
+    this.setState({ rootId: id })
     this.loadDirectory(id)
   }
 
-  render () {
+  render() {
     return (
       <div className="DropboxChooser">
-        <div>
-          GDrive support coming soon!
-        </div>
+        <div>GDrive support coming soon!</div>
       </div>
     )
   }

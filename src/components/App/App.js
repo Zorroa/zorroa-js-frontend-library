@@ -1,16 +1,19 @@
 import React, { Component, PropTypes } from 'react'
 import {
-  EMBEDMODE_ITEM, LOAD_SEARCH_ITEM, CLEAR_SESSION_STATE_ITEM, SESSION_STATE_ITEM,
-  SHOW_IMPORT_ITEM
+  EMBEDMODE_ITEM,
+  LOAD_SEARCH_ITEM,
+  CLEAR_SESSION_STATE_ITEM,
+  SESSION_STATE_ITEM,
+  SHOW_IMPORT_ITEM,
 } from '../../constants/localStorageItems'
 import domUtils from '../../services/domUtils'
 
 class App extends Component {
   static propTypes = {
-    children: PropTypes.object
+    children: PropTypes.object,
   }
 
-  componentWillMount () {
+  componentWillMount() {
     var queryParams = domUtils.parseQueryString(window.location.search)
     if (queryParams[EMBEDMODE_ITEM]) {
       localStorage.setItem(EMBEDMODE_ITEM, queryParams[EMBEDMODE_ITEM])
@@ -26,12 +29,8 @@ class App extends Component {
     }
   }
 
-  render () {
-    return (
-      <div>
-        {this.props.children}
-      </div>
-    )
+  render() {
+    return <div>{this.props.children}</div>
   }
 }
 

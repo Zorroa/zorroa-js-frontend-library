@@ -15,23 +15,25 @@ import keydown from 'react-keydown'
 class FlipbookViewer extends Component {
   static propTypes = {
     onError: PropTypes.func,
-    frames: PropTypes.arrayOf(PropTypes.shape({
-      url: PropTypes.string.isRequired,
-      imageBitmap: PropTypes.instanceOf(window.ImageBitmap),
-      number: PropTypes.number.isRequired
-    })).isRequired,
+    frames: PropTypes.arrayOf(
+      PropTypes.shape({
+        url: PropTypes.string.isRequired,
+        imageBitmap: PropTypes.instanceOf(window.ImageBitmap),
+        number: PropTypes.number.isRequired,
+      }),
+    ).isRequired,
     actions: PropTypes.shape({
       setFlipbookFps: PropTypes.func,
-      shouldLoop: PropTypes.func
+      shouldLoop: PropTypes.func,
     }),
     shouldLoop: PropTypes.bool,
     totalFrames: PropTypes.number.isRequired,
     loadedPercentage: PropTypes.number.isRequired,
     fps: PropTypes.number.isRequired,
-    isolatedAsset: PropTypes.instanceOf(Asset)
+    isolatedAsset: PropTypes.instanceOf(Asset),
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.shuttler = new PubSub()
@@ -40,11 +42,11 @@ class FlipbookViewer extends Component {
     this.state = {
       playing: false,
       currentFrameNumber: 0,
-      loopPaused: false
+      loopPaused: false,
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.status.on('playing', playing => {
       this.setState({ playing })
     })
@@ -56,32 +58,36 @@ class FlipbookViewer extends Component {
     })
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (
       nextProps.isolatedAsset !== this.props.isolatedAsset &&
       nextProps.isolatedAsset.clipType() === 'flipbook' &&
-      nextProps.isolatedAsset.document.media && nextProps.isolatedAsset.document.media.clip
+      nextProps.isolatedAsset.document.media &&
+      nextProps.isolatedAsset.document.media.clip
     ) {
-      this.shuttler.publish('scrub', nextProps.isolatedAsset.document.media.clip.start)
+      this.shuttler.publish(
+        'scrub',
+        nextProps.isolatedAsset.document.media.clip.start,
+      )
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.status.off()
     this.shuttler.off()
   }
 
-  onError = (error) => {
+  onError = error => {
     if (this.props.onError !== undefined) {
       this.props.onError(error)
     }
   }
 
-  scrub = (frame) => {
+  scrub = frame => {
     this.shuttler.publish('scrub', frame)
   }
 
-  getLoadedPercentage () {
+  getLoadedPercentage() {
     return this.props.loadedPercentage
   }
 
@@ -90,17 +96,17 @@ class FlipbookViewer extends Component {
   }
 
   @keydown('.')
-  nextFrame () {
+  nextFrame() {
     this.shuttler.publish('frameForward')
   }
 
   @keydown(',')
-  previousFrame () {
+  previousFrame() {
     this.shuttler.publish('frameBack')
   }
 
   @keydown('space')
-  startOrStop (event) {
+  startOrStop(event) {
     if (event && typeof event.preventDefault === 'function') {
       event.preventDefault()
     }
@@ -108,7 +114,7 @@ class FlipbookViewer extends Component {
     this.shuttler.publish('startOrStop')
   }
 
-  getDefaultFrameFromIsolatedAsset () {
+  getDefaultFrameFromIsolatedAsset() {
     if (
       this.props.isolatedAsset.document.media &&
       this.props.isolatedAsset.document.media.clip &&
@@ -128,26 +134,27 @@ class FlipbookViewer extends Component {
     this.props.actions.shouldLoop(!this.props.shouldLoop)
   }
 
-  render () {
-    const isLoading = this.getLoadedPercentage() < 100 || this.props.frames.length === 0
+  render() {
+    const isLoading =
+      this.getLoadedPercentage() < 100 || this.props.frames.length === 0
     const { currentFrameNumber, playing } = this.state
     const frameFrequency = {
       onFrameFrequency: this.onFrameFrequency,
       options: defaultFpsFrequencies,
-      rate: this.props.fps
+      rate: this.props.fps,
     }
     const panZoomClassNames = classnames('FlipbookViewer__pan-zoom', {
-      'FlipbookViewer__pan-zoom--is-loading': isLoading
+      'FlipbookViewer__pan-zoom--is-loading': isLoading,
     })
 
     return (
       <div className="FlipbookViewer">
-        { isLoading === true && (
+        {isLoading === true && (
           <div className="FlipbookViewer__loading-status">
-            <ProgressCircle percentage={ this.getLoadedPercentage() } />
+            <ProgressCircle percentage={this.getLoadedPercentage()} />
           </div>
         )}
-        { isLoading === false && (
+        {isLoading === false && (
           <div className="FlipbookViewer__media">
             <div className={panZoomClassNames}>
               <PanZoom
@@ -159,8 +166,7 @@ class FlipbookViewer extends Component {
                 loopPaused={this.state.loopPaused}
                 shouldLoop={this.props.shouldLoop}
                 currentFrameNumber={currentFrameNumber}
-                totalFrames={this.props.totalFrames}
-              >
+                totalFrames={this.props.totalFrames}>
                 <Flipbook
                   shouldLoop={this.props.shouldLoop}
                   onError={this.onError}
@@ -180,24 +186,29 @@ class FlipbookViewer extends Component {
               currentFrameNumber={currentFrameNumber}
             />
           </div>
-        ) }
+        )}
       </div>
     )
   }
 }
 
 const ConnectedFlipbookViewer = connect(
-  (state) => ({
+  state => ({
     fps: state.app.flipbookFps,
     shouldLoop: state.app.shouldLoop,
-    isolatedAsset: state.assets.all.find(asset => asset.id === state.assets.isolatedId)
+    isolatedAsset: state.assets.all.find(
+      asset => asset.id === state.assets.isolatedId,
+    ),
   }),
   dispatch => ({
-    actions: bindActionCreators({
-      setFlipbookFps,
-      shouldLoop
-    }, dispatch)
-  })
+    actions: bindActionCreators(
+      {
+        setFlipbookFps,
+        shouldLoop,
+      },
+      dispatch,
+    ),
+  }),
 )(FlipbookViewer)
 
 export default withFlipbook(ConnectedFlipbookViewer)

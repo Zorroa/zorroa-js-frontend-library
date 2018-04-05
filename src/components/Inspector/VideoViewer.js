@@ -23,21 +23,25 @@ class VideoViewer extends Component {
     onError: PropTypes.func.isRequired,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
-    actions: PropTypes.object
+    actions: PropTypes.object,
   }
 
   static defaultProps = {
-    frameRate: 30
+    frameRate: 30,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.shuttler = new PubSub()
     this.status = new PubSub()
 
-    this.status.on('played', played => { this.setState({ played }) })
-    this.status.on('started', started => { this.setState({ started }) })
+    this.status.on('played', played => {
+      this.setState({ played })
+    })
+    this.status.on('started', started => {
+      this.setState({ started })
+    })
 
     this.state = {
       started: false,
@@ -46,29 +50,38 @@ class VideoViewer extends Component {
       startFrame: this.props.startFrame,
       stopFrame: this.props.stopFrame,
       clipStartFrame: Number.MAX_SAFE_INTEGER,
-      clipStopFrame: -Number.MAX_SAFE_INTEGER
+      clipStopFrame: -Number.MAX_SAFE_INTEGER,
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.componentWillReceiveProps(this.props)
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     const { frames, startFrame, stopFrame, url } = nextProps
-    if (this.props.startFrame !== startFrame || this.props.stopFrame !== stopFrame) {
+    if (
+      this.props.startFrame !== startFrame ||
+      this.props.stopFrame !== stopFrame
+    ) {
       this.setState({ startFrame, stopFrame, played: 0 })
     }
-    if (this.state.clipStartFrame === Number.MAX_SAFE_INTEGER || url !== this.props.url) {
+    if (
+      this.state.clipStartFrame === Number.MAX_SAFE_INTEGER ||
+      url !== this.props.url
+    ) {
       const clipStartFrame = Math.max(0, startFrame - (stopFrame - startFrame))
-      const clipStopFrame = Math.min(frames - 1, stopFrame + (stopFrame - startFrame))
-      this.setState({clipStartFrame, clipStopFrame})
+      const clipStopFrame = Math.min(
+        frames - 1,
+        stopFrame + (stopFrame - startFrame),
+      )
+      this.setState({ clipStartFrame, clipStopFrame })
       this.shuttler.publish('load')
     }
   }
 
   @keydown('space')
-  playPause (event) {
+  playPause(event) {
     if (event) event.preventDefault()
     this.shuttler.publish('startOrStop')
   }
@@ -81,7 +94,7 @@ class VideoViewer extends Component {
     this.props.actions.saveUserSettings(this.props.user, settings)
   }
 
-  scrub = (frame) => this.shuttler.publish('scrub', frame)
+  scrub = frame => this.shuttler.publish('scrub', frame)
 
   clipRange = (clipStartFrame, clipStopFrame) => {
     if (clipStartFrame < 0 || clipStopFrame > this.props.frames - 1) return
@@ -93,61 +106,101 @@ class VideoViewer extends Component {
     if (startFrame < 0 || stopFrame > this.props.frames - 1) return
     if (startFrame > stopFrame) startFrame = stopFrame
     this.setState({ startFrame, stopFrame })
-    if (startFrame < this.state.clipStartFrame) this.setState({ clipStartFrame: startFrame })
-    if (stopFrame > this.state.clipStopFrame) this.setState({ clipStopFrame: stopFrame })
+    if (startFrame < this.state.clipStartFrame)
+      this.setState({ clipStartFrame: startFrame })
+    if (stopFrame > this.state.clipStopFrame)
+      this.setState({ clipStopFrame: stopFrame })
   }
 
-  render () {
+  render() {
     const { url, frameRate, frames, backgroundURL, onError } = this.props
-    const { started, volume, played, startFrame, stopFrame, clipStartFrame, clipStopFrame } = this.state
+    const {
+      started,
+      volume,
+      played,
+      startFrame,
+      stopFrame,
+      clipStartFrame,
+      clipStopFrame,
+    } = this.state
     const seconds = played ? (played * frames - startFrame) / frameRate : 0
     const duration = (stopFrame - startFrame) / frameRate
-    const title = <div className="VideoViewer-time"><Duration className='VideoViewer-remaining' seconds={seconds} frameRate={frameRate} />/<Duration seconds={duration} frameRate={frameRate}/></div>
+    const title = (
+      <div className="VideoViewer-time">
+        <Duration
+          className="VideoViewer-remaining"
+          seconds={seconds}
+          frameRate={frameRate}
+        />/<Duration seconds={duration} frameRate={frameRate} />
+      </div>
+    )
     const total = frames * 10
     return (
-      <div className='VideoViewer'>
+      <div className="VideoViewer">
         <div className="VideoViewer-pan-zoom">
-          <PanZoom title={title} titleWidth={300}
-                   shuttler={this.shuttler} playing={started}
-                   onVolume={this.setVolume} volume={volume}>
-            <Video url={url}
-                 backgroundURL={backgroundURL}
-                 frames={frames}
-                 frameRate={frameRate}
-                 startFrame={startFrame}
-                 stopFrame={stopFrame}
-                 onError={onError}
-                 shuttler={this.shuttler}
-                 status={this.status}
-                 height={window.innerHeight}
-                 width={window.innerWidth}
+          <PanZoom
+            title={title}
+            titleWidth={300}
+            shuttler={this.shuttler}
+            playing={started}
+            onVolume={this.setVolume}
+            volume={volume}>
+            <Video
+              url={url}
+              backgroundURL={backgroundURL}
+              frames={frames}
+              frameRate={frameRate}
+              startFrame={startFrame}
+              stopFrame={stopFrame}
+              onError={onError}
+              shuttler={this.shuttler}
+              status={this.status}
+              height={window.innerHeight}
+              width={window.innerWidth}
             />
           </PanZoom>
         </div>
-        <VideoRange played={played} frames={frames} frameRate={frameRate}
-                    startFrame={startFrame} stopFrame={stopFrame} total={total}
-                    clipStartFrame={clipStartFrame} clipStopFrame={clipStopFrame}
-                    onScrub={this.scrub} onClipRange={this.clipRange}
-                    onRange={this.range} backgroundURL={backgroundURL}/>
+        <VideoRange
+          played={played}
+          frames={frames}
+          frameRate={frameRate}
+          startFrame={startFrame}
+          stopFrame={stopFrame}
+          total={total}
+          clipStartFrame={clipStartFrame}
+          clipStopFrame={clipStopFrame}
+          onScrub={this.scrub}
+          onClipRange={this.clipRange}
+          onRange={this.range}
+          backgroundURL={backgroundURL}
+        />
       </div>
     )
   }
 }
 
-export default connect(state => ({
-  videoVolume: state.app.videoVolume,
-  user: state.auth.user,
-  userSettings: state.app.userSettings
-}), dispatch => ({
-  actions: bindActionCreators({
-    setVideoVolume,
-    saveUserSettings
-  }, dispatch)
-}))(VideoViewer)
+export default connect(
+  state => ({
+    videoVolume: state.app.videoVolume,
+    user: state.auth.user,
+    userSettings: state.app.userSettings,
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        setVideoVolume,
+        saveUserSettings,
+      },
+      dispatch,
+    ),
+  }),
+)(VideoViewer)
 
 const Duration = ({ className, seconds, frameRate }) => {
   return (
-    <time dateTime={`P${Math.round(seconds)}S`} className={className || 'VideoViewer-duration'}>
+    <time
+      dateTime={`P${Math.round(seconds)}S`}
+      className={className || 'VideoViewer-duration'}>
       {formatDuration(seconds, frameRate)}
     </time>
   )
@@ -156,5 +209,5 @@ const Duration = ({ className, seconds, frameRate }) => {
 Duration.propTypes = {
   seconds: PropTypes.number.isRequired,
   frameRate: PropTypes.number.isRequired,
-  className: PropTypes.string
+  className: PropTypes.string,
 }

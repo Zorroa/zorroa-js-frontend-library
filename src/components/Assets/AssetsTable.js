@@ -7,10 +7,22 @@ import Asset, { minimalUniqueFieldTitle } from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
 import User from '../../models/User'
 import { unCamelCase } from '../../services/jsUtil'
-import { updateTableLayouts, iconifyRightSidebar, addTableLayout, deleteTableLayout, selectTableLayout, showModal, hideModal } from '../../actions/appActions'
+import {
+  updateTableLayouts,
+  iconifyRightSidebar,
+  addTableLayout,
+  deleteTableLayout,
+  selectTableLayout,
+  showModal,
+  hideModal,
+} from '../../actions/appActions'
 import { createFacetWidget, fieldUsedInWidget } from '../../models/Widget'
 import { modifyRacetrackWidget } from '../../actions/racetrackAction'
-import { sortAssets, unorderAssets, isolateAssetId } from '../../actions/assetsAction'
+import {
+  sortAssets,
+  unorderAssets,
+  isolateAssetId,
+} from '../../actions/assetsAction'
 import { saveUserSettings } from '../../actions/authAction'
 import Table from '../Table'
 import AclEntry from '../../models/Acl'
@@ -18,7 +30,10 @@ import FieldList from '../../models/FieldList'
 import TableField from '../Table/TableField'
 import TableSettings from '../Table/TableSettings'
 import TableContextMenu from '../Table/TableContextMenu'
-import { defaultTableFields, defaultTableFieldWidth } from '../../constants/defaultState'
+import {
+  defaultTableFields,
+  defaultTableFieldWidth,
+} from '../../constants/defaultState'
 
 class AssetsTable extends Component {
   static propTypes = {
@@ -44,24 +59,26 @@ class AssetsTable extends Component {
     selectFn: PropTypes.func.isRequired,
 
     // connect actions
-    actions: PropTypes.object
+    actions: PropTypes.object,
   }
 
   state = {
     showSettings: false,
     showContextMenu: false,
     contextMenuPos: { x: 0, y: 0 },
-    selectedFieldIndex: -1
+    selectedFieldIndex: -1,
   }
 
   setFieldWidth = (field, width) => {
     const { actions, userSettings } = this.props
     const tableLayouts = [...this.props.tableLayouts]
-    const index = tableLayouts.findIndex(layout => layout.id === this.props.selectedTableLayoutId)
+    const index = tableLayouts.findIndex(
+      layout => layout.id === this.props.selectedTableLayoutId,
+    )
     let settings = userSettings
     if (index >= 0) {
       const layout = new FieldList(tableLayouts[index])
-      layout.widths = {...layout.widths, [field]: width}
+      layout.widths = { ...layout.widths, [field]: width }
       tableLayouts[index] = layout
       actions.updateTableLayouts(tableLayouts)
       settings = { ...userSettings, tableLayouts }
@@ -70,7 +87,7 @@ class AssetsTable extends Component {
     }
   }
 
-  saveTableFieldWidth = (settings) => {
+  saveTableFieldWidth = settings => {
     this.props.actions.saveUserSettings(this.props.user, settings)
   }
 
@@ -80,7 +97,9 @@ class AssetsTable extends Component {
     var maxWidth = 0
 
     // measure the largest cell in this column
-    test.innerHTML = ReactDOMServer.renderToString(<TableField dark={monochrome} {...{ asset, field, isOpen: false }}/>)
+    test.innerHTML = ReactDOMServer.renderToString(
+      <TableField dark={monochrome} {...{ asset, field, isOpen: false }} />,
+    )
     maxWidth = Math.max(maxWidth, test.clientWidth)
 
     // include the header!
@@ -92,7 +111,7 @@ class AssetsTable extends Component {
     return maxWidth
   }
 
-  isolateToLightbox = (asset) => {
+  isolateToLightbox = asset => {
     this.props.actions.isolateAssetId(asset.id)
   }
 
@@ -103,11 +122,11 @@ class AssetsTable extends Component {
   }
 
   // Rotate through on -> off -> unordered
-  sortByField = (field) => {
+  sortByField = field => {
     const { order } = this.props
     let ascending = true
     if (order) {
-      const index = order && order.findIndex(order => (order.field === field))
+      const index = order && order.findIndex(order => order.field === field)
       if (index >= 0) {
         ascending = order[index].ascending ? false : undefined
       }
@@ -119,10 +138,12 @@ class AssetsTable extends Component {
     }
   }
 
-  updateFields = (fields) => {
+  updateFields = fields => {
     const { actions, user, userSettings } = this.props
     const tableLayouts = [...this.props.tableLayouts]
-    const index = tableLayouts.findIndex(layout => layout.id === this.props.selectedTableLayoutId)
+    const index = tableLayouts.findIndex(
+      layout => layout.id === this.props.selectedTableLayoutId,
+    )
     if (index >= 0) {
       const layout = new FieldList(tableLayouts[index])
       layout.fields = [...fields]
@@ -132,71 +153,98 @@ class AssetsTable extends Component {
     }
   }
 
-  duplicateTableLayout = (event) => {
+  duplicateTableLayout = event => {
     const { actions, user, userSettings } = this.props
     const tableLayouts = [...this.props.tableLayouts]
-    const layout = tableLayouts.find(layout => layout.id === this.props.selectedTableLayoutId)
+    const layout = tableLayouts.find(
+      layout => layout.id === this.props.selectedTableLayoutId,
+    )
     if (layout) {
-      const acl = [ new AclEntry({ permissionId: user.permissionId, access: AclEntry.ReadAccess | AclEntry.WriteAccess }) ]
+      const acl = [
+        new AclEntry({
+          permissionId: user.permissionId,
+          access: AclEntry.ReadAccess | AclEntry.WriteAccess,
+        }),
+      ]
       const name = `${layout.name} (copy)`
-      const id = isNaN(parseInt(layout.id)) ? `${layout.id}1` : String(parseInt(layout.id) + 1)
+      const id = isNaN(parseInt(layout.id))
+        ? `${layout.id}1`
+        : String(parseInt(layout.id) + 1)
       const dup = new FieldList({ ...layout, acl, name, id })
       const selectedTableLayoutId = dup.id
       tableLayouts.push(dup)
       actions.addTableLayout(dup)
-      actions.saveUserSettings(user, { ...userSettings, tableLayouts, selectedTableLayoutId })
+      actions.saveUserSettings(user, {
+        ...userSettings,
+        tableLayouts,
+        selectedTableLayoutId,
+      })
     }
   }
 
-  shareTableLayout = () => {
-  }
+  shareTableLayout = () => {}
 
-  deleteTableLayout = (event) => {
+  deleteTableLayout = event => {
     this.props.actions.deleteTableLayout(this.props.selectedTableLayoutId)
 
     // Remove layout from user settings
     const { actions, user, userSettings } = this.props
     const tableLayouts = [...this.props.tableLayouts]
     let selectedTableLayoutId = this.props.selectedTableLayoutId
-    const index = tableLayouts.findIndex(layout => layout.id === selectedTableLayoutId)
+    const index = tableLayouts.findIndex(
+      layout => layout.id === selectedTableLayoutId,
+    )
     if (index >= 0) {
       if (index === 0) selectedTableLayoutId = tableLayouts[0].id
       else selectedTableLayoutId = tableLayouts[index - 1].id
       tableLayouts.splice(index, 1)
-      actions.saveUserSettings(user, { ...userSettings, tableLayouts, selectedTableLayoutId })
+      actions.saveUserSettings(user, {
+        ...userSettings,
+        tableLayouts,
+        selectedTableLayoutId,
+      })
     }
   }
 
-  selectTableLayout = (layout) => {
+  selectTableLayout = layout => {
     const { actions, user, userSettings } = this.props
     actions.selectTableLayout(layout.id)
-    actions.saveUserSettings(user, { ...userSettings, selectedTableLayoutId: layout.id })
+    actions.saveUserSettings(user, {
+      ...userSettings,
+      selectedTableLayoutId: layout.id,
+    })
   }
 
   renameTableLayout = (layoutId, name) => {
     if (!name.trim().length) return
     const { actions, user, userSettings } = this.props
-    const index = this.props.tableLayouts.findIndex(layout => layout.id === layoutId)
+    const index = this.props.tableLayouts.findIndex(
+      layout => layout.id === layoutId,
+    )
     if (index < 0) return
-    const tableLayouts = [ ...this.props.tableLayouts ]
+    const tableLayouts = [...this.props.tableLayouts]
     tableLayouts[index] = new FieldList({ ...tableLayouts[index], name })
     actions.updateTableLayouts(tableLayouts)
     actions.saveUserSettings(user, { ...userSettings, tableLayouts })
   }
 
-  showModal = (modal) => { this.props.actions.showModal(modal) }
-  hideModal = () => { this.props.actions.hideModal() }
+  showModal = modal => {
+    this.props.actions.showModal(modal)
+  }
+  hideModal = () => {
+    this.props.actions.hideModal()
+  }
 
   showContextMenu = (selectedFieldIndex, event) => {
     event.preventDefault()
     this.setState({
       selectedFieldIndex,
       showContextMenu: true,
-      contextMenuPos: { x: event.pageX, y: event.pageY }
+      contextMenuPos: { x: event.pageX, y: event.pageY },
     })
   }
 
-  dismissContextMenu = (event) => {
+  dismissContextMenu = event => {
     if (event) event.preventDefault()
     this.setState({ showContextMenu: false })
   }
@@ -204,9 +252,12 @@ class AssetsTable extends Component {
   createTagFacet = (term, field, event) => {
     const fieldType = this.props.fieldTypes[field]
     field = field && field.endsWith('.raw') ? field : field + '.raw'
-    const index = this.props.widgets.findIndex(widget => fieldUsedInWidget(field, widget))
+    const index = this.props.widgets.findIndex(widget =>
+      fieldUsedInWidget(field, widget),
+    )
     let terms = [term]
-    if (index >= 0 && event.shiftKey) {       // Add to terms for shift
+    if (index >= 0 && event.shiftKey) {
+      // Add to terms for shift
       const widget = this.props.widgets[index]
       if (widget.sliver && widget.sliver.filter && widget.sliver.filter.terms) {
         terms = [...widget.sliver.filter.terms[field], term]
@@ -219,36 +270,45 @@ class AssetsTable extends Component {
     event.stopPropagation()
   }
 
-  renderTitle (field, fields) {
+  renderTitle(field, fields) {
     const { head, tails } = minimalUniqueFieldTitle(field, fields, 0)
     const tail = tails && '\u2039 ' + tails.join(' \u2039 ')
     return (
       <div className="Table-title">
         <div className="Table-title-head">{unCamelCase(head)}</div>
-        { tail && <div className="Table-title-tail">{tail}</div> }
+        {tail && <div className="Table-title-tail">{tail}</div>}
       </div>
     )
   }
 
-  fieldOrder = (field) => {
+  fieldOrder = field => {
     const { order } = this.props
     if (!order) return
-    const index = order.findIndex(order => (order.field === field))
+    const index = order.findIndex(order => order.field === field)
     if (index !== 0) return
     return order[index].ascending ? 'ascending' : 'descending'
   }
 
   renderElement = (asset, field, width, leftPx, order) => {
     const { monochrome } = this.props
-    return <TableField dark={monochrome} order={order}
-                       {...{ asset, field, key: field, width, left: `${leftPx}px`, top: `0px` }}
-                       onTag={this.createTagFacet} />
+    return (
+      <TableField
+        dark={monochrome}
+        order={order}
+        {...{
+          asset,
+          field,
+          key: field,
+          width,
+          left: `${leftPx}px`,
+          top: `0px`,
+        }}
+        onTag={this.createTagFacet}
+      />
+    )
   }
 
-  getReasonsForDisabledDeleteAction ({
-    isLastLayout,
-    isReadOnly
-  }) {
+  getReasonsForDisabledDeleteAction({ isLastLayout, isReadOnly }) {
     if (isLastLayout) {
       return 'Cannot delete the last saved layout'
     }
@@ -258,121 +318,159 @@ class AssetsTable extends Component {
     }
   }
 
-  renderSettings (fields, layout) {
-    const { tableLayouts, user, assetFields, selectedTableLayoutId } = this.props
+  renderSettings(fields, layout) {
+    const {
+      tableLayouts,
+      user,
+      assetFields,
+      selectedTableLayoutId,
+    } = this.props
     if (!this.state.showSettings) return
-    const layoutActions = [{
-      label: 'Duplicate',
-      fn: this.duplicateTableLayout,
-      disabled: false
-    }, {
-      label: 'Delete',
-      fn: this.deleteTableLayout,
-      disabled: tableLayouts.length <= 1 || !selectedLayoutHasWritePermission,
-      disabledReason: this.getReasonsForDisabledDeleteAction({
-        isLastLayout: tableLayouts.length <= 1,
-        isReadOnly: !selectedLayoutHasWritePermission
-      })
-    }]
-    const selectedLayoutHasWritePermission = layout && layout.hasAccess(user, AclEntry.WriteAccess)
+    const layoutActions = [
+      {
+        label: 'Duplicate',
+        fn: this.duplicateTableLayout,
+        disabled: false,
+      },
+      {
+        label: 'Delete',
+        fn: this.deleteTableLayout,
+        disabled: tableLayouts.length <= 1 || !selectedLayoutHasWritePermission,
+        disabledReason: this.getReasonsForDisabledDeleteAction({
+          isLastLayout: tableLayouts.length <= 1,
+          isReadOnly: !selectedLayoutHasWritePermission,
+        }),
+      },
+    ]
+    const selectedLayoutHasWritePermission =
+      layout && layout.hasAccess(user, AclEntry.WriteAccess)
     const allFieldNames = []
-    Object.keys(assetFields).forEach(type => assetFields[type].forEach(field => allFieldNames.push(field)))
+    Object.keys(assetFields).forEach(type =>
+      assetFields[type].forEach(field => allFieldNames.push(field)),
+    )
     return (
       <div>
-        <div className="Table-context-background"
-             onClick={() => this.setState({ showSettings: false })}
-             onContextMenu={() => this.setState({ showSettings: false })}/>
-        <TableSettings fields={fields}
-                       allFieldNames={allFieldNames}
-                       tableLayouts={tableLayouts}
-                       selectedTableLayoutId={selectedTableLayoutId}
-                       user={user}
-                       layoutActions={layoutActions}
-                       updateFieldsFn={this.updateFields}
-                       selectTableLayoutFn={this.selectTableLayout}
-                       renameTableLayoutFn={this.renameTableLayout}
-                       showModalFn={this.showModal}
-                       hideModalFn={this.hideModal} />
+        <div
+          className="Table-context-background"
+          onClick={() => this.setState({ showSettings: false })}
+          onContextMenu={() => this.setState({ showSettings: false })}
+        />
+        <TableSettings
+          fields={fields}
+          allFieldNames={allFieldNames}
+          tableLayouts={tableLayouts}
+          selectedTableLayoutId={selectedTableLayoutId}
+          user={user}
+          layoutActions={layoutActions}
+          updateFieldsFn={this.updateFields}
+          selectTableLayoutFn={this.selectTableLayout}
+          renameTableLayoutFn={this.renameTableLayout}
+          showModalFn={this.showModal}
+          hideModalFn={this.hideModal}
+        />
       </div>
     )
   }
 
-  renderContextMenu (fields) {
+  renderContextMenu(fields) {
     const { contextMenuPos, selectedFieldIndex } = this.state
     if (!this.state.showContextMenu) return
     return (
-      <TableContextMenu fields={fields}
-                        contextMenuPos={contextMenuPos}
-                        selectedFieldIndex={selectedFieldIndex}
-                        onDismiss={this.dismissContextMenu}
-                        updateFieldsFn={this.updateFields} />
+      <TableContextMenu
+        fields={fields}
+        contextMenuPos={contextMenuPos}
+        selectedFieldIndex={selectedFieldIndex}
+        onDismiss={this.dismissContextMenu}
+        updateFieldsFn={this.updateFields}
+      />
     )
   }
 
-  render () {
-    const { assets, assetsCounter, selectedAssetIds, selectionCounter, tableLayouts, selectedTableLayoutId, tableIsResizing, height, selectFn } = this.props
-    const layout = tableLayouts && tableLayouts.find(layout => layout.id === selectedTableLayoutId)
-    const tableFields = layout && layout.fields || defaultTableFields
+  render() {
+    const {
+      assets,
+      assetsCounter,
+      selectedAssetIds,
+      selectionCounter,
+      tableLayouts,
+      selectedTableLayoutId,
+      tableIsResizing,
+      height,
+      selectFn,
+    } = this.props
+    const layout =
+      tableLayouts &&
+      tableLayouts.find(layout => layout.id === selectedTableLayoutId)
+    const tableFields = (layout && layout.fields) || defaultTableFields
     const fields = tableFields.map(field => ({
       field: field,
       title: this.renderTitle(field, tableFields),
       order: this.fieldOrder(field),
-      width: layout && layout.widths && layout.widths[field] || defaultTableFieldWidth
+      width:
+        (layout && layout.widths && layout.widths[field]) ||
+        defaultTableFieldWidth,
     }))
     return (
       <div>
-        <Table assets={assets}
-               assetsCounter={assetsCounter}
-               selectedAssetIds={selectedAssetIds}
-               selectionCounter={selectionCounter}
-               fields={fields}
-               height={height}
-               tableIsResizing={tableIsResizing}
-               onSettings={() => this.setState({ showSettings: true })}
-               onColumnHeaderContextMenu={this.showContextMenu}
-               selectFn={selectFn}
-               isolateFn={this.isolateToLightbox}
-               autoResizeFieldFn={this.columnAutoResize}
-               setFieldWidthFn={this.setFieldWidth}
-               fieldOrderFn={this.fieldOrder}
-               sortFieldFn={this.sortByField}
-               elementFn={this.renderElement} >
-          { this.renderSettings(fields) }
-          { this.renderContextMenu(fields) }
+        <Table
+          assets={assets}
+          assetsCounter={assetsCounter}
+          selectedAssetIds={selectedAssetIds}
+          selectionCounter={selectionCounter}
+          fields={fields}
+          height={height}
+          tableIsResizing={tableIsResizing}
+          onSettings={() => this.setState({ showSettings: true })}
+          onColumnHeaderContextMenu={this.showContextMenu}
+          selectFn={selectFn}
+          isolateFn={this.isolateToLightbox}
+          autoResizeFieldFn={this.columnAutoResize}
+          setFieldWidthFn={this.setFieldWidth}
+          fieldOrderFn={this.fieldOrder}
+          sortFieldFn={this.sortByField}
+          elementFn={this.renderElement}>
+          {this.renderSettings(fields)}
+          {this.renderContextMenu(fields)}
         </Table>
       </div>
     )
   }
 }
 
-export default connect(state => ({
-  assets: state.assets.all,
-  assetsCounter: state.assets.assetsCounter,
-  selectedAssetIds: state.assets.selectedIds,
-  selectionCounter: state.assets.selectionCounter,
-  query: state.assets.query,
-  order: state.assets.order,
-  monochrome: state.app.monochrome,
-  selectedTableLayoutId: state.app.selectedTableLayoutId,
-  tableLayouts: state.app.tableLayouts,
-  fieldTypes: state.assets.types,
-  assetFields: state.assets.fields,
-  widgets: state.racetrack.widgets,
-  user: state.auth.user,
-  userSettings: state.app.userSettings
-}), dispatch => ({
-  actions: bindActionCreators({
-    sortAssets,
-    unorderAssets,
-    isolateAssetId,
-    updateTableLayouts,
-    addTableLayout,
-    deleteTableLayout,
-    selectTableLayout,
-    modifyRacetrackWidget,
-    iconifyRightSidebar,
-    showModal,
-    hideModal,
-    saveUserSettings
-  }, dispatch)
-}))(AssetsTable)
+export default connect(
+  state => ({
+    assets: state.assets.all,
+    assetsCounter: state.assets.assetsCounter,
+    selectedAssetIds: state.assets.selectedIds,
+    selectionCounter: state.assets.selectionCounter,
+    query: state.assets.query,
+    order: state.assets.order,
+    monochrome: state.app.monochrome,
+    selectedTableLayoutId: state.app.selectedTableLayoutId,
+    tableLayouts: state.app.tableLayouts,
+    fieldTypes: state.assets.types,
+    assetFields: state.assets.fields,
+    widgets: state.racetrack.widgets,
+    user: state.auth.user,
+    userSettings: state.app.userSettings,
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        sortAssets,
+        unorderAssets,
+        isolateAssetId,
+        updateTableLayouts,
+        addTableLayout,
+        deleteTableLayout,
+        selectTableLayout,
+        modifyRacetrackWidget,
+        iconifyRightSidebar,
+        showModal,
+        hideModal,
+        saveUserSettings,
+      },
+      dispatch,
+    ),
+  }),
+)(AssetsTable)

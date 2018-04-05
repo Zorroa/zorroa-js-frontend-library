@@ -28,7 +28,7 @@ const theme = {
   base0C: '#76c7b7',
   base0D: '#6fb3d2',
   base0E: '#d381c3',
-  base0F: '#be643c'
+  base0F: '#be643c',
 }
 
 class Developer extends Component {
@@ -36,16 +36,16 @@ class Developer extends Component {
     query: PropTypes.instanceOf(AssetSearch),
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     selectedAssetIds: PropTypes.instanceOf(Set),
-    actions: PropTypes.object.isRequired
+    actions: PropTypes.object.isRequired,
   }
 
   state = {
     selectedAssets: [],
     copyingAssets: false,
-    copyingQuery: false
+    copyingQuery: false,
   }
 
-  componentWillMount () {
+  componentWillMount() {
     this.updateAssets()
   }
 
@@ -53,23 +53,22 @@ class Developer extends Component {
     const { query, selectedAssetIds } = this.props
     if (!selectedAssetIds || !selectedAssetIds.size) return
     const search = new AssetSearch(query)
-    const filter = new AssetFilter({terms: {'_id': [...selectedAssetIds]}})
+    const filter = new AssetFilter({ terms: { _id: [...selectedAssetIds] } })
     search.filter = search.filter ? search.filter.merge(filter) : filter
     search.from = 0
     search.size = selectedAssetIds.size
     const dummyDispatch = () => {}
-    searchAssetsRequestProm(dummyDispatch, search)
-      .then(response => {
-        const selectedAssets = response.data.list.map(json => (new Asset(json)))
-        this.setState({selectedAssets})
-      })
+    searchAssetsRequestProm(dummyDispatch, search).then(response => {
+      const selectedAssets = response.data.list.map(json => new Asset(json))
+      this.setState({ selectedAssets })
+    })
   }
 
-  dismiss = (event) => {
+  dismiss = event => {
     this.props.actions.hideModal()
   }
 
-  copyQueryToClipboard = (event) => {
+  copyQueryToClipboard = event => {
     copy(JSON.stringify(this.props.query))
     this.setState({ copyingQuery: true })
     if (this.copyQueryTimeout) clearTimeout(this.copyQueryTimeout)
@@ -79,7 +78,7 @@ class Developer extends Component {
     }, 3000)
   }
 
-  copyAssetsToClipboard = (event) => {
+  copyAssetsToClipboard = event => {
     copy(JSON.stringify(this.state.selectedAssets))
     this.setState({ copyingAssets: true })
     if (this.copyAssetsTimeout) clearTimeout(this.copyAssetsTimeout)
@@ -89,17 +88,21 @@ class Developer extends Component {
     }, 3000)
   }
 
-  renderQuery () {
+  renderQuery() {
     const { query } = this.props
     const { copyingQuery } = this.state
-    const data = JSON.parse(JSON.stringify(query), (key, value) => (value)) // remove undefined
+    const data = JSON.parse(JSON.stringify(query), (key, value) => value) // remove undefined
     return (
       <div className="Developer-query">
         <div className="Developer-query-title">
           <div className="Developer-query-label">Current Search</div>
-          <div onClick={this.copyQueryToClipboard} className="Developer-query-copy">
+          <div
+            onClick={this.copyQueryToClipboard}
+            className="Developer-query-copy">
             <div>Copy</div>
-            { copyingQuery && <div className="Developer-query-copying">Copied to Clipboard</div> }
+            {copyingQuery && (
+              <div className="Developer-query-copying">Copied to Clipboard</div>
+            )}
           </div>
         </div>
         <div className="Developer-query-body">
@@ -109,7 +112,7 @@ class Developer extends Component {
     )
   }
 
-  renderSelectedAssets () {
+  renderSelectedAssets() {
     const { selectedAssetIds } = this.props
     const { selectedAssets, copyingAssets } = this.state
     const loading = require('../Assets/ellipsis.svg')
@@ -117,46 +120,71 @@ class Developer extends Component {
       <div className="Developer-assets">
         <div className="Developer-assets-title">
           <div className="Developer-assets-label">Selected Assets</div>
-          <div onClick={this.copyAssetsToClipboard} className="Developer-assets-copy">
+          <div
+            onClick={this.copyAssetsToClipboard}
+            className="Developer-assets-copy">
             <div>Copy</div>
-            { copyingAssets && <div className="Developer-assets-copying">Copied to Clipboard</div> }
+            {copyingAssets && (
+              <div className="Developer-assets-copying">
+                Copied to Clipboard
+              </div>
+            )}
           </div>
         </div>
         <div className="Developer-assets-json">
           <JSONTree data={selectedAssets} theme={theme} invertTheme hideRoot />
-          { (!selectedAssetIds || !selectedAssetIds.size) && <div className="Developer-assets-empty">No assets selected</div> }
-          { selectedAssetIds && selectedAssetIds.size > 0 && (!selectedAssets || !selectedAssets.length) && <div className="fullWidth flexRowCenter"><img src={loading}/></div> }
+          {(!selectedAssetIds || !selectedAssetIds.size) && (
+            <div className="Developer-assets-empty">No assets selected</div>
+          )}
+          {selectedAssetIds &&
+            selectedAssetIds.size > 0 &&
+            (!selectedAssets || !selectedAssets.length) && (
+              <div className="fullWidth flexRowCenter">
+                <img src={loading} />
+              </div>
+            )}
         </div>
       </div>
     )
   }
 
-  render () {
+  render() {
     return (
       <div className="Developer">
         <div className="Developer-title">
           <div className="flexRowCenter">
-            <div className="Developer-title-icon icon-script"/>
+            <div className="Developer-title-icon icon-script" />
             <div className="Developer-title-text">Developer</div>
           </div>
-          <div onClick={this.dismiss} className="Developer-title-close icon-cross"/>
+          <div
+            onClick={this.dismiss}
+            className="Developer-title-close icon-cross"
+          />
         </div>
-        { this.renderQuery() }
-        { this.renderSelectedAssets() }
+        {this.renderQuery()}
+        {this.renderSelectedAssets()}
         <div className="Developer-controls">
-          <div className="Developer-done" onClick={this.dismiss}>Done</div>
+          <div className="Developer-done" onClick={this.dismiss}>
+            Done
+          </div>
         </div>
       </div>
     )
   }
 }
 
-export default connect(state => ({
-  query: state.assets.query,
-  assets: state.assets.all,
-  selectedAssetIds: state.assets.selectedIds
-}), dispatch => ({
-  actions: bindActionCreators({
-    hideModal
-  }, dispatch)
-}))(Developer)
+export default connect(
+  state => ({
+    query: state.assets.query,
+    assets: state.assets.all,
+    selectedAssetIds: state.assets.selectedIds,
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        hideModal,
+      },
+      dispatch,
+    ),
+  }),
+)(Developer)

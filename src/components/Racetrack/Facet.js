@@ -13,7 +13,7 @@ import PieChart from '../PieChart'
 
 const BAR_CHART = 'icon-list'
 const PIE_CHART = 'icon-pie-chart'
-const chartTypes = [ BAR_CHART, PIE_CHART ]
+const chartTypes = [BAR_CHART, PIE_CHART]
 const OTHER_BUCKET = 'Other'
 const MAX_BAR_BUCKETS = 100
 const MAX_PIE_BUCKETS = 9
@@ -30,31 +30,32 @@ class Facet extends Component {
     aggs: PropTypes.object,
     fieldTypes: PropTypes.object,
     widgets: PropTypes.arrayOf(PropTypes.object),
-    uxLevel: PropTypes.number
+    uxLevel: PropTypes.number,
   }
 
   state = {
     otherIsSelected: false,
     field: '',
-    order: { '_count': 'desc' },
+    order: { _count: 'desc' },
     terms: [],
-    chartType: BAR_CHART
+    chartType: BAR_CHART,
   }
 
-  componentWillMount () {
+  componentWillMount() {
     this.componentWillReceiveProps(this.props)
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     const { id, widgets } = nextProps
-    const index = widgets && widgets.findIndex(widget => (id === widget.id))
+    const index = widgets && widgets.findIndex(widget => id === widget.id)
     const widget = widgets && widgets[index]
     if (widget && widget.sliver) {
       const fraw = widget.field && removeRaw(widget.field)
-      const fieldType = fraw && this.props.fieldTypes && this.props.fieldTypes[fraw]
+      const fieldType =
+        fraw && this.props.fieldTypes && this.props.fieldTypes[fraw]
       const field = aggField(widget.field, fieldType)
       if (field !== this.state.field) {
-        this.setState({field})
+        this.setState({ field })
       }
       if (widget.sliver.filter) {
         const terms = widget.sliver.filter.terms[field]
@@ -65,7 +66,7 @@ class Facet extends Component {
           const merged = this.mergeOtherBuckets(buckets, MAX_PIE_BUCKETS)
           let otherTerms = new Set()
           buckets.forEach(bucket => {
-            if (merged.findIndex(b => (b.key === bucket.key)) < 0) {
+            if (merged.findIndex(b => b.key === bucket.key) < 0) {
               otherTerms.add(bucket.key)
             }
           })
@@ -75,21 +76,21 @@ class Facet extends Component {
               break
             }
           }
-          if (widget.isEnabled) this.setState({terms, otherIsSelected})
+          if (widget.isEnabled) this.setState({ terms, otherIsSelected })
         }
       } else if (widget.isEnabled) {
-        this.setState({terms: [], otherIsSelected: false})
+        this.setState({ terms: [], otherIsSelected: false })
       }
       if (widget.isEnabled && widget.sliver.aggs && widget.sliver.aggs.facet) {
         const order = widget.sliver.aggs.facet.terms.order
-        if (order) this.setState({order})
+        if (order) this.setState({ order })
       }
     }
   }
 
   modifySliver = (field, terms, order) => {
     const { id, widgets } = this.props
-    const index = widgets && widgets.findIndex(widget => (id === widget.id))
+    const index = widgets && widgets.findIndex(widget => id === widget.id)
     const oldWidget = widgets && widgets[index]
     let isEnabled, isPinned
     if (oldWidget) {
@@ -97,14 +98,21 @@ class Facet extends Component {
       isPinned = oldWidget.isPinned
     }
     const fieldType = this.props.fieldTypes[removeRaw(field)]
-    const widget = createFacetWidget(field, fieldType, terms, order, isEnabled, isPinned)
+    const widget = createFacetWidget(
+      field,
+      fieldType,
+      terms,
+      order,
+      isEnabled,
+      isPinned,
+    )
     widget.id = this.props.id
     this.props.actions.modifyRacetrackWidget(widget)
   }
 
-  selectGraph (chartType) {
+  selectGraph(chartType) {
     if (chartType !== this.state.chartType) {
-      this.setState({chartType})
+      this.setState({ chartType })
       this.buckets = null
     }
   }
@@ -116,7 +124,7 @@ class Facet extends Component {
       const merged = this.mergeOtherBuckets(buckets, MAX_PIE_BUCKETS)
       let otherTerms = []
       buckets.forEach(bucket => {
-        if (merged.findIndex(b => (b.key === bucket.key)) < 0) {
+        if (merged.findIndex(b => b.key === bucket.key) < 0) {
           otherTerms.push(bucket.key)
         }
       })
@@ -124,14 +132,14 @@ class Facet extends Component {
       let isOtherEnabled = false
       for (let i = 0; i < this.state.terms.length; ++i) {
         const term = this.state.terms[i]
-        const index = merged.findIndex(bucket => (bucket.key === term))
+        const index = merged.findIndex(bucket => bucket.key === term)
         if (index < 0) {
           isOtherEnabled = true
           break
         }
       }
       otherTerms.forEach(term => {
-        const index = terms.findIndex(t => (t === term))
+        const index = terms.findIndex(t => t === term)
         if (isOtherEnabled) {
           if (index >= 0) terms.splice(index, 1)
         } else {
@@ -140,9 +148,11 @@ class Facet extends Component {
       })
     } else if (event.shiftKey) {
       const buckets = this.aggBuckets(this.state.terms)
-      const firstSelectedIndex = buckets.findIndex(b => (this.state.terms.findIndex(t => (t === b.key)) >= 0))
+      const firstSelectedIndex = buckets.findIndex(
+        b => this.state.terms.findIndex(t => t === b.key) >= 0,
+      )
       if (firstSelectedIndex >= 0) {
-        const selectedIndex = buckets.findIndex(b => (b.key === term))
+        const selectedIndex = buckets.findIndex(b => b.key === term)
         const minIndex = Math.min(selectedIndex, firstSelectedIndex)
         const maxIndex = Math.max(selectedIndex, firstSelectedIndex)
         terms = buckets.slice(minIndex, maxIndex + 1).map(bucket => bucket.key)
@@ -150,7 +160,7 @@ class Facet extends Component {
         window.getSelection().removeAllRanges()
       }
     } else if (event.metaKey) {
-      const index = this.state.terms.findIndex(t => (t === term))
+      const index = this.state.terms.findIndex(t => t === term)
       if (index >= 0) {
         terms = [...this.state.terms]
         terms.splice(index, 1)
@@ -160,7 +170,13 @@ class Facet extends Component {
       }
     } else {
       // single click on a single selected term will deselect, otherwise select the clicked term
-      if (!(this.state.terms && this.state.terms.length === 1 && this.state.terms[0] === term)) {
+      if (
+        !(
+          this.state.terms &&
+          this.state.terms.length === 1 &&
+          this.state.terms[0] === term
+        )
+      ) {
         terms = [term]
       }
     }
@@ -175,67 +191,75 @@ class Facet extends Component {
     this.modifySliver(this.state.field, [], this.state.order)
   }
 
-  rotateOrder (order, field, dir) {
+  rotateOrder(order, field, dir) {
     if (order[field] === 'asc') return { [field]: 'desc' }
     if (order[field] === 'desc') return { [field]: 'asc' }
     return { [field]: dir }
   }
 
-  sortBuckets (column) {
+  sortBuckets(column) {
     const { field, terms, order } = this.state
-    const sortField = { 'keyword': '_term', 'count': '_count' }
-    const dir = { 'keyword': 'asc', 'count': 'desc' }
+    const sortField = { keyword: '_term', count: '_count' }
+    const dir = { keyword: 'asc', count: 'desc' }
     let newOrder = this.rotateOrder(order, sortField[column], dir[column])
     this.setState({ order: newOrder })
     this.modifySliver(field, terms, newOrder)
   }
 
-  baseBuckets () {
+  baseBuckets() {
     const { id, aggs } = this.props
-    return aggs && (id in aggs) ? aggs[id].facet.buckets : []
+    return aggs && id in aggs ? aggs[id].facet.buckets : []
   }
 
-  aggBuckets (terms) {
+  aggBuckets(terms) {
     const buckets = this.baseBuckets()
 
     // Add in any selected terms that are not in the search agg
-    terms && terms.forEach(key => {
-      const index = buckets.findIndex(bucket => (bucket.key === key))
-      if (index < 0) {
-        buckets.unshift({key, doc_count: 1})  // FIXME: Arbitrary doc_count
-      }
-    })
+    terms &&
+      terms.forEach(key => {
+        const index = buckets.findIndex(bucket => bucket.key === key)
+        if (index < 0) {
+          buckets.unshift({ key, doc_count: 1 }) // FIXME: Arbitrary doc_count
+        }
+      })
 
     return buckets
   }
 
-  renderHeaderCell (column) {
+  renderHeaderCell(column) {
     const { order } = this.state
-    const sortField = { 'keyword': '_term', 'count': '_count' }
+    const sortField = { keyword: '_term', count: '_count' }
     const dir = order[sortField[column]]
     const icon = 'Facet-table-header-count icon-sort' + (dir ? `-${dir}` : '')
     return (
-      <div onClick={this.sortBuckets.bind(this, column)} className="Facet-table-header-cell">
+      <div
+        onClick={this.sortBuckets.bind(this, column)}
+        className="Facet-table-header-cell">
         <div className="Facet-table-header-title">{column}</div>
-        <div className={icon}/>
+        <div className={icon} />
       </div>
     )
   }
 
-  renderClearSelection () {
+  renderClearSelection() {
     const { terms } = this.state
     if (!this.baseBuckets().length) return
-    if (!terms || terms.length === 0) return <div className="Facet-clear-selection"/>
+    if (!terms || terms.length === 0)
+      return <div className="Facet-clear-selection" />
     return (
       <div className="Facet-clear-selection">
-        { `${terms.length} facets selected` }
-        <div onClick={this.deselectAllTerms} className="Facet-clear-selection-cancel icon-cancel-circle"/>
+        {`${terms.length} facets selected`}
+        <div
+          onClick={this.deselectAllTerms}
+          className="Facet-clear-selection-cancel icon-cancel-circle"
+        />
       </div>
     )
   }
 
-  mergeOtherBuckets (buckets, maxCount) {
-    if (buckets.length <= maxCount || this.state.chartType === BAR_CHART) return buckets
+  mergeOtherBuckets(buckets, maxCount) {
+    if (buckets.length <= maxCount || this.state.chartType === BAR_CHART)
+      return buckets
     // Keep the order, but group the smallest ones into "Other"
     const sorted = buckets.sort((a, b) => {
       if (a.doc_count < b.doc_count) return 1
@@ -245,10 +269,11 @@ class Facet extends Component {
       return 0
     })
     let otherCount = 0
-    for (let i = maxCount; i < buckets.length; ++i) otherCount += sorted[i].doc_count
+    for (let i = maxCount; i < buckets.length; ++i)
+      otherCount += sorted[i].doc_count
     let merged = []
     buckets.forEach(bucket => {
-      if (sorted.findIndex(b => (bucket.key === b.key)) < maxCount) {
+      if (sorted.findIndex(b => bucket.key === b.key) < maxCount) {
         merged.push(bucket)
       }
     })
@@ -256,7 +281,7 @@ class Facet extends Component {
     return merged
   }
 
-  renderBucketKey = (key) => {
+  renderBucketKey = key => {
     if (key === OTHER_BUCKET) return key
     const field = this.state.field && removeRaw(this.state.field)
     const fieldType = this.props.fieldTypes && this.props.fieldTypes[field]
@@ -266,22 +291,23 @@ class Facet extends Component {
     return key
   }
 
-  renderChart () {
+  renderChart() {
     const { uxLevel, id, widgets } = this.props
     const { field, terms, otherIsSelected, chartType } = this.state
-    const index = widgets && widgets.findIndex(widget => (id === widget.id))
+    const index = widgets && widgets.findIndex(widget => id === widget.id)
     const isPinned = widgets && widgets[index] && widgets[index].isPinned
     let maxCount = 0
     let minCount = Number.MAX_SAFE_INTEGER
     // Extract the buckets for this widget from the global query using id
-    const buckets = this.mergeOtherBuckets(this.aggBuckets(terms), chartType === BAR_CHART ? MAX_BAR_BUCKETS : MAX_PIE_BUCKETS)
+    const buckets = this.mergeOtherBuckets(
+      this.aggBuckets(terms),
+      chartType === BAR_CHART ? MAX_BAR_BUCKETS : MAX_PIE_BUCKETS,
+    )
     if (!buckets || !buckets.length) {
       return (
         <div className="Facet-empty">
-          <div className="Facet-empty-icon icon-emptybox"/>
-          <div className="Facet-empty-info">
-            No results
-          </div>
+          <div className="Facet-empty-icon icon-emptybox" />
+          <div className="Facet-empty-info">No results</div>
         </div>
       )
     }
@@ -292,47 +318,83 @@ class Facet extends Component {
     // Only animate when the buckets change, cached in class variable, not state
     const animate = JSON.stringify(buckets) !== JSON.stringify(this.buckets)
     this.buckets = buckets
-    const mergedTerms = terms.filter(t => (buckets.findIndex(b => (b.key === t)) >= 0))
+    const mergedTerms = terms.filter(
+      t => buckets.findIndex(b => b.key === t) >= 0,
+    )
     if (mergedTerms.length < terms.length) mergedTerms.push(OTHER_BUCKET)
-    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042',
-      '#ce2d3f', '#fc6c2c', ' #a11e77', '#b7df4d', '#1875d1' ]
+    const COLORS = [
+      '#0088FE',
+      '#00C49F',
+      '#FFBB28',
+      '#FF8042',
+      '#ce2d3f',
+      '#fc6c2c',
+      ' #a11e77',
+      '#b7df4d',
+      '#1875d1',
+    ]
     switch (chartType) {
       case BAR_CHART:
         return (
           <div className="Facet-table">
-            { uxLevel > 0 && <div className="Facet-table-header">
-              { this.renderHeaderCell('keyword') }
-              { this.renderHeaderCell('count') }
-            </div> }
-            <div className="Facet-value-table" style={{minHeight: isPinned ? '300px' : undefined}}>
+            {uxLevel > 0 && (
+              <div className="Facet-table-header">
+                {this.renderHeaderCell('keyword')}
+                {this.renderHeaderCell('count')}
+              </div>
+            )}
+            <div
+              className="Facet-value-table"
+              style={{ minHeight: isPinned ? '300px' : undefined }}>
               <table className="Facet-value-table-table">
                 <thead>
-                { uxLevel === 0 ? (
-                  <tr>
-                    <td style={{width: '100%'}}/>
-                  </tr>
-                ) : (
-                  <tr>
-                    <td style={{width: '80%'}}/>
-                    <td style={{width: '20%', minWidth: '60px'}}/>
-                  </tr>
-                )}
+                  {uxLevel === 0 ? (
+                    <tr>
+                      <td style={{ width: '100%' }} />
+                    </tr>
+                  ) : (
+                    <tr>
+                      <td style={{ width: '80%' }} />
+                      <td style={{ width: '20%', minWidth: '60px' }} />
+                    </tr>
+                  )}
                 </thead>
                 <tbody>
-                { buckets && buckets.map(bucket => (
-                  <tr className={classnames('Facet-value-table-row',
-                    { selected: mergedTerms.indexOf(bucket.key) >= 0 })}
-                      title={`Click to filter for ${bucket.key}`}
-                      key={bucket.key} onClick={this.selectTerm.bind(this, bucket.key)}>
-                    <td className="Facet-value-cell" style={{maxWidth: isPinned ? '0' : '360px'}}>
-                      <div className="Facet-value-table-key">
-                        { uxLevel > 0 && <div className="Facet-value-pct-bar" style={{width: `${100 * bucket.doc_count / maxCount}%`}} /> }
-                        <div className="Facet-value-key">{this.renderBucketKey(bucket.key)}</div>
-                      </div>
-                    </td>
-                    { uxLevel > 0 && <td className="Facet-value-count">{bucket.doc_count}</td> }
-                  </tr>
-                )) }
+                  {buckets &&
+                    buckets.map(bucket => (
+                      <tr
+                        className={classnames('Facet-value-table-row', {
+                          selected: mergedTerms.indexOf(bucket.key) >= 0,
+                        })}
+                        title={`Click to filter for ${bucket.key}`}
+                        key={bucket.key}
+                        onClick={this.selectTerm.bind(this, bucket.key)}>
+                        <td
+                          className="Facet-value-cell"
+                          style={{ maxWidth: isPinned ? '0' : '360px' }}>
+                          <div className="Facet-value-table-key">
+                            {uxLevel > 0 && (
+                              <div
+                                className="Facet-value-pct-bar"
+                                style={{
+                                  width: `${100 *
+                                    bucket.doc_count /
+                                    maxCount}%`,
+                                }}
+                              />
+                            )}
+                            <div className="Facet-value-key">
+                              {this.renderBucketKey(bucket.key)}
+                            </div>
+                          </div>
+                        </td>
+                        {uxLevel > 0 && (
+                          <td className="Facet-value-count">
+                            {bucket.doc_count}
+                          </td>
+                        )}
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>
@@ -340,55 +402,75 @@ class Facet extends Component {
         )
 
       case PIE_CHART:
-        const data = buckets.map(bucket => ({name: bucket.key, value: bucket.doc_count}))
-        const activeIndex = mergedTerms.map((term) => (buckets.findIndex(bucket => (bucket.key === term))))
-        return <PieChart field={field} data={data} terms={terms} otherIsSelected={otherIsSelected}
-                         activeIndex={activeIndex} COLORS={COLORS}
-                         animate={animate} bucketKey={this.renderBucketKey}
-                         onSelectPieSection={this.selectPieSection} />
+        const data = buckets.map(bucket => ({
+          name: bucket.key,
+          value: bucket.doc_count,
+        }))
+        const activeIndex = mergedTerms.map(term =>
+          buckets.findIndex(bucket => bucket.key === term),
+        )
+        return (
+          <PieChart
+            field={field}
+            data={data}
+            terms={terms}
+            otherIsSelected={otherIsSelected}
+            activeIndex={activeIndex}
+            COLORS={COLORS}
+            animate={animate}
+            bucketKey={this.renderBucketKey}
+            onSelectPieSection={this.selectPieSection}
+          />
+        )
     }
   }
 
-  renderChartIcon (type) {
+  renderChartIcon(type) {
     const { chartType } = this.state
     const selected = chartType === type
     return (
-      <div className={classnames('Facet-icon', type, {selected})}
-              key={type} onClick={this.selectGraph.bind(this, type)} />
+      <div
+        className={classnames('Facet-icon', type, { selected })}
+        key={type}
+        onClick={this.selectGraph.bind(this, type)}
+      />
     )
   }
 
-  renderChartTypes () {
+  renderChartTypes() {
     if (this.props.onOpen) return
     const buckets = this.baseBuckets()
     if (!buckets || !buckets.length) return
     return (
       <div className="Facet-chart-selector">
-        { chartTypes.map(type => this.renderChartIcon(type)) }
+        {chartTypes.map(type => this.renderChartIcon(type))}
       </div>
     )
   }
 
-  render () {
+  render() {
     const { id, floatBody, isIconified, isOpen, onOpen } = this.props
     const { field, terms } = this.state
-    const lastName = field ? Asset.lastNamespace(unCamelCase(field)).toUpperCase() : ''
+    const lastName = field
+      ? Asset.lastNamespace(unCamelCase(field)).toUpperCase()
+      : ''
     const active = terms && terms.length
     const selected = active ? (isOpen ? lastName : terms.join(', ')) : lastName
     return (
-      <Widget className="Facet"
-              id={id}
-              floatBody={floatBody}
-              field={selected}
-              backgroundColor={FacetWidgetInfo.color}
-              isIconified={isIconified}
-              icon={FacetWidgetInfo.icon}
-              isOpen={isOpen}
-              onOpen={onOpen}>
+      <Widget
+        className="Facet"
+        id={id}
+        floatBody={floatBody}
+        field={selected}
+        backgroundColor={FacetWidgetInfo.color}
+        isIconified={isIconified}
+        icon={FacetWidgetInfo.icon}
+        isOpen={isOpen}
+        onOpen={onOpen}>
         <div className="Facet-body">
-          { this.renderChart() }
-          { this.renderClearSelection() }
-          { this.renderChartTypes() }
+          {this.renderChart()}
+          {this.renderClearSelection()}
+          {this.renderChartTypes()}
         </div>
       </Widget>
     )
@@ -400,8 +482,9 @@ export default connect(
     aggs: state.assets && state.assets.aggs,
     fieldTypes: state.assets && state.assets.types,
     widgets: state.racetrack && state.racetrack.widgets,
-    uxLevel: state.app.uxLevel
-  }), dispatch => ({
-    actions: bindActionCreators({ modifyRacetrackWidget }, dispatch)
-  })
+    uxLevel: state.app.uxLevel,
+  }),
+  dispatch => ({
+    actions: bindActionCreators({ modifyRacetrackWidget }, dispatch),
+  }),
 )(Facet)

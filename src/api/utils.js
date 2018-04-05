@@ -1,15 +1,14 @@
 import { ORIGIN_ITEM } from '../constants/localStorageItems'
 
-export function getOrigin () {
+export function getOrigin() {
   try {
     return localStorage.getItem(ORIGIN_ITEM)
-  } catch (error) {
-
-  }
+  } catch (error) {}
 }
 
-export function handleError (errorResponse) {
-  if (typeof errorResponse === 'object' &&
+export function handleError(errorResponse) {
+  if (
+    typeof errorResponse === 'object' &&
     errorResponse.response &&
     errorResponse.response.data
   ) {
@@ -17,6 +16,6 @@ export function handleError (errorResponse) {
   }
 
   return Promise.reject({
-    error: JSON.stringify(errorResponse)
+    error: JSON.stringify(errorResponse),
   })
 }

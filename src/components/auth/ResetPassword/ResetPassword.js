@@ -9,39 +9,49 @@ class ResetPassword extends Component {
   static propTypes = {
     actions: PropTypes.object,
     error: PropTypes.string,
-    location: PropTypes.object
+    location: PropTypes.object,
   }
 
-  static get contextTypes () {
+  static get contextTypes() {
     return {
-      router: PropTypes.object
+      router: PropTypes.object,
     }
   }
 
-  changePassword = (password) => {
-    const token = this.props.location && this.props.location.query && this.props.location.query.token
+  changePassword = password => {
+    const token =
+      this.props.location &&
+      this.props.location.query &&
+      this.props.location.query.token
     const origin = window.location.origin
     this.props.actions.resetPassword(password, token, origin)
   }
 
-  cancel = (event) => {
+  cancel = event => {
     this.context.router.push('/')
   }
 
-  render () {
+  render() {
     return (
       <ChangePassword
         onChangePassword={this.changePassword}
         onCancel={this.cancel}
-        error={this.props.error}/>
+        error={this.props.error}
+      />
     )
   }
 }
 
-export default connect(state => ({
-  error: state.auth.error
-}), dispatch => ({
-  actions: bindActionCreators({
-    resetPassword
-  }, dispatch)
-}))(ResetPassword)
+export default connect(
+  state => ({
+    error: state.auth.error,
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        resetPassword,
+      },
+      dispatch,
+    ),
+  }),
+)(ResetPassword)

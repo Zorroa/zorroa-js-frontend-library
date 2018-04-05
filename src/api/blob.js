@@ -1,44 +1,44 @@
 import axios from 'axios'
 import * as utils from './utils.js'
 
-function getBlob (client, {feature, name}) {
+function getBlob(client, { feature, name }) {
   return client
     .get(`/${feature}/${name}`)
-    .then((response) => {
+    .then(response => {
       return response.data.data
     })
     .catch(utils.handleError)
 }
 
-function postBlob (client, {feature, name, payload}) {
+function postBlob(client, { feature, name, payload }) {
   return client
     .post(`/${feature}/${name}`, payload)
-    .then((response) => {
+    .then(response => {
       return response.data.data
     })
     .catch(utils.handleError)
 }
 
-export default function blob (app) {
+export default function blob(app) {
   const origin = utils.getOrigin()
   const client = axios.create({
     baseURL: `${origin}/api/v1/blobs/${app}`,
-    withCredentials: true
+    withCredentials: true,
   })
 
   return {
-    get: (config) => {
+    get: config => {
       return getBlob(client, {
         feature: config.feature,
-        name: config.name
+        name: config.name,
       })
     },
-    post: (config) => {
+    post: config => {
       return postBlob(client, {
         feature: config.feature,
         name: config.name,
-        payload: config.payload
+        payload: config.payload,
       })
-    }
+    },
   }
 }

@@ -1,5 +1,5 @@
 export default {
-  enableScroll () {
+  enableScroll() {
     if (window.removeEventListener) {
       window.removeEventListener('DOMMouseScroll', preventDefault, false)
     }
@@ -9,7 +9,7 @@ export default {
     window.ontouchmove = null
     document.onkeydown = null
   },
-  disableScroll () {
+  disableScroll() {
     if (window.addEventListener) {
       window.addEventListener('DOMMouseScroll', preventDefault, false)
     }
@@ -19,7 +19,7 @@ export default {
     window.ontouchmove = preventDefault // mobile
     document.onkeydown = preventDefaultForScrollKeys
   },
-  parseQueryString (str) {
+  parseQueryString(str) {
     var ret = Object.create(null)
 
     if (typeof str !== 'string') {
@@ -32,7 +32,7 @@ export default {
       return ret
     }
 
-    str.split('&').forEach((param) => {
+    str.split('&').forEach(param => {
       var parts = param.replace(/\+/g, ' ').split('=')
       // Firefox (pre 40) decodes `%3D` to `=`
       // https://github.com/sindresorhus/query-string/pull/37
@@ -55,10 +55,10 @@ export default {
     })
 
     return ret
-  }
+  },
 }
 
-function preventDefault (e) {
+function preventDefault(e) {
   e = e || window.event
   if (e.preventDefault) {
     e.preventDefault()
@@ -67,7 +67,7 @@ function preventDefault (e) {
   e.returnValue = false
 }
 
-function preventDefaultForScrollKeys (e) {
+function preventDefaultForScrollKeys(e) {
   const keys = { 37: 1, 38: 1, 39: 1, 40: 1 }
 
   if (keys[e.keyCode]) {

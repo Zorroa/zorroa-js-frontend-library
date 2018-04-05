@@ -11,5 +11,5 @@ export {
   Button as FormButton,
   Select as FormSelect,
   Checkbox as FormCheckbox,
-  Radio as FormRadio
+  Radio as FormRadio,
 }

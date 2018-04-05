@@ -26,44 +26,51 @@ export default class Controlbar extends PureComponent {
     frameFrequency: PropTypes.shape({
       onFrameFrequency: PropTypes.func,
       options: PropTypes.arrayOf(PropTypes.number),
-      rate: PropTypes.number
+      rate: PropTypes.number,
     }),
-    volume: PropTypes.number
+    volume: PropTypes.number,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
-      showFpsOptions: false
+      showFpsOptions: false,
     }
   }
 
-  showVideo () {
+  showVideo() {
     return !!this.props.shuttler
   }
 
-  showVolume () {
+  showVolume() {
     return !!this.props.onVolume
   }
 
-  showFrameFrequency () {
+  showFrameFrequency() {
     return !!this.props.frameFrequency
   }
 
-  showZoom () {
+  showZoom() {
     return this.props.onZoomIn || this.props.onZoomOut || this.props.onFit
   }
 
-  showLoop () {
+  showLoop() {
     return typeof this.props.onLoop === 'function'
   }
 
-  showScrubber () {
+  showScrubber() {
     const hasScrubHandler = typeof this.props.onScrub === 'function'
-    const hasTotalFramesCount = Number.isInteger(this.props.totalFrames) === true
-    const hasCurrentFrameNumber = Number.isInteger(this.props.currentFrameNumber) === true
+    const hasTotalFramesCount =
+      Number.isInteger(this.props.totalFrames) === true
+    const hasCurrentFrameNumber =
+      Number.isInteger(this.props.currentFrameNumber) === true
     const hasShuttler = this.props.shuttler !== undefined
-    return hasScrubHandler && hasTotalFramesCount && hasCurrentFrameNumber && hasShuttler
+    return (
+      hasScrubHandler &&
+      hasTotalFramesCount &&
+      hasCurrentFrameNumber &&
+      hasShuttler
+    )
   }
 
   toggleShowFpsOptions = () => {
@@ -75,12 +82,12 @@ export default class Controlbar extends PureComponent {
 
     this.setState(prevState => {
       return {
-        showFpsOptions: !prevState.showFpsOptions
+        showFpsOptions: !prevState.showFpsOptions,
       }
     })
   }
 
-  getGaugeIntensity () {
+  getGaugeIntensity() {
     const frameFrequency = this.props.frameFrequency
     const index = frameFrequency.options.indexOf(frameFrequency.rate)
 
@@ -95,89 +102,126 @@ export default class Controlbar extends PureComponent {
     return 'high'
   }
 
-  render () {
+  render() {
     return (
       <div className="Controlbar">
         <div className="Controlbar__inner">
-        { this.showScrubber() && (
-          <div className="Controlbar__section">
-            <Scrubber
-              shuttler={this.props.shuttler}
-              currentFrameNumber={this.props.currentFrameNumber}
-              totalFrames={this.props.totalFrames}
-            />
-          </div>
-        ) }
-          { this.props.title && <div className="Controlbar__title">{this.props.title}</div> }
-          { this.showVideo() && (
+          {this.showScrubber() && (
             <div className="Controlbar__section">
-              <button onClick={e => this.props.shuttler.publish('rewind', e)} className="Controlbar__button icon-prev-clip"/>
-              <button onClick={e => this.props.shuttler.publish('frameBack', e)} className="Controlbar__button icon-frame-back"/>
+              <Scrubber
+                shuttler={this.props.shuttler}
+                currentFrameNumber={this.props.currentFrameNumber}
+                totalFrames={this.props.totalFrames}
+              />
+            </div>
+          )}
+          {this.props.title && (
+            <div className="Controlbar__title">{this.props.title}</div>
+          )}
+          {this.showVideo() && (
+            <div className="Controlbar__section">
+              <button
+                onClick={e => this.props.shuttler.publish('rewind', e)}
+                className="Controlbar__button icon-prev-clip"
+              />
+              <button
+                onClick={e => this.props.shuttler.publish('frameBack', e)}
+                className="Controlbar__button icon-frame-back"
+              />
               <button
                 onClick={e => this.props.shuttler.publish('startOrStop', e)}
                 className={classnames('Controlbar__button', {
                   'icon-pause': this.props.playing === true,
-                  'icon-play3': this.props.playing === false
+                  'icon-play3': this.props.playing === false,
                 })}
               />
-              <button onClick={e => this.props.shuttler.publish('frameForward', e)} className="Controlbar__button icon-frame-forward"/>
-              <button onClick={e => this.props.shuttler.publish('fastForward', e)} className="Controlbar__button icon-next-clip"/>
+              <button
+                onClick={e => this.props.shuttler.publish('frameForward', e)}
+                className="Controlbar__button icon-frame-forward"
+              />
+              <button
+                onClick={e => this.props.shuttler.publish('fastForward', e)}
+                className="Controlbar__button icon-next-clip"
+              />
             </div>
           )}
-          { this.showFrameFrequency() && (
+          {this.showFrameFrequency() && (
             <div className="Controlbar__section Controlbar__section-options">
               <button
                 title="Change FPS"
                 className="Controlbar__button"
-                onClick={() => this.toggleShowFpsOptions()}
-               >
-               <Gauge color="#fff" intensity={this.getGaugeIntensity()} />
+                onClick={() => this.toggleShowFpsOptions()}>
+                <Gauge color="#fff" intensity={this.getGaugeIntensity()} />
               </button>
-              { this.state.showFpsOptions === true && (
+              {this.state.showFpsOptions === true && (
                 <ul className="Controlbar__options">
-                  { this.props.frameFrequency.options.map(option => {
+                  {this.props.frameFrequency.options.map(option => {
                     return (
-                        <li key={option} className="Controlbar__options-items">
-                          <button
-                            onClick={() => this.props.frameFrequency.onFrameFrequency(option)}
-                            title="Change playback frame rate"
-                            className={classnames('Controlbar__options-button', {
-                              'Controlbar__options-button--active': this.props.frameFrequency.rate === option
-                            })}
-                          >
-                            {option} fps
-                          </button>
-                        </li>
+                      <li key={option} className="Controlbar__options-items">
+                        <button
+                          onClick={() =>
+                            this.props.frameFrequency.onFrameFrequency(option)
+                          }
+                          title="Change playback frame rate"
+                          className={classnames('Controlbar__options-button', {
+                            'Controlbar__options-button--active':
+                              this.props.frameFrequency.rate === option,
+                          })}>
+                          {option} fps
+                        </button>
+                      </li>
                     )
-                  }) }
+                  })}
                 </ul>
               )}
             </div>
-          ) }
-          { this.showLoop() && (
+          )}
+          {this.showLoop() && (
             <div className="Controlbar__section">
               <button
                 onClick={this.props.onLoop}
-                title={ this.props.shouldLoop ? 'Disable Playback Loop' : 'Enable Playback Loop' }
+                title={
+                  this.props.shouldLoop
+                    ? 'Disable Playback Loop'
+                    : 'Enable Playback Loop'
+                }
                 className={classnames('Controlbar__loop-button', {
-                  'Controlbar__loop-button--loop-paused': this.props.loopPaused === true,
-                  'Controlbar__loop-button--active': this.props.shouldLoop === true
-                })}
-              >Toggle Loop</button>
+                  'Controlbar__loop-button--loop-paused':
+                    this.props.loopPaused === true,
+                  'Controlbar__loop-button--active':
+                    this.props.shouldLoop === true,
+                })}>
+                Toggle Loop
+              </button>
             </div>
           )}
-          { this.showVolume() && (
+          {this.showVolume() && (
             <div className="Controlbar__section">
-              <VolumeBar volume={this.props.volume} onVolume={this.props.onVolume}/>
+              <VolumeBar
+                volume={this.props.volume}
+                onVolume={this.props.onVolume}
+              />
             </div>
           )}
-          { this.showZoom() && (
-              <div className="Controlbar__section">
-                <button disabled={!this.props.onZoomOut} className="Controlbar__button Controlbar__zoom-out icon-zoom-out" onClick={this.props.onZoomOut} />
-                <button disabled={!this.props.onFit} className="Controlbar__button Controlbar__zoom-reset icon-expand3" onClick={this.props.onFit} />
-                <button disabled={!this.props.onZoomIn} className="Controlbar__button Controlbar__zoom-in icon-zoom-in" onClick={this.props.onZoomIn} />
-              </div>
-            ) }
+          {this.showZoom() && (
+            <div className="Controlbar__section">
+              <button
+                disabled={!this.props.onZoomOut}
+                className="Controlbar__button Controlbar__zoom-out icon-zoom-out"
+                onClick={this.props.onZoomOut}
+              />
+              <button
+                disabled={!this.props.onFit}
+                className="Controlbar__button Controlbar__zoom-reset icon-expand3"
+                onClick={this.props.onFit}
+              />
+              <button
+                disabled={!this.props.onZoomIn}
+                className="Controlbar__button Controlbar__zoom-in icon-zoom-in"
+                onClick={this.props.onZoomIn}
+              />
+            </div>
+          )}
         </div>
       </div>
     )

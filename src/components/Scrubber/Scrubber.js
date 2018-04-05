@@ -8,31 +8,33 @@ export default class Scrubber extends PureComponent {
     shuttler: PropTypes.instanceOf(PubSub),
     currentFrameNumber: PropTypes.number,
     totalFrames: PropTypes.number.isRequired,
-    progress: PropTypes.bool
+    progress: PropTypes.bool,
   }
 
   state = {
     scrubbedFrameNumber: this.props.currentFrameNumber,
-    isMouseDown: false
+    isMouseDown: false,
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (nextProps.currentFrameNumber !== this.props.currentFrameNumber) {
       this.setState({
-        scrubbedFrameNumber: nextProps.currentFrameNumber
+        scrubbedFrameNumber: nextProps.currentFrameNumber,
       })
     }
   }
 
   setScrubbedFrameNumber = frameNumber => {
     this.setState({
-      scrubbedFrameNumber: frameNumber
+      scrubbedFrameNumber: frameNumber,
     })
   }
 
-  scrub = (scrubbedFrameNumber) => {
+  scrub = scrubbedFrameNumber => {
     if (typeof this.props.shuttler === undefined) {
-      console.warn('Scrubbing without a shuttler, no change will be reflected in frame')
+      console.warn(
+        'Scrubbing without a shuttler, no change will be reflected in frame',
+      )
     } else {
       this.props.shuttler.publish('scrub', scrubbedFrameNumber)
     }
@@ -46,14 +48,14 @@ export default class Scrubber extends PureComponent {
   onProgressMouseDown = event => {
     event.preventDefault()
     this.setState({
-      isMouseDown: true
+      isMouseDown: true,
     })
   }
 
   onProgressMouseUp = event => {
     event.preventDefault()
     this.setState({
-      isMouseDown: false
+      isMouseDown: false,
     })
   }
 
@@ -71,7 +73,9 @@ export default class Scrubber extends PureComponent {
     const rangeDistance = rangeEnd - rangeStart
 
     const rangePercentTraversed = (rangePosition - rangeStart) / rangeDistance
-    const scrubbedFrameNumber = Math.round(rangePercentTraversed * this.props.totalFrames)
+    const scrubbedFrameNumber = Math.round(
+      rangePercentTraversed * this.props.totalFrames,
+    )
 
     if (scrubbedFrameNumber === this.props.currentFrameNumber) {
       return
@@ -80,34 +84,45 @@ export default class Scrubber extends PureComponent {
     this.scrub(scrubbedFrameNumber)
   }
 
-  render () {
+  render() {
     const { currentFrameNumber, totalFrames } = this.props
-    const completedPercentage = (currentFrameNumber - 1) / (totalFrames - 1) * 100
+    const completedPercentage =
+      (currentFrameNumber - 1) / (totalFrames - 1) * 100
     const pastStyle = {
-      width: `${completedPercentage}%`
+      width: `${completedPercentage}%`,
     }
     const draggerStyle = {
-      left: `${completedPercentage}%`
+      left: `${completedPercentage}%`,
     }
     const draggerClasses = classnames('Scrubber__progress-dragger', {
-      'Scrubber__progress-dragger--ended': completedPercentage === 100
+      'Scrubber__progress-dragger--ended': completedPercentage === 100,
     })
 
     const progressBarClasses = 'Scrubber__progress-bar'
 
     return (
       <form onSubmit={this.onScrubSubmit} className="Scrubber">
-        { this.props.progress === true && (
+        {this.props.progress === true && (
           <div
             className="Scrubber__progress"
             title={`Frame ${currentFrameNumber} of ${totalFrames}`}
             onMouseDown={this.onProgressMouseDown}
             onMouseUp={this.onProgressMouseUp}
-            onMouseMove={this.onProgressMouseMove}
-          >
+            onMouseMove={this.onProgressMouseMove}>
             <div style={draggerStyle} className={draggerClasses} />
-            <div style={pastStyle} className={classnames(progressBarClasses, 'Scrubber__progress-bar--past')} />
-            <div className={classnames(progressBarClasses, 'Scrubber__progress-bar--future')} />
+            <div
+              style={pastStyle}
+              className={classnames(
+                progressBarClasses,
+                'Scrubber__progress-bar--past',
+              )}
+            />
+            <div
+              className={classnames(
+                progressBarClasses,
+                'Scrubber__progress-bar--future',
+              )}
+            />
           </div>
         )}
         <div className="Scruber__frame-jumper">
@@ -116,9 +131,16 @@ export default class Scrubber extends PureComponent {
             type="text"
             className="Scrubber__scrubber-input"
             value={this.state.scrubbedFrameNumber}
-            onFocus={() => { typeof this.props.shuttler === 'function' && this.props.shuttler.publish('stop') }}
-            onChange={(event) => { this.setScrubbedFrameNumber(event.target.value) }}
-            onBlur={() => { this.scrub(this.state.scrubbedFrameNumber) }}
+            onFocus={() => {
+              typeof this.props.shuttler === 'function' &&
+                this.props.shuttler.publish('stop')
+            }}
+            onChange={event => {
+              this.setScrubbedFrameNumber(event.target.value)
+            }}
+            onBlur={() => {
+              this.scrub(this.state.scrubbedFrameNumber)
+            }}
           />
           of {totalFrames}
         </div>

@@ -6,41 +6,35 @@ import { connect } from 'react-redux'
 import Toggle from '../Toggle'
 import './UserStatusToggle.scss'
 
-import {
-  disableUser,
-  enableUser
-} from '../../actions/usersActions'
+import { disableUser, enableUser } from '../../actions/usersActions'
 
 class UserStatusToggle extends Component {
   static propTypes = {
     authorizedUser: PropTypes.shape({
-      id: PropTypes.number.isRequired
+      id: PropTypes.number.isRequired,
     }),
     user: PropTypes.shape({
       id: PropTypes.number.isRequired,
-      enabled: PropTypes.bool.isRequired
+      enabled: PropTypes.bool.isRequired,
     }),
     usersBeingDisabled: PropTypes.arrayOf(PropTypes.number),
     actions: PropTypes.shape({
       disableUser: PropTypes.func.isRequired,
-      enableUser: PropTypes.func.isRequired
-    })
+      enableUser: PropTypes.func.isRequired,
+    }),
   }
 
-  isLoading () {
+  isLoading() {
     return this.props.usersBeingDisabled.indexOf(this.props.user.id) >= 0
   }
 
-  isDisabled () {
+  isDisabled() {
     return this.props.user.id === this.props.authorizedUser.id
   }
 
   toggleUserState = () => {
     const { user } = this.props
-    const {
-      disableUser,
-      enableUser
-    } = this.props.actions
+    const { disableUser, enableUser } = this.props.actions
 
     if (this.isLoading() || this.isDisabled()) {
       return
@@ -54,16 +48,16 @@ class UserStatusToggle extends Component {
     enableUser(user.id)
   }
 
-  onClick = (event) => {
+  onClick = event => {
     // Toggling the user status should not cause the user field to become populated
     // so prevent the event from bubbling
     event.stopPropagation()
   }
 
-  render () {
+  render() {
     const classes = classnames('UserStatusToggle', {
       'UserStatusToggle--loading': this.isLoading(),
-      'UserStatusToggle--disabled': this.isDisabled()
+      'UserStatusToggle--disabled': this.isDisabled(),
     })
 
     return (
@@ -76,19 +70,25 @@ class UserStatusToggle extends Component {
           disabledTitle="You cannot disable yourself"
         />
         <span className="UserStatusToggle__label">
-          { this.props.user.enabled ? 'Enabled' : 'Disabled' }
+          {this.props.user.enabled ? 'Enabled' : 'Disabled'}
         </span>
       </div>
     )
   }
 }
 
-export default connect(state => ({
-  usersBeingDisabled: state.users.usersBeingDisabled,
-  authorizedUser: state.auth.user
-}), dispatch => ({
-  actions: bindActionCreators({
-    disableUser,
-    enableUser
-  }, dispatch)
-}))(UserStatusToggle)
+export default connect(
+  state => ({
+    usersBeingDisabled: state.users.usersBeingDisabled,
+    authorizedUser: state.auth.user,
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        disableUser,
+        enableUser,
+      },
+      dispatch,
+    ),
+  }),
+)(UserStatusToggle)

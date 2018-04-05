@@ -7,8 +7,14 @@ import User from '../../models/User'
 import Folder from '../../models/Folder'
 import AclEntry from '../../models/Acl'
 import AssetSearch from '../../models/AssetSearch'
-import { getFolderChildren, createFolder, selectFolderIds, selectFolderId,
-  toggleFolder, countAssetsInFolderIds } from '../../actions/folderAction'
+import {
+  getFolderChildren,
+  createFolder,
+  selectFolderIds,
+  selectFolderId,
+  toggleFolder,
+  countAssetsInFolderIds,
+} from '../../actions/folderAction'
 import { showModal, sortFolders } from '../../actions/appActions'
 import Trash from './Trash'
 import FolderItem from './FolderItem'
@@ -25,9 +31,13 @@ const MAX_FOLDER_SCROLL_HEIGHT_PX = 400
 
 const FOLDER_COUNT_SCROLL_IDLE_THRESH_MS = 250 // ms to wait after scrolling stops before requesting folder counts
 
-const NUMTRUE = {numeric: true}
+const NUMTRUE = { numeric: true }
 
-const target = { drop () { /* only needed for highlighting -- drop happens on FolderItem */ } }
+const target = {
+  drop() {
+    /* only needed for highlighting -- drop happens on FolderItem */
+  },
+}
 
 export const FULL_COUNTS = 'full'
 export const FILTERED_COUNTS = 'filtered'
@@ -58,17 +68,17 @@ class Folders extends Component {
     filteredCounts: PropTypes.instanceOf(Map),
     modifiedFolderIds: PropTypes.instanceOf(Set),
     user: PropTypes.instanceOf(User),
-    userSettings: PropTypes.object.isRequired
+    userSettings: PropTypes.object.isRequired,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = {
       rootId: undefined,
       filterString: '',
       foldersScrollTop: 0,
-      foldersScrollHeight: 0
+      foldersScrollHeight: 0,
     }
 
     this.folderSortCache = new LRUCache({ max: 1000 })
@@ -84,7 +94,10 @@ class Folders extends Component {
 
   queueFolderCounts = () => {
     clearTimeout(this.requestFolderCountsTimer)
-    this.requestFolderCountsTimer = setTimeout(this.requestFolderCounts, FOLDER_COUNT_SCROLL_IDLE_THRESH_MS)
+    this.requestFolderCountsTimer = setTimeout(
+      this.requestFolderCounts,
+      FOLDER_COUNT_SCROLL_IDLE_THRESH_MS,
+    )
   }
 
   // Request folder counts for visible folders. There are two types of counts,
@@ -108,58 +121,84 @@ class Folders extends Component {
   // list of modified and visible folders to construct a batch of work at the
   // last possible second -- sort of an implicit queue.
 
-  requestFolderCounts = (forceFilter) => {
-    const { modifiedFolderIds, query, folderCounts, filteredCounts, userSettings } = this.props
+  requestFolderCounts = forceFilter => {
+    const {
+      modifiedFolderIds,
+      query,
+      folderCounts,
+      filteredCounts,
+      userSettings,
+    } = this.props
 
     // Find the set of modified visible folders for full counts.
-    const modifiedVisibleIds = [...modifiedFolderIds].filter(id => this.foldersVisible.has(id))
+    const modifiedVisibleIds = [...modifiedFolderIds].filter(id =>
+      this.foldersVisible.has(id),
+    )
 
     // Find the set of visible folders that have not had any full count computed
-    const uncomputedVisibleIds = [...this.foldersVisible].filter(id => !folderCounts.has(id))
+    const uncomputedVisibleIds = [...this.foldersVisible].filter(
+      id => !folderCounts.has(id),
+    )
 
     // Compute a batch of full folder counts to request
     const maxBatchSize = 3
-    if (userSettings.showFolderCounts !== NO_COUNTS && !this.pendingFullRequest) {
+    if (
+      userSettings.showFolderCounts !== NO_COUNTS &&
+      !this.pendingFullRequest
+    ) {
       const allFullCountIds = [...modifiedVisibleIds, ...uncomputedVisibleIds]
       const fullCountIds = allFullCountIds.slice(0, maxBatchSize)
       if (fullCountIds.length) {
-        this.pendingFullRequest = true        // Serialize batches
-        this.props.actions.countAssetsInFolderIds(fullCountIds)
+        this.pendingFullRequest = true // Serialize batches
+        this.props.actions
+          .countAssetsInFolderIds(fullCountIds)
           .then(_ => {
             this.pendingFullRequest = false
-            this.queueFolderCounts()          // Recheck for more work
+            this.queueFolderCounts() // Recheck for more work
           })
-          .catch(_ => { this.pendingFullRequest = false })
+          .catch(_ => {
+            this.pendingFullRequest = false
+          })
       }
     }
 
     // Compute a batch of filtered folder counts to request
     // if we are starting a new query or if forced by add/remove asset
-    if (userSettings.showFolderCounts === FILTERED_COUNTS && query && (!query.empty() || forceFilter) && !this.pendingSearchRequest) {
+    if (
+      userSettings.showFolderCounts === FILTERED_COUNTS &&
+      query &&
+      (!query.empty() || forceFilter) &&
+      !this.pendingSearchRequest
+    ) {
       // Note that filteredCounts is cleared in the foldersReducer whenever
       // the search has changed, so checking for a valid value is sufficient.
-      const visibleSearchCountIds = [...this.foldersVisible].filter(id => !filteredCounts.has(id))
+      const visibleSearchCountIds = [...this.foldersVisible].filter(
+        id => !filteredCounts.has(id),
+      )
       const searchCountIds = visibleSearchCountIds.slice(0, maxBatchSize)
       if (searchCountIds.length) {
-        this.pendingSearchRequest = true        // Serialize batches
-        this.props.actions.countAssetsInFolderIds(searchCountIds, query)
+        this.pendingSearchRequest = true // Serialize batches
+        this.props.actions
+          .countAssetsInFolderIds(searchCountIds, query)
           .then(_ => {
             this.pendingSearchRequest = false
-            this.queueFolderCounts()            // Recheck for more work
+            this.queueFolderCounts() // Recheck for more work
           })
-          .catch(_ => { this.pendingSearchRequest = false })
+          .catch(_ => {
+            this.pendingSearchRequest = false
+          })
       }
     }
   }
 
-  foldersScroll = (event) => {
+  foldersScroll = event => {
     this.setState({
       foldersScrollTop: event.target.scrollTop,
-      foldersScrollHeight: event.target.clientHeight
+      foldersScrollHeight: event.target.clientHeight,
     })
   }
 
-  componentWillMount () {
+  componentWillMount() {
     const all = this.props.folders.all
     const { rootId } = this.props
     const rootFolder = all.get(rootId === undefined ? Folder.ROOT_ID : rootId)
@@ -169,7 +208,7 @@ class Folders extends Component {
     this.componentWillReceiveProps(this.props)
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     // Force load the User folder's children so we can find the home folder
     const all = nextProps.folders.all
     const rootFolder = all.get(Folder.ROOT_ID)
@@ -189,10 +228,15 @@ class Folders extends Component {
       const rootFolder = all.get(Folder.ROOT_ID)
       if (rootFolder && rootFolder.childIds) {
         const rootChildIds = [...rootFolder.childIds]
-        const index = rootChildIds.findIndex(id => all.get(id).name === nextProps.rootName)
+        const index = rootChildIds.findIndex(
+          id => all.get(id).name === nextProps.rootName,
+        )
         if (index >= 0) this.setState({ rootId: rootChildIds[index] })
       }
-    } else if (this.state.rootId === undefined && nextProps.rootId !== undefined) {
+    } else if (
+      this.state.rootId === undefined &&
+      nextProps.rootId !== undefined
+    ) {
       this.setState({ rootId: nextProps.rootId })
     } else if (this.state.rootId === undefined) {
       this.setState({ rootId: Folder.ROOT_ID })
@@ -209,18 +253,20 @@ class Folders extends Component {
     }
   }
 
-  sortOrder () {
+  sortOrder() {
     return this.props.sortFolders || 'alpha-asc'
   }
 
-  loadChildren (folder) {
-    folder.childIds = new Set()   // Warning: modifying app state to avoid multiple loads
+  loadChildren(folder) {
+    folder.childIds = new Set() // Warning: modifying app state to avoid multiple loads
     this.props.actions.getFolderChildren(folder.id)
   }
 
-  isOpen = (folderId) => (folderId === this.state.rootId || this.props.folders.openFolderIds.has(folderId))
+  isOpen = folderId =>
+    folderId === this.state.rootId ||
+    this.props.folders.openFolderIds.has(folderId)
 
-  toggleFolder = (folder) => {
+  toggleFolder = folder => {
     const { folders } = this.props
     const isOpen = this.isOpen(folder.id)
     const hasChildren = folder.childCount > 0
@@ -229,12 +275,21 @@ class Folders extends Component {
     // and user is trying to close the current folder,
     // then prevent closing the current folder
     const lockOpenIfChildSelected = false
-    if (lockOpenIfChildSelected && !isOpen && hasChildren && folders.selectedFolderIds.size) {
+    if (
+      lockOpenIfChildSelected &&
+      !isOpen &&
+      hasChildren &&
+      folders.selectedFolderIds.size
+    ) {
       // Start with the parents of all selected folders.
-      var selectedFolders = Array.from(folders.selectedFolderIds).map(id => folders.all.get(id))
+      var selectedFolders = Array.from(folders.selectedFolderIds).map(id =>
+        folders.all.get(id),
+      )
       var selectedParentIds = selectedFolders.map(f => f.parentId)
       // Filter out any invalid ids (which means parent of root)
-      var parentFolders = selectedParentIds.map(id => folders.all.get(id)).filter(f => !!f)
+      var parentFolders = selectedParentIds
+        .map(id => folders.all.get(id))
+        .filter(f => !!f)
 
       // Transitive closure of parents - we'll compute parents and parents of parents
       // until we've exhausted all parents. We're done when we run out of parents.
@@ -244,7 +299,9 @@ class Folders extends Component {
         if (parentFolders.filter(f => f.id === folder.id).length) return
 
         // Find all grandparents - parents of the current parents
-        parentFolders = parentFolders.map(f => folders.all.get(f.parentId)).filter(f => !!f)
+        parentFolders = parentFolders
+          .map(f => folders.all.get(f.parentId))
+          .filter(f => !!f)
       }
     }
 
@@ -256,11 +313,13 @@ class Folders extends Component {
     }
   }
 
-  scrollToFolder = (folderId) => {
+  scrollToFolder = folderId => {
     const { folders } = this.props
     const { foldersScrollTop, foldersScrollHeight, rootId } = this.state
     const folderList = this.folderList(folders.all.get(rootId))
-    const folderPosition = folderList.findIndex(folder => folder.id === folderId)
+    const folderPosition = folderList.findIndex(
+      folder => folder.id === folderId,
+    )
     if (folderPosition < 0) return
 
     // scroll up by one folder if the opened folder is the last one
@@ -268,35 +327,43 @@ class Folders extends Component {
     // Maybe this should be removed
     // Animated scrolling might help though
     const folderHeight = folderPosition * FOLDER_HEIGHT_PX
-    if (folderHeight > foldersScrollTop + foldersScrollHeight - 1.5 * FOLDER_HEIGHT_PX) {
+    if (
+      folderHeight >
+      foldersScrollTop + foldersScrollHeight - 1.5 * FOLDER_HEIGHT_PX
+    ) {
       this.refs.foldersScroll.scrollTop = foldersScrollTop + FOLDER_HEIGHT_PX
     }
   }
 
   // Apply standard desktop shift+meta multi-select on click and update state.
-  selectFolder (folder, event) {
+  selectFolder(folder, event) {
     const { folders, onSelect } = this.props
     if (onSelect) return onSelect(folder, event)
     const rootFolder = folders.all.get(this.state.rootId)
     const folderList = this.folderList(rootFolder)
-    this.props.actions.selectFolderId(folder.id, event.shiftKey, event.metaKey,
-      folderList, this.props.folders.selectedFolderIds)
+    this.props.actions.selectFolderId(
+      folder.id,
+      event.shiftKey,
+      event.metaKey,
+      folderList,
+      this.props.folders.selectedFolderIds,
+    )
   }
 
-  filterFolders = (event) => {
+  filterFolders = event => {
     const filterString = event.target.value
     this.setState({ filterString })
   }
 
-  cancelFilter = (event) => {
+  cancelFilter = event => {
     this.setState({ filterString: '' })
   }
 
-  deselectAll = (event) => {
+  deselectAll = event => {
     this.props.actions.selectFolderIds()
   }
 
-  sortFolders (field) {
+  sortFolders(field) {
     const sort = this.sortOrder()
     let newSort = sort
     switch (field) {
@@ -320,10 +387,17 @@ class Folders extends Component {
 
   addFolder = () => {
     const width = '300px'
-    const body = <CreateFolder title='Create Collection' acl={[]} name=""
-                               includeAssets={true} includePermissions={false}
-                               onCreate={this.createFolder}/>
-    this.props.actions.showModal({body, width})
+    const body = (
+      <CreateFolder
+        title="Create Collection"
+        acl={[]}
+        name=""
+        includeAssets={true}
+        includePermissions={false}
+        onCreate={this.createFolder}
+      />
+    )
+    this.props.actions.showModal({ body, width })
   }
 
   createFolder = (name, acl, assetIds) => {
@@ -332,7 +406,7 @@ class Folders extends Component {
     this.props.actions.createFolder(folder, assetIds)
   }
 
-  cannotAddFolderReason () {
+  cannotAddFolderReason() {
     const { folders, user } = this.props
     // True if one folder is selected, it isn't in the trash, and we have write permission
     const selectedFolderIds = folders.selectedFolderIds
@@ -340,14 +414,17 @@ class Folders extends Component {
       if (selectedFolderIds.size > 1) return 'Select a single parent folder'
       const id = selectedFolderIds.values().next().value
       if (folders.trashedFolders) {
-        const index = folders.trashedFolders.findIndex(trashedFolder => (trashedFolder.folderId === id))
+        const index = folders.trashedFolders.findIndex(
+          trashedFolder => trashedFolder.folderId === id,
+        )
         if (index >= 0) return 'Select a folder outside of trash'
       }
       const folder = folders.all.get(id)
       if (!folder) return 'Selected folder does not exist'
       if (folder.isDyhi()) return 'Cannot add child to automatic smart folder'
       if (folder.isSmartCollection()) return 'Cannot add child to smart folder'
-      if (!folder.hasAccess(user, AclEntry.WriteAccess)) return 'No write permission to parent folder'
+      if (!folder.hasAccess(user, AclEntry.WriteAccess))
+        return 'No write permission to parent folder'
     }
   }
 
@@ -361,9 +438,13 @@ class Folders extends Component {
       case 'alpha-desc':
         return b.name.localeCompare(a.name, undefined, NUMTRUE)
       case 'time-asc':
-        return a.timeModified < b.timeModified ? -1 : (a.timeModified > b.timeModified ? 1 : 0)
+        return a.timeModified < b.timeModified
+          ? -1
+          : a.timeModified > b.timeModified ? 1 : 0
       case 'time-desc':
-        return b.timeModified < a.timeModified ? -1 : (b.timeModified > a.timeModified ? 1 : 0)
+        return b.timeModified < a.timeModified
+          ? -1
+          : b.timeModified > a.timeModified ? 1 : 0
     }
 
     return a.name.localeCompare(b.name, undefined, NUMTRUE)
@@ -374,20 +455,20 @@ class Folders extends Component {
     let hash = optHash || 0
     if (str.length === 0) return hash
     for (let i = 0; i < str.length; i++) {
-      hash = ((hash << 5) - hash) + str.charCodeAt(i)
+      hash = (hash << 5) - hash + str.charCodeAt(i)
       hash = hash & hash // Convert to 32bit integer
     }
     return hash
   }
 
-  folderList (folder) {
+  folderList(folder) {
     const { folders, filter } = this.props
     const { filterString, rootId } = this.state
     const isOpen = this.isOpen(folder.id)
     const childIds = folder.childIds
 
     // Show this folder, except for root, we don't need to see root
-    let folderList = (folder.id !== rootId) ? [folder] : []
+    let folderList = folder.id !== rootId ? [folder] : []
 
     let grandkids = []
     if (childIds && isOpen) {
@@ -401,7 +482,9 @@ class Folders extends Component {
       })
 
       // We are caching the folder sort because alphabetic sort is SLOW, and this runs every frame (e.g., while scrolling)
-      const key = `${folder.id}|${this.sortOrder()}|${children.length}|${childrenNameHash}`
+      const key = `${folder.id}|${this.sortOrder()}|${
+        children.length
+      }|${childrenNameHash}`
       let childrenSortOrder = this.folderSortCache.get(key)
       if (childrenSortOrder) {
         // If we already sorted before and nothing's changed, retrieve the sort order
@@ -423,21 +506,24 @@ class Folders extends Component {
     }
 
     // Filter the list, showing parent if any descendents match
-    if (grandkids.length || folder.name.toLowerCase().includes(filterString.toLowerCase())) {
+    if (
+      grandkids.length ||
+      folder.name.toLowerCase().includes(filterString.toLowerCase())
+    ) {
       return folderList.concat(grandkids)
     }
 
     return []
   }
 
-  depth (folder) {
+  depth(folder) {
     const { folders } = this.props
     if (folder.id === this.state.rootId) return 0
     const parent = folders.all.get(folder.parentId)
     return this.depth(parent) + 1
   }
 
-  isDropTarget () {
+  isDropTarget() {
     const { dragInfo, folders, user } = this.props
     if (!dragInfo) return false
     const root = folders.all.get(this.state.rootId)
@@ -454,7 +540,7 @@ class Folders extends Component {
     if (startIndex % 2 === 1 && startIndex > 0) startIndex--
     const stopIndex = Math.min(
       Math.ceil((foldersScrollTop + foldersScrollHeight) / FOLDER_HEIGHT_PX),
-      folderList.length - 1
+      folderList.length - 1,
     )
 
     const renderedFolders = []
@@ -473,37 +559,55 @@ class Folders extends Component {
       this.foldersVisible.add(folder.id)
 
       renderedFolders.push(
-        <FolderItem {...{key, depth, folder, isOpen, isSelected, hasChildren, top: `${i * FOLDER_HEIGHT_PX}px`}}
+        <FolderItem
+          {...{
+            key,
+            depth,
+            folder,
+            isOpen,
+            isSelected,
+            hasChildren,
+            top: `${i * FOLDER_HEIGHT_PX}px`,
+          }}
           onToggle={this.toggleFolder.bind(this, folder)}
-          onSelect={this.selectFolder.bind(this, folder)} />
+          onSelect={this.selectFolder.bind(this, folder)}
+        />,
       )
     }
 
-    if (!equalSets(prevFoldersVisible, this.foldersVisible)) this.queueFolderCounts()
+    if (!equalSets(prevFoldersVisible, this.foldersVisible))
+      this.queueFolderCounts()
     return renderedFolders
   }
 
-  renderSortButton (field) {
+  renderSortButton(field) {
     const sort = this.sortOrder()
     const enabled = sort.match(field) != null
     const icon = enabled ? `icon-sort-${sort}` : `icon-sort-${field}-asc`
     return (
-      <div onClick={this.sortFolders.bind(this, field)} className={classnames('Folders-sort-button', icon, {enabled})}/>
+      <div
+        onClick={this.sortFolders.bind(this, field)}
+        className={classnames('Folders-sort-button', icon, { enabled })}
+      />
     )
   }
 
-  renderFolderDeselector () {
-    const selectedFolderIds = this.props.folders && this.props.folders.selectedFolderIds
+  renderFolderDeselector() {
+    const selectedFolderIds =
+      this.props.folders && this.props.folders.selectedFolderIds
     if (!selectedFolderIds || selectedFolderIds.size === 0) return null
     return (
       <div className="Folders-selected">
-        { `${selectedFolderIds.size} folders selected` }
-        <div onClick={this.deselectAll} className="Folders-deselect-all icon-cancel-circle"/>
+        {`${selectedFolderIds.size} folders selected`}
+        <div
+          onClick={this.deselectAll}
+          className="Folders-deselect-all icon-cancel-circle"
+        />
       </div>
     )
   }
 
-  render () {
+  render() {
     const { folders, user, query } = this.props
     const { filterString, rootId } = this.state
     const rootLoaded = folders.all.has(rootId)
@@ -516,9 +620,16 @@ class Folders extends Component {
 
     const folderList = this.folderList(folders.all.get(rootId))
     const numOpenFolders = folderList.length
-    const foldersBodyHeight = numOpenFolders * FOLDER_HEIGHT_PX || FOLDER_EMPTY_HEIGHT_PX
-    const foldersScrollHeight = Math.min(foldersBodyHeight, MAX_FOLDER_SCROLL_HEIGHT_PX)
-    const folderComponentList = this.renderFolderList(folderList, foldersScrollHeight)
+    const foldersBodyHeight =
+      numOpenFolders * FOLDER_HEIGHT_PX || FOLDER_EMPTY_HEIGHT_PX
+    const foldersScrollHeight = Math.min(
+      foldersBodyHeight,
+      MAX_FOLDER_SCROLL_HEIGHT_PX,
+    )
+    const folderComponentList = this.renderFolderList(
+      folderList,
+      foldersScrollHeight,
+    )
 
     requestAnimationFrame(_ => {
       // ignore this code if the user just closed the panel
@@ -527,11 +638,13 @@ class Folders extends Component {
       const foldersScrollTop = this.refs.foldersScroll.scrollTop
       const foldersScrollHeight = this.refs.foldersScroll.clientHeight
 
-      if (foldersScrollTop !== this.state.foldersScrollTop ||
-        foldersScrollHeight !== this.state.foldersScrollHeight) {
+      if (
+        foldersScrollTop !== this.state.foldersScrollTop ||
+        foldersScrollHeight !== this.state.foldersScrollHeight
+      ) {
         this.setState({
           foldersScrollTop: this.refs.foldersScroll.scrollTop,
-          foldersScrollHeight: this.refs.foldersScroll.clientHeight
+          foldersScrollHeight: this.refs.foldersScroll.clientHeight,
         })
       }
     })
@@ -542,73 +655,98 @@ class Folders extends Component {
     const canAddFolder = root && root.id === user.homeFolderId
     const cannotAddError = this.cannotAddFolderReason()
     return (
-      <div className={classnames('Folders', {isDropTarget, dragHover})}>
+      <div className={classnames('Folders', { isDropTarget, dragHover })}>
         <div className="Folders-controls">
           <div className="Folders-filter-add">
             <div className="Folders-filter">
-              <input className="Folders-filter-input" type="text" value={filterString}
-                     onChange={this.filterFolders}
-                     placeholder='Filter collections' />
-              { filterString && filterString.length && <div onClick={this.cancelFilter} className="Folders-cancel-filter icon-cancel-circle"/> }
-              <div className="icon-search"/>
-
+              <input
+                className="Folders-filter-input"
+                type="text"
+                value={filterString}
+                onChange={this.filterFolders}
+                placeholder="Filter collections"
+              />
+              {filterString &&
+                filterString.length && (
+                  <div
+                    onClick={this.cancelFilter}
+                    className="Folders-cancel-filter icon-cancel-circle"
+                  />
+                )}
+              <div className="icon-search" />
             </div>
-            { canAddFolder && <div className={classnames('Folders-controls-add', {disabled: cannotAddError})}
-                                   title={cannotAddError || 'Create a new folder'}
-                                   onClick={!cannotAddError && this.addFolder}>
-              <span className='icon-collections-add'/>
-              <div className="Folders-controls-add-label">NEW</div>
-            </div> }
+            {canAddFolder && (
+              <div
+                className={classnames('Folders-controls-add', {
+                  disabled: cannotAddError,
+                })}
+                title={cannotAddError || 'Create a new folder'}
+                onClick={!cannotAddError && this.addFolder}>
+                <span className="icon-collections-add" />
+                <div className="Folders-controls-add-label">NEW</div>
+              </div>
+            )}
           </div>
           <div className="Folders-sort-selected">
             <div className="Folders-sort">
-              { this.renderSortButton(SORT_ALPHABETICAL) }
-              { this.renderSortButton(SORT_TIME) }
+              {this.renderSortButton(SORT_ALPHABETICAL)}
+              {this.renderSortButton(SORT_TIME)}
             </div>
-            { this.renderFolderDeselector(folderList) }
+            {this.renderFolderDeselector(folderList)}
           </div>
         </div>
-        {folderComponentList ? <Trash/> : null }
-        <div ref='foldersScroll'
-             className='Folders-scroll'
-             onScroll={this.foldersScroll}
-             style={{height: `${foldersScrollHeight}px`, maxHeight: `${foldersScrollHeight}px`}}>
-          <div className='Folders-body'
-               style={{ height: `${foldersBodyHeight}px` }}>
+        {folderComponentList ? <Trash /> : null}
+        <div
+          ref="foldersScroll"
+          className="Folders-scroll"
+          onScroll={this.foldersScroll}
+          style={{
+            height: `${foldersScrollHeight}px`,
+            maxHeight: `${foldersScrollHeight}px`,
+          }}>
+          <div
+            className="Folders-body"
+            style={{ height: `${foldersBodyHeight}px` }}>
             {folderComponentList}
             {(!folderComponentList || !folderComponentList.length) && (
               <div className="Folders-empty">
-                <div className="Folders-empty-icon icon-emptybox"/>
+                <div className="Folders-empty-icon icon-emptybox" />
                 <div className="Folders-empty-label">No Folders</div>
               </div>
             )}
           </div>
-          <div className="Folders-drop-target"/>
+          <div className="Folders-drop-target" />
         </div>
       </div>
     )
   }
 }
 
-export default connect(state => ({
-  folders: state.folders,
-  sortFolders: state.app.sortFolders,
-  folderCounts: state.folders.counts,
-  filteredCounts: state.folders.filteredCounts,
-  modifiedFolderIds: state.folders.modifiedIds,
-  query: state.assets.query,
-  assetsCounter: state.assets.assetsCounter,
-  user: state.auth.user,
-  userSettings: state.app.userSettings
-}), dispatch => ({
-  actions: bindActionCreators({
-    getFolderChildren,
-    createFolder,
-    selectFolderIds,
-    selectFolderId,
-    toggleFolder,
-    showModal,
-    sortFolders,
-    countAssetsInFolderIds
-  }, dispatch)
-}))(Folders)
+export default connect(
+  state => ({
+    folders: state.folders,
+    sortFolders: state.app.sortFolders,
+    folderCounts: state.folders.counts,
+    filteredCounts: state.folders.filteredCounts,
+    modifiedFolderIds: state.folders.modifiedIds,
+    query: state.assets.query,
+    assetsCounter: state.assets.assetsCounter,
+    user: state.auth.user,
+    userSettings: state.app.userSettings,
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        getFolderChildren,
+        createFolder,
+        selectFolderIds,
+        selectFolderId,
+        toggleFolder,
+        showModal,
+        sortFolders,
+        countAssetsInFolderIds,
+      },
+      dispatch,
+    ),
+  }),
+)(Folders)

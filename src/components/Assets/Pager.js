@@ -8,31 +8,29 @@ class Pager extends Component {
     loaded: PropTypes.number.isRequired,
     total: PropTypes.number.isRequired,
     top: PropTypes.number.isRequired,
-    query: PropTypes.instanceOf(AssetSearch).isRequired
+    query: PropTypes.instanceOf(AssetSearch).isRequired,
   }
 
-  render () {
-    const {loaded, total} = this.props
+  render() {
+    const { loaded, total } = this.props
     if (loaded < total) {
       const ellipsis = require('./ellipsis.svg')
       return (
-        <div className="Pager-waiting flexRowCenter"
-             style={{top: this.props.top + 'px'}}>
-          <img className="Pager-waiting" src={ellipsis}/>
+        <div
+          className="Pager-waiting flexRowCenter"
+          style={{ top: this.props.top + 'px' }}>
+          <img className="Pager-waiting" src={ellipsis} />
         </div>
       )
     }
-    return <div className="Pager" style={{top: this.props.top + 'px'}}/>
+    return <div className="Pager" style={{ top: this.props.top + 'px' }} />
   }
 }
 
-const mapDispatchToProps = () => ({
-})
+const mapDispatchToProps = () => ({})
 
 const mapStateToProps = state => ({
-  query: state.assets.query
+  query: state.assets.query,
 })
 
-export default connect(
-  mapStateToProps, mapDispatchToProps
-)(Pager)
+export default connect(mapStateToProps, mapDispatchToProps)(Pager)

@@ -3,7 +3,7 @@ import classnames from 'classnames'
 import CollapsibleHeader from './CollapsibleHeader'
 
 export default class Collapsible extends Component {
-  static get displayName () {
+  static get displayName() {
     return 'Collapsible'
   }
 
@@ -21,11 +21,18 @@ export default class Collapsible extends Component {
     className: PropTypes.string,
 
     // child props
-    children: PropTypes.node
+    children: PropTypes.node,
   }
 
-  render () {
-    const { header, isIconified, isSelected, isOpen, onOpen, onSelect } = this.props
+  render() {
+    const {
+      header,
+      isIconified,
+      isSelected,
+      isOpen,
+      onOpen,
+      onSelect,
+    } = this.props
     const { children, openIcon, closeIcon } = this.props
 
     const CollapsibleHeaderParams = {
@@ -37,21 +44,22 @@ export default class Collapsible extends Component {
       onSelect,
       openIcon,
       isParent: !!children,
-      onOpen
+      onOpen,
     }
 
     const { className } = this.props
-    const collapsibleClasses = classnames('Collapsible', 'flexCol',
-      { isParent: children, isOpen, isIconified, [className]: !!className })
+    const collapsibleClasses = classnames('Collapsible', 'flexCol', {
+      isParent: children,
+      isOpen,
+      isIconified,
+      [className]: !!className,
+    })
 
     return (
       <div className={collapsibleClasses}>
-        <CollapsibleHeader {...CollapsibleHeaderParams}/>
-        { !isIconified && isOpen && (
-          <div className="Collapsible-body">
-            { children }
-          </div>
-        )}
+        <CollapsibleHeader {...CollapsibleHeaderParams} />
+        {!isIconified &&
+          isOpen && <div className="Collapsible-body">{children}</div>}
       </div>
     )
   }

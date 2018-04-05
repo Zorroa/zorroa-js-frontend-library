@@ -3,7 +3,7 @@ import classnames from 'classnames'
 import Resizer from '../../services/Resizer'
 
 export default class Sidebar extends Component {
-  static displayName () {
+  static displayName() {
     return 'Sidebar'
   }
 
@@ -14,17 +14,17 @@ export default class Sidebar extends Component {
     onToggle: PropTypes.func,
 
     // children props
-    children: PropTypes.node
+    children: PropTypes.node,
   }
 
   static defaultProps = {
-    isRightEdge: false
+    isRightEdge: false,
   }
 
   resizer = null
 
   state = {
-    width: 340    // Tricky ref stuff needed in componentDidMount to get width
+    width: 340, // Tricky ref stuff needed in componentDidMount to get width
   }
 
   componentWillMount = () => {
@@ -35,21 +35,22 @@ export default class Sidebar extends Component {
     this.resizer.release()
   }
 
-  clampWidth = (width) => {
+  clampWidth = width => {
     return Math.min(1020, Math.max(340, width))
   }
 
-  resizeStart = (event) => {
+  resizeStart = event => {
     this.resizer.capture(
-      this.resizeUpdate,                /* onMove    */
-      null,                             /* onRelease */
-      this.state.width,                 /* startX    */
-      0,                                /* startY    */
-      this.props.isRightEdge ? -1 : 1,  /* optScaleX */
-      0)                                /* optScaleY */
+      this.resizeUpdate /* onMove    */,
+      null /* onRelease */,
+      this.state.width /* startX    */,
+      0 /* startY    */,
+      this.props.isRightEdge ? -1 : 1 /* optScaleX */,
+      0,
+    ) /* optScaleY */
   }
 
-  resizeUpdate = (resizeX) => {
+  resizeUpdate = resizeX => {
     if (resizeX < 160 && !this.props.isIconified) {
       this.props.onToggle()
     } else {
@@ -58,24 +59,32 @@ export default class Sidebar extends Component {
     }
   }
 
-  toggleIfNotIconified = (event) => {
+  toggleIfNotIconified = event => {
     if (!this.props.isIconified) return
     this.props.onToggle()
     return false
   }
 
-  render () {
+  render() {
     const { isIconified, children, isRightEdge } = this.props
     const { width } = this.state
     const isOpen = !isIconified
     return (
-      <div style={{width}} className={classnames('Sidebar', { isOpen, isRightEdge, isIconified })}>
-        { !isRightEdge && <div className="Workspace-sidebar-spacer"/> }
-        <div className={classnames('scroller', { isRightEdge })} onClick={this.toggleIfNotIconified}>
-          { children }
+      <div
+        style={{ width }}
+        className={classnames('Sidebar', { isOpen, isRightEdge, isIconified })}>
+        {!isRightEdge && <div className="Workspace-sidebar-spacer" />}
+        <div
+          className={classnames('scroller', { isRightEdge })}
+          onClick={this.toggleIfNotIconified}>
+          {children}
         </div>
-        { isOpen && <div onMouseDown={this.resizeStart}
-                         className={classnames('Sidebar-resize-thumb', { isRightEdge })} /> }
+        {isOpen && (
+          <div
+            onMouseDown={this.resizeStart}
+            className={classnames('Sidebar-resize-thumb', { isRightEdge })}
+          />
+        )}
       </div>
     )
   }

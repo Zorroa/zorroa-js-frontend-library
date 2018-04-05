@@ -7,7 +7,7 @@ export default class DialogPrompt extends Component {
     title: PropTypes.string,
     message: PropTypes.string,
     confirmAction: PropTypes.func,
-    cancelAction: PropTypes.func
+    cancelAction: PropTypes.func,
   }
 
   input = null
@@ -22,39 +22,52 @@ export default class DialogPrompt extends Component {
     }
   }
 
-  keyDown = (event) => {
+  keyDown = event => {
     switch (event.key) {
-      case 'Enter': return this.confirm()
-      case 'Escape': return this.cancel()
+      case 'Enter':
+        return this.confirm()
+      case 'Escape':
+        return this.cancel()
       default:
     }
   }
 
-  render () {
+  render() {
     const { title, message, cancelAction } = this.props
-    const header = <span className='DialogPrompt-header'>{title}</span>
+    const header = <span className="DialogPrompt-header">{title}</span>
     const body = (
-      <div className='DialogPrompt-body'>
+      <div className="DialogPrompt-body">
         {message}
-        <input className='DialogPrompt-input'
-               onKeyDown={this.keyDown}
-               ref={(input) => { this.input = input; if (input) input.focus() }} />
+        <input
+          className="DialogPrompt-input"
+          onKeyDown={this.keyDown}
+          ref={input => {
+            this.input = input
+            if (input) input.focus()
+          }}
+        />
       </div>
     )
 
     const footer = (
-      <div className='DialogPrompt-footer'>
-        <div className='DialogPrompt-cancel' onClick={this.cancel}>Cancel</div>
-        <div className='DialogPrompt-confirm' onClick={this.confirm}>Okay</div>
+      <div className="DialogPrompt-footer">
+        <div className="DialogPrompt-cancel" onClick={this.cancel}>
+          Cancel
+        </div>
+        <div className="DialogPrompt-confirm" onClick={this.confirm}>
+          Okay
+        </div>
       </div>
     )
 
     return (
-      <Dialog className='DialogPrompt'
-              closeFn={cancelAction}
-              header={header}
-              body={body}
-              footer={footer}/>
+      <Dialog
+        className="DialogPrompt"
+        closeFn={cancelAction}
+        header={header}
+        body={body}
+        footer={footer}
+      />
     )
   }
 }

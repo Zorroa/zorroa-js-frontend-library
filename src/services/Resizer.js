@@ -26,7 +26,7 @@
 //       render = () => { <div style={{width: this.state.resizeWidth}} />
 
 export default class Resizer {
-  constructor () {
+  constructor() {
     this.reset()
   }
 
@@ -55,7 +55,7 @@ export default class Resizer {
     window.addEventListener('mouseup', this.release)
   }
 
-  move = (event) => {
+  move = event => {
     if (!this.startPageX && !this.startPageY) {
       this.startPageX = event.pageX
       this.startPageY = event.pageY
@@ -73,10 +73,12 @@ export default class Resizer {
     window.getSelection().removeAllRanges()
 
     // wait a frame to allow more events, otherwise events queue up syncronously
-    requestAnimationFrame(_ => { this.allowUpdate = true })
+    requestAnimationFrame(_ => {
+      this.allowUpdate = true
+    })
   }
 
-  release = (event) => {
+  release = event => {
     this.active = false
     this.allowUpdate = true
     window.removeEventListener('mousemove', this.move)

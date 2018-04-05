@@ -18,10 +18,28 @@ import Metadata from '../Metadata'
 import Collapsible from '../Collapsible'
 import ProgressBar from '../ProgressBar'
 import Racebar from '../Racetrack/Racebar'
-import { iconifyLeftSidebar, toggleCollapsible, showModal, hideModal, dialogAlertPromise, dialogConfirmPromise, dialogPromptPromise, setEmbedModeEnabled } from '../../actions/appActions'
-import { getUserPermissions, updatePassword, changePassword } from '../../actions/authAction'
+import {
+  iconifyLeftSidebar,
+  toggleCollapsible,
+  showModal,
+  hideModal,
+  dialogAlertPromise,
+  dialogConfirmPromise,
+  dialogPromptPromise,
+  setEmbedModeEnabled,
+} from '../../actions/appActions'
+import {
+  getUserPermissions,
+  updatePassword,
+  changePassword,
+} from '../../actions/authAction'
 import { queueFileEntrysUpload } from '../../actions/jobActions'
-import { updateCommand, getAllCommands, isolateAssetId, getAllAssetCount } from '../../actions/assetsAction'
+import {
+  updateCommand,
+  getAllCommands,
+  isolateAssetId,
+  getAllAssetCount,
+} from '../../actions/assetsAction'
 import { restoreFolders } from '../../actions/racetrackAction'
 import { loadSharedLink } from '../../actions/sharedLinkAction'
 import ChangePassword from '../auth/ChangePassword'
@@ -37,11 +55,21 @@ import Feedback from '../Feedback'
 import Import, { LocalChooser } from '../Import'
 import Importer from '../Importer'
 import { ImportJobs, ExportJobs } from '../Jobs'
-import { LOCAL_IMPORT, CLOUD_IMPORT, SERVER_IMPORT, SERVER_PATH_IMPORT } from '../Import/ImportConstants'
-import { EMBEDMODE_ITEM, LOAD_SEARCH_ITEM, SESSION_STATE_ITEM, SHOW_IMPORT_ITEM } from '../../constants/localStorageItems'
+import {
+  LOCAL_IMPORT,
+  CLOUD_IMPORT,
+  SERVER_IMPORT,
+  SERVER_PATH_IMPORT,
+} from '../Import/ImportConstants'
+import {
+  EMBEDMODE_ITEM,
+  LOAD_SEARCH_ITEM,
+  SESSION_STATE_ITEM,
+  SHOW_IMPORT_ITEM,
+} from '../../constants/localStorageItems'
 
 class Workspace extends Component {
-  static displayName () {
+  static displayName() {
     return 'Workspace'
   }
 
@@ -72,12 +100,12 @@ class Workspace extends Component {
     isExporter: PropTypes.bool.isRequired,
     monochrome: PropTypes.bool,
     showQuickview: PropTypes.bool.isRequired,
-    showExportsWizard: PropTypes.bool
+    showExportsWizard: PropTypes.bool,
   }
 
   state = {
     isDroppable: false,
-    showReloader: false
+    showReloader: false,
   }
 
   reloadInterval = null
@@ -86,26 +114,30 @@ class Workspace extends Component {
   repoContainsAssets = false
   tipShown = false
 
-  loadSharedLinkData = (folderObj) => {
+  loadSharedLinkData = folderObj => {
     const { actions } = this.props
     const folder = new Folder(folderObj)
     actions.isolateAssetId()
     actions.restoreFolders([folder])
   }
 
-  loadSharedLinkId = (id) => {
+  loadSharedLinkId = id => {
     const { actions } = this.props
-    actions.loadSharedLink(id)
-    .then(response => {
-      this.loadSharedLinkData(response.folder)
-    })
-    .catch(err => {
-      actions.dialogAlertPromise('Load Search Error', 'Something went wrong loading this search. Check console for errors.')
-      return Promise.reject(err)
-    })
+    actions
+      .loadSharedLink(id)
+      .then(response => {
+        this.loadSharedLinkData(response.folder)
+      })
+      .catch(err => {
+        actions.dialogAlertPromise(
+          'Load Search Error',
+          'Something went wrong loading this search. Check console for errors.',
+        )
+        return Promise.reject(err)
+      })
   }
 
-  componentWillMount () {
+  componentWillMount() {
     const { actions, user, app } = this.props
     actions.getUserPermissions(user)
     actions.getAllCommands()
@@ -113,7 +145,7 @@ class Workspace extends Component {
 
     const embedMode = localStorage.getItem(EMBEDMODE_ITEM)
     const { embedModeEnabled } = app
-    const newEmbedModeEnabled = (embedMode === 'true')
+    const newEmbedModeEnabled = embedMode === 'true'
     if (newEmbedModeEnabled && newEmbedModeEnabled !== embedModeEnabled) {
       actions.setEmbedModeEnabled(true)
       actions.iconifyLeftSidebar(true)
@@ -139,60 +171,83 @@ class Workspace extends Component {
     const showImport = localStorage.getItem(SHOW_IMPORT_ITEM)
     if (showImport) {
       localStorage.removeItem(SHOW_IMPORT_ITEM)
-      const sources = { cloud: CLOUD_IMPORT, file_server: SERVER_IMPORT, my_computer: LOCAL_IMPORT, network_drive: SERVER_PATH_IMPORT }
+      const sources = {
+        cloud: CLOUD_IMPORT,
+        file_server: SERVER_IMPORT,
+        my_computer: LOCAL_IMPORT,
+        network_drive: SERVER_PATH_IMPORT,
+      }
       const source = sources[showImport]
       this.tipShown = true
       const width = '65vw'
-      const body = <Import source={source} step={source ? 2 : 1}/>
-      this.props.actions.showModal({body, width})
+      const body = <Import source={source} step={source ? 2 : 1} />
+      this.props.actions.showModal({ body, width })
     }
 
     actions.getAllAssetCount()
   }
 
-  componentDidMount () {
+  componentDidMount() {
     // every now and then, check if the server's version of curator was updated & this session is stale
     this.reloadInterval = setInterval(this.checkForStaleVersion, 15 * 60 * 1000)
   }
 
   checkForStaleVersion = () => {
-    const vurl = (DEBUG) ? '/bin/version.html' : '/version.html'
-    axios.get(vurl)
-    .then(response => {
-      const SerVer = response.data.trim()
-      // console.log(`my version: ${zvVersion}  server says: ${SerVer}`)
-      this.setState({ showReloader: (SerVer !== zvVersion) })
-    })
-    .catch(error => {
-      // should this make noise? not sure
-      console.log('error requesting curator version', error)
-    })
+    const vurl = DEBUG ? '/bin/version.html' : '/version.html'
+    axios
+      .get(vurl)
+      .then(response => {
+        const SerVer = response.data.trim()
+        // console.log(`my version: ${zvVersion}  server says: ${SerVer}`)
+        this.setState({ showReloader: SerVer !== zvVersion })
+      })
+      .catch(error => {
+        // should this make noise? not sure
+        console.log('error requesting curator version', error)
+      })
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     clearInterval(this.reloadInterval)
     clearInterval(this.commandInterval)
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (nextProps.app.modal && this.state.isDroppable) {
-      this.setState({isDroppable: false})
+      this.setState({ isDroppable: false })
     }
-    if (!nextProps.app.modal && (nextProps.changePassword || (nextProps.user && nextProps.user.changePassword))) {
+    if (
+      !nextProps.app.modal &&
+      (nextProps.changePassword ||
+        (nextProps.user && nextProps.user.changePassword))
+    ) {
       const width = '300px'
-      const title = `${nextProps.onboarding ? 'SELECT' : 'CHANGE'} ${nextProps.user.username}'s PASSWORD`
-      const body = <ChangePassword onChangePassword={this.updatePassword}
-                                   onCancel={this.cancelPasswordUpdate}
-                                   title={title} />
-      this.props.actions.showModal({body, width})
-    } else if (nextProps.app.modal && nextProps.app.modal.body.props.onChangePassword && !nextProps.changePassword) {
+      const title = `${nextProps.onboarding ? 'SELECT' : 'CHANGE'} ${
+        nextProps.user.username
+      }'s PASSWORD`
+      const body = (
+        <ChangePassword
+          onChangePassword={this.updatePassword}
+          onCancel={this.cancelPasswordUpdate}
+          title={title}
+        />
+      )
+      this.props.actions.showModal({ body, width })
+    } else if (
+      nextProps.app.modal &&
+      nextProps.app.modal.body.props.onChangePassword &&
+      !nextProps.changePassword
+    ) {
       // The conditional above checks to see if the current modal is the ChangePassword component,
       // and that we should hide it, which is really better handled with a promise somehow?
       this.props.actions.hideModal()
     }
 
-    if (nextProps.assets && nextProps.assets.length) this.repoContainsAssets = true
-    const command = [...nextProps.commands.values()].find(command => (command.state === Job.Waiting || command.state === Job.Active))
+    if (nextProps.assets && nextProps.assets.length)
+      this.repoContainsAssets = true
+    const command = [...nextProps.commands.values()].find(
+      command => command.state === Job.Waiting || command.state === Job.Active,
+    )
     if (!this.commandInterval && command) {
       // Add a timer to monitor long commands, including the initial Waiting state,
       // but only display Active commands in render. If it completes in <5s nothing is shown
@@ -213,7 +268,7 @@ class Workspace extends Component {
     this.props.actions.updateCommand(this.activeCommandId)
   }
 
-  updatePassword = (password) => {
+  updatePassword = password => {
     this.props.actions.updatePassword(this.props.user, password)
   }
 
@@ -227,8 +282,17 @@ class Workspace extends Component {
     actions.iconifyLeftSidebar(!app.leftSidebarIsIconified)
   }
 
-  static collapsibleNames = new Set(['library', 'home', 'simple', 'smart', 'explorer', 'metadata', 'importJobs', 'exportJobs'])
-  toggleCollapsible = (name) => {
+  static collapsibleNames = new Set([
+    'library',
+    'home',
+    'simple',
+    'smart',
+    'explorer',
+    'metadata',
+    'importJobs',
+    'exportJobs',
+  ])
+  toggleCollapsible = name => {
     const { actions, app } = this.props
     // If the Sidebar is iconified, ignore the click, the sidebar will open itself instead
     if (app.leftSidebarIsIconified) return
@@ -236,31 +300,38 @@ class Workspace extends Component {
     actions.toggleCollapsible(name, !app.collapsibleOpen[name])
   }
 
-  dragEnter = (event) => {
-    const isFile = event.dataTransfer.types.findIndex(type => (type === 'Files')) >= 0
+  dragEnter = event => {
+    const isFile =
+      event.dataTransfer.types.findIndex(type => type === 'Files') >= 0
     const { app } = this.props
     if (isFile && app && !app.modal) {
-      this.setState({isDroppable: true})
+      this.setState({ isDroppable: true })
     }
   }
 
-  dragOver = (event) => {
+  dragOver = event => {
     event.preventDefault()
   }
 
-  dragLeave = (event) => {
+  dragLeave = event => {
     if (this.state.isDroppable) {
-      this.setState({isDroppable: false})
+      this.setState({ isDroppable: false })
     }
   }
 
-  cancelLocalImport = (event) => {
+  cancelLocalImport = event => {
     this.props.actions.hideModal()
   }
 
-  createLocalImport = (event) => {
+  createLocalImport = event => {
     const source = LOCAL_IMPORT
-    const items = source === LOCAL_IMPORT && event && event.dataTransfer && event.dataTransfer.items ? event.dataTransfer.items : null
+    const items =
+      source === LOCAL_IMPORT &&
+      event &&
+      event.dataTransfer &&
+      event.dataTransfer.items
+        ? event.dataTransfer.items
+        : null
     const entries = []
     for (let i = 0; i < items.length; ++i) {
       entries.push(items[i].webkitGetAsEntry())
@@ -268,14 +339,22 @@ class Workspace extends Component {
     this.props.actions.queueFileEntrysUpload(entries)
 
     const width = '65vw'
-    const body = <div className="Workspace-local-chooser"><div onClick={this.cancelLocalImport} className="Workspace-local-chooser-cancel icon-cross"/><LocalChooser/></div>
-    this.props.actions.showModal({body, width})
-    this.setState({isDroppable: false})
+    const body = (
+      <div className="Workspace-local-chooser">
+        <div
+          onClick={this.cancelLocalImport}
+          className="Workspace-local-chooser-cancel icon-cross"
+        />
+        <LocalChooser />
+      </div>
+    )
+    this.props.actions.showModal({ body, width })
+    this.setState({ isDroppable: false })
     event.preventDefault()
   }
 
   // This is an example of how to use DialogAlert. Remove anytime
-  alert = (message) => {
+  alert = message => {
     const { dialogAlertPromise } = this.props.actions
     message = message || 'Hey, you should know something'
     // message = message + ' lsjd flks jdlfkj sdljf lskdj flkjs dlfj lskdj flkjsd flkj sdlkjf lskdj flkjsd lkfj sldjf lskjd lksjd flkjsd this is a message lsjd flks jdlfkj sdljf lskdj flkjs dlfj lskdj flkjsd flkj sdlkjf lskdj flkjsd lkfj sldjf lskjd lksjd flkjsd this is a message lsjd flks jdlfkj sdljf lskdj flkjs dlfj lskdj flkjsd flkj sdlkjf lskdj flkjsd lkfj sldjf lskjd lksjd flkjsd this is a message lsjd flks jdlfkj sdljf lskdj flkjs dlfj lskdj flkjsd flkj sdlkjf lskdj flkjsd lkfj sldjf lskjd lksjd flkjsd '
@@ -283,9 +362,10 @@ class Workspace extends Component {
   }
 
   // This is an example of how to use DialogConfirm. Remove anytime
-  confirm = (message) => {
+  confirm = message => {
     const { dialogConfirmPromise } = this.props.actions
-    message = message || 'Confirm that you want to do something really dangerous.'
+    message =
+      message || 'Confirm that you want to do something really dangerous.'
     return dialogConfirmPromise('confirm dialog', message)
     // NB: this is supposed to throw an unhandled rejection when you hit cancel
   }
@@ -296,13 +376,13 @@ class Workspace extends Component {
     const { dialogPromptPromise } = this.props.actions
     const message = 'Enter your value, pretty please:'
     return dialogPromptPromise('prompt dialog', message)
-    .then(value => {
-      return this.confirm(`Do you want to do something with "${value}"?`)
-      .then(_ => 'accepted', _ => 'rejected')
-      .then(action => this.alert(`I have ${action} ${value}`))
-      .then(_ => value)
-    })
-    .catch(_ => this.alert('I bailed out'))
+      .then(value => {
+        return this.confirm(`Do you want to do something with "${value}"?`)
+          .then(_ => 'accepted', _ => 'rejected')
+          .then(action => this.alert(`I have ${action} ${value}`))
+          .then(_ => value)
+      })
+      .catch(_ => this.alert('I bailed out'))
   }
 
   // This is example code for alert & confirm dialogs. Remove anytime.
@@ -310,7 +390,7 @@ class Workspace extends Component {
     const test = false
     if (test) {
       return (
-        <div className='flexRowCenter'>
+        <div className="flexRowCenter">
           <button onClick={event => this.alert()}>alert</button>
           <button onClick={event => this.confirm()}>confirm</button>
           <button onClick={event => this.prompt()}>prompt</button>
@@ -326,13 +406,16 @@ class Workspace extends Component {
     // https://stackoverflow.com/a/39828187/1424242
     // Or Popper https://github.com/souporserious/react-popper (esp. for tooltips & tutorials!)
     const { app } = this.props
-    if (app.dialogAlert) return <Modal width='' body={<DialogAlert {...app.dialogAlert}/>}/>
-    if (app.dialogConfirm) return <Modal width='' body={<DialogConfirm {...app.dialogConfirm}/>}/>
-    if (app.dialogPrompt) return <Modal width='' body={<DialogPrompt {...app.dialogPrompt}/>}/>
+    if (app.dialogAlert)
+      return <Modal width="" body={<DialogAlert {...app.dialogAlert} />} />
+    if (app.dialogConfirm)
+      return <Modal width="" body={<DialogConfirm {...app.dialogConfirm} />} />
+    if (app.dialogPrompt)
+      return <Modal width="" body={<DialogPrompt {...app.dialogPrompt} />} />
     if (app.modal) return <Modal {...app.modal} />
   }
 
-  render () {
+  render() {
     const {
       app,
       isolatedId,
@@ -346,69 +429,81 @@ class Workspace extends Component {
       searching,
       monochrome,
       isolatedJob,
-      showQuickview
+      showQuickview,
     } = this.props
 
     const LibraryParams = () => ({
-      header: (<span>Library</span>),
+      header: <span>Library</span>,
       isOpen: app.collapsibleOpen.library,
       isIconified: app.leftSidebarIsIconified,
       onOpen: this.toggleCollapsible.bind(this, 'library'),
       closeIcon: 'icon-library',
-      className: 'Library-collapsible Collections-library'
+      className: 'Library-collapsible Collections-library',
     })
     const HomeParams = () => ({
-      header: (<span>Home</span>),
+      header: <span>Home</span>,
       isOpen: app.collapsibleOpen.home,
       isIconified: app.leftSidebarIsIconified,
       onOpen: this.toggleCollapsible.bind(this, 'home'),
       closeIcon: 'icon-bookmarks',
-      className: 'Home-collapsible Collections-home'
+      className: 'Home-collapsible Collections-home',
     })
     const ExplorerParams = () => ({
-      header: (<span>Explore</span>),
+      header: <span>Explore</span>,
       isOpen: app.collapsibleOpen.explorer,
       isIconified: app.leftSidebarIsIconified,
       onOpen: this.toggleCollapsible.bind(this, 'explorer'),
       closeIcon: 'icon-telescope',
-      className: 'Explorer-collapsible'
+      className: 'Explorer-collapsible',
     })
     const MetadataParams = () => ({
-      header: (<span>Metadata</span>),
+      header: <span>Metadata</span>,
       isOpen: app.collapsibleOpen.metadata,
       isIconified: app.leftSidebarIsIconified,
       onOpen: this.toggleCollapsible.bind(this, 'metadata'),
       closeIcon: 'icon-register',
-      className: 'Metadata-collapsible'
+      className: 'Metadata-collapsible',
     })
     const ImportJobsParams = () => ({
-      header: (<span>Imports</span>),
+      header: <span>Imports</span>,
       isOpen: app.collapsibleOpen.importJobs,
       isIconified: app.leftSidebarIsIconified,
       onOpen: this.toggleCollapsible.bind(this, 'importJobs'),
       closeIcon: 'icon-import2',
-      className: 'ImportJobs-collapsible'
+      className: 'ImportJobs-collapsible',
     })
     const ExportJobsParams = () => ({
-      header: (<span>Exports</span>),
+      header: <span>Exports</span>,
       isOpen: app.collapsibleOpen.exportJobs,
       isIconified: app.leftSidebarIsIconified,
       onOpen: this.toggleCollapsible.bind(this, 'exportJobs'),
       closeIcon: 'icon-export',
-      className: 'ExportJobs-collapsible'
+      className: 'ExportJobs-collapsible',
     })
 
     // Only show the command progress if Active, skipping super quick commands
     const commands = [...this.props.commands.values()]
-    const command = commands.find(command => (command.state === Job.Active)) || commands.find(command => (command.state === Job.Waiting))
-    const commandSuccessPct = command && command.totalCount ? 100 * command.successCount / command.totalCount : 0
-    const commandErrorPct = command && command.totalCount ? 100 * command.errorCount / command.totalCount : 0
+    const command =
+      commands.find(command => command.state === Job.Active) ||
+      commands.find(command => command.state === Job.Waiting)
+    const commandSuccessPct =
+      command && command.totalCount
+        ? 100 * command.successCount / command.totalCount
+        : 0
+    const commandErrorPct =
+      command && command.totalCount
+        ? 100 * command.errorCount / command.totalCount
+        : 0
 
     const { showReloader } = this.state
     return (
-
-      <div onDragEnter={this.dragEnter} className={classnames('App', 'Workspace', 'fullHeight', {isDragging: app.dragInfo, dark: monochrome, embedMode: app.embedModeEnabled})}>
-
+      <div
+        onDragEnter={this.dragEnter}
+        className={classnames('App', 'Workspace', 'fullHeight', {
+          isDragging: app.dragInfo,
+          dark: monochrome,
+          embedMode: app.embedModeEnabled,
+        })}>
         {/*
           Children are listen in reverse order so that the stacking order of drop-down
           menus is bottom-to-top.
@@ -424,62 +519,86 @@ class Workspace extends Component {
         */}
 
         <div className="Workspace flexOn flexRow fullWidth fullHeight">
-
           {/*  left panel - folders */}
-          <Sidebar onToggle={this.toggleLeftSidebar}
-                   isIconified={app.leftSidebarIsIconified}>
+          <Sidebar
+            onToggle={this.toggleLeftSidebar}
+            isIconified={app.leftSidebarIsIconified}>
             <Collapsible {...LibraryParams()}>
-              <Folders rootName={isAdministrator ? undefined : 'Library'}
-                       rootId={isAdministrator ? Folder.ROOT_ID : undefined}
-                       filter={isAdministrator ? undefined : folder => (folder.name !== 'Users')}/>
+              <Folders
+                rootName={isAdministrator ? undefined : 'Library'}
+                rootId={isAdministrator ? Folder.ROOT_ID : undefined}
+                filter={
+                  isAdministrator
+                    ? undefined
+                    : folder => folder.name !== 'Users'
+                }
+              />
             </Collapsible>
             <Collapsible {...HomeParams()}>
-              <Folders rootId={user.homeFolderId}/>
+              <Folders rootId={user.homeFolderId} />
             </Collapsible>
             <Collapsible {...ExplorerParams()}>
-              <Explorer/>
+              <Explorer />
             </Collapsible>
             <Collapsible {...MetadataParams()}>
-              <Metadata assetIds={selectedAssetIds} height="60vh" dark={monochrome} />
+              <Metadata
+                assetIds={selectedAssetIds}
+                height="60vh"
+                dark={monochrome}
+              />
             </Collapsible>
-            { /* disable imports */ false && (isAdministrator || isManager || isDeveloper) && (
-              <Collapsible {...ImportJobsParams()}>
-                <ImportJobs/>
-              </Collapsible>
-            )}
-            { (isAdministrator || isManager || isDeveloper || isExporter || isAdministrator) && (
+            {/* disable imports */ false &&
+              (isAdministrator || isManager || isDeveloper) && (
+                <Collapsible {...ImportJobsParams()}>
+                  <ImportJobs />
+                </Collapsible>
+              )}
+            {(isAdministrator ||
+              isManager ||
+              isDeveloper ||
+              isExporter ||
+              isAdministrator) && (
               <Collapsible {...ExportJobsParams()}>
-                <ExportJobs/>
+                <ExportJobs />
               </Collapsible>
             )}
           </Sidebar>
 
-          <div className="Workspace-vertical-separator flexOff"/>
+          <div className="Workspace-vertical-separator flexOff" />
 
           {/*  right panel - thumbnails */}
-          <Assets/>
+          <Assets />
         </div>
 
         <div className="Assets-searching">
-          { searching && <ProgressBar successPct={0} errorPct={0}/> }
+          {searching && <ProgressBar successPct={0} errorPct={0} />}
         </div>
 
-        <Racebar/>
+        <Racebar />
 
-        { command && <CommandProgress successPct={commandSuccessPct} errorPct={commandErrorPct}/>}
+        {command && (
+          <CommandProgress
+            successPct={commandSuccessPct}
+            errorPct={commandErrorPct}
+          />
+        )}
 
-        { !app.embedModeEnabled && <Header/> }
+        {!app.embedModeEnabled && <Header />}
 
-        { showReloader && (
+        {showReloader && (
           <div className="Workspace-reloader">
             <div className="flexRowCenter">
               This version of Curator has been updated.
-              <button className="Workspace-reloader-reload" onClick={() => location.reload()}>
+              <button
+                className="Workspace-reloader-reload"
+                onClick={() => location.reload()}>
                 Reload now
               </button>
             </div>
-            <div className="Workspace-reloader-close icon-cross"
-                 onClick={() => this.setState({ showReloader: false })}/>
+            <div
+              className="Workspace-reloader-close icon-cross"
+              onClick={() => this.setState({ showReloader: false })}
+            />
           </div>
         )}
 
@@ -497,59 +616,65 @@ class Workspace extends Component {
           </div>
         */}
 
-        { isolatedId && showQuickview === false && <Lightbox/> }
-        { isolatedId && showQuickview === true && <Quickview/>}
-        { showExportsWizard && <Exports/>}
-        { isolatedJob && <Importer/> }
+        {isolatedId && showQuickview === false && <Lightbox />}
+        {isolatedId && showQuickview === true && <Quickview />}
+        {showExportsWizard && <Exports />}
+        {isolatedJob && <Importer />}
 
-        { this.renderModalTest() }
-        { this.renderModal() }
+        {this.renderModalTest()}
+        {this.renderModal()}
 
-        <div id='Table-cell-test' className='Table-cell'/>
+        <div id="Table-cell-test" className="Table-cell" />
       </div>
     )
   }
 }
 
-export default connect(state => ({
-  app: state.app,
-  showQuickview: state.app.showQuickview,
-  user: state.auth.user,
-  isolatedId: state.assets.isolatedId,
-  isolatedJob: state.jobs.isolated,
-  changePassword: state.auth.changePassword,
-  searching: state.assets.searching,
-  onboarding: state.auth.onboarding,
-  assets: state.assets.all,
-  selectedAssetIds: state.assets.selectedIds,
-  jobs: state.jobs.all,
-  commands: state.assets.commands,
-  isAdministrator: state.auth.isAdministrator,
-  isManager: state.auth.isManager,
-  isDeveloper: state.auth.isDeveloper,
-  isSharer: state.auth.isSharer,
-  isExporter: state.auth.isExporter,
-  monochrome: state.app.monochrome,
-  showExportsWizard: state.exports.shouldShow
-}), dispatch => ({
-  actions: bindActionCreators({
-    iconifyLeftSidebar,
-    toggleCollapsible,
-    getUserPermissions,
-    updatePassword,
-    changePassword,
-    showModal,
-    hideModal,
-    dialogAlertPromise,
-    dialogConfirmPromise,
-    dialogPromptPromise,
-    queueFileEntrysUpload,
-    isolateAssetId,
-    restoreFolders,
-    loadSharedLink,
-    getAllCommands,
-    updateCommand,
-    setEmbedModeEnabled,
-    getAllAssetCount
-  }, dispatch)
-}))(Workspace)
+export default connect(
+  state => ({
+    app: state.app,
+    showQuickview: state.app.showQuickview,
+    user: state.auth.user,
+    isolatedId: state.assets.isolatedId,
+    isolatedJob: state.jobs.isolated,
+    changePassword: state.auth.changePassword,
+    searching: state.assets.searching,
+    onboarding: state.auth.onboarding,
+    assets: state.assets.all,
+    selectedAssetIds: state.assets.selectedIds,
+    jobs: state.jobs.all,
+    commands: state.assets.commands,
+    isAdministrator: state.auth.isAdministrator,
+    isManager: state.auth.isManager,
+    isDeveloper: state.auth.isDeveloper,
+    isSharer: state.auth.isSharer,
+    isExporter: state.auth.isExporter,
+    monochrome: state.app.monochrome,
+    showExportsWizard: state.exports.shouldShow,
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        iconifyLeftSidebar,
+        toggleCollapsible,
+        getUserPermissions,
+        updatePassword,
+        changePassword,
+        showModal,
+        hideModal,
+        dialogAlertPromise,
+        dialogConfirmPromise,
+        dialogPromptPromise,
+        queueFileEntrysUpload,
+        isolateAssetId,
+        restoreFolders,
+        loadSharedLink,
+        getAllCommands,
+        updateCommand,
+        setEmbedModeEnabled,
+        getAllAssetCount,
+      },
+      dispatch,
+    ),
+  }),
+)(Workspace)

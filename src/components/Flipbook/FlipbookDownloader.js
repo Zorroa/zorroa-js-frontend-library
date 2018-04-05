@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import getImage from '../../services/getImage'
 import api from '../../api'
 
-function getTotalFrames (frames) {
+function getTotalFrames(frames) {
   // Gets the total number of frames in a Flipbook based on the largest "frame
   // number." This is because there could be dropped frames, so simply doing
   // a `frames.length` could return less frames than actually exist
@@ -17,85 +17,87 @@ function getTotalFrames (frames) {
   }, 0)
 }
 
-function getDisplayName (WrappedComponent) {
+function getDisplayName(WrappedComponent) {
   return WrappedComponent.displayName || WrappedComponent.name || 'Component'
 }
 
-export default function withFlipbook (WrappedComponent) {
+export default function withFlipbook(WrappedComponent) {
   class FlipbookDownloader extends PureComponent {
     static displayName = `WithFlipbook(${getDisplayName(WrappedComponent)})`
     static propTypes = {
       clipParentId: PropTypes.string.isRequired,
-      origin: PropTypes.string.isRequired
+      origin: PropTypes.string.isRequired,
     }
-    constructor (props) {
+    constructor(props) {
       super(props)
 
       this.state = {
         loadImagesCount: 0,
         totalFrames: 0,
-        frames: []
+        frames: [],
       }
 
       this.downloadableFrameCount = 0
     }
 
-    componentDidMount () {
+    componentDidMount() {
       this.downloadBitmapImages()
     }
 
-    componentWillReceiveProps (nextProps) {
+    componentWillReceiveProps(nextProps) {
       if (nextProps.clipParentId !== this.props.clipParentId) {
         this.downloadBitmapImages()
         this.setState({
           frames: [],
           totalFrames: 0,
-          loadImagesCount: 0
+          loadImagesCount: 0,
         })
       }
     }
 
-    downloadBitmapImages () {
+    downloadBitmapImages() {
       this.downloadableFrameCount = 0
 
-      api
-        .flipbook
+      api.flipbook
         .get(this.props.clipParentId)
         .then(framesAssets => {
-          return framesAssets.map(asset => {
-            return {
-              url: asset.atLeastProxyURL(this.props.origin, 300, 300),
-              number: asset.document.media.clip.start
-            }
-          }).sort((a, b) => {
-            if (a.number > b.number) {
-              return 1
-            }
+          return framesAssets
+            .map(asset => {
+              return {
+                url: asset.atLeastProxyURL(this.props.origin, 300, 300),
+                number: asset.document.media.clip.start,
+              }
+            })
+            .sort((a, b) => {
+              if (a.number > b.number) {
+                return 1
+              }
 
-            return -1
-          })
+              return -1
+            })
         })
         .then(frames => {
           this.downloadableFrameCount = frames.length
 
-          return Promise.all(frames.map(frame => {
-            return getImage(frame.url)
-              .then(imageBitmap => {
+          return Promise.all(
+            frames.map(frame => {
+              return getImage(frame.url).then(imageBitmap => {
                 this.setState(prevState => {
                   return {
-                    loadImagesCount: prevState.loadImagesCount + 1
+                    loadImagesCount: prevState.loadImagesCount + 1,
                   }
                 })
 
                 const dataFrame = {
                   url: frame.url,
                   number: frame.number,
-                  imageBitmap
+                  imageBitmap,
                 }
 
                 return dataFrame
               })
-          }))
+            }),
+          )
         })
         .catch(error => {
           console.error('Unable to download frame bitmaps for Flipbook', error)
@@ -104,17 +106,22 @@ export default function withFlipbook (WrappedComponent) {
         .then(framesWithBitmaps => {
           this.setState({
             frames: framesWithBitmaps,
-            totalFrames: getTotalFrames(framesWithBitmaps)
+            totalFrames: getTotalFrames(framesWithBitmaps),
           })
         })
         .catch(error => {
-          console.error('Unable to update frame files in state for Flipbook', error)
+          console.error(
+            'Unable to update frame files in state for Flipbook',
+            error,
+          )
           return Promise.reject(error)
         })
     }
 
-    getLoadedPercentage () {
-      const percentage = Math.floor((this.state.loadImagesCount / this.downloadableFrameCount) * 100)
+    getLoadedPercentage() {
+      const percentage = Math.floor(
+        this.state.loadImagesCount / this.downloadableFrameCount * 100,
+      )
 
       if (Number.isNaN(percentage)) {
         return 0
@@ -123,21 +130,23 @@ export default function withFlipbook (WrappedComponent) {
       return percentage
     }
 
-    render () {
+    render() {
       // Filter out extra props that are specific to this HOC
       // eslint-disable-next-line no-unused-vars
       const { clipParentId, ...passThroughProps } = this.props
 
-      return <WrappedComponent
-        loadedPercentage={this.getLoadedPercentage()}
-        frames={this.state.frames}
-        totalFrames={this.state.totalFrames}
-        {...passThroughProps}
-      />
+      return (
+        <WrappedComponent
+          loadedPercentage={this.getLoadedPercentage()}
+          frames={this.state.frames}
+          totalFrames={this.state.totalFrames}
+          {...passThroughProps}
+        />
+      )
     }
   }
 
   return connect(state => ({
-    origin: state.auth.origin
+    origin: state.auth.origin,
   }))(FlipbookDownloader)
 }

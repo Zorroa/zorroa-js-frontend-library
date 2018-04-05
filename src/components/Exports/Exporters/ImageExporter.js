@@ -1,9 +1,5 @@
 import React, { Component, PropTypes } from 'react'
-import {
-  FormSelect,
-  FormLabel,
-  FormRadio
-} from '../../Form'
+import { FormSelect, FormLabel, FormRadio } from '../../Form'
 import ExportsSection from '../ExportsSection'
 import ResizeExportAsset from '../ResizeExportAsset'
 
@@ -17,8 +13,8 @@ export default class ImageExporter extends Component {
       format: PropTypes.string.isRequired,
       size: PropTypes.number.isRequired,
       quality: PropTypes.number.isRequired,
-      exportOriginal: PropTypes.bool.isRequired
-    })
+      exportOriginal: PropTypes.bool.isRequired,
+    }),
   }
 
   state = {
@@ -26,7 +22,7 @@ export default class ImageExporter extends Component {
     format: this.props.arguments.format,
     size: this.props.arguments.size,
     quality: this.props.arguments.quality,
-    exportOriginal: this.props.arguments.exportOriginal
+    exportOriginal: this.props.arguments.exportOriginal,
   }
 
   onChange = (options, overrideExportOriginal) => {
@@ -42,16 +38,16 @@ export default class ImageExporter extends Component {
               format: this.state.format,
               size: this.state.size,
               quality: this.state.quality,
-              exportOriginal: this.state.exportOriginal
+              exportOriginal: this.state.exportOriginal,
             },
-            shouldExport: this.state.shouldExport
-          }
+            shouldExport: this.state.shouldExport,
+          },
         })
       }
     })
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     const newState = {}
 
     if (
@@ -72,175 +68,176 @@ export default class ImageExporter extends Component {
 
   toggleCanExport = shouldExport => {
     this.onChange({
-      shouldExport
+      shouldExport,
     })
   }
 
   toggleExportOriginal = exportOriginal => {
     this.onChange({
-      exportOriginal
+      exportOriginal,
     })
   }
 
-  render () {
+  render() {
     const qualityOptions = [
       {
         label: 'Best',
-        value: 100
-      }, {
+        value: 100,
+      },
+      {
         label: 'Good',
-        value: 75
+        value: 75,
       },
       {
         label: 'Fast',
-        value: 50
-      }
+        value: 50,
+      },
     ]
     const formatOptions = [
       {
-        'label': 'JPG',
-        'value': 'jpg'
+        label: 'JPG',
+        value: 'jpg',
       },
       {
-        'label': 'JPEG',
-        'value': 'jpeg'
+        label: 'JPEG',
+        value: 'jpeg',
       },
       {
-        'label': 'PNG',
-        'value': 'png'
+        label: 'PNG',
+        value: 'png',
       },
       {
-        'label': 'TIF',
-        'value': 'tif'
+        label: 'TIF',
+        value: 'tif',
       },
       {
-        'label': 'TIFF',
-        'value': 'tiff'
+        label: 'TIFF',
+        value: 'tiff',
       },
       {
-        'label': 'GIF',
-        'value': 'gif'
+        label: 'GIF',
+        value: 'gif',
       },
       {
-        'label': 'BMP',
-        'value': 'bmp'
+        label: 'BMP',
+        value: 'bmp',
       },
       {
-        'label': 'CIN',
-        'value': 'cin'
+        label: 'CIN',
+        value: 'cin',
       },
       {
-        'label': 'DDS',
-        'value': 'dds'
+        label: 'DDS',
+        value: 'dds',
       },
       {
-        'label': 'DPX',
-        'value': 'dpx'
+        label: 'DPX',
+        value: 'dpx',
       },
       {
-        'label': 'FITS',
-        'value': 'fits'
+        label: 'FITS',
+        value: 'fits',
       },
       {
-        'label': 'HDR',
-        'value': 'hdr'
+        label: 'HDR',
+        value: 'hdr',
       },
       {
-        'label': 'ICO',
-        'value': 'ico'
+        label: 'ICO',
+        value: 'ico',
       },
       {
-        'label': 'IFF',
-        'value': 'iff'
+        label: 'IFF',
+        value: 'iff',
       },
       {
-        'label': 'EXR',
-        'value': 'exr'
+        label: 'EXR',
+        value: 'exr',
       },
       {
-        'label': 'PNM',
-        'value': 'pnm'
+        label: 'PNM',
+        value: 'pnm',
       },
       {
-        'label': 'PSD',
-        'value': 'psd'
+        label: 'PSD',
+        value: 'psd',
       },
       {
-        'label': 'RLA',
-        'value': 'rla'
+        label: 'RLA',
+        value: 'rla',
       },
       {
-        'label': 'SGI',
-        'value': 'sgi'
+        label: 'SGI',
+        value: 'sgi',
       },
       {
-        'label': 'PIC',
-        'value': 'pic'
+        label: 'PIC',
+        value: 'pic',
       },
       {
-        'label': 'TGA',
-        'value': 'tga'
+        label: 'TGA',
+        value: 'tga',
       },
       {
-        'label': 'DPX',
-        'value': 'dpx'
+        label: 'DPX',
+        value: 'dpx',
       },
       {
-        'label': 'RAW',
-        'value': 'raw'
+        label: 'RAW',
+        value: 'raw',
       },
       {
-        'label': 'KDC',
-        'value': 'kdc'
+        label: 'KDC',
+        value: 'kdc',
       },
       {
-        'label': 'MRW',
-        'value': 'mrw'
+        label: 'MRW',
+        value: 'mrw',
       },
       {
-        'label': 'SRW',
-        'value': 'srw'
+        label: 'SRW',
+        value: 'srw',
       },
       {
-        'label': 'PEF',
-        'value': 'pef'
+        label: 'PEF',
+        value: 'pef',
       },
       {
-        'label': 'RAF',
-        'value': 'raf'
+        label: 'RAF',
+        value: 'raf',
       },
       {
-        'label': 'SRF',
-        'value': 'srf'
+        label: 'SRF',
+        value: 'srf',
       },
       {
-        'label': 'ARW',
-        'value': 'arw'
+        label: 'ARW',
+        value: 'arw',
       },
       {
-        'label': 'ORF',
-        'value': 'orf'
+        label: 'ORF',
+        value: 'orf',
       },
       {
-        'label': 'NEF',
-        'value': 'nef'
+        label: 'NEF',
+        value: 'nef',
       },
       {
-        'label': 'CR2',
-        'value': 'cr2'
+        label: 'CR2',
+        value: 'cr2',
       },
       {
-        'label': 'DNG',
-        'value': 'dng'
+        label: 'DNG',
+        value: 'dng',
       },
       {
-        'label': 'CRW',
-        'value': 'crw'
+        label: 'CRW',
+        value: 'crw',
       },
       {
-        'label': 'ZFILE',
-        'value': 'zfile'
-      }
+        label: 'ZFILE',
+        value: 'zfile',
+      },
     ]
     return (
       <ExportsSection
@@ -248,50 +245,54 @@ export default class ImageExporter extends Component {
         onToggleExport={this.toggleCanExport}
         onToggleAccordion={this.props.onToggleAccordion}
         isExportable={this.state.shouldExport}
-        isOpen={this.props.isOpen}
-      >
+        isOpen={this.props.isOpen}>
         <radiogroup>
-          <FormLabel afterLabel="Export original assets" className="Exports__form-element">
-            <FormRadio onChange={() => this.toggleExportOriginal(true)} checked={this.state.exportOriginal === true} name="ImageExporter" />
+          <FormLabel
+            afterLabel="Export original assets"
+            className="Exports__form-element">
+            <FormRadio
+              onChange={() => this.toggleExportOriginal(true)}
+              checked={this.state.exportOriginal === true}
+              name="ImageExporter"
+            />
           </FormLabel>
           <FormLabel
             afterLabel="Export assets as"
-            className="Exports__form-element"
-          >
-            <FormRadio onChange={() => this.toggleExportOriginal(false)} checked={this.state.exportOriginal === false} name="ImageExporter" />
+            className="Exports__form-element">
+            <FormRadio
+              onChange={() => this.toggleExportOriginal(false)}
+              checked={this.state.exportOriginal === false}
+              name="ImageExporter"
+            />
           </FormLabel>
           <FormLabel
             vertical
-            className="Exports__form-element Exports__form-element--nested"
-          >
+            className="Exports__form-element Exports__form-element--nested">
             <FormSelect
               className="Exports__form-select"
               options={qualityOptions}
-              fieldLabel='label'
-              fieldKey='value'
+              fieldLabel="label"
+              fieldKey="value"
               value={this.state.quality}
-              onChange={({value}) => this.onChange({quality: value}, false)}
-            >
-            </FormSelect>
+              onChange={({ value }) => this.onChange({ quality: value }, false)}
+            />
           </FormLabel>
           <FormLabel
             vertical
             label="Export assets as"
-            className="Exports__form-element Exports__form-element--nested"
-          >
+            className="Exports__form-element Exports__form-element--nested">
             <FormSelect
               className="Exports__form-select"
               options={formatOptions}
-              fieldLabel='label'
-              fieldKey='value'
+              fieldLabel="label"
+              fieldKey="value"
               value={this.state.format}
-              onChange={({value}) => this.onChange({format: value}, false)}
-            >
-            </FormSelect>
+              onChange={({ value }) => this.onChange({ format: value }, false)}
+            />
           </FormLabel>
           <ResizeExportAsset
             defaultSize={this.state.size}
-            onChange={(size) => this.onChange({size}, false)}
+            onChange={size => this.onChange({ size }, false)}
           />
         </radiogroup>
       </ExportsSection>

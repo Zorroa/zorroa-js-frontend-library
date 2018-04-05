@@ -1,4 +1,4 @@
-export function articulateQuality (quality) {
+export function articulateQuality(quality) {
   if (quality === 'veryslow') {
     return 'Best'
   }
@@ -23,14 +23,14 @@ export function articulateQuality (quality) {
     return 'Fast'
   }
 
-  return (quality).toString()
+  return quality.toString()
 }
 
-export function pluralize (count, singular, plural) {
+export function pluralize(count, singular, plural) {
   return count === 1 ? singular : plural
 }
 
-export function getClassFromNamespace (namespace) {
+export function getClassFromNamespace(namespace) {
   const parsedNamespaces = namespace.split('.')
   return parsedNamespaces[parsedNamespaces.length - 1]
 }

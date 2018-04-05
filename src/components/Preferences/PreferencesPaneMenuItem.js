@@ -7,28 +7,31 @@ export default class PreferencesPaneMenuItem extends Component {
     paneName: PropTypes.string.isRequired,
     onClick: PropTypes.func.isRequired,
     activePaneName: PropTypes.string,
-    children: PropTypes.node
+    children: PropTypes.node,
   }
 
   setActivePane = () => {
     this.props.onClick(this.props.paneName)
   }
 
-  isPaneActive (pane) {
+  isPaneActive(pane) {
     return pane === this.props.activePaneName
   }
 
-  render () {
+  render() {
     const classes = classnames('PreferencesPane__menu-item', {
-      'PreferencesPane__menu-item--active': this.isPaneActive(this.props.paneName)
+      'PreferencesPane__menu-item--active': this.isPaneActive(
+        this.props.paneName,
+      ),
     })
 
     return (
       <li className={classes}>
         <a
-          onClick={ () => { this.setActivePane() }}
-          className="PreferencesPane__menu-link"
-        >
+          onClick={() => {
+            this.setActivePane()
+          }}
+          className="PreferencesPane__menu-link">
           {this.props.children}
         </a>
       </li>

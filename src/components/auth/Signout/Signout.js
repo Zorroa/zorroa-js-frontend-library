@@ -9,38 +9,41 @@ class Signout extends Component {
   static propTypes = {
     signoutUser: PropTypes.func.isRequired,
     host: PropTypes.string,
-    user: PropTypes.instanceOf(User)
+    user: PropTypes.instanceOf(User),
   }
 
-  static get contextTypes () {
+  static get contextTypes() {
     return {
-      router: PropTypes.object
+      router: PropTypes.object,
     }
   }
 
-  componentWillMount () {
+  componentWillMount() {
     const { host, user } = this.props
     this.props.signoutUser(user, host)
   }
 
-  render () {
-    setTimeout(() => { this.context.router.push('/') }, 1000)
+  render() {
+    setTimeout(() => {
+      this.context.router.push('/')
+    }, 1000)
     return (
       <div className="auth flexCenter">
         <div className="auth-box flexColCenter">
           <div className="auth-logo flexCenter">
-            <Logo/>
+            <Logo />
           </div>
-          <div className="auth-message signout-message">
-            Logging out...
-          </div>
+          <div className="auth-message signout-message">Logging out...</div>
         </div>
       </div>
     )
   }
 }
 
-export default connect(state => ({
-  host: state.auth.host,
-  user: state.auth.user
-}), actions)(Signout)
+export default connect(
+  state => ({
+    host: state.auth.host,
+    user: state.auth.user,
+  }),
+  actions,
+)(Signout)

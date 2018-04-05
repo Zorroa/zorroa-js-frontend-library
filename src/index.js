@@ -37,10 +37,12 @@ const middleware = [thunk, multi, ReduxPromise]
 // Redux DevTools site: http://extension.remotedev.io/
 // This code modified using Redux DevTools setup instructions here:
 // http://extension.remotedev.io/#usage (1.2 Advanced store setup)
-const composeEnhancers = (DEBUG && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) || compose
-const store = createStore(reducers, /* preloadedState, */ composeEnhancers(
-  applyMiddleware(...middleware)
-))
+const composeEnhancers =
+  (DEBUG && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) || compose
+const store = createStore(
+  reducers,
+  /* preloadedState, */ composeEnhancers(applyMiddleware(...middleware)),
+)
 
 log('creating application node')
 const applicationNode = (

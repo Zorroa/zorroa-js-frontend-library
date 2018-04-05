@@ -1,4 +1,3 @@
-
 /* ----------------------------------------------------------------------
  Given the asset list, asset panel width, and suggested thumbnail size,
  Compute the positions & size of each thumbnail for a a given layout.
@@ -18,7 +17,13 @@
  collapsed     - Total number of assets collapsed into multipage docs
 */
 
-export function masonry (assets, panelWidth, thumbSize, showMultipage, isolatedParentId) {
+export function masonry(
+  assets,
+  panelWidth,
+  thumbSize,
+  showMultipage,
+  isolatedParentId,
+) {
   let idealAspectSum = panelWidth / thumbSize
   const proposedRowHeight = panelWidth / idealAspectSum
   const margin = 5
@@ -87,7 +92,7 @@ export function masonry (assets, panelWidth, thumbSize, showMultipage, isolatedP
     let rowHeight = rowWidthSansMargins / rowAspects[r]
 
     // Special handling for the last row -- don't expand it to fit unless it's already close
-    if (r === numRows - 1 && (rowAspects[r] / idealAspectSum < 0.75)) {
+    if (r === numRows - 1 && rowAspects[r] / idealAspectSum < 0.75) {
       rowHeight = proposedRowHeight
     }
 
@@ -104,7 +109,13 @@ export function masonry (assets, panelWidth, thumbSize, showMultipage, isolatedP
   return { positions, multipage, collapsed }
 }
 
-export function grid (assets, panelWidth, thumbSize, showMultipage, isolatedParentId) {
+export function grid(
+  assets,
+  panelWidth,
+  thumbSize,
+  showMultipage,
+  isolatedParentId,
+) {
   const numColumns = Math.floor(panelWidth / thumbSize)
   const numMargins = numColumns - 1
   const margin = 5
@@ -119,7 +130,7 @@ export function grid (assets, panelWidth, thumbSize, showMultipage, isolatedPare
     ++collapsed
     // Zero width, but valid y & height for Pager
     const y = positions[positions.length - 1].y
-    positions.push({x: 0, y, width: 0, height: thumbWidth})
+    positions.push({ x: 0, y, width: 0, height: thumbWidth })
   }
 
   for (var i = 0; i < assets.length; i++) {
@@ -141,7 +152,7 @@ export function grid (assets, panelWidth, thumbSize, showMultipage, isolatedPare
       }
     }
 
-    const columnIndex = (j % numColumns)
+    const columnIndex = j % numColumns
     const rowIndex = Math.floor(j / numColumns)
     ++j
 
@@ -149,7 +160,7 @@ export function grid (assets, panelWidth, thumbSize, showMultipage, isolatedPare
       x: thumbWidth * columnIndex + margin * columnIndex,
       y: thumbWidth * rowIndex + margin * rowIndex,
       width: thumbWidth,
-      height: thumbWidth
+      height: thumbWidth,
     })
   }
 

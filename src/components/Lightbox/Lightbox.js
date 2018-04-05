@@ -22,66 +22,84 @@ class Lightbox extends Component {
       left: PropTypes.number.isRequired,
       top: PropTypes.number.isRequired,
       width: PropTypes.number.isRequired,
-      height: PropTypes.number.isRequired
+      height: PropTypes.number.isRequired,
     }),
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
-    actions: PropTypes.object
+    actions: PropTypes.object,
   }
 
   @keydown('esc')
-  closeLightbox (event) {
+  closeLightbox(event) {
     this.props.actions.isolateAssetId()
   }
 
   @keydown('right')
-  nextAsset (event) {
+  nextAsset(event) {
     this.isolateIndexOffset(1)
   }
 
   @keydown('left')
-  previousAsset (event) {
+  previousAsset(event) {
     this.isolateIndexOffset(-1)
   }
 
-  isolateIndexOffset (offset) {
+  isolateIndexOffset(offset) {
     const { assets, isolatedId, actions } = this.props
-    const index = assets.findIndex(asset => (asset.id === isolatedId))
+    const index = assets.findIndex(asset => asset.id === isolatedId)
     if (index + offset >= 0 && index + offset < assets.length) {
       actions.isolateAssetId(assets[index + offset].id)
     }
   }
 
-  toggleMetadata = (event) => {
+  toggleMetadata = event => {
     const { user, userSettings } = this.props
-    const lightboxMetadata = { ...this.props.lightboxMetadata, show: !this.props.lightboxMetadata.show }
+    const lightboxMetadata = {
+      ...this.props.lightboxMetadata,
+      show: !this.props.lightboxMetadata.show,
+    }
     this.props.actions.lightboxMetadata(lightboxMetadata)
-    this.props.actions.saveUserSettings(user, { ...userSettings, lightboxMetadata })
+    this.props.actions.saveUserSettings(user, {
+      ...userSettings,
+      lightboxMetadata,
+    })
   }
 
-  closeMetadata = (event) => {
+  closeMetadata = event => {
     const { user, userSettings } = this.props
     const lightboxMetadata = { ...this.props.lightboxMetadata, show: false }
     this.props.actions.lightboxMetadata(lightboxMetadata)
-    this.props.actions.saveUserSettings(user, { ...userSettings, lightboxMetadata })
+    this.props.actions.saveUserSettings(user, {
+      ...userSettings,
+      lightboxMetadata,
+    })
     event.stopPropagation()
   }
 
-  moveMetadata = ({left, top, width, height}) => {
+  moveMetadata = ({ left, top, width, height }) => {
     const { user, userSettings } = this.props
-    const lightboxMetadata = { ...this.props.lightboxMetadata, left, top, width, height }
+    const lightboxMetadata = {
+      ...this.props.lightboxMetadata,
+      left,
+      top,
+      width,
+      height,
+    }
     this.props.actions.lightboxMetadata(lightboxMetadata)
-    this.props.actions.saveUserSettings(user, { ...userSettings, lightboxMetadata })
+    this.props.actions.saveUserSettings(user, {
+      ...userSettings,
+      lightboxMetadata,
+    })
   }
 
-  render () {
+  render() {
     const { assets, isolatedId, lightboxMetadata } = this.props
     let asset = null
     let hasNext = false
     let hasPrev = false
     if (isolatedId) {
       if (!asset && assets) {
-        const index = assets.findIndex(asset => (asset.id === isolatedId))
+        const index = assets.findIndex(asset => asset.id === isolatedId)
         asset = assets[index]
         hasPrev = index > 0
         hasNext = index < assets.length - 1
@@ -89,7 +107,7 @@ class Lightbox extends Component {
     }
     const metadataTitle = (
       <div className="Lightbox-metadata-title">
-        <div className="Lightbox__metadata-icon icon-register"/>
+        <div className="Lightbox__metadata-icon icon-register" />
         <div>Metadata</div>
       </div>
     )
@@ -102,8 +120,10 @@ class Lightbox extends Component {
 
     return (
       <div className="lightbox dark">
-        <Lightbar showMetadata={lightboxMetadata.show}
-                  onMetadata={this.toggleMetadata}/>
+        <Lightbar
+          showMetadata={lightboxMetadata.show}
+          onMetadata={this.toggleMetadata}
+        />
         <div className="lightbox-body">
           <Inspector
             asset={asset}
@@ -112,33 +132,41 @@ class Lightbox extends Component {
             onPrev={hasPrev ? () => this.isolateIndexOffset(-1) : null}
           />
         </div>
-        { lightboxMetadata.show && (
+        {lightboxMetadata.show && (
           <ResizableWindow
             onClose={this.closeMetadata}
             onMove={this.moveMetadata}
             preventOutOfBounds
-             {...lightboxMetadata}
-             title={metadataTitle}
-           >
-            <Metadata assetIds={new Set([isolatedId])} dark={true} height="100%"/>
+            {...lightboxMetadata}
+            title={metadataTitle}>
+            <Metadata
+              assetIds={new Set([isolatedId])}
+              dark={true}
+              height="100%"
+            />
           </ResizableWindow>
-          )
-        }
+        )}
       </div>
     )
   }
 }
 
-export default connect(state => ({
-  assets: state.assets.all,
-  isolatedId: state.assets.isolatedId,
-  lightboxMetadata: state.app.lightboxMetadata,
-  user: state.auth.user,
-  userSettings: state.app.userSettings
-}), dispatch => ({
-  actions: bindActionCreators({
-    isolateAssetId,
-    lightboxMetadata,
-    saveUserSettings
-  }, dispatch)
-}))(Lightbox)
+export default connect(
+  state => ({
+    assets: state.assets.all,
+    isolatedId: state.assets.isolatedId,
+    lightboxMetadata: state.app.lightboxMetadata,
+    user: state.auth.user,
+    userSettings: state.app.userSettings,
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        isolateAssetId,
+        lightboxMetadata,
+        saveUserSettings,
+      },
+      dispatch,
+    ),
+  }),
+)(Lightbox)

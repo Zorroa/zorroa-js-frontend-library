@@ -1,11 +1,8 @@
-import React, {PropTypes} from 'react'
+import React, { PropTypes } from 'react'
 import { articulateQuality, pluralize } from '../utils'
 
-export default function ExportPreviewerFlipbook (props) {
-  const {
-    flipbookAssetCount,
-    exporterArguments
-  } = props
+export default function ExportPreviewerFlipbook(props) {
+  const { flipbookAssetCount, exporterArguments } = props
 
   return (
     <dl className="Exports__review-section">
@@ -13,10 +10,12 @@ export default function ExportPreviewerFlipbook (props) {
       {flipbookAssetCount > 0 && (
         <dd className="Exports__review-definition">
           <span>
-            {flipbookAssetCount.toLocaleString()} {pluralize(flipbookAssetCount, 'asset', 'assets')}
+            {flipbookAssetCount.toLocaleString()}{' '}
+            {pluralize(flipbookAssetCount, 'asset', 'assets')}
           </span>
           <span>
-            Export as: {(({exportImages, exportMovies}) => {
+            Export as:{' '}
+            {(({ exportImages, exportMovies }) => {
               if (exportImages && exportMovies) {
                 return 'Movie and Image Files'
               }
@@ -30,18 +29,14 @@ export default function ExportPreviewerFlipbook (props) {
               }
             })(exporterArguments)}
           </span>
-          <span>
-            Quality: {articulateQuality(exporterArguments.quality)}
-          </span>
+          <span>Quality: {articulateQuality(exporterArguments.quality)}</span>
           <span>
             Frame Rate: {exporterArguments.frameRate.toLocaleString()}
           </span>
         </dd>
       )}
       {flipbookAssetCount === 0 && (
-        <dd className="Exports__review-definition">
-          None
-        </dd>
+        <dd className="Exports__review-definition">None</dd>
       )}
     </dl>
   )
@@ -53,6 +48,6 @@ ExportPreviewerFlipbook.propTypes = {
     quality: PropTypes.number.isRequired,
     frameRate: PropTypes.number.isRequired,
     exportImages: PropTypes.bool.isRequired,
-    exportMovies: PropTypes.bool.isRequired
-  }).isRequired
+    exportMovies: PropTypes.bool.isRequired,
+  }).isRequired,
 }

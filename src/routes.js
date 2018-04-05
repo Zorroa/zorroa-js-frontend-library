@@ -14,7 +14,7 @@ import { BoxAuth } from './components/Import/BoxAuthenticator'
 import { GDriveAuth } from './components/Import/GDriveAuthenticator'
 
 export default (
-  <Route path='/' component={App}>
+  <Route path="/" component={App}>
     <IndexRoute component={RequireAuth(Workspace, '/signin')} />
     <Route path="signin" component={Signin} />
     <Route path="signout" component={Signout} />

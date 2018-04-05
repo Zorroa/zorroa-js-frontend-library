@@ -1,21 +1,39 @@
 import {
-  MODIFY_RACETRACK_WIDGET, REMOVE_RACETRACK_WIDGET_IDS, RESET_RACETRACK_WIDGETS,
-  ASSET_ORDER, ASSET_SORT, SELECT_FOLDERS,
-  SELECT_JOBS, ANALYZE_SIMILAR, UNAUTH_USER, ISOLATE_PARENT, SIMILAR_MINSCORE,
-  UPSERT_RACETRACK_WIDGETS, ISOLATE_FLIPBOOK, DEISOLATE_FLIPBOOK
+  MODIFY_RACETRACK_WIDGET,
+  REMOVE_RACETRACK_WIDGET_IDS,
+  RESET_RACETRACK_WIDGETS,
+  ASSET_ORDER,
+  ASSET_SORT,
+  SELECT_FOLDERS,
+  SELECT_JOBS,
+  ANALYZE_SIMILAR,
+  UNAUTH_USER,
+  ISOLATE_PARENT,
+  SIMILAR_MINSCORE,
+  UPSERT_RACETRACK_WIDGETS,
+  ISOLATE_FLIPBOOK,
+  DEISOLATE_FLIPBOOK,
 } from '../constants/actionTypes'
 import Widget from '../models/Widget'
 import {
-  SimilarHashWidgetInfo, CollectionsWidgetInfo, SortOrderWidgetInfo,
-  MultipageWidgetInfo, ImportSetWidgetInfo, FlipbookWidgetInfo, FiletypeWidgetInfo } from '../components/Racetrack/WidgetInfo'
+  SimilarHashWidgetInfo,
+  CollectionsWidgetInfo,
+  SortOrderWidgetInfo,
+  MultipageWidgetInfo,
+  ImportSetWidgetInfo,
+  FlipbookWidgetInfo,
+  FiletypeWidgetInfo,
+} from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
 
 const initialState = {
   widgets: [],
-  similarMinScore: {/* field: lastMinScore */}
+  similarMinScore: {
+    /* field: lastMinScore */
+  },
 }
 
-export default function (state = initialState, action) {
+export default function(state = initialState, action) {
   switch (action.type) {
     case MODIFY_RACETRACK_WIDGET: {
       const widget = action.payload
@@ -32,7 +50,7 @@ export default function (state = initialState, action) {
     case REMOVE_RACETRACK_WIDGET_IDS: {
       assert.ok(Array.isArray(action.payload))
       const ids = action.payload
-      let widgets = [ ...state.widgets ]
+      let widgets = [...state.widgets]
       assert.ok(!widgets.length || widgets[0] instanceof Widget)
       widgets = state.widgets.filter(w => ids.indexOf(w.id) < 0)
       return { ...state, widgets }
@@ -65,10 +83,21 @@ export default function (state = initialState, action) {
       const hashes = assets.map(() => ({ hash, ofsId, weight: 1 }))
       const minScore = state.minScore[state.similarField] || 75
       let widgets = [...state.widgets]
-      const index = widgets.findIndex(widget => widget.type === SimilarHashWidgetInfo.type && widget.field === similarField)
+      const index = widgets.findIndex(
+        widget =>
+          widget.type === SimilarHashWidgetInfo.type &&
+          widget.field === similarField,
+      )
       const isEnabled = true
       const isPinned = false
-      const widget = SimilarHashWidgetInfo.create(similarField, null, hashes, minScore, isEnabled, isPinned)
+      const widget = SimilarHashWidgetInfo.create(
+        similarField,
+        null,
+        hashes,
+        minScore,
+        isEnabled,
+        isPinned,
+      )
       if (index >= 0) {
         widgets[index] = widget
       } else {
@@ -89,9 +118,14 @@ export default function (state = initialState, action) {
       }
 
       const widgets = [...state.widgets]
-      if (action.type === ASSET_SORT || (action.payload && action.payload.length > 0)) {
+      if (
+        action.type === ASSET_SORT ||
+        (action.payload && action.payload.length > 0)
+      ) {
         // Actively sorting by another field, add a sort widget if needed
-        const index = state.widgets.findIndex(widget => (widget.type === SortOrderWidgetInfo.type))
+        const index = state.widgets.findIndex(
+          widget => widget.type === SortOrderWidgetInfo.type,
+        )
         if (index < 0) {
           const widget = SortOrderWidgetInfo.create()
           widgets.push(widget)
@@ -102,7 +136,9 @@ export default function (state = initialState, action) {
     case SELECT_FOLDERS: {
       const selectedFolderIds = action.payload
       if (selectedFolderIds.size) {
-        const index = state.widgets.findIndex(widget => (widget.type === CollectionsWidgetInfo.type))
+        const index = state.widgets.findIndex(
+          widget => widget.type === CollectionsWidgetInfo.type,
+        )
         if (index < 0) {
           const widget = CollectionsWidgetInfo.create()
           const widgets = [...state.widgets, widget]
@@ -114,13 +150,20 @@ export default function (state = initialState, action) {
     case SELECT_JOBS: {
       const selectedJobIds = action.payload
       if (selectedJobIds.size) {
-        const index = state.widgets.findIndex(widget => (widget.type === ImportSetWidgetInfo.type))
+        const index = state.widgets.findIndex(
+          widget => widget.type === ImportSetWidgetInfo.type,
+        )
         if (index < 0) {
           const isEnabled = true
           const isPinned = false
-          const widget = ImportSetWidgetInfo.create(undefined, undefined, isEnabled, isPinned)
+          const widget = ImportSetWidgetInfo.create(
+            undefined,
+            undefined,
+            isEnabled,
+            isPinned,
+          )
           const widgets = [...state.widgets, widget]
-          return {...state, widgets}
+          return { ...state, widgets }
         }
       }
       return state
@@ -131,17 +174,27 @@ export default function (state = initialState, action) {
         const widgets = [...state.widgets]
         const sortByPage = false
         const filterMultipage = false
-        const index = state.widgets.findIndex(widget => (widget.type === MultipageWidgetInfo.type))
+        const index = state.widgets.findIndex(
+          widget => widget.type === MultipageWidgetInfo.type,
+        )
         const isEnabled = index >= 0 ? state.widgets[index].isEnabled : true
         const isPinned = index >= 0 ? state.widgets[index].isPinned : false
-        const widget = MultipageWidgetInfo.create(undefined, undefined, isolatedParent, sortByPage, filterMultipage, isEnabled, isPinned)
+        const widget = MultipageWidgetInfo.create(
+          undefined,
+          undefined,
+          isolatedParent,
+          sortByPage,
+          filterMultipage,
+          isEnabled,
+          isPinned,
+        )
         if (index < 0) {
           widgets.push(widget)
         } else {
           widget.id = widgets[index].id
           widgets[index] = widget
         }
-        return {...state, widgets}
+        return { ...state, widgets }
       }
       return state
     }
@@ -151,7 +204,7 @@ export default function (state = initialState, action) {
           // Re-enable the FileType widget
           newWidgets.push({
             ...widget,
-            isEnabled: true
+            isEnabled: true,
           })
 
           return newWidgets
@@ -162,28 +215,30 @@ export default function (state = initialState, action) {
 
         return newWidgets
       }, [])
-      return {...state, widgets}
+      return { ...state, widgets }
     }
     case ISOLATE_FLIPBOOK: {
       const flipbook = action.payload
 
       if (flipbook) {
         const sortByPage = true
-        const index = state.widgets.findIndex(widget => (widget.type === FlipbookWidgetInfo.type))
+        const index = state.widgets.findIndex(
+          widget => widget.type === FlipbookWidgetInfo.type,
+        )
         const isEnabled = index >= 0 ? state.widgets[index].isEnabled : true
         const widgetState = {
           id: flipbook.parentId(),
-          title: flipbook.document.source.filename
+          title: flipbook.document.source.filename,
         }
         const widget = FlipbookWidgetInfo.create(
           sortByPage,
           flipbook,
           isEnabled,
           false,
-          widgetState
+          widgetState,
         )
         const widgets = [widget]
-        return {...state, widgets}
+        return { ...state, widgets }
       }
       return state
     }

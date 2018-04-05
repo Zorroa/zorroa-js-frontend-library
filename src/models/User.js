@@ -1,15 +1,15 @@
 export default class User {
-  constructor ({
-      id,
-      username,
-      email,
-      enabled,
-      firstName,
-      lastName,
-      permissionId,
-      homeFolderId,
-      timeLastLogin,
-      loginCount
+  constructor({
+    id,
+    username,
+    email,
+    enabled,
+    firstName,
+    lastName,
+    permissionId,
+    homeFolderId,
+    timeLastLogin,
+    loginCount,
   }) {
     this.id = id
     this.username = username
@@ -23,7 +23,7 @@ export default class User {
     this.homeFolderId = homeFolderId
   }
 
-  get loginDate () {
+  get loginDate() {
     // The server responds with a date of 0 if the user has never logged in
     if (!this.timeLastLogin) {
       return undefined
@@ -32,7 +32,7 @@ export default class User {
     return new Date(this.timeLastLogin)
   }
 
-  get name () {
-    return (this.firstName + ' ' + this.lastName)
+  get name() {
+    return this.firstName + ' ' + this.lastName
   }
 }

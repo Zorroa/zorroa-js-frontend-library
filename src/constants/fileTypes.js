@@ -22,7 +22,7 @@ export const allExts = {
   m4v: 'Quicktime Video',
   ogg: 'Ogg Vorbis',
   mpg: 'Motion Picture Group',
-  mpeg: 'Motion Picture Group'
+  mpeg: 'Motion Picture Group',
 
   // aac: 'Advanced Audio Coding',
   // mp3: 'Music File',
@@ -45,10 +45,18 @@ export const allExts = {
 
 // Note, these groups are not mutually exclusive
 export const groupExts = {
-  [FILE_GROUP_IMAGES]: ['gif', 'png', 'jpg', 'jpeg', 'tif', 'tiff', 'psd'], /*, 'geotiff' */
+  [FILE_GROUP_IMAGES]: [
+    'gif',
+    'png',
+    'jpg',
+    'jpeg',
+    'tif',
+    'tiff',
+    'psd',
+  ] /*, 'geotiff' */,
   [FILE_GROUP_VECTORS]: ['pdf', 'svg', 'ai', 'shp', 'cdr'],
   [FILE_GROUP_VIDEOS]: ['mp4', 'm4v', 'mov', 'ogg', 'mpg', 'mpeg'],
-  [FILE_GROUP_DOCUMENTS]: ['pdf']
+  [FILE_GROUP_DOCUMENTS]: ['pdf'],
   // 'Audio Files': ['aac', 'mp3'],
   // 'Design Source Files - sketch, Adobe': ['ai', 'indd', 'psd'],
   // 'Map Files': ['shp', 'kml', 'gdb', 'osm', 'geotiff'],

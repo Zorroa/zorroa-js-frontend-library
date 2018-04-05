@@ -2,11 +2,11 @@ import axios from 'axios'
 import * as utils from './utils.js'
 import User from '../models/User.js'
 
-export function get () {
+export function get() {
   const origin = utils.getOrigin()
   const client = axios.create({
     baseURL: origin,
-    withCredentials: true
+    withCredentials: true,
   })
 
   return client
@@ -14,11 +14,11 @@ export function get () {
     .then(response => response.data.map(user => new User(user)))
 }
 
-export function post (user) {
+export function post(user) {
   const origin = utils.getOrigin()
   const client = axios.create({
     baseURL: origin,
-    withCredentials: true
+    withCredentials: true,
   })
 
   return client

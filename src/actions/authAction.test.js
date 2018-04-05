@@ -3,7 +3,7 @@ import thunk from 'redux-thunk'
 import * as types from '../constants/actionTypes'
 import * as actions from './authAction'
 
-const middlewares = [ thunk ]
+const middlewares = [thunk]
 const mockStore = configureMockStore(middlewares)
 jest.mock('../components/Racetrack/Map')
 
@@ -20,7 +20,7 @@ describe('authActions', () => {
       const errmsg = 'something bad'
       const expectedAction = {
         type: types.AUTH_ERROR,
-        payload: errmsg + ': ' + error.message
+        payload: errmsg + ': ' + error.message,
       }
       expect(actions.authError(errmsg, error)).toEqual(expectedAction)
     })
@@ -30,14 +30,13 @@ describe('authActions', () => {
     xit('creates user after checking', () => {
       const expectedAction = {
         type: types.AUTH_USER,
-        payload: {token}
+        payload: { token },
       }
       const store = mockStore({})
 
-      return store.dispatch(actions.signinUser(payload))
-        .then(() => {
-          expect(store.getActions()).toEqual(expectedAction)
-        })
+      return store.dispatch(actions.signinUser(payload)).then(() => {
+        expect(store.getActions()).toEqual(expectedAction)
+      })
     })
   })
 })

@@ -1,9 +1,5 @@
 import React, { Component, PropTypes } from 'react'
-import {
-  FormSelect,
-  FormLabel,
-  FormRadio
-} from '../../Form'
+import { FormSelect, FormLabel, FormRadio } from '../../Form'
 import ExportsSection from '../ExportsSection'
 
 export default class PdfExporter extends Component {
@@ -15,8 +11,8 @@ export default class PdfExporter extends Component {
     format: PropTypes.string.isRequired,
     arguments: PropTypes.shape({
       pageMode: PropTypes.string.isRequired,
-      exportOriginal: PropTypes.bool.isRequired
-    })
+      exportOriginal: PropTypes.bool.isRequired,
+    }),
   }
 
   state = {
@@ -26,10 +22,10 @@ export default class PdfExporter extends Component {
 
     // Arguments
     exportOriginal: this.props.arguments.exportOriginal,
-    pageMode: this.props.arguments.pageMode
+    pageMode: this.props.arguments.pageMode,
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     const newState = {}
 
     if (
@@ -57,9 +53,12 @@ export default class PdfExporter extends Component {
       pageMode = 'separate'
     }
 
-    this.onChange({
-      pageMode
-    }, false)
+    this.onChange(
+      {
+        pageMode,
+      },
+      false,
+    )
   }
 
   onChange = (options, overrideExportOriginal) => {
@@ -73,10 +72,10 @@ export default class PdfExporter extends Component {
           PdfExporter: {
             arguments: {
               pageMode: this.state.pageMode,
-              exportOriginal: this.state.exportOriginal
+              exportOriginal: this.state.exportOriginal,
             },
-            shouldExport: this.state.shouldExport
-          }
+            shouldExport: this.state.shouldExport,
+          },
         })
       }
     })
@@ -84,26 +83,26 @@ export default class PdfExporter extends Component {
 
   toggleCanExport = shouldExport => {
     this.onChange({
-      shouldExport
+      shouldExport,
     })
   }
 
   toggleExportOriginal = exportOriginal => {
     this.onChange({
-      exportOriginal
+      exportOriginal,
     })
   }
 
-  render () {
+  render() {
     const formatOptions = [
       {
         label: 'Combined PDF',
-        value: 'merge'
+        value: 'merge',
       },
       {
         label: 'Single PDFs',
-        value: 'seperate'
-      }
+        value: 'seperate',
+      },
     ]
 
     return (
@@ -112,29 +111,36 @@ export default class PdfExporter extends Component {
         onToggleExport={this.toggleCanExport}
         onToggleAccordion={this.props.onToggleAccordion}
         isExportable={this.state.shouldExport}
-        isOpen={this.props.isOpen}
-      >
+        isOpen={this.props.isOpen}>
         <radiogroup>
-          <FormLabel afterLabel="Export original assets" className="Exports__form-element">
-            <FormRadio onChange={() => this.toggleExportOriginal(true)} checked={this.state.exportOriginal === true} name="PdfExporter" />
+          <FormLabel
+            afterLabel="Export original assets"
+            className="Exports__form-element">
+            <FormRadio
+              onChange={() => this.toggleExportOriginal(true)}
+              checked={this.state.exportOriginal === true}
+              name="PdfExporter"
+            />
           </FormLabel>
           <FormLabel
             afterLabel="Export assets as"
-            className="Exports__form-element"
-          >
-            <FormRadio onChange={() => this.toggleExportOriginal(false)} checked={this.state.exportOriginal === false} name="PdfExporter" />
+            className="Exports__form-element">
+            <FormRadio
+              onChange={() => this.toggleExportOriginal(false)}
+              checked={this.state.exportOriginal === false}
+              name="PdfExporter"
+            />
           </FormLabel>
           <FormLabel
             vertical
-            className="Exports__form-element Exports__form-element--nested"
-          >
+            className="Exports__form-element Exports__form-element--nested">
             <FormSelect
               className="Exports__form-select"
               options={formatOptions}
-              fieldLabel='label'
-              fieldKey='value'
+              fieldLabel="label"
+              fieldKey="value"
               value={this.state.pageMode}
-              onChange={({value}) => this.onFormatChange(value)}
+              onChange={({ value }) => this.onFormatChange(value)}
             />
           </FormLabel>
         </radiogroup>

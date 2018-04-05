@@ -1,4 +1,3 @@
-
 /*
   http://paulbourke.net/texture_colour/colourspace/
   Calculate HSL from RGB
@@ -6,7 +5,7 @@
   Lightness is between 0 and 100
   Saturation is between 0 and 100
 */
-export function RGB2HSL ([c1R, c1G, c1B]) {
+export function RGB2HSL([c1R, c1G, c1B]) {
   var themin, themax, delta
   var c2H, c2S, c2L
 
@@ -16,7 +15,7 @@ export function RGB2HSL ([c1R, c1G, c1B]) {
   c2L = (themin + themax) / 2
   c2S = 0
   if (c2L > 0 && c2L < 1) {
-    c2S = delta / (c2L < 0.5 ? (2 * c2L) : (2 - 2 * c2L))
+    c2S = delta / (c2L < 0.5 ? 2 * c2L : 2 - 2 * c2L)
   }
   c2H = 0
   if (delta > 0) {
@@ -24,10 +23,10 @@ export function RGB2HSL ([c1R, c1G, c1B]) {
       c2H += (c1G - c1B) / delta
     }
     if (themax === c1G && themax !== c1B) {
-      c2H += (2 + (c1B - c1R) / delta)
+      c2H += 2 + (c1B - c1R) / delta
     }
     if (themax === c1B && themax !== c1R) {
-      c2H += (4 + (c1R - c1G) / delta)
+      c2H += 4 + (c1R - c1G) / delta
     }
     c2H *= 60
   }
@@ -41,7 +40,7 @@ export function RGB2HSL ([c1R, c1G, c1B]) {
   Lightness is between 0 and 100
   Saturation is between 0 and 100
 */
-export function HSL2RGB ([c1H, c1S, c1L]) {
+export function HSL2RGB([c1H, c1S, c1L]) {
   var h = c1H
   var s = c1S / 100
   var l = c1L / 100
@@ -97,7 +96,7 @@ export function HSL2RGB ([c1H, c1S, c1L]) {
   Lightness is between 0 and 1
   Saturation is between 0 and 1
 */
-export function HSV2RGB ([c1H, c1S, c1V]) {
+export function HSV2RGB([c1H, c1S, c1V]) {
   var h = c1H
   var s = c1S / 100
   var v = c1V / 100
@@ -141,7 +140,7 @@ export function HSV2RGB ([c1H, c1S, c1V]) {
   Lightness is betweeen 0 and 1
   Saturation is between 0 and 1
 */
-export function RGB2HSV ([c1R, c1G, c1B]) {
+export function RGB2HSV([c1R, c1G, c1B]) {
   var themin, themax, delta
   var c2H, c2S, c2V
 
@@ -159,10 +158,10 @@ export function RGB2HSV ([c1R, c1G, c1B]) {
       c2H += (c1G - c1B) / delta
     }
     if (themax === c1G && themax !== c1B) {
-      c2H += (2 + (c1B - c1R) / delta)
+      c2H += 2 + (c1B - c1R) / delta
     }
     if (themax === c1B && themax !== c1R) {
-      c2H += (4 + (c1R - c1G) / delta)
+      c2H += 4 + (c1R - c1G) / delta
     }
     c2H *= 60
   }
@@ -175,55 +174,64 @@ export function RGB2HSV ([c1R, c1G, c1B]) {
   return [c2H, c2S * 100, c2V * 100]
 }
 
-export function HSL2HSV ([c1H, c1S, c1L]) {
+export function HSL2HSV([c1H, c1S, c1L]) {
   var rgb = HSL2RGB([c1H, c1S, c1L])
   return RGB2HSV(rgb)
 }
 
-export function HSV2HSL ([c1H, c1S, c1V]) {
+export function HSV2HSL([c1H, c1S, c1V]) {
   var rgb = HSV2RGB([c1H, c1S, c1V])
   return RGB2HSL(rgb)
 }
 
 // http://codeitdown.com/hsl-hsb-hsv-color/
-export function hsl2hsb ([_H, _S, _L]) {
+export function hsl2hsb([_H, _S, _L]) {
   var __S = _S / 100
   var __L = _L / 100
   const B = 0.5 * (2 * __L + __S * (1 - Math.abs(2 * __L - 1)))
-  const S = (B !== 0) ? (2 * (B - __L) / B) : 0
+  const S = B !== 0 ? 2 * (B - __L) / B : 0
   return [_H, S * 100, B * 100]
 }
-export function hsb2hsl ([_H, _S, _B]) {
+export function hsb2hsl([_H, _S, _B]) {
   var __S = _S / 100
   var __B = _B / 100
   const L = 0.5 * __B * (2 - __S)
   const d = 1 - Math.abs(2 * L - 1)
-  const S = (d !== 0) ? __B * __S / d : 0
+  const S = d !== 0 ? __B * __S / d : 0
   return [_H, S * 100, L * 100]
 }
 
 // http://stackoverflow.com/a/5624139/1424242
 const hexToRgbLongRE = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i
 const hexToRgbShortRE = /^#?([a-f\d])([a-f\d])([a-f\d])$/i
-export function hexToRgb (hex) {
+export function hexToRgb(hex) {
   // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-  hex = hex.replace(hexToRgbShortRE, function (m, r, g, b) {
+  hex = hex.replace(hexToRgbShortRE, function(m, r, g, b) {
     return r + r + g + g + b + b
   })
 
   var result = hexToRgbLongRE.exec(hex)
-  return result ? [
-    parseInt(result[1], 16),
-    parseInt(result[2], 16),
-    parseInt(result[3], 16)
-  ] : null
+  return result
+    ? [
+        parseInt(result[1], 16),
+        parseInt(result[2], 16),
+        parseInt(result[3], 16),
+      ]
+    : null
 }
 
-export function rgbToHex ([r, g, b]) {
-  return '#' + ((1 << 24) +
-    (Math.min(255, Math.floor(r * 256)) << 16) +
-    (Math.min(255, Math.floor(g * 256)) << 8) +
-    (Math.min(255, Math.floor(b * 256)))).toString(16).slice(1)
+export function rgbToHex([r, g, b]) {
+  return (
+    '#' +
+    (
+      (1 << 24) +
+      (Math.min(255, Math.floor(r * 256)) << 16) +
+      (Math.min(255, Math.floor(g * 256)) << 8) +
+      Math.min(255, Math.floor(b * 256))
+    )
+      .toString(16)
+      .slice(1)
+  )
 }
 
 // convert between normalized hsl/hsv and percent based hsl/hsv

@@ -8,21 +8,21 @@ export default class FormInput extends Component {
     className: PropTypes.string,
     error: PropTypes.bool,
     onChange: PropTypes.func,
-    checked: PropTypes.bool
+    checked: PropTypes.bool,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = {
-      checked: props.checked === true
+      checked: props.checked === true,
     }
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (nextProps.checked !== this.state.checked) {
       this.setState({
-        checked: nextProps.checked === true
+        checked: nextProps.checked === true,
       })
     }
   }
@@ -34,15 +34,19 @@ export default class FormInput extends Component {
       this.props.onChange(checked)
     }
     this.setState({
-      checked
+      checked,
     })
   }
 
-  render () {
-    const {className, error} = this.props
-    const inputClasses = classnames('FormInput__checkbox-virtual', {
-      'FormInput__checkbox-virtual': error === true
-    }, className)
+  render() {
+    const { className, error } = this.props
+    const inputClasses = classnames(
+      'FormInput__checkbox-virtual',
+      {
+        'FormInput__checkbox-virtual': error === true,
+      },
+      className,
+    )
 
     return (
       <div className="FormInput__checkbox">

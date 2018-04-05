@@ -6,16 +6,18 @@
  * to scale and center an image. This is useful for sizing content to fit within
  * canvas elements
  */
-export function size ({
+export function size({
   parentWidth,
   parentHeight,
   childWidth,
   childHeight,
-  containBackground
+  containBackground,
 }) {
   const childRatio = childWidth / childHeight
   const containerRatio = parentWidth / parentHeight
-  const shouldContainBackground = containBackground ? (childRatio > containerRatio) : (childRatio < containerRatio)
+  const shouldContainBackground = containBackground
+    ? childRatio > containerRatio
+    : childRatio < containerRatio
   let width = parentWidth
   let height = parentHeight
 
@@ -32,25 +34,20 @@ export function size ({
     width,
     height,
     x,
-    y
+    y,
   }
 }
 
-export function resizeByAspectRatio ({
-  height,
-  width,
-  newHeight,
-  newWidth
-}) {
+export function resizeByAspectRatio({ height, width, newHeight, newWidth }) {
   if (newWidth !== undefined) {
     return {
-      height: (height / width) * newWidth,
-      width: newWidth
+      height: height / width * newWidth,
+      width: newWidth,
     }
   }
 
   return {
     height: newHeight,
-    width: (height / width) * newHeight
+    width: height / width * newHeight,
   }
 }

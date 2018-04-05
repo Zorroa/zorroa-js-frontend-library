@@ -8,14 +8,14 @@ import Asset from '../models/Asset'
 import { ISOLATE_ASSET, SELECT_ASSETS } from '../constants/actionTypes'
 import Page from '../models/Page'
 
-const middlewares = [ thunk ]
+const middlewares = [thunk]
 const mockStore = configureMockStore(middlewares)
 jest.mock('../components/Racetrack/Map')
 
 const origin = 'https://localhost:8066'
 const archivist = axios.create({
   origin,
-  withCredentials: true
+  withCredentials: true,
 })
 
 describe('assetsActions', () => {
@@ -26,23 +26,25 @@ describe('assetsActions', () => {
     const store = mockStore({})
 
     const mockAdapter = new MockAdapter(archivist)
-    mockAdapter.onPost('/api/v3/assets/_search')
-      .reply(200, {
-        status: 200,
-        response: { query: '', assets: [asset], page: new Page({from: 0, size: 1, totalCount: 1}) }
-      })
+    mockAdapter.onPost('/api/v3/assets/_search').reply(200, {
+      status: 200,
+      response: {
+        query: '',
+        assets: [asset],
+        page: new Page({ from: 0, size: 1, totalCount: 1 }),
+      },
+    })
 
-    return store.dispatch(searchAssets({query: 'foo'}))
-      .then(() => {
-        expect(true).toBeTruthy()
-      })
+    return store.dispatch(searchAssets({ query: 'foo' })).then(() => {
+      expect(true).toBeTruthy()
+    })
   })
 
   it('should isolate asset', () => {
     const id = '12345-abcde'
     const expectedAction = {
       type: ISOLATE_ASSET,
-      payload: id
+      payload: id,
     }
     expect(isolateAssetId(id)).toEqual(expectedAction)
   })
@@ -52,7 +54,7 @@ describe('assetsActions', () => {
     const ids = new Set([id])
     const expectedAction = {
       type: SELECT_ASSETS,
-      payload: ids
+      payload: ids,
     }
     expect(selectAssetIds(ids)).toEqual(expectedAction)
   })

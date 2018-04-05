@@ -17,13 +17,13 @@ import {
   EXPORT_ONLINE_STATUS_ERROR,
   CREATE_EXPORT_START,
   CREATE_EXPORT_SUCCESS,
-  CREATE_EXPORT_ERROR
+  CREATE_EXPORT_ERROR,
 } from '../constants/actionTypes'
 import {
   FILE_GROUP_IMAGES,
   FILE_GROUP_VIDEOS,
   FILE_GROUP_DOCUMENTS,
-  groupExts
+  groupExts,
 } from '../constants/fileTypes'
 import AssetSearch from '../models/AssetSearch'
 
@@ -70,10 +70,10 @@ export const initialState = {
   totalAssetCount: 0,
   isLoading: false,
   hasRestrictedAssets: false,
-  assetSearch: new AssetSearch()
+  assetSearch: new AssetSearch(),
 }
 
-export default function (state = initialState, action) {
+export default function(state = initialState, action) {
   switch (action.type) {
     case SHOW_EXPORT_UI: {
       return {
@@ -81,7 +81,7 @@ export default function (state = initialState, action) {
         isLoading: true,
         shouldShow: true,
         assetSearch: action.payload.assetSearch,
-        packageName: action.payload.packageName
+        packageName: action.payload.packageName,
       }
     }
     case HIDE_EXPORT_UI: {
@@ -91,22 +91,25 @@ export default function (state = initialState, action) {
       const {
         hasRestrictedAssets,
         totalAssetCount,
-        exportPreviewAssets
+        exportPreviewAssets,
       } = action.payload
       const assetGroupCounts = [
         FILE_GROUP_IMAGES,
         FILE_GROUP_VIDEOS,
-        FILE_GROUP_DOCUMENTS
+        FILE_GROUP_DOCUMENTS,
       ].reduce((accumulatorGroupCounts, groupKey) => {
-        accumulatorGroupCounts[groupKey] = groupExts[groupKey]
-          .reduce((accumulator, extension) => {
-            const extensionDocumentCount = action.payload.documentCounts.extension[extension]
+        accumulatorGroupCounts[groupKey] = groupExts[groupKey].reduce(
+          (accumulator, extension) => {
+            const extensionDocumentCount =
+              action.payload.documentCounts.extension[extension]
             if (extensionDocumentCount) {
               return extensionDocumentCount + accumulator
             }
 
             return accumulator
-          }, 0)
+          },
+          0,
+        )
 
         return accumulatorGroupCounts
       }, {})
@@ -120,7 +123,7 @@ export default function (state = initialState, action) {
         videoAssetCount: assetGroupCounts[FILE_GROUP_VIDEOS] || 0,
         flipbookAssetCount: action.payload.clipParentCounts.type.flipbook || 0,
         documentAssetCount: assetGroupCounts[FILE_GROUP_DOCUMENTS] || 0,
-        totalAssetCount
+        totalAssetCount,
       }
     }
     case LOAD_EXPORT_PROFILE_BLOB: {
@@ -146,7 +149,7 @@ export default function (state = initialState, action) {
         ...state,
         exportProfilesPosting,
         exportProfilesPostingError,
-        exportProfilesSuccess
+        exportProfilesSuccess,
       }
     }
     case POST_EXPORT_PROFILE_BLOB_SUCCESS: {
@@ -158,7 +161,7 @@ export default function (state = initialState, action) {
         ...state,
         exportProfilesPosting,
         exportProfilesSuccess,
-        exportProfiles
+        exportProfiles,
       }
     }
     case POST_EXPORT_PROFILE_BLOB_ERROR: {
@@ -167,7 +170,7 @@ export default function (state = initialState, action) {
       return {
         ...state,
         exportProfilesPosting,
-        exportProfilesPostingError
+        exportProfilesPostingError,
       }
     }
     case POST_EXPORT_PROFILE_BLOB_CLEAR: {
@@ -181,7 +184,7 @@ export default function (state = initialState, action) {
         exportProfilesPosting,
         exportProfilesPostingError,
         exportProfilesSuccess,
-        errorMessage
+        errorMessage,
       }
     }
     case EXPORT_REQUEST_START: {
@@ -195,7 +198,7 @@ export default function (state = initialState, action) {
         exportRequestPosting,
         exportRequestPostingError,
         exportRequestPostingSuccess,
-        errorMessage
+        errorMessage,
       }
     }
     case EXPORT_REQUEST_SUCCESS: {
@@ -207,7 +210,7 @@ export default function (state = initialState, action) {
         ...state,
         exportRequestPosting,
         exportRequestPostingError,
-        exportRequestPostingSuccess
+        exportRequestPostingSuccess,
       }
     }
     case EXPORT_REQUEST_ERROR: {
@@ -221,7 +224,7 @@ export default function (state = initialState, action) {
         exportRequestPosting,
         exportRequestPostingError,
         exportRequestPostingSuccess,
-        errorMessage
+        errorMessage,
       }
     }
     case EXPORT_ONLINE_STATUS_START: {
@@ -237,7 +240,7 @@ export default function (state = initialState, action) {
         offlineAssets,
         loadingOnlineStatuses,
         loadingOnlineStatusesError,
-        loadingOnlineStatusesSuccess
+        loadingOnlineStatusesSuccess,
       }
     }
     case EXPORT_ONLINE_STATUS_SUCCESS: {
@@ -253,7 +256,7 @@ export default function (state = initialState, action) {
         offlineAssets,
         loadingOnlineStatuses,
         loadingOnlineStatusesError,
-        loadingOnlineStatusesSuccess
+        loadingOnlineStatusesSuccess,
       }
     }
     case EXPORT_ONLINE_STATUS_ERROR: {
@@ -265,7 +268,7 @@ export default function (state = initialState, action) {
         ...state,
         loadingOnlineStatuses,
         loadingOnlineStatusesError,
-        loadingOnlineStatusesSuccess
+        loadingOnlineStatusesSuccess,
       }
     }
     case CREATE_EXPORT_START: {
@@ -279,7 +282,7 @@ export default function (state = initialState, action) {
         loadingCreateExport,
         loadingCreateExportError,
         loadingCreateExportSuccess,
-        errorMessage
+        errorMessage,
       }
     }
     case CREATE_EXPORT_SUCCESS: {
@@ -291,7 +294,7 @@ export default function (state = initialState, action) {
         ...state,
         loadingCreateExport,
         loadingCreateExportError,
-        loadingCreateExportSuccess
+        loadingCreateExportSuccess,
       }
     }
     case CREATE_EXPORT_ERROR: {
@@ -305,10 +308,9 @@ export default function (state = initialState, action) {
         loadingCreateExport,
         loadingCreateExportError,
         loadingCreateExportSuccess,
-        errorMessage
+        errorMessage,
       }
     }
-
   }
 
   return state

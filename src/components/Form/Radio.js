@@ -9,21 +9,21 @@ export default class FormInput extends Component {
     error: PropTypes.bool,
     onChange: PropTypes.func,
     checked: PropTypes.bool,
-    name: PropTypes.string.isRequired
+    name: PropTypes.string.isRequired,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = {
-      checked: props.checked === true
+      checked: props.checked === true,
     }
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (nextProps.checked !== this.state.checked) {
       this.setState({
-        value: nextProps.checked === true
+        value: nextProps.checked === true,
       })
     }
   }
@@ -35,15 +35,19 @@ export default class FormInput extends Component {
       this.props.onChange(checked)
     }
     this.setState({
-      value: checked
+      value: checked,
     })
   }
 
-  render () {
-    const {className, error} = this.props
-    const inputClasses = classnames('FormInput__radio-virtual', {
-      'FormInput__radio--error': error === true
-    }, className)
+  render() {
+    const { className, error } = this.props
+    const inputClasses = classnames(
+      'FormInput__radio-virtual',
+      {
+        'FormInput__radio--error': error === true,
+      },
+      className,
+    )
 
     return (
       <div className="FormInput__radio">

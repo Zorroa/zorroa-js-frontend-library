@@ -14,22 +14,22 @@ class PreferencesPane extends Component {
   static propTypes = {
     onDismiss: PropTypes.func,
     actions: PropTypes.shape({
-      hideModal: PropTypes.func.isRequired
+      hideModal: PropTypes.func.isRequired,
     }),
     user: PropTypes.instanceOf(User),
     activePane: PropTypes.string,
     isDeveloper: PropTypes.bool.isRequired,
-    isAdministrator: PropTypes.bool.isRequired
+    isAdministrator: PropTypes.bool.isRequired,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
-      activePane: props.activePane || 'general'
+      activePane: props.activePane || 'general',
     }
   }
 
-  dismiss = (event) => {
+  dismiss = event => {
     const { onDismiss } = this.props
     if (onDismiss) onDismiss(event)
     this.props.actions.hideModal()
@@ -37,16 +37,16 @@ class PreferencesPane extends Component {
 
   setActivePane = pane => {
     this.setState({
-      activePane: pane
+      activePane: pane,
     })
   }
 
-  canAccessAdministratorMenu () {
+  canAccessAdministratorMenu() {
     const { isAdministrator } = this.props
     return isAdministrator
   }
 
-  render () {
+  render() {
     return (
       <div className="PreferencesPane">
         <div className="PreferencesPane__header">
@@ -63,14 +63,13 @@ class PreferencesPane extends Component {
                   <PreferencesPaneMenuItem
                     onClick={this.setActivePane}
                     paneName="general"
-                    activePaneName={this.state.activePane}
-                  >
+                    activePaneName={this.state.activePane}>
                     My Settings
                   </PreferencesPaneMenuItem>
                 </ul>
               </li>
             </ul>
-            { this.canAccessAdministratorMenu() && (
+            {this.canAccessAdministratorMenu() && (
               <ul className="PreferencesPane__menu">
                 <li className="PreferencesPane__menu-item">
                   Adminstrator
@@ -78,8 +77,7 @@ class PreferencesPane extends Component {
                     <PreferencesPaneMenuItem
                       onClick={this.setActivePane}
                       paneName="user"
-                      activePaneName={this.state.activePane}
-                    >
+                      activePaneName={this.state.activePane}>
                       Users
                     </PreferencesPaneMenuItem>
                   </ul>
@@ -88,26 +86,28 @@ class PreferencesPane extends Component {
             )}
           </div>
           <div className="PreferencesPane__main">
-            { this.state.activePane === 'general' && (
+            {this.state.activePane === 'general' && (
               <General user={this.props.user} />
-
             )}
-            { this.state.activePane === 'user' && (
-              <UserAdministrator />
-            )}
+            {this.state.activePane === 'user' && <UserAdministrator />}
           </div>
         </div>
-
       </div>
     )
   }
 }
 
-export default connect(state => ({
-  isDeveloper: state.auth.isDeveloper,
-  isAdministrator: state.auth.isAdministrator
-}), dispatch => ({
-  actions: bindActionCreators({
-    hideModal
-  }, dispatch)
-}))(PreferencesPane)
+export default connect(
+  state => ({
+    isDeveloper: state.auth.isDeveloper,
+    isAdministrator: state.auth.isAdministrator,
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        hideModal,
+      },
+      dispatch,
+    ),
+  }),
+)(PreferencesPane)

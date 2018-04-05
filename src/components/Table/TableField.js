@@ -15,69 +15,89 @@ export default class TableField extends Component {
     width: PropTypes.number,
     order: PropTypes.string,
     left: PropTypes.string, // if given, then position becomes absolute
-    top: PropTypes.string // if given, then position becomes absolute
+    top: PropTypes.string, // if given, then position becomes absolute
   }
 
   renderFileType = (vals, asset) => (
-    <FileIcon ext={asset.document.source && asset.document.source.extension
-      ? asset.document.source.extension.slice(0, 4) : '???'} />
+    <FileIcon
+      ext={
+        asset.document.source && asset.document.source.extension
+          ? asset.document.source.extension.slice(0, 4)
+          : '???'
+      }
+    />
   )
 
-  renderColorArray = (vals) => {
+  renderColorArray = vals => {
     return (
-      <div className='TableField-array'>
-        { vals.map((val, i) => (
-          <div className='TableField-color'
-               key={i}
-               style={{backgroundColor: val}}/>
+      <div className="TableField-array">
+        {vals.map((val, i) => (
+          <div
+            className="TableField-color"
+            key={i}
+            style={{ backgroundColor: val }}
+          />
         ))}
       </div>
     )
   }
 
-  renderColors = (vals) => {
+  renderColors = vals => {
     return (
-      <div className='TableField-array'>
-        { vals.map((val, i) => (
-          <div className='TableField-color'
-               key={i}
-               style={{backgroundColor: val['hex']}}/>
+      <div className="TableField-array">
+        {vals.map((val, i) => (
+          <div
+            className="TableField-color"
+            key={i}
+            style={{ backgroundColor: val['hex'] }}
+          />
         ))}
       </div>
     )
   }
 
-  renderStringArray = (vals) => {
+  renderStringArray = vals => {
     const { isOpen, onOpen, onTag, field } = this.props
     return (
-      <div className={classnames('TableField-array', {isOpen})}>
-        { onOpen &&
-          <div className='TableField-toggle'
-               onClick={onOpen}>
-            <div className='TableField-toggle-icon'>{'\u22ef'}</div>
+      <div className={classnames('TableField-array', { isOpen })}>
+        {onOpen && (
+          <div className="TableField-toggle" onClick={onOpen}>
+            <div className="TableField-toggle-icon">{'\u22ef'}</div>
           </div>
-        }
-        { vals.map((val, i) => val && (typeof val !== 'string' || val.match(/[a-z0-9]/i)) && (
-          <div key={i} onClick={e => onTag(val, field, e)}
-               className={classnames('TableField-tag', {disabled: !onTag})}>
-            { Array.isArray(val) && val.join(' ') }
-            { !Array.isArray(val) && val }
-          </div>
-        ))}
+        )}
+        {vals.map(
+          (val, i) =>
+            val &&
+            (typeof val !== 'string' || val.match(/[a-z0-9]/i)) && (
+              <div
+                key={i}
+                onClick={e => onTag(val, field, e)}
+                className={classnames('TableField-tag', { disabled: !onTag })}>
+                {Array.isArray(val) && val.join(' ')}
+                {!Array.isArray(val) && val}
+              </div>
+            ),
+        )}
       </div>
     )
   }
 
-  renderGeneral = (val) => {
+  renderGeneral = val => {
     const { field } = this.props
     if (typeof val === 'boolean') {
       return val ? 'true' : 'false'
-    } else if (field.toLowerCase().endsWith('size') && typeof val === 'number') {
+    } else if (
+      field.toLowerCase().endsWith('size') &&
+      typeof val === 'number'
+    ) {
       return humanFileSize(val)
-    } else if (field.toLowerCase().includes('date') && typeof val === 'string') {
+    } else if (
+      field.toLowerCase().includes('date') &&
+      typeof val === 'string'
+    ) {
       const date = Date.parse(val)
       if (!isNaN(date)) {
-        return (new Date(date)).toUTCString()
+        return new Date(date).toUTCString()
       }
     }
     const str = Asset._valueToString(val)
@@ -96,8 +116,12 @@ export default class TableField extends Component {
     } else if (Array.isArray(val)) {
       if (!val.length) {
         renderValFn = _ => null
-      } else if (val[0] && typeof val[0] === 'string' && val[0][0] === '#' &&
-        val.every(v => v[0] === '#' && v.length === 7 || v.length === 4)) {
+      } else if (
+        val[0] &&
+        typeof val[0] === 'string' &&
+        val[0][0] === '#' &&
+        val.every(v => (v[0] === '#' && v.length === 7) || v.length === 4)
+      ) {
         renderValFn = this.renderColorArray
       } else if (field === 'colors') {
         renderValFn = this.renderColors
@@ -122,6 +146,12 @@ export default class TableField extends Component {
       style.position = 'absolute'
     }
     const ordered = !!order
-    return (<div className={classnames('Table-cell', {isOpen, dark, ordered})} style={style}>{renderValFn(val, asset)}</div>)
+    return (
+      <div
+        className={classnames('Table-cell', { isOpen, dark, ordered })}
+        style={style}>
+        {renderValFn(val, asset)}
+      </div>
+    )
   }
 }

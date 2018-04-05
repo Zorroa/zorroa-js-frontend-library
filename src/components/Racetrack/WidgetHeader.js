@@ -3,26 +3,74 @@ import classnames from 'classnames'
 
 import pin from './pin.svg'
 
-const WidgetHeader = ({ isEnabled, isPinned, isIconified, isOpen, maxWidth, title, field, icon, backgroundColor, enableToggleFn, collapseToggleFn, pinnedToggleFn, onClose }) => {
-  const iconClassNames = classnames('WidgetHeader-icon', icon, { isEnabled, isIconified })
+const WidgetHeader = ({
+  isEnabled,
+  isPinned,
+  isIconified,
+  isOpen,
+  maxWidth,
+  title,
+  field,
+  icon,
+  backgroundColor,
+  enableToggleFn,
+  collapseToggleFn,
+  pinnedToggleFn,
+  onClose,
+}) => {
+  const iconClassNames = classnames('WidgetHeader-icon', icon, {
+    isEnabled,
+    isIconified,
+  })
   return (
-    <div style={{backgroundColor, maxWidth}} className={classnames('WidgetHeader', {isEnabled})}>
-      <div className='WidgetHeader-hover'>
-        <div className='WidgetHeader-toggle flexRowCenter fullWidth fullHeight' onClick={_ => collapseToggleFn(!isOpen)}>
-          <div className={iconClassNames}/>
-          { !isIconified && (
+    <div
+      style={{ backgroundColor, maxWidth }}
+      className={classnames('WidgetHeader', { isEnabled })}>
+      <div className="WidgetHeader-hover">
+        <div
+          className="WidgetHeader-toggle flexRowCenter fullWidth fullHeight"
+          onClick={_ => collapseToggleFn(!isOpen)}>
+          <div className={iconClassNames} />
+          {!isIconified && (
             <div className="WidgetHeader-header">
               <div className="WidgetHeader-header-label">
-                { title && <span className="WidgetHeader-header-title">{title}{field && field.length ? ':' : ''}</span> }
-                { field && <span className="WidgetHeader-header-field">{field}</span> }
+                {title && (
+                  <span className="WidgetHeader-header-title">
+                    {title}
+                    {field && field.length ? ':' : ''}
+                  </span>
+                )}
+                {field && (
+                  <span className="WidgetHeader-header-field">{field}</span>
+                )}
               </div>
             </div>
-          ) }
-          <div className='flexOn'/>
+          )}
+          <div className="flexOn" />
         </div>
-        { !isIconified && pinnedToggleFn && (<div className="WidgetHeader-pin" onClick={pinnedToggleFn}><img className={classnames('WidgetHeader-pin-img', {isPinned})} src={pin}/></div>) }
-        { !isIconified && enableToggleFn && (<div className={classnames('WidgetHeader-enable', {'icon-eye2': isEnabled, 'icon-eye-crossed2': !isEnabled, isEnabled})} onClick={enableToggleFn}/>) }
-        { !isIconified && (<div className='WidgetHeader-close icon-cross' onClick={onClose}/>) }
+        {!isIconified &&
+          pinnedToggleFn && (
+            <div className="WidgetHeader-pin" onClick={pinnedToggleFn}>
+              <img
+                className={classnames('WidgetHeader-pin-img', { isPinned })}
+                src={pin}
+              />
+            </div>
+          )}
+        {!isIconified &&
+          enableToggleFn && (
+            <div
+              className={classnames('WidgetHeader-enable', {
+                'icon-eye2': isEnabled,
+                'icon-eye-crossed2': !isEnabled,
+                isEnabled,
+              })}
+              onClick={enableToggleFn}
+            />
+          )}
+        {!isIconified && (
+          <div className="WidgetHeader-close icon-cross" onClick={onClose} />
+        )}
       </div>
     </div>
   )
@@ -41,7 +89,7 @@ WidgetHeader.propTypes = {
   enableToggleFn: PropTypes.func,
   collapseToggleFn: PropTypes.func,
   pinnedToggleFn: PropTypes.func,
-  onClose: PropTypes.func.isRequired
+  onClose: PropTypes.func.isRequired,
 }
 
 export default WidgetHeader

@@ -7,18 +7,21 @@ const Toggle = ({
   disabled,
   waiting,
   disabledTitle,
-  highlightColor
+  highlightColor,
 }) => {
   const isDisabled = disabled === true
   const isWaiting = waiting === true
   const labelClasses = classnames('Toggle', {
     'Toggle--disabled': isDisabled,
-    'Toggle--yellow': highlightColor === 'yellow'
+    'Toggle--yellow': highlightColor === 'yellow',
   })
-  const toggleSliderClasses = classnames('Toggle__slider Toggle__slider--round', {
-    'Toggle__slider--disabled': isDisabled,
-    'Toggle__slider--waiting': isWaiting
-  })
+  const toggleSliderClasses = classnames(
+    'Toggle__slider Toggle__slider--round',
+    {
+      'Toggle__slider--disabled': isDisabled,
+      'Toggle__slider--waiting': isWaiting,
+    },
+  )
   return (
     <label className={labelClasses}>
       <input
@@ -29,7 +32,7 @@ const Toggle = ({
       />
       <div
         className={toggleSliderClasses}
-        title={ isDisabled ? disabledTitle : null }
+        title={isDisabled ? disabledTitle : null}
       />
     </label>
   )
@@ -41,7 +44,7 @@ Toggle.propTypes = {
   disabledTitle: PropTypes.string,
   onChange: PropTypes.func.isRequired,
   waiting: PropTypes.bool,
-  highlightColor: PropTypes.oneOf(['yellow'])
+  highlightColor: PropTypes.oneOf(['yellow']),
 }
 
 export default Toggle

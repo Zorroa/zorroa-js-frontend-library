@@ -19,16 +19,16 @@ class ImportSet extends Component {
     onOpen: PropTypes.func,
     floatBody: PropTypes.bool.isRequired,
     user: PropTypes.instanceOf(User).isRequired,
-    actions: PropTypes.object
+    actions: PropTypes.object,
   }
 
   state = {
     jobs: [],
     suggestions: [],
-    suggestion: ''
+    suggestion: '',
   }
 
-  componentWillMount () {
+  componentWillMount() {
     const { user } = this.props
     const userId = user && user.id
     const type = Job.Import
@@ -37,7 +37,7 @@ class ImportSet extends Component {
     this.componentWillReceiveProps(this.props)
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     const jobs = [...this.state.jobs]
     if (nextProps.selectedJobIds && nextProps.selectedJobIds.size) {
       nextProps.selectedJobIds.forEach(id => {
@@ -49,9 +49,18 @@ class ImportSet extends Component {
     }
     const MIN_JOBS = 3
     if (jobs.length < MIN_JOBS && nextProps.jobs) {
-      const firstJobs = Object.keys(nextProps.jobs).map(k => nextProps.jobs[k])
-        .filter(job => job.type === Job.Import && jobs.findIndex(j => j.id !== job.id) < 0)
-        .sort((a, b) => (a.timeStarted < b.timeStarted ? -1 : (a.timeStarted > b.timeStarted ? 1 : 0)))
+      const firstJobs = Object.keys(nextProps.jobs)
+        .map(k => nextProps.jobs[k])
+        .filter(
+          job =>
+            job.type === Job.Import && jobs.findIndex(j => j.id !== job.id) < 0,
+        )
+        .sort(
+          (a, b) =>
+            a.timeStarted < b.timeStarted
+              ? -1
+              : a.timeStarted > b.timeStarted ? 1 : 0,
+        )
         .slice(0, MIN_JOBS)
       firstJobs.forEach(job => jobs.push(job))
     }
@@ -69,7 +78,7 @@ class ImportSet extends Component {
     this.setState({ suggestions: [], suggestion: '' })
   }
 
-  clearAll = (event) => {
+  clearAll = event => {
     this.props.actions.selectJobIds()
     this.setState({ suggestions: [], suggestion: '' })
   }
@@ -83,17 +92,19 @@ class ImportSet extends Component {
       const key = suggestion.toLowerCase()
       Object.keys(jobs).forEach(() => {
         const job = jobs[key]
-        if (job.type === Job.Import &&
+        if (
+          job.type === Job.Import &&
           job.name.toLowerCase().includes(key) &&
-          curJobs.findIndex(j => j.id === job.id) < 0) {
-          suggestions.push({text: job.name, job: job})
+          curJobs.findIndex(j => j.id === job.id) < 0
+        ) {
+          suggestions.push({ text: job.name, job: job })
         }
       })
-      this.setState({suggestions, suggestion})
+      this.setState({ suggestions, suggestion })
     }
   }
 
-  select = (text) => {
+  select = text => {
     if (!text) return
     const { suggestions } = this.state
     const suggestion = suggestions.find(suggestion => suggestion.text === text)
@@ -101,46 +112,75 @@ class ImportSet extends Component {
     const selectedJobIds = new Set([...this.props.selectedJobIds, job.id])
     this.props.actions.selectJobIds(selectedJobIds)
     console.log('Select ' + text)
-    this.setState({suggestions: [], suggestion: ''})
+    this.setState({ suggestions: [], suggestion: '' })
     console.log('Select suggestion ' + text)
   }
 
-  render () {
-    const { jobs, selectedJobIds, id, floatBody, isOpen, onOpen, isIconified } = this.props
+  render() {
+    const {
+      jobs,
+      selectedJobIds,
+      id,
+      floatBody,
+      isOpen,
+      onOpen,
+      isIconified,
+    } = this.props
     const { suggestions, suggestion } = this.state
     const selectedJobs = [...selectedJobIds.values()].map(id => jobs[id])
     const title = 'Imports'
     const field = undefined
     return (
-      <Widget className='ImportSet'
-              id={id}
-              isOpen={isOpen}
-              onOpen={onOpen}
-              floatBody={floatBody}
-              title={title}
-              field={field}
-              backgroundColor={ImportSetWidgetInfo.color}
-              isIconified={isIconified}
-              icon={ImportSetWidgetInfo.icon}>
+      <Widget
+        className="ImportSet"
+        id={id}
+        isOpen={isOpen}
+        onOpen={onOpen}
+        floatBody={floatBody}
+        title={title}
+        field={field}
+        backgroundColor={ImportSetWidgetInfo.color}
+        isIconified={isIconified}
+        icon={ImportSetWidgetInfo.icon}>
         <div className="ImportSet-body">
           <div className="ImportSet-suggestions">
-            <Suggestions suggestions={suggestions} placeholder="Search Imports" className="clear"
-                         value={suggestion} onChange={this.suggest} onSelect={this.select}/>
+            <Suggestions
+              suggestions={suggestions}
+              placeholder="Search Imports"
+              className="clear"
+              value={suggestion}
+              onChange={this.suggest}
+              onSelect={this.select}
+            />
           </div>
-          { selectedJobs.length > 0 && (
+          {selectedJobs.length > 0 && (
             <div className="ImportSet-clear-all" key="clear-all">
               <div className="ImportSet-clear-all-label">
                 {`${selectedJobs.length} imports selected`}
               </div>
-              <div className="ImportSet-clear-all-icon icon-cancel-circle" onClick={this.clearAll}/>
+              <div
+                className="ImportSet-clear-all-icon icon-cancel-circle"
+                onClick={this.clearAll}
+              />
             </div>
           )}
-          { this.state.jobs.length <= 0 && <div className="ImportSet-clear-all" key="clear-all"/> }
-          { !this.state.jobs.length && <div className="ImportSet-empty"><div className="icon-emptybox"/>No Imports Selected</div> }
+          {this.state.jobs.length <= 0 && (
+            <div className="ImportSet-clear-all" key="clear-all" />
+          )}
+          {!this.state.jobs.length && (
+            <div className="ImportSet-empty">
+              <div className="icon-emptybox" />No Imports Selected
+            </div>
+          )}
           <div className="ImportSet-imports">
-            { this.state.jobs.map(job => (
+            {this.state.jobs.map(job => (
               <div className="ImportSet-import" key={job.id}>
-                <div className={`ImportSet-import-selected icon-checkbox-${selectedJobIds.has(job.id) ? 'checked' : 'empty'}`} onClick={e => this.toggleJob(job, e)}/>
+                <div
+                  className={`ImportSet-import-selected icon-checkbox-${
+                    selectedJobIds.has(job.id) ? 'checked' : 'empty'
+                  }`}
+                  onClick={e => this.toggleJob(job, e)}
+                />
                 <div className="ImportSet-import-name">{job.name}</div>
               </div>
             ))}
@@ -155,11 +195,15 @@ export default connect(
   state => ({
     jobs: state.jobs.all,
     selectedJobIds: state.jobs.selectedIds,
-    user: state.auth.user
-  }), dispatch => ({
-    actions: bindActionCreators({
-      getJobs,
-      selectJobIds
-    }, dispatch)
-  })
+    user: state.auth.user,
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        getJobs,
+        selectJobIds,
+      },
+      dispatch,
+    ),
+  }),
 )(ImportSet)

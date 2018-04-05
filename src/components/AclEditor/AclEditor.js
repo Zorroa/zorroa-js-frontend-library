@@ -13,40 +13,42 @@ class AclEditor extends Component {
     onChange: PropTypes.func.isRequired,
     acl: PropTypes.arrayOf(PropTypes.instanceOf(AclEntry)),
     permissions: PropTypes.arrayOf(PropTypes.instanceOf(Permission)),
-    actions: PropTypes.object
+    actions: PropTypes.object,
   }
 
   static defaultProps = {
-    acl: []
+    acl: [],
   }
 
   state = {
     selectedPermissionIds: new Map(),
-    filterText: ''
+    filterText: '',
   }
 
-  componentWillMount () {
+  componentWillMount() {
     // Move to a global location, pending cache invalidation issues
     this.props.actions.getAllPermissions()
     this.updatePermissions(this.props)
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     this.updatePermissions(nextProps)
   }
 
-  updatePermissions (props) {
+  updatePermissions(props) {
     const { permissions, acl } = props
     const { name } = this.state
     let selectedPermissionIds = new Map()
     acl.forEach(aclEntry => {
-      const permission = permissions.find(permission => (aclEntry.permissionId === permission.id))
+      const permission = permissions.find(
+        permission => aclEntry.permissionId === permission.id,
+      )
       if (permission) selectedPermissionIds.set(permission.id, aclEntry.access)
     })
     this.setState({ selectedPermissionIds, name })
   }
 
-  togglePermission (permission, event) {
+  togglePermission(permission, event) {
     let selectedPermissionIds = new Map(this.state.selectedPermissionIds)
     if (event.target.checked) {
       selectedPermissionIds.set(permission.id, AclEntry.ReadAccess)
@@ -56,7 +58,7 @@ class AclEditor extends Component {
     this.setState({ selectedPermissionIds }, this.changeAcl)
   }
 
-  setAccess (access, event) {
+  setAccess(access, event) {
     let selectedPermissionIds = new Map()
     this.state.selectedPermissionIds.forEach((value, key) => {
       selectedPermissionIds.set(key, access)
@@ -64,13 +66,13 @@ class AclEditor extends Component {
     this.setState({ selectedPermissionIds }, this.changeAcl)
   }
 
-  permissionName (permissionId) {
+  permissionName(permissionId) {
     for (let permission of this.props.permissions) {
       if (permission.id === permissionId) return permission.name
     }
   }
 
-  permissionIcon (permissionId) {
+  permissionIcon(permissionId) {
     for (let permission of this.props.permissions) {
       if (permission.id === permissionId) {
         return permission.type === 'group' ? 'icon-group' : undefined
@@ -78,64 +80,103 @@ class AclEditor extends Component {
     }
   }
 
-  permissionValue (access) {
+  permissionValue(access) {
     if (access & AclEntry.ExportAccess) return 3
     if (access & AclEntry.WriteAccess) return 2
     if (access & AclEntry.ReadAccess) return 1
-    return -1   // Avoid undefined since this is used for input:value
+    return -1 // Avoid undefined since this is used for input:value
   }
 
-  permissionsForValue (value) {
+  permissionsForValue(value) {
     switch (value) {
-      case 1: return AclEntry.ReadAccess
-      case 2: return AclEntry.ReadAccess | AclEntry.WriteAccess
-      case 3: return AclEntry.ReadAccess | AclEntry.WriteAccess | AclEntry.ExportAccess
+      case 1:
+        return AclEntry.ReadAccess
+      case 2:
+        return AclEntry.ReadAccess | AclEntry.WriteAccess
+      case 3:
+        return (
+          AclEntry.ReadAccess | AclEntry.WriteAccess | AclEntry.ExportAccess
+        )
     }
   }
 
-  removePermission (permissionId) {
+  removePermission(permissionId) {
     let selectedPermissionIds = new Map(this.state.selectedPermissionIds)
     selectedPermissionIds.delete(permissionId)
     this.setState({ selectedPermissionIds }, this.changeAcl)
   }
 
-  changePermission (permissionId, event) {
+  changePermission(permissionId, event) {
     let selectedPermissionIds = new Map(this.state.selectedPermissionIds)
     const value = parseInt(event.target.value, 10)
     selectedPermissionIds.set(permissionId, this.permissionsForValue(value))
     this.setState({ selectedPermissionIds }, this.changeAcl)
   }
 
-  changeFilterText = (event) => {
+  changeFilterText = event => {
     this.setState({ filterText: event.target.value })
   }
 
   changeAcl = () => {
     const { selectedPermissionIds } = this.state
-    const acl = selectedPermissionIds && selectedPermissionIds.size
-      ? Array.from(selectedPermissionIds).map(([permissionId, access]) => (
-        new AclEntry({ permissionId, access }))) : undefined
+    const acl =
+      selectedPermissionIds && selectedPermissionIds.size
+        ? Array.from(selectedPermissionIds).map(
+            ([permissionId, access]) => new AclEntry({ permissionId, access }),
+          )
+        : undefined
     this.props.onChange(acl)
   }
 
-  renderPermissionSlider (permissionId, access) {
+  renderPermissionSlider(permissionId, access) {
     return (
       <div className="flexRow flexAlignItemsCenter">
         <div className="AclEditor-perm-slider">
           <div className="AclEditor-perms-tick-row">
-            <div className={classnames('AclEditor-perms-tick', {ticked: access & AclEntry.ReadAccess})} style={{left: '0%'}}/>
-            <div className={classnames('AclEditor-perms-tick', 'medium', {ticked: access & AclEntry.WriteAccess})} style={{left: '50%'}}/>
-            <div className={classnames('AclEditor-perms-tick', 'large', {ticked: access & AclEntry.ExportAccess})} style={{left: '100%'}}/>
+            <div
+              className={classnames('AclEditor-perms-tick', {
+                ticked: access & AclEntry.ReadAccess,
+              })}
+              style={{ left: '0%' }}
+            />
+            <div
+              className={classnames('AclEditor-perms-tick', 'medium', {
+                ticked: access & AclEntry.WriteAccess,
+              })}
+              style={{ left: '50%' }}
+            />
+            <div
+              className={classnames('AclEditor-perms-tick', 'large', {
+                ticked: access & AclEntry.ExportAccess,
+              })}
+              style={{ left: '100%' }}
+            />
           </div>
-          <progress className="AclEditor-perm-progress" min={0} max={2} value={this.permissionValue(access) - 1} />
-          <input className="AclEditor-perms-input" type="range" min="1" max="3" step="1" value={this.permissionValue(access)} onChange={this.changePermission.bind(this, permissionId)} />
+          <progress
+            className="AclEditor-perm-progress"
+            min={0}
+            max={2}
+            value={this.permissionValue(access) - 1}
+          />
+          <input
+            className="AclEditor-perms-input"
+            type="range"
+            min="1"
+            max="3"
+            step="1"
+            value={this.permissionValue(access)}
+            onChange={this.changePermission.bind(this, permissionId)}
+          />
         </div>
-        <div onClick={this.removePermission.bind(this, permissionId)} className="icon-cross"/>
+        <div
+          onClick={this.removePermission.bind(this, permissionId)}
+          className="icon-cross"
+        />
       </div>
     )
   }
 
-  renderPermissions (name, icon, permissions) {
+  renderPermissions(name, icon, permissions) {
     if (!permissions || !permissions.length) return
     const { selectedPermissionIds } = this.state
     return (
@@ -144,11 +185,27 @@ class AclEditor extends Component {
           <div className="AclEditor-permission-title">{name}</div>
         </div>
         <div className="AclEditor-permission-items">
-          { permissions.map(permission => (
+          {permissions.map(permission => (
             <div key={permission.id} className="AclEditor-permission">
-              <input type="checkbox" name={`${permission.type}__${permission.name}`} id={permission.id} checked={selectedPermissionIds && selectedPermissionIds.has(permission.id)} onChange={this.togglePermission.bind(this, permission)}/>
-              <label htmlFor={permission.id} className={classnames('AclEditor-permission-icon', icon)}/>
-              <label htmlFor={permission.id} className="AclEditor-permission-name">{permission.name}</label>
+              <input
+                type="checkbox"
+                name={`${permission.type}__${permission.name}`}
+                id={permission.id}
+                checked={
+                  selectedPermissionIds &&
+                  selectedPermissionIds.has(permission.id)
+                }
+                onChange={this.togglePermission.bind(this, permission)}
+              />
+              <label
+                htmlFor={permission.id}
+                className={classnames('AclEditor-permission-icon', icon)}
+              />
+              <label
+                htmlFor={permission.id}
+                className="AclEditor-permission-name">
+                {permission.name}
+              </label>
             </div>
           ))}
         </div>
@@ -156,63 +213,90 @@ class AclEditor extends Component {
     )
   }
 
-  render () {
+  render() {
     const { permissions } = this.props
     const { selectedPermissionIds, filterText } = this.state
     const lcFilterText = filterText.toLowerCase()
-    const groupPermissions = permissions.filter(permission => (
-      permission.type === 'group' &&
-      permission.name.toLowerCase().includes(lcFilterText)
-    ))
-    const userPermissions = permissions.filter(permission => (
-      permission.type === 'user' &&
-      permission.name.toLowerCase().includes(lcFilterText)
-    ))
+    const groupPermissions = permissions.filter(
+      permission =>
+        permission.type === 'group' &&
+        permission.name.toLowerCase().includes(lcFilterText),
+    )
+    const userPermissions = permissions.filter(
+      permission =>
+        permission.type === 'user' &&
+        permission.name.toLowerCase().includes(lcFilterText),
+    )
 
     return (
       <div className="AclEditor">
         <div className="AclEditor-acl">
           <div className="AclEditor-shared-with">
-            { selectedPermissionIds.size ? (
+            {selectedPermissionIds.size ? (
               <div className="AclEditor-shared-with-title">
                 <div>Shared With</div>
                 <div className="AclEditor-shared-with-perm-icons">
-                  <div className="icon-eye2" onClick={this.setAccess.bind(this, this.permissionsForValue(1))} />
-                  <div className="icon-pen" onClick={this.setAccess.bind(this, this.permissionsForValue(2))} />
-                  <div className="icon-export" onClick={this.setAccess.bind(this, this.permissionsForValue(3))} />
+                  <div
+                    className="icon-eye2"
+                    onClick={this.setAccess.bind(
+                      this,
+                      this.permissionsForValue(1),
+                    )}
+                  />
+                  <div
+                    className="icon-pen"
+                    onClick={this.setAccess.bind(
+                      this,
+                      this.permissionsForValue(2),
+                    )}
+                  />
+                  <div
+                    className="icon-export"
+                    onClick={this.setAccess.bind(
+                      this,
+                      this.permissionsForValue(3),
+                    )}
+                  />
                 </div>
-              </div>) : (
-                <div className="AclEditor-empty">
-                  <div className="AclEditor-empty-icon icon-emptybox"/>
-                  <div className="AclEditor-empty-label">No Permissions</div>
-                </div>
+              </div>
+            ) : (
+              <div className="AclEditor-empty">
+                <div className="AclEditor-empty-icon icon-emptybox" />
+                <div className="AclEditor-empty-label">No Permissions</div>
+              </div>
             )}
           </div>
           <div className="AclEditor-shared-with-permissions">
-            { Array.from(selectedPermissionIds).map(([permissionId, access]) => (
+            {Array.from(selectedPermissionIds).map(([permissionId, access]) => (
               <div key={permissionId} className="AclEditor-selected-permission">
                 <div className="flexRow flexAlignItemsCenter">
-                  <div className={this.permissionIcon(permissionId)}/>
+                  <div className={this.permissionIcon(permissionId)} />
                   {this.permissionName(permissionId)}
                 </div>
-                { this.renderPermissionSlider(permissionId, access) }
+                {this.renderPermissionSlider(permissionId, access)}
               </div>
             ))}
           </div>
         </div>
         <div className="AclEditor-controls">
-          <Filter value={filterText} onChange={this.changeFilterText}
-                  placeholder="Search groups and individuals"/>
-          { this.renderPermissions('Groups', 'icon-group', groupPermissions) }
-          { this.renderPermissions('Individuals', undefined, userPermissions) }
+          <Filter
+            value={filterText}
+            onChange={this.changeFilterText}
+            placeholder="Search groups and individuals"
+          />
+          {this.renderPermissions('Groups', 'icon-group', groupPermissions)}
+          {this.renderPermissions('Individuals', undefined, userPermissions)}
         </div>
       </div>
     )
   }
 }
 
-export default connect(state => ({
-  permissions: state.permissions.all
-}), dispatch => ({
-  actions: bindActionCreators({ getAllPermissions }, dispatch)
-}))(AclEditor)
+export default connect(
+  state => ({
+    permissions: state.permissions.all,
+  }),
+  dispatch => ({
+    actions: bindActionCreators({ getAllPermissions }, dispatch),
+  }),
+)(AclEditor)

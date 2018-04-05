@@ -1,5 +1,15 @@
 export default class Command {
-  constructor ({ id, user, type, args, state, totalCount, successCount, errorCount, message }) {
+  constructor({
+    id,
+    user,
+    type,
+    args,
+    state,
+    totalCount,
+    successCount,
+    errorCount,
+    message,
+  }) {
     this.id = id
     this.user = user
     this.type = type

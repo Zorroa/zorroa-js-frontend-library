@@ -5,12 +5,20 @@ import ThumbLayoutSelector from './ThumbLayoutSelector'
 import TableToggle from './TableToggle'
 import MultipageToggle from './MultipageToggle'
 
-const Footer = (props) => (
+const Footer = props => (
   <div className="assets-footer">
     <ThumbSizeSlider value={props.thumbSize} onChange={props.handleThumbSize} />
-    <ThumbLayoutSelector thumbLayout={props.layout} onClick={props.handleLayout} />
-    <MultipageToggle enabled={props.showMultipage} onClick={props.toggleShowMultipage}/>
-    { props.toggleShowTable && <TableToggle enabled={props.showTable} onClick={props.toggleShowTable} /> }
+    <ThumbLayoutSelector
+      thumbLayout={props.layout}
+      onClick={props.handleLayout}
+    />
+    <MultipageToggle
+      enabled={props.showMultipage}
+      onClick={props.toggleShowMultipage}
+    />
+    {props.toggleShowTable && (
+      <TableToggle enabled={props.showTable} onClick={props.toggleShowTable} />
+    )}
   </div>
 )
 
@@ -22,7 +30,7 @@ Footer.propTypes = {
   thumbSize: PropTypes.number.isRequired,
   handleThumbSize: PropTypes.func.isRequired,
   showMultipage: PropTypes.bool.isRequired,
-  toggleShowMultipage: PropTypes.func.isRequired
+  toggleShowMultipage: PropTypes.func.isRequired,
 }
 
 export default Footer

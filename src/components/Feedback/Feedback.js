@@ -16,7 +16,7 @@ const SUPPORT_ADDRESS = 'support@zorroa.com'
 class Feedback extends Component {
   static propTypes = {
     user: PropTypes.instanceOf(User),
-    actions: PropTypes.object
+    actions: PropTypes.object,
   }
 
   static loadEmailJs = () => {
@@ -27,8 +27,8 @@ class Feedback extends Component {
     window.zorroaEmailJSLoadAttempted = true
 
     // http://stackoverflow.com/a/7719185/1424242
-    var loadScript = (src) => {
-      return new Promise(function (resolve, reject) {
+    var loadScript = src => {
+      return new Promise(function(resolve, reject) {
         var s
         s = document.createElement('script')
         s.src = src
@@ -40,35 +40,35 @@ class Feedback extends Component {
 
     // wait for above-the-fold loads to finish
     new Promise(resolve => setTimeout(resolve, 1000))
-    .then(() => loadScript('https://cdn.emailjs.com/dist/email.min.js'))
-    // emailjs needs a moment to init before window.emailjs will be defined
-    .then(() => new Promise(resolve => setTimeout(resolve, 1000)))
-    .then(() => window.emailjs.init('user_WBcDrP5QF9DWgdWTE6DvB'))
-    .catch(err => console.error('Zorroa email js', err))
+      .then(() => loadScript('https://cdn.emailjs.com/dist/email.min.js'))
+      // emailjs needs a moment to init before window.emailjs will be defined
+      .then(() => new Promise(resolve => setTimeout(resolve, 1000)))
+      .then(() => window.emailjs.init('user_WBcDrP5QF9DWgdWTE6DvB'))
+      .catch(err => console.error('Zorroa email js', err))
   }
 
   state = {
     text: '',
-    sendState: window.emailjs ? EDITING : OUT_OF_ORDER
+    sendState: window.emailjs ? EDITING : OUT_OF_ORDER,
   }
 
   _isMounted = false
-  componentDidMount () {
+  componentDidMount() {
     this._isMounted = true
   }
-  componentWillUnmount () {
+  componentWillUnmount() {
     this._isMounted = false
   }
 
-  dismiss = (event) => {
+  dismiss = event => {
     this.props.actions.hideModal()
   }
 
-  updateText = (event) => {
-    this.setState({text: event.target.value})
+  updateText = event => {
+    this.setState({ text: event.target.value })
   }
 
-  send = (event) => {
+  send = event => {
     const { user } = this.props
 
     // These will be injected into the email according to the template we're using.
@@ -84,7 +84,7 @@ class Feedback extends Component {
       from_email: this.props.user.email,
       reply_to: this.props.user.email,
       subject: 'help',
-      message: this.state.text
+      message: this.state.text,
     }
 
     console.log(emailBlob)
@@ -108,75 +108,108 @@ class Feedback extends Component {
     // The email template is setup manually inside the emailjs.com account
     // emailjs.send parameters: service_id, template_id, template_parameters
     //
-    window.emailjs.send('default_service', 'template_4EvEfQML', emailBlob)
-    .then(
-      (response) => {
+    window.emailjs.send('default_service', 'template_4EvEfQML', emailBlob).then(
+      response => {
         // console.log("SUCCESS. status=%d, text=%s", response.status, response.text)
         if (this._isMounted) this.setState({ sendState: SENT })
       },
       () => {
         // console.log("FAILED. error=", reason)
         if (this._isMounted) this.setState({ sendState: SENDERROR })
-      }
+      },
     )
   }
 
-  render () {
+  render() {
     const { sendState } = this.state
     return (
       <div className="Feedback">
         <div className="Feedback-header">
           <div className="flexRow flexAlignItemsCenter">
-            <div className="Feedback-icon icon-question"/>
+            <div className="Feedback-icon icon-question" />
             <div>Feedback</div>
           </div>
-          <div onClick={this.dismiss} className="Feedback-close icon-cross"/>
+          <div onClick={this.dismiss} className="Feedback-close icon-cross" />
         </div>
-        { (sendState === EDITING) && (
+        {sendState === EDITING && (
           <div className="Feedback-body">
-            <span>Enter a question or note here, and we will get back to you asap.
-            If you prefer, you can email <a href={`mailto:${SUPPORT_ADDRESS}?Subject=Zorroa%20support%20request`} target="_top">{SUPPORT_ADDRESS}</a> directly.</span>
-            <textarea className="Feedback-text" type="text" rows="5" value={this.state.name} onChange={this.updateText}/>
+            <span>
+              Enter a question or note here, and we will get back to you asap.
+              If you prefer, you can email{' '}
+              <a
+                href={`mailto:${SUPPORT_ADDRESS}?Subject=Zorroa%20support%20request`}
+                target="_top">
+                {SUPPORT_ADDRESS}
+              </a>{' '}
+              directly.
+            </span>
+            <textarea
+              className="Feedback-text"
+              type="text"
+              rows="5"
+              value={this.state.name}
+              onChange={this.updateText}
+            />
           </div>
         )}
-        { (sendState === SENDING) && (
+        {sendState === SENDING && (
           <div className="Feedback-body">
             <span>Sending feedback to Zorroa Support...</span>
           </div>
         )}
-        { (sendState === SENT) && (
-          <div className="Feedback-body">
-            <span>Feedback sent. Thank you! We will get back to you as soon as we can.</span>
-          </div>
-        )}
-        { (sendState === SENDERROR) && (
+        {sendState === SENT && (
           <div className="Feedback-body">
             <span>
-              Sorry, something went wrong emailing support.
-              Please try again later or
-              email <a href={`mailto:${SUPPORT_ADDRESS}?Subject=Zorroa%20support%20request`} target="_top">{SUPPORT_ADDRESS}</a> directly.
+              Feedback sent. Thank you! We will get back to you as soon as we
+              can.
             </span>
           </div>
         )}
-        { (sendState === OUT_OF_ORDER) && (
+        {sendState === SENDERROR && (
           <div className="Feedback-body">
             <span>
-              Sorry, this feature is unavailable at this time.<br/>
+              Sorry, something went wrong emailing support. Please try again
+              later or email{' '}
+              <a
+                href={`mailto:${SUPPORT_ADDRESS}?Subject=Zorroa%20support%20request`}
+                target="_top">
+                {SUPPORT_ADDRESS}
+              </a>{' '}
+              directly.
+            </span>
+          </div>
+        )}
+        {sendState === OUT_OF_ORDER && (
+          <div className="Feedback-body">
+            <span>
+              Sorry, this feature is unavailable at this time.<br />
               Please check your network connectivity and try again later, or
-              email <a href={`mailto:${SUPPORT_ADDRESS}?Subject=Zorroa%20support%20request`} target="_top">{SUPPORT_ADDRESS}</a> directly.
+              email{' '}
+              <a
+                href={`mailto:${SUPPORT_ADDRESS}?Subject=Zorroa%20support%20request`}
+                target="_top">
+                {SUPPORT_ADDRESS}
+              </a>{' '}
+              directly.
             </span>
           </div>
         )}
 
-        { (sendState === EDITING) && (
+        {sendState === EDITING && (
           <div className="Feedback-footer">
-            <button className="Feedback-send default" onClick={this.send}>Send</button>
-            <button className="Feedback-cancel" onClick={this.dismiss}>Cancel</button>
+            <button className="Feedback-send default" onClick={this.send}>
+              Send
+            </button>
+            <button className="Feedback-cancel" onClick={this.dismiss}>
+              Cancel
+            </button>
           </div>
         )}
-        { (sendState !== EDITING) && (
+        {sendState !== EDITING && (
           <div className="Feedback-footer">
-            <button className="Feedback-close" onClick={this.dismiss}>Close</button>
+            <button className="Feedback-close" onClick={this.dismiss}>
+              Close
+            </button>
           </div>
         )}
       </div>
@@ -184,6 +217,9 @@ class Feedback extends Component {
   }
 }
 
-export default connect(() => ({}), dispatch => ({
-  actions: bindActionCreators({ hideModal }, dispatch)
-}))(Feedback)
+export default connect(
+  () => ({}),
+  dispatch => ({
+    actions: bindActionCreators({ hideModal }, dispatch),
+  }),
+)(Feedback)

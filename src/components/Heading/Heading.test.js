@@ -1,7 +1,7 @@
 /* eslint-env jest */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import { shallow } from 'enzyme'
 import Heading from './Heading'
 
 describe('<Heading />', () => {
@@ -21,7 +21,7 @@ describe('<Heading />', () => {
     const opinionatedHeading = shallow(
       <Heading level="h4" size="medium">
         Hello World
-      </Heading>
+      </Heading>,
     )
 
     it('Should have a Heading--medium class', () => {

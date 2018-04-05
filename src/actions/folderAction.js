@@ -1,26 +1,38 @@
 import {
-  GET_FOLDER_CHILDREN, SELECT_FOLDERS, CREATE_FOLDER, UPDATE_FOLDER,
-  DELETE_FOLDER, TOGGLE_FOLDER, ADD_ASSETS_TO_FOLDER,
-  REMOVE_ASSETS_FROM_FOLDER, DROP_FOLDER_ID,
-  FOLDER_COUNTS, CLEAR_MODIFIED_FOLDERS,
-  CREATE_TAXONOMY, DELETE_TAXONOMY, UPDATE_FOLDER_PERMISSIONS
+  GET_FOLDER_CHILDREN,
+  SELECT_FOLDERS,
+  CREATE_FOLDER,
+  UPDATE_FOLDER,
+  DELETE_FOLDER,
+  TOGGLE_FOLDER,
+  ADD_ASSETS_TO_FOLDER,
+  REMOVE_ASSETS_FROM_FOLDER,
+  DROP_FOLDER_ID,
+  FOLDER_COUNTS,
+  CLEAR_MODIFIED_FOLDERS,
+  CREATE_TAXONOMY,
+  DELETE_TAXONOMY,
+  UPDATE_FOLDER_PERMISSIONS,
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import {
-  archivistGet, archivistPut, archivistPost, archivistRequest,
-  archivistDelete
+  archivistGet,
+  archivistPut,
+  archivistPost,
+  archivistRequest,
+  archivistDelete,
 } from './authAction'
 import { restoreFolders } from './racetrackAction'
 import { selectId } from '../services/jsUtil'
 
 const rootEndpoint = '/api/v1/folders'
 
-export function toggleFolder (folderId, isOpen) {
+export function toggleFolder(folderId, isOpen) {
   return dispatch => {
     console.log('Toggle Folder', folderId, isOpen)
     dispatch({
       type: TOGGLE_FOLDER,
-      payload: { folderId, isOpen }
+      payload: { folderId, isOpen },
     })
   }
 }
@@ -28,30 +40,36 @@ export function toggleFolder (folderId, isOpen) {
 // Queue a load of the children for folder <parentId>
 // pass optOnDoneFn optionally to receive a callback when the request is returned
 // the request will be passed the list of children loaded
-export function getFolderChildren (parentId, optOnDoneFn) {
-  if (parentId < Folder.ROOT_ID) {             // Catch "fake" folders, if used
-    return () => { return Promise.resolve() }
+export function getFolderChildren(parentId, optOnDoneFn) {
+  if (parentId < Folder.ROOT_ID) {
+    // Catch "fake" folders, if used
+    return () => {
+      return Promise.resolve()
+    }
   }
   return dispatch => {
     console.log('Load folder ' + parentId)
-    return archivistGet(dispatch, `${rootEndpoint}/${parentId}/_children`)
-      .then(response => {
-        const children = response.data.map(folder => (new Folder(folder)))
+    return archivistGet(dispatch, `${rootEndpoint}/${parentId}/_children`).then(
+      response => {
+        const children = response.data.map(folder => new Folder(folder))
         if (optOnDoneFn) optOnDoneFn(children)
         return dispatch({
           type: GET_FOLDER_CHILDREN,
-          payload: { parentId, children }
+          payload: { parentId, children },
         })
-      })
+      },
+    )
   }
 }
 
-export function selectFolderIds (ids) {
+export function selectFolderIds(ids) {
   if (!(ids instanceof Set)) ids = new Set(ids)
-  return [{
-    type: SELECT_FOLDERS,
-    payload: ids
-  }]
+  return [
+    {
+      type: SELECT_FOLDERS,
+      payload: ids,
+    },
+  ]
 }
 
 // Select the folder and restore launchpads if needed.
@@ -59,28 +77,32 @@ export function selectFolderIds (ids) {
 // we can share this logic without duplicating the TrashedFolder array into
 // a Folder array each time we do selection, which would require dup+find.
 // TrashedFolder.folderId is used instead of Folder.id rather than instanceof.
-export function selectFolderId (id, shiftKey, metaKey, folders, selectedIds) {
+export function selectFolderId(id, shiftKey, metaKey, folders, selectedIds) {
   let selectedFolderIds = selectId(id, shiftKey, metaKey, folders, selectedIds)
   const restoredFolders = []
-  selectedFolderIds = new Set([...selectedFolderIds].filter(id => {
-    const folder = folders.find(folder => id === folder.id)
-    if (!folder) return false
-    if (folder.isLaunchpad()) {
-      restoredFolders.push(folder)
-      return false
-    }
-    return true
-  }))
+  selectedFolderIds = new Set(
+    [...selectedFolderIds].filter(id => {
+      const folder = folders.find(folder => id === folder.id)
+      if (!folder) return false
+      if (folder.isLaunchpad()) {
+        restoredFolders.push(folder)
+        return false
+      }
+      return true
+    }),
+  )
 
   let actions = []
-  if (selectedFolderIds.size) actions = actions.concat(selectFolderIds(selectedFolderIds))
+  if (selectedFolderIds.size)
+    actions = actions.concat(selectFolderIds(selectedFolderIds))
   const upsert = shiftKey || metaKey
-  if (restoredFolders.length) actions = actions.concat(restoreFolders(restoredFolders, upsert))
+  if (restoredFolders.length)
+    actions = actions.concat(restoreFolders(restoredFolders, upsert))
 
   return actions
 }
 
-export function createFolder (folder, assetIds) {
+export function createFolder(folder, assetIds) {
   return dispatch => {
     console.log('Create folder: ' + JSON.stringify(folder))
     archivistPost(dispatch, `${rootEndpoint}`, folder)
@@ -88,7 +110,7 @@ export function createFolder (folder, assetIds) {
         const folder = new Folder(response.data)
         dispatch({
           type: CREATE_FOLDER,
-          payload: folder
+          payload: folder,
         })
         if (assetIds) {
           // Chain actions to add assets to newly created folder
@@ -101,14 +123,14 @@ export function createFolder (folder, assetIds) {
   }
 }
 
-export function updateFolder (folder) {
+export function updateFolder(folder) {
   return dispatch => {
     console.log('Update folder: ' + JSON.stringify(folder))
     archivistPut(dispatch, `${rootEndpoint}/${folder.id}`, folder)
       .then(response => {
         dispatch({
           type: UPDATE_FOLDER,
-          payload: new Folder(response.data)
+          payload: new Folder(response.data),
         })
       })
       .catch(error => {
@@ -117,23 +139,27 @@ export function updateFolder (folder) {
   }
 }
 
-export function updateFolderPermissions (folderId, acl) {
+export function updateFolderPermissions(folderId, acl) {
   return dispatch => {
-    console.log('Update folder ' + folderId + ' permissions: ' + JSON.stringify(acl))
-    archivistPut(dispatch, `${rootEndpoint}/${folderId}/_permissions`, {acl})
+    console.log(
+      'Update folder ' + folderId + ' permissions: ' + JSON.stringify(acl),
+    )
+    archivistPut(dispatch, `${rootEndpoint}/${folderId}/_permissions`, { acl })
       .then(response => {
         dispatch({
           type: UPDATE_FOLDER_PERMISSIONS,
-          payload: new Folder(response.data)
+          payload: new Folder(response.data),
         })
       })
       .catch(error => {
-        console.error('Error updating folder ' + folderId + ' permissions: ' + error)
+        console.error(
+          'Error updating folder ' + folderId + ' permissions: ' + error,
+        )
       })
   }
 }
 
-export function deleteFolderIds (ids) {
+export function deleteFolderIds(ids) {
   return dispatch => {
     for (let id of ids) {
       console.log('Delete folder ' + id)
@@ -141,13 +167,13 @@ export function deleteFolderIds (ids) {
       const request = {
         method: 'delete',
         url: `${rootEndpoint}/${id}`,
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
       }
       archivistRequest(dispatch, request)
         .then(response => {
           dispatch({
             type: DELETE_FOLDER,
-            payload: id
+            payload: id,
           })
         })
         .catch(error => {
@@ -157,95 +183,137 @@ export function deleteFolderIds (ids) {
   }
 }
 
-export function addAssetIdsToFolderId (assetIds, folderId) {
+export function addAssetIdsToFolderId(assetIds, folderId) {
   return dispatch => addAssetIdsToFolderIdProm(dispatch, assetIds, folderId)
 }
 
-export function addAssetIdsToFolderIdProm (dispatch, assetIds, folderId) {
+export function addAssetIdsToFolderIdProm(dispatch, assetIds, folderId) {
   if (assetIds instanceof Set) assetIds = [...assetIds]
-  console.log('Add assets ' + JSON.stringify(assetIds) + ' to folder ' + folderId)
+  console.log(
+    'Add assets ' + JSON.stringify(assetIds) + ' to folder ' + folderId,
+  )
   return archivistPost(dispatch, `${rootEndpoint}/${folderId}/assets`, assetIds)
     .then(response => {
       dispatch({
         type: ADD_ASSETS_TO_FOLDER,
-        payload: {assetIds, folderId, data: response.data}
+        payload: { assetIds, folderId, data: response.data },
       })
     })
     .catch(error => {
-      console.error('Error adding assets ' + JSON.stringify(assetIds) + ' to folder ' + folderId + ': ' + error)
+      console.error(
+        'Error adding assets ' +
+          JSON.stringify(assetIds) +
+          ' to folder ' +
+          folderId +
+          ': ' +
+          error,
+      )
     })
 }
 
-export function removeAssetIdsFromFolderId (assetIds, folderId) {
+export function removeAssetIdsFromFolderId(assetIds, folderId) {
   return dispatch => {
     if (assetIds instanceof Set) assetIds = [...assetIds]
-    console.log('Remove assets ' + JSON.stringify(assetIds) + ' from folder ' + folderId)
+    console.log(
+      'Remove assets ' + JSON.stringify(assetIds) + ' from folder ' + folderId,
+    )
     // Workaround CORS issue in OPTIONS preflight request for axios.delete
     const request = {
       method: 'delete',
       url: `${rootEndpoint}/${folderId}/assets`,
       headers: { 'X-Requested-With': 'XMLHttpRequest' },
-      data: assetIds
+      data: assetIds,
     }
     archivistRequest(dispatch, request)
       .then(response => {
         dispatch({
           type: REMOVE_ASSETS_FROM_FOLDER,
-          payload: {assetIds, folderId, data: response.data}
+          payload: { assetIds, folderId, data: response.data },
         })
       })
       .catch(error => {
-        console.error('Error removing assets ' + JSON.stringify(assetIds) + ' from folder ' + folderId + ': ' + error)
+        console.error(
+          'Error removing assets ' +
+            JSON.stringify(assetIds) +
+            ' from folder ' +
+            folderId +
+            ': ' +
+            error,
+        )
       })
   }
 }
 
-export function countAssetsInFolderIds (ids, search) {
-  if (search && search.empty() || (!ids || !ids.length)) {
+export function countAssetsInFolderIds(ids, search) {
+  if ((search && search.empty()) || (!ids || !ids.length)) {
     // Fast path -- empty search, just set filteredCounts to counts in reducer
-    return ([
+    return [
       { type: FOLDER_COUNTS, payload: { search, ids } },
-      { type: CLEAR_MODIFIED_FOLDERS, payload: ids }
-    ])
+      { type: CLEAR_MODIFIED_FOLDERS, payload: ids },
+    ]
   }
   return dispatch => {
-    console.log('Count query assets in folders ' + JSON.stringify(ids) + (search ? ' with query ' + JSON.stringify(search) : ' without search'))
+    console.log(
+      'Count query assets in folders ' +
+        JSON.stringify(ids) +
+        (search ? ' with query ' + JSON.stringify(search) : ' without search'),
+    )
     dispatch({ type: CLEAR_MODIFIED_FOLDERS, payload: ids })
-    return archivistPost(dispatch, `${rootEndpoint}/_assetCounts`, { search, ids })
+    return archivistPost(dispatch, `${rootEndpoint}/_assetCounts`, {
+      search,
+      ids,
+    })
       .then(response => {
         const counts = response.data.counts
         dispatch({
           type: FOLDER_COUNTS,
-          payload: { search, ids, counts }
+          payload: { search, ids, counts },
         })
       })
       .catch(error => {
-        console.error('Error counting query assets in folders ' + JSON.stringify(ids) + ': ' + error)
+        console.error(
+          'Error counting query assets in folders ' +
+            JSON.stringify(ids) +
+            ': ' +
+            error,
+        )
         return Promise.reject(error)
       })
   }
 }
 
-function createDyHiProm (dispatch, folder, levels) {
+function createDyHiProm(dispatch, folder, levels) {
   const folderId = folder.id
-  console.log('Create dyhi inside folder id ' + folderId, ' with ' + JSON.stringify(levels))
+  console.log(
+    'Create dyhi inside folder id ' + folderId,
+    ' with ' + JSON.stringify(levels),
+  )
   return archivistPost(dispatch, '/api/v1/dyhi', { folderId, levels })
     .then(response => {
       folder.dyhiId = response.data.id
-      folder.childCount = 1  // Force loadChildren
+      folder.childCount = 1 // Force loadChildren
       dispatch({
         type: CREATE_FOLDER,
-        payload: folder
+        payload: folder,
       })
     })
     .catch(error => {
-      console.error('Error creating dyhi for ' + folder.id + ' with ' + JSON.stringify(levels) + ': ' + error)
+      console.error(
+        'Error creating dyhi for ' +
+          folder.id +
+          ' with ' +
+          JSON.stringify(levels) +
+          ': ' +
+          error,
+      )
     })
 }
 
-export function createDyHiFolder (folder, dyhiLevels) {
+export function createDyHiFolder(folder, dyhiLevels) {
   return dispatch => {
-    console.log('Create dyhi for ' + folder.name + ' with ' + JSON.stringify(dyhiLevels))
+    console.log(
+      'Create dyhi for ' + folder.name + ' with ' + JSON.stringify(dyhiLevels),
+    )
     archivistPost(dispatch, `${rootEndpoint}`, folder)
       .then(response => {
         const dyhi = new Folder(response.data)
@@ -258,30 +326,32 @@ export function createDyHiFolder (folder, dyhiLevels) {
   }
 }
 
-export function dropFolderId (id) {
+export function dropFolderId(id) {
   return {
     type: DROP_FOLDER_ID,
-    payload: id
+    payload: id,
   }
 }
 
-export function createTaxonomy (folderId) {
+export function createTaxonomy(folderId) {
   return dispatch => {
     console.log('Create taxonomy for folder id ' + folderId)
-    archivistPost(dispatch, '/api/v1/taxonomy', {folderId})
+    archivistPost(dispatch, '/api/v1/taxonomy', { folderId })
       .then(response => {
         dispatch({
           type: CREATE_TAXONOMY,
-          payload: response.data
+          payload: response.data,
         })
       })
       .catch(error => {
-        console.error('Error creating taxonomy for folder id ' + folderId + ': ' + error)
+        console.error(
+          'Error creating taxonomy for folder id ' + folderId + ': ' + error,
+        )
       })
   }
 }
 
-export function deleteTaxonomy (folderId) {
+export function deleteTaxonomy(folderId) {
   return dispatch => {
     console.log('Delete taxonomy for folder id ' + folderId)
     archivistGet(dispatch, `/api/v1/taxonomy/_folder/${folderId}`)
@@ -291,15 +361,19 @@ export function deleteTaxonomy (folderId) {
           .then(response => {
             dispatch({
               type: DELETE_TAXONOMY,
-              payload: taxonomy
+              payload: taxonomy,
             })
           })
           .catch(error => {
-            console.error('Error deleting taxonomy for folder ' + folderId + ': ' + error)
+            console.error(
+              'Error deleting taxonomy for folder ' + folderId + ': ' + error,
+            )
           })
       })
       .catch(error => {
-        console.error('Error getting taxonomy for folder id ' + folderId + ': ' + error)
+        console.error(
+          'Error getting taxonomy for folder id ' + folderId + ': ' + error,
+        )
       })
   }
 }

@@ -3,142 +3,167 @@ import * as assert from 'assert'
 import Proxy from './Proxy'
 
 export default class Asset {
-  constructor ({ id, score, document }) {
+  constructor({ id, score, document }) {
     this.id = id
     this.score = score
     this.document = document
 
     // Build the Proxy list from the ProxySchema
-    if (this.document && this.document.proxies && this.document.proxies.proxies) {
-      this.proxies = this.document.proxies.proxies.map(proxy => new Proxy(proxy))
+    if (
+      this.document &&
+      this.document.proxies &&
+      this.document.proxies.proxies
+    ) {
+      this.proxies = this.document.proxies.proxies.map(
+        proxy => new Proxy(proxy),
+      )
     }
   }
 
-  source () { return this.document.source && this.document.source.filename }
+  source() {
+    return this.document.source && this.document.source.filename
+  }
 
-  static endpoint (origin, id) {
+  static endpoint(origin, id) {
     return `${origin}/api/v1/assets/${id}`
   }
 
-  static _url (id, origin) {
+  static _url(id, origin) {
     return Asset.endpoint(origin, id) + '/_stream'
   }
 
-  url (origin) {
+  url(origin) {
     return Asset._url(this.id, origin)
   }
 
-  static _closestProxyURL (id, origin, width, height) {
-    return `${Asset.endpoint(origin, id)}/proxies/closest/${Math.round(width)}x${Math.round(height)}`
+  static _closestProxyURL(id, origin, width, height) {
+    return `${Asset.endpoint(origin, id)}/proxies/closest/${Math.round(
+      width,
+    )}x${Math.round(height)}`
   }
 
-  closestProxyURL (origin, width, height) {
+  closestProxyURL(origin, width, height) {
     return Asset._closestProxyURL(this.id, origin, width, height)
   }
 
-  atLeastProxyURL (origin, width, height) {
+  atLeastProxyURL(origin, width, height) {
     const id = this.id
     const largestDimension = Math.round(Math.max(width, height))
 
     return `${Asset.endpoint(origin, id)}/proxies/atLeast/${largestDimension}`
   }
 
-  static _largestProxyURL (id, origin) {
+  static _largestProxyURL(id, origin) {
     return Asset.endpoint(origin, id) + '/proxies/largest'
   }
 
-  largestProxyURL (origin) {
+  largestProxyURL(origin) {
     return Asset._largestProxyURL(this.id, origin)
   }
 
-  static _smallestParentProxyURL (parentId, origin) {
+  static _smallestParentProxyURL(parentId, origin) {
     if (!parentId) return null
     return Asset.endpoint(origin, parentId) + '/proxies/smallest'
   }
 
-  smallestParentProxyURL (origin) {
+  smallestParentProxyURL(origin) {
     return Asset._smallestParentProxyURL(this.parentId(), origin)
   }
 
-  backgroundURL (origin) {
+  backgroundURL(origin) {
     const id = this.rawValue('video.background')
     if (!id) return
     return Asset.ofsURL(id, origin)
   }
 
-  static ofsURL (id, origin) {
+  static ofsURL(id, origin) {
     return `${origin}/api/v1/ofs/${id}`
   }
 
-  mediaType () {
+  mediaType() {
     return (this.document.source && this.document.source.mediaType) || 'unknown'
   }
 
-  isOfType (mimeType) {
-    return this.mediaType().toLowerCase().startsWith(mimeType.toLowerCase())
+  isOfType(mimeType) {
+    return this.mediaType()
+      .toLowerCase()
+      .startsWith(mimeType.toLowerCase())
   }
 
-  tinyProxy () { return (this.document.proxies && (this.document.proxies ? this.document.proxies.tinyProxy : null)) }
+  tinyProxy() {
+    return (
+      this.document.proxies &&
+      (this.document.proxies ? this.document.proxies.tinyProxy : null)
+    )
+  }
 
-  isContainedByParent () {
-    const containerTypes = [
-      'flipbook'
-    ]
+  isContainedByParent() {
+    const containerTypes = ['flipbook']
 
     return (
-      this.document.media &&
-      this.document.media.clip &&
-      this.document.media.clip.type &&
-      containerTypes.includes(this.document.media.clip.type)
-    ) === true
+      (this.document.media &&
+        this.document.media.clip &&
+        this.document.media.clip.type &&
+        containerTypes.includes(this.document.media.clip.type)) === true
+    )
   }
 
-  width () {
+  width() {
     if (this.document.image) return this.document.image.width
     if (this.document.video) return this.document.video.width
   }
-  height () {
+  height() {
     if (this.document.image) return this.document.image.height
     if (this.document.video) return this.document.video.height
   }
 
-  aspect () { return this.width() / Math.max(1, this.height()) }
+  aspect() {
+    return this.width() / Math.max(1, this.height())
+  }
 
-  proxyAspect () {
+  proxyAspect() {
     const proxy = this.biggestProxy()
     if (proxy) return proxy.width / Math.max(1, proxy.height)
   }
 
-  backgroundColor () { return this.tinyProxy() ? this.tinyProxy()[5] : getRandomColor() }
-
-  pageCount () {
-    if (this.document.media && this.document.media.pages) return this.document.media.pages
+  backgroundColor() {
+    return this.tinyProxy() ? this.tinyProxy()[5] : getRandomColor()
   }
 
-  startPage () {
+  pageCount() {
+    if (this.document.media && this.document.media.pages)
+      return this.document.media.pages
+  }
+
+  startPage() {
     return this.document.media && this.document.media.start
   }
 
-  stopPage () {
+  stopPage() {
     return this.document.media && this.document.media.stop
   }
 
-  frameRate () {    // frames per second
+  frameRate() {
+    // frames per second
     return this.document.media && this.document.media.frameRate
   }
-  frames () {       // total # frames in the source video -- the entire film, not the clip
+  frames() {
+    // total # frames in the source video -- the entire film, not the clip
     return this.document.media && this.document.media.frames
   }
-  frameRange () {   // number of frames in this clip -- a subset of frames()
+  frameRange() {
+    // number of frames in this clip -- a subset of frames()
     return this.stopFrame() - this.startFrame()
   }
-  duration () {     // seconds in this clip -- a subset of the entire film
+  duration() {
+    // seconds in this clip -- a subset of the entire film
     this.frameRange() / (this.frameRate() || 30)
   }
-  isClip () {
+  isClip() {
     return !!(this.document.media && this.document.media.clip)
   }
-  startFrame () {   // start frame for this clip -- >= 0
+  startFrame() {
+    // start frame for this clip -- >= 0
     if (this.isOfType('video')) {
       if (this.isClip()) {
         return this.document.media.clip.start
@@ -146,20 +171,21 @@ export default class Asset {
       return 0
     }
   }
-  stopFrame () {    // stop frame for this clip -- <= frames()
+  stopFrame() {
+    // stop frame for this clip -- <= frames()
     if (this.isOfType('video')) {
       if (this.isClip()) return this.document.media.clip.stop
       return this.document.media && this.document.media.frames - 1
     }
   }
-  validVideo () {
+  validVideo() {
     if (!this.frameRate()) return false
     if (!this.frames()) return false
     if (!this.frameRange()) return false
     return true
   }
 
-  smallestProxy () {
+  smallestProxy() {
     if (!this.proxies) return null
     var smallestProxy = this.proxies[0]
     var leastPixels = Number.MAX_SAFE_INTEGER
@@ -174,7 +200,7 @@ export default class Asset {
     return smallestProxy
   }
 
-  biggestProxy () {
+  biggestProxy() {
     if (!this.proxies) return null
     var biggestProxy = this.proxies[0]
     var mostPixels = 0
@@ -189,7 +215,7 @@ export default class Asset {
     return biggestProxy
   }
 
-  closestProxy (width, height) {
+  closestProxy(width, height) {
     if (!this.proxies) return null
     var bestProxy = this.proxies[0]
     var bestDim = Number.MAX_SAFE_INTEGER
@@ -206,46 +232,54 @@ export default class Asset {
     return bestProxy
   }
 
-  parentId () {
+  parentId() {
     if (!this.document.media || !this.document.media.clip) return null
     return this.document.media.clip.parent
   }
 
-  clipType () {
-    if (this.document.media === undefined || this.document.media.clip === undefined) {
+  clipType() {
+    if (
+      this.document.media === undefined ||
+      this.document.media.clip === undefined
+    ) {
       return null
     }
 
     return this.document.media.clip.type
   }
 
-  folders () {
-    return this.document && this.document.zorroa && this.document.zorroa.links && this.document.zorroa.links.folder
+  folders() {
+    return (
+      this.document &&
+      this.document.zorroa &&
+      this.document.zorroa.links &&
+      this.document.zorroa.links.folder
+    )
   }
 
   // Returns true if the asset is in any of the folder ids
-  memberOfAnyFolderIds (folderIds) {
+  memberOfAnyFolderIds(folderIds) {
     const folders = this.folders()
     if (!folders || !folders.length) return false
     for (const folderId of folderIds) {
-      const index = folders.findIndex(id => (id === folderId))
+      const index = folders.findIndex(id => id === folderId)
       if (index >= 0) return true
     }
     return false
   }
 
   // Returns true if the asset is in all of the folder ids
-  memberOfAllFolderIds (folderIds) {
+  memberOfAllFolderIds(folderIds) {
     const folders = this.folders()
     if (!folders || !folders.length) return false
     for (const folderId of folderIds) {
-      const index = folders.findIndex(id => (id === folderId))
+      const index = folders.findIndex(id => id === folderId)
       if (index < 0) return false
     }
     return true
   }
 
-  addFolderIds (folderIds) {
+  addFolderIds(folderIds) {
     const folders = this.folders()
     if (!folders || !folders.length) {
       if (!this.document.zorroa) this.document.zorroa = {}
@@ -258,7 +292,7 @@ export default class Asset {
     }
   }
 
-  removeFolderIds (folderIds) {
+  removeFolderIds(folderIds) {
     const folders = this.folders()
     if (folders && folders.length) {
       const newFolderIds = new Set([...folders])
@@ -267,7 +301,7 @@ export default class Asset {
     }
   }
 
-  static lastNamespace (field) {
+  static lastNamespace(field) {
     if (field && field.length) {
       const namespaces = field.split('.')
       let index = namespaces.length - 1
@@ -279,7 +313,7 @@ export default class Asset {
     }
   }
 
-  findRawValue (fields) {
+  findRawValue(fields) {
     for (let i = 0; i < fields.length; ++i) {
       const val = this.rawValue(fields[i])
       if (val !== undefined) return val
@@ -291,7 +325,7 @@ export default class Asset {
   // as a path through the JSON-structured asset document. Recursively
   // invokes _field to navigate through the JSON and then uses
   // _valueToString to get a displayable form of the value.
-  value (field) {
+  value(field) {
     return Asset._valueToString(Asset._field(this.document, field))
   }
 
@@ -299,12 +333,12 @@ export default class Asset {
   // as a path through the JSON-structured asset document. Recursively
   // invokes _field to navigate through the JSON and then uses
   // _valueToString to get a displayable form of the value.
-  rawValue (field) {
+  rawValue(field) {
     if (field === 'id' || field === 'score') return this[field]
     return Asset._field(this.document, field)
   }
 
-  static _field (obj, key) {
+  static _field(obj, key) {
     const idx = key.indexOf('.')
     if (idx >= 0) {
       const namespace = key.slice(0, idx)
@@ -333,12 +367,12 @@ export default class Asset {
     return obj[key]
   }
 
-  static _valueToString (value) {
+  static _valueToString(value) {
     // E.g. tinyProxy, an array of POD
     // FIXME: Unify array management with _field
     if (Array.isArray(value) || value instanceof Array) {
       let array = '['
-      value.map((f) => {
+      value.map(f => {
         array += Asset._valueToString(f)
         array += ', '
       })
@@ -347,7 +381,10 @@ export default class Asset {
       return array
     }
 
-    assert.ok(!(value instanceof Object || typeof value === 'object'), 'object field')
+    assert.ok(
+      !(value instanceof Object || typeof value === 'object'),
+      'object field',
+    )
     if (value instanceof String || typeof value === 'string') {
       return value
     }
@@ -356,11 +393,11 @@ export default class Asset {
     }
   }
 
-  terms (field) {
+  terms(field) {
     return Asset._terms(this.document, field)
   }
 
-  static _terms (obj, key) {
+  static _terms(obj, key) {
     const idx = key.indexOf('.')
     if (idx >= 0) {
       const namespace = key.slice(0, idx)
@@ -380,7 +417,7 @@ export default class Asset {
   }
 }
 
-function getRandomColor () {
+function getRandomColor() {
   var letters = '0123456789ABCDEF'
   var color = '#'
   for (var i = 0; i < 6; i++) {
@@ -389,13 +426,14 @@ function getRandomColor () {
   return color
 }
 
-export function minimalUniqueFieldTitle (field, fields, minIndex) {
+export function minimalUniqueFieldTitle(field, fields, minIndex) {
   const types = ['point', 'bit', 'byte', 'raw']
   const names = field.split('.')
   if (!names || names.length < 2) return { head: field }
   let title, head, tails
   for (let i = names.length - 1; i >= minIndex; --i) {
-    if (i === names.length - 1 && types.findIndex(t => t === names[i]) >= 0) continue
+    if (i === names.length - 1 && types.findIndex(t => t === names[i]) >= 0)
+      continue
     if (!head) {
       head = names[i]
     } else if (!tails) {
@@ -408,7 +446,8 @@ export function minimalUniqueFieldTitle (field, fields, minIndex) {
     } else {
       title = names[i] + '.' + title
     }
-    const matchesAnotherField = fields.findIndex(f => f !== field && f.endsWith(title)) >= 0
+    const matchesAnotherField =
+      fields.findIndex(f => f !== field && f.endsWith(title)) >= 0
     if (!matchesAnotherField) return { head, tails }
   }
   return { head, tails }

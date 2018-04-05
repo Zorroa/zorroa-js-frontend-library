@@ -1,18 +1,43 @@
 import {
-  SHOW_MODAL, HIDE_MODAL, SORT_FOLDERS,
-  ICONIFY_LEFT_SIDEBAR, ICONIFY_RIGHT_SIDEBAR, TOGGLE_COLLAPSIBLE,
-  METADATA_FIELDS, LIGHTBOX_METADATA, LIGHTBOX_PANNER, SET_DRAGGING,
-  THUMB_SIZE, THUMB_LAYOUT, SHOW_TABLE, TABLE_HEIGHT,
-  SHOW_MULTIPAGE, VIDEO_VOLUME,
-  HOVER_FIELD, CLEAR_HOVER_FIELD,
-  SHOW_DIALOG_ALERT, HIDE_DIALOG_ALERT,
-  SHOW_DIALOG_CONFIRM, HIDE_DIALOG_CONFIRM,
-  SHOW_DIALOG_PROMPT, HIDE_DIALOG_PROMPT,
-  THUMB_FIELD_TEMPLATE, DRAG_FIELD_TEMPLATE, LIGHTBAR_FIELD_TEMPLATE,
-  UX_LEVEL, EMBEDMODE_ENABLED, MONOCHROME, SHOW_IMPORT,
-  SHOW_QUICKVIEW, HIDE_QUICKVIEW,
-  TABLE_LAYOUTS, SELECT_TABLE_LAYOUT, ADD_TABLE_LAYOUT, DELETE_TABLE_LAYOUT,
-  FLIPBOOK_FPS, SHOULD_LOOP
+  SHOW_MODAL,
+  HIDE_MODAL,
+  SORT_FOLDERS,
+  ICONIFY_LEFT_SIDEBAR,
+  ICONIFY_RIGHT_SIDEBAR,
+  TOGGLE_COLLAPSIBLE,
+  METADATA_FIELDS,
+  LIGHTBOX_METADATA,
+  LIGHTBOX_PANNER,
+  SET_DRAGGING,
+  THUMB_SIZE,
+  THUMB_LAYOUT,
+  SHOW_TABLE,
+  TABLE_HEIGHT,
+  SHOW_MULTIPAGE,
+  VIDEO_VOLUME,
+  HOVER_FIELD,
+  CLEAR_HOVER_FIELD,
+  SHOW_DIALOG_ALERT,
+  HIDE_DIALOG_ALERT,
+  SHOW_DIALOG_CONFIRM,
+  HIDE_DIALOG_CONFIRM,
+  SHOW_DIALOG_PROMPT,
+  HIDE_DIALOG_PROMPT,
+  THUMB_FIELD_TEMPLATE,
+  DRAG_FIELD_TEMPLATE,
+  LIGHTBAR_FIELD_TEMPLATE,
+  UX_LEVEL,
+  EMBEDMODE_ENABLED,
+  MONOCHROME,
+  SHOW_IMPORT,
+  SHOW_QUICKVIEW,
+  HIDE_QUICKVIEW,
+  TABLE_LAYOUTS,
+  SELECT_TABLE_LAYOUT,
+  ADD_TABLE_LAYOUT,
+  DELETE_TABLE_LAYOUT,
+  FLIPBOOK_FPS,
+  SHOULD_LOOP,
 } from '../constants/actionTypes'
 
 export const MIN_THUMBSIZE = 48
@@ -20,45 +45,45 @@ export const MAX_THUMBSIZE = 480
 export const DELTA_THUMBSIZE = 48
 export const DEFAULT_THUMBSIZE = 128
 
-export function setFlipbookFps (fps) {
+export function setFlipbookFps(fps) {
   return {
     type: FLIPBOOK_FPS,
-    payload: fps
+    payload: fps,
   }
 }
 
-export function shouldLoop (shouldLoopSetting) {
+export function shouldLoop(shouldLoopSetting) {
   return {
     type: SHOULD_LOOP,
-    payload: shouldLoopSetting
+    payload: shouldLoopSetting,
   }
 }
 
-export function showModal (props) {
+export function showModal(props) {
   return {
     type: SHOW_MODAL,
-    payload: props
+    payload: props,
   }
 }
 
-export function hideModal () {
+export function hideModal() {
   return {
     type: HIDE_MODAL,
-    payload: null
+    payload: null,
   }
 }
 
-export function showQuickview () {
+export function showQuickview() {
   return {
     type: SHOW_QUICKVIEW,
-    payload: null
+    payload: null,
   }
 }
 
-export function hideQuickview () {
+export function hideQuickview() {
   return {
     type: HIDE_QUICKVIEW,
-    payload: null
+    payload: null,
   }
 }
 
@@ -67,19 +92,18 @@ export function hideQuickview () {
 // Returns a promise that resolves when the user confirms or closes the dialog.
 // The promise always resolves and never rejects.
 // The dialog is hidden automatically.
-export function dialogAlertPromise (title, message) {
+export function dialogAlertPromise(title, message) {
   return dispatch => {
     return new Promise(resolve => {
       dispatch({
         type: SHOW_DIALOG_ALERT,
-        payload: { title, message, confirmAction: resolve }
+        payload: { title, message, confirmAction: resolve },
       })
-    })
-    .then(_ => {
+    }).then(_ => {
       console.log('DISMISSED!')
       dispatch({
         type: HIDE_DIALOG_ALERT,
-        payload: null
+        payload: null,
       })
     })
   }
@@ -90,27 +114,31 @@ export function dialogAlertPromise (title, message) {
 // This returns a promise that resolves when the user confirms.
 // If the user closes or cancels the prompt, the promise will reject.
 // The dialog is hidden automatically.
-export function dialogConfirmPromise (title, message) {
+export function dialogConfirmPromise(title, message) {
   const hideConfirmAction = {
     type: HIDE_DIALOG_CONFIRM,
-    payload: null
+    payload: null,
   }
 
   return dispatch => {
     return new Promise((resolve, reject) => {
       dispatch({
         type: SHOW_DIALOG_CONFIRM,
-        payload: { title, message, confirmAction: resolve, cancelAction: reject }
+        payload: {
+          title,
+          message,
+          confirmAction: resolve,
+          cancelAction: reject,
+        },
       })
-    })
-    .then(
-      function _confirmConfirm () {
+    }).then(
+      function _confirmConfirm() {
         dispatch(hideConfirmAction)
       },
-      function _confirmCancel () {
+      function _confirmCancel() {
         dispatch(hideConfirmAction)
         return Promise.reject()
-      }
+      },
     )
   }
 }
@@ -120,223 +148,227 @@ export function dialogConfirmPromise (title, message) {
 // This returns a promise that resolves with the prompted value.
 // If the user closes or cancels the prompt, the promise will reject.
 // The dialog is closed automatically.
-export function dialogPromptPromise (title, message) {
+export function dialogPromptPromise(title, message) {
   const hidePromptAction = {
     type: HIDE_DIALOG_PROMPT,
-    payload: null
+    payload: null,
   }
 
   return dispatch => {
     return new Promise((resolve, reject) => {
       dispatch({
         type: SHOW_DIALOG_PROMPT,
-        payload: { title, message, confirmAction: resolve, cancelAction: reject }
+        payload: {
+          title,
+          message,
+          confirmAction: resolve,
+          cancelAction: reject,
+        },
       })
-    })
-    .then(
-      function _promptConfirm (value) {
+    }).then(
+      function _promptConfirm(value) {
         dispatch(hidePromptAction)
         return value
       },
-      function _promptCancel () {
+      function _promptCancel() {
         dispatch(hidePromptAction)
         return Promise.reject()
-      }
+      },
     )
   }
 }
 
-export function iconifyLeftSidebar (isIconified) {
+export function iconifyLeftSidebar(isIconified) {
   return {
     type: ICONIFY_LEFT_SIDEBAR,
-    payload: isIconified
+    payload: isIconified,
   }
 }
 
-export function iconifyRightSidebar (isIconified) {
+export function iconifyRightSidebar(isIconified) {
   return {
     type: ICONIFY_RIGHT_SIDEBAR,
-    payload: isIconified
+    payload: isIconified,
   }
 }
 
-export function toggleCollapsible (collapsibleName, isOpen) {
+export function toggleCollapsible(collapsibleName, isOpen) {
   return {
     type: TOGGLE_COLLAPSIBLE,
-    payload: { collapsibleName, isOpen }
+    payload: { collapsibleName, isOpen },
   }
 }
 
-export function updateMetadataFields (fields) {
-  return ({
+export function updateMetadataFields(fields) {
+  return {
     type: METADATA_FIELDS,
-    payload: fields
-  })
+    payload: fields,
+  }
 }
 
-export function updateTableLayouts (tableLayouts) {
-  return ({
+export function updateTableLayouts(tableLayouts) {
+  return {
     type: TABLE_LAYOUTS,
-    payload: tableLayouts
-  })
+    payload: tableLayouts,
+  }
 }
 
-export function addTableLayout (layout) {
+export function addTableLayout(layout) {
   return {
     type: ADD_TABLE_LAYOUT,
-    payload: layout
+    payload: layout,
   }
 }
 
-export function deleteTableLayout (layoutId) {
+export function deleteTableLayout(layoutId) {
   return {
     type: DELETE_TABLE_LAYOUT,
-    payload: layoutId
+    payload: layoutId,
   }
 }
 
-export function selectTableLayout (layoutId) {
+export function selectTableLayout(layoutId) {
   return {
     type: SELECT_TABLE_LAYOUT,
-    payload: layoutId
+    payload: layoutId,
   }
 }
 
-export function lightboxMetadata ({show, left, top, width, height}) {
-  return ({
+export function lightboxMetadata({ show, left, top, width, height }) {
+  return {
     type: LIGHTBOX_METADATA,
-    payload: { show, left, top, width, height }
-  })
+    payload: { show, left, top, width, height },
+  }
 }
 
-export function lightboxPanner ({x, y, scale}) {
-  return ({
+export function lightboxPanner({ x, y, scale }) {
+  return {
     type: LIGHTBOX_PANNER,
-    payload: { x, y, scale }
-  })
+    payload: { x, y, scale },
+  }
 }
 
-export function startDragging (type, data) {
-  return ({
+export function startDragging(type, data) {
+  return {
     type: SET_DRAGGING,
-    payload: {type, ...data}  // expand data e.g. dragInfo.assetIds
-  })
+    payload: { type, ...data }, // expand data e.g. dragInfo.assetIds
+  }
 }
 
-export function stopDragging () {
-  return ({
+export function stopDragging() {
+  return {
     type: SET_DRAGGING,
-    payload: null
-  })
+    payload: null,
+  }
 }
 
-export function setThumbSize (size) {
-  return ({
+export function setThumbSize(size) {
+  return {
     type: THUMB_SIZE,
-    payload: size
-  })
+    payload: size,
+  }
 }
 
-export function setThumbLayout (layout) {
-  return ({
+export function setThumbLayout(layout) {
+  return {
     type: THUMB_LAYOUT,
-    payload: layout
-  })
+    payload: layout,
+  }
 }
 
-export function showTable (show) {
-  return ({
+export function showTable(show) {
+  return {
     type: SHOW_TABLE,
-    payload: show
-  })
+    payload: show,
+  }
 }
 
-export function setTableHeight (height) {
-  return ({
+export function setTableHeight(height) {
+  return {
     type: TABLE_HEIGHT,
-    payload: height
-  })
+    payload: height,
+  }
 }
 
-export function setVideoVolume (volume) {
-  return ({
+export function setVideoVolume(volume) {
+  return {
     type: VIDEO_VOLUME,
-    payload: volume
-  })
+    payload: volume,
+  }
 }
 
-export function showMultipage (show) {
-  return ({
+export function showMultipage(show) {
+  return {
     type: SHOW_MULTIPAGE,
-    payload: show
-  })
+    payload: show,
+  }
 }
 
-export function sortFolders (order) {
-  return ({
+export function sortFolders(order) {
+  return {
     type: SORT_FOLDERS,
-    payload: order
-  })
+    payload: order,
+  }
 }
 
-export function hoverField (field) {
-  return ({
+export function hoverField(field) {
+  return {
     type: HOVER_FIELD,
-    payload: field
-  })
+    payload: field,
+  }
 }
 
-export function clearHoverField (field) {
-  return ({
+export function clearHoverField(field) {
+  return {
     type: CLEAR_HOVER_FIELD,
-    payload: field
-  })
+    payload: field,
+  }
 }
 
-export function thumbFieldTemplate (template) {
-  return ({
+export function thumbFieldTemplate(template) {
+  return {
     type: THUMB_FIELD_TEMPLATE,
-    payload: template
-  })
+    payload: template,
+  }
 }
 
-export function lightbarFieldTemplate (template) {
-  return ({
+export function lightbarFieldTemplate(template) {
+  return {
     type: LIGHTBAR_FIELD_TEMPLATE,
-    payload: template
-  })
+    payload: template,
+  }
 }
 
-export function dragFieldTemplate (template) {
-  return ({
+export function dragFieldTemplate(template) {
+  return {
     type: DRAG_FIELD_TEMPLATE,
-    payload: template
-  })
+    payload: template,
+  }
 }
 
-export function uxLevel (level) {
-  return ({
+export function uxLevel(level) {
+  return {
     type: UX_LEVEL,
-    payload: level
-  })
+    payload: level,
+  }
 }
 
-export function setEmbedModeEnabled (isEnabled) {
-  return ({
+export function setEmbedModeEnabled(isEnabled) {
+  return {
     type: EMBEDMODE_ENABLED,
-    payload: isEnabled
-  })
+    payload: isEnabled,
+  }
 }
-export function monochrome (state) {
-  return ({
+export function monochrome(state) {
+  return {
     type: MONOCHROME,
-    payload: state
-  })
+    payload: state,
+  }
 }
 
-export function showImport (show) {
-  return ({
+export function showImport(show) {
+  return {
     type: SHOW_IMPORT,
-    payload: show
-  })
+    payload: show,
+  }
 }

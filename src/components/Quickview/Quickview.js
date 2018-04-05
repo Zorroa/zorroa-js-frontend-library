@@ -22,51 +22,53 @@ class Quickview extends Component {
     showQuickview: PropTypes.bool.isRequired,
     actions: PropTypes.shape({
       isolateAssetId: PropTypes.func.isRequired,
-      hideQuickview: PropTypes.func.isRequired
-    })
+      hideQuickview: PropTypes.func.isRequired,
+    }),
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
-      error: undefined
+      error: undefined,
     }
     this.shuttler = new PubSub()
   }
 
-  shouldComponentUpdate (nextProps, nextState) {
+  shouldComponentUpdate(nextProps, nextState) {
     return (
       nextProps.isolatedAsset.id !== this.props.isolatedAsset.id ||
       nextState.error !== this.state.error
     )
   }
 
-  componentWillUpdate () {
+  componentWillUpdate() {
     this.shuttler.publish('stop')
     this.shuttler.publish('load')
   }
 
   @keydown('left')
-  onLeft () {
+  onLeft() {
     this.onNavigation()
     this.back()
   }
 
   @keydown('right')
-  onRight () {
+  onRight() {
     this.onNavigation()
     this.next()
   }
 
   onNavigation = () => {
     this.setState({
-      error: undefined
+      error: undefined,
     })
   }
 
-  back () {
+  back() {
     const instanceIds = [...this.props.selectedIds]
-    const instanceSelectionIndex = instanceIds.indexOf(this.props.isolatedAsset.id)
+    const instanceSelectionIndex = instanceIds.indexOf(
+      this.props.isolatedAsset.id,
+    )
     const previousIndex = instanceSelectionIndex - 1
     const lastIndex = instanceIds.length - 1
 
@@ -78,9 +80,11 @@ class Quickview extends Component {
     this.props.actions.isolateAssetId(instanceIds[previousIndex])
   }
 
-  next () {
+  next() {
     const instanceIds = [...this.props.selectedIds]
-    const instanceSelectionIndex = instanceIds.indexOf(this.props.isolatedAsset.id)
+    const instanceSelectionIndex = instanceIds.indexOf(
+      this.props.isolatedAsset.id,
+    )
     const nextIndex = instanceSelectionIndex + 1
     const firstIndex = 0
 
@@ -93,7 +97,7 @@ class Quickview extends Component {
   }
 
   @keydown('space', 'esc')
-  onEscape (event) {
+  onEscape(event) {
     if (event && typeof event.preventDefault === 'function') {
       event.preventDefault()
     }
@@ -111,13 +115,13 @@ class Quickview extends Component {
     this.props.actions.hideQuickview()
   }
 
-  isolatedAssetURL (width, height) {
+  isolatedAssetURL(width, height) {
     const { isolatedAsset, origin } = this.props
 
     return isolatedAsset.closestProxyURL(origin, width, height) // TODO consider changing these values to be more dynamic
   }
 
-  isVideo () {
+  isVideo() {
     const asset = this.props.isolatedAsset
     const mimeType = asset.mediaType()
     const parsedMimeString = mimeType.split('/')
@@ -126,7 +130,7 @@ class Quickview extends Component {
     return mediaType === 'video'
   }
 
-  isFlipbook () {
+  isFlipbook() {
     const asset = this.props.isolatedAsset
     const type = asset.clipType()
     const mediaType = asset.mediaType()
@@ -134,7 +138,7 @@ class Quickview extends Component {
     return type === 'flipbook' || mediaType === 'zorroa/x-flipbook'
   }
 
-  getMediaType () {
+  getMediaType() {
     if (this.isVideo()) {
       return 'video'
     }
@@ -150,7 +154,7 @@ class Quickview extends Component {
     console.error('There was a problem loading the video.')
   }
 
-  render () {
+  render() {
     let width = Math.floor(window.innerWidth * 0.75)
     let height = Math.floor(window.innerHeight * 0.75)
     const asset = this.props.isolatedAsset
@@ -164,17 +168,11 @@ class Quickview extends Component {
 
     const body = (
       <div className="Quickview__body">
-        <ModalHeader closeFn={this.close}>
-          {asset.source()}
-        </ModalHeader>
-        {
-          this.state.error !== undefined && (
-            <div className="Quickview__error">
-              {this.state.error}
-            </div>
-          )
-        }
-        { this.getMediaType() === 'video' && (
+        <ModalHeader closeFn={this.close}>{asset.source()}</ModalHeader>
+        {this.state.error !== undefined && (
+          <div className="Quickview__error">{this.state.error}</div>
+        )}
+        {this.getMediaType() === 'video' && (
           <div className="Quickview__video">
             <Video
               url={asset.url(this.props.origin)}
@@ -185,25 +183,22 @@ class Quickview extends Component {
               stopFrame={asset.stopFrame()}
               onError={this.onError}
               shuttler={this.shuttler}
-              status={(new PubSub())}
+              status={new PubSub()}
             />
           </div>
         )}
-        { this.getMediaType() === 'flipbook' && (
+        {this.getMediaType() === 'flipbook' && (
           <div className="Quickview__flipbook">
-            <FlipbookPlayer
-              clipParentId={asset.parentId()}
-              width={width}
-            />
+            <FlipbookPlayer clipParentId={asset.parentId()} width={width} />
           </div>
         )}
-        { this.getMediaType() === 'generic' && (
+        {this.getMediaType() === 'generic' && (
           <div
             className="Quickview__image"
             style={{
               backgroundImage: `url(${this.isolatedAssetURL(width, height)})`,
               height,
-              width
+              width,
             }}
           />
         )}
@@ -212,25 +207,29 @@ class Quickview extends Component {
 
     return (
       <div className="Quickview">
-        <Modal
-          onModalUnderlayClick={this.close}
-          body={body}
-          width={width}
-        />
+        <Modal onModalUnderlayClick={this.close} body={body} width={width} />
       </div>
     )
   }
 }
 
-export default connect(state => ({
-  assets: state.assets.all,
-  selectedIds: state.assets.selectedIds,
-  isolatedAsset: state.assets.all.find(asset => asset.id === state.assets.isolatedId),
-  origin: state.auth.origin,
-  showQuickview: state.app.showQuickview
-}), dispatch => ({
-  actions: bindActionCreators({
-    isolateAssetId,
-    hideQuickview
-  }, dispatch)
-}))(Quickview)
+export default connect(
+  state => ({
+    assets: state.assets.all,
+    selectedIds: state.assets.selectedIds,
+    isolatedAsset: state.assets.all.find(
+      asset => asset.id === state.assets.isolatedId,
+    ),
+    origin: state.auth.origin,
+    showQuickview: state.app.showQuickview,
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        isolateAssetId,
+        hideQuickview,
+      },
+      dispatch,
+    ),
+  }),
+)(Quickview)

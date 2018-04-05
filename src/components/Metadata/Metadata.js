@@ -11,10 +11,21 @@ import { minimalUniqueFieldTitle } from '../../models/Asset'
 import { unCamelCase, equalSets } from '../../services/jsUtil'
 import { assetsForIds } from '../../actions/assetsAction'
 import { saveUserSettings } from '../../actions/authAction'
-import { fieldUsedInWidget, widgetTypeForField, createFacetWidget } from '../../models/Widget'
-import { modifyRacetrackWidget, removeRacetrackWidgetIds } from '../../actions/racetrackAction'
-import { iconifyRightSidebar,
-  toggleCollapsible, hoverField, clearHoverField } from '../../actions/appActions'
+import {
+  fieldUsedInWidget,
+  widgetTypeForField,
+  createFacetWidget,
+} from '../../models/Widget'
+import {
+  modifyRacetrackWidget,
+  removeRacetrackWidgetIds,
+} from '../../actions/racetrackAction'
+import {
+  iconifyRightSidebar,
+  toggleCollapsible,
+  hoverField,
+  clearHoverField,
+} from '../../actions/appActions'
 import * as WidgetInfo from '../Racetrack/WidgetInfo'
 
 class Metadata extends Component {
@@ -29,7 +40,7 @@ class Metadata extends Component {
     fieldTypes: PropTypes.object,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object,
-    actions: PropTypes.object
+    actions: PropTypes.object,
   }
 
   state = {
@@ -37,28 +48,29 @@ class Metadata extends Component {
     filterString: '',
     showNull: false,
     showFavorites: this.props.userSettings.showFavorites,
-    titleWidth: 100
+    titleWidth: 100,
   }
 
   cachedAssetIds = new Set()
 
-  componentWillMount () {
+  componentWillMount() {
     this.resizer = new Resizer()
     this.componentWillReceiveProps(this.props)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.resizer.release()
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (!nextProps.assetIds || !nextProps.assetIds.size) {
-      if (this.state.selectedAssets.length) this.setState({selectedAssets: []})
+      if (this.state.selectedAssets.length)
+        this.setState({ selectedAssets: [] })
       this.cachedAssetIds = new Set()
     } else if (!equalSets(this.cachedAssetIds, nextProps.assetIds)) {
       this.cachedAssetIds = new Set([...nextProps.assetIds])
       assetsForIds(nextProps.assetIds)
-        .then(selectedAssets => this.setState({selectedAssets}))
+        .then(selectedAssets => this.setState({ selectedAssets }))
         .catch(error => {
           console.log('Error getting selected assets: ' + error)
         })
@@ -67,37 +79,40 @@ class Metadata extends Component {
 
   resizeStart = () => {
     this.resizer.capture(
-      this.resize,                      /* onMove    */
-      this.resizeDone,                  /* onRelease */
-      this.state.titleWidth,            /* startX    */
-      0,                                /* startY    */
-      1,                                /* optScaleX */
-      0)                                /* optScaleY */
+      this.resize /* onMove    */,
+      this.resizeDone /* onRelease */,
+      this.state.titleWidth /* startX    */,
+      0 /* startY    */,
+      1 /* optScaleX */,
+      0,
+    ) /* optScaleY */
   }
 
-  resize = (w) => {
+  resize = w => {
     const titleWidth = Math.min(500, Math.max(40, w))
-    this.setState({titleWidth})
+    this.setState({ titleWidth })
   }
 
   resizeDone = () => {
     this.forceUpdate()
   }
 
-  isFavorite (fieldTypes, hasChildren, namespace, metadataFields) {
+  isFavorite(fieldTypes, hasChildren, namespace, metadataFields) {
     let isFavorite
     if (hasChildren) {
       isFavorite = true
-      const children = Object.keys(fieldTypes).filter(f => f.startsWith(namespace) && f.charAt(namespace.length) === '.')
+      const children = Object.keys(fieldTypes).filter(
+        f => f.startsWith(namespace) && f.charAt(namespace.length) === '.',
+      )
       for (let j = 0; j < children.length; ++j) {
         const child = children[j]
-        if (metadataFields.findIndex(f => (f === child)) < 0) {
+        if (metadataFields.findIndex(f => f === child) < 0) {
           isFavorite = false
           break
         }
       }
     } else {
-      isFavorite = metadataFields.findIndex(f => (f === namespace)) >= 0
+      isFavorite = metadataFields.findIndex(f => f === namespace) >= 0
     }
     return isFavorite
   }
@@ -105,13 +120,13 @@ class Metadata extends Component {
   toggleFavorites = () => {
     const { user, userSettings } = this.props
     const showFavorites = !this.state.showFavorites
-    this.setState({showFavorites})
+    this.setState({ showFavorites })
     const settings = { ...userSettings, showFavorites }
     this.props.actions.saveUserSettings(user, settings)
   }
 
   toggleNull = () => {
-    this.setState({showNull: !this.state.showNull})
+    this.setState({ showNull: !this.state.showNull })
   }
 
   toggleCollapsible = (key, event) => {
@@ -120,7 +135,7 @@ class Metadata extends Component {
     event.stopPropagation()
   }
 
-  createWidget (field) {
+  createWidget(field) {
     const { fieldTypes } = this.props
     const fieldType = fieldTypes[field]
     const type = widgetTypeForField(field, fieldType)
@@ -131,7 +146,7 @@ class Metadata extends Component {
     }
   }
 
-  widgetTypeIcon (type) {
+  widgetTypeIcon(type) {
     const infos = Object.keys(WidgetInfo)
     for (let i = 0; i < infos.length; ++i) {
       const info = WidgetInfo[infos[i]]
@@ -158,9 +173,12 @@ class Metadata extends Component {
   createTagFacet = (term, field, event) => {
     const fieldType = this.props.fieldTypes[field]
     field = field && field.endsWith('.raw') ? field : field + '.raw'
-    const index = this.props.widgets.findIndex(widget => fieldUsedInWidget(field, widget))
+    const index = this.props.widgets.findIndex(widget =>
+      fieldUsedInWidget(field, widget),
+    )
     let terms = [term]
-    if (index >= 0 && event.shiftKey) {       // Add to terms for shift
+    if (index >= 0 && event.shiftKey) {
+      // Add to terms for shift
       const widget = this.props.widgets[index]
       if (widget.sliver && widget.sliver.filter && widget.sliver.filter.terms) {
         terms = [...widget.sliver.filter.terms[field], term]
@@ -173,35 +191,44 @@ class Metadata extends Component {
     event.stopPropagation()
   }
 
-  hover = (field) => {
+  hover = field => {
     if (this.props.isolatedId) return
     this.props.actions.hoverField(field)
   }
 
-  clearHover = (field) => {
+  clearHover = field => {
     if (this.props.isolatedId) return
     this.props.actions.clearHoverField(field)
   }
 
-  isLeaf (field, namespace) {
+  isLeaf(field, namespace) {
     return field === namespace || field === `${namespace}.raw`
   }
 
-  renderNamespace (namespace, isOpen) {
+  renderNamespace(namespace, isOpen) {
     const itemClass = namespace.replace('.', '-')
     return (
-      <div key={itemClass}
-           onClick={e => this.toggleCollapsible(`meta2-${namespace}`, e)}
-           className={classnames('Metadata-namespace', 'Metadata-namespace-' + itemClass, {isOpen})}>
-        <div className="Metadata-namespace-title">
-          {unCamelCase(namespace)}
-        </div>
-        <div className={classnames('Metadata-namespace-toggle', 'icon-arrow-down', {isOpen})}/>
+      <div
+        key={itemClass}
+        onClick={e => this.toggleCollapsible(`meta2-${namespace}`, e)}
+        className={classnames(
+          'Metadata-namespace',
+          'Metadata-namespace-' + itemClass,
+          { isOpen },
+        )}>
+        <div className="Metadata-namespace-title">{unCamelCase(namespace)}</div>
+        <div
+          className={classnames(
+            'Metadata-namespace-toggle',
+            'icon-arrow-down',
+            { isOpen },
+          )}
+        />
       </div>
     )
   }
 
-  renderValue (field, namespace, asset) {
+  renderValue(field, namespace, asset) {
     if (asset === null) {
       return <div className="Metadata-value-various">Various</div>
     } else if (asset.rawValue(field) === undefined) {
@@ -209,14 +236,20 @@ class Metadata extends Component {
     } else if (asset) {
       return (
         <div className="Metadata-value">
-          <TableField asset={asset} field={field} isOpen={true} dark={this.props.dark} onTag={!this.props.isolatedId && this.createTagFacet}/>
+          <TableField
+            asset={asset}
+            field={field}
+            isOpen={true}
+            dark={this.props.dark}
+            onTag={!this.props.isolatedId && this.createTagFacet}
+          />
         </div>
       )
     }
     return <div className="Metadata-value-null">null</div>
   }
 
-  renderLeaf (field, namespace, fields, isSelected, isFavorite) {
+  renderLeaf(field, namespace, fields, isSelected, isFavorite) {
     const { selectedAssets, titleWidth, showNull } = this.state
     const itemClass = field.replace('.', '-')
     let asset
@@ -236,53 +269,82 @@ class Metadata extends Component {
     const { head, tails } = minimalUniqueFieldTitle(field, fields, 1)
     const tail = tails && '\u2039 ' + tails.join(' \u2039 ')
     return (
-      <div key={itemClass} className={classnames('Metadata-leaf', {isSelected})}
-           title={field}
-           onMouseOver={() => this.hover(namespace)} onMouseOut={() => this.clearHover(namespace)}
-           onClick={e => this.toggleWidget(field, e)}>
-        <div className="Metadata-leaf-title" style={{minWidth: titleWidth, maxWidth: titleWidth}}>
-          <div className="Metadata-leaf-title-head">
-            {unCamelCase(head)}
-          </div>
-          { tail && <div className="Metadata-leaf-title-tail">{tail}</div> }
+      <div
+        key={itemClass}
+        className={classnames('Metadata-leaf', { isSelected })}
+        title={field}
+        onMouseOver={() => this.hover(namespace)}
+        onMouseOut={() => this.clearHover(namespace)}
+        onClick={e => this.toggleWidget(field, e)}>
+        <div
+          className="Metadata-leaf-title"
+          style={{ minWidth: titleWidth, maxWidth: titleWidth }}>
+          <div className="Metadata-leaf-title-head">{unCamelCase(head)}</div>
+          {tail && <div className="Metadata-leaf-title-tail">{tail}</div>}
         </div>
-        { this.renderValue(field, namespace, asset, isFavorite) }
+        {this.renderValue(field, namespace, asset, isFavorite)}
       </div>
     )
   }
 
-  renderFields () {
+  renderFields() {
     const { selectedAssets } = this.state
     if (!selectedAssets || !selectedAssets.length) {
       const empty = (
         <div key="no-assets" className="Metadata-no-assets">
-          <div className="Metadata-no-assets-icon icon-emptybox"/>
+          <div className="Metadata-no-assets-icon icon-emptybox" />
           No Assets Selected
         </div>
       )
       return [empty]
     }
-    const { fieldTypes, metadataFields, collapsibleOpen, widgets, isolatedId } = this.props
-    const fields = this.state.showFavorites ? metadataFields : Object.keys(fieldTypes)
+    const {
+      fieldTypes,
+      metadataFields,
+      collapsibleOpen,
+      widgets,
+      isolatedId,
+    } = this.props
+    const fields = this.state.showFavorites
+      ? metadataFields
+      : Object.keys(fieldTypes)
     const lcFilterString = this.state.filterString.toLowerCase()
-    const filteredFields = fields.filter(field => (field.toLowerCase().includes(lcFilterString))).sort((a, b) => a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'}))
+    const filteredFields = fields
+      .filter(field => field.toLowerCase().includes(lcFilterString))
+      .sort((a, b) =>
+        a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }),
+      )
     const namespaces = []
     const components = []
-    const addField = (field) => {
+    const addField = field => {
       const parents = field.split('.')
       const namespace = parents[0]
       const isOpen = collapsibleOpen[`meta2-${namespace}`]
       const isLeaf = this.isLeaf(field, namespace)
       const hasChildren = false
-      const isFavorite = this.isFavorite(fieldTypes, hasChildren, namespace, metadataFields)
-      const isSearched = !isolatedId && widgets.findIndex(widget => fieldUsedInWidget(field, widget)) >= 0
+      const isFavorite = this.isFavorite(
+        fieldTypes,
+        hasChildren,
+        namespace,
+        metadataFields,
+      )
+      const isSearched =
+        !isolatedId &&
+        widgets.findIndex(widget => fieldUsedInWidget(field, widget)) >= 0
       const widgetType = widgetTypeForField(field, fieldTypes[field])
       const widgetIcon = this.widgetTypeIcon(widgetType)
-      const leaf = this.renderLeaf(field, namespace, fields, isSearched, isFavorite, widgetIcon)
-      const index = namespaces.findIndex(n => (n === namespace))
+      const leaf = this.renderLeaf(
+        field,
+        namespace,
+        fields,
+        isSearched,
+        isFavorite,
+        widgetIcon,
+      )
+      const index = namespaces.findIndex(n => n === namespace)
       if (leaf && !isLeaf && index < 0) {
         components.push(this.renderNamespace(namespace, isOpen))
-        namespaces.push(namespace)  // Only render each namespace once
+        namespaces.push(namespace) // Only render each namespace once
       }
       if (leaf && (isLeaf || isOpen)) components.push(leaf) // Wait until we know it is not null
     }
@@ -290,29 +352,49 @@ class Metadata extends Component {
     return components
   }
 
-  render () {
+  render() {
     const { dark, height } = this.props
     const { filterString, showFavorites, titleWidth, showNull } = this.state
     return (
-      <div className={classnames('Metadata', {dark})} style={{height: height, maxHeight: height}}>
+      <div
+        className={classnames('Metadata', { dark })}
+        style={{ height: height, maxHeight: height }}>
         <div className="Metadata-header">
-          <Filter className="box" value={filterString} dark={dark}
-                  placeholder="Filter Metadata Fields"
-                  onClear={_ => this.setState({filterString: ''})}
-                  onChange={e => this.setState({filterString: e.target.value})}/>
-          <div onClick={this.toggleNull} title="Filter to remove null-valued fields"
-               className={classnames('Metadata-nulls', 'icon-blocked',
-                 {isSelected: !showNull})}/>
-          <div onClick={this.toggleFavorites} title="Filter to show only favorite fields"
-               className={classnames('Metadata-favorites',
-                 `icon-star-${showFavorites ? 'filled' : 'empty'}`,
-                 {isSelected: showFavorites})}/>
+          <Filter
+            className="box"
+            value={filterString}
+            dark={dark}
+            placeholder="Filter Metadata Fields"
+            onClear={_ => this.setState({ filterString: '' })}
+            onChange={e => this.setState({ filterString: e.target.value })}
+          />
+          <div
+            onClick={this.toggleNull}
+            title="Filter to remove null-valued fields"
+            className={classnames('Metadata-nulls', 'icon-blocked', {
+              isSelected: !showNull,
+            })}
+          />
+          <div
+            onClick={this.toggleFavorites}
+            title="Filter to show only favorite fields"
+            className={classnames(
+              'Metadata-favorites',
+              `icon-star-${showFavorites ? 'filled' : 'empty'}`,
+              { isSelected: showFavorites },
+            )}
+          />
         </div>
         <div className="Metadata-body">
           <div className="Metadata-scroll">
-            { this.renderFields() }
-            <div className={classnames('Metadata-resizer', {active: this.resizer.active})}
-                 style={{left: 6 + titleWidth}} onMouseDown={this.resizeStart}/>
+            {this.renderFields()}
+            <div
+              className={classnames('Metadata-resizer', {
+                active: this.resizer.active,
+              })}
+              style={{ left: 6 + titleWidth }}
+              onMouseDown={this.resizeStart}
+            />
           </div>
         </div>
       </div>
@@ -320,23 +402,29 @@ class Metadata extends Component {
   }
 }
 
-export default connect(state => ({
-  assets: state.assets.all,
-  isolatedId: state.assets.isolatedId,
-  metadataFields: state.app.metadataFields,
-  widgets: state.racetrack.widgets,
-  collapsibleOpen: state.app.collapsibleOpen,
-  fieldTypes: state.assets.types,
-  user: state.auth.user,
-  userSettings: state.app.userSettings
-}), dispatch => ({
-  actions: bindActionCreators({
-    iconifyRightSidebar,
-    saveUserSettings,
-    toggleCollapsible,
-    modifyRacetrackWidget,
-    removeRacetrackWidgetIds,
-    hoverField,
-    clearHoverField
-  }, dispatch)
-}))(Metadata)
+export default connect(
+  state => ({
+    assets: state.assets.all,
+    isolatedId: state.assets.isolatedId,
+    metadataFields: state.app.metadataFields,
+    widgets: state.racetrack.widgets,
+    collapsibleOpen: state.app.collapsibleOpen,
+    fieldTypes: state.assets.types,
+    user: state.auth.user,
+    userSettings: state.app.userSettings,
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        iconifyRightSidebar,
+        saveUserSettings,
+        toggleCollapsible,
+        modifyRacetrackWidget,
+        removeRacetrackWidgetIds,
+        hoverField,
+        clearHoverField,
+      },
+      dispatch,
+    ),
+  }),
+)(Metadata)

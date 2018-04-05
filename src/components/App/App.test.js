@@ -7,14 +7,14 @@ jest.mock('../Racetrack/Map')
 import App from './App'
 import Header from '../Header'
 
-const storeFake = (state) => {
+const storeFake = state => {
   return {
     default: () => {},
     subscribe: () => {},
     dispatch: () => {},
     getState: () => {
       return Object.assign({}, state)
-    }
+    },
   }
 }
 
@@ -24,17 +24,17 @@ describe('<App/>', () => {
   beforeEach(() => {
     const store = storeFake({
       auth: {
-        authenticated: true
+        authenticated: true,
       },
       app: {
-        modal: {}
-      }
+        modal: {},
+      },
     })
 
     const wrapper = mount(
       <Provider store={store}>
-        <App/>
-      </Provider>
+        <App />
+      </Provider>,
     )
 
     app = wrapper.find(App)

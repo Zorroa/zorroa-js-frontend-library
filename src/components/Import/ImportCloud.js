@@ -9,10 +9,10 @@ import { BoxAuthenticator } from './BoxAuthenticator'
 import { GDriveAuthenticator } from './GDriveAuthenticator'
 import { DROPBOX_CLOUD, BOX_CLOUD, GDRIVE_CLOUD } from './ImportConstants'
 
-const logos = [ DropboxLogo, GDriveLogo, BoxLogo ]
-const clouds = [ DROPBOX_CLOUD, GDRIVE_CLOUD, BOX_CLOUD ]
+const logos = [DropboxLogo, GDriveLogo, BoxLogo]
+const clouds = [DROPBOX_CLOUD, GDRIVE_CLOUD, BOX_CLOUD]
 
-const ImportCloud = (props) => {
+const ImportCloud = props => {
   const auths = [
     new DropboxAuthenticator('6fifppvd9maxou9', accessToken => {
       if (accessToken && accessToken.length && accessToken !== 'undefined') {
@@ -34,13 +34,18 @@ const ImportCloud = (props) => {
       } else {
         BoxAuthenticator.deauthorize()
       }
-    })
+    }),
   ]
-  clouds.forEach((c, i) => { if (props.launch === c) requestAnimationFrame(auths[i].authorize) })
+  clouds.forEach((c, i) => {
+    if (props.launch === c) requestAnimationFrame(auths[i].authorize)
+  })
   return (
     <div className="ImportCloud">
       <div className="Import-back" onClick={props.onBack}>
-        <div className="icon-arrow-down" style={{transform: 'rotate(90deg)'}}/>
+        <div
+          className="icon-arrow-down"
+          style={{ transform: 'rotate(90deg)' }}
+        />
         Back
       </div>
       <div className="Import-title">
@@ -48,10 +53,14 @@ const ImportCloud = (props) => {
         Authentication to Cloud Service
       </div>
       <div className="ImportCloud-services">
-        { clouds.map((c, i) => (
+        {clouds.map((c, i) => (
           <div className="ImportCloud-service" key={i}>
-            <img className="ImportCloud-logo" src={logos[i]}/>
-            <div onClick={() => auths[i].authorize()} className={classnames('Import-button', {disabled: c === GDRIVE_CLOUD})}>
+            <img className="ImportCloud-logo" src={logos[i]} />
+            <div
+              onClick={() => auths[i].authorize()}
+              className={classnames('Import-button', {
+                disabled: c === GDRIVE_CLOUD,
+              })}>
               Authenticate
             </div>
           </div>
@@ -64,7 +73,7 @@ const ImportCloud = (props) => {
 ImportCloud.propTypes = {
   onSelect: PropTypes.func.isRequired,
   onBack: PropTypes.func.isRequired,
-  launch: PropTypes.string
+  launch: PropTypes.string,
 }
 
 export default ImportCloud

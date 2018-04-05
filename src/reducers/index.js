@@ -21,5 +21,5 @@ export default combineReducers({
   jobs,
   archivist,
   users,
-  exports
+  exports,
 })

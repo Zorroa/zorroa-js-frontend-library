@@ -18,215 +18,211 @@ import {
   LOAD_USER_SUCCESS,
   UPDATE_USER,
   UPDATE_USER_ERROR,
-  UPDATE_USER_SUCCESS
+  UPDATE_USER_SUCCESS,
 } from '../constants/actionTypes'
 import api from '../api'
 
-export function loadUsers () {
+export function loadUsers() {
   return dispatch => {
     dispatch({
-      type: LOAD_USERS
+      type: LOAD_USERS,
     })
 
-    api
-      .users
-      .get()
-      .then(response => {
+    api.users.get().then(
+      response => {
         dispatch({
           type: LOAD_USERS_SUCCESS,
-          payload: response
+          payload: response,
         })
-      }, errorResponse => {
+      },
+      errorResponse => {
         dispatch({
           type: LOAD_USERS_ERROR,
-          payload: errorResponse.data
+          payload: errorResponse.data,
         })
-      })
+      },
+    )
   }
 }
 
-export function loadUser (userId) {
+export function loadUser(userId) {
   return dispatch => {
     dispatch({
       type: LOAD_USER,
-      payload: userId
+      payload: userId,
     })
 
     api
       .user(userId)
       .get()
-      .then(user => {
-        dispatch({
-          type: LOAD_USER_SUCCESS,
-          payload: user
-        })
-      }, errorResponse => {
-        dispatch({
-          type: LOAD_USER_ERROR,
-          payload: errorResponse
-        })
-      })
+      .then(
+        user => {
+          dispatch({
+            type: LOAD_USER_SUCCESS,
+            payload: user,
+          })
+        },
+        errorResponse => {
+          dispatch({
+            type: LOAD_USER_ERROR,
+            payload: errorResponse,
+          })
+        },
+      )
   }
 }
 
-export function disableUser (userId) {
+export function disableUser(userId) {
   return dispatch => {
     dispatch({
       type: DISABLE_USER,
-      payload: userId
+      payload: userId,
     })
 
     api
       .user(userId)
-      .enabled
-      .put(false)
-      .then(response => {
-        dispatch({
-          type: DISABLE_USER_SUCCESS,
-          payload: userId
-        })
-      }, errorResponse => {
-        console.log(errorResponse)
-        dispatch({
-          type: DISABLE_USER_ERROR,
-          payload: userId
-        })
-      })
+      .enabled.put(false)
+      .then(
+        response => {
+          dispatch({
+            type: DISABLE_USER_SUCCESS,
+            payload: userId,
+          })
+        },
+        errorResponse => {
+          console.log(errorResponse)
+          dispatch({
+            type: DISABLE_USER_ERROR,
+            payload: userId,
+          })
+        },
+      )
   }
 }
 
-export function enableUser (userId) {
+export function enableUser(userId) {
   return dispatch => {
     dispatch({
       type: ENABLE_USER,
-      payload: userId
+      payload: userId,
     })
 
     api
       .user(userId)
-      .enabled
-      .put(true)
-      .then(response => {
-        dispatch({
-          type: ENABLE_USER_SUCCESS,
-          payload: userId
-        })
-      }, () => {
-        dispatch({
-          type: ENABLE_USER_ERROR,
-          payload: userId
-        })
-      })
+      .enabled.put(true)
+      .then(
+        response => {
+          dispatch({
+            type: ENABLE_USER_SUCCESS,
+            payload: userId,
+          })
+        },
+        () => {
+          dispatch({
+            type: ENABLE_USER_ERROR,
+            payload: userId,
+          })
+        },
+      )
   }
 }
 
-export function buildUser (user) {
+export function buildUser(user) {
   return dispatch => {
     dispatch({
       type: BUILD_USER,
-      payload: user
+      payload: user,
     })
   }
 }
 
-export function resetUser () {
+export function resetUser() {
   return dispatch => {
     dispatch({
       type: RESET_USER,
-      payload: {}
+      payload: {},
     })
   }
 }
 
-export function createUser (user) {
+export function createUser(user) {
   return dispatch => {
     dispatch({
       type: CREATE_USER,
-      payload: user
+      payload: user,
     })
 
-    api
-      .users
-      .post(user)
-      .then(response => {
+    api.users.post(user).then(
+      response => {
         dispatch({
           type: CREATE_USER_SUCCESS,
-          payload: response
+          payload: response,
         })
-      }, errorResponse => {
+      },
+      errorResponse => {
         dispatch({
           type: CREATE_USER_ERROR,
-          payload: errorResponse
+          payload: errorResponse,
         })
-      })
+      },
+    )
   }
 }
 
-function updateUserPermissions (user) {
+function updateUserPermissions(user) {
   if (Array.isArray(user.permissions) === false) {
     // Nothing to do here, just resolve
     return Promise.resolve()
   }
 
-  return api
-    .user(user.id)
-    .permissions
-    .put(user.permissions)
+  return api.user(user.id).permissions.put(user.permissions)
 }
 
-function updateUserProfile (user) {
-  return api
-    .user(user.id)
-    .profile
-    .put({
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email
-    })
+function updateUserProfile(user) {
+  return api.user(user.id).profile.put({
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+  })
 }
 
-function updateUserPassword (user) {
+function updateUserPassword(user) {
   if (user.password === undefined) {
     // There's no password to change, so just carry on about our business
     return Promise.resolve()
   }
 
-  return api
-    .user(user.id)
-    .password
-    .put(user.password, user.oldPassword)
+  return api.user(user.id).password.put(user.password, user.oldPassword)
 }
 
-export function updateUser (user) {
+export function updateUser(user) {
   const userUpdatePromises = Promise.all([
     updateUserPermissions(user),
     updateUserProfile(user),
-    updateUserPassword(user)
+    updateUserPassword(user),
   ])
 
   return dispatch => {
     dispatch({
       type: UPDATE_USER,
-      payload: user
+      payload: user,
     })
 
     userUpdatePromises
       .then(() => {
         // Whew, everything got updated. Request the user object for a single source of truth
-        return api
-          .user(user.id)
-          .get()
+        return api.user(user.id).get()
       })
       .then(userResponse => {
         dispatch({
           type: UPDATE_USER_SUCCESS,
-          payload: userResponse
+          payload: userResponse,
         })
       })
       .catch(errorResponse => {
         dispatch({
           type: UPDATE_USER_ERROR,
-          payload: errorResponse
+          payload: errorResponse,
         })
       })
   }

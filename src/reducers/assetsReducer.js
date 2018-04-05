@@ -1,12 +1,25 @@
 import {
-  ASSET_SEARCH, ASSET_AGGS, ASSET_SEARCH_ERROR,
-  ASSET_SORT, ASSET_ORDER, ASSET_FIELDS,
-  ASSET_PERMISSIONS, ASSET_SEARCHING,
-  UPDATE_COMMAND, GET_COMMANDS,
-  ISOLATE_ASSET, SELECT_ASSETS, ASSET_DELETE,
-  ADD_ASSETS_TO_FOLDER, REMOVE_ASSETS_FROM_FOLDER,
-  SUGGEST_COMPLETIONS, UNAUTH_USER, ISOLATE_PARENT, ISOLATE_FLIPBOOK,
-  ALL_ASSET_COUNT, SIMILAR_FIELDS
+  ASSET_SEARCH,
+  ASSET_AGGS,
+  ASSET_SEARCH_ERROR,
+  ASSET_SORT,
+  ASSET_ORDER,
+  ASSET_FIELDS,
+  ASSET_PERMISSIONS,
+  ASSET_SEARCHING,
+  UPDATE_COMMAND,
+  GET_COMMANDS,
+  ISOLATE_ASSET,
+  SELECT_ASSETS,
+  ASSET_DELETE,
+  ADD_ASSETS_TO_FOLDER,
+  REMOVE_ASSETS_FROM_FOLDER,
+  SUGGEST_COMPLETIONS,
+  UNAUTH_USER,
+  ISOLATE_PARENT,
+  ISOLATE_FLIPBOOK,
+  ALL_ASSET_COUNT,
+  SIMILAR_FIELDS,
 } from '../constants/actionTypes'
 
 import * as api from '../globals/api.js'
@@ -22,10 +35,10 @@ const initialState = {
   assetsCounter: 0,
   selectionCounter: 0,
   commands: new Map(),
-  similarFields: new Set()
+  similarFields: new Set(),
 }
 
-export default function (state = initialState, action) {
+export default function(state = initialState, action) {
   switch (action.type) {
     case ASSET_SEARCH: {
       // Collapsed Loading
@@ -61,10 +74,13 @@ export default function (state = initialState, action) {
       const { query, assets, page, multipage, isFirstPage } = action.payload
       let collapsedCount = 0
       const maxStackCount = 3
-      const parentCounts = multipage ? (isFirstPage ? new Map() : new Map(state.parentCounts)) : undefined
+      const parentCounts = multipage
+        ? isFirstPage ? new Map() : new Map(state.parentCounts)
+        : undefined
       const collapsedAssets = multipage ? [] : assets
       if (multipage) {
-        const isolatedParentId = state.isolatedParent && state.isolatedParent.parentId()
+        const isolatedParentId =
+          state.isolatedParent && state.isolatedParent.parentId()
         assets.forEach(asset => {
           if (asset.parentId() && asset.parentId() !== isolatedParentId) {
             const count = parentCounts.get(asset.parentId()) || 0
@@ -84,20 +100,36 @@ export default function (state = initialState, action) {
           }
         })
       }
-      const all = state.all && !isFirstPage ? state.all.concat(collapsedAssets) : collapsedAssets
+      const all =
+        state.all && !isFirstPage
+          ? state.all.concat(collapsedAssets)
+          : collapsedAssets
       const loadedCount = page ? page.from + assets.length - collapsedCount : 0
-      const filteredCount = page && page.totalCount || 0
-      const totalCount = page && page.totalCount && isFirstPage ? page.totalCount : state.totalCount
+      const filteredCount = (page && page.totalCount) || 0
+      const totalCount =
+        page && page.totalCount && isFirstPage
+          ? page.totalCount
+          : state.totalCount
       const assetsCounter = state.assetsCounter + 1
       api.setAssetsCounter(assetsCounter)
-      const updates = { query, all, totalCount, filteredCount, loadedCount, parentCounts, suggestions: null, assetsCounter, error: null }
+      const updates = {
+        query,
+        all,
+        totalCount,
+        filteredCount,
+        loadedCount,
+        parentCounts,
+        suggestions: null,
+        assetsCounter,
+        error: null,
+      }
       return { ...state, ...updates }
     }
 
     case ASSET_AGGS: {
       const {
         aggs, // These are parent aggregation counts where ES `post_filter` are treated as "pre" (i.e. `filter`) filter
-        unfilteredAggs // These are parent aggregation counts that ignore all filters except for the parent IDs
+        unfilteredAggs, // These are parent aggregation counts that ignore all filters except for the parent IDs
       } = action.payload
 
       // If the filtered aggregations parentCounts are available, set the state with those
@@ -132,9 +164,10 @@ export default function (state = initialState, action) {
 
     case ASSET_SORT: {
       const { field, ascending } = action.payload
-      let order = state.order ? [ ...state.order ] : []
-      const index = state.order && state.order.findIndex(order => (order.field === field))
-      if (index >= 0) order.splice(index, 1)  // remove if order===undefined, re-order otherwise
+      let order = state.order ? [...state.order] : []
+      const index =
+        state.order && state.order.findIndex(order => order.field === field)
+      if (index >= 0) order.splice(index, 1) // remove if order===undefined, re-order otherwise
       if (ascending !== undefined) {
         // add as primary sort and crop list to max count
         order.unshift(action.payload)
@@ -161,7 +194,11 @@ export default function (state = initialState, action) {
     case ASSET_FIELDS: {
       const fields = action.payload
       const types = {}
-      Object.keys(fields).forEach(type => { fields[type].forEach(field => { types[field] = type }) })
+      Object.keys(fields).forEach(type => {
+        fields[type].forEach(field => {
+          types[field] = type
+        })
+      })
       return { ...state, fields, types }
     }
 
@@ -178,11 +215,15 @@ export default function (state = initialState, action) {
     }
 
     case SUGGEST_COMPLETIONS: {
-      const suggestionPayload = Array.isArray(action.payload) ? action.payload : []
-      const deduplicatedSuggestions = deduplicateStringsByCaseAndWhitespace(suggestionPayload)
-      const suggestions = deduplicatedSuggestions.map(text => ({text}))
+      const suggestionPayload = Array.isArray(action.payload)
+        ? action.payload
+        : []
+      const deduplicatedSuggestions = deduplicateStringsByCaseAndWhitespace(
+        suggestionPayload,
+      )
+      const suggestions = deduplicatedSuggestions.map(text => ({ text }))
 
-      return {...state, suggestions}
+      return { ...state, suggestions }
     }
 
     case ADD_ASSETS_TO_FOLDER: {
@@ -191,7 +232,7 @@ export default function (state = initialState, action) {
       const all = [...state.all]
       const assetIds = action.payload.data.success
       assetIds.forEach(id => {
-        const index = all.findIndex(asset => (asset.id === id))
+        const index = all.findIndex(asset => asset.id === id)
         if (index >= 0) {
           const asset = new Asset(all[index])
           asset.addFolderIds([folderId])
@@ -201,8 +242,13 @@ export default function (state = initialState, action) {
 
       // Flush the query cache if one of the selected folders was modified
       let query = state.query
-      if (query && query.filter && query.filter.links && query.filter.links.folder) {
-        const index = query.filter.links.folder.findIndex(id => (id === folderId))
+      if (
+        query &&
+        query.filter &&
+        query.filter.links &&
+        query.filter.links.folder
+      ) {
+        const index = query.filter.links.folder.findIndex(id => id === folderId)
         if (index >= 0) {
           query = new AssetSearch(query)
           query.filter.links.folder = null
@@ -217,7 +263,7 @@ export default function (state = initialState, action) {
       const all = [...state.all]
       const assetIds = action.payload.data.success
       assetIds.forEach(id => {
-        const index = all.findIndex(asset => (asset.id === id))
+        const index = all.findIndex(asset => asset.id === id)
         if (index >= 0) {
           const asset = new Asset(all[index])
           asset.removeFolderIds([folderId])
@@ -227,8 +273,13 @@ export default function (state = initialState, action) {
 
       // Flush the query cache if one of the selected folders was modified
       let query = state.query
-      if (query && query.filter && query.filter.links && query.filter.links.folder) {
-        const index = query.filter.links.folder.findIndex(id => (id === folderId))
+      if (
+        query &&
+        query.filter &&
+        query.filter.links &&
+        query.filter.links.folder
+      ) {
+        const index = query.filter.links.folder.findIndex(id => id === folderId)
         if (index >= 0) {
           query = new AssetSearch(query)
           query.filter.links.folder = null
@@ -237,7 +288,7 @@ export default function (state = initialState, action) {
       return { ...state, all, query }
     }
 
-    case UPDATE_COMMAND:        // Same reduction action for update
+    case UPDATE_COMMAND: // Same reduction action for update
     case ASSET_PERMISSIONS: {
       const command = action.payload
       const commands = new Map(state.commands)
@@ -269,7 +320,7 @@ export default function (state = initialState, action) {
 
       // remove the deleted asset from list of all assets
       const all = [...state.all]
-      const index = all.findIndex(asset => (asset.id === assetId))
+      const index = all.findIndex(asset => asset.id === assetId)
       if (index >= 0) {
         const asset = new Asset(all[index])
         asset.removeFolderIds([folderId])

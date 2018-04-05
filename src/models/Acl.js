@@ -8,35 +8,46 @@ export default class AclEntry {
   static WriteAccess = 2
   static ExportAccess = 4
 
-  constructor (json) {
-    this.permissionId = json.permissionId   // int
-    this.access = json.access               // int
+  constructor(json) {
+    this.permissionId = json.permissionId // int
+    this.access = json.access // int
   }
 }
 
 // Utility method to check for permission
-export function hasAccess (acl, permission, access) {
+export function hasAccess(acl, permission, access) {
   if (!acl) return false
   // Empty Acl gets read access?
   if (acl && !acl.length && access === AclEntry.ReadAccess) {
     return true
   }
   for (let entry of acl) {
-    if (entry.permissionId === permission.id &&
-      (access & entry.access) === access) {
+    if (
+      entry.permissionId === permission.id &&
+      (access & entry.access) === access
+    ) {
       return true
     }
   }
   return false
 }
 
-export function isPublic (acl, user, userPermissions) {
-  return acl && userPermissions &&
+export function isPublic(acl, user, userPermissions) {
+  return (
+    acl &&
+    userPermissions &&
     acl.some(aclEntry => {
-      const whitelist = [ 'administrator', 'manager' ]
-      const index = userPermissions.findIndex(permission => (permission.id === aclEntry.permissionId))
-      return index < 0 ||
-        (userPermissions[index].type === 'user' && userPermissions[index].name !== user.username) ||
-        (userPermissions[index].type === 'group' && whitelist.findIndex(name => (name === userPermissions[index].name)) < 0)
+      const whitelist = ['administrator', 'manager']
+      const index = userPermissions.findIndex(
+        permission => permission.id === aclEntry.permissionId,
+      )
+      return (
+        index < 0 ||
+        (userPermissions[index].type === 'user' &&
+          userPermissions[index].name !== user.username) ||
+        (userPermissions[index].type === 'group' &&
+          whitelist.findIndex(name => name === userPermissions[index].name) < 0)
+      )
     })
+  )
 }

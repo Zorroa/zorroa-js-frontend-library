@@ -9,7 +9,7 @@ import { epochUTCString } from '../../services/jsUtil'
 class ImporterBar extends Component {
   static propTypes = {
     job: PropTypes.instanceOf(Job),
-    actions: PropTypes.object
+    actions: PropTypes.object,
   }
 
   state = {}
@@ -18,27 +18,35 @@ class ImporterBar extends Component {
     this.props.actions.isolateJob()
   }
 
-  render () {
+  render() {
     const { job } = this.props
     return (
       <div className="ImporterBar">
         <div className="ImporterBar-job">
-          <div className="ImporterBar-job-info ImporterBar-job-name">{job.name}</div>
-          <div className="ImporterBar-job-info ImporterBar-job-owner">{job.user.username}</div>
-          <div className="ImporterBar-job-info ImporterBar-job-time">{epochUTCString(job.timeStarted)}</div>
-          <div className="ImporterBar-job-info ImporterBar-job-time">{epochUTCString(job.timeUpdated)}</div>
+          <div className="ImporterBar-job-info ImporterBar-job-name">
+            {job.name}
+          </div>
+          <div className="ImporterBar-job-info ImporterBar-job-owner">
+            {job.user.username}
+          </div>
+          <div className="ImporterBar-job-info ImporterBar-job-time">
+            {epochUTCString(job.timeStarted)}
+          </div>
+          <div className="ImporterBar-job-info ImporterBar-job-time">
+            {epochUTCString(job.timeUpdated)}
+          </div>
         </div>
         <div className="ImporterBar-actions">
           <div className="ImporterBar-action">
-            <div className="icon-play2"/>
+            <div className="icon-play2" />
             <div>Run</div>
           </div>
           <div className="ImporterBar-action">
-            <div className="icon-download2"/>
+            <div className="icon-download2" />
             <div>Download</div>
           </div>
           <div className="ImporterBar-action">
-            <div className="icon-envelope"/>
+            <div className="icon-envelope" />
             <div>Email</div>
           </div>
           <div className="ImporterBar-close icon-cross" onClick={this.close} />
@@ -48,10 +56,16 @@ class ImporterBar extends Component {
   }
 }
 
-export default connect(state => ({
-  job: state.jobs.isolated
-}), dispatch => ({
-  actions: bindActionCreators({
-    isolateJob
-  }, dispatch)
-}))(ImporterBar)
+export default connect(
+  state => ({
+    job: state.jobs.isolated,
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        isolateJob,
+      },
+      dispatch,
+    ),
+  }),
+)(ImporterBar)

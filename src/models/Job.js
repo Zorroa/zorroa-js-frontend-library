@@ -15,7 +15,19 @@ export default class Job {
 
   static MaxAssets = 500
 
-  constructor ({ id, name, type, user, state, args, timeStarted, timeUpdated, tasks, stats, progress }) {
+  constructor({
+    id,
+    name,
+    type,
+    user,
+    state,
+    args,
+    timeStarted,
+    timeUpdated,
+    tasks,
+    stats,
+    progress,
+  }) {
     this.id = id
     this.name = name
     this.type = type
@@ -29,40 +41,54 @@ export default class Job {
     this.progress = progress && new JobProgress(progress)
   }
 
-  isFinished () {
+  isFinished() {
     return this.state === Job.Finished
   }
 
-  errorCount () {
-    return (this.stats && this.stats.frameErrorCount) || (this.tasks && this.tasks.failed)
+  errorCount() {
+    return (
+      (this.stats && this.stats.frameErrorCount) ||
+      (this.tasks && this.tasks.failed)
+    )
   }
 
-  warningCount () {
-    return (this.stats && this.stats.frameWarningCount) || (this.tasks && this.tasks.skipped)
+  warningCount() {
+    return (
+      (this.stats && this.stats.frameWarningCount) ||
+      (this.tasks && this.tasks.skipped)
+    )
   }
 
-  successCount () {
-    return (this.stats && this.stats.frameSuccessCount) || (this.tasks && this.tasks.success)
+  successCount() {
+    return (
+      (this.stats && this.stats.frameSuccessCount) ||
+      (this.tasks && this.tasks.success)
+    )
   }
 
-  exportStream (origin) {
+  exportStream(origin) {
     if (this.type === Job.Export && this.isFinished()) {
       return `${origin}/api/v1/exports/${this.id}/_stream`
     }
   }
 
-  percentCompleted () {
+  percentCompleted() {
     if (this.progress) return this.progress.percentComplete()
     if (this.tasks) return this.tasks.percentCompleted()
     return -1
   }
 
-  timeElapsed () {
+  timeElapsed() {
     return this.timeUpdated - this.timeStarted
   }
 
-  timeRemaining () {
-    if (!this.timeUpdated || !this.timeStarted || this.timeUpdated < this.timeStarted) return -1
+  timeRemaining() {
+    if (
+      !this.timeUpdated ||
+      !this.timeStarted ||
+      this.timeUpdated < this.timeStarted
+    )
+      return -1
     const elapsed = this.timeElapsed()
     if (elapsed < 0) return -1
     if (!this.tasks) return -1
@@ -71,7 +97,7 @@ export default class Job {
     return 100 * elapsed / pct
   }
 
-  timeRemainingString () {
+  timeRemainingString() {
     const time = this.timeRemaining()
     if (time < 0) return 'Unknown'
     const s = Math.floor(time / 1000)
@@ -85,18 +111,20 @@ export default class Job {
   }
 }
 
-export function jobsOfType (jobs, type) {
+export function jobsOfType(jobs, type) {
   if (!jobs) return
-  return Object.keys(jobs).map(key => jobs[key]).filter(job => (job.type === type))
+  return Object.keys(jobs)
+    .map(key => jobs[key])
+    .filter(job => job.type === type)
 }
 
-export function countOfJobsOfType (jobs, type) {
+export function countOfJobsOfType(jobs, type) {
   if (!jobs) return 0
   return jobsOfType(jobs, type).length
 }
 
 export class JobFilter {
-  constructor ({ state, type, userId }) {
+  constructor({ state, type, userId }) {
     this.state = state
     this.type = type
     this.userId = userId
@@ -104,7 +132,7 @@ export class JobFilter {
 }
 
 export class JobProgress {
-  constructor ({ failed, running, skipped, success, total, waiting }) {
+  constructor({ failed, running, skipped, success, total, waiting }) {
     this.failed = failed
     this.running = running
     this.skipped = skipped
@@ -113,13 +141,22 @@ export class JobProgress {
     this.waiting = waiting
   }
 
-  percentComplete () {
+  percentComplete() {
     return this.failed + this.skipped + this.success
   }
 }
 
 export class JobTasks {
-  constructor ({ total, completed, waiting, queued, running, success, failure, skipped }) {
+  constructor({
+    total,
+    completed,
+    waiting,
+    queued,
+    running,
+    success,
+    failure,
+    skipped,
+  }) {
     this.total = total
     this.completed = completed
     this.waiting = waiting
@@ -130,14 +167,19 @@ export class JobTasks {
     this.skipped = skipped
   }
 
-  percentCompleted () {
+  percentCompleted() {
     if (!this.completed || !this.total) return -1
     return 100 * this.completed / this.total
   }
 }
 
 export class JobStats {
-  constructor ({ frameSuccessCount, frameErrorCount, frameWarningCount, frameTotalCount }) {
+  constructor({
+    frameSuccessCount,
+    frameErrorCount,
+    frameWarningCount,
+    frameTotalCount,
+  }) {
     this.frameSuccessCount = frameSuccessCount
     this.frameErrorCount = frameErrorCount
     this.frameWarningCount = frameWarningCount

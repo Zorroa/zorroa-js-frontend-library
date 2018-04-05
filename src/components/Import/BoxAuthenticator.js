@@ -19,16 +19,18 @@ export const BoxAuth = () => {
 }
 
 export class BoxAuthenticator {
-  constructor (clientID, onAuth) {
+  constructor(clientID, onAuth) {
     this.clientID = clientID
     this.onAuth = onAuth
   }
 
-  static redirectURL = () => ('https://onboard.zorroa.com:3000/boxauth')
-  static accessToken = () => (localStorage.getItem(BOX_ACCESS_TOKEN_ITEM))
-  static deauthorize = () => { localStorage.removeItem(BOX_ACCESS_TOKEN_ITEM) }
+  static redirectURL = () => 'https://onboard.zorroa.com:3000/boxauth'
+  static accessToken = () => localStorage.getItem(BOX_ACCESS_TOKEN_ITEM)
+  static deauthorize = () => {
+    localStorage.removeItem(BOX_ACCESS_TOKEN_ITEM)
+  }
 
-  authorized = (ev) => {
+  authorized = ev => {
     if (ev.key === BOX_ACCESS_TOKEN_ITEM) {
       this.accessToken = ev.newValue
       this.authenticating = false
@@ -42,11 +44,16 @@ export class BoxAuthenticator {
     if (accessToken && accessToken.length) {
       const box = axios.create({
         baseURL: 'https://api.box.com/2.0',
-        headers: {'Authorization': 'Bearer ' + accessToken}
+        headers: { Authorization: 'Bearer ' + accessToken },
       })
-      box.get('users/me')
-        .then(response => { this.onAuth(accessToken) })
-        .catch(_ => { this.authenticate() })
+      box
+        .get('users/me')
+        .then(response => {
+          this.onAuth(accessToken)
+        })
+        .catch(_ => {
+          this.authenticate()
+        })
     } else {
       this.authenticate()
     }
@@ -60,21 +67,26 @@ export class BoxAuthenticator {
     window.addEventListener('storage', this.authorized)
     // const authUrl = 'http://localhost:8066/#access_token=gnXMnC4kaSAAAAAAAAABcjGEFV6hNSMs-L3xJ3D6qGF9SFNW2LJ2YcdSUTwNX4h8&token_type=bearer&uid=542065014&account_id=dbid%3AAAALlZIpNztmWVNtxx53n-gH4N0bhq_YnJQ'
     // Set the login anchors href using dbx.getAuthenticationUrl()
-    const url = 'https://account.box.com/api/oauth2/authorize' +
-      '?response_type=code&client_id=' + this.clientID +
-      '&redirect_uri=' + BoxAuthenticator.redirectURL() +
-      '&state=w3@r3n0td@m!' + window.location.origin
+    const url =
+      'https://account.box.com/api/oauth2/authorize' +
+      '?response_type=code&client_id=' +
+      this.clientID +
+      '&redirect_uri=' +
+      BoxAuthenticator.redirectURL() +
+      '&state=w3@r3n0td@m!' +
+      window.location.origin
     const w = 480
     const h = 640
     const wLeft = window.screenLeft ? window.screenLeft : window.screenX
     const wTop = window.screenTop ? window.screenTop : window.screenY
-    const left = wLeft + (window.innerWidth / 2) - (w / 2)
-    const top = wTop + (window.innerHeight / 2) - (h / 2)
+    const left = wLeft + window.innerWidth / 2 - w / 2
+    const top = wTop + window.innerHeight / 2 - h / 2
     const strWindowFeatures = `left=${left},top=${top},width=${w},height=${h},dialog=yes,resizable=no,status=no,dependent=yes,toolbar=no,location=no,directories=no,menubar=no,copyhistory=no`
     const win = window.open(url, 'Zorroa Box', strWindowFeatures)
     if (win) {
       const pollTimer = window.setInterval(_ => {
-        if (win.closed !== false) { // !== is required for compatibility with Opera
+        if (win.closed !== false) {
+          // !== is required for compatibility with Opera
           window.clearInterval(pollTimer)
           this.authenticating = false
         }

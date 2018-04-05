@@ -10,7 +10,7 @@ export default class Permission {
   static Librarian = 'librarian'
   static Export = 'export'
 
-  constructor (json) {
+  constructor(json) {
     this.id = json.id
     this.name = json.name
     this.type = json.type
@@ -18,15 +18,15 @@ export default class Permission {
     this.immutable = json.immutable
   }
 
-  authority () {
+  authority() {
     return this.type + '::' + this.name
   }
 
-  get fullName () {
+  get fullName() {
     return this.authority()
   }
 
-  equals (name, type) {
+  equals(name, type) {
     if (!name || !type) return false
     if (this.name !== name) return false
     if (this.type !== type) return false

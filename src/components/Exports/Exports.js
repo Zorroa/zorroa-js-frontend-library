@@ -12,7 +12,7 @@ import {
   clearPostExportLoadingStates,
   exportRequest,
   onlineStatus,
-  createExport
+  createExport,
 } from '../../actions/exportsAction'
 import { getJobs } from '../../actions/jobActions'
 import { getClassFromNamespace } from './utils'
@@ -51,9 +51,7 @@ class Exports extends Component {
     flipbookAssetCount: PropTypes.number.isRequired,
     documentAssetCount: PropTypes.number.isRequired,
     totalAssetCount: PropTypes.number.isRequired,
-    selectedAssets: PropTypes.arrayOf(
-      PropTypes.instanceOf(Asset)
-    ),
+    selectedAssets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     metadataFields: PropTypes.arrayOf(PropTypes.string).isRequired,
     errorMessage: PropTypes.string,
     isLoading: PropTypes.bool.isRequired,
@@ -67,10 +65,10 @@ class Exports extends Component {
         processors: PropTypes.arrayOf(
           PropTypes.shape({
             args: PropTypes.object,
-            className: PropTypes.string
-          })
-        )
-      })
+            className: PropTypes.string,
+          }),
+        ),
+      }),
     ),
     loadingCreateExport: PropTypes.bool.isRequired,
     loadingCreateExportError: PropTypes.bool.isRequired,
@@ -91,11 +89,11 @@ class Exports extends Component {
       exportRequest: PropTypes.func.isRequired,
       onlineStatus: PropTypes.func.isRequired,
       createExport: PropTypes.func.isRequired,
-      getJobs: PropTypes.func.isRequired
-    })
+      getJobs: PropTypes.func.isRequired,
+    }),
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.defaultProcessors = {
@@ -104,69 +102,72 @@ class Exports extends Component {
           exportOriginal: true,
           format: 'jpg',
           size: 1024,
-          quality: 100
+          quality: 100,
         },
-        shouldExport: true
+        shouldExport: true,
       },
       PdfExporter: {
         arguments: {
           exportOriginal: true,
-          pageMode: 'merge'
+          pageMode: 'merge',
         },
         shouldExport: true,
-        format: 'multipage'
+        format: 'multipage',
       },
       FlipbookExporter: {
         arguments: {
           quality: 'medium',
           exportImages: true,
           exportMovies: true,
-          frameRate: 30
+          frameRate: 30,
         },
         shouldExport: true,
-        flipbookExportType: 'image'
+        flipbookExportType: 'image',
       },
       CsvExporter: {
         arguments: {
-          fields: props.metadataFields
+          fields: props.metadataFields,
         },
-        shouldExport: true
+        shouldExport: true,
       },
       JsonExporter: {
         arguments: {
-          fields: props.metadataFields
+          fields: props.metadataFields,
         },
-        shouldExport: true
+        shouldExport: true,
       },
       VideoClipExporter: {
         arguments: {
           scale: '960:540',
           quality: 'medium',
           format: 'mp4',
-          exportOriginal: true
+          exportOriginal: true,
         },
-        shouldExport: true
-      }
+        shouldExport: true,
+      },
     }
 
     this.state = {
       ...this.defaultProcessors,
-      fileName: `zorroa-export-${moment().format('YYYYMMDD')}-${props.packageName || 'untitled'}-${moment().format('x')}`,
+      fileName: `zorroa-export-${moment().format(
+        'YYYYMMDD',
+      )}-${props.packageName || 'untitled'}-${moment().format('x')}`,
       showPresetForm: false,
       visibleExporter: 'ZipExportPackager',
       presetId: undefined,
-      newPresetName: `Preset ${(new Date()).toLocaleDateString()}`,
-      presetSaveCounter: 0
+      newPresetName: `Preset ${new Date().toLocaleDateString()}`,
+      presetSaveCounter: 0,
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.actions.loadExportProfiles()
     this.props.actions.onlineStatus(new AssetSearch(this.props.assetSearch))
   }
 
-  componentWillReceiveProps (nextProps) {
-    if (this.props.exportProfilesPosting !== nextProps.exportProfilesPosting && // Must be a new prop
+  componentWillReceiveProps(nextProps) {
+    if (
+      this.props.exportProfilesPosting !== nextProps.exportProfilesPosting && // Must be a new prop
       this.props.exportProfilesPosting === true && // Only change if it was in the middle of posting
       this.state.showPresetForm === true // Only change if the form is already open
     ) {
@@ -175,12 +176,13 @@ class Exports extends Component {
         this.setState(prevState => ({
           showPresetForm: false,
           presetSaveCounter: prevState.presetSaveCounter + 1,
-          newPresetName: `Preset ${prevState.presetSaveCounter + 1}`
+          newPresetName: `Preset ${prevState.presetSaveCounter + 1}`,
         }))
       }, SHOW_SUCCESS_MS)
     }
 
-    if (this.props.loadingCreateExportSuccess === false &&
+    if (
+      this.props.loadingCreateExportSuccess === false &&
       nextProps.loadingCreateExportSuccess === true
     ) {
       const { userId } = this.props
@@ -197,11 +199,11 @@ class Exports extends Component {
   onChange = newState => {
     this.setState({
       ...newState,
-      presetId: undefined
+      presetId: undefined,
     })
   }
 
-  getSaveProfileState () {
+  getSaveProfileState() {
     if (this.props.exportProfilesPostingError === true) {
       return 'error'
     }
@@ -215,7 +217,7 @@ class Exports extends Component {
     }
   }
 
-  getExportRequestState () {
+  getExportRequestState() {
     if (this.props.exportRequestPostingError === true) {
       return 'error'
     }
@@ -229,7 +231,7 @@ class Exports extends Component {
     }
   }
 
-  getCreateExportState () {
+  getCreateExportState() {
     if (this.props.loadingCreateExportError === true) {
       return 'error'
     }
@@ -243,16 +245,16 @@ class Exports extends Component {
     }
   }
 
-  toggleAccordion = (visibleExporter) => {
+  toggleAccordion = visibleExporter => {
     if (this.state.visibleExporter === visibleExporter) {
       this.setState({
-        visibleExporter: undefined
+        visibleExporter: undefined,
       })
       return
     }
 
     this.setState({
-      visibleExporter
+      visibleExporter,
     })
   }
 
@@ -261,31 +263,32 @@ class Exports extends Component {
     const savedProfiles = [].concat(this.props.exportProfiles, {
       processors: this.serializeExporterArguments().processors,
       presetName: this.state.newPresetName,
-      id: presetId
+      id: presetId,
     })
 
     this.props.actions.postExportProfiles(savedProfiles)
 
     this.setState({
-      presetId
+      presetId,
     })
   }
 
-  onSelectPreset = (preset) => {
-    const presets = preset
-      .processors
-      .reduce((accumulator, processor) => {
+  onSelectPreset = preset => {
+    const presets = preset.processors.reduce(
+      (accumulator, processor) => {
         const className = processor.className
         accumulator[className] = Object.assign({}, this.state[className], {
           arguments: processor.args,
-          shouldExport: true
+          shouldExport: true,
         })
         return accumulator
-      }, {...this.defaultProcessors})
+      },
+      { ...this.defaultProcessors },
+    )
 
     this.setState({
       ...presets,
-      presetId: preset.id
+      presetId: preset.id,
     })
   }
 
@@ -297,29 +300,30 @@ class Exports extends Component {
       FlipbookExporter: 'com.zorroa.core.exporter.FlipbookExporter',
       PdfExporter: 'com.zorroa.core.exporter.PdfExporter',
       CsvExporter: 'com.zorroa.core.exporter.CsvExporter',
-      JsonExporter: 'com.zorroa.core.exporter.JsonExporter'
+      JsonExporter: 'com.zorroa.core.exporter.JsonExporter',
     }
 
-    const processors = Object
-      .keys(fullyQualifiedProcessorNames)
-      .reduce((accumulator, exporterName) => {
+    const processors = Object.keys(fullyQualifiedProcessorNames).reduce(
+      (accumulator, exporterName) => {
         const exporter = this.state[exporterName]
 
         if (exporter && exporter.shouldExport === true) {
           accumulator.push({
-            args: {...exporter.arguments},
-            className: `${fullyQualifiedProcessorNames[exporterName]}`
+            args: { ...exporter.arguments },
+            className: `${fullyQualifiedProcessorNames[exporterName]}`,
           })
         }
 
         return accumulator
-      }, [])
+      },
+      [],
+    )
 
     return {
       search: this.props.assetSearch,
       name: this.props.packageName || fileName,
       compress: true,
-      processors
+      processors,
     }
   }
 
@@ -330,11 +334,11 @@ class Exports extends Component {
   togglePresetFormVisibility = () => {
     this.props.actions.clearPostExportLoadingStates()
     this.setState(prevState => ({
-      showPresetForm: !(prevState.showPresetForm === true)
+      showPresetForm: !(prevState.showPresetForm === true),
     }))
   }
 
-  canRequestExport () {
+  canRequestExport() {
     const folderId = this.getExportFolderId()
     return folderId !== undefined
   }
@@ -350,8 +354,10 @@ class Exports extends Component {
       this.props.actions.exportRequest({
         folderId,
         type: 'Export',
-        comment: `${fullName} (${email}) has requested an export of "${this.props.packageName}" (folder ID: ${folderId}).`,
-        emailCC: email
+        comment: `${fullName} (${email}) has requested an export of "${
+          this.props.packageName
+        }" (folder ID: ${folderId}).`,
+        emailCC: email,
       })
 
       return
@@ -360,7 +366,7 @@ class Exports extends Component {
     console.error('A folder must be selected in order to request an export')
   }
 
-  getExportFolderId () {
+  getExportFolderId() {
     return (
       this.props.assetSearch &&
       this.props.assetSearch.filter &&
@@ -370,114 +376,137 @@ class Exports extends Component {
     )
   }
 
-  render () {
+  render() {
     const exporterArguments = this.serializeExporterArguments()
     const processors = exporterArguments.processors
     const { exportProfiles, hasRestrictedAssets } = this.props
-    const activePreset = exportProfiles.find(preset => preset.id === this.state.presetId)
+    const activePreset = exportProfiles.find(
+      preset => preset.id === this.state.presetId,
+    )
     const exportsClassNames = classnames('Exports', {
-      'Exports--loading': this.props.isLoading
+      'Exports--loading': this.props.isLoading,
     })
     const body = (
       <div className={exportsClassNames}>
-        <ModalHeader className="Exports__header" icon="icon-export" closeFn={this.close}>
-         Create Export
+        <ModalHeader
+          className="Exports__header"
+          icon="icon-export"
+          closeFn={this.close}>
+          Create Export
         </ModalHeader>
         <form onSubmit={this.onSubmit} className="Exports__body">
-            { hasRestrictedAssets === false && (
-              <div className="Exports__sidebar">
-                <ZipExportPackager
-                  isOpen={this.state.visibleExporter === 'ZipExportPackager'}
-                  onToggleAccordion={() => this.toggleAccordion('ZipExportPackager')}
-                  onChange={this.onChange}
-                  savedArguments={this.state.savedArguments}
-                  fileName={this.state.fileName}
-                  presetId={this.state.presetId}
-                  presets={this.props.exportProfiles}
-                  onSelectPreset={this.onSelectPreset}
-                />
-                <ImageExporter
-                  isOpen={this.state.visibleExporter === 'ImageExporter'}
-                  onToggleAccordion={() => this.toggleAccordion('ImageExporter')}
-                  onChange={this.onChange}
-                  arguments={this.state.ImageExporter.arguments}
-                  shouldExport={this.state.ImageExporter.shouldExport}
-                />
-                <VideoClipExporter
-                  isOpen={this.state.visibleExporter === 'VideoClipExporter'}
-                  onToggleAccordion={() => this.toggleAccordion('VideoClipExporter')}
-                  onChange={this.onChange}
-                  arguments={this.state.VideoClipExporter.arguments}
-                  shouldExport={this.state.VideoClipExporter.shouldExport}
+          {hasRestrictedAssets === false && (
+            <div className="Exports__sidebar">
+              <ZipExportPackager
+                isOpen={this.state.visibleExporter === 'ZipExportPackager'}
+                onToggleAccordion={() =>
+                  this.toggleAccordion('ZipExportPackager')
+                }
+                onChange={this.onChange}
+                savedArguments={this.state.savedArguments}
+                fileName={this.state.fileName}
+                presetId={this.state.presetId}
+                presets={this.props.exportProfiles}
+                onSelectPreset={this.onSelectPreset}
+              />
+              <ImageExporter
+                isOpen={this.state.visibleExporter === 'ImageExporter'}
+                onToggleAccordion={() => this.toggleAccordion('ImageExporter')}
+                onChange={this.onChange}
+                arguments={this.state.ImageExporter.arguments}
+                shouldExport={this.state.ImageExporter.shouldExport}
+              />
+              <VideoClipExporter
+                isOpen={this.state.visibleExporter === 'VideoClipExporter'}
+                onToggleAccordion={() =>
+                  this.toggleAccordion('VideoClipExporter')
+                }
+                onChange={this.onChange}
+                arguments={this.state.VideoClipExporter.arguments}
+                shouldExport={this.state.VideoClipExporter.shouldExport}
+              />
+              <FlipbookExporter
+                isOpen={this.state.visibleExporter === 'FlipbookExporter'}
+                onToggleAccordion={() =>
+                  this.toggleAccordion('FlipbookExporter')
+                }
+                onChange={this.onChange}
+                arguments={this.state.FlipbookExporter.arguments}
+                shouldExport={this.state.FlipbookExporter.shouldExport}
+              />
+              <PdfExporter
+                isOpen={this.state.visibleExporter === 'PdfExporter'}
+                onToggleAccordion={() => this.toggleAccordion('PdfExporter')}
+                onChange={this.onChange}
+                arguments={this.state.PdfExporter.arguments}
+                format={this.state.PdfExporter.format}
+                shouldExport={this.state.PdfExporter.shouldExport}
+              />
+              <MetadataExporter
+                isOpen={this.state.visibleExporter === 'MetadataExporter'}
+                onToggleAccordion={() =>
+                  this.toggleAccordion('MetadataExporter')
+                }
+                onChange={this.onChange}
+                exporter={
+                  this.state.JsonExporter.shouldExport
+                    ? 'JsonExporter'
+                    : 'CsvExporter'
+                }
+                shouldExport={
+                  this.state.JsonExporter.shouldExport ||
+                  this.state.CsvExporter.shouldExport
+                }
+              />
+            </div>
+          )}
 
-                />
-                <FlipbookExporter
-                  isOpen={this.state.visibleExporter === 'FlipbookExporter'}
-                  onToggleAccordion={() => this.toggleAccordion('FlipbookExporter')}
-                  onChange={this.onChange}
-                  arguments={this.state.FlipbookExporter.arguments}
-                  shouldExport={this.state.FlipbookExporter.shouldExport}
-                />
-                <PdfExporter
-                  isOpen={this.state.visibleExporter === 'PdfExporter'}
-                  onToggleAccordion={() => this.toggleAccordion('PdfExporter')}
-                  onChange={this.onChange}
-                  arguments={this.state.PdfExporter.arguments}
-                  format={this.state.PdfExporter.format}
-                  shouldExport={this.state.PdfExporter.shouldExport}
-                />
-                <MetadataExporter
-                  isOpen={this.state.visibleExporter === 'MetadataExporter'}
-                  onToggleAccordion={() => this.toggleAccordion('MetadataExporter')}
-                  onChange={this.onChange}
-                  exporter={this.state.JsonExporter.shouldExport ? 'JsonExporter' : 'CsvExporter'}
-                  shouldExport={this.state.JsonExporter.shouldExport || this.state.CsvExporter.shouldExport}
-                />
-              </div>
-            ) }
-
-            { hasRestrictedAssets === true && (
-              <div className="Exports__sidebar">
-                <h2 className="Exports__sidebar-title">Export Request</h2>
-                <h3 className="Exports__sidebar-subtitle">Export Package Name</h3>
-                <p className="Exports__sidebar-paragraph">{this.state.fileName}</p>
-              </div>
-            )}
+          {hasRestrictedAssets === true && (
+            <div className="Exports__sidebar">
+              <h2 className="Exports__sidebar-title">Export Request</h2>
+              <h3 className="Exports__sidebar-subtitle">Export Package Name</h3>
+              <p className="Exports__sidebar-paragraph">
+                {this.state.fileName}
+              </p>
+            </div>
+          )}
           <div className="Exports__mainbar">
-            { this.props.totalAssetCount > this.props.maxExportableAssets && (
+            {this.props.totalAssetCount > this.props.maxExportableAssets && (
               <FlashMessage look="warning">
-                The current export contains {this.props.totalAssetCount.toLocaleString()} assets. A
-                maximum of {this.props.maxExportableAssets.toLocaleString()} assets can be exported
-                at a given time. The remaining {(this.props.totalAssetCount -
-                this.props.maxExportableAssets).toLocaleString() } will be ignored.
+                The current export contains{' '}
+                {this.props.totalAssetCount.toLocaleString()} assets. A maximum
+                of {this.props.maxExportableAssets.toLocaleString()} assets can
+                be exported at a given time. The remaining{' '}
+                {(
+                  this.props.totalAssetCount - this.props.maxExportableAssets
+                ).toLocaleString()}{' '}
+                will be ignored.
               </FlashMessage>
             )}
-            { this.props.loadingCreateExportSuccess && (
+            {this.props.loadingCreateExportSuccess && (
               <FlashMessage look="success">
                 We’re processing your export. It may take some time to complete,
                 but you can close this window at any time and we’ll notify you
                 when the export is complete.
               </FlashMessage>
             )}
-            { hasRestrictedAssets && this.canRequestExport() === false && (
-              <FlashMessage look="warning">
-                <p>
-                  To export, choose a folder and right-click for export options.
-                </p>
-              </FlashMessage>
-            )}
-            { this.props.errorMessage && (
+            {hasRestrictedAssets &&
+              this.canRequestExport() === false && (
+                <FlashMessage look="warning">
+                  <p>
+                    To export, choose a folder and right-click for export
+                    options.
+                  </p>
+                </FlashMessage>
+              )}
+            {this.props.errorMessage && (
               <FlashMessage look="error">
                 <p>
-                  Whoops, something went wrong on our server. Feel free to try this
-                  request again. If the problem persists, you can report the error
-                  message below:
+                  Whoops, something went wrong on our server. Feel free to try
+                  this request again. If the problem persists, you can report
+                  the error message below:
                 </p>
-                {this.props.errorMessage && (
-                  <p>
-                    “{this.props.errorMessage} ”
-                  </p>
-                )}
+                {this.props.errorMessage && <p>“{this.props.errorMessage} ”</p>}
               </FlashMessage>
             )}
             <ExportsPreview
@@ -486,96 +515,103 @@ class Exports extends Component {
             />
             <dl className="Exports__review-section Exports__review-section--heading">
               <dt className="Exports__review-term">Assets</dt>
-              <dd className="Exports__review-definition">{this.props.totalAssetCount.toLocaleString()}</dd>
+              <dd className="Exports__review-definition">
+                {this.props.totalAssetCount.toLocaleString()}
+              </dd>
             </dl>
             {this.props.offlineAssets > 0 && (
               <div>
                 <dl className="Exports__review-section Exports__review-section--heading">
                   <dt className="Exports__review-term">Online Assets</dt>
-                  <dd className="Exports__review-definition">{this.props.onlineAssets.toLocaleString()}</dd>
+                  <dd className="Exports__review-definition">
+                    {this.props.onlineAssets.toLocaleString()}
+                  </dd>
                 </dl>
                 <dl className="Exports__review-section Exports__review-section--heading">
                   <dt className="Exports__review-term">Offline Assets</dt>
-                  <dd className="Exports__review-definition">{this.props.offlineAssets.toLocaleString()}</dd>
+                  <dd className="Exports__review-definition">
+                    {this.props.offlineAssets.toLocaleString()}
+                  </dd>
                 </dl>
               </div>
             )}
             <dl className="Exports__review-section Exports__review-section--heading">
               <dt className="Exports__review-term">Name</dt>
-              <dd className="Exports__review-definition">{this.state.fileName}</dd>
+              <dd className="Exports__review-definition">
+                {this.state.fileName}
+              </dd>
             </dl>
             {hasRestrictedAssets === false && (
               <dl className="Exports__review-section Exports__review-section--heading">
                 <dt className="Exports__review-term">Profile</dt>
-                <dd className={classnames('Exports__review-definition', {
-                  'Exports__review-definition--demphasized': this.state.presetId === undefined
-                })}>
+                <dd
+                  className={classnames('Exports__review-definition', {
+                    'Exports__review-definition--demphasized':
+                      this.state.presetId === undefined,
+                  })}>
                   {activePreset === undefined
                     ? 'No profile chosen'
-                    : activePreset.presetName
-                  }
+                    : activePreset.presetName}
                 </dd>
               </dl>
             )}
-            {
-              processors.map((processor, index) => {
-                const key = `${processor.className}-${index}`
-                switch (getClassFromNamespace(processor.className)) {
-                  case 'ImageExporter':
-                    return (
-                      <ExportPreviewerImage
-                        key={key}
-                        imageAssetCount={this.props.imageAssetCount}
-                        exporterArguments={processor.args}
-                      />
-                    )
+            {processors.map((processor, index) => {
+              const key = `${processor.className}-${index}`
+              switch (getClassFromNamespace(processor.className)) {
+                case 'ImageExporter':
+                  return (
+                    <ExportPreviewerImage
+                      key={key}
+                      imageAssetCount={this.props.imageAssetCount}
+                      exporterArguments={processor.args}
+                    />
+                  )
 
-                  case 'VideoExporter':
-                    return (
-                      <ExportPreviewerVideoClip
-                        key={key}
-                        videoAssetCount={this.props.videoAssetCount}
-                        exporterArguments={processor.args}
-                      />
-                    )
+                case 'VideoExporter':
+                  return (
+                    <ExportPreviewerVideoClip
+                      key={key}
+                      videoAssetCount={this.props.videoAssetCount}
+                      exporterArguments={processor.args}
+                    />
+                  )
 
-                  case 'FlipbookExporter':
-                    return (
-                      <ExportPreviewerFlipbook
-                        key={key}
-                        flipbookAssetCount={this.props.flipbookAssetCount}
-                        exporterArguments={processor.args}
-                      />
-                    )
+                case 'FlipbookExporter':
+                  return (
+                    <ExportPreviewerFlipbook
+                      key={key}
+                      flipbookAssetCount={this.props.flipbookAssetCount}
+                      exporterArguments={processor.args}
+                    />
+                  )
 
-                  case 'PdfExporter':
-                    return (
-                      <ExportPreviewerPdf
-                        key={key}
-                        documentAssetCount={this.props.documentAssetCount}
-                        exporterArguments={processor.args}
-                      />
-                    )
+                case 'PdfExporter':
+                  return (
+                    <ExportPreviewerPdf
+                      key={key}
+                      documentAssetCount={this.props.documentAssetCount}
+                      exporterArguments={processor.args}
+                    />
+                  )
 
-                  case 'JsonExporter':
-                    return (
-                      <ExportPreviewerJson key={key} />
-                    )
+                case 'JsonExporter':
+                  return <ExportPreviewerJson key={key} />
 
-                  case 'CsvExporter':
-                    return (
-                      <ExportPreviewerCsv key={key} />
-                    )
-                }
-              })
-            }
-            { hasRestrictedAssets === false && (
+                case 'CsvExporter':
+                  return <ExportPreviewerCsv key={key} />
+              }
+            })}
+            {hasRestrictedAssets === false && (
               <div className="Exports__form-footer">
-                <div className={classnames('Exports__main-form-buttons', {
-                  'Exports__main-form-buttons--visible': this.state.showPresetForm !== true
-                })}>
+                <div
+                  className={classnames('Exports__main-form-buttons', {
+                    'Exports__main-form-buttons--visible':
+                      this.state.showPresetForm !== true,
+                  })}>
                   <div className="Exports__form-button-group">
-                    <FormButton state={this.getCreateExportState()} onClick={this.startExport}>
+                    <FormButton
+                      state={this.getCreateExportState()}
+                      onClick={this.startExport}>
                       Export
                     </FormButton>
                     <FormButton look="minimal" onClick={this.close}>
@@ -583,7 +619,9 @@ class Exports extends Component {
                     </FormButton>
                   </div>
                   <div className="Exports__form-button-group Exports__form-button-group--secondary">
-                    <FormButton look="mini" onClick={this.togglePresetFormVisibility}>
+                    <FormButton
+                      look="mini"
+                      onClick={this.togglePresetFormVisibility}>
                       <IconSave />
                       <span className="Exports__save-label">
                         Save Export Profile
@@ -591,27 +629,34 @@ class Exports extends Component {
                     </FormButton>
                   </div>
                 </div>
-                <div className={classnames('Exports__main-form-buttons', {
-                  'Exports__main-form-buttons--visible': this.state.showPresetForm === true
-                })}>
+                <div
+                  className={classnames('Exports__main-form-buttons', {
+                    'Exports__main-form-buttons--visible':
+                      this.state.showPresetForm === true,
+                  })}>
                   <div className="Exports__form-button-group">
                     <FormLabel
                       label="Name preset"
-                      className="Exports__form-element Exports__form-element--inline"
-                    >
+                      className="Exports__form-element Exports__form-element--inline">
                       <FormInput
                         value={this.state.newPresetName}
                         inlineReset
                         className="Exports__form-input--inline"
-                        onChange={(presetName) => this.setState({newPresetName: presetName})}
+                        onChange={presetName =>
+                          this.setState({ newPresetName: presetName })
+                        }
                       />
                     </FormLabel>
                   </div>
                   <div className="Exports__form-button-group Exports__form-button-group--secondary">
-                    <FormButton state={this.getSaveProfileState()} onClick={this.saveProfiles}>
+                    <FormButton
+                      state={this.getSaveProfileState()}
+                      onClick={this.saveProfiles}>
                       Save
                     </FormButton>
-                    <FormButton look="minimal" onClick={this.togglePresetFormVisibility}>
+                    <FormButton
+                      look="minimal"
+                      onClick={this.togglePresetFormVisibility}>
                       Back
                     </FormButton>
                   </div>
@@ -623,11 +668,14 @@ class Exports extends Component {
                 <div className="Exports__main-form-buttons Exports__main-form-buttons--visible">
                   <div className="Exports__form-button-group">
                     <FormButton
-                      title={this.canRequestExport() ? '' : 'To export, choose a folder and right-click for export options'}
+                      title={
+                        this.canRequestExport()
+                          ? ''
+                          : 'To export, choose a folder and right-click for export options'
+                      }
                       disabled={this.canRequestExport() === false}
                       state={this.getExportRequestState()}
-                      onClick={this.startExportRequest}
-                    >
+                      onClick={this.startExportRequest}>
                       Request Export
                     </FormButton>
                     <FormButton look="minimal" onClick={this.close}>
@@ -643,55 +691,62 @@ class Exports extends Component {
     )
 
     return (
-      <Modal
-        onModalUnderlayClick={this.close}
-        body={body}
-        width={'830px'}
-      />
+      <Modal onModalUnderlayClick={this.close} body={body} width={'830px'} />
     )
   }
 }
 
-export default connect(state => ({
-  userEmail: state.auth.user.email,
-  userFullName: (`${state.auth.user.firstName} ${state.auth.user.lastName}`).trim() || state.auth.user.email.split('@')[0],
-  userId: state.auth.user.id,
-  assetSearch: state.exports.assetSearch,
-  hasRestrictedAssets: state.exports.hasRestrictedAssets,
-  videoAssetCount: state.exports.videoAssetCount,
-  imageAssetCount: state.exports.imageAssetCount,
-  flipbookAssetCount: state.exports.flipbookAssetCount,
-  documentAssetCount: state.exports.documentAssetCount,
-  totalAssetCount: state.exports.totalAssetCount,
-  selectedAssets: state.exports.exportPreviewAssets,
-  shouldShow: state.exports.shouldShow,
-  origin: state.auth.origin,
-  exportProfiles: state.exports.exportProfiles,
-  packageName: state.exports.packageName,
-  exportProfilesPostingError: state.exports.exportProfilesPostingError,
-  exportProfilesSuccess: state.exports.exportProfilesSuccess,
-  exportProfilesPosting: state.exports.exportProfilesPosting,
-  isLoading: state.exports.isLoading || state.exports.loadingOnlineStatuses,
-  exportRequestPosting: state.exports.exportRequestPosting,
-  exportRequestPostingError: state.exports.exportRequestPostingError,
-  exportRequestPostingSuccess: state.exports.exportRequestPostingSuccess,
-  loadingCreateExport: state.exports.loadingCreateExport,
-  loadingCreateExportError: state.exports.loadingCreateExportError,
-  loadingCreateExportSuccess: state.exports.loadingCreateExportSuccess,
-  onlineAssets: state.exports.onlineAssets,
-  offlineAssets: state.exports.offlineAssets,
-  errorMessage: state.exports.errorMessage,
-  metadataFields: state.app.userSettings.metadataFields,
-  maxExportableAssets: parseInt(state.archivist.settings['archivist.export.maxAssetCount'].currentValue, 10)
-}), dispatch => ({
-  actions: bindActionCreators({
-    hideExportInterface,
-    loadExportProfiles,
-    postExportProfiles,
-    clearPostExportLoadingStates,
-    exportRequest,
-    createExport,
-    onlineStatus,
-    getJobs
-  }, dispatch)
-}))(Exports)
+export default connect(
+  state => ({
+    userEmail: state.auth.user.email,
+    userFullName:
+      `${state.auth.user.firstName} ${state.auth.user.lastName}`.trim() ||
+      state.auth.user.email.split('@')[0],
+    userId: state.auth.user.id,
+    assetSearch: state.exports.assetSearch,
+    hasRestrictedAssets: state.exports.hasRestrictedAssets,
+    videoAssetCount: state.exports.videoAssetCount,
+    imageAssetCount: state.exports.imageAssetCount,
+    flipbookAssetCount: state.exports.flipbookAssetCount,
+    documentAssetCount: state.exports.documentAssetCount,
+    totalAssetCount: state.exports.totalAssetCount,
+    selectedAssets: state.exports.exportPreviewAssets,
+    shouldShow: state.exports.shouldShow,
+    origin: state.auth.origin,
+    exportProfiles: state.exports.exportProfiles,
+    packageName: state.exports.packageName,
+    exportProfilesPostingError: state.exports.exportProfilesPostingError,
+    exportProfilesSuccess: state.exports.exportProfilesSuccess,
+    exportProfilesPosting: state.exports.exportProfilesPosting,
+    isLoading: state.exports.isLoading || state.exports.loadingOnlineStatuses,
+    exportRequestPosting: state.exports.exportRequestPosting,
+    exportRequestPostingError: state.exports.exportRequestPostingError,
+    exportRequestPostingSuccess: state.exports.exportRequestPostingSuccess,
+    loadingCreateExport: state.exports.loadingCreateExport,
+    loadingCreateExportError: state.exports.loadingCreateExportError,
+    loadingCreateExportSuccess: state.exports.loadingCreateExportSuccess,
+    onlineAssets: state.exports.onlineAssets,
+    offlineAssets: state.exports.offlineAssets,
+    errorMessage: state.exports.errorMessage,
+    metadataFields: state.app.userSettings.metadataFields,
+    maxExportableAssets: parseInt(
+      state.archivist.settings['archivist.export.maxAssetCount'].currentValue,
+      10,
+    ),
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        hideExportInterface,
+        loadExportProfiles,
+        postExportProfiles,
+        clearPostExportLoadingStates,
+        exportRequest,
+        createExport,
+        onlineStatus,
+        getJobs,
+      },
+      dispatch,
+    ),
+  }),
+)(Exports)

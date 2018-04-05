@@ -3,40 +3,43 @@ import classnames from 'classnames'
 
 import Cloudproxy from '../../services/Cloudproxy'
 
-const oses = [ 'linux', 'osx' ]
+const oses = ['linux', 'osx']
 const urls = [
   'https://dl.zorroa.com/public/cloudproxy/zorroa-cloudproxy-linux.tgz',
-  'https://dl.zorroa.com/public/cloudproxy/Gofer-v0.1.0.dmg'
+  'https://dl.zorroa.com/public/cloudproxy/Gofer-v0.1.0.dmg',
 ]
-const index = window.navigator.userAgent.indexOf('Mac') >= 0 ? 1 : (window.navigator.userAgent.indexOf('Linux') >= 0 ? 0 : -1)
+const index =
+  window.navigator.userAgent.indexOf('Mac') >= 0
+    ? 1
+    : window.navigator.userAgent.indexOf('Linux') >= 0 ? 0 : -1
 
 export default class LocalCloudproxy extends Component {
   static propTypes = {
     onBack: PropTypes.func.isRequired,
-    onDone: PropTypes.func.isRequired
+    onDone: PropTypes.func.isRequired,
   }
 
   state = {
     stats: null,
-    downloaded: false
+    downloaded: false,
   }
 
   cloudproxy = null
 
-  componentWillMount () {
+  componentWillMount() {
     this.cloudproxy = new Cloudproxy('localhost', this.props.onDone)
     this.cloudproxy.start()
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     if (this.cloudproxy) this.cloudproxy.stop()
   }
 
-  download = (event) => {
-    this.setState({downloaded: true})
+  download = event => {
+    this.setState({ downloaded: true })
   }
 
-  renderDownload () {
+  renderDownload() {
     return (
       <div>
         <div className="Import-title">
@@ -45,20 +48,28 @@ export default class LocalCloudproxy extends Component {
         </div>
         <div className="ImportCloudproxy-downloads">
           <div className="ImportCloudproxy-download" key={oses[index]}>
-            <div className="ImportCloudproxy-script icon-script"/>
-            <a href={urls[index]} download className="Import-button" onClick={this.download}>
+            <div className="ImportCloudproxy-script icon-script" />
+            <a
+              href={urls[index]}
+              download
+              className="Import-button"
+              onClick={this.download}>
               Download {oses[index]} {index === 0 ? 'server' : 'app'}
             </a>
           </div>
         </div>
         <div className="ImportCloudproxy-upload-overflow">
-          We'll show you how to {index === 0 ? 'run the upload server' : 'install the backgrounding tool'} next...
+          We'll show you how to{' '}
+          {index === 0
+            ? 'run the upload server'
+            : 'install the backgrounding tool'}{' '}
+          next...
         </div>
       </div>
     )
   }
 
-  renderOSX () {
+  renderOSX() {
     return (
       <div className="CloudproxyInstructions-item-osx">
         <div className="CloudproxyInstructions-item">
@@ -70,33 +81,34 @@ export default class LocalCloudproxy extends Component {
         <div className="CloudproxyInstructions-item">
           <div className="CloudproxyInstructions-item-title">2.</div>
           <div className="CloudproxyInstructions-item-body code">
-            Run the Gopher status bar application to start the background loader.
+            Run the Gopher status bar application to start the background
+            loader.
           </div>
         </div>
       </div>
     )
   }
 
-  renderLinux () {
+  renderLinux() {
     return (
       <div className="CloudproxyInstructions-linux">
         <div className="CloudproxyInstructions-item">
           <div className="CloudproxyInstructions-item-title">1.</div>
           <div className="CloudproxyInstructions-item-body code">
-            { `tar xvzf <download-directory>/zorroa-cloudproxy-linux.tgz` }
+            {`tar xvzf <download-directory>/zorroa-cloudproxy-linux.tgz`}
           </div>
         </div>
         <div className="CloudproxyInstructions-item">
           <div className="CloudproxyInstructions-item-title">2.</div>
           <div className="CloudproxyInstructions-item-body code">
-            { `zorroa-cloudproxy-linux/bin/cloudproxy -d` }
+            {`zorroa-cloudproxy-linux/bin/cloudproxy -d`}
           </div>
         </div>
       </div>
     )
   }
 
-  renderLocal () {
+  renderLocal() {
     const { onDone } = this.props
     const { stats } = this.state
     const disabled = !stats
@@ -107,24 +119,29 @@ export default class LocalCloudproxy extends Component {
           <div className="Import-step">Step 2:</div>
           Start the Cloudproxy uploading tool.
         </div>
-        { index === 0 ? this.renderLinux() : this.renderOSX() }
-        <div className={classnames('CloudproxyInstructions-done', {disabled})} onClick={!disabled && onDone}>
-          { label }
+        {index === 0 ? this.renderLinux() : this.renderOSX()}
+        <div
+          className={classnames('CloudproxyInstructions-done', { disabled })}
+          onClick={!disabled && onDone}>
+          {label}
         </div>
       </div>
     )
   }
 
-  render () {
+  render() {
     const { onBack } = this.props
     const { downloaded } = this.state
     return (
       <div className="CloudproxyInstructions">
         <div className="Import-back" onClick={onBack}>
-          <div className="icon-arrow-down" style={{transform: 'rotate(90deg)'}}/>
+          <div
+            className="icon-arrow-down"
+            style={{ transform: 'rotate(90deg)' }}
+          />
           Back
         </div>
-        { downloaded ? this.renderLocal() : this.renderDownload() }
+        {downloaded ? this.renderLocal() : this.renderDownload()}
       </div>
     )
   }
