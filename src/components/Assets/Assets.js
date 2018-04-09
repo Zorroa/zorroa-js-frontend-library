@@ -409,6 +409,7 @@ class Assets extends Component {
     // close lightbox, restore search
     const folder = historyVal.folder
     this.props.actions.isolateAssetId()
+    this.props.actions.isolateParent()
     this.props.actions.restoreFolders([folder])
   }
 
