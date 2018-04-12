@@ -96,13 +96,20 @@ There are two different modes this project can be run in: __dev mode__ and __sta
 
 Dev mode is for the typical daily workflow and has live reloading enabled. It does not actually build into a directory, it runs the project though a dev server that uses the files in your working tree.
 
+The first time you run the dev server you'll need to generate a certificate.
 ```
-npm run dev # will run with hot reloading on a special server over HTTP
+npm run dev-https-cert
 ```
 
+From then on you can start the dev server by running the following.
 ```
-npm run dev -- --https # dev server over HTTPS
+npm run dev-https
 ```
+
+Once the build is complete you can access the server at [https://localhost:8080](https://localhost:8080). 
+You'll need to connect to a live environment by filling out the "Archivist" field on the login page. Input the domain name 
+of a running environment (i.e. staging.pool.zorroa.com) and check the "SSL" box.
+
 
 #### Remote debugging
 
