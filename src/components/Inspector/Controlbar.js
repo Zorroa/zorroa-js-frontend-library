@@ -62,8 +62,7 @@ export default class Controlbar extends PureComponent {
     const hasScrubHandler = typeof this.props.onScrub === 'function'
     const hasTotalFramesCount =
       Number.isInteger(this.props.totalFrames) === true
-    const hasCurrentFrameNumber =
-      Number.isInteger(this.props.currentFrameNumber) === true
+    const hasCurrentFrameNumber = isNaN(this.props.currentFrameNumber) === false
     const hasShuttler = this.props.shuttler !== undefined
     return (
       hasScrubHandler &&
@@ -119,6 +118,7 @@ export default class Controlbar extends PureComponent {
                 shuttler={this.props.shuttler}
                 currentFrameNumber={this.props.currentFrameNumber}
                 totalFrames={this.props.totalFrames}
+                mode="controlbar"
               />
             </div>
           )}

@@ -8,7 +8,7 @@ export default class Scrubber extends PureComponent {
     shuttler: PropTypes.instanceOf(PubSub),
     currentFrameNumber: PropTypes.number,
     totalFrames: PropTypes.number.isRequired,
-    progress: PropTypes.bool,
+    mode: PropTypes.oneOf(['lightbox']),
   }
 
   state = {
@@ -31,13 +31,14 @@ export default class Scrubber extends PureComponent {
   }
 
   scrub = scrubbedFrameNumber => {
-    if (typeof this.props.shuttler === undefined) {
+    if (typeof this.props.shuttler === 'undefined') {
       console.warn(
         'Scrubbing without a shuttler, no change will be reflected in frame',
       )
-    } else {
-      this.props.shuttler.publish('scrub', scrubbedFrameNumber)
+      return
     }
+
+    this.props.shuttler.publish('scrub', scrubbedFrameNumber)
   }
 
   onScrubSubmit = event => {
@@ -94,55 +95,38 @@ export default class Scrubber extends PureComponent {
     const draggerStyle = {
       left: `${completedPercentage}%`,
     }
+    const isControlBar = this.props.mode === 'controlbar'
+
     const draggerClasses = classnames('Scrubber__progress-dragger', {
       'Scrubber__progress-dragger--ended': completedPercentage === 100,
+      'Scrubber__progress-dragger--controlbar': isControlBar,
     })
-
-    const progressBarClasses = 'Scrubber__progress-bar'
+    const progressBarClasses = classnames('Scrubber__progress-bar', {
+      'Scrubber__progress-bar--controlbar': isControlBar,
+    })
 
     return (
       <form onSubmit={this.onScrubSubmit} className="Scrubber">
-        {this.props.progress === true && (
+        <div
+          className="Scrubber__progress"
+          title={`Frame ${currentFrameNumber}`}
+          onMouseDown={this.onProgressMouseDown}
+          onMouseUp={this.onProgressMouseUp}
+          onMouseMove={this.onProgressMouseMove}>
+          <div style={draggerStyle} className={draggerClasses} />
           <div
-            className="Scrubber__progress"
-            title={`Frame ${currentFrameNumber} of ${totalFrames}`}
-            onMouseDown={this.onProgressMouseDown}
-            onMouseUp={this.onProgressMouseUp}
-            onMouseMove={this.onProgressMouseMove}>
-            <div style={draggerStyle} className={draggerClasses} />
-            <div
-              style={pastStyle}
-              className={classnames(
-                progressBarClasses,
-                'Scrubber__progress-bar--past',
-              )}
-            />
-            <div
-              className={classnames(
-                progressBarClasses,
-                'Scrubber__progress-bar--future',
-              )}
-            />
-          </div>
-        )}
-        <div className="Scruber__frame-jumper">
-          Frame
-          <input
-            type="text"
-            className="Scrubber__scrubber-input"
-            value={this.state.scrubbedFrameNumber}
-            onFocus={() => {
-              typeof this.props.shuttler === 'function' &&
-                this.props.shuttler.publish('stop')
-            }}
-            onChange={event => {
-              this.setScrubbedFrameNumber(event.target.value)
-            }}
-            onBlur={() => {
-              this.scrub(this.state.scrubbedFrameNumber)
-            }}
+            style={pastStyle}
+            className={classnames(
+              progressBarClasses,
+              'Scrubber__progress-bar--past',
+            )}
           />
-          of {totalFrames}
+          <div
+            className={classnames(
+              progressBarClasses,
+              'Scrubber__progress-bar--future',
+            )}
+          />
         </div>
       </form>
     )

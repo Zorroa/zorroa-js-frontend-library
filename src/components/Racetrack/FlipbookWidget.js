@@ -183,7 +183,6 @@ class FlipbookWidget extends Component {
               currentFrameNumber={this.state.currentFrameNumber}
               totalFrames={this.state.totalFrames}
               isPlaying={this.state.playing}
-              progress
             />
           </div>
           <div className="FlipbookWidget__order FlipbookWidget__section">

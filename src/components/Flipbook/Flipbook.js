@@ -102,7 +102,7 @@ class Flipbook extends PureComponent {
       Number(new Date()) + forcedTimeOffset - animationStartTime
     const completedPercentage =
       elapsedTimeMilliseconds / totalRunTimeMilliseconds
-    const currentFrameNumber = Math.floor(completedPercentage * totalFrames)
+    const currentFrameNumber = completedPercentage * totalFrames
 
     return currentFrameNumber
   }

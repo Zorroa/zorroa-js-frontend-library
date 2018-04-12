@@ -4,11 +4,13 @@ $progress-height: $zorroa-metric-base * 1.5;
 $progress-dragger-width: 8px;
 $progress-bar-height: $zorroa-metric-base * 0.5;
 $progress-bar-highlight-color: $zorroa-color-yellow-1;
+$progress-bar-highlight-color-alternate: $zorroa-color-green-1;
 
 .Scrubber {
   text-align: center;
   display: flex;
   width: 100%;
+  min-width: 100px;
   align-content: center;
   justify-content: center;
   align-items: center;
@@ -26,11 +28,15 @@ $progress-bar-highlight-color: $zorroa-color-yellow-1;
     height: 100%;
     width: $progress-dragger-width;
     background: $progress-bar-highlight-color;
-    border: 1px solid $zorroa-color-white;
+    border: 1px solid transparent;
     position: absolute;
     top: 50%;
     margin-top: $progress-height / -2;
     z-index: 2;
+
+    &--controlbar {
+      background: $progress-bar-highlight-color-alternate;
+    }
 
     &--ended {
       margin-left: $progress-dragger-width * -1;
@@ -46,15 +52,23 @@ $progress-bar-highlight-color: $zorroa-color-yellow-1;
     top: ($progress-height - $progress-bar-height) / 2;
     background: $zorroa-color-gray-dark-4;
     height: $progress-bar-height;
-  }
 
-  &__progress-bar--past {
-    background-color: $progress-bar-highlight-color;
-    z-index: 1;
-  }
+    &--controlbar {
+      background: $zorroa-color-white;
+    }
 
-  &__progress-bar--future {
-    width: 100%;
+    &--past {
+      background-color: $progress-bar-highlight-color;
+      z-index: 1;
+
+      &.Scrubber__progress-bar--controlbar {
+        background: $progress-bar-highlight-color-alternate;
+      }
+    }
+
+    &--future {
+      width: 100%;
+    }
   }
 
   &__scrubber-input {

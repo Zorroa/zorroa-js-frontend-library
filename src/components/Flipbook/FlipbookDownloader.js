@@ -14,7 +14,7 @@ function getTotalFrames(frames) {
     }
 
     return numberOfFrames
-  }, 0)
+  }, frames.length)
 }
 
 function getDisplayName(WrappedComponent) {
