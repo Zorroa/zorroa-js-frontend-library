@@ -37,6 +37,7 @@ class PanZoom extends Component {
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object,
+    onZoom: PropTypes.func,
     children: PropTypes.node.isRequired,
   }
 
@@ -57,6 +58,9 @@ class PanZoom extends Component {
 
   componentWillMount() {
     this.panner = new Panner(this.props.lightboxPanner || {})
+    if (typeof this.props.onZoom === 'function') {
+      this.props.onZoom(this.panner.scale)
+    }
   }
 
   savePanner = () => {
@@ -128,6 +132,9 @@ class PanZoom extends Component {
     )
     const topPadding = 0 // Note this value needs to also be changed in PanZoom.scss
     const leftPadding = 0 // Note this value needs to be also changed in PanZoom.scss
+    if (typeof this.props.onZoom === 'function') {
+      this.props.onZoom(zoomFactor)
+    }
     this.panner.zoom(zoomFactor, {
       x: event.pageX - leftPadding,
       y: event.pageY - topPadding,

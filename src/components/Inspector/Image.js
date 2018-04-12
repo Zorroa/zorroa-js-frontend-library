@@ -8,10 +8,7 @@ const Image = props => (
       title={props.title}
       onNextPage={props.onNextPage}
       onPrevPage={props.onPrevPage}>
-      <div
-        className="Image"
-        style={{ backgroundSize: 'fit', backgroundImage: `url(${props.url})` }}
-      />
+      <div className="Image" style={{ backgroundImage: `url(${props.url})` }} />
     </PanZoom>
   </div>
 )

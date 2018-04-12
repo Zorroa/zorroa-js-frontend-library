@@ -87,6 +87,13 @@ export default class Controlbar extends PureComponent {
     })
   }
 
+  showPageControls() {
+    return (
+      typeof this.props.onNextPage === 'function' &&
+      typeof this.props.onPrevPage === 'function'
+    )
+  }
+
   getGaugeIntensity() {
     const frameFrequency = this.props.frameFrequency
     const index = frameFrequency.options.indexOf(frameFrequency.rate)
@@ -116,7 +123,21 @@ export default class Controlbar extends PureComponent {
             </div>
           )}
           {this.props.title && (
-            <div className="Controlbar__title">{this.props.title}</div>
+            <div className="Controlbar__section Controlbar__page-title">
+              {this.props.title}
+            </div>
+          )}
+          {this.showPageControls() && (
+            <div className="Controlbar__section">
+              <button
+                onClick={() => this.props.onPrevPage()}
+                className="Controlbar__button icon-frame-back"
+              />
+              <button
+                onClick={() => this.props.onNextPage()}
+                className="Controlbar__button icon-frame-forward"
+              />
+            </div>
           )}
           {this.showVideo() && (
             <div className="Controlbar__section">

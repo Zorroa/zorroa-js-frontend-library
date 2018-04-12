@@ -109,16 +109,24 @@ export default class Asset {
   }
 
   width() {
-    if (this.document.image) return this.document.image.width
-    if (this.document.video) return this.document.video.width
+    this.getMediaClip().width
   }
+
   height() {
-    if (this.document.image) return this.document.image.height
-    if (this.document.video) return this.document.video.height
+    this.getMediaClip().height
   }
 
   aspect() {
     return this.width() / Math.max(1, this.height())
+  }
+
+  getMediaClip() {
+    return this.document.media || {}
+  }
+
+  getClip() {
+    const media = this.getMediaClip()
+    return media.clip || {}
   }
 
   proxyAspect() {
@@ -136,11 +144,11 @@ export default class Asset {
   }
 
   startPage() {
-    return this.document.media && this.document.media.start
+    return this.getClip().start
   }
 
   stopPage() {
-    return this.document.media && this.document.media.stop
+    return this.getClip().stop
   }
 
   frameRate() {

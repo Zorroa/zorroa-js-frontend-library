@@ -1,6 +1,8 @@
 import React, { Component, PropTypes } from 'react'
+import PanZoom from './PanZoom'
 
 import ProgressCircle from '../ProgressCircle'
+import FlashMessage from '../FlashMessage'
 
 // Orignal Code: https://github.com/mikecousins/react-pdf-js
 // Core library is Pdf.js, which we now call directly.
@@ -35,7 +37,7 @@ export default class Pdf extends Component {
     page: null,
     pdf: null,
     error: null,
-    scale: 1,
+    scale: window.devicePixelRatio || 1,
     disableZoomOut: false,
   }
 
@@ -66,6 +68,14 @@ export default class Pdf extends Component {
       this.documentPromise.cancel()
       this.documentPromise = null
     }
+  }
+
+  onZoom = zoomFactor => {
+    const devicePixelRatio = window.devicePixelRatio || 1
+    const scale = Math.max(1, zoomFactor) * Math.max(1, devicePixelRatio)
+    this.setState({ scale }, () => {
+      this.queueRenderPage(this.state.pageNumber)
+    })
   }
 
   onDocumentComplete = pdf => {
@@ -117,19 +127,6 @@ export default class Pdf extends Component {
     this.queueRenderPage(this.state.pageNumber + 1)
   }
 
-  static scaleFactor = 1.5
-  zoomIn = event => {
-    const scale = this.state.scale * Pdf.scaleFactor
-    this.setState({ scale })
-    this.queueRenderPage(this.state.pageNumber)
-  }
-
-  zoomOut = event => {
-    const scale = this.state.scale / Pdf.scaleFactor
-    this.setState({ scale })
-    this.queueRenderPage(this.state.pageNumber)
-  }
-
   // https://mozilla.github.io/pdf.js/examples/
   pageNumPending = null
   pageRendering = false
@@ -170,18 +167,19 @@ export default class Pdf extends Component {
     const { canvas } = this
     if (!canvas) return
     const canvasContext = canvas.getContext('2d')
+    canvasContext.scale(window.devicePixelRatio, window.devicePixelRatio)
     let unscaledViewport = page.getViewport(1)
-    const scaleW = canvas.width / unscaledViewport.width
-    const scaleH = canvas.height / unscaledViewport.height
+    const documentWidth = page.pageInfo.view[2]
+    const documentHeight = page.pageInfo.view[3]
+    const scaleW = documentWidth / unscaledViewport.width
+    const scaleH = documentHeight / unscaledViewport.height
     const scale = this.state.scale * Math.min(scaleW, scaleH)
     let viewport = page.getViewport(scale)
 
     // Adjust the scale so the view exactly fits the parent body element
     const body = canvas.parentElement
     let { width, height } = viewport
-    let disableZoomOut = false
     if (height < body.clientHeight || width < body.clientWidth) {
-      disableZoomOut = true
       const aspect = width / height
       if (width / body.clientWidth < height / body.clientHeight) {
         height = body.clientHeight
@@ -196,27 +194,15 @@ export default class Pdf extends Component {
     canvas.height = viewport.height
     canvas.width = viewport.width
 
-    // https://github.com/mozilla/pdf.js/issues/2923#issuecomment-14715851
-    this.setState({ error: null, disableZoomOut })
+    this.setState({ error: null })
     return page.render({ canvasContext, viewport })
   }
 
   render() {
-    const {
-      pageNumber,
-      pdf,
-      progress,
-      error,
-      scale,
-      disableZoomOut,
-    } = this.state
+    const { pdf, progress, error } = this.state
     const svg = require('./loading-ring.svg')
     if (error) {
-      return (
-        <div className="Pdf">
-          <div className="error">{error}</div>
-        </div>
-      )
+      return <FlashMessage>{error}</FlashMessage>
     }
     if (!pdf && !progress) {
       return (
@@ -233,52 +219,20 @@ export default class Pdf extends Component {
         </div>
       )
     }
-
-    const isPreviousDisabled = pageNumber <= 1
-    const isNextDisabled = pageNumber >= pdf.numPages
-    const isZoomInDisabled = scale > 32
-    const isZoomOutDisabled = scale < 0.1 || disableZoomOut
     return (
       <div className="Pdf">
-        <div className="Pdf-singlepage-body">
+        <PanZoom
+          title={`Page ${this.state.pageNumber} / ${this.state.pdf.numPages}`}
+          onNextPage={this.nextPage}
+          onPrevPage={this.previousPage}
+          onZoom={this.onZoom}>
           <canvas
             ref={c => {
               this.canvas = c
             }}
+            className="Pdf__canvas"
           />
-        </div>
-        {pdf &&
-          pdf.numPages && (
-            <div className="Pdf-controls">
-              <div className="Pdf-controls-group border-right">
-                Page {pageNumber} / {pdf.numPages}
-              </div>
-              <div className="Pdf-controls-group">
-                <button
-                  className="icon-frame-back"
-                  disabled={isPreviousDisabled}
-                  onClick={this.previousPage}
-                />
-                <button
-                  className="icon-frame-forward"
-                  disabled={isNextDisabled}
-                  onClick={this.nextPage}
-                />
-              </div>
-              <div className="Pdf-controls-group">
-                <button
-                  className="icon-zoom-in"
-                  disabled={isZoomInDisabled}
-                  onClick={this.zoomIn}
-                />
-                <button
-                  className="icon-zoom-out"
-                  disabled={isZoomOutDisabled}
-                  onClick={this.zoomOut}
-                />
-              </div>
-            </div>
-          )}
+        </PanZoom>
       </div>
     )
   }

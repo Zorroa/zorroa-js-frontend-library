@@ -120,6 +120,11 @@ $options-menu-offset: $control-bar-height;
     }
   }
 
+  &__page-title {
+    // Adds a min width to avoid short titles such as (page 2/100) to jump around when the numbers increase
+    min-width: 19ex;
+  }
+
   &__title {
     @include nowrap;
     @include flexRowCenter;
@@ -127,6 +132,7 @@ $options-menu-offset: $control-bar-height;
 
   &__section {
     @include flexRowCenter;
+    min-height: 40px;
     padding: $control-bar-padding $zorroa-metric-base;
 
     & ~ & {
