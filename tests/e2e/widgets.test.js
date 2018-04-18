@@ -235,7 +235,7 @@ describe('search widget', function () {
       .then(_ => { DEBUG && console.log('Count with two selected facets ' + text3) })
       .then(selenium.waitForIdle)
 
-      .then(_ => { expect(Number(text3)).toBe(82) })
+      .then(_ => { expect(Number(text3)).toBe(245) })
       .then(_ => { expect(Number(text2)).toBe(Number(text3)) })
 
       .then(_ => { DEBUG && console.log('Closing both facet widgets') })
