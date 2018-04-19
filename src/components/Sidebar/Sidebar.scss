@@ -13,6 +13,11 @@
   min-width: 60px;
 
   background-color: $zorroa-nearwhite;
+  overflow: hidden;
+
+  &:hover {
+    overflow-y: auto;
+  }
 
   .dark & { background-color: $zorroa-nearblack; }
 
@@ -36,9 +41,6 @@
       padding-left: 10px;
       padding-right: 10px;
     }
-
-    overflow-x: hidden;
-    overflow-y: auto;
 
     @include flexOn;
   }

@@ -102,8 +102,16 @@ $tableResizeRightPadding: 20px;
   height: 100%;
   width: 100%;
   position: relative;
-  overflow: auto;
-  &::-webkit-scrollbar { width: 5px; }
+  overflow: hidden;
+
+  &:hover {
+    overflow: auto;
+  }
+
+  &::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
 }
 
 .Table-body {
