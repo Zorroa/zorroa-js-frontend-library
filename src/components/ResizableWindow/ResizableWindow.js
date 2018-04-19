@@ -34,27 +34,21 @@ export default class ResizableWindow extends Component {
 
   componentWillMount() {
     this.resizer = new Resizer()
+    if (this.props.preventOutOfBounds === true) {
+      window.addEventListener('resize', this.onResize)
+    }
   }
 
   componentWillUnmount() {
     this.resizer.release()
+    window.removeEventListener('resize', this.onResize)
+  }
+
+  onResize = () => {
+    this.forceUpdate()
   }
 
   moveHeader = (left, top) => {
-    if (this.props.preventOutOfBounds === true) {
-      this.setState(prevState => ({
-        left: Math.max(
-          prevState.width * 0.1 - prevState.width, // Allows up to 90% of the window to be off screen left
-          Math.min(left, window.innerWidth - prevState.width * 0.1), // Alows up to 90% of the window to be off screen right
-        ),
-        top: Math.max(
-          0, // The top dragger (i.e. the header) can't ever be off the screen, otherwise you can't drag
-          Math.min(top, window.innerHeight - prevState.height * 0.1),
-        ), // Allows window to be up to 90% off the bottom screen
-      }))
-      return
-    }
-
     this.setState({
       left,
       top,
@@ -102,12 +96,28 @@ export default class ResizableWindow extends Component {
   }
 
   render() {
-    const { title, children, onClose } = this.props
-    const { top, left, width, height } = this.state
+    const { title, children, onClose, preventOutOfBounds } = this.props
+    let { top, left, width, height } = this.state
+    let style = { ...this.state }
+
+    if (preventOutOfBounds === true) {
+      left = Math.max(
+        width * 0.1 - width, // Allows up to 90% of the window to be off screen left
+        Math.min(left, window.innerWidth - width * 0.1), // Alows up to 90% of the window to be off screen right
+      )
+      top = Math.max(
+        0, // The top dragger (i.e. the header) can't ever be off the screen, otherwise you can't drag
+        Math.min(top, window.innerHeight - height * 0.1),
+      ) // Allows window to be up to 90% off the bottom screen
+
+      style.left = left
+      style.top = top
+    }
+
     return (
-      <div className="ResizableWindow" style={this.state}>
+      <div className="ResizableWindow" style={style}>
         <div
-          onMouseDown={_ =>
+          onMouseDown={() =>
             this.resizer.capture(this.moveHeader, this.release, left, top)
           }
           className="ResizableWindow-header">
@@ -116,31 +126,31 @@ export default class ResizableWindow extends Component {
         </div>
         <div className="ResizableWindow-body">{children}</div>
         <div
-          onMouseDown={_ =>
+          onMouseDown={() =>
             this.resizer.capture(this.moveLeft, this.release, left, top)
           }
           className="ResizeableWindow-handle ResizableWindow-left-handle"
         />
         <div
-          onMouseDown={_ =>
+          onMouseDown={() =>
             this.resizer.capture(this.moveRight, this.release, width, top)
           }
           className="ResizeableWindow-handle ResizableWindow-right-handle"
         />
         <div
-          onMouseDown={_ =>
+          onMouseDown={() =>
             this.resizer.capture(this.moveBottom, this.release, width, height)
           }
           className="ResizeableWindow-handle ResizableWindow-bottom-handle"
         />
         <div
-          onMouseDown={_ =>
+          onMouseDown={() =>
             this.resizer.capture(this.moveLowerLeft, this.release, left, height)
           }
           className="ResizeableWindow-handle ResizableWindow-lower-left-handle"
         />
         <div
-          onMouseDown={_ =>
+          onMouseDown={() =>
             this.resizer.capture(
               this.moveLowerRight,
               this.release,
