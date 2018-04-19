@@ -91,9 +91,14 @@ class Flipbook extends PureComponent {
     return frame
   }
 
-  getCurrentFrameNumberByTime(
+  getCurrentFrameNumberByTime(completedPercentage, totalFrames) {
+    const currentFrameNumber = completedPercentage * totalFrames
+
+    return currentFrameNumber
+  }
+
+  getCompletedTimePercentage(
     totalFrames,
-    fps,
     forcedTimeOffset,
     animationStartTime,
   ) {
@@ -102,17 +107,18 @@ class Flipbook extends PureComponent {
       Number(new Date()) + forcedTimeOffset - animationStartTime
     const completedPercentage =
       elapsedTimeMilliseconds / totalRunTimeMilliseconds
-    const currentFrameNumber = completedPercentage * totalFrames
-
-    return currentFrameNumber
+    return completedPercentage
   }
 
   animationLoop = ({ animationStartTime, forcedTimeOffset, totalFrames }) => {
-    const currentFrameNumber = this.getCurrentFrameNumberByTime(
+    const completedPercentage = this.getCompletedTimePercentage(
       totalFrames,
-      this.props.fps,
       forcedTimeOffset,
       animationStartTime,
+    )
+    const currentFrameNumber = this.getCurrentFrameNumberByTime(
+      completedPercentage,
+      totalFrames,
     )
     const frame = this.getClosestFrameByFrameNumber(currentFrameNumber)
     const isAnimationCompleted = currentFrameNumber > totalFrames
@@ -139,7 +145,7 @@ class Flipbook extends PureComponent {
       return
     }
 
-    this.drawFrame(frame)
+    this.drawFrame(frame, completedPercentage)
 
     this.animationFrameId = requestAnimationFrame(() => {
       this.animationLoop({
@@ -320,13 +326,21 @@ class Flipbook extends PureComponent {
     }
   }
 
-  drawFrame = frame => {
+  drawFrame = (frame, completedPercentage) => {
     const image = frame.imageBitmap
     this.animationFrameNumber = frame.number
 
     this.setState({
       currentFrameImage: image,
     })
+
+    if (completedPercentage === undefined) {
+      completedPercentage = frame.number / this.props.totalFrames
+    }
+    this.publishStatusTopic(
+      'elapsedPercent',
+      Math.min(1, Math.max(completedPercentage, 0)),
+    )
 
     this.publishStatusTopic('played', frame.number)
   }

@@ -6,6 +6,7 @@ export default class CanvasImage extends PureComponent {
     image: PropTypes.instanceOf(window.ImageBitmap),
     height: PropTypes.number,
     width: PropTypes.number,
+    title: PropTypes.string,
     className: PropTypes.string,
     onClick: PropTypes.func,
     size: PropTypes.oneOf(['cover', 'contain']),
@@ -72,12 +73,13 @@ export default class CanvasImage extends PureComponent {
   }
 
   render() {
-    const { onClick, height, width, className } = this.props
+    const { onClick, height, width, className, title } = this.props
 
     const canvasAttributes = {
       onClick,
       height,
       width,
+      title,
       className,
     }
 

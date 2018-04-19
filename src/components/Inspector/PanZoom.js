@@ -22,6 +22,7 @@ class PanZoom extends Component {
     shouldLoop: PropTypes.bool,
     frameFrequency: PropTypes.object,
     shuttler: PropTypes.instanceOf(PubSub),
+    status: PropTypes.instanceOf(PubSub),
     playing: PropTypes.bool,
     onVolume: PropTypes.func,
     volume: PropTypes.number,
@@ -188,6 +189,7 @@ class PanZoom extends Component {
       onVolume,
       volume,
       shuttler,
+      status,
       playing,
       userSettings,
       totalFrames,
@@ -235,6 +237,7 @@ class PanZoom extends Component {
                   onVolume={onVolume}
                   volume={volume}
                   shuttler={shuttler}
+                  status={status}
                   playing={playing}
                   frameFrequency={frameFrequency}
                   totalFrames={totalFrames}

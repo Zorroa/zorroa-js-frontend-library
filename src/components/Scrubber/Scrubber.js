@@ -6,14 +6,22 @@ import { PubSub } from '../../services/jsUtil'
 export default class Scrubber extends PureComponent {
   static propTypes = {
     shuttler: PropTypes.instanceOf(PubSub),
+    status: PropTypes.instanceOf(PubSub),
     currentFrameNumber: PropTypes.number,
     totalFrames: PropTypes.number.isRequired,
-    mode: PropTypes.oneOf(['lightbox']),
+    mode: PropTypes.oneOf(['controlbar']),
   }
 
   state = {
     scrubbedFrameNumber: this.props.currentFrameNumber,
     isMouseDown: false,
+    elapsedPercent: 0,
+  }
+
+  componentWillMount() {
+    this.props.status.on('elapsedPercent', elapsedPercent => {
+      this.setState({ elapsedPercent })
+    })
   }
 
   componentWillReceiveProps(nextProps) {
@@ -22,12 +30,6 @@ export default class Scrubber extends PureComponent {
         scrubbedFrameNumber: nextProps.currentFrameNumber,
       })
     }
-  }
-
-  setScrubbedFrameNumber = frameNumber => {
-    this.setState({
-      scrubbedFrameNumber: frameNumber,
-    })
   }
 
   scrub = scrubbedFrameNumber => {
@@ -87,8 +89,10 @@ export default class Scrubber extends PureComponent {
 
   render() {
     const { currentFrameNumber, totalFrames } = this.props
-    const completedPercentage =
-      (currentFrameNumber - 1) / (totalFrames - 1) * 100
+    const { elapsedPercent } = this.state
+    const completedPercentage = elapsedPercent
+      ? elapsedPercent * 100
+      : (currentFrameNumber - 1) / (totalFrames - 1) * 100
     const pastStyle = {
       width: `${completedPercentage}%`,
     }

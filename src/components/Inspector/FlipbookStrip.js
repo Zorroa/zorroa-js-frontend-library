@@ -10,7 +10,7 @@ function resize(srcWidth, srcHeight, maxWidth, maxHeight) {
   }
 }
 
-export default class FlipbookViewer extends Component {
+export default class FlipbookStrip extends Component {
   static propTypes = {
     frames: PropTypes.arrayOf(
       PropTypes.shape({
@@ -20,8 +20,44 @@ export default class FlipbookViewer extends Component {
       }),
     ).isRequired,
     shuttler: PropTypes.instanceOf(PubSub).isRequired,
+    status: PropTypes.instanceOf(PubSub).isRequired,
     totalFrames: PropTypes.number.isRequired,
     currentFrameNumber: PropTypes.number.isRequired,
+  }
+
+  state = {
+    elapsedPercent: 0,
+  }
+
+  componentWillMount() {
+    this.props.status.on('playing', isPlaying => {
+      if (isPlaying === false) {
+        this.scroll()
+      }
+    })
+    this.props.status.on('elapsedPercent', elapsedPercent => {
+      this.setState({
+        elapsedPercent,
+      })
+    })
+  }
+
+  componentDidMount() {
+    this.scroll()
+  }
+
+  scroll() {
+    const { frames, currentFrameNumber } = this.props
+    const element = this.element
+    const { elapsedPercent } = this.state
+
+    if (element !== undefined && frames.length > 0) {
+      element.scrollTo(
+        element.scrollWidth *
+          (elapsedPercent || currentFrameNumber / this.props.totalFrames || 0),
+        0,
+      )
+    }
   }
 
   scrub(frameNumber) {
@@ -29,16 +65,7 @@ export default class FlipbookViewer extends Component {
   }
 
   render() {
-    const element = this.element
-    const { currentFrameNumber, frames } = this.props
-
-    if (element !== undefined && frames.length > 0) {
-      element.scrollTo(
-        (element.scrollWidth - element.offsetWidth) *
-          (currentFrameNumber / frames.length),
-        0,
-      )
-    }
+    const { frames } = this.props
 
     return (
       <div
@@ -66,6 +93,7 @@ export default class FlipbookViewer extends Component {
                 size="cover"
                 height={size.height}
                 width={size.width}
+                title={`Frame no. ${frame.number.toLocaleString()}`}
               />
             )
           })}

@@ -161,6 +161,7 @@ class FlipbookViewer extends Component {
                 frameFrequency={frameFrequency}
                 onScrub={this.scrub}
                 shuttler={this.shuttler}
+                status={this.status}
                 onLoop={this.onLoopToggle}
                 playing={playing}
                 loopPaused={this.state.loopPaused}
@@ -182,6 +183,7 @@ class FlipbookViewer extends Component {
             <FlipbookStrip
               totalFrames={this.props.totalFrames}
               shuttler={this.shuttler}
+              status={this.status}
               frames={this.props.frames}
               currentFrameNumber={currentFrameNumber}
             />

@@ -16,6 +16,7 @@ export default class Controlbar extends PureComponent {
     onPrevPage: PropTypes.func,
     onScrub: PropTypes.func,
     shuttler: PropTypes.instanceOf(PubSub),
+    status: PropTypes.instanceOf(PubSub),
     playing: PropTypes.bool,
     onVolume: PropTypes.func,
     currentFrameNumber: PropTypes.number,
@@ -115,6 +116,7 @@ export default class Controlbar extends PureComponent {
           {this.showScrubber() && (
             <div className="Controlbar__section">
               <Scrubber
+                status={this.props.status}
                 shuttler={this.props.shuttler}
                 currentFrameNumber={this.props.currentFrameNumber}
                 totalFrames={this.props.totalFrames}
