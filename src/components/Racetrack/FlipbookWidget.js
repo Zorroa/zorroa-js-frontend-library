@@ -180,6 +180,7 @@ class FlipbookWidget extends Component {
             )}>
             <Scrubber
               shuttler={this.shuttler}
+              status={this.status}
               currentFrameNumber={this.state.currentFrameNumber}
               totalFrames={this.state.totalFrames}
               isPlaying={this.state.playing}

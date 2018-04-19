@@ -19,9 +19,11 @@ export default class Scrubber extends PureComponent {
   }
 
   componentWillMount() {
-    this.props.status.on('elapsedPercent', elapsedPercent => {
-      this.setState({ elapsedPercent })
-    })
+    if (typeof this.props.status === 'function') {
+      this.props.status.on('elapsedPercent', elapsedPercent => {
+        this.setState({ elapsedPercent })
+      })
+    }
   }
 
   componentWillReceiveProps(nextProps) {
