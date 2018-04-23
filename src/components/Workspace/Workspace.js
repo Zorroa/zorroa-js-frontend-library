@@ -18,6 +18,7 @@ import Metadata from '../Metadata'
 import Collapsible from '../Collapsible'
 import ProgressBar from '../ProgressBar'
 import Racebar from '../Racetrack/Racebar'
+import Preferences from '../../components/Preferences'
 import {
   iconifyLeftSidebar,
   toggleCollapsible,
@@ -97,7 +98,7 @@ class Workspace extends Component {
     isManager: PropTypes.bool,
     isDeveloper: PropTypes.bool,
     isSharer: PropTypes.bool,
-    isExporter: PropTypes.bool.isRequired,
+    isExporter: PropTypes.bool,
     monochrome: PropTypes.bool,
     showQuickview: PropTypes.bool.isRequired,
     showExportsWizard: PropTypes.bool,
@@ -430,6 +431,7 @@ class Workspace extends Component {
       monochrome,
       isolatedJob,
       showQuickview,
+      showPreferencesModal,
     } = this.props
 
     const LibraryParams = () => ({
@@ -556,7 +558,7 @@ class Workspace extends Component {
             {(isAdministrator ||
               isManager ||
               isDeveloper ||
-              isExporter ||
+              isExporter === true ||
               isAdministrator) && (
               <Collapsible {...ExportJobsParams()}>
                 <ExportJobs />
@@ -619,6 +621,7 @@ class Workspace extends Component {
         {isolatedId && showQuickview === false && <Lightbox />}
         {isolatedId && showQuickview === true && <Quickview />}
         {showExportsWizard && <Exports />}
+        {showPreferencesModal && <Preferences user={user} />}
         {isolatedJob && <Importer />}
 
         {this.renderModalTest()}
@@ -651,6 +654,7 @@ export default connect(
     isExporter: state.auth.isExporter,
     monochrome: state.app.monochrome,
     showExportsWizard: state.exports.shouldShow,
+    showPreferencesModal: state.app.showPreferencesModal,
   }),
   dispatch => ({
     actions: bindActionCreators(

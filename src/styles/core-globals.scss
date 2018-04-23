@@ -25,6 +25,7 @@ html, body {
   font-size: 14px;
   padding:0;
   margin:0;
+  font-family: 'Roboto', sans-serif;
 }
 
 // https://css-tricks.com/box-sizing/
@@ -33,10 +34,6 @@ html {
 }
 *, *:before, *:after {
   box-sizing: inherit;
-}
-
-* {
-  font-family: 'Roboto', sans-serif;
 }
 
 // no glows, EVER!

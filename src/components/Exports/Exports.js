@@ -1,9 +1,13 @@
 import React, { Component, PropTypes } from 'react'
+import ModalOverlay, {
+  ModalOverlayBody,
+  ModalOverlayFooter,
+  ModalOverlaySidebar,
+  ModalOverlayHeader,
+} from '../ModalOverlay'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
-import Modal from '../Modal'
-import ModalHeader from '../ModalHeader'
 import FlashMessage from '../FlashMessage'
 import {
   hideExportInterface,
@@ -134,7 +138,7 @@ class Exports extends Component {
         arguments: {
           fields: props.metadataFields,
         },
-        shouldExport: true,
+        shouldExport: false,
       },
       VideoClipExporter: {
         arguments: {
@@ -277,10 +281,14 @@ class Exports extends Component {
     const presets = preset.processors.reduce(
       (accumulator, processor) => {
         const className = processor.className
-        accumulator[className] = Object.assign({}, this.state[className], {
-          arguments: processor.args,
-          shouldExport: true,
-        })
+        accumulator[getClassFromNamespace(className)] = Object.assign(
+          {},
+          this.state[className],
+          {
+            arguments: processor.args,
+            shouldExport: true,
+          },
+        )
         return accumulator
       },
       { ...this.defaultProcessors },
@@ -376,6 +384,14 @@ class Exports extends Component {
     )
   }
 
+  isFileNameValid() {
+    return this.state.fileName.trim().length > 0
+  }
+
+  onSubmit(event) {
+    event.preventDefault()
+  }
+
   render() {
     const exporterArguments = this.serializeExporterArguments()
     const processors = exporterArguments.processors
@@ -386,17 +402,17 @@ class Exports extends Component {
     const exportsClassNames = classnames('Exports', {
       'Exports--loading': this.props.isLoading,
     })
-    const body = (
-      <div className={exportsClassNames}>
-        <ModalHeader
+    return (
+      <ModalOverlay onClose={this.close} className={exportsClassNames}>
+        <ModalOverlayHeader
+          onClose={this.close}
           className="Exports__header"
-          icon="icon-export"
-          closeFn={this.close}>
+          icon="icon-export">
           Create Export
-        </ModalHeader>
-        <form onSubmit={this.onSubmit} className="Exports__body">
+        </ModalOverlayHeader>
+        <ModalOverlaySidebar>
           {hasRestrictedAssets === false && (
-            <div className="Exports__sidebar">
+            <div>
               <ZipExportPackager
                 isOpen={this.state.visibleExporter === 'ZipExportPackager'}
                 onToggleAccordion={() =>
@@ -460,9 +476,8 @@ class Exports extends Component {
               />
             </div>
           )}
-
           {hasRestrictedAssets === true && (
-            <div className="Exports__sidebar">
+            <div>
               <h2 className="Exports__sidebar-title">Export Request</h2>
               <h3 className="Exports__sidebar-subtitle">Export Package Name</h3>
               <p className="Exports__sidebar-paragraph">
@@ -470,137 +485,148 @@ class Exports extends Component {
               </p>
             </div>
           )}
-          <div className="Exports__mainbar">
-            {this.props.totalAssetCount > this.props.maxExportableAssets && (
-              <FlashMessage look="warning">
-                The current export contains{' '}
-                {this.props.totalAssetCount.toLocaleString()} assets. A maximum
-                of {this.props.maxExportableAssets.toLocaleString()} assets can
-                be exported at a given time. The remaining{' '}
-                {(
-                  this.props.totalAssetCount - this.props.maxExportableAssets
-                ).toLocaleString()}{' '}
-                will be ignored.
-              </FlashMessage>
-            )}
-            {this.props.loadingCreateExportSuccess && (
-              <FlashMessage look="success">
-                We’re processing your export. It may take some time to complete,
-                but you can close this window at any time and we’ll notify you
-                when the export is complete.
-              </FlashMessage>
-            )}
-            {hasRestrictedAssets &&
-              this.canRequestExport() === false && (
-                <FlashMessage look="warning">
-                  <p>
-                    To export, choose a folder and right-click for export
-                    options.
-                  </p>
+        </ModalOverlaySidebar>
+        <ModalOverlayBody>
+          <form onSubmit={this.onSubmit} className="Exports__body">
+            <div className="Exports__mainbar-container">
+              {this.isFileNameValid() === false && (
+                <FlashMessage look="error">
+                  An export cannot have a blank name.
                 </FlashMessage>
               )}
-            {this.props.errorMessage && (
-              <FlashMessage look="error">
-                <p>
-                  Whoops, something went wrong on our server. Feel free to try
-                  this request again. If the problem persists, you can report
-                  the error message below:
-                </p>
-                {this.props.errorMessage && <p>“{this.props.errorMessage} ”</p>}
-              </FlashMessage>
-            )}
-            <ExportsPreview
-              selectedAssets={this.props.selectedAssets}
-              origin={this.props.origin}
-            />
-            <dl className="Exports__review-section Exports__review-section--heading">
-              <dt className="Exports__review-term">Assets</dt>
-              <dd className="Exports__review-definition">
-                {this.props.totalAssetCount.toLocaleString()}
-              </dd>
-            </dl>
-            {this.props.offlineAssets > 0 && (
-              <div>
-                <dl className="Exports__review-section Exports__review-section--heading">
-                  <dt className="Exports__review-term">Online Assets</dt>
-                  <dd className="Exports__review-definition">
-                    {this.props.onlineAssets.toLocaleString()}
-                  </dd>
-                </dl>
-                <dl className="Exports__review-section Exports__review-section--heading">
-                  <dt className="Exports__review-term">Offline Assets</dt>
-                  <dd className="Exports__review-definition">
-                    {this.props.offlineAssets.toLocaleString()}
-                  </dd>
-                </dl>
-              </div>
-            )}
-            <dl className="Exports__review-section Exports__review-section--heading">
-              <dt className="Exports__review-term">Name</dt>
-              <dd className="Exports__review-definition">
-                {this.state.fileName}
-              </dd>
-            </dl>
-            {hasRestrictedAssets === false && (
+              {this.props.totalAssetCount > this.props.maxExportableAssets && (
+                <FlashMessage look="warning">
+                  The current export contains{' '}
+                  {this.props.totalAssetCount.toLocaleString()} assets. A
+                  maximum of {this.props.maxExportableAssets.toLocaleString()}{' '}
+                  assets can be exported at a given time. The remaining{' '}
+                  {(
+                    this.props.totalAssetCount - this.props.maxExportableAssets
+                  ).toLocaleString()}{' '}
+                  will be ignored.
+                </FlashMessage>
+              )}
+              {this.props.loadingCreateExportSuccess && (
+                <FlashMessage look="success">
+                  We’re processing your export. It may take some time to
+                  complete, but you can close this window at any time and we’ll
+                  notify you when the export is complete.
+                </FlashMessage>
+              )}
+              {hasRestrictedAssets &&
+                this.canRequestExport() === false && (
+                  <FlashMessage look="warning">
+                    <p>
+                      To export, choose a folder and right-click for export
+                      options.
+                    </p>
+                  </FlashMessage>
+                )}
+              {this.props.errorMessage && (
+                <FlashMessage look="error">
+                  <p>
+                    Whoops, something went wrong on our server. Feel free to try
+                    this request again. If the problem persists, you can report
+                    the error message below:
+                  </p>
+                  {this.props.errorMessage && (
+                    <p>“{this.props.errorMessage} ”</p>
+                  )}
+                </FlashMessage>
+              )}
+              <ExportsPreview
+                selectedAssets={this.props.selectedAssets}
+                origin={this.props.origin}
+              />
               <dl className="Exports__review-section Exports__review-section--heading">
-                <dt className="Exports__review-term">Profile</dt>
-                <dd
-                  className={classnames('Exports__review-definition', {
-                    'Exports__review-definition--demphasized':
-                      this.state.presetId === undefined,
-                  })}>
-                  {activePreset === undefined
-                    ? 'No profile chosen'
-                    : activePreset.presetName}
+                <dt className="Exports__review-term">Assets</dt>
+                <dd className="Exports__review-definition">
+                  {this.props.totalAssetCount.toLocaleString()}
                 </dd>
               </dl>
-            )}
-            {processors.map((processor, index) => {
-              const key = `${processor.className}-${index}`
-              switch (getClassFromNamespace(processor.className)) {
-                case 'ImageExporter':
-                  return (
-                    <ExportPreviewerImage
-                      key={key}
-                      imageAssetCount={this.props.imageAssetCount}
-                      exporterArguments={processor.args}
-                    />
-                  )
+              {this.props.offlineAssets > 0 && (
+                <div>
+                  <dl className="Exports__review-section Exports__review-section--heading">
+                    <dt className="Exports__review-term">Online Assets</dt>
+                    <dd className="Exports__review-definition">
+                      {this.props.onlineAssets.toLocaleString()}
+                    </dd>
+                  </dl>
+                  <dl className="Exports__review-section Exports__review-section--heading">
+                    <dt className="Exports__review-term">Offline Assets</dt>
+                    <dd className="Exports__review-definition">
+                      {this.props.offlineAssets.toLocaleString()}
+                    </dd>
+                  </dl>
+                </div>
+              )}
+              <dl className="Exports__review-section Exports__review-section--heading">
+                <dt className="Exports__review-term">Name</dt>
+                <dd className="Exports__review-definition">
+                  {this.state.fileName}
+                </dd>
+              </dl>
+              {hasRestrictedAssets === false && (
+                <dl className="Exports__review-section Exports__review-section--heading">
+                  <dt className="Exports__review-term">Profile</dt>
+                  <dd
+                    className={classnames('Exports__review-definition', {
+                      'Exports__review-definition--demphasized':
+                        this.state.presetId === undefined,
+                    })}>
+                    {activePreset === undefined
+                      ? 'No profile chosen'
+                      : activePreset.presetName}
+                  </dd>
+                </dl>
+              )}
+              {processors.map((processor, index) => {
+                const key = `${processor.className}-${index}`
+                switch (getClassFromNamespace(processor.className)) {
+                  case 'ImageExporter':
+                    return (
+                      <ExportPreviewerImage
+                        key={key}
+                        imageAssetCount={this.props.imageAssetCount}
+                        exporterArguments={processor.args}
+                      />
+                    )
 
-                case 'VideoExporter':
-                  return (
-                    <ExportPreviewerVideoClip
-                      key={key}
-                      videoAssetCount={this.props.videoAssetCount}
-                      exporterArguments={processor.args}
-                    />
-                  )
+                  case 'VideoExporter':
+                    return (
+                      <ExportPreviewerVideoClip
+                        key={key}
+                        videoAssetCount={this.props.videoAssetCount}
+                        exporterArguments={processor.args}
+                      />
+                    )
 
-                case 'FlipbookExporter':
-                  return (
-                    <ExportPreviewerFlipbook
-                      key={key}
-                      flipbookAssetCount={this.props.flipbookAssetCount}
-                      exporterArguments={processor.args}
-                    />
-                  )
+                  case 'FlipbookExporter':
+                    return (
+                      <ExportPreviewerFlipbook
+                        key={key}
+                        flipbookAssetCount={this.props.flipbookAssetCount}
+                        exporterArguments={processor.args}
+                      />
+                    )
 
-                case 'PdfExporter':
-                  return (
-                    <ExportPreviewerPdf
-                      key={key}
-                      documentAssetCount={this.props.documentAssetCount}
-                      exporterArguments={processor.args}
-                    />
-                  )
+                  case 'PdfExporter':
+                    return (
+                      <ExportPreviewerPdf
+                        key={key}
+                        documentAssetCount={this.props.documentAssetCount}
+                        exporterArguments={processor.args}
+                      />
+                    )
 
-                case 'JsonExporter':
-                  return <ExportPreviewerJson key={key} />
+                  case 'JsonExporter':
+                    return <ExportPreviewerJson key={key} />
 
-                case 'CsvExporter':
-                  return <ExportPreviewerCsv key={key} />
-              }
-            })}
+                  case 'CsvExporter':
+                    return <ExportPreviewerCsv key={key} />
+                }
+              })}
+            </div>
             {hasRestrictedAssets === false && (
               <div className="Exports__form-footer">
                 <div
@@ -610,6 +636,7 @@ class Exports extends Component {
                   })}>
                   <div className="Exports__form-button-group">
                     <FormButton
+                      disabled={this.isFileNameValid() === false}
                       state={this.getCreateExportState()}
                       onClick={this.startExport}>
                       Export
@@ -621,11 +648,9 @@ class Exports extends Component {
                   <div className="Exports__form-button-group Exports__form-button-group--secondary">
                     <FormButton
                       look="mini"
+                      icon={<span className="icon-save" />}
                       onClick={this.togglePresetFormVisibility}>
-                      <IconSave />
-                      <span className="Exports__save-label">
-                        Save Export Profile
-                      </span>
+                      Save Export Profile
                     </FormButton>
                   </div>
                 </div>
@@ -685,13 +710,9 @@ class Exports extends Component {
                 </div>
               </div>
             )}
-          </div>
-        </form>
-      </div>
-    )
-
-    return (
-      <Modal onModalUnderlayClick={this.close} body={body} width={'830px'} />
+          </form>
+        </ModalOverlayBody>
+      </ModalOverlay>
     )
   }
 }

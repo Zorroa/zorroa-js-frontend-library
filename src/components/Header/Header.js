@@ -8,7 +8,6 @@ import User from '../../models/User'
 import Asset from '../../models/Asset'
 import Logo from '../../components/Logo'
 import DropdownMenu from '../../components/DropdownMenu'
-import Preferences from '../../components/Preferences'
 import Feedback from '../../components/Feedback'
 import Developer from '../../components/Developer'
 import Settings from '../../components/Settings'
@@ -17,6 +16,7 @@ import {
   showModal,
   hideModal,
   dialogAlertPromise,
+  showPreferencesModal,
 } from '../../actions/appActions'
 import { archivistBaseURL, saveUserSettings } from '../../actions/authAction'
 import {
@@ -44,7 +44,16 @@ class Header extends Component {
     similarFields: PropTypes.instanceOf(Set),
     similarMinScore: PropTypes.object,
     userSettings: PropTypes.object.isRequired,
-    actions: PropTypes.object.isRequired,
+    actions: PropTypes.shape({
+      showModal: PropTypes.func.isRequired,
+      hideModal: PropTypes.func.isRequired,
+      selectAssetIds: PropTypes.func.isRequired,
+      saveUserSettings: PropTypes.func.isRequired,
+      dialogAlertPromise: PropTypes.func.isRequired,
+      findSimilarFields: PropTypes.func.isRequired,
+      resetRacetrackWidgets: PropTypes.func.isRequired,
+      showPreferencesModal: PropTypes.func.isRequired,
+    }),
     widgets: PropTypes.arrayOf(PropTypes.object),
   }
 
@@ -100,14 +109,8 @@ class Header extends Component {
   }
 
   showPreferences = activePane => {
-    const { user, actions } = this.props
-    const width = '90vw'
-    const body = <Preferences activePane={activePane} user={user} />
-    actions.showModal({
-      body,
-      width,
-      onModalUnderlayClick: actions.hideModal,
-    })
+    const { actions } = this.props
+    actions.showPreferencesModal(activePane)
   }
 
   showFeedback = () => {
@@ -358,7 +361,8 @@ class Header extends Component {
               </div>
             </DropdownMenu>
           </div>
-          <div className="header-menu header-menu-user icon-zorroa-person-06">
+          <div className="header-menu header-menu-user">
+            <span className="icon-zorroa-person-06" />
             <DropdownMenu label={<div>{user.username}</div>}>
               <div
                 className="header-menu-item header-menu-prefs"
@@ -442,6 +446,7 @@ export default connect(
         dialogAlertPromise,
         findSimilarFields,
         resetRacetrackWidgets,
+        showPreferencesModal,
       },
       dispatch,
     ),

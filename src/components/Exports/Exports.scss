@@ -2,6 +2,9 @@
 
 $max-height: 80vh;
 $content-height: calc(80vh - 40px);
+$modal-width: 830px;
+$sidebar-width: 360px;
+$mainbar-width: $modal-width - $sidebar-width;
 
 .Exports {
   max-height: $max-height;
@@ -58,29 +61,8 @@ $content-height: calc(80vh - 40px);
   }
 
   &__body {
-    display: flex;
-
     &--loading {
       display: none;
-    }
-
-    .dark & {
-      background-color: #000;
-    }
-  }
-
-  &__sidebar {
-    background: $zorroa-color-gray-light-2;
-    padding: 30px;
-    overflow: hidden;
-    overflow-y: scroll;
-    height: $content-height;
-    color: $zorroa-color-gray-dark-4;
-    width: 300px;
-    max-width: 300px;
-
-    .dark & {
-      background-color: $zorroa-color-gray-dark-1;
     }
   }
 
@@ -117,13 +99,6 @@ $content-height: calc(80vh - 40px);
   }
 
   &__mainbar {
-    padding: 0 20px;
-    flex-grow: 1;
-    flex-shrink: 1000;
-    height: $content-height;
-    overflow: hidden;
-    overflow-y: scroll;
-
     .dark & {
       color: $zorroa-color-gray-dark-4;
     }
@@ -131,8 +106,8 @@ $content-height: calc(80vh - 40px);
 
   &__form-element {
     display: flex;
-    align-items: center;
-    align-content: center;
+    align-items: flex-start;
+    align-content: flex-start;
     justify-content: flex-start;
     flex-grow: 1;
     flex-shrink: 0;
@@ -140,6 +115,7 @@ $content-height: calc(80vh - 40px);
     &--nested {
       align-items: flex-start;
       align-content: flex-start;
+      margin-left: 30px;
     }
 
     &--inline {
@@ -214,14 +190,26 @@ $content-height: calc(80vh - 40px);
 
   &__review-term {
     width: 130px;
-    color: $zorroa-color-gray-dark-4;
+    color: $zorroa-color-gray-dark-2;
     font-size: 14px;
     font-weight: 500;
+    flex-basis: 150px;
+
+    .dark & {
+      color: $zorroa-color-gray-dark-4;
+    }
   }
 
   &__review-definition {
     display: flex;
     flex-direction: column;
+    margin: 0;
+    flex-grow: 0;
+    flex-shrink: 100000;
+
+    .dark & {
+      color: $zorroa-color-gray-dark-4;
+    }
 
     &--demphasized {
       color: $zorroa-color-gray-dark-3;
@@ -234,6 +222,8 @@ $content-height: calc(80vh - 40px);
 
   &__form-footer {
     position: relative;
+    padding: 0 20px 20px;
+    border-top: 1px solid $zorroa-color-gray-dark-4;
   }
 
   &__main-form-buttons {
@@ -246,6 +236,7 @@ $content-height: calc(80vh - 40px);
     pointer-events: none;
     display: flex;
     align-items: center;
+    left: 0;
     width: 100%;
 
     &--visible {
@@ -270,12 +261,13 @@ $content-height: calc(80vh - 40px);
   }
 
   &__asset-preview-wrapper {
-    border: 1px solid $zorroa-color-gray-dark-3;
+    border: 1px solid $zorroa-color-gray-dark-4;
     margin: 20px 0;
+    font-size: 0;
 
     .dark & {
       border: 1px solid $zorroa-color-gray-dark-2;
-      background: $zorroa-color-gray-dark-1;
+      background: $zorroa-color-black;
     }
 
     &,
@@ -335,14 +327,6 @@ $content-height: calc(80vh - 40px);
     height: auto;
   }
 
-  &__save-label {
-    margin-left: 10px;
-    display: inline-block;
-  }
-
-  ::-webkit-scrollbar {
-    width: 5px;
-  }
 }
 
 @keyframes spin { 100% { transform:rotate(360deg); } }

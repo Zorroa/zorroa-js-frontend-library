@@ -65,7 +65,7 @@
       text-transform: none;
     }
 
-    &[class*='icon-zorroa-person-'] {
+    [class*='icon-zorroa-person-'] {
       .dark & { color: $zorroa-whitegray; }
       font-size: 30px;
     }

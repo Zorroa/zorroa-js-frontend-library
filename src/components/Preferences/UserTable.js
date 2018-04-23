@@ -3,10 +3,12 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import moment from 'moment'
 
-import './UserAdministrator.scss'
-
 import Table from '../Table'
 import UserStatusToggle from './UserStatusToggle'
+import { FormInput, FormLabel } from '../Form'
+import './UserTable.scss'
+import FlashMessage from '../FlashMessage'
+import Heading from '../Heading'
 
 import {
   loadUsers,
@@ -24,7 +26,7 @@ function Field(asset, field, width) {
 
   if (field === 'loginDate' && asset[field] instanceof Date) {
     cellContent = (
-      <div className="Table-cell UserAdministrator__date">
+      <div className="Table-cell UserForm__date">
         {moment(asset[field]).fromNow()}
       </div>
     )
@@ -37,14 +39,12 @@ function Field(asset, field, width) {
   }
 
   if (field === 'email') {
-    cellContent = (
-      <div className="Table-cell UserAdministrator__link">{cellContent}</div>
-    )
+    cellContent = <div className="Table-cell UserForm__link">{cellContent}</div>
   }
 
   return (
     <div
-      className="Table-cell UserAdministrator__cell"
+      className="Table-cell UserForm__cell"
       key={`${asset.id}-${field}`}
       style={{ width }}>
       {cellContent}
@@ -53,7 +53,13 @@ function Field(asset, field, width) {
 }
 
 function FieldTitle(title) {
-  return <div className="UserAdministrator__header-cell">{title}</div>
+  return (
+    <div className="UserForm__header-cell Table-cell">
+      <span className="Table-title">
+        <span className="Table-title-head">{title}</span>
+      </span>
+    </div>
+  )
 }
 
 class UserTable extends Component {
@@ -67,6 +73,7 @@ class UserTable extends Component {
         enabled: PropTypes.bool.isRequired,
       }),
     ),
+    onSetActivePane: PropTypes.func.isRequired,
     actions: PropTypes.shape({
       loadUsers: PropTypes.func.isRequired,
       disableUser: PropTypes.func.isRequired,
@@ -75,11 +82,8 @@ class UserTable extends Component {
     }),
   }
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      selectedUsers: new Set([]),
-    }
+  state = {
+    searchTerm: '',
   }
 
   componentDidMount() {
@@ -89,78 +93,110 @@ class UserTable extends Component {
   }
 
   onSelect = (asset, event) => {
-    const warningMessage =
-      'You are about to loose changes for the user you are editing. Are you sure you want to discard them?'
     const { id } = asset
-    const isSelectingDifferentUser = this.state.selectedUsers.has(id) === false
-    let selectedUsers = new Set([])
+    this.props.actions.loadUser(id)
+    this.props.onSetActivePane('userEdit')
+  }
 
-    if (
-      this.props.hasModifiedUser === true &&
-      window.confirm(warningMessage) === false
-    ) {
-      return
-    }
-
-    if (isSelectingDifferentUser) {
-      this.props.actions.loadUser(id)
-      selectedUsers = new Set([id])
-    } else {
-      this.props.actions.resetUser()
-    }
-
+  setSearchTerm = searchTerm => {
     this.setState({
-      selectedUsers,
+      searchTerm,
     })
   }
 
+  getFilteredUsers = () => {
+    const searchTerm = this.state.searchTerm.toLowerCase()
+
+    if (!searchTerm) {
+      return this.props.users
+    }
+
+    return this.props.users.filter(
+      user =>
+        user.username.toLowerCase().search(searchTerm) >= 0 ||
+        (user.lastName &&
+          user.lastName.toLowerCase().search(searchTerm) >= 0) ||
+        (user.firstName &&
+          user.firstName.toLowerCase().search(searchTerm) >= 0) ||
+        user.email.toLowerCase().search(searchTerm) >= 0,
+    )
+  }
+
   render() {
+    const users = this.getFilteredUsers()
+
     return (
       <div className="UserTable">
-        <Table
-          assets={this.props.users}
-          assetsCounter={this.props.users.length}
-          selectionCounter={0}
-          selectedAssetIds={this.state.selectedUsers}
-          fields={[
-            {
-              field: 'email',
-              title: FieldTitle('Email'),
-              width: 125,
-            },
-            {
-              field: 'firstName',
-              title: FieldTitle('First Name'),
-              width: 100,
-            },
-            {
-              field: 'lastName',
-              title: FieldTitle('Last Name'),
-              width: 100,
-            },
-            {
-              field: 'enabled',
-              title: FieldTitle('Status'),
-              width: 150,
-            },
-            {
-              field: 'loginDate',
-              title: FieldTitle('Last Login'),
-              width: 150,
-            },
-            {
-              field: 'loginCount',
-              title: FieldTitle('Total Logins'),
-              width: 150,
-            },
-          ]}
-          height={200}
-          tableIsResizing={false}
-          selectFn={this.onSelect}
-          elementFn={Field}
-          look="clean"
-          isSingleSelectOnly={true}
-        />
+        <Heading size="large" level="h2">
+          Manage Users
+        </Heading>
+        {users.length === 0 &&
+          !this.state.searchTerm &&
+          (users.length === 0 && !this.state.searchTerm)}
+
+        <FormLabel vertical label="Search users">
+          <FormInput
+            required
+            className="UserTable__search"
+            value={this.state.searchTerm}
+            onChange={newSearchTerm => {
+              this.setSearchTerm(newSearchTerm)
+            }}
+          />
+        </FormLabel>
+        {users.length === 0 &&
+          this.state.searchTerm && (
+            <FlashMessage look="warning">
+              No users matched the search term {`"${this.state.searchTerm}."`}
+            </FlashMessage>
+          )}
+        {users.length > 0 && (
+          <Table
+            assets={users}
+            assetsCounter={users.length}
+            selectionCounter={0}
+            selectedAssetIds={new Set()}
+            fields={[
+              {
+                field: 'email',
+                title: FieldTitle('Email'),
+                width: 125,
+              },
+              {
+                field: 'firstName',
+                title: FieldTitle('First Name'),
+                width: 100,
+              },
+              {
+                field: 'lastName',
+                title: FieldTitle('Last Name'),
+                width: 100,
+              },
+              {
+                field: 'enabled',
+                title: FieldTitle('Status'),
+                width: 150,
+              },
+              {
+                field: 'loginDate',
+                title: FieldTitle('Last Login'),
+                width: 150,
+              },
+              {
+                field: 'loginCount',
+                title: FieldTitle('Total Logins'),
+                width: 150,
+              },
+            ]}
+            tableIsResizing={false}
+            selectFn={this.onSelect}
+            elementFn={Field}
+            look="clean"
+            height={500}
+            noScroll
+            isSingleSelectOnly
+          />
+        )}
       </div>
     )
   }

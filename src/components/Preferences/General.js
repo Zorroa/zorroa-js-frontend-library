@@ -5,7 +5,7 @@ import JSONTree from 'react-json-tree'
 import classnames from 'classnames'
 
 import {
-  hideModal,
+  hidePreferencesModal,
   lightbarFieldTemplate,
   thumbFieldTemplate,
   dragFieldTemplate,
@@ -79,7 +79,7 @@ class General extends Component {
   dismiss = event => {
     const { onDismiss } = this.props
     if (onDismiss) onDismiss(event)
-    this.props.actions.hideModal()
+    this.props.actions.hidePreferencesModal()
   }
 
   reset = event => {
@@ -427,7 +427,7 @@ export default connect(
         archivistHealth,
         archivistMetrics,
         archivistSetting,
-        hideModal,
+        hidePreferencesModal,
         lightbarFieldTemplate,
         thumbFieldTemplate,
         dragFieldTemplate,

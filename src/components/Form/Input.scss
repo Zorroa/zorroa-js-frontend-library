@@ -4,7 +4,7 @@
 .FormInput {
   display: flex;
   flex-direction: row;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 
   .dark & {
     color: $zorroa-dark-color-text;
@@ -61,7 +61,7 @@
     height: $form-element-height;
     line-height: 20px;
     padding: 10px;
-    border: $form-element-border;
+    border: 1px solid $zorroa-color-gray-dark-3;
     font-size: 14px;
     background: none;
     max-width: 100%;

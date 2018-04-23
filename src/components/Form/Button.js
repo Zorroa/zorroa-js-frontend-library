@@ -19,6 +19,7 @@ export default function FormButton(props) {
   })
   const buttonLabelClasses = classnames('FormButton__label', {
     'FormButton__label--state-active': props.state !== undefined,
+    'FormButton__label--mini': props.look === 'mini',
   })
   return (
     <button
@@ -29,6 +30,9 @@ export default function FormButton(props) {
       title={props.title}>
       {(isNormalLook || props.look === 'mini') && (
         <span className={buttonStateClasses} title={props.state} />
+      )}
+      {props.icon !== undefined && (
+        <span className="FormButton__icon">{props.icon}</span>
       )}
       <span className={buttonLabelClasses}>{props.children}</span>
     </button>

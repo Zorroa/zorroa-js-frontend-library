@@ -38,6 +38,7 @@ export default class Table extends Component {
     setFieldWidthFn: PropTypes.func,
     sortFieldFn: PropTypes.func,
     elementFn: PropTypes.func.isRequired,
+    noScroll: PropTypes.bool,
   }
 
   constructor(props) {
@@ -319,9 +320,12 @@ export default class Table extends Component {
         fieldIsVisible = true
       if (fieldIsVisible) visibleFields.push(i)
     }
+    const tableClassNames = classnames('Table', {
+      'Table--no-scroll': this.props.noScroll === true,
+    })
 
     return (
-      <div className="Table" style={tableStyle}>
+      <div className={tableClassNames} style={tableStyle}>
         <div
           className="Table-header"
           style={{

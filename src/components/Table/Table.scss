@@ -5,10 +5,22 @@
   @include flexCol;
 
   position: relative; // for Table-settings and context menu
-
+  background-color: $zorroa-color-gray-light-2;
+  border-bottom: 1px solid $zorroa-color-gray-light-1;
+  overflow: hidden;
   // height is defined in JSX
 
-  overflow: hidden;
+  .dark & {
+    border-bottom: 1px solid $zorroa-color-gray-dark-2;
+    background-color: $zorroa-color-gray-dark-1;
+  }
+
+  &--no-scroll {
+    overflow: visible;
+    overflow-x: scroll;
+    height: initial!important; // Override JSX height
+    max-height: initial!important; // Override JSX height
+  }
 }
 
 // this is to allow resizing of the rightmost column
@@ -25,11 +37,18 @@ $tableResizeRightPadding: 20px;
 
   padding-right: $tableResizeRightPadding;
 
+  .Table--no-scroll & {
+    position: static;
+  }
 }
 
 .Table-header-cell {
   height: 100%;
   @include flexRowCenter;
+
+  .Table--no-scroll & {
+    position: static!important; // Override JSX style
+  }
 }
 
 .Table-header-sort {
@@ -96,6 +115,12 @@ $tableResizeRightPadding: 20px;
   // top & height are defined in JSX
 
   overflow: hidden;
+
+  .Table--no-scroll & {
+    overflow: visible;
+    height: initial!important;
+    position: static;
+  }
 }
 
 .Table-scroll {
@@ -112,15 +137,27 @@ $tableResizeRightPadding: 20px;
     width: 5px;
     height: 5px;
   }
+  .Table--no-scroll & {
+    overflow: visible;
+  }
 }
 
 .Table-body {
   position: absolute; // Allow width to respect children not parent (enable horiz scrolling)
   min-width: 100%;
-
-  border-bottom: 1px solid #aaa;
   border-spacing: 0;
-  padding: 2px 0 2px 2px;
+  padding: 0;
+
+  .dark & {
+    background-color: $zorroa-color-gray-dark-1;
+    border-color: $zorroa-color-gray-dark-2;
+  }
+
+  .Table--no-scroll & {
+    overflow: visible;
+    height: initial!important;
+    position: static;
+  }
 }
 
 .Table-row {
@@ -158,6 +195,10 @@ $tableResizeRightPadding: 20px;
 
     .dark & { border-color: $zorroa-dark-selected; }
   }
+
+  .Table--no-scroll & {
+    position: static;
+  }
 }
 
 
@@ -170,8 +211,8 @@ $tableResizeRightPadding: 20px;
 }
 
 .Table-body .Table-row:hover:not(.isSelected) {
-  background-color: $zorroa-hover;
-  .dark & { background-color: $zorroa-dark-hover; }
+  background-color: $zorroa-color-gray-light-1;
+  .dark & { background-color: $zorroa-color-gray-dark-2; }
 }
 
 .Table-cell {
@@ -201,6 +242,9 @@ $tableResizeRightPadding: 20px;
 .Table-title {
   @include flexRowCenter;
   margin-left: 4px;
+  font-size: 12px;
+  font-family: Roboto Condensed;
+  text-transform: uppercase;
 }
 
 .Table-title-head {
@@ -208,9 +252,6 @@ $tableResizeRightPadding: 20px;
   @include nowrap;
   @include clampText;
   text-align: left;
-  //text-transform: uppercase;
-  font-size: 12px;
-  font-family: Roboto Condensed;
   color: $zorroa-gray;
 
   .ordered & {
@@ -228,9 +269,6 @@ $tableResizeRightPadding: 20px;
   @include clampText;
   @include nowrap;
   text-align: left;
-  text-transform: uppercase;
-  font-size: 12px;
-  font-family: Roboto Condensed;
   color: $zorroa-lightgray;
   margin-left: 4px;
 }

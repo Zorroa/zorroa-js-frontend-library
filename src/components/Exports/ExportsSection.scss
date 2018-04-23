@@ -9,11 +9,7 @@ $toggle-height: 16px;
   border: 0;
   padding: 0;
   position: relative;
-  border-bottom: 1px solid $zorroa-color-gray-dark-3;
-
-  &:last-child {
-    border-bottom: 0;
-  }
+  border-bottom: 1px solid $zorroa-color-gray-dark-4;
 
   &__header {
     display: flex;
@@ -84,7 +80,7 @@ $toggle-height: 16px;
 
     &::before,
     &::after {
-      border-top: 1px solid $zorroa-color-gray-dark-3;
+      border-top: 1px solid $zorroa-color-gray-dark-2;
       content: '';
       display: block;
       position: absolute;

@@ -48,7 +48,7 @@ export default class ZipExportPackager extends Component {
         <FormLabel
           vertical
           label="Export Package Name"
-          className="Exports__form-element Exports__form-element--nested">
+          className="Exports__form-element">
           <FormInput
             className="Exports__form-input Exports__form-input--large"
             required

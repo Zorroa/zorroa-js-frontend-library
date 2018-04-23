@@ -1,13 +1,8 @@
 @import '../../styles/core-mixins.scss';
 @import '../../styles/colors.scss';
 
-.UserAdministrator {
+.UserForm {
   box-sizing: border-box;
-
-  &__form {
-    margin-bottom: 30px;
-    padding: 10px 20px;
-  }
 
   &__fields {
     display: flex;
@@ -19,15 +14,16 @@
     flex-direction: column;
     border: 0;
     flex-grow: 1;
-    padding: 0 20px 0 0;
-    flex-basis: 25%;
+    padding: 0;
+    flex-basis: 50%;
+    margin: 0;
 
-    & ~ .UserAdministrator__field-group {
+    & ~ .UserForm__field-group {
       padding-left: 20px;
     }
 
     &--permissions {
-      flex-basis: 50%;
+      flex-basis: 100%;
     }
   }
 

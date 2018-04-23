@@ -1,0 +1,35 @@
+@import '../../styles/core-mixins.scss';
+@import './variables.scss';
+
+.ModalOverlayBody {
+  padding: $content-padding;
+  overflow: hidden;
+  height: calc(#{$content-height} - #{$content-padding * 2});
+  background: $zorroa-color-white;
+  flex-grow: 1;
+
+  .dark & {
+    background: black;
+  }
+
+  &:hover {
+    overflow-y: auto;
+  }
+
+  &__scroll {
+    width: $content-max-width - $sidebar-width - $content-padding * 2;
+    max-height: calc(#{$content-height} - #{$content-padding * 2});
+
+    .ModalOverlayBody--narrow & {
+      width: $content-max-width - $sidebar-width-narrow - $content-padding * 2;
+    }
+  }
+
+  @media(max-width: $content-max-width * 1.2) {
+    overflow-y: auto;
+
+    &__scroll {
+      max-width: 100%;
+    }
+  }
+}

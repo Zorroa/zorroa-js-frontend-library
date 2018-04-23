@@ -3,10 +3,11 @@
 .FormInput__select {
   margin-top: $form-element-top-margin;
   margin-bottom: $form-element-bottom-margin;
-  border: $form-element-border;
+  border: 1px solid $zorroa-color-gray-dark-3;
   border-radius: $form-element-border-radius;
   max-width: 300px;
   position: relative;
+  color: $zorroa-color-gray-dark-2;
 
   &::after {
     content: ' ';
@@ -17,7 +18,7 @@
     top: 0;
     right: 30px;
     height: 100%;
-    border-left: $form-element-border;
+    border-left: 1px solid $zorroa-color-gray-dark-3;
   }
 }
 
@@ -28,7 +29,7 @@
   background-position: calc(100% - 7px) center;
   background-repeat: no-repeat;
   border: 0;
-  height: $form-element-height - $form-element-border-size;
+  height: 30px - $form-element-border-size;
   width: 100%;
   margin: 0;
   outline: none;
@@ -37,6 +38,7 @@
   text-overflow: '';
   outline: 0;
   padding: 0 10px;
+  color: $zorroa-color-gray-dark-2;
 
   &:focus {
     outline: 0;

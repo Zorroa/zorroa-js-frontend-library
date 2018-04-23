@@ -32,6 +32,8 @@ import {
   SHOW_IMPORT,
   SHOW_QUICKVIEW,
   HIDE_QUICKVIEW,
+  SHOW_PREFERENCES,
+  HIDE_PREFERENCES,
   TABLE_LAYOUTS,
   SELECT_TABLE_LAYOUT,
   ADD_TABLE_LAYOUT,
@@ -370,5 +372,18 @@ export function showImport(show) {
   return {
     type: SHOW_IMPORT,
     payload: show,
+  }
+}
+
+export function showPreferencesModal(activePane) {
+  return {
+    type: SHOW_PREFERENCES,
+    payload: activePane,
+  }
+}
+
+export function hidePreferencesModal() {
+  return {
+    type: HIDE_PREFERENCES,
   }
 }

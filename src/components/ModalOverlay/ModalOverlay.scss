@@ -1,0 +1,91 @@
+@import '../../styles/core-mixins.scss';
+@import './variables.scss';
+
+.ModalOverlay {
+  position: fixed;
+  background: rgba($zorroa-color-black, .75);
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  cursor: pointer;
+  animation: fadeIn 300ms cubic-bezier(0.785, 0.135, 0.15, 0.86);
+
+  &--closing {
+    opacity: 0;
+    animation: fadeOut 900ms cubic-bezier(0.785, 0.135, 0.15, 0.86);
+  }
+
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &__main {
+    display: flex;
+  }
+
+  &__header {
+    width: 100%;
+  }
+
+  &__container {
+    height: $content-height;
+    width: $content-width;
+    max-width: $content-max-width;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    overflow: hidden;
+    cursor: auto;
+    animation: slideIn 600ms cubic-bezier(0.86, 0, 0.07, 1);
+
+    &--closing {
+      transform: translateY(100vh);
+      animation: slideOut 600ms cubic-bezier(0.86, 0, 0.07, 1);
+    }
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-100vh);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-100vh);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}

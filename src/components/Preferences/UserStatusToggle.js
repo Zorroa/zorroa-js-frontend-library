@@ -11,10 +11,10 @@ import { disableUser, enableUser } from '../../actions/usersActions'
 class UserStatusToggle extends Component {
   static propTypes = {
     authorizedUser: PropTypes.shape({
-      id: PropTypes.number.isRequired,
+      id: PropTypes.string.isRequired,
     }),
     user: PropTypes.shape({
-      id: PropTypes.number.isRequired,
+      id: PropTypes.string.isRequired,
       enabled: PropTypes.bool.isRequired,
     }),
     usersBeingDisabled: PropTypes.arrayOf(PropTypes.number),

@@ -324,9 +324,10 @@ class FolderItem extends Component {
     this.dismissContextMenu(event)
 
     const { selectedFolderIds, folder } = this.props
-    const folderIds = selectedFolderIds.has(folder.id)
-      ? new Set(this.props.selectedFolderIds)
+    const normalizedSelectedFolderIds = selectedFolderIds.has(folder.id)
+      ? this.props.selectedFolderIds
       : [folder.id]
+    const folderIds = new Set(normalizedSelectedFolderIds)
     const filter = new AssetFilter({
       links: {
         folder: [...folderIds],

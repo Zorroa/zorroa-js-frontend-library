@@ -27,6 +27,8 @@ import {
   HIDE_DIALOG_CONFIRM,
   SHOW_DIALOG_PROMPT,
   HIDE_DIALOG_PROMPT,
+  SHOW_PREFERENCES,
+  HIDE_PREFERENCES,
   THUMB_FIELD_TEMPLATE,
   LIGHTBAR_FIELD_TEMPLATE,
   DRAG_FIELD_TEMPLATE,
@@ -112,6 +114,8 @@ const initialState = {
   showQuickview: false,
   flipbookFps: defaultFpsFrequencies[0],
   shouldLoop: false,
+  activePreferencesPane: undefined,
+  showPreferencesModal: false,
 }
 
 export default function app(state = initialState, action) {
@@ -297,6 +301,18 @@ export default function app(state = initialState, action) {
       return { ...state, flipbookFps: action.payload }
     case SHOULD_LOOP:
       return { ...state, shouldLoop: action.payload }
+    case SHOW_PREFERENCES:
+      return {
+        ...state,
+        activePreferencesPane: action.payload,
+        showPreferencesModal: true,
+      }
+    case HIDE_PREFERENCES:
+      return {
+        ...state,
+        activePreferencesPane: undefined,
+        showPreferencesModal: false,
+      }
     default:
       return state
   }

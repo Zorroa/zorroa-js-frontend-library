@@ -187,11 +187,7 @@ export default function(state = initialState, action) {
       const createUserError = true
       let createUserErrorMessage =
         'Unable to save the user. Ensure all data is valid and that your network works.'
-      console.log(action)
-      if (
-        action.payload.exception ===
-        'com.zorroa.sdk.client.exception.DuplicateElementException'
-      ) {
+      if (action.payload.message) {
         createUserErrorMessage = action.payload.message
       }
 

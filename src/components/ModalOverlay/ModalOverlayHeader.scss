@@ -1,0 +1,34 @@
+@import '../../styles/core-mixins.scss';
+
+.ModalOverlayHeader {
+  text-transform: uppercase;
+  color: $zorroa-color-white;
+  background-color: $zorroa-color-black;
+  height: 40px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0 10px 10px;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+  overflow: hidden;
+
+  .dark & {
+    border-bottom: 1px solid $zorroa-color-gray-dark-2;
+  }
+
+  &__close {
+    height: 40px;
+    width: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $zorroa-color-gray-dark-2;
+    }
+  }
+}

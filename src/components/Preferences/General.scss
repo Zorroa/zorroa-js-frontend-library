@@ -75,8 +75,8 @@ $border-color: 1px solid $zorroa-lightgray;
 
 .General-curator {
   border-bottom: 1px solid $zorroa-lightgray;
-  .dark & { border-bottom: 1px solid $zorroa-darkgray; }
-  padding: 10px 20px;
+  .dark & { border-bottom-color: $zorroa-darkgray; }
+  padding: 10px 0;
 }
 
 .General-reset {
