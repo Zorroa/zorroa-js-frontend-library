@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import Measure from 'react-measure'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 import keydown from 'react-keydown'
 import * as assert from 'assert'
 
@@ -83,6 +84,7 @@ class Assets extends Component {
     actions: PropTypes.object,
     isolatedId: PropTypes.string,
     showQuickview: PropTypes.bool.isRequired,
+    history: PropTypes.object,
   }
 
   constructor(props) {
@@ -248,7 +250,7 @@ class Assets extends Component {
     this.skipNextSelectionScroll = true
     const event = { shiftKey: false, metaKey: false }
     this.select(asset, event)
-    this.props.actions.isolateAssetId(asset.id)
+    this.props.actions.isolateAssetId(asset.id, this.props.history)
   }
 
   toggleShowTable = () => {
@@ -892,7 +894,7 @@ class Assets extends Component {
   }
 }
 
-export default connect(
+const ConnectedAssets = connect(
   state => ({
     assets: state.assets.all,
     assetsCounter: state.assets.assetsCounter,
@@ -951,3 +953,5 @@ export default connect(
     ),
   }),
 )(Assets)
+
+export default withRouter(ConnectedAssets)

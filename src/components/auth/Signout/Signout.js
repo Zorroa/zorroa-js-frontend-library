@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
+import { Redirect } from 'react-router-dom'
 
 import User from '../../../models/User'
 import Logo from '../../../components/Logo'
@@ -12,21 +13,23 @@ class Signout extends Component {
     user: PropTypes.instanceOf(User),
   }
 
-  static get contextTypes() {
-    return {
-      router: PropTypes.object,
-    }
+  state = {
+    doRedirect: false,
   }
 
   componentWillMount() {
     const { host, user } = this.props
     this.props.signoutUser(user, host)
+    setTimeout(() => {
+      this.setState({ doRedirect: true })
+    }, 1000)
   }
 
   render() {
-    setTimeout(() => {
-      this.context.router.push('/')
-    }, 1000)
+    if (this.state.doRedirect) {
+      return <Redirect to={'/signin'} />
+    }
+
     return (
       <div className="auth flexCenter">
         <div className="auth-box flexColCenter">

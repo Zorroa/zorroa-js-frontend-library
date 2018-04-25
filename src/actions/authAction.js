@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { browserHistory } from 'react-router'
 import * as api from '../globals/api.js'
 
 import {
@@ -143,7 +142,6 @@ export function validateUser(origin) {
         if (error && error.response && error.response.status === 401) {
           dispatch({ type: UNAUTH_USER, payload: error.response.data })
         } else {
-          browserHistory.push('/signin')
         }
       })
   }
@@ -178,7 +176,7 @@ export function signinUser(username, password, origin) {
   }
 }
 
-function authorize(dispatch, json, source) {
+function authorize(dispatch, json) {
   const user = new User(json)
   dispatch({ type: AUTH_USER, payload: user })
   localStorage.setItem(USER_ITEM, JSON.stringify(user))
@@ -287,8 +285,6 @@ function authorize(dispatch, json, source) {
       dispatch({ type: LIGHTBOX_PANNER, payload: metadata.lightboxPanner })
     }
   }
-  const url = source && source.length ? '?source=' + source : ''
-  browserHistory.push(url) // Retain search from original URL
 }
 
 export function forgotPassword(email, origin) {
@@ -307,7 +303,6 @@ export function forgotPassword(email, origin) {
     )
       .then(response => {
         dispatch({ type: UNAUTH_USER, payload: response.data })
-        browserHistory.push('/signin')
       })
       .catch(error => dispatch(authError('Cannot reset ' + email, error)))
   }
@@ -361,7 +356,8 @@ export function resetPassword(password, token, origin, source) {
       },
     )
       .then(response => {
-        authorize(dispatch, response.data, source)
+        const url = source && source.length ? '?source=' + source : ''
+        authorize(dispatch, response.data, url)
         const onboarding = source && source.length > 0
         dispatch({ type: AUTH_ONBOARDING, payload: onboarding })
       })

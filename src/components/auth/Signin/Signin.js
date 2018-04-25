@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { Link } from 'react-router'
+import { Link, Redirect } from 'react-router-dom'
 import classnames from 'classnames'
 
 import Logo from '../../Logo'
@@ -21,6 +21,8 @@ class Signin extends Component {
     error: PropTypes.string,
     defaults: PropTypes.object,
     actions: PropTypes.object,
+    authenticated: PropTypes.bool,
+    location: PropTypes.object,
   }
 
   state = {
@@ -150,6 +152,12 @@ class Signin extends Component {
       !username.length ||
       (!PROD && (!host || !host.length)) ||
       !acceptEULA
+    const { from } = this.props.location.state || { from: { pathname: '/' } }
+
+    if (this.props.authenticated) {
+      return <Redirect to={from} />
+    }
+
     return (
       <div className="auth">
         <div className="auth-box">
@@ -236,6 +244,7 @@ export default connect(
   state => ({
     error: state.auth.error,
     defaults: state.auth.defaults,
+    authenticated: state.auth.authenticated,
   }),
   dispatch => ({
     actions: bindActionCreators(

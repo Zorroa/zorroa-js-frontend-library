@@ -13,7 +13,7 @@ class Searchbar extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
     query: PropTypes.instanceOf(AssetSearch),
-    error: PropTypes.string,
+    error: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
     totalCount: PropTypes.number,
     suggestions: PropTypes.arrayOf(PropTypes.object),
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
@@ -86,7 +86,11 @@ class Searchbar extends Component {
             onSelect={this.search}
           />
         </div>
-        {error && <div className="Searchbar-error">Search syntax error</div>}
+        {error && (
+          <div className="Searchbar-error" title={error.toString()}>
+            Search error
+          </div>
+        )}
       </div>
     )
   }

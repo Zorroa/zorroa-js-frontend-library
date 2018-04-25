@@ -2,21 +2,26 @@ import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import keydown from 'react-keydown'
-
+import { withRouter } from 'react-router-dom'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
 import Lightbar from './Lightbar'
 import Inspector from '../Inspector'
 import Metadata from '../Metadata'
 import ResizableWindow from '../ResizableWindow'
-import { isolateAssetId } from '../../actions/assetsAction'
+import { isolateAssetId, searchAssets } from '../../actions/assetsAction'
 import { lightboxMetadata } from '../../actions/appActions'
 import { saveUserSettings } from '../../actions/authAction'
+import AssetSearch from '../../models/AssetSearch'
 
 class Lightbox extends Component {
   static propTypes = {
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
-    isolatedId: PropTypes.string.isRequired,
+    match: PropTypes.shape({
+      params: PropTypes.shape({
+        isolatedId: PropTypes.string.isRequired,
+      }),
+    }).isRequired,
     lightboxMetadata: PropTypes.shape({
       show: PropTypes.bool.isRequired,
       left: PropTypes.number.isRequired,
@@ -26,7 +31,12 @@ class Lightbox extends Component {
     }),
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
-    actions: PropTypes.object,
+    actions: PropTypes.shape({
+      searchAssets: PropTypes.func.isRequired,
+      saveUserSettings: PropTypes.func.isRequired,
+      lightboxMetadata: PropTypes.func.isRequired,
+      isolateAssetId: PropTypes.func.isRequired,
+    }),
   }
 
   @keydown('esc')
@@ -44,8 +54,32 @@ class Lightbox extends Component {
     this.isolateIndexOffset(-1)
   }
 
+  getIsolatedId() {
+    return this.props.match.params.isolatedId
+  }
+
+  componentWillMount() {
+    const { assets, match } = this.props
+    const { params } = match
+    const { isolatedId } = params
+    const asset = assets && assets.find(asset => asset.id === isolatedId)
+    if (!asset) {
+      const assetSearchQuery = new AssetSearch({
+        filter: {
+          terms: {
+            _id: [this.getIsolatedId()],
+          },
+        },
+        size: 1,
+      })
+      this.props.actions.searchAssets(assetSearchQuery)
+      this.props.actions.isolateAssetId(isolatedId)
+    }
+  }
+
   isolateIndexOffset(offset) {
-    const { assets, isolatedId, actions } = this.props
+    const { assets, actions } = this.props
+    const isolatedId = this.getIsolatedId()
     const index = assets.findIndex(asset => asset.id === isolatedId)
     if (index + offset >= 0 && index + offset < assets.length) {
       actions.isolateAssetId(assets[index + offset].id)
@@ -93,7 +127,9 @@ class Lightbox extends Component {
   }
 
   render() {
-    const { assets, isolatedId, lightboxMetadata } = this.props
+    const { assets, lightboxMetadata } = this.props
+    const isolatedId = this.getIsolatedId()
+
     let asset = null
     let hasNext = false
     let hasPrev = false
@@ -105,6 +141,11 @@ class Lightbox extends Component {
         hasNext = index < assets.length - 1
       }
     }
+
+    if (!asset) {
+      return <div>No asset available</div>
+    }
+
     const metadataTitle = (
       <div className="Lightbox-metadata-title">
         <div className="Lightbox__metadata-icon icon-register" />
@@ -151,10 +192,9 @@ class Lightbox extends Component {
   }
 }
 
-export default connect(
+const ConnectedLightbox = connect(
   state => ({
     assets: state.assets.all,
-    isolatedId: state.assets.isolatedId,
     lightboxMetadata: state.app.lightboxMetadata,
     user: state.auth.user,
     userSettings: state.app.userSettings,
@@ -165,8 +205,11 @@ export default connect(
         isolateAssetId,
         lightboxMetadata,
         saveUserSettings,
+        searchAssets,
       },
       dispatch,
     ),
   }),
 )(Lightbox)
+
+export default withRouter(ConnectedLightbox)

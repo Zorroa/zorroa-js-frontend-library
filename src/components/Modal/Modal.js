@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react'
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 import classnames from 'classnames'
 
 export default class Modal extends Component {
@@ -33,18 +32,9 @@ export default class Modal extends Component {
     })
     return (
       <div className={classes} onClick={this.onModalUnderlayClick}>
-        <ReactCSSTransitionGroup
-          className="modal-csstg"
-          transitionName="modal"
-          transitionAppear={true}
-          transitionEnterTimeout={500}
-          transitionAppearTimeout={500}
-          transitionLeaveTimeout={300}
-          component="div">
-          <div className="modal" key="modal" style={{ width }}>
-            <div className="modal-body">{body}</div>
-          </div>
-        </ReactCSSTransitionGroup>
+        <div className="modal" key="modal" style={{ width }}>
+          <div className="modal-body">{body}</div>
+        </div>
       </div>
     )
   }

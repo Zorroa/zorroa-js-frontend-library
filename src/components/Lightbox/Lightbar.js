@@ -2,10 +2,10 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
-import copy from 'copy-to-clipboard'
 import downloadjs from 'downloadjs'
 import api from '../../api'
 import getImage from '../../services/getImage'
+import { withRouter } from 'react-router-dom'
 
 import User from '../../models/User'
 import Asset from '../../models/Asset'
@@ -29,15 +29,16 @@ class Lightbar extends Component {
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object,
+    history: PropTypes.object,
   }
 
   state = {
-    copyingLink: false,
     showFolders: false,
     addingToCollection: false,
   }
 
   closeLightbox() {
+    this.props.history.goBack()
     this.props.actions.isolateAssetId()
   }
 
@@ -92,18 +93,6 @@ class Lightbar extends Component {
     })
   }
 
-  copyIsolatedAssetLink = () => {
-    const text = this.isolatedAssetURL()
-    if (!text) return
-    copy(text)
-    this.setState({ copyingLink: true })
-    if (this.copyTimeout) clearTimeout(this.copyTimeout)
-    this.copyTimeout = setTimeout(() => {
-      this.setState({ copyingLink: false })
-      this.copyTimeout = null
-    }, 3000)
-  }
-
   showFolders = event => {
     this.setState({ showFolders: !this.state.showFolders })
     event.preventDefault()
@@ -135,7 +124,6 @@ class Lightbar extends Component {
     const {
       actionWidth,
       lightbarHeight,
-      copyingLink,
       showFolders,
       addingToCollection,
     } = this.state
@@ -162,19 +150,6 @@ class Lightbar extends Component {
             <span className="Lightbar-action-text Lightbar-action-download">
               Download
             </span>
-          </div>
-          <div
-            onClick={!copyingLink && this.copyIsolatedAssetLink}
-            className="Lightbar-action">
-            <i className="Lightbar__icon icon-link2" />
-            <span className="Lightbar-action-text Lightbar-action-get-link">
-              Get Link
-            </span>
-            {copyingLink && (
-              <div className="Lightbar-performed-action">
-                Copied URL to clipboard
-              </div>
-            )}
           </div>
           <div onClick={this.showFolders} className="Lightbar-action">
             <span className="Lightbar-action-text Lightbar-action-add-to-collection">
@@ -215,7 +190,7 @@ class Lightbar extends Component {
   }
 }
 
-export default connect(
+const ConnectedLightbar = connect(
   state => ({
     assets: state.assets.all,
     asset: state.assets.all.find(asset => asset.id === state.assets.isolatedId),
@@ -236,3 +211,5 @@ export default connect(
     ),
   }),
 )(Lightbar)
+
+export default withRouter(ConnectedLightbar)

@@ -3,14 +3,13 @@
 import debug from 'debug'
 import React from 'react'
 import { render } from 'react-dom'
-import { Router, browserHistory } from 'react-router'
 import { Provider } from 'react-redux'
 import { createStore, applyMiddleware, compose } from 'redux'
 import multi from 'redux-multi'
 import thunk from 'redux-thunk'
 import ReduxPromise from 'redux-promise'
 
-import routes from './routes'
+import App from './components/App'
 import reducers from './reducers'
 import { USER_ITEM, ORIGIN_ITEM } from './constants/localStorageItems'
 import { validateUser, signinDefaults } from './actions/authAction'
@@ -47,7 +46,7 @@ const store = createStore(
 log('creating application node')
 const applicationNode = (
   <Provider store={store}>
-    <Router history={browserHistory} routes={routes} />
+    <App />
   </Provider>
 )
 

@@ -36,6 +36,7 @@ const initialState = {
   selectionCounter: 0,
   commands: new Map(),
   similarFields: new Set(),
+  all: [],
 }
 
 export default function(state = initialState, action) {

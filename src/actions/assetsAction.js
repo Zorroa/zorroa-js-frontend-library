@@ -370,7 +370,10 @@ export function unorderAssets() {
   return orderAssets()
 }
 
-export function isolateAssetId(id) {
+export function isolateAssetId(id, history) {
+  if (history && id) {
+    history.push(`/asset/${id}`)
+  }
   return {
     type: ISOLATE_ASSET,
     payload: id,

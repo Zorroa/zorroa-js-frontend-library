@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import ReactDOMServer from 'react-dom/server'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 
 import Asset, { minimalUniqueFieldTitle } from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
@@ -60,6 +61,9 @@ class AssetsTable extends Component {
 
     // connect actions
     actions: PropTypes.object,
+
+    // router props
+    history: PropTypes.object,
   }
 
   state = {
@@ -112,7 +116,7 @@ class AssetsTable extends Component {
   }
 
   isolateToLightbox = asset => {
-    this.props.actions.isolateAssetId(asset.id)
+    this.props.actions.isolateAssetId(asset.id, this.props.history)
   }
 
   // light wrapper around Assets.select(); just make sure we don't scroll
@@ -437,7 +441,7 @@ class AssetsTable extends Component {
   }
 }
 
-export default connect(
+const ConnectedAssetsTable = connect(
   state => ({
     assets: state.assets.all,
     assetsCounter: state.assets.assetsCounter,
@@ -474,3 +478,5 @@ export default connect(
     ),
   }),
 )(AssetsTable)
+
+export default withRouter(ConnectedAssetsTable)
