@@ -366,6 +366,7 @@ class Explorer extends Component {
       'double',
       'integer',
       'date',
+      'path',
     ]
     const isLeaf = this.isLeaf(field, namespace)
     const isSortable =
