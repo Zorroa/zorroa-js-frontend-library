@@ -1,6 +1,7 @@
 import * as assert from 'assert'
 
 import Proxy from './Proxy'
+import Timecode from '../services/Timecode'
 
 export default class Asset {
   constructor({ id, score, document }) {
@@ -174,7 +175,8 @@ export default class Asset {
     // start frame for this clip -- >= 0
     if (this.isOfType('video')) {
       if (this.isClip()) {
-        return this.document.media.clip.start
+        const time = new Timecode(this.document.media.frameRate)
+        return time.timeToFrames(this.document.media.clip.start)
       }
       return 0
     }
@@ -182,7 +184,10 @@ export default class Asset {
   stopFrame() {
     // stop frame for this clip -- <= frames()
     if (this.isOfType('video')) {
-      if (this.isClip()) return this.document.media.clip.stop
+      if (this.isClip()) {
+        const time = new Timecode(this.document.media.frameRate)
+        return time.timeToFrames(this.document.media.clip.stop)
+      }
       return this.document.media && this.document.media.frames - 1
     }
   }
