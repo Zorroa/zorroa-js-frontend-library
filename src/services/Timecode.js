@@ -10,7 +10,7 @@ export default function Timecode(frameRate) {
     let dropFrames = 0
 
     if (this.frameRate.toFixed(2) === '29.98') {
-      dropFrames = 42
+      dropFrames = 2
     }
 
     if (this.frameRate.toFixed(2) === '59.94') {
