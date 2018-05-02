@@ -49,7 +49,6 @@ import Job from '../../models/Job'
 import Asset from '../../models/Asset'
 import Folder from '../../models/Folder'
 import CommandProgress from '../Workspace/CommandProgress'
-import Lightbox from '../Lightbox'
 import Quickview from '../Quickview'
 import Exports from '../Exports'
 import Feedback from '../Feedback'
@@ -618,7 +617,6 @@ class Workspace extends Component {
           </div>
         */}
 
-        {isolatedId && showQuickview === false && <Lightbox />}
         {isolatedId && showQuickview === true && <Quickview />}
         {showExportsWizard && <Exports />}
         {showPreferencesModal && <Preferences user={user} />}

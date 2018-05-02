@@ -143,6 +143,7 @@ class Thumb extends Component {
 
     this.shuttler = new PubSub()
     this.status = new PubSub()
+    this.wasDoubleClickIntercepted = false
 
     this.status.on('started', videoStarted => {
       if (this.state.videoStarted && !videoStarted)
@@ -321,16 +322,33 @@ class Thumb extends Component {
     return this.props.asset.mediaType() !== 'zorroa/x-flipbook'
   }
 
+  onClick = event => {
+    const timeout = this.props.isSelected ? 400 : 0
+    setTimeout(() => {
+      const shouldHandleSingleClick = this.wasDoubleClickIntercepted === false
+      this.wasDoubleClickIntercepted = false
+
+      if (shouldHandleSingleClick) {
+        this.props.onClick(event)
+      }
+    }, timeout)
+  }
+
+  onDoubleClick = event => {
+    this.wasDoubleClickIntercepted = true
+    this.props.onDoubleClick(event)
+  }
+
   render() {
     const {
       pages,
       isSelected,
-      onClick,
-      onDoubleClick,
       dragparams,
       parentTotals,
       unfilteredParentTotals,
     } = this.props
+    const onDoubleClick = this.onDoubleClick
+    const onClick = this.onClick
     const { width, height, x, y } = this.props.dim // Original thumb rect
     if (!width || !height) return null
 

@@ -37,10 +37,12 @@ class Lightbox extends Component {
       lightboxMetadata: PropTypes.func.isRequired,
       isolateAssetId: PropTypes.func.isRequired,
     }),
+    history: PropTypes.object,
   }
 
   @keydown('esc')
   closeLightbox(event) {
+    this.props.history.goBack()
     this.props.actions.isolateAssetId()
   }
 
