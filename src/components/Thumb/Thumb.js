@@ -87,6 +87,7 @@ ImageThumb.propTypes = {
 @DragSource('ASSET', source)
 class Thumb extends Component {
   static propTypes = {
+    parentWidth: PropTypes.number.isRequired,
     // Rendering properties
     dim: PropTypes.shape({
       width: PropTypes.number.isRequired,
@@ -274,13 +275,23 @@ class Thumb extends Component {
 
     if (!pageBadge && !iconBadge) return {}
 
+    const position = this.props.dim.x / this.props.parentWidth
+    const thumbIconStyle = {
+      right: position > 0.5 ? '5px' : undefined,
+      left: position <= 0.5 ? '5px' : undefined,
+    }
+
     return {
       parentURL,
       badges: (
         <div
           className={classnames('Thumb-badges', { small: badgeHeight < 25 })}>
           {pageBadge ? <div className="Thumb-pages">{pageBadge}</div> : null}
-          {iconBadge ? <div className="Thumb-icon">{iconBadge}</div> : null}
+          {iconBadge ? (
+            <div className="Thumb-icon" style={thumbIconStyle}>
+              {iconBadge}
+            </div>
+          ) : null}
         </div>
       ),
     }

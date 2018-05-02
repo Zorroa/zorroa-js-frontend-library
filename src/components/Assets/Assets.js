@@ -771,6 +771,7 @@ class Assets extends Component {
                     <Thumb
                       isSelected={selectedIds && selectedIds.has(asset.id)}
                       dim={dim}
+                      parentWidth={this.refs.assetsScroll.clientWidth}
                       key={asset.id}
                       asset={asset}
                       assetId={asset.id}
