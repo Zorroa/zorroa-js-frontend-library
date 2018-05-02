@@ -53,41 +53,12 @@ class Lightbar extends Component {
   }
 
   onDownload = () => {
-    const { asset, origin } = this.props
+    const { asset } = this.props
     const { source } = asset.document
     const { mediaType, filename } = source
     const options = {
       format: 'blob',
     }
-
-    if (asset.clipType() === 'flipbook') {
-      api.flipbook
-        .get(asset.parentId())
-        .then(assets => {
-          return Promise.all(
-            assets.map(childAsset => {
-              const imageUrl = childAsset.url(origin)
-              return getImage(imageUrl, options).then(image => ({
-                image,
-                ...childAsset,
-              }))
-            }),
-          )
-        })
-        .then(assetImages => {
-          assetImages.forEach((assetImage, index) => {
-            setTimeout(() => {
-              downloadjs(
-                assetImage.image,
-                assetImage.document.source.filename,
-                assetImage.document.source.mediaType,
-              )
-            }, index * 1000)
-          })
-        })
-      return
-    }
-
     getImage(this.isolatedAssetURL(), options).then(image => {
       downloadjs(image, filename, mediaType)
     })
