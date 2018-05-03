@@ -75,7 +75,6 @@ export default class Sidebar extends Component {
         className={classnames('Sidebar', { isOpen, isRightEdge, isIconified })}>
         {!isRightEdge && <div className="Workspace-sidebar-spacer" />}
         <div
-          style={{ minWidth: width }}
           className={classnames('scroller', { isRightEdge })}
           onClick={this.toggleIfNotIconified}>
           {children}
