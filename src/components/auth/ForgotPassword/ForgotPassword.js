@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
-
+import { withRouter } from 'react-router-dom'
 import Logo from '../../Logo'
 import User from '../../../models/User'
 import { isValidEmail } from '../../../services/jsUtil'
@@ -13,6 +13,9 @@ class ForgotPassword extends Component {
     user: PropTypes.instanceOf(User),
     error: PropTypes.string,
     actions: PropTypes.object,
+    history: PropTypes.shape({
+      goBack: PropTypes.func.isRequired,
+    }),
   }
 
   state = {
@@ -39,7 +42,7 @@ class ForgotPassword extends Component {
   }
 
   cancel = event => {
-    this.context.router.push('/')
+    this.props.history.goBack()
   }
 
   submit = event => {
@@ -88,7 +91,7 @@ class ForgotPassword extends Component {
   }
 }
 
-export default connect(
+const ConnectedForgotPassword = connect(
   state => ({
     user: state.auth.user,
     error: state.auth.error,
@@ -97,3 +100,5 @@ export default connect(
     actions: bindActionCreators({ forgotPassword, authError }, dispatch),
   }),
 )(ForgotPassword)
+
+export default withRouter(ConnectedForgotPassword)

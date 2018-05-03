@@ -63,6 +63,11 @@
       "from": "decamelize@https://registry.npmjs.org/decamelize/-/decamelize-1.2.0.tgz",
       "resolved": "https://registry.npmjs.org/decamelize/-/decamelize-1.2.0.tgz"
     },
+    "decode-uri-component": {
+      "version": "0.2.0",
+      "from": "decode-uri-component@>=0.2.0 <0.3.0",
+      "resolved": "https://registry.npmjs.org/decode-uri-component/-/decode-uri-component-0.2.0.tgz"
+    },
     "dom-helpers": {
       "version": "3.3.1",
       "from": "dom-helpers@>=3.2.0 <4.0.0",
@@ -618,6 +623,11 @@
       "version": "15.6.1",
       "from": "prop-types@>=15.5.6 <16.0.0",
       "resolved": "https://registry.npmjs.org/prop-types/-/prop-types-15.6.1.tgz"
+    },
+    "query-string": {
+      "version": "6.1.0",
+      "from": "query-string@latest",
+      "resolved": "https://registry.npmjs.org/query-string/-/query-string-6.1.0.tgz"
     },
     "react": {
       "version": "15.6.2",
@@ -1826,6 +1836,11 @@
       "version": "1.0.5",
       "from": "setimmediate@>=1.0.5 <2.0.0",
       "resolved": "https://registry.npmjs.org/setimmediate/-/setimmediate-1.0.5.tgz"
+    },
+    "strict-uri-encode": {
+      "version": "2.0.0",
+      "from": "strict-uri-encode@>=2.0.0 <3.0.0",
+      "resolved": "https://registry.npmjs.org/strict-uri-encode/-/strict-uri-encode-2.0.0.tgz"
     },
     "ua-parser-js": {
       "version": "0.7.17",

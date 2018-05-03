@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 
 import { resetPassword } from '../../../actions/authAction'
 
@@ -8,6 +9,9 @@ class Onboard extends Component {
   static propTypes = {
     location: PropTypes.object,
     actions: PropTypes.object,
+    history: PropTypes.shape({
+      goBack: PropTypes.func.isRequired,
+    }),
   }
 
   static get contextTypes() {
@@ -36,7 +40,7 @@ class Onboard extends Component {
       this.props.location.query &&
       this.props.location.query.source
     this.props.actions.resetPassword(password, token, origin, source)
-    this.context.router.push('/')
+    this.props.history.goBack()
   }
 
   render() {
@@ -44,7 +48,7 @@ class Onboard extends Component {
   }
 }
 
-export default connect(
+const ConnectedOnboard = connect(
   () => ({}),
   dispatch => ({
     actions: bindActionCreators(
@@ -55,3 +59,5 @@ export default connect(
     ),
   }),
 )(Onboard)
+
+export default withRouter(ConnectedOnboard)

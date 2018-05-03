@@ -1,7 +1,8 @@
 import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-
+import { withRouter } from 'react-router-dom'
+import qs from 'query-string'
 import ChangePassword from '../ChangePassword'
 import { resetPassword } from '../../../actions/authAction'
 
@@ -10,6 +11,9 @@ class ResetPassword extends Component {
     actions: PropTypes.object,
     error: PropTypes.string,
     location: PropTypes.object,
+    history: PropTypes.shape({
+      goBack: PropTypes.func.isRequired,
+    }),
   }
 
   static get contextTypes() {
@@ -19,16 +23,13 @@ class ResetPassword extends Component {
   }
 
   changePassword = password => {
-    const token =
-      this.props.location &&
-      this.props.location.query &&
-      this.props.location.query.token
+    const token = qs.parse(this.props.location.search).token
     const origin = window.location.origin
     this.props.actions.resetPassword(password, token, origin)
   }
 
   cancel = event => {
-    this.context.router.push('/')
+    this.props.history.goBack()
   }
 
   render() {
@@ -42,7 +43,7 @@ class ResetPassword extends Component {
   }
 }
 
-export default connect(
+const ConnectedResetPassword = connect(
   state => ({
     error: state.auth.error,
   }),
@@ -55,3 +56,5 @@ export default connect(
     ),
   }),
 )(ResetPassword)
+
+export default withRouter(ConnectedResetPassword)
