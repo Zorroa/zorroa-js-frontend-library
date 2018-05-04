@@ -13,6 +13,8 @@ import {
   CREATE_TAXONOMY,
   DELETE_TAXONOMY,
   UPDATE_FOLDER_PERMISSIONS,
+  GET_FOLDER_BY_ID,
+  GET_FOLDER_BY_ID_SUCCESS,
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import {
@@ -24,6 +26,7 @@ import {
 } from './authAction'
 import { restoreFolders } from './racetrackAction'
 import { selectId } from '../services/jsUtil'
+import api from '../api'
 
 const rootEndpoint = '/api/v1/folders'
 
@@ -34,6 +37,34 @@ export function toggleFolder(folderId, isOpen) {
       type: TOGGLE_FOLDER,
       payload: { folderId, isOpen },
     })
+  }
+}
+
+export function getFolderById(folderId) {
+  return dispatch => {
+    dispatch({
+      type: GET_FOLDER_BY_ID,
+      payload: { folderId },
+    })
+
+    api.folders.getById(folderId).then(
+      response => {
+        const { data } = response
+        dispatch({
+          type: GET_FOLDER_CHILDREN,
+          payload: {
+            parentId: response.parentId,
+            children: [response],
+          },
+        })
+      },
+      error => {
+        console.error(
+          `Unable to get folder by ID for folder ${folderId}`,
+          error,
+        )
+      },
+    )
   }
 }
 

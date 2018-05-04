@@ -5,7 +5,7 @@ import classnames from 'classnames'
 
 import TrashedFolder from '../../models/TrashedFolder'
 import { CollectionsWidgetInfo } from './WidgetInfo'
-import { selectFolderIds } from '../../actions/folderAction'
+import { selectFolderIds, getFolderById } from '../../actions/folderAction'
 import { restoreFolders } from '../../actions/racetrackAction'
 import Widget from './Widget'
 import Suggestions from '../Suggestions'
@@ -24,6 +24,7 @@ class Collections extends Component {
     isOpen: PropTypes.bool.isRequired,
     onOpen: PropTypes.func,
     floatBody: PropTypes.bool.isRequired,
+    queryFolderIds: PropTypes.array,
   }
 
   state = {
@@ -39,6 +40,7 @@ class Collections extends Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.selectedFolderIds && nextProps.selectedFolderIds.size) {
       const folders = [...this.state.folders]
+
       nextProps.selectedFolderIds.forEach(id => {
         if (folders.findIndex(folder => folder.id === id) < 0) {
           const folder = nextProps.folders.get(id)
@@ -46,6 +48,12 @@ class Collections extends Component {
         }
       })
       this.setState({ folders })
+
+      if (folders.length === 0 && Array.isArray(this.props.queryFolderIds)) {
+        this.props.queryFolderIds.forEach(folderId => {
+          this.props.actions.getFolderById(folderId)
+        })
+      }
     }
   }
 
@@ -229,12 +237,18 @@ export default connect(
     folders: state.folders.all,
     selectedFolderIds: state.folders.selectedFolderIds,
     trashedFolders: state.folders.trashedFolders,
+    queryFolderIds:
+      state.assets.query &&
+      state.assets.query.filter &&
+      state.assets.query.filter.links &&
+      state.assets.query.filter.links.folder,
   }),
   dispatch => ({
     actions: bindActionCreators(
       {
         selectFolderIds,
         restoreFolders,
+        getFolderById,
       },
       dispatch,
     ),
