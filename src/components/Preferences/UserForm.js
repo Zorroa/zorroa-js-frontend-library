@@ -101,7 +101,12 @@ class UserForm extends Component {
 
   getUnassignedPermissions() {
     const assignedPermissions = this.props.user.permissions
-    const availablePermissions = this.props.availablePermissions || []
+    const availablePermissions = (this.props.availablePermissions || []).filter(
+      permission => {
+        const isUserPermission = permission.fullName.search('user::') === 0
+        return isUserPermission === false
+      },
+    )
     const hasNoAssignedPermissions =
       assignedPermissions === undefined || assignedPermissions.length === 0
 
