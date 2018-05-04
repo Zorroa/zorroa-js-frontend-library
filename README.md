@@ -108,7 +108,7 @@ npm run dev-https
 
 Once the build is complete you can access the server at [https://localhost:8080](https://localhost:8080). 
 You'll need to connect to a live environment by filling out the "Archivist" field on the login page. Input the domain name 
-of a running environment (i.e. staging.pool.zorroa.com) and check the "SSL" box.
+of a running environment (i.e. staging.pool.zorroa.com or localhost:8066) and check the "SSL" box (assuming the archivist is using TLS).
 
 
 #### Remote debugging
