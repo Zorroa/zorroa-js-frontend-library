@@ -362,9 +362,7 @@ class Exports extends Component {
       this.props.actions.exportRequest({
         folderId,
         type: 'Export',
-        comment: `${fullName} (${email}) has requested an export of "${
-          this.props.packageName
-        }" (folder ID: ${folderId}).`,
+        comment: `Use the button below to view the folder. If you approve please export the folder for ${fullName}.`,
         emailCC: email,
       })
 
