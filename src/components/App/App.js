@@ -7,6 +7,7 @@ import ResetPassword from '../auth/ResetPassword'
 import ForgotPassword from '../auth/ForgotPassword'
 import Workspace from '../Workspace'
 import Lightbox from '../Lightbox'
+import FolderRedirect from '../FolderRedirect'
 import RequireAuth from '../RequireAuth'
 
 import {
@@ -45,6 +46,7 @@ class App extends Component {
         <div>
           <RequireAuth exact path="/" component={Workspace} />
           <RequireAuth path="/asset/:isolatedId" component={Lightbox} />
+          <RequireAuth path="/folder/:folderId" component={FolderRedirect} />
           <Route path="/signin" component={Signin} />
           <Route path="/signout" component={Signout} />
           <Route path="/forgot" component={ForgotPassword} />
