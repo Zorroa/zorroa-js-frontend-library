@@ -4,7 +4,7 @@ import foldersReducer, {
 } from './foldersReducer'
 import {
   GET_FOLDER_CHILDREN,
-  CREATE_FOLDER,
+  CREATE_FOLDER_SUCCESS,
   UPDATE_FOLDER,
   DELETE_FOLDER,
   TOGGLE_FOLDER,
@@ -75,7 +75,7 @@ describe('foldersReducer', () => {
     ).toEqual({ selectedFolderIds })
   })
 
-  it('CREATE_FOLDER adds a new folder', () => {
+  it('CREATE_FOLDER_SUCCESS adds a new folder', () => {
     const foo = new Folder({ id: folderId1, name: 'Foo', parentId: folderId0 })
     let afterState = createInitialState()
     afterState.all.set(foo.id, foo)
@@ -83,7 +83,10 @@ describe('foldersReducer', () => {
     afterState.all.get(folderId0).childCount = 1
     afterState.modifiedIds = new Set([folderId1])
     expect(
-      foldersReducer(initialState, { type: CREATE_FOLDER, payload: foo }),
+      foldersReducer(initialState, {
+        type: CREATE_FOLDER_SUCCESS,
+        payload: foo,
+      }),
     ).toEqual(afterState)
   })
 
@@ -95,7 +98,7 @@ describe('foldersReducer', () => {
     afterState.all.get(folderId0).childIds = new Set([folderId1])
     afterState.all.get(folderId0).childCount = 1
     const nextState = foldersReducer(initialState, {
-      type: CREATE_FOLDER,
+      type: CREATE_FOLDER_SUCCESS,
       payload: foo,
     })
     let finalState = createInitialState()

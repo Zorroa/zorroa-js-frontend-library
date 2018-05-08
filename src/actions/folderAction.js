@@ -2,6 +2,8 @@ import {
   GET_FOLDER_CHILDREN,
   SELECT_FOLDERS,
   CREATE_FOLDER,
+  CREATE_FOLDER_SUCCESS,
+  CREATE_FOLDER_ERROR,
   UPDATE_FOLDER,
   DELETE_FOLDER,
   TOGGLE_FOLDER,
@@ -14,7 +16,6 @@ import {
   DELETE_TAXONOMY,
   UPDATE_FOLDER_PERMISSIONS,
   GET_FOLDER_BY_ID,
-  GET_FOLDER_BY_ID_SUCCESS,
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import {
@@ -135,12 +136,18 @@ export function selectFolderId(id, shiftKey, metaKey, folders, selectedIds) {
 
 export function createFolder(folder, assetIds) {
   return dispatch => {
-    console.log('Create folder: ' + JSON.stringify(folder))
+    dispatch({
+      type: CREATE_FOLDER,
+      payload: {
+        folder,
+        assetIds,
+      },
+    })
     archivistPost(dispatch, `${rootEndpoint}`, folder)
       .then(response => {
         const folder = new Folder(response.data)
         dispatch({
-          type: CREATE_FOLDER,
+          type: CREATE_FOLDER_SUCCESS,
           payload: folder,
         })
         if (assetIds) {
@@ -149,7 +156,12 @@ export function createFolder(folder, assetIds) {
         }
       })
       .catch(error => {
-        console.error('Error creating folder ' + folder.name + ': ' + error)
+        dispatch({
+          type: CREATE_FOLDER_ERROR,
+          payload: {
+            error: error.response.data,
+          },
+        })
       })
   }
 }
@@ -315,28 +327,29 @@ export function countAssetsInFolderIds(ids, search) {
 
 function createDyHiProm(dispatch, folder, levels) {
   const folderId = folder.id
-  console.log(
-    'Create dyhi inside folder id ' + folderId,
-    ' with ' + JSON.stringify(levels),
-  )
+  dispatch({
+    type: CREATE_FOLDER,
+    payload: {
+      folder,
+    },
+  })
+
   return archivistPost(dispatch, '/api/v1/dyhi', { folderId, levels })
     .then(response => {
       folder.dyhiId = response.data.id
       folder.childCount = 1 // Force loadChildren
       dispatch({
-        type: CREATE_FOLDER,
+        type: CREATE_FOLDER_SUCCESS,
         payload: folder,
       })
     })
     .catch(error => {
-      console.error(
-        'Error creating dyhi for ' +
-          folder.id +
-          ' with ' +
-          JSON.stringify(levels) +
-          ': ' +
-          error,
-      )
+      dispatch({
+        type: CREATE_FOLDER_ERROR,
+        payload: {
+          error: error.response.data,
+        },
+      })
     })
 }
 

@@ -2,6 +2,8 @@ import {
   GET_FOLDER_CHILDREN,
   SELECT_FOLDERS,
   CREATE_FOLDER,
+  CREATE_FOLDER_SUCCESS,
+  CREATE_FOLDER_ERROR,
   UPDATE_FOLDER,
   DELETE_FOLDER,
   ADD_ASSETS_TO_FOLDER,
@@ -55,6 +57,9 @@ export var createInitialState = () => ({
 
   // Id of active drop target, set by FolderItem for display in Folders of active section
   dropFolderId: -1,
+
+  isCreatingFolder: false,
+  isCreatingFolderError: undefined,
 })
 export const initialState = createInitialState()
 
@@ -103,7 +108,22 @@ export default function(state = initialState, action) {
     }
 
     case CREATE_FOLDER: {
+      const isCreatingFolder = true
+      const isCreatingFolderError = undefined
+      return { ...state, isCreatingFolder, isCreatingFolderError }
+    }
+
+    case CREATE_FOLDER_ERROR: {
+      const isCreatingFolder = false
+      const isCreatingFolderError = action.payload.error
+      return { ...state, isCreatingFolder, isCreatingFolderError }
+    }
+
+    case CREATE_FOLDER_SUCCESS: {
       const folder = action.payload
+      const isCreatingFolder = false
+      const isCreatingFolderError = undefined
+
       if (folder.id) {
         folder.childIds = new Set() // new folder has no children
         let all = new Map(state.all) // copy folder map
@@ -130,7 +150,14 @@ export default function(state = initialState, action) {
         }
         const modifiedIds = new Set(state.modifiedIds)
         _addAncestorIds(folder, modifiedIds, state.all)
-        return { ...state, all, openFolderIds, modifiedIds }
+        return {
+          ...state,
+          all,
+          openFolderIds,
+          modifiedIds,
+          isCreatingFolder,
+          isCreatingFolderError,
+        }
       }
       break
     }

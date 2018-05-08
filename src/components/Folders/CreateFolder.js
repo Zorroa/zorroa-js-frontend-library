@@ -7,6 +7,7 @@ import { hideModal } from '../../actions/appActions'
 import User from '../../models/User'
 import AclEntry from '../../models/Acl'
 import AclEditor from '../AclEditor'
+import FlashMessage from '../FlashMessage'
 
 class CreateFolder extends Component {
   static propTypes = {
@@ -35,6 +36,10 @@ class CreateFolder extends Component {
     isAdministrator: PropTypes.bool,
     uxLevel: PropTypes.number,
     actions: PropTypes.object.isRequired,
+    isCreatingFolder: PropTypes.bool.isRequired,
+    isCreatingFolderError: PropTypes.shape({
+      message: PropTypes.string.isRequired,
+    }),
   }
 
   state = {
@@ -42,6 +47,30 @@ class CreateFolder extends Component {
     acl: this.props.acl,
     includeSelectedAssets: this.props.includeAssets,
     mode: 'Search', // 'Search', 'Hierarchy'
+    createFolderErrorMessage: '',
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const finishedCreatingFolder =
+      this.props.isCreatingFolder === true &&
+      nextProps.isCreatingFolder === false
+    if (
+      finishedCreatingFolder &&
+      nextProps.isCreatingFolderError !== undefined
+    ) {
+      const createFolderErrorMessage =
+        nextProps.isCreatingFolderError.message || 'Unable to create folder'
+      this.setState({
+        createFolderErrorMessage,
+      })
+    }
+
+    if (
+      finishedCreatingFolder &&
+      nextProps.isCreatingFolderError === undefined
+    ) {
+      this.props.actions.hideModal()
+    }
   }
 
   changeName = event => {
@@ -92,9 +121,10 @@ class CreateFolder extends Component {
         ? assetIds
         : mode === 'Hierarchy' ? dyhiLevels : mode
       this.props.onCreate(name, acl, assetsOrDyhis)
-      this.props.actions.hideModal()
     } else {
-      console.error('Cannot determine permissions to create folder ' + name)
+      const createFolderErrorMessage =
+        'Cannot determine permissions to create folder ' + name
+      this.setState({ createFolderErrorMessage })
     }
   }
 
@@ -207,6 +237,11 @@ class CreateFolder extends Component {
             />
           </div>
           <div className="CreateFolder-body">
+            {this.state.createFolderErrorMessage && (
+              <FlashMessage look="error">
+                {this.state.createFolderErrorMessage}
+              </FlashMessage>
+            )}
             {name !== null &&
               name !== undefined && (
                 <input
@@ -282,6 +317,8 @@ export default connect(
     isManager: state.auth.isManager,
     isAdministrator: state.auth.isAdministrator,
     uxLevel: state.app.uxLevel,
+    isCreatingFolder: state.folders.isCreatingFolder,
+    isCreatingFolderError: state.folders.isCreatingFolderError,
   }),
   dispatch => ({
     actions: bindActionCreators({ hideModal }, dispatch),
