@@ -19,6 +19,7 @@ import {
   showPreferencesModal,
 } from '../../actions/appActions'
 import { archivistBaseURL, saveUserSettings } from '../../actions/authAction'
+import { archivistInfo } from '../../actions/archivistAction'
 import {
   selectAssetIds,
   findSimilarFields,
@@ -53,13 +54,21 @@ class Header extends Component {
       findSimilarFields: PropTypes.func.isRequired,
       resetRacetrackWidgets: PropTypes.func.isRequired,
       showPreferencesModal: PropTypes.func.isRequired,
+      archivistInfo: PropTypes.func.isRequired,
     }),
     widgets: PropTypes.arrayOf(PropTypes.object),
+    signoutUrl: PropTypes.string.isRequired,
   }
 
   state = {
     similarField: '',
     isSelectedHashValid: false,
+  }
+
+  componentWillMount() {
+    if (!this.props.archivistInfo) {
+      this.props.actions.archivistInfo()
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -290,6 +299,7 @@ class Header extends Component {
       loadedCount,
       selectedIds,
       monochrome,
+      signoutUrl,
     } = this.props
     const baseURL = archivistBaseURL()
 
@@ -405,7 +415,7 @@ class Header extends Component {
               )}
               <Link
                 className="header-menu-item header-menu-logout"
-                to="/signout">
+                to={signoutUrl}>
                 Logout
               </Link>
             </DropdownMenu>
@@ -420,25 +430,41 @@ class Header extends Component {
 }
 
 export default connect(
-  state => ({
-    sync: state.auth.sync,
-    user: state.auth.user,
-    isDeveloper: state.auth.isDeveloper,
-    isAdministrator: state.auth.isAdministrator,
-    monochrome: state.app.monochrome,
-    assets: state.assets.all,
-    selectedIds: state.assets.selectedIds,
-    totalCount: state.assets.totalCount,
-    loadedCount: state.assets.loadedCount,
-    assetFields: state.assets.fields,
-    similarFields: state.assets.similarFields,
-    similarMinScore: state.racetrack.similarMinScore,
-    userSettings: state.app.userSettings,
-    widgets: state.racetrack.widgets,
-  }),
+  state => {
+    const info = state.archivist.info || {}
+    const archivistPlugins = info['archivist-plugins'] || []
+    const hasSaml = archivistPlugins.some(
+      plugin => plugin.search('saml-') === 0,
+    )
+    let signoutUrl = '/signout'
+
+    if (hasSaml) {
+      signoutUrl = '/saml/logout?local=true'
+    }
+
+    return {
+      sync: state.auth.sync,
+      user: state.auth.user,
+      isDeveloper: state.auth.isDeveloper,
+      isAdministrator: state.auth.isAdministrator,
+      monochrome: state.app.monochrome,
+      assets: state.assets.all,
+      selectedIds: state.assets.selectedIds,
+      totalCount: state.assets.totalCount,
+      loadedCount: state.assets.loadedCount,
+      assetFields: state.assets.fields,
+      similarFields: state.assets.similarFields,
+      similarMinScore: state.racetrack.similarMinScore,
+      userSettings: state.app.userSettings,
+      widgets: state.racetrack.widgets,
+      archivistInfo: state.archivist.info,
+      signoutUrl,
+    }
+  },
   dispatch => ({
     actions: bindActionCreators(
       {
+        archivistInfo,
         showModal,
         hideModal,
         selectAssetIds,
