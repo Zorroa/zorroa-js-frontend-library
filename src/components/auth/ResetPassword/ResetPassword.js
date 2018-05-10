@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import qs from 'query-string'
+import domUtils from '../../../services/domUtils'
 import ChangePassword from '../ChangePassword'
 import { resetPassword } from '../../../actions/authAction'
 
@@ -23,7 +23,7 @@ class ResetPassword extends Component {
   }
 
   changePassword = password => {
-    const token = qs.parse(this.props.location.search).token
+    const token = domUtils.parseQueryString(this.props.location.search).token
     const origin = window.location.origin
     this.props.actions.resetPassword(password, token, origin)
   }
