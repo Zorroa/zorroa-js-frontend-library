@@ -101,6 +101,7 @@ class Workspace extends Component {
     monochrome: PropTypes.bool,
     showQuickview: PropTypes.bool.isRequired,
     showExportsWizard: PropTypes.bool,
+    showPreferencesModal: PropTypes.bool,
   }
 
   state = {
@@ -284,7 +285,6 @@ class Workspace extends Component {
 
   static collapsibleNames = new Set([
     'library',
-    'home',
     'simple',
     'smart',
     'explorer',
@@ -434,20 +434,12 @@ class Workspace extends Component {
     } = this.props
 
     const LibraryParams = () => ({
-      header: <span>Library</span>,
+      header: <span>Collections</span>,
       isOpen: app.collapsibleOpen.library,
       isIconified: app.leftSidebarIsIconified,
       onOpen: this.toggleCollapsible.bind(this, 'library'),
       closeIcon: 'icon-library',
-      className: 'Library-collapsible Collections-library',
-    })
-    const HomeParams = () => ({
-      header: <span>Home</span>,
-      isOpen: app.collapsibleOpen.home,
-      isIconified: app.leftSidebarIsIconified,
-      onOpen: this.toggleCollapsible.bind(this, 'home'),
-      closeIcon: 'icon-bookmarks',
-      className: 'Home-collapsible Collections-home',
+      className: 'Library-collapsible',
     })
     const ExplorerParams = () => ({
       header: <span>Explore</span>,
@@ -525,18 +517,7 @@ class Workspace extends Component {
             onToggle={this.toggleLeftSidebar}
             isIconified={app.leftSidebarIsIconified}>
             <Collapsible {...LibraryParams()}>
-              <Folders
-                rootName={isAdministrator ? undefined : 'Library'}
-                rootId={isAdministrator ? Folder.ROOT_ID : undefined}
-                filter={
-                  isAdministrator
-                    ? undefined
-                    : folder => folder.name !== 'Users'
-                }
-              />
-            </Collapsible>
-            <Collapsible {...HomeParams()}>
-              <Folders rootId={user.homeFolderId} />
+              <Folders canAddFolder={true} />
             </Collapsible>
             <Collapsible {...ExplorerParams()}>
               <Explorer />

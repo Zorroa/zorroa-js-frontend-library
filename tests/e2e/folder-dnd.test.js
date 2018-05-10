@@ -60,24 +60,24 @@ describe('Folder dnd', function () {
   var emptyTrash = function () {
     return driver
     .then(_ => { DEBUG && console.log('Check the trash and empty') })
-    .then(_ => selenium.getSelectorVisible(By.css('.Home-collapsible .Trash')))
+    .then(_ => selenium.getSelectorVisible(By.css('.Library-collapsible .Trash')))
     .then(trashVisible => {
       if (!trashVisible) return driver.then(_ => { DEBUG && console.log('no trash to empty 1') })
-      return selenium.getSelectorVisible(By.css('.Home-collapsible .Trash-body'))
+      return selenium.getSelectorVisible(By.css('.Library-collapsible .Trash-body'))
       .then(trashBodyVisible => {
         DEBUG && console.log('trashBodyVisible = ' + trashBodyVisible)
-        if (!trashBodyVisible) return selenium.clickSelector(By.css('.Home-collapsible .Trash-toggle'))
+        if (!trashBodyVisible) return selenium.clickSelector(By.css('.Library-collapsible .Trash-toggle'))
       })
       .then(_ => { DEBUG && console.log('opened trash') })
-      .then(_ => selenium.getSelectorVisible(By.css('.Home-collapsible .Trash-empty')))
+      .then(_ => selenium.getSelectorVisible(By.css('.Library-collapsible .Trash-empty')))
       .then(trashEmptyVisible => {
         if (!trashEmptyVisible) return driver.then(_ => { DEBUG && console.log('no trash to empty 2') })
         return driver
         .then(_ => { DEBUG && console.log('emptying trash') })
-        .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Home-collapsible .Trash-empty'), 5000))
-        .then(_ => selenium.clickSelector(By.css('.Home-collapsible .Trash-empty')))
+        .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Library-collapsible .Trash-empty'), 5000))
+        .then(_ => selenium.clickSelector(By.css('.Library-collapsible .Trash-empty')))
         .then(_ => selenium.waitForIdle(15000))
-        .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Home-collapsible .Trash'), 5000))
+        .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.Library-collapsible .Trash'), 5000))
       })
     })
   }
@@ -85,12 +85,12 @@ describe('Folder dnd', function () {
   // open the home panel if not already open
   var openHomePanel = function () {
     return driver.then(_ => { DEBUG && console.log('open the home panel') })
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Home-collapsible'), 5000))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Library-collapsible'), 5000))
     .then(_ => selenium.waitForIdle())
-    .then(_ => selenium.doesSelectorHaveClass(By.css('.Home-collapsible'), 'isOpen'))
+    .then(_ => selenium.doesSelectorHaveClass(By.css('.Library-collapsible'), 'isOpen'))
       .then(isOpen => {
         if (!isOpen) {
-          driver.then(_ => selenium.clickSelector(By.css('.Home-collapsible')))
+          driver.then(_ => selenium.clickSelector(By.css('.Library-collapsible')))
           driver.then(_ => selenium.waitForIdle())
         }
         // wait until some folders appear
@@ -181,7 +181,7 @@ describe('Folder dnd', function () {
       .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.FolderItem-context-remove-folder')))
       .then(_ => selenium.clickSelector(By.css('.FolderItem-context-remove-folder')))
       .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.FolderItem-context-remove-folder'), 5000))
-      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Home-collapsible .Trash'), 15000))
+      .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Library-collapsible .Trash'), 15000))
   })
 
   it('add & remove assets + dnd', function () {
@@ -386,7 +386,7 @@ describe('Folder dnd', function () {
     .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.FolderItem-context-remove-folder')))
     .then(_ => selenium.clickSelector(By.css('.FolderItem-context-remove-folder')))
     .then(_ => selenium.waitForSelectorVisibleToBe(false, By.css('.FolderItem-context-remove-folder'), 5000))
-    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Home-collapsible .Trash'), 15000))
+    .then(_ => selenium.waitForSelectorVisibleToBe(true, By.css('.Library-collapsible .Trash'), 15000))
   })
 
   it('empty trash', function () {

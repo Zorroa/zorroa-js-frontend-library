@@ -52,6 +52,7 @@ class Folders extends Component {
     rootId: PropTypes.string,
     rootName: PropTypes.string,
     filter: PropTypes.func,
+    canAddFolder: PropTypes.bool,
     onSelect: PropTypes.func,
 
     dragInfo: PropTypes.object,
@@ -401,7 +402,7 @@ class Folders extends Component {
   }
 
   createFolder = (name, acl, assetIds) => {
-    const parentId = this.state.rootId
+    const parentId = this.props.user.homeFolderId
     const folder = new Folder({ name, parentId, acl })
     this.props.actions.createFolder(folder, assetIds)
   }
@@ -608,7 +609,7 @@ class Folders extends Component {
   }
 
   render() {
-    const { folders, user, query } = this.props
+    const { folders, query, canAddFolder } = this.props
     const { filterString, rootId } = this.state
     const rootLoaded = folders.all.has(rootId)
     if (!rootLoaded) return null
@@ -651,8 +652,6 @@ class Folders extends Component {
 
     const dragHover = folders.dropFolderId === rootId
     const isDropTarget = this.isDropTarget()
-    const root = folders.all.get(rootId)
-    const canAddFolder = root && root.id === user.homeFolderId
     const cannotAddError = this.cannotAddFolderReason()
     return (
       <div className={classnames('Folders', { isDropTarget, dragHover })}>
@@ -682,7 +681,7 @@ class Folders extends Component {
                 })}
                 title={cannotAddError || 'Create a new folder'}
                 onClick={!cannotAddError && this.addFolder}>
-                <span className="icon-collections-add" />
+                <span className="icon-folder-add" />
                 <div className="Folders-controls-add-label">NEW</div>
               </div>
             )}
