@@ -431,16 +431,8 @@ class Header extends Component {
 
 export default connect(
   state => {
-    const info = state.archivist.info || {}
-    const archivistPlugins = info['archivist-plugins'] || []
-    const hasSaml = archivistPlugins.some(
-      plugin => plugin.search('saml-') === 0,
-    )
-    let signoutUrl = '/signout'
-
-    if (hasSaml) {
-      signoutUrl = '/saml/logout?local=true'
-    }
+    const isLocalAuth = state.auth.source === 'local'
+    let signoutUrl = isLocalAuth ? '/signout' : '/saml/logout?local=true'
 
     return {
       sync: state.auth.sync,

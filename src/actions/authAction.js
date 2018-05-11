@@ -178,7 +178,14 @@ export function signinUser(username, password, origin) {
 
 function authorize(dispatch, json) {
   const user = new User(json)
-  dispatch({ type: AUTH_USER, payload: user })
+  const source = json.source
+  dispatch({
+    type: AUTH_USER,
+    payload: {
+      user,
+      source,
+    },
+  })
   localStorage.setItem(USER_ITEM, JSON.stringify(user))
   const metadata = json.settings && json.settings.metadata
 

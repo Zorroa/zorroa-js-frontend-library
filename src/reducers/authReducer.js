@@ -16,6 +16,7 @@ import Permission from '../models/Permission'
 
 const initialState = {
   sync: true,
+  source: 'local',
 }
 
 export default function(state = initialState, action) {
@@ -24,8 +25,9 @@ export default function(state = initialState, action) {
       return {
         ...state,
         error: '',
+        source: action.payload.source,
         authenticated: !!action.payload.id,
-        user: action.payload,
+        user: action.payload.user,
       }
     case UNAUTH_USER:
       return { ...state, authenticated: false }
