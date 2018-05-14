@@ -26,7 +26,7 @@ export default function(state = initialState, action) {
         ...state,
         error: '',
         source: action.payload.source,
-        authenticated: !!action.payload.id,
+        authenticated: !!action.payload.user.id,
         user: action.payload.user,
       }
     case UNAUTH_USER:
