@@ -628,7 +628,7 @@ class FolderItem extends Component {
                 className="FolderItem-context-item FolderItem-context-asset-permissions"
                 onContextMenu={this.dismissContextMenu}>
                 <div className="icon-link2" />
-                <div>Share Asset...</div>
+                <div>Asset Permissions...</div>
               </div>
             )}
           {singleFolderSelected &&
