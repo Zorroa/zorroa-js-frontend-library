@@ -324,6 +324,7 @@ class Thumb extends Component {
 
   onClick = event => {
     const timeout = this.props.isSelected ? 400 : 0
+    event.persist()
     setTimeout(() => {
       const shouldHandleSingleClick = this.wasDoubleClickIntercepted === false
       this.wasDoubleClickIntercepted = false
