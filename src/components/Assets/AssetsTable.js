@@ -330,6 +330,8 @@ class AssetsTable extends Component {
       selectedTableLayoutId,
     } = this.props
     if (!this.state.showSettings) return
+    const selectedLayoutHasWritePermission =
+      layout && layout.hasAccess(user, AclEntry.WriteAccess)
     const layoutActions = [
       {
         label: 'Duplicate',
@@ -346,8 +348,6 @@ class AssetsTable extends Component {
         }),
       },
     ]
-    const selectedLayoutHasWritePermission =
-      layout && layout.hasAccess(user, AclEntry.WriteAccess)
     const allFieldNames = []
     Object.keys(assetFields).forEach(type =>
       assetFields[type].forEach(field => allFieldNames.push(field)),
@@ -433,7 +433,7 @@ class AssetsTable extends Component {
           fieldOrderFn={this.fieldOrder}
           sortFieldFn={this.sortByField}
           elementFn={this.renderElement}>
-          {this.renderSettings(fields)}
+          {this.renderSettings(fields, layout)}
           {this.renderContextMenu(fields)}
         </Table>
       </div>
