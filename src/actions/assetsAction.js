@@ -44,7 +44,6 @@ export function requiredFields(fields, fieldTypes) {
   const prefix = ['links', 'clip', 'media', 'pages', 'proxies']
 
   const req = new Set()
-  req.add('*point')
   fieldTypes &&
     Object.keys(fieldTypes).forEach(field => {
       let addedPrefix = false
