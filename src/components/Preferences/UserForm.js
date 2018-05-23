@@ -5,9 +5,11 @@ import { connect } from 'react-redux'
 import './UserForm.scss'
 import Heading from '../Heading'
 import ListEditor from '../ListEditor'
+import FlashMessage from '../FlashMessage'
 import { FormInput, FormLabel, FormSelect, FormButton as Button } from '../Form'
 import Permission from '../../models/Permission'
 import { buildUser } from '../../actions/usersActions'
+import detectLoginSource from '../../services/detectLoginSource'
 
 const userShape = PropTypes.shape({
   id: PropTypes.string,
@@ -26,6 +28,7 @@ const userShape = PropTypes.shape({
 class UserForm extends Component {
   static propTypes = {
     authorizedUserId: PropTypes.number.isRequired,
+    loginSource: PropTypes.string.isRequired,
     user: userShape,
     isCreatingUser: PropTypes.bool.isRequired,
     availablePermissions: PropTypes.arrayOf(PropTypes.instanceOf(Permission)),
@@ -95,6 +98,10 @@ class UserForm extends Component {
     })
   }
 
+  isForeignUser() {
+    return detectLoginSource(this.props.user.source) !== 'local'
+  }
+
   isEditingOwnAccount() {
     return this.props.user.id === this.props.authorizedUserId
   }
@@ -145,6 +152,12 @@ class UserForm extends Component {
     return (
       <div className="UserForm">
         <form className="UserForm__form" onSubmit={this.onSubmit}>
+          {this.isForeignUser() && (
+            <FlashMessage look="warning">
+              This user account is managed by an external identity provider.
+              Certain fields are removed or are read-only.
+            </FlashMessage>
+          )}
           <Heading size="large" level="h2">
             {heading}
           </Heading>
@@ -155,7 +168,8 @@ class UserForm extends Component {
                 label="Email (used For username)"
                 className="UserForm__form-element">
                 <FormInput
-                  required
+                  required={!this.isForeignUser()}
+                  readOnly={this.isForeignUser()}
                   value={user.email}
                   type="email"
                   onChange={email => {
@@ -189,58 +203,62 @@ class UserForm extends Component {
               </FormLabel>
             </fieldset>
             <fieldset className="UserForm__field-group">
-              {this.isEditingOwnAccount() && (
-                <FormLabel
-                  vertical
-                  error={isPasswordChangeInvalid}
-                  label="Original Password"
-                  className="UserForm__form-element">
-                  <FormInput
-                    onChange={password => {
-                      this.onBuildEditableUser({ oldPassword: password })
-                    }}
-                    value={user.oldPassword}
+              {this.isForeignUser() === false && (
+                <div>
+                  {this.isEditingOwnAccount() && (
+                    <FormLabel
+                      vertical
+                      error={isPasswordChangeInvalid}
+                      label="Original Password"
+                      className="UserForm__form-element">
+                      <FormInput
+                        onChange={password => {
+                          this.onBuildEditableUser({ oldPassword: password })
+                        }}
+                        value={user.oldPassword}
+                        error={isPasswordChangeInvalid}
+                        type="password"
+                      />
+                    </FormLabel>
+                  )}
+                  <FormLabel
+                    vertical
                     error={isPasswordChangeInvalid}
-                    type="password"
-                  />
-                </FormLabel>
+                    label="Password"
+                    className="UserForm__form-element">
+                    <FormInput
+                      onChange={password => {
+                        this.onBuildEditableUser({ password })
+                      }}
+                      value={user.password}
+                      error={isPasswordChangeInvalid}
+                      type="password"
+                    />
+                  </FormLabel>
+                  <FormLabel
+                    vertical
+                    error={isPasswordChangeInvalid}
+                    label="Confirm Password"
+                    className="UserForm__form-element">
+                    <FormInput
+                      onChange={confirmPassword => {
+                        this.onBuildEditableUser({ confirmPassword })
+                      }}
+                      value={user.confirmPassword}
+                      error={isPasswordChangeInvalid}
+                      type="password"
+                    />
+                    {isPasswordChangeInvalid && (
+                      <span>
+                        {this.isEditingOwnAccount() === false &&
+                          'Passwords don’t match'}
+                        {this.isEditingOwnAccount() === true &&
+                          'Passwords don’t match or you must enter your old password'}
+                      </span>
+                    )}
+                  </FormLabel>
+                </div>
               )}
-              <FormLabel
-                vertical
-                error={isPasswordChangeInvalid}
-                label="Password"
-                className="UserForm__form-element">
-                <FormInput
-                  onChange={password => {
-                    this.onBuildEditableUser({ password })
-                  }}
-                  value={user.password}
-                  error={isPasswordChangeInvalid}
-                  type="password"
-                />
-              </FormLabel>
-              <FormLabel
-                vertical
-                error={isPasswordChangeInvalid}
-                label="Confirm Password"
-                className="UserForm__form-element">
-                <FormInput
-                  onChange={confirmPassword => {
-                    this.onBuildEditableUser({ confirmPassword })
-                  }}
-                  value={user.confirmPassword}
-                  error={isPasswordChangeInvalid}
-                  type="password"
-                />
-                {isPasswordChangeInvalid && (
-                  <span>
-                    {this.isEditingOwnAccount() === false &&
-                      'Passwords don’t match'}
-                    {this.isEditingOwnAccount() === true &&
-                      'Passwords don’t match or you must enter your old password'}
-                  </span>
-                )}
-              </FormLabel>
             </fieldset>
           </div>
           <div className="UserForm__fields">
@@ -252,15 +270,16 @@ class UserForm extends Component {
                 vertical
                 label="Permissions"
                 className="UserForm__form-element">
-                {this.getUnassignedPermissions().length > 0 && (
-                  <FormSelect
-                    options={this.getUnassignedPermissions()}
-                    onChange={this.onPermissionSelected}
-                    fieldKey="id"
-                    fieldLabel="fullName"
-                    deafultLabel="Add Permissions"
-                  />
-                )}
+                {this.isForeignUser() === false &&
+                  this.getUnassignedPermissions().length > 0 && (
+                    <FormSelect
+                      options={this.getUnassignedPermissions()}
+                      onChange={this.onPermissionSelected}
+                      fieldKey="id"
+                      fieldLabel="fullName"
+                      deafultLabel="Add Permissions"
+                    />
+                  )}
                 {Array.isArray(user.permissions) &&
                   user.permissions.length > 0 && (
                     <ListEditor
@@ -268,7 +287,9 @@ class UserForm extends Component {
                       items={user.permissions}
                       labelField="fullName"
                       keyField="id"
-                      disabled={this.isEditingOwnAccount()}
+                      disabled={
+                        this.isForeignUser() || this.isEditingOwnAccount()
+                      }
                     />
                   )}
               </FormLabel>
@@ -291,11 +312,13 @@ class UserForm extends Component {
 }
 
 export default connect(
-  state => ({
-    availablePermissions: state.permissions.all,
-    authorizedUserId: state.auth.user.id,
-    isCreatingUser: state.users.isCreatingUser,
-  }),
+  state => {
+    return {
+      availablePermissions: state.permissions.all,
+      authorizedUserId: state.auth.user.id,
+      isCreatingUser: state.users.isCreatingUser,
+    }
+  },
   dispatch => ({
     actions: bindActionCreators({ buildUser }, dispatch),
   }),

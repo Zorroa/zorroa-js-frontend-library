@@ -11,6 +11,7 @@ export default class FormInput extends Component {
     error: PropTypes.bool,
     required: PropTypes.bool,
     onChange: PropTypes.func,
+    readOnly: PropTypes.bool,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     inlineReset: PropTypes.bool,
     type: PropTypes.oneOf([
@@ -68,7 +69,7 @@ export default class FormInput extends Component {
   }
 
   render() {
-    const { type, required, className, error } = this.props
+    const { type, required, className, error, readOnly } = this.props
     const inputClasses = classnames(
       'FormInput__input',
       {
@@ -83,6 +84,7 @@ export default class FormInput extends Component {
           className="FormInput__input-native"
           type={type}
           required={required}
+          readOnly={readOnly}
           onChange={this.onChange}
           value={this.state.value}
         />
