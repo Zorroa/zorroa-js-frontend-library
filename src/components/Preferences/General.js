@@ -12,7 +12,7 @@ import {
   uxLevel,
   monochrome,
 } from '../../actions/appActions'
-import { saveUserSettings, changePassword } from '../../actions/authAction'
+import { saveUserSettings } from '../../actions/authAction'
 import {
   archivistInfo,
   archivistHealth,
@@ -97,11 +97,6 @@ class General extends Component {
     // Some code that writes to userSettings isn't watching userSettings for updates.
     // We should probably also ensure that all settings have an explicit default
     // value in app.userSettings.<setting> (appReducer.js)
-  }
-
-  changePassword = event => {
-    this.props.actions.changePassword(true)
-    this.dismiss()
   }
 
   changeThumbFieldTemplate = event => {
@@ -340,9 +335,6 @@ class General extends Component {
               <button className="General-reset" onClick={this.reset}>
                 Reset Default User Settings
               </button>
-              <button className="General-reset" onClick={this.changePassword}>
-                Change Password
-              </button>
             </div>
           </div>
           <div className="General-status">
@@ -422,7 +414,6 @@ export default connect(
     actions: bindActionCreators(
       {
         saveUserSettings,
-        changePassword,
         archivistInfo,
         archivistHealth,
         archivistMetrics,

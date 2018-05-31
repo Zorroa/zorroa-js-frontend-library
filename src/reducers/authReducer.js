@@ -22,10 +22,11 @@ const initialState = {
 export default function(state = initialState, action) {
   switch (action.type) {
     case AUTH_USER:
+      const source = action.payload.source || state.source
       return {
         ...state,
         error: '',
-        source: action.payload.source,
+        source,
         authenticated: !!action.payload.user.id,
         user: action.payload.user,
       }

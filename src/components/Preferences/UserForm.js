@@ -6,6 +6,7 @@ import './UserForm.scss'
 import Heading from '../Heading'
 import ListEditor from '../ListEditor'
 import FlashMessage from '../FlashMessage'
+import Password from './Password'
 import { FormInput, FormLabel, FormSelect, FormButton as Button } from '../Form'
 import Permission from '../../models/Permission'
 import { buildUser } from '../../actions/usersActions'
@@ -146,6 +147,8 @@ class UserForm extends Component {
       submitState,
       onCancel,
     } = this.props
+
+    const { password, confirmPassword, oldPassword } = user
     const isPasswordChangeInvalid =
       this.isPasswordValid() === false && user.confirmPassword !== undefined
 
@@ -202,64 +205,15 @@ class UserForm extends Component {
                 />
               </FormLabel>
             </fieldset>
-            <fieldset className="UserForm__field-group">
-              {this.isForeignUser() === false && (
-                <div>
-                  {this.isEditingOwnAccount() && (
-                    <FormLabel
-                      vertical
-                      error={isPasswordChangeInvalid}
-                      label="Original Password"
-                      className="UserForm__form-element">
-                      <FormInput
-                        onChange={password => {
-                          this.onBuildEditableUser({ oldPassword: password })
-                        }}
-                        value={user.oldPassword}
-                        error={isPasswordChangeInvalid}
-                        type="password"
-                      />
-                    </FormLabel>
-                  )}
-                  <FormLabel
-                    vertical
-                    error={isPasswordChangeInvalid}
-                    label="Password"
-                    className="UserForm__form-element">
-                    <FormInput
-                      onChange={password => {
-                        this.onBuildEditableUser({ password })
-                      }}
-                      value={user.password}
-                      error={isPasswordChangeInvalid}
-                      type="password"
-                    />
-                  </FormLabel>
-                  <FormLabel
-                    vertical
-                    error={isPasswordChangeInvalid}
-                    label="Confirm Password"
-                    className="UserForm__form-element">
-                    <FormInput
-                      onChange={confirmPassword => {
-                        this.onBuildEditableUser({ confirmPassword })
-                      }}
-                      value={user.confirmPassword}
-                      error={isPasswordChangeInvalid}
-                      type="password"
-                    />
-                    {isPasswordChangeInvalid && (
-                      <span>
-                        {this.isEditingOwnAccount() === false &&
-                          'Passwords don’t match'}
-                        {this.isEditingOwnAccount() === true &&
-                          'Passwords don’t match or you must enter your old password'}
-                      </span>
-                    )}
-                  </FormLabel>
-                </div>
-              )}
-            </fieldset>
+            <Password
+              oldPassword={oldPassword}
+              password={password}
+              confirmPassword={confirmPassword}
+              requireOriginalPassword={this.isEditingOwnAccount()}
+              onChange={password => {
+                this.onBuildEditableUser(password)
+              }}
+            />
           </div>
           <div className="UserForm__fields">
             <fieldset className="UserForm__field-group UserForm__field-group--permissions">

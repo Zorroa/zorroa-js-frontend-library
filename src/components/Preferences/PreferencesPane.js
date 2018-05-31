@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import detectLoginSource from '../../services/detectLoginSource'
 
 import { hidePreferencesModal } from '../../actions/appActions'
 import User from '../../models/User'
@@ -9,6 +10,7 @@ import CreateUser from './CreateUser'
 import EditUser from './EditUser'
 import UserTable from './UserTable'
 import PreferencesPaneMenuItem from './PreferencesPaneMenuItem'
+import ChangePassword from './ChangePassword'
 import './PreferencesPane.scss'
 import ModalOverlay, {
   ModalOverlayBody,
@@ -26,6 +28,7 @@ class PreferencesPane extends Component {
     activePane: PropTypes.string,
     isDeveloper: PropTypes.bool.isRequired,
     isAdministrator: PropTypes.bool.isRequired,
+    authSource: PropTypes.string.isRequired,
   }
 
   constructor(props) {
@@ -52,6 +55,10 @@ class PreferencesPane extends Component {
     return isAdministrator
   }
 
+  isLocalUser() {
+    return detectLoginSource(this.props.authSource) === 'local'
+  }
+
   render() {
     return (
       <ModalOverlay
@@ -72,6 +79,14 @@ class PreferencesPane extends Component {
                   activePaneName={this.state.activePane}>
                   My Settings
                 </PreferencesPaneMenuItem>
+                {this.isLocalUser() && (
+                  <PreferencesPaneMenuItem
+                    onClick={this.setActivePane}
+                    paneName="updatepassword"
+                    activePaneName={this.state.activePane}>
+                    Update Password
+                  </PreferencesPaneMenuItem>
+                )}
               </ul>
             </li>
           </ul>
@@ -110,6 +125,12 @@ class PreferencesPane extends Component {
           {this.state.activePane === 'userEdit' && (
             <EditUser onSetActivePane={this.setActivePane} />
           )}
+          {this.state.activePane === 'updatepassword' && (
+            <ChangePassword
+              onChangePassword={this.updatePassword}
+              title={'Change Password'}
+            />
+          )}
         </ModalOverlayBody>
       </ModalOverlay>
     )
@@ -121,6 +142,7 @@ export default connect(
     isDeveloper: state.auth.isDeveloper,
     isAdministrator: state.auth.isAdministrator,
     activePane: state.app.activePreferencesPane,
+    authSource: state.auth.source,
   }),
   dispatch => ({
     actions: bindActionCreators(
