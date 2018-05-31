@@ -12,15 +12,24 @@ import {
 describe('authReducer', () => {
   it('AUTH_USER sets authenticated', () => {
     const user = new User({
-      id: 1,
+      id: '1',
       username: 'Bob',
       email: 'bob@foo.com',
       firstName: 'Bob',
       lastName: 'Robert',
     })
-    expect(authReducer([], { type: AUTH_USER, payload: user })).toEqual({
+    expect(
+      authReducer([], {
+        type: AUTH_USER,
+        payload: {
+          user,
+          source: 'local',
+        },
+      }),
+    ).toEqual({
       error: '',
       authenticated: true,
+      source: 'local',
       user,
     })
   })

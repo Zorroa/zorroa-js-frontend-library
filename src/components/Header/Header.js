@@ -46,6 +46,7 @@ class Header extends Component {
     similarFields: PropTypes.instanceOf(Set),
     similarMinScore: PropTypes.object,
     userSettings: PropTypes.object.isRequired,
+    archivistInfo: PropTypes.object,
     actions: PropTypes.shape({
       showModal: PropTypes.func.isRequired,
       hideModal: PropTypes.func.isRequired,

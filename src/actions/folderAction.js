@@ -50,7 +50,6 @@ export function getFolderById(folderId) {
 
     api.folders.getById(folderId).then(
       response => {
-        const { data } = response
         dispatch({
           type: GET_FOLDER_CHILDREN,
           payload: {

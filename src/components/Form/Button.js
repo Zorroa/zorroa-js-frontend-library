@@ -47,4 +47,5 @@ FormButton.propTypes = {
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
   title: PropTypes.string,
+  icon: PropTypes.node,
 }

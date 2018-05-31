@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import ModalOverlay, {
   ModalOverlayBody,
-  ModalOverlayFooter,
   ModalOverlaySidebar,
   ModalOverlayHeader,
 } from '../ModalOverlay'
@@ -36,7 +35,6 @@ import ExportPreviewerPdf from './Previewers/Pdf'
 import ExportPreviewerJson from './Previewers/Json'
 import ExportPreviewerCsv from './Previewers/Csv'
 import ExportsPreview from './ExportsPreview'
-import { Save as IconSave } from '../Icons'
 import { JobFilter } from '../../models/Job'
 import moment from 'moment'
 

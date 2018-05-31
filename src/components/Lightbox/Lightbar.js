@@ -3,7 +3,6 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 import downloadjs from 'downloadjs'
-import api from '../../api'
 import getImage from '../../services/getImage'
 import { withRouter } from 'react-router-dom'
 

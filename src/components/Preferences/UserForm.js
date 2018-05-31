@@ -149,8 +149,6 @@ class UserForm extends Component {
     } = this.props
 
     const { password, confirmPassword, oldPassword } = user
-    const isPasswordChangeInvalid =
-      this.isPasswordValid() === false && user.confirmPassword !== undefined
 
     return (
       <div className="UserForm">
