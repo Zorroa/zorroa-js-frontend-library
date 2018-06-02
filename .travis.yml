@@ -25,4 +25,4 @@ notifications:
 
 before_script:
   - npm run dev &
-  - (while ! nc -z localhost 8080; do sleep 1; done); curl -s localhost:8080 > /dev/null; echo SERVER UP
+  - (while ! nc -z localhost 8081; do sleep 1; done); curl -s localhost:8081 > /dev/null; echo SERVER UP

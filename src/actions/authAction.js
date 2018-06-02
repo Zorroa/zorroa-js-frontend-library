@@ -298,7 +298,7 @@ export function forgotPassword(email, origin) {
   return dispatch => {
     const url = PROD
       ? origin
-      : origin.replace('localhost:8080', 'localhost:8066')
+      : origin.replace('localhost:8081', 'localhost:8066')
     createArchivist(dispatch, url)
     archivistPost(
       dispatch,
@@ -349,7 +349,7 @@ export function resetPassword(password, token, origin, source) {
   return dispatch => {
     const url = PROD
       ? origin
-      : origin.replace('localhost:8080', 'localhost:8066')
+      : origin.replace('localhost:8081', 'localhost:8066')
     createArchivist(dispatch, url)
     archivistPost(
       dispatch,

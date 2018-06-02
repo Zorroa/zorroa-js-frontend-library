@@ -9,6 +9,7 @@ module.exports = {
   devtool: 'eval-cheap-module-source-map',
   devServer: {
     disableHostCheck: true,
+    port: 8081
   },
   entry: [
     require.resolve('webpack-dev-server/client') + '?/',

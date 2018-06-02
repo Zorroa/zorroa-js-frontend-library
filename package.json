@@ -8,7 +8,7 @@
   },
   "scripts": {
     "post-install": "rm -rf bin; npm run build",
-    "start": "./node_modules/.bin/serve ./bin -p 8080",
+    "start": "./node_modules/.bin/serve ./bin -p 8081",
     "dev": "./node_modules/.bin/webpack-dev-server --config ./build/webpack.dev.js --progress --inline --hot --colors --no-info --history-api-fallback",
     "dev-https": "./node_modules/.bin/webpack-dev-server --config ./build/webpack.dev.js --progress --inline --hot --colors --no-info --history-api-fallback --https --cert ./cert.pem --key ./key.pem # this is for safari testing",
     "dev-https-cert": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj '/CN=localhost'",
@@ -21,7 +21,7 @@
     "test": "$(npm bin)/jest src/**/*.test.js",
     "test:watch": "$(npm bin)/jest src/**/*.test.js --verbose --watch",
     "test:lint": "$(npm bin)/eslint src --color",
-    "test:coverage": "npm test; ./node_modules/.bin/serve ./coverage/lcov-report & open http://localhost:8080",
+    "test:coverage": "npm test; ./node_modules/.bin/serve ./coverage/lcov-report & open http://localhost:8081",
     "purge": "rm -rf node_modules; npm cache clean; npm install",
     "update-fonts": "src/assets/fonts/zorroa-icons/update-fonts.bash",
     "preview-fonts": "src/assets/fonts/zorroa-icons/preview-fonts.bash"

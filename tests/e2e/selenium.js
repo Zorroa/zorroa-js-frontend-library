@@ -59,7 +59,7 @@ global.expect = global.expect || (x => {
 // SELENIUM_REMOTE_URL="http://localhost:4444/wd/hub" jest -i tags
 // SELENIUM_REMOTE_URL="http://10.8.0.1:4444/wd/hub" jest -i tags
 // DONT FORGET to use a public URL for your curator server (BASE_URL); localhost is not accessible inside docker
-// [dahart] ssh tjt + ssh -L 8000::8080 localhost -nNT + BASE_URL = http://blot.asuscomm.com:8000/
+// [dahart] ssh tjt + ssh -L 8000::8081 localhost -nNT + BASE_URL = http://blot.asuscomm.com:8000/
 //
 // https://github.com/SeleniumHQ/docker-selenium
 // When you are prompted for the password it is secret.
@@ -92,7 +92,7 @@ if (USE_SAUCE) {
 var ZORROA_GRID_PORT = process.env.ZORROA_GRID_PORT
 const USE_GRID = (ZORROA_GRID_PORT !== undefined)
 
-export const BASE_URL = USE_GRID ? `http://10.8.0.1:${ZORROA_GRID_PORT}` : 'http://localhost:8080'
+export const BASE_URL = USE_GRID ? `http://10.8.0.1:${ZORROA_GRID_PORT}` : 'http://localhost:8081'
 
 // let selenium tests run. jest's default is an unreasonable 5 seconds
 jasmine.DEFAULT_TIMEOUT_INTERVAL = (DEBUG && !USE_SAUCE) ? 180000 : 200000

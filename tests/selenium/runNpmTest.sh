@@ -18,7 +18,7 @@ if [[ $USE_ZORROA_GRID == "true" ]]; then
   # setup localhost:4444 to see our selenium hub via ssh tunnel
   # expose our web server on a random port (so multiple tests can run on the grid simultaneously)
   export ZORROA_GRID_PORT=$(node -e 'console.log(Math.round(Math.random()*1000+8000))')
-  ssh -4 -q -i id_rsa_zorroa_selenium_hub -nNT -o UserKnownHostsFile=/dev/null -o BatchMode=yes -o StrictHostKeyChecking=no -L 4444:localhost:4444 -R $ZORROA_GRID_PORT:localhost:8080 computeruser@shub.zorroa.com > /dev/null 2>&1 &
+  ssh -4 -q -i id_rsa_zorroa_selenium_hub -nNT -o UserKnownHostsFile=/dev/null -o BatchMode=yes -o StrictHostKeyChecking=no -L 4444:localhost:4444 -R $ZORROA_GRID_PORT:localhost:8081 computeruser@shub.zorroa.com > /dev/null 2>&1 &
   sshPid=$!
 
   # wait for the ssh connection to spin up
