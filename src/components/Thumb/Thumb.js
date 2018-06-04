@@ -210,8 +210,9 @@ class Thumb extends Component {
     const pageCount = asset.pageCount() || stackCount
     const startPage = asset.startPage()
     const stopPage = asset.stopPage()
+    const isClip = asset.isClip()
     if (pageCount > 1) {
-      if (stackCount > 0 && stackCount !== pageCount) {
+      if (stackCount > 0 && stackCount !== pageCount && isClip) {
         pageBadge = (
           <div className="Thumb-page-label">
             {stackCount} of {pageCount}
