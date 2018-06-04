@@ -28,8 +28,7 @@ const userShape = PropTypes.shape({
 
 class UserForm extends Component {
   static propTypes = {
-    authorizedUserId: PropTypes.number.isRequired,
-    loginSource: PropTypes.string.isRequired,
+    authorizedUserId: PropTypes.string.isRequired,
     user: userShape,
     isCreatingUser: PropTypes.bool.isRequired,
     availablePermissions: PropTypes.arrayOf(PropTypes.instanceOf(Permission)),
@@ -38,6 +37,7 @@ class UserForm extends Component {
     onSubmit: PropTypes.func.isRequired,
     submitState: PropTypes.oneOf(['success', 'loading']),
     onCancel: PropTypes.func.isRequired,
+    hasModifiedUser: PropTypes.bool,
     actions: PropTypes.shape({
       buildUser: PropTypes.func.isRequired,
     }),
@@ -82,7 +82,11 @@ class UserForm extends Component {
 
     const permissions = this.props.user.permissions.filter(
       assignedPermission => {
-        return permission.fullName !== assignedPermission.fullName
+        return (
+          permission !== undefined &&
+          assignedPermission !== undefined &&
+          permission.fullName !== assignedPermission.fullName
+        )
       },
     )
 
@@ -92,7 +96,7 @@ class UserForm extends Component {
   }
 
   onPermissionSelected = permission => {
-    const permissions = this.props.user.permissions || []
+    const permissions = [].concat(this.props.user.permissions)
     permissions.push(permission)
     this.onBuildEditableUser({
       permissions,
@@ -108,15 +112,16 @@ class UserForm extends Component {
   }
 
   getUnassignedPermissions() {
-    const assignedPermissions = this.props.user.permissions
+    const assignedPermissions = (this.props.user.permissions || []).filter(
+      permission => permission !== undefined,
+    )
     const availablePermissions = (this.props.availablePermissions || []).filter(
       permission => {
         const isUserPermission = permission.fullName.search('user::') === 0
         return isUserPermission === false
       },
     )
-    const hasNoAssignedPermissions =
-      assignedPermissions === undefined || assignedPermissions.length === 0
+    const hasNoAssignedPermissions = assignedPermissions.length === 0
 
     if (hasNoAssignedPermissions) {
       return availablePermissions
@@ -146,6 +151,7 @@ class UserForm extends Component {
       heading,
       submitState,
       onCancel,
+      hasModifiedUser,
     } = this.props
 
     const { password, confirmPassword, oldPassword } = user
@@ -248,7 +254,15 @@ class UserForm extends Component {
             </fieldset>
           </div>
           <div className="UserForm__form-actions">
-            <Button state={submitState} type="submit">
+            <Button
+              title={
+                hasModifiedUser === false
+                  ? 'There are no changes to save'
+                  : undefined
+              }
+              disabled={hasModifiedUser === false}
+              state={submitState}
+              type="submit">
               {buttonSubmitLabel}
             </Button>
             {this.isCreatingNewUser() === false && (

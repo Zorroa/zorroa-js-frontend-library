@@ -1,12 +1,8 @@
 import React, { Component, PropTypes } from 'react'
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
 
-import FlashMessage from '../FlashMessage'
-import UserForm from './UserForm'
-import Permission from '../../models/Permission'
-
-import { createUser, resetUser } from '../../actions/usersActions'
+import FlashMessage from '../../FlashMessage'
+import UserForm from '../UserForm'
+import Permission from '../../../models/Permission'
 
 const userShape = PropTypes.shape({
   id: PropTypes.string,
@@ -22,7 +18,7 @@ const userShape = PropTypes.shape({
   ),
 })
 
-class CreateUser extends Component {
+export default class CreateUser extends Component {
   static propTypes = {
     createUserError: PropTypes.bool.isRequired,
     createUserErrorMessage: PropTypes.string.isRequired,
@@ -69,8 +65,11 @@ class CreateUser extends Component {
 
   onSubmit = event => {
     const { user } = this.props
-    const permissionIds = Array.isArray(user.permissions)
-      ? user.permissions.map(permission => permission.id)
+    const permissions = (user.permissions || []).filter(
+      permission => typeof permission === 'object',
+    )
+    const permissionIds = Array.isArray(permissions)
+      ? permissions.map(permission => permission.id)
       : undefined
 
     this.props.actions.createUser({
@@ -118,22 +117,3 @@ class CreateUser extends Component {
     )
   }
 }
-
-export default connect(
-  state => ({
-    availablePermissions: state.permissions.all,
-    user: state.users.user,
-    createUserError: state.users.createUserError,
-    createUserErrorMessage: state.users.createUserErrorMessage,
-    isCreatingUser: state.users.isCreatingUser,
-  }),
-  dispatch => ({
-    actions: bindActionCreators(
-      {
-        createUser,
-        resetUser,
-      },
-      dispatch,
-    ),
-  }),
-)(CreateUser)
