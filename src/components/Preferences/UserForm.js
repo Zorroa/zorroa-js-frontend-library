@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-
 import './UserForm.scss'
+import randomAutoComplete from './randomAutoComplete'
 import Heading from '../Heading'
 import ListEditor from '../ListEditor'
 import FlashMessage from '../FlashMessage'
@@ -179,6 +179,7 @@ class UserForm extends Component {
                   readOnly={this.isForeignUser()}
                   value={user.email}
                   type="email"
+                  autocomplete={randomAutoComplete()}
                   onChange={email => {
                     this.onBuildEditableUser({ email })
                   }}
@@ -190,6 +191,7 @@ class UserForm extends Component {
                 className="UserForm__form-element">
                 <FormInput
                   required
+                  autocomplete={randomAutoComplete()}
                   value={user.firstName}
                   onChange={firstName => {
                     this.onBuildEditableUser({ firstName })
@@ -202,6 +204,7 @@ class UserForm extends Component {
                 className="UserForm__form-element">
                 <FormInput
                   required
+                  autocomplete={randomAutoComplete()}
                   value={user.lastName}
                   onChange={lastName => {
                     this.onBuildEditableUser({ lastName })

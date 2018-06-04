@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 
 import { FormInput, FormLabel } from '../Form'
+import randomAutoComplete from './randomAutoComplete'
 
 export default class Password extends Component {
   static propTypes = {
@@ -97,6 +98,7 @@ export default class Password extends Component {
               onChange={password => {
                 this.onChange({ password })
               }}
+              autocomplete={randomAutoComplete()}
               value={password}
               error={isPasswordChangeInvalid}
               type="password"
@@ -111,6 +113,7 @@ export default class Password extends Component {
               onChange={confirmPassword => {
                 this.onChange({ confirmPassword })
               }}
+              autocomplete={randomAutoComplete()}
               value={confirmPassword}
               error={isPasswordChangeInvalid}
               type="password"
