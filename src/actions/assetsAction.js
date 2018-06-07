@@ -44,7 +44,6 @@ export function requiredFields(fields, fieldTypes) {
   const prefix = ['links', 'clip', 'media', 'pages', 'proxies']
 
   const req = new Set()
-  req.add('*point')
   fieldTypes &&
     Object.keys(fieldTypes).forEach(field => {
       let addedPrefix = false
@@ -81,12 +80,9 @@ export function searchAssetsRequestProm(dispatch, query) {
   assert.ok(query instanceof AssetSearch)
   assert.ok(query.size)
   assert.ok(typeof query.from === 'undefined' || query.from >= 0)
-  console.log('Search: ' + JSON.stringify(query))
 
   return archivistPost(dispatch, '/api/v3/assets/_search', query)
     .then(response => {
-      console.log('Query ' + JSON.stringify(query))
-      console.log(response)
       return response
     })
     .catch(error => {
@@ -106,12 +102,9 @@ export function searchAssetsRequestProm(dispatch, query) {
 
 export function countAssetsRequestProm(dispatch, query) {
   assert.ok(query instanceof AssetSearch)
-  console.log('Count: ' + JSON.stringify(query))
 
   return archivistPost(dispatch, '/api/v2/assets/_count', query)
     .then(response => {
-      console.log('Count query ' + JSON.stringify(query))
-      console.log(response)
       return response
     })
     .catch(error => {
@@ -322,7 +315,7 @@ export function updateParentTotals(query, parentIds, options = {}) {
           })
         })
         .catch(error => {
-          console.log('Cannot get parent counts: ' + error)
+          console.error('Cannot get parent counts: ' + error)
         })
     }
 
@@ -449,12 +442,6 @@ export function findSimilarFields(assetFields) {
 
 export function setAssetPermissions(search, acl) {
   return dispatch => {
-    console.log(
-      'Set asset permissions ' +
-        JSON.stringify(acl) +
-        '\non: ' +
-        JSON.stringify(search),
-    )
     archivistPut(dispatch, '/api/v1/assets/_permissions', { search, acl })
       .then(response => {
         dispatch({
@@ -520,7 +507,7 @@ export function getAllAssetCount() {
         })
       })
       .catch(error => {
-        console.log('Error counting all assets: ' + error)
+        console.error('Error counting all assets: ' + error)
       })
   }
 }

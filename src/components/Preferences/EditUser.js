@@ -66,11 +66,23 @@ class EditUser extends Component {
       return false
     }
 
-    return editableFields.some(field => {
+    const userPermissions = this.props.user.permissions.map(
+      permission => permission.id,
+    )
+    const unmodifiedUserPermissions = unmodifiedUser.permissions.map(
+      permission => permission.id,
+    )
+
+    const hasChangedPermissions =
+      unmodifiedUserPermissions.sort().join() !== userPermissions.sort().join()
+
+    const hasFieldChanged = editableFields.some(field => {
       const modifiedUserField = this.props.user[field]
       const unmodifiedUserField = unmodifiedUser[field]
       return modifiedUserField !== unmodifiedUserField
     })
+
+    return hasChangedPermissions || hasFieldChanged
   }
 
   onSubmit = event => {
@@ -126,6 +138,7 @@ class EditUser extends Component {
           onSubmit={this.onSubmit}
           submitState={this.getSubmitState()}
           onCancel={this.resetUser}
+          hasModifiedUser={this.hasModifiedUser()}
         />
       </div>
     )

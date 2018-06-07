@@ -1,13 +1,16 @@
 import React, { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-
 import './UserForm.scss'
+import randomAutoComplete from './randomAutoComplete'
 import Heading from '../Heading'
 import ListEditor from '../ListEditor'
+import FlashMessage from '../FlashMessage'
+import Password from './Password'
 import { FormInput, FormLabel, FormSelect, FormButton as Button } from '../Form'
 import Permission from '../../models/Permission'
 import { buildUser } from '../../actions/usersActions'
+import detectLoginSource from '../../services/detectLoginSource'
 
 const userShape = PropTypes.shape({
   id: PropTypes.string,
@@ -25,7 +28,7 @@ const userShape = PropTypes.shape({
 
 class UserForm extends Component {
   static propTypes = {
-    authorizedUserId: PropTypes.number.isRequired,
+    authorizedUserId: PropTypes.string.isRequired,
     user: userShape,
     isCreatingUser: PropTypes.bool.isRequired,
     availablePermissions: PropTypes.arrayOf(PropTypes.instanceOf(Permission)),
@@ -34,6 +37,7 @@ class UserForm extends Component {
     onSubmit: PropTypes.func.isRequired,
     submitState: PropTypes.oneOf(['success', 'loading']),
     onCancel: PropTypes.func.isRequired,
+    hasModifiedUser: PropTypes.bool,
     actions: PropTypes.shape({
       buildUser: PropTypes.func.isRequired,
     }),
@@ -78,7 +82,11 @@ class UserForm extends Component {
 
     const permissions = this.props.user.permissions.filter(
       assignedPermission => {
-        return permission.fullName !== assignedPermission.fullName
+        return (
+          permission !== undefined &&
+          assignedPermission !== undefined &&
+          permission.fullName !== assignedPermission.fullName
+        )
       },
     )
 
@@ -88,11 +96,15 @@ class UserForm extends Component {
   }
 
   onPermissionSelected = permission => {
-    const permissions = this.props.user.permissions || []
+    const permissions = [].concat(this.props.user.permissions)
     permissions.push(permission)
     this.onBuildEditableUser({
       permissions,
     })
+  }
+
+  isForeignUser() {
+    return detectLoginSource(this.props.user.source) !== 'local'
   }
 
   isEditingOwnAccount() {
@@ -100,15 +112,16 @@ class UserForm extends Component {
   }
 
   getUnassignedPermissions() {
-    const assignedPermissions = this.props.user.permissions
+    const assignedPermissions = (this.props.user.permissions || []).filter(
+      permission => permission !== undefined,
+    )
     const availablePermissions = (this.props.availablePermissions || []).filter(
       permission => {
         const isUserPermission = permission.fullName.search('user::') === 0
         return isUserPermission === false
       },
     )
-    const hasNoAssignedPermissions =
-      assignedPermissions === undefined || assignedPermissions.length === 0
+    const hasNoAssignedPermissions = assignedPermissions.length === 0
 
     if (hasNoAssignedPermissions) {
       return availablePermissions
@@ -138,13 +151,20 @@ class UserForm extends Component {
       heading,
       submitState,
       onCancel,
+      hasModifiedUser,
     } = this.props
-    const isPasswordChangeInvalid =
-      this.isPasswordValid() === false && user.confirmPassword !== undefined
+
+    const { password, confirmPassword, oldPassword } = user
 
     return (
       <div className="UserForm">
         <form className="UserForm__form" onSubmit={this.onSubmit}>
+          {this.isForeignUser() && (
+            <FlashMessage look="warning">
+              This user account is managed by an external identity provider.
+              Certain fields are removed or are read-only.
+            </FlashMessage>
+          )}
           <Heading size="large" level="h2">
             {heading}
           </Heading>
@@ -155,9 +175,11 @@ class UserForm extends Component {
                 label="Email (used For username)"
                 className="UserForm__form-element">
                 <FormInput
-                  required
+                  required={!this.isForeignUser()}
+                  readOnly={this.isForeignUser()}
                   value={user.email}
                   type="email"
+                  autocomplete={randomAutoComplete()}
                   onChange={email => {
                     this.onBuildEditableUser({ email })
                   }}
@@ -169,6 +191,7 @@ class UserForm extends Component {
                 className="UserForm__form-element">
                 <FormInput
                   required
+                  autocomplete={randomAutoComplete()}
                   value={user.firstName}
                   onChange={firstName => {
                     this.onBuildEditableUser({ firstName })
@@ -181,6 +204,7 @@ class UserForm extends Component {
                 className="UserForm__form-element">
                 <FormInput
                   required
+                  autocomplete={randomAutoComplete()}
                   value={user.lastName}
                   onChange={lastName => {
                     this.onBuildEditableUser({ lastName })
@@ -188,60 +212,15 @@ class UserForm extends Component {
                 />
               </FormLabel>
             </fieldset>
-            <fieldset className="UserForm__field-group">
-              {this.isEditingOwnAccount() && (
-                <FormLabel
-                  vertical
-                  error={isPasswordChangeInvalid}
-                  label="Original Password"
-                  className="UserForm__form-element">
-                  <FormInput
-                    onChange={password => {
-                      this.onBuildEditableUser({ oldPassword: password })
-                    }}
-                    value={user.oldPassword}
-                    error={isPasswordChangeInvalid}
-                    type="password"
-                  />
-                </FormLabel>
-              )}
-              <FormLabel
-                vertical
-                error={isPasswordChangeInvalid}
-                label="Password"
-                className="UserForm__form-element">
-                <FormInput
-                  onChange={password => {
-                    this.onBuildEditableUser({ password })
-                  }}
-                  value={user.password}
-                  error={isPasswordChangeInvalid}
-                  type="password"
-                />
-              </FormLabel>
-              <FormLabel
-                vertical
-                error={isPasswordChangeInvalid}
-                label="Confirm Password"
-                className="UserForm__form-element">
-                <FormInput
-                  onChange={confirmPassword => {
-                    this.onBuildEditableUser({ confirmPassword })
-                  }}
-                  value={user.confirmPassword}
-                  error={isPasswordChangeInvalid}
-                  type="password"
-                />
-                {isPasswordChangeInvalid && (
-                  <span>
-                    {this.isEditingOwnAccount() === false &&
-                      'Passwords don’t match'}
-                    {this.isEditingOwnAccount() === true &&
-                      'Passwords don’t match or you must enter your old password'}
-                  </span>
-                )}
-              </FormLabel>
-            </fieldset>
+            <Password
+              oldPassword={oldPassword}
+              password={password}
+              confirmPassword={confirmPassword}
+              requireOriginalPassword={this.isEditingOwnAccount()}
+              onChange={password => {
+                this.onBuildEditableUser(password)
+              }}
+            />
           </div>
           <div className="UserForm__fields">
             <fieldset className="UserForm__field-group UserForm__field-group--permissions">
@@ -252,15 +231,16 @@ class UserForm extends Component {
                 vertical
                 label="Permissions"
                 className="UserForm__form-element">
-                {this.getUnassignedPermissions().length > 0 && (
-                  <FormSelect
-                    options={this.getUnassignedPermissions()}
-                    onChange={this.onPermissionSelected}
-                    fieldKey="id"
-                    fieldLabel="fullName"
-                    deafultLabel="Add Permissions"
-                  />
-                )}
+                {this.isForeignUser() === false &&
+                  this.getUnassignedPermissions().length > 0 && (
+                    <FormSelect
+                      options={this.getUnassignedPermissions()}
+                      onChange={this.onPermissionSelected}
+                      fieldKey="id"
+                      fieldLabel="fullName"
+                      deafultLabel="Add Permissions"
+                    />
+                  )}
                 {Array.isArray(user.permissions) &&
                   user.permissions.length > 0 && (
                     <ListEditor
@@ -268,14 +248,24 @@ class UserForm extends Component {
                       items={user.permissions}
                       labelField="fullName"
                       keyField="id"
-                      disabled={this.isEditingOwnAccount()}
+                      disabled={
+                        this.isForeignUser() || this.isEditingOwnAccount()
+                      }
                     />
                   )}
               </FormLabel>
             </fieldset>
           </div>
           <div className="UserForm__form-actions">
-            <Button state={submitState} type="submit">
+            <Button
+              title={
+                hasModifiedUser === false
+                  ? 'There are no changes to save'
+                  : undefined
+              }
+              disabled={hasModifiedUser === false}
+              state={submitState}
+              type="submit">
               {buttonSubmitLabel}
             </Button>
             {this.isCreatingNewUser() === false && (
@@ -291,11 +281,13 @@ class UserForm extends Component {
 }
 
 export default connect(
-  state => ({
-    availablePermissions: state.permissions.all,
-    authorizedUserId: state.auth.user.id,
-    isCreatingUser: state.users.isCreatingUser,
-  }),
+  state => {
+    return {
+      availablePermissions: state.permissions.all,
+      authorizedUserId: state.auth.user.id,
+      isCreatingUser: state.users.isCreatingUser,
+    }
+  },
   dispatch => ({
     actions: bindActionCreators({ buildUser }, dispatch),
   }),

@@ -106,14 +106,14 @@ From then on you can start the dev server by running the following.
 npm run dev-https
 ```
 
-Once the build is complete you can access the server at [https://localhost:8080](https://localhost:8080). 
+Once the build is complete you can access the server at [https://localhost:8081](https://localhost:8081). 
 You'll need to connect to a live environment by filling out the "Archivist" field on the login page. Input the domain name 
 of a running environment (i.e. staging.pool.zorroa.com or localhost:8066) and check the "SSL" box (assuming the archivist is using TLS).
 
 
 #### Remote debugging
 
-Here's the entire process: I start my curator. Then I use ssh -R 8080:localhost:8080 computeruser@shub.zorroa.com, and leave that running in a shell. It'll stay exposed as long as ssh is connected. Then I tell Juan to visit shub.zorroa.com:8080, and he will see & use the version of curator on my laptop.
+Here's the entire process: I start my curator. Then I use ssh -R 8081:localhost:8081 computeruser@shub.zorroa.com, and leave that running in a shell. It'll stay exposed as long as ssh is connected. Then I tell Juan to visit shub.zorroa.com:8081, and he will see & use the version of curator on my laptop.
 
 #### Fonts
 

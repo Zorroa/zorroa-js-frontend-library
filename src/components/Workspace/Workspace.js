@@ -29,11 +29,7 @@ import {
   dialogPromptPromise,
   setEmbedModeEnabled,
 } from '../../actions/appActions'
-import {
-  getUserPermissions,
-  updatePassword,
-  changePassword,
-} from '../../actions/authAction'
+import { getUserPermissions, changePassword } from '../../actions/authAction'
 import { queueFileEntrysUpload } from '../../actions/jobActions'
 import {
   updateCommand,
@@ -43,7 +39,6 @@ import {
 } from '../../actions/assetsAction'
 import { restoreFolders } from '../../actions/racetrackAction'
 import { loadSharedLink } from '../../actions/sharedLinkAction'
-import ChangePassword from '../auth/ChangePassword'
 import User from '../../models/User'
 import Job from '../../models/Job'
 import Asset from '../../models/Asset'
@@ -217,32 +212,6 @@ class Workspace extends Component {
     if (nextProps.app.modal && this.state.isDroppable) {
       this.setState({ isDroppable: false })
     }
-    if (
-      !nextProps.app.modal &&
-      (nextProps.changePassword ||
-        (nextProps.user && nextProps.user.changePassword))
-    ) {
-      const width = '300px'
-      const title = `${nextProps.onboarding ? 'SELECT' : 'CHANGE'} ${
-        nextProps.user.username
-      }'s PASSWORD`
-      const body = (
-        <ChangePassword
-          onChangePassword={this.updatePassword}
-          onCancel={this.cancelPasswordUpdate}
-          title={title}
-        />
-      )
-      this.props.actions.showModal({ body, width })
-    } else if (
-      nextProps.app.modal &&
-      nextProps.app.modal.body.props.onChangePassword &&
-      !nextProps.changePassword
-    ) {
-      // The conditional above checks to see if the current modal is the ChangePassword component,
-      // and that we should hide it, which is really better handled with a promise somehow?
-      this.props.actions.hideModal()
-    }
 
     if (nextProps.assets && nextProps.assets.length)
       this.repoContainsAssets = true
@@ -271,11 +240,6 @@ class Workspace extends Component {
 
   updatePassword = password => {
     this.props.actions.updatePassword(this.props.user, password)
-  }
-
-  cancelPasswordUpdate = () => {
-    this.props.actions.changePassword(false)
-    this.props.actions.hideModal()
   }
 
   toggleLeftSidebar = () => {
@@ -641,7 +605,6 @@ export default connect(
         iconifyLeftSidebar,
         toggleCollapsible,
         getUserPermissions,
-        updatePassword,
         changePassword,
         showModal,
         hideModal,

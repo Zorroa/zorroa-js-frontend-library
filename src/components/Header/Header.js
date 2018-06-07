@@ -27,6 +27,7 @@ import {
 } from '../../actions/assetsAction'
 import { resetRacetrackWidgets } from '../../actions/racetrackAction'
 import { equalSets } from '../../services/jsUtil'
+import detectLoginSource from '../../services/detectLoginSource'
 import { createSimilarityWidget } from '../../models/Widget'
 import fieldNamespaceToName from '../../services/fieldNamespaceToName'
 
@@ -45,6 +46,7 @@ class Header extends Component {
     similarFields: PropTypes.instanceOf(Set),
     similarMinScore: PropTypes.object,
     userSettings: PropTypes.object.isRequired,
+    archivistInfo: PropTypes.object,
     actions: PropTypes.shape({
       showModal: PropTypes.func.isRequired,
       hideModal: PropTypes.func.isRequired,
@@ -413,11 +415,11 @@ class Header extends Component {
                   Archivist Settings...
                 </div>
               )}
-              <Link
+              <a
                 className="header-menu-item header-menu-logout"
-                to={signoutUrl}>
+                href={signoutUrl}>
                 Logout
-              </Link>
+              </a>
             </DropdownMenu>
           </div>
         </div>
@@ -431,8 +433,8 @@ class Header extends Component {
 
 export default connect(
   state => {
-    const isLocalAuth = state.auth.source === 'local'
-    let signoutUrl = isLocalAuth ? '/signout' : '/saml/logout?local=true'
+    const isSaml = detectLoginSource(state.auth.source) === 'saml'
+    let signoutUrl = isSaml ? '/saml/logout?local=true' : '/signout'
 
     return {
       sync: state.auth.sync,

@@ -7,8 +7,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ZORROA=$DIR/..
 
 # make sure user is running a local server first
-if ! nc -z localhost 8080; then
-  echo "I see no curator running on localhost:8080; make sure to start your server"
+if ! nc -z localhost 8081; then
+  echo "I see no curator running on localhost:8081; make sure to start your server"
   exit
 fi
 

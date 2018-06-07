@@ -70,7 +70,7 @@ chromenode:
 
 # hub on shub
 # node on local
-# ssh -L 4444:localhost:4444 -R 5900:localhost:5900 -R 8080:localhost:8080 z-shub
+# ssh -L 4444:localhost:4444 -R 5900:localhost:5900 -R 8081:localhost:8081 z-shub
 
 # machang notes
 # docker run -d -p 5555:5555 -e HUB_PORT_4444_TCP_ADDR="localhost" -e HUB_PORT_4444_TCP_PORT="4444" --name chrome-node selenium/node-chrome

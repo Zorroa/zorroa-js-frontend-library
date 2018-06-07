@@ -23,6 +23,9 @@ export default class ListEditor extends Component {
     return (
       <ul className="ListEditor">
         {items.map(item => {
+          if (item === undefined) {
+            return null
+          }
           const label = item[labelField]
           const key = item[keyField]
           const buttonClasses = classnames('ListEditor__button', {

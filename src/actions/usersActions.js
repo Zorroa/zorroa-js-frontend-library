@@ -170,11 +170,6 @@ export function createUser(user) {
 }
 
 function updateUserPermissions(user) {
-  if (Array.isArray(user.permissions) === false) {
-    // Nothing to do here, just resolve
-    return Promise.resolve()
-  }
-
   return api.user(user.id).permissions.put(user.permissions)
 }
 
@@ -196,11 +191,21 @@ function updateUserPassword(user) {
 }
 
 export function updateUser(user) {
-  const userUpdatePromises = Promise.all([
-    updateUserPermissions(user),
-    updateUserProfile(user),
-    updateUserPassword(user),
-  ])
+  const userActions = []
+
+  if (Array.isArray(user.permissions)) {
+    userActions.push(updateUserPermissions(user))
+  }
+
+  if (user.firstName || user.lastName || user.email) {
+    userActions.push(updateUserProfile(user))
+  }
+
+  if (user.password) {
+    userActions.push(updateUserPassword(user))
+  }
+
+  const userUpdatePromises = Promise.all(userActions)
 
   return dispatch => {
     dispatch({
