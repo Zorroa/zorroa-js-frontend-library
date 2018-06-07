@@ -139,6 +139,10 @@ export default class VideoRange extends Component {
     const tickCount = Math.ceil(
       Math.min(5, Math.max(3, Math.round(clipWidth / 100))),
     )
+    const timeNormalizationFactor = 10
+    const minimumClipDuration = 1000
+    const canDisplayTimeAxis =
+      clipWidth && clipStopTime * timeNormalizationFactor >= minimumClipDuration
     return (
       <div className="VideoRange">
         <div
@@ -146,7 +150,7 @@ export default class VideoRange extends Component {
           ref="clip"
           onMouseDown={e => this.resizeStart(this.resizeUpdate, e)}
           style={clipBackground}>
-          {clipWidth && (
+          {canDisplayTimeAxis && (
             <div className="VideoRange-axis">
               <TimeAxis
                 format={d => ({
@@ -158,8 +162,8 @@ export default class VideoRange extends Component {
                 width={clipWidth}
                 height={clipHeight}
                 margin={0}
-                beginTime={clipStartTime * 10}
-                endTime={clipStopTime * 10}
+                beginTime={clipStartTime * timeNormalizationFactor}
+                endTime={clipStopTime * timeNormalizationFactor}
                 tickCount={tickCount}
                 standalone={true}
               />
