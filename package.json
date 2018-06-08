@@ -1,6 +1,6 @@
 {
   "name": "zorroa-js-curator",
-  "version": "0.39.2",
+  "version": "0.40.0",
   "description": "this is a front end template using react, redux, and webpack built by jordan with love",
   "repository": {
     "type": "git",
