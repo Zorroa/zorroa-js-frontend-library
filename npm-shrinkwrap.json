@@ -1,6 +1,6 @@
 {
   "name": "zorroa-js-curator",
-  "version": "0.8.0",
+  "version": "0.39.2",
   "dependencies": {
     "asap": {
       "version": "2.0.6",
@@ -23,6 +23,11 @@
           "resolved": "https://registry.npmjs.org/stream-consume/-/stream-consume-0.1.1.tgz"
         }
       }
+    },
+    "camelcase": {
+      "version": "5.0.0",
+      "from": "camelCase@latest",
+      "resolved": "https://registry.npmjs.org/camelcase/-/camelcase-5.0.0.tgz"
     },
     "chain-function": {
       "version": "1.0.0",

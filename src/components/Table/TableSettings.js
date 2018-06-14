@@ -142,7 +142,7 @@ export default class TableSettings extends Component {
               tableLayouts.map(layout => (
                 <div
                   key={layout.id}
-                  onClick={_ => selectTableLayoutFn(layout)}
+                  onClick={() => selectTableLayoutFn(layout)}
                   className={classnames('TableSettings-layout-item', {
                     selected: layout.id === selectedTableLayoutId,
                     locked: lockedLayouts.has(layout.id),
@@ -165,7 +165,7 @@ export default class TableSettings extends Component {
                   )}
                   <div
                     className="TableSettings-layout-edit icon-pencil"
-                    onClick={_ => this.rename(layout)}
+                    onClick={() => this.rename(layout)}
                   />
                   <div className="TableSettings-layout-item-lock icon-lock4" />
                 </div>
@@ -190,7 +190,7 @@ export default class TableSettings extends Component {
               onClick={!action.disabled && action.fn}
               key={action.label}
               title={action.disabledReason}>
-              {action.label} Table layout
+              {action.label}
             </div>
           ))}
         </div>

@@ -1,3 +1,4 @@
+import { APP_NAME } from '../constants/general'
 import {
   SHOW_EXPORT_UI,
   HIDE_EXPORT_UI,
@@ -22,7 +23,6 @@ import {
 import api from '../api'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
-const APP_NAME = 'curator'
 
 /**
  * This starts off the backend Exporters

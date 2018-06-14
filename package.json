@@ -103,6 +103,7 @@
   },
   "dependencies": {
     "axios": "0.14.0",
+    "camelcase": "5.0.0",
     "classnames": "2.2.5",
     "copy-to-clipboard": "3.0.8",
     "debug": "2.6.9",
