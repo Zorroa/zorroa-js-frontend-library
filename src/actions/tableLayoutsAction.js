@@ -14,7 +14,7 @@ import {
   DELETE_SHARED_TABLE_LAYOUT_ERROR,
 } from '../constants/actionTypes'
 import api from '../api'
-import camelCase from 'camelCase'
+import camelCase from 'camel-case'
 
 export function shareTableLayout(layoutName, fields, layoutId) {
   return dispatch => {
