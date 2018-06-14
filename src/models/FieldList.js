@@ -24,4 +24,24 @@ export default class FieldList {
     if (isAdministrator) return true
     return false
   }
+
+  isEqual(fieldList) {
+    if (fieldList.name !== this.name) {
+      return false
+    }
+
+    if (fieldList.fields.length !== this.fields.length) {
+      return false
+    }
+
+    if (
+      this.fields.some(exisitingField => {
+        return !fieldList.fields.includes(exisitingField)
+      })
+    ) {
+      return false
+    }
+
+    return true
+  }
 }

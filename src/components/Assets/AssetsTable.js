@@ -19,6 +19,7 @@ import {
 } from '../../actions/appActions'
 import { createFacetWidget, fieldUsedInWidget } from '../../models/Widget'
 import { modifyRacetrackWidget } from '../../actions/racetrackAction'
+import { shareTableLayout } from '../../actions/tableLayoutsAction'
 import {
   sortAssets,
   unorderAssets,
@@ -53,6 +54,10 @@ class AssetsTable extends Component {
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     query: PropTypes.instanceOf(AssetSearch),
+    isAdministrator: PropTypes.bool,
+    isSavingSharedTableLayouts: PropTypes.object.isRequired,
+    isSavingSharedTableLayoutsError: PropTypes.object.isRequired,
+    isSavingSharedTableLayoutsSuccess: PropTypes.object.isRequired,
 
     // input props
     height: PropTypes.number.isRequired,
@@ -60,10 +65,30 @@ class AssetsTable extends Component {
     selectFn: PropTypes.func.isRequired,
 
     // connect actions
-    actions: PropTypes.object,
+    actions: PropTypes.shape({
+      sortAssets: PropTypes.func.isRequired,
+      unorderAssets: PropTypes.func.isRequired,
+      isolateAssetId: PropTypes.func.isRequired,
+      updateTableLayouts: PropTypes.func.isRequired,
+      addTableLayout: PropTypes.func.isRequired,
+      deleteTableLayout: PropTypes.func.isRequired,
+      selectTableLayout: PropTypes.func.isRequired,
+      modifyRacetrackWidget: PropTypes.func.isRequired,
+      iconifyRightSidebar: PropTypes.func.isRequired,
+      showModal: PropTypes.func.isRequired,
+      hideModal: PropTypes.func.isRequired,
+      saveUserSettings: PropTypes.func.isRequired,
+      shareTableLayout: PropTypes.func.isRequired,
+    }).isRequired,
 
     // router props
     history: PropTypes.object,
+  }
+
+  static defaultProps = {
+    isSavingSharedTableLayouts: {},
+    isSavingSharedTableLayoutsError: {},
+    isSavingSharedTableLayoutsSuccess: {},
   }
 
   state = {
@@ -74,11 +99,9 @@ class AssetsTable extends Component {
   }
 
   setFieldWidth = (field, width) => {
-    const { actions, userSettings } = this.props
+    const { actions, userSettings, selectedTableLayoutId } = this.props
     const tableLayouts = [...this.props.tableLayouts]
-    const index = tableLayouts.findIndex(
-      layout => layout.id === this.props.selectedTableLayoutId,
-    )
+    const index = this.getTableLayoutIndexById(selectedTableLayoutId)
     let settings = userSettings
     if (index >= 0) {
       const layout = new FieldList(tableLayouts[index])
@@ -143,11 +166,9 @@ class AssetsTable extends Component {
   }
 
   updateFields = fields => {
-    const { actions, user, userSettings } = this.props
+    const { actions, user, userSettings, selectedTableLayoutId } = this.props
     const tableLayouts = [...this.props.tableLayouts]
-    const index = tableLayouts.findIndex(
-      layout => layout.id === this.props.selectedTableLayoutId,
-    )
+    const index = this.getTableLayoutIndexById(selectedTableLayoutId)
     if (index >= 0) {
       const layout = new FieldList(tableLayouts[index])
       layout.fields = [...fields]
@@ -157,12 +178,20 @@ class AssetsTable extends Component {
     }
   }
 
+  getTableLayoutById(id) {
+    const tableLayouts = [...this.props.tableLayouts]
+    return tableLayouts.find(layout => layout.id === id)
+  }
+
+  getTableLayoutIndexById(id) {
+    const tableLayouts = [...this.props.tableLayouts]
+    return tableLayouts.findIndex(layout => layout.id === id)
+  }
+
   duplicateTableLayout = event => {
     const { actions, user, userSettings } = this.props
     const tableLayouts = [...this.props.tableLayouts]
-    const layout = tableLayouts.find(
-      layout => layout.id === this.props.selectedTableLayoutId,
-    )
+    const layout = this.getTableLayoutById(this.props.selectedTableLayoutId)
     if (layout) {
       const acl = [
         new AclEntry({
@@ -186,7 +215,15 @@ class AssetsTable extends Component {
     }
   }
 
-  shareTableLayout = () => {}
+  shareTableLayout = () => {
+    const { selectedTableLayoutId } = this.props
+    const layout = this.getTableLayoutById(selectedTableLayoutId)
+    this.props.actions.shareTableLayout(
+      layout.name,
+      layout.fields,
+      selectedTableLayoutId,
+    )
+  }
 
   deleteTableLayout = event => {
     this.props.actions.deleteTableLayout(this.props.selectedTableLayoutId)
@@ -195,9 +232,7 @@ class AssetsTable extends Component {
     const { actions, user, userSettings } = this.props
     const tableLayouts = [...this.props.tableLayouts]
     let selectedTableLayoutId = this.props.selectedTableLayoutId
-    const index = tableLayouts.findIndex(
-      layout => layout.id === selectedTableLayoutId,
-    )
+    const index = this.getTableLayoutIndexById(selectedTableLayoutId)
     if (index >= 0) {
       if (index === 0) selectedTableLayoutId = tableLayouts[0].id
       else selectedTableLayoutId = tableLayouts[index - 1].id
@@ -222,9 +257,7 @@ class AssetsTable extends Component {
   renameTableLayout = (layoutId, name) => {
     if (!name.trim().length) return
     const { actions, user, userSettings } = this.props
-    const index = this.props.tableLayouts.findIndex(
-      layout => layout.id === layoutId,
-    )
+    const index = this.getTableLayoutIndexById(layoutId)
     if (index < 0) return
     const tableLayouts = [...this.props.tableLayouts]
     tableLayouts[index] = new FieldList({ ...tableLayouts[index], name })
@@ -322,29 +355,65 @@ class AssetsTable extends Component {
     }
   }
 
+  getReasonsForDisabledShareAction({ needsPermissions, alreadyAdded }) {
+    if (needsPermissions) {
+      return 'Insufficient permissions to share layouts'
+    }
+
+    if (alreadyAdded) {
+      return 'The layout has already been shared'
+    }
+  }
+
   renderSettings(fields, layout) {
     const {
       tableLayouts,
       user,
       assetFields,
       selectedTableLayoutId,
+      isAdministrator,
     } = this.props
     if (!this.state.showSettings) return
     const selectedLayoutHasWritePermission =
       layout && layout.hasAccess(user, AclEntry.WriteAccess)
+    const hasSharePermissions = isAdministrator === true
+    const hasSharedLayout =
+      this.props.isSavingSharedTableLayoutsSuccess[layout.id] === true
+    const hasSharedLayoutError =
+      this.props.isSavingSharedTableLayoutsError[layout.id] === true
+
+    let sharedLayoutLabel = 'Share Layout'
+
+    if (hasSharedLayout) {
+      sharedLayoutLabel = `${sharedLayoutLabel} (Succesfully Shared)`
+    }
+
+    if (hasSharedLayoutError) {
+      sharedLayoutLabel = `${sharedLayoutLabel} (Error: Unable To Share)`
+    }
+
     const layoutActions = [
       {
-        label: 'Duplicate',
+        label: 'Duplicate Layout',
         fn: this.duplicateTableLayout,
         disabled: false,
       },
       {
-        label: 'Delete',
+        label: 'Delete Layout',
         fn: this.deleteTableLayout,
         disabled: tableLayouts.length <= 1 || !selectedLayoutHasWritePermission,
         disabledReason: this.getReasonsForDisabledDeleteAction({
           isLastLayout: tableLayouts.length <= 1,
           isReadOnly: !selectedLayoutHasWritePermission,
+        }),
+      },
+      {
+        label: sharedLayoutLabel,
+        fn: this.shareTableLayout,
+        disabled: hasSharePermissions === false || hasSharedLayout,
+        disabledReason: this.getReasonsForDisabledShareAction({
+          needsPermissions: hasSharePermissions === false,
+          alreadyAdded: hasSharedLayout,
         }),
       },
     ]
@@ -403,8 +472,7 @@ class AssetsTable extends Component {
       selectFn,
     } = this.props
     const layout =
-      tableLayouts &&
-      tableLayouts.find(layout => layout.id === selectedTableLayoutId)
+      tableLayouts && this.getTableLayoutById(selectedTableLayoutId)
     const tableFields = (layout && layout.fields) || defaultTableFields
     const fields = tableFields.map(field => ({
       field: field,
@@ -457,6 +525,12 @@ const ConnectedAssetsTable = connect(
     widgets: state.racetrack.widgets,
     user: state.auth.user,
     userSettings: state.app.userSettings,
+    isAdministrator: state.auth.isAdministrator,
+    isSavingSharedTableLayouts: state.tableLayouts.isSavingSharedTableLayouts,
+    isSavingSharedTableLayoutsError:
+      state.tableLayouts.isSavingSharedTableLayoutsError,
+    isSavingSharedTableLayoutsSuccess:
+      state.tableLayouts.isSavingSharedTableLayoutsSuccess,
   }),
   dispatch => ({
     actions: bindActionCreators(
@@ -473,6 +547,7 @@ const ConnectedAssetsTable = connect(
         showModal,
         hideModal,
         saveUserSettings,
+        shareTableLayout,
       },
       dispatch,
     ),

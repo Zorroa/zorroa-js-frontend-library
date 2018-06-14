@@ -11,6 +11,7 @@ import EditUser from './EditUser'
 import UserTable from './UserTable'
 import PreferencesPaneMenuItem from './PreferencesPaneMenuItem'
 import ChangePassword from './ChangePassword'
+import SharedMetadata from './SharedMetadata/index.js'
 import './PreferencesPane.scss'
 import ModalOverlay, {
   ModalOverlayBody,
@@ -79,6 +80,12 @@ class PreferencesPane extends Component {
                   activePaneName={this.state.activePane}>
                   My Settings
                 </PreferencesPaneMenuItem>
+                <PreferencesPaneMenuItem
+                  onClick={this.setActivePane}
+                  paneName="sharedmetadata"
+                  activePaneName={this.state.activePane}>
+                  Metadata Templates
+                </PreferencesPaneMenuItem>
                 {this.isLocalUser() && (
                   <PreferencesPaneMenuItem
                     onClick={this.setActivePane}
@@ -124,6 +131,9 @@ class PreferencesPane extends Component {
           )}
           {this.state.activePane === 'userEdit' && (
             <EditUser onSetActivePane={this.setActivePane} />
+          )}
+          {this.state.activePane === 'sharedmetadata' && (
+            <SharedMetadata onSetActivePane={this.setActivePane} />
           )}
           {this.state.activePane === 'updatepassword' && (
             <ChangePassword

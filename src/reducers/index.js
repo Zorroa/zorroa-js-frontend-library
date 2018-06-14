@@ -10,6 +10,7 @@ import jobs from './jobsReducer'
 import archivist from './archivistReducer'
 import users from './usersReducer'
 import exports from './exportsReducer'
+import tableLayouts from './tableLayoutsReducer'
 
 export default combineReducers({
   app,
@@ -22,4 +23,5 @@ export default combineReducers({
   archivist,
   users,
   exports,
+  tableLayouts,
 })
