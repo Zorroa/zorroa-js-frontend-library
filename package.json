@@ -7,6 +7,7 @@
     "url": "https://github.com/Zorroa/zorroa-js-curator.git"
   },
   "scripts": {
+    "prepush": "npm test",
     "post-install": "rm -rf bin; npm run build",
     "start": "./node_modules/.bin/serve ./bin -p 8081",
     "dev": "./node_modules/.bin/webpack-dev-server --config ./build/webpack.dev.js --progress --inline --hot --colors --no-info --history-api-fallback",
@@ -17,11 +18,10 @@
     "build-prodlocal": "./node_modules/.bin/webpack --config ./build/webpack.prodlocal.js --progress --colors",
     "build": "npm test && npm run build-only",
     "deploy": "sh ./build/build-prod.sh",
-    "pretest": "npm run test:lint",
-    "test": "$(npm bin)/jest src/**/*.test.js",
+    "test": "npm run test:lint && npm run test:unit",
     "test:watch": "$(npm bin)/jest src/**/*.test.js --verbose --watch",
     "test:lint": "$(npm bin)/eslint src --color",
-    "test:coverage": "npm test; ./node_modules/.bin/serve ./coverage/lcov-report & open http://localhost:8081",
+    "test:unit": "$(npm bin)/jest src/**/*.test.js",
     "purge": "rm -rf node_modules; npm cache clean; npm install",
     "update-fonts": "src/assets/fonts/zorroa-icons/update-fonts.bash",
     "preview-fonts": "src/assets/fonts/zorroa-icons/preview-fonts.bash"
@@ -81,6 +81,7 @@
     "handlebars-webpack-plugin": "0.1.1",
     "html-loader": "0.4.5",
     "html-webpack-plugin": "2.30.1",
+    "husky": "0.14.3",
     "install": "0.11.0",
     "jest-cli": "18.1.0",
     "json": "9.0.6",
