@@ -476,6 +476,7 @@ class Assets extends Component {
       thumbSize,
       showMultipage,
       isolatedParent,
+      parentTotals,
     } = this.props
     if (!assets) return
 
@@ -515,11 +516,13 @@ class Assets extends Component {
     const parentsModified = !equalSets(a, b)
     this.setState({ positions, multipage, collapsed })
     const parentIds = showMultipage && multipage && Object.keys(multipage)
-    if (parentsModified) {
-      this.props.actions.updateParentTotals(query, parentIds)
-      this.props.actions.updateParentTotals(query, parentIds, {
-        isUnfiltered: true,
-      })
+    const untotaledParentIds = parentIds.filter(
+      parentId =>
+        parentTotals === undefined || parentTotals.has(parentId) === false,
+    )
+
+    if (parentsModified && untotaledParentIds.length > 0) {
+      this.props.actions.updateParentTotals(query, untotaledParentIds)
     }
 
     this.clearAssetsLayoutTimer()
@@ -639,6 +642,7 @@ class Assets extends Component {
       layout,
       showMultipage,
       parentCounts,
+      parentTotals,
       origin,
       thumbSize,
       query,
@@ -748,6 +752,7 @@ class Assets extends Component {
                       force,
                       isFirstPage,
                       parentIds,
+                      parentTotals,
                     )
                   }
                   if (!dim || width <= 0 || height <= 0) return null
