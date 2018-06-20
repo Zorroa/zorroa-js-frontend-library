@@ -1,0 +1,13 @@
+src
+templates
+tests
+utils
+.babelrc
+.editorconfig
+.eslintignore
+.eslintrc
+.npmrc
+.nvmrc
+.travis.yml
+README.md
+tsconfig.json
