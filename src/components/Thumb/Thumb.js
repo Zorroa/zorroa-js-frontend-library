@@ -342,13 +342,7 @@ class Thumb extends Component {
   }
 
   render() {
-    const {
-      pages,
-      isSelected,
-      dragparams,
-      parentTotals,
-      unfilteredParentTotals,
-    } = this.props
+    const { pages, isSelected, dragparams, parentTotals } = this.props
     const onDoubleClick = this.onDoubleClick
     const onClick = this.onClick
     const { width, height, x, y } = this.props.dim // Original thumb rect
@@ -363,8 +357,7 @@ class Thumb extends Component {
     const stackCount =
       (parentId && parentTotals && parentTotals.get(parentId)) ||
       (pages && pages.length)
-    const childCount =
-      parentId && unfilteredParentTotals && unfilteredParentTotals.get(parentId)
+    const childCount = parentId && parentTotals && parentTotals.get(parentId)
 
     const { parentURL, badges } = this.renderBadges(
       asset,

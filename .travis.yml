@@ -1,28 +1,12 @@
 language: node_js
 node_js:
-  - "6"
+  - "8"
 
 bundler_args: --retry 2
 
 notifications:
   slack: zorroa:U0489fQGuSPls5EZZfSUoGsL
 
-# sudo: required
-# dist: precise
-
-
-# Uncomment these sections to default to using Sauce Labs for Travis tests
-# Don't forget to adjust runNpmTest.sh too
-
-# addons:
-#   sauce_connect: true
-
-# env:
-#   global:
-#     - SAUCE_USERNAME: "zorroasauce"
-#     - SAUCE_ACCESS_KEY: "f6c35e63-e19a-4575-be77-b49748e98bd6"
-
-
-before_script:
-  - npm run dev &
-  - (while ! nc -z localhost 8081; do sleep 1; done); curl -s localhost:8081 > /dev/null; echo SERVER UP
+cache:
+  directories:
+    - node_modules

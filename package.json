@@ -1,14 +1,15 @@
 {
   "name": "zorroa-js-curator",
+  "description": "Frontend for the Zorroa Archivist, part of the EVI platform",
   "version": "0.40.0",
-  "description": "this is a front end template using react, redux, and webpack built by jordan with love",
   "repository": {
     "type": "git",
     "url": "https://github.com/Zorroa/zorroa-js-curator.git"
   },
   "scripts": {
+    "prepush": "npm test",
     "post-install": "rm -rf bin; npm run build",
-    "start": "./node_modules/.bin/serve ./bin -p 8081",
+    "start": "node ./server/app.js",
     "dev": "./node_modules/.bin/webpack-dev-server --config ./build/webpack.dev.js --progress --inline --hot --colors --no-info --history-api-fallback",
     "dev-https": "./node_modules/.bin/webpack-dev-server --config ./build/webpack.dev.js --progress --inline --hot --colors --no-info --history-api-fallback --https --cert ./cert.pem --key ./key.pem # this is for safari testing",
     "dev-https-cert": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj '/CN=localhost'",
@@ -17,11 +18,13 @@
     "build-prodlocal": "./node_modules/.bin/webpack --config ./build/webpack.prodlocal.js --progress --colors",
     "build": "npm test && npm run build-only",
     "deploy": "sh ./build/build-prod.sh",
-    "pretest": "npm run test:lint",
-    "test": "$(npm bin)/jest src/**/*.test.js",
+    "test": "npm run test:client && npm run test:server",
     "test:watch": "$(npm bin)/jest src/**/*.test.js --verbose --watch",
-    "test:lint": "$(npm bin)/eslint src --color",
-    "test:coverage": "npm test; ./node_modules/.bin/serve ./coverage/lcov-report & open http://localhost:8081",
+    "test:client": "npm run test:client:lint && npm run test:client:unit",
+    "test:server": "npm run test:server:lint",
+    "test:client:lint": "$(npm bin)/eslint src --color",
+    "test:client:unit": "$(npm bin)/jest src/**/*.test.js",
+    "test:server:lint": "$(npm bin)/eslint server --color",
     "purge": "rm -rf node_modules; npm cache clean; npm install",
     "update-fonts": "src/assets/fonts/zorroa-icons/update-fonts.bash",
     "preview-fonts": "src/assets/fonts/zorroa-icons/preview-fonts.bash"
@@ -30,8 +33,8 @@
   "license": "UNLICENSED",
   "private": true,
   "engines": {
-    "node": "7.10.1",
-    "npm": "^3.10.7"
+    "node": "^8.11.3",
+    "npm": "^5.6.0"
   },
   "jest": {
     "moduleNameMapper": {
@@ -66,7 +69,6 @@
     "babel-preset-react": "6.24.1",
     "babel-preset-stage-1": "6.24.1",
     "babel-register": "6.26.0",
-    "chromedriver": "2.36.0",
     "css-loader": "0.25.0",
     "enzyme": "2.9.1",
     "eslint": "3.19.0",
@@ -81,6 +83,7 @@
     "handlebars-webpack-plugin": "0.1.1",
     "html-loader": "0.4.5",
     "html-webpack-plugin": "2.30.1",
+    "husky": "0.14.3",
     "install": "0.11.0",
     "jest-cli": "18.1.0",
     "json": "9.0.6",
@@ -88,15 +91,12 @@
     "less": "2.7.2",
     "less-loader": "2.2.3",
     "node-sass": "3.13.1",
-    "npm": "5.8.0",
     "pdfjs-dist": "1.10.97",
     "prettier": "1.10.2",
     "raw-loader": "0.5.1",
     "react-mapbox-gl": "0.17.0",
     "react-test-renderer": "15.6.2",
     "sass-loader": "4.1.1",
-    "selenium-webdriver": "3.6.0",
-    "serve": "1.4.0",
     "style-loader": "0.13.2",
     "webpack": "1.15.0",
     "webpack-dev-server": "1.16.5"
@@ -111,6 +111,8 @@
     "downloadjs": "1.4.7",
     "dropbox": "2.5.12",
     "ease-component": "1.0.0",
+    "express": "4.16.3",
+    "http-proxy-middleware": "0.18.0",
     "latlon-geohash": "1.1.0",
     "lru-cache": "4.1.1",
     "moment": "2.21.0",
