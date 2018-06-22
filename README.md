@@ -2,8 +2,10 @@
 
 ## Dependency assumptions
 
-1.  You will be required to use Node 8 for this app. Download it
-    [here](https://nodejs.org/en/)
+1.  You will be required to use [Node 8](https://nodejs.org/en/) for this app.
+    You can also use [Node Version Manager](https://github.com/creationix/nvm)
+    which will make your life a lot easier. After installing NVM you can run a
+    command such as `nvm use 8`.
 
 ## Install the app and its dependencies using your terminal
 
