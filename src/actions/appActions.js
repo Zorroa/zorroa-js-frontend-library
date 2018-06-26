@@ -40,6 +40,7 @@ import {
   DELETE_TABLE_LAYOUT,
   FLIPBOOK_FPS,
   SHOULD_LOOP,
+  SHOULD_HOLD,
 } from '../constants/actionTypes'
 
 export const MIN_THUMBSIZE = 48
@@ -58,6 +59,13 @@ export function shouldLoop(shouldLoopSetting) {
   return {
     type: SHOULD_LOOP,
     payload: shouldLoopSetting,
+  }
+}
+
+export function shouldHold(shouldHoldSetting) {
+  return {
+    type: SHOULD_HOLD,
+    payload: shouldHoldSetting,
   }
 }
 

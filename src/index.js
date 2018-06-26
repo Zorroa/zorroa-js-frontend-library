@@ -51,7 +51,6 @@ const applicationNode = (
 )
 
 // If we have a token, consider the user to be signed in, and update local state
-console.log('loading token')
 const userItem = JSON.parse(localStorage.getItem(USER_ITEM))
 const user = userItem ? new User(userItem) : null
 const origin = localStorage.getItem(ORIGIN_ITEM)

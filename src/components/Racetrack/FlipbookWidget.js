@@ -6,7 +6,7 @@ import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import { showModal, setFlipbookFps } from '../../actions/appActions'
 import { sortAssets } from '../../actions/assetsAction'
 import Widget from './Widget'
-import { FlipbookPlayer } from '../Flipbook'
+import FlipbookPlayer from '../Flipbook/FlipbookImage/index.js'
 import Scrubber from '../Scrubber'
 import { PubSub } from '../../services/jsUtil'
 import classnames from 'classnames'
@@ -116,7 +116,15 @@ class FlipbookWidget extends Component {
       return null
     }
 
-    const { id, floatBody, isIconified, isOpen, onOpen, fps } = this.props
+    const {
+      id,
+      floatBody,
+      isIconified,
+      isOpen,
+      onOpen,
+      fps,
+      asset,
+    } = this.props
     const title = isOpen ? FlipbookWidgetInfo.title : undefined
     const field = isOpen ? undefined : this.title()
     const hasFrames = this.state.totalFrames > 0
@@ -133,8 +141,8 @@ class FlipbookWidget extends Component {
       width: `calc(1 / ${defaultFpsFrequencies.length} * 100%)`,
     }
     const flipbookDimensions = resizeByAspectRatio({
-      width: this.props.asset.document.media.width,
-      height: this.props.asset.document.media.height,
+      width: asset.width(),
+      height: asset.height(),
       newWidth: 230, // The value 230 comes from the CSS
     })
 
@@ -152,16 +160,17 @@ class FlipbookWidget extends Component {
         icon={FlipbookWidgetInfo.icon}>
         <div className="FlipbookWidget__body">
           <div className="FlipbookWidget__player-container">
-            <FlipbookPlayer
-              clipParentId={this.state.id}
-              onLoad={this.onFlipbookLoad}
-              shuttler={this.shuttler}
-              status={this.status}
-              autoPlay={false}
-              defaultFrame={1}
-              height={flipbookDimensions.height}
-              width={flipbookDimensions.width}
-            />
+            {isOpen && (
+              <FlipbookPlayer
+                clipParentId={this.state.id}
+                onLoad={this.onFlipbookLoad}
+                shuttler={this.shuttler}
+                status={this.status}
+                height={flipbookDimensions.height}
+                width={flipbookDimensions.width}
+                defaultFrame={asset}
+              />
+            )}
             <div className="FlipbookWidget__duration-container">
               <Duration
                 onClick={this.startOrStopFlipbook}

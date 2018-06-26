@@ -3,51 +3,35 @@ import classnames from 'classnames'
 
 import { PubSub } from '../../services/jsUtil'
 
+const UNDEFINED_SHUTTLER_WARNING =
+  'Scrubbing without a shuttler, no change will be reflected in frame'
+
 export default class Scrubber extends PureComponent {
   static propTypes = {
     shuttler: PropTypes.instanceOf(PubSub),
     status: PropTypes.instanceOf(PubSub),
-    currentFrameNumber: PropTypes.number,
-    totalFrames: PropTypes.number.isRequired,
     mode: PropTypes.oneOf(['controlbar']),
   }
 
   state = {
-    scrubbedFrameNumber: this.props.currentFrameNumber,
     isMouseDown: false,
     elapsedPercent: 0,
   }
 
   componentWillMount() {
-    if (typeof this.props.status === 'function') {
+    if (typeof this.props.status === 'object') {
       this.props.status.on('elapsedPercent', elapsedPercent => {
         this.setState({ elapsedPercent })
       })
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.currentFrameNumber !== this.props.currentFrameNumber) {
-      this.setState({
-        scrubbedFrameNumber: nextProps.currentFrameNumber,
-      })
-    }
-  }
-
-  scrub = scrubbedFrameNumber => {
+  scrubByPercent = percent => {
     if (typeof this.props.shuttler === 'undefined') {
-      console.warn(
-        'Scrubbing without a shuttler, no change will be reflected in frame',
-      )
-      return
+      return console.warn(UNDEFINED_SHUTTLER_WARNING)
     }
 
-    this.props.shuttler.publish('scrub', scrubbedFrameNumber)
-  }
-
-  onScrubSubmit = event => {
-    event.preventDefault()
-    this.scrub(this.state.scrubbedFrameNumber)
+    this.props.shuttler.publish('scrubByPercent', percent)
   }
 
   onProgressMouseDown = event => {
@@ -70,7 +54,6 @@ export default class Scrubber extends PureComponent {
     if (this.state.isMouseDown === false) {
       return
     }
-
     const rectangle = event.currentTarget.getBoundingClientRect()
     const rangeStart = rectangle.x
     const rangePosition = event.clientX
@@ -78,23 +61,14 @@ export default class Scrubber extends PureComponent {
     const rangeDistance = rangeEnd - rangeStart
 
     const rangePercentTraversed = (rangePosition - rangeStart) / rangeDistance
-    const scrubbedFrameNumber = Math.round(
-      rangePercentTraversed * this.props.totalFrames,
-    )
 
-    if (scrubbedFrameNumber === this.props.currentFrameNumber) {
-      return
-    }
-
-    this.scrub(scrubbedFrameNumber)
+    this.scrubByPercent(rangePercentTraversed)
   }
 
   render() {
-    const { currentFrameNumber, totalFrames } = this.props
     const { elapsedPercent } = this.state
-    const completedPercentage = elapsedPercent
-      ? elapsedPercent * 100
-      : (currentFrameNumber - 1) / (totalFrames - 1) * 100
+    const completedPercentage = Math.max(0, Math.min(elapsedPercent * 100, 100))
+
     const pastStyle = {
       width: `${completedPercentage}%`,
     }
@@ -112,10 +86,9 @@ export default class Scrubber extends PureComponent {
     })
 
     return (
-      <form onSubmit={this.onScrubSubmit} className="Scrubber">
+      <div className="Scrubber">
         <div
           className="Scrubber__progress"
-          title={`Frame ${currentFrameNumber}`}
           onMouseDown={this.onProgressMouseDown}
           onMouseUp={this.onProgressMouseUp}
           onMouseMove={this.onProgressMouseMove}>
@@ -134,7 +107,7 @@ export default class Scrubber extends PureComponent {
             )}
           />
         </div>
-      </form>
+      </div>
     )
   }
 }

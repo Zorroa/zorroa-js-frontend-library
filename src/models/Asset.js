@@ -110,23 +110,23 @@ export default class Asset {
   }
 
   width() {
-    this.getMediaClip().width
+    return this.getMedia().width
   }
 
   height() {
-    this.getMediaClip().height
+    return this.getMedia().height
   }
 
   aspect() {
     return this.width() / Math.max(1, this.height())
   }
 
-  getMediaClip() {
+  getMedia() {
     return this.document.media || {}
   }
 
   getClip() {
-    const media = this.getMediaClip()
+    const media = this.getMedia()
     return media.clip || {}
   }
 

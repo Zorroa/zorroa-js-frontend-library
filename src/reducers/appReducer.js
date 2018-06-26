@@ -11,6 +11,7 @@ import {
   LIGHTBOX_PANNER,
   SET_DRAGGING,
   SHOULD_LOOP,
+  SHOULD_HOLD,
   THUMB_SIZE,
   THUMB_LAYOUT,
   SHOW_TABLE,
@@ -113,6 +114,7 @@ const initialState = {
   showQuickview: false,
   flipbookFps: defaultFpsFrequencies[0],
   shouldLoop: false,
+  shouldHold: false,
   activePreferencesPane: undefined,
   showPreferencesModal: false,
 }
@@ -300,6 +302,8 @@ export default function app(state = initialState, action) {
       return { ...state, flipbookFps: action.payload }
     case SHOULD_LOOP:
       return { ...state, shouldLoop: action.payload }
+    case SHOULD_HOLD:
+      return { ...state, shouldHold: action.payload }
     case SHOW_PREFERENCES:
       return {
         ...state,

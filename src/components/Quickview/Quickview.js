@@ -7,7 +7,7 @@ import Asset from '../../models/Asset'
 import Modal from '../Modal'
 import ModalHeader from '../ModalHeader'
 import Video from '../Video'
-import { FlipbookPlayer } from '../Flipbook'
+import FlipbookPlayer from '../Flipbook/FlipbookImage/index.js'
 import { isolateAssetId } from '../../actions/assetsAction'
 import { hideQuickview } from '../../actions/appActions'
 import { PubSub } from '../../services/jsUtil'
@@ -189,7 +189,12 @@ class Quickview extends Component {
         )}
         {this.getMediaType() === 'flipbook' && (
           <div className="Quickview__flipbook">
-            <FlipbookPlayer clipParentId={asset.parentId()} width={width} />
+            <FlipbookPlayer
+              autoPlay
+              defaultFrame={asset}
+              clipParentId={asset.parentId()}
+              width={width}
+            />
           </div>
         )}
         {this.getMediaType() === 'generic' && (

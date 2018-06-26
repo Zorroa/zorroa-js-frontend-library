@@ -1,11 +1,13 @@
 import React, { Component, PropTypes } from 'react'
 import classnames from 'classnames'
 import { PubSub } from '../../services/jsUtil'
-import { Flipbook, withFlipbook } from '../Flipbook'
-import FlipbookStrip from './FlipbookStrip'
+import Flipbook from '../Flipbook/FlipbookImage/index.js'
 import PanZoom from './PanZoom'
-import ProgressCircle from '../ProgressCircle'
-import { setFlipbookFps, shouldLoop } from '../../actions/appActions'
+import {
+  setFlipbookFps,
+  shouldLoop,
+  shouldHold as actionShouldHold,
+} from '../../actions/appActions'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { defaultFpsFrequencies } from '../../constants/defaultState.js'
@@ -14,23 +16,17 @@ import keydown from 'react-keydown'
 
 class FlipbookViewer extends Component {
   static propTypes = {
+    clipParentId: PropTypes.string.isRequired,
     onError: PropTypes.func,
-    frames: PropTypes.arrayOf(
-      PropTypes.shape({
-        url: PropTypes.string.isRequired,
-        imageBitmap: PropTypes.instanceOf(window.ImageBitmap),
-        number: PropTypes.number.isRequired,
-      }),
-    ).isRequired,
     actions: PropTypes.shape({
       setFlipbookFps: PropTypes.func,
       shouldLoop: PropTypes.func,
+      shouldHold: PropTypes.func,
     }),
     shouldLoop: PropTypes.bool,
-    totalFrames: PropTypes.number.isRequired,
-    loadedPercentage: PropTypes.number.isRequired,
     fps: PropTypes.number.isRequired,
     isolatedAsset: PropTypes.instanceOf(Asset),
+    shouldHold: PropTypes.bool,
   }
 
   constructor(props) {
@@ -41,17 +37,17 @@ class FlipbookViewer extends Component {
 
     this.state = {
       playing: false,
-      currentFrameNumber: 0,
       loopPaused: false,
     }
+  }
+
+  onHoldToggle = () => {
+    this.props.actions.shouldHold(!this.props.shouldHold)
   }
 
   componentDidMount() {
     this.status.on('playing', playing => {
       this.setState({ playing })
-    })
-    this.status.on('played', currentFrameNumber => {
-      this.setState({ currentFrameNumber })
     })
     this.status.on('loopPaused', loopPaused => {
       this.setState({ loopPaused })
@@ -87,10 +83,6 @@ class FlipbookViewer extends Component {
     this.shuttler.publish('scrub', frame)
   }
 
-  getLoadedPercentage() {
-    return this.props.loadedPercentage
-  }
-
   onFrameFrequency = frameRate => {
     this.props.actions.setFlipbookFps(frameRate)
   }
@@ -115,15 +107,12 @@ class FlipbookViewer extends Component {
   }
 
   getDefaultFrameFromIsolatedAsset() {
-    if (
-      this.props.isolatedAsset.document.media &&
-      this.props.isolatedAsset.document.media.clip &&
-      this.props.isolatedAsset.document.media.clip.start
-    ) {
-      return this.props.isolatedAsset.document.media.clip.start
+    const asset = this.props.isolatedAsset
+    if (asset.clipType() === 'flipbook') {
+      return asset
     }
 
-    return 1
+    return undefined
   }
 
   onLoopToggle = () => {
@@ -135,69 +124,51 @@ class FlipbookViewer extends Component {
   }
 
   render() {
-    const isLoading =
-      this.getLoadedPercentage() < 100 || this.props.frames.length === 0
-    const { currentFrameNumber, playing } = this.state
+    const { playing } = this.state
+    const { shouldHold } = this.props
     const frameFrequency = {
       onFrameFrequency: this.onFrameFrequency,
       options: defaultFpsFrequencies,
       rate: this.props.fps,
     }
-    const panZoomClassNames = classnames('FlipbookViewer__pan-zoom', {
-      'FlipbookViewer__pan-zoom--is-loading': isLoading,
-    })
+    const panZoomClassNames = classnames('FlipbookViewer__pan-zoom')
 
     return (
       <div className="FlipbookViewer">
-        {isLoading === true && (
-          <div className="FlipbookViewer__loading-status">
-            <ProgressCircle percentage={this.getLoadedPercentage()} />
-          </div>
-        )}
-        {isLoading === false && (
-          <div className="FlipbookViewer__media">
-            <div className={panZoomClassNames}>
-              <PanZoom
-                frameFrequency={frameFrequency}
-                onScrub={this.scrub}
-                shuttler={this.shuttler}
-                status={this.status}
-                onLoop={this.onLoopToggle}
-                playing={playing}
-                loopPaused={this.state.loopPaused}
-                shouldLoop={this.props.shouldLoop}
-                currentFrameNumber={currentFrameNumber}
-                totalFrames={this.props.totalFrames}>
-                <Flipbook
-                  shouldLoop={this.props.shouldLoop}
-                  onError={this.onError}
-                  shuttler={this.shuttler}
-                  status={this.status}
-                  frames={this.props.frames}
-                  totalFrames={this.props.totalFrames}
-                  autoPlay={false}
-                  defaultFrame={this.getDefaultFrameFromIsolatedAsset()}
-                />
-              </PanZoom>
-            </div>
-            <FlipbookStrip
-              totalFrames={this.props.totalFrames}
+        <div className="FlipbookViewer__media">
+          <div className={panZoomClassNames}>
+            <PanZoom
+              frameFrequency={frameFrequency}
+              onScrub={this.scrub}
               shuttler={this.shuttler}
               status={this.status}
-              frames={this.props.frames}
-              currentFrameNumber={currentFrameNumber}
-            />
+              onLoop={this.onLoopToggle}
+              playing={playing}
+              loopPaused={this.state.loopPaused}
+              shouldLoop={this.props.shouldLoop}
+              onHold={this.onHoldToggle}
+              shouldHold={shouldHold}>
+              <Flipbook
+                onError={this.onError}
+                shuttler={this.shuttler}
+                status={this.status}
+                autoPlay={false} //  TODO: This is controversial, probably needs to be turned off
+                defaultFrame={this.getDefaultFrameFromIsolatedAsset()}
+                clipParentId={this.props.clipParentId}
+              />
+            </PanZoom>
           </div>
-        )}
+        </div>
       </div>
     )
   }
 }
 
-const ConnectedFlipbookViewer = connect(
+export default connect(
   state => ({
     fps: state.app.flipbookFps,
     shouldLoop: state.app.shouldLoop,
+    shouldHold: state.app.shouldHold,
     isolatedAsset: state.assets.all.find(
       asset => asset.id === state.assets.isolatedId,
     ),
@@ -207,10 +178,9 @@ const ConnectedFlipbookViewer = connect(
       {
         setFlipbookFps,
         shouldLoop,
+        shouldHold: actionShouldHold,
       },
       dispatch,
     ),
   }),
 )(FlipbookViewer)
-
-export default withFlipbook(ConnectedFlipbookViewer)

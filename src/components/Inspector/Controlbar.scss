@@ -32,7 +32,7 @@ $icon-active: '%2373b61c';
 
   }
 
-  &__loop-button {
+  &__control-button {
     background-color: transparent;
     overflow: hidden;
     text-indent: -5000px;
@@ -43,20 +43,42 @@ $icon-active: '%2373b61c';
     background-position: center center;
     background-repeat: no-repeat;
 
-    & {
-      background-image: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22768%22%20height%3D%22768%22%3E%3Cpath%20fill%3D%22#{$icon-inactive}%22%20d%3D%22M384%20576v-96l127.5%20127.5-127.5%20129v-96A257.4%20257.4%200%200%201%20127.5%20384c0-49.5%2015-97.5%2040.5-136.5l46.5%2046.5c-15%2027-22.5%2057-22.5%2090%200%20106.5%2085.5%20192%20192%20192zm0-448.5c141%200%20256.5%20115.5%20256.5%20256.5%200%2049.5-15%2097.5-40.5%20136.5L553.5%20474c15-27%2022.5-57%2022.5-90%200-106.5-85.5-192-192-192v96L256.5%20160.5%20384%2031.5v96z%22%2F%3E%3C%2Fsvg%3E");
+    &--loop {
+      background-color: transparent;
+      overflow: hidden;
+      text-indent: -5000px;
+      border: 0;
+      width: 20px;
+      height: 20px;
+      background-size: contain;
+      background-position: center center;
+      background-repeat: no-repeat;
+
+      & {
+        background-image: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22768%22%20height%3D%22768%22%3E%3Cpath%20fill%3D%22#{$icon-inactive}%22%20d%3D%22M384%20576v-96l127.5%20127.5-127.5%20129v-96A257.4%20257.4%200%200%201%20127.5%20384c0-49.5%2015-97.5%2040.5-136.5l46.5%2046.5c-15%2027-22.5%2057-22.5%2090%200%20106.5%2085.5%20192%20192%20192zm0-448.5c141%200%20256.5%20115.5%20256.5%20256.5%200%2049.5-15%2097.5-40.5%20136.5L553.5%20474c15-27%2022.5-57%2022.5-90%200-106.5-85.5-192-192-192v96L256.5%20160.5%20384%2031.5v96z%22%2F%3E%3C%2Fsvg%3E");
+      }
+
+      &:hover,
+      &-active {
+        background-image: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22768%22%20height%3D%22768%22%3E%3Cpath%20fill%3D%22#{$icon-active}%22%20d%3D%22M384%20576v-96l127.5%20127.5-127.5%20129v-96A257.4%20257.4%200%200%201%20127.5%20384c0-49.5%2015-97.5%2040.5-136.5l46.5%2046.5c-15%2027-22.5%2057-22.5%2090%200%20106.5%2085.5%20192%20192%20192zm0-448.5c141%200%20256.5%20115.5%20256.5%20256.5%200%2049.5-15%2097.5-40.5%20136.5L553.5%20474c15-27%2022.5-57%2022.5-90%200-106.5-85.5-192-192-192v96L256.5%20160.5%20384%2031.5v96z%22%2F%3E%3C%2Fsvg%3E");
+      }
+
+      &-paused {
+        animation: spin 1000ms cubic-bezier(0.645, 0.045, 0.355, 1) infinite reverse; // This value is copied in the JS
+      }
     }
 
-    &:hover,
-    &--active {
-      background-image: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22768%22%20height%3D%22768%22%3E%3Cpath%20fill%3D%22#{$icon-active}%22%20d%3D%22M384%20576v-96l127.5%20127.5-127.5%20129v-96A257.4%20257.4%200%200%201%20127.5%20384c0-49.5%2015-97.5%2040.5-136.5l46.5%2046.5c-15%2027-22.5%2057-22.5%2090%200%20106.5%2085.5%20192%20192%20192zm0-448.5c141%200%20256.5%20115.5%20256.5%20256.5%200%2049.5-15%2097.5-40.5%20136.5L553.5%20474c15-27%2022.5-57%2022.5-90%200-106.5-85.5-192-192-192v96L256.5%20160.5%20384%2031.5v96z%22%2F%3E%3C%2Fsvg%3E");
-    }
+    &--hold {
+      & {
+        background-image: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22768%22%20height%3D%22768%22%3E%3Cpath%20fill%3D%22#{$icon-inactive}%22%20d%3D%22M480%20496.5L592.5%20384%20480%20271.5v81H288v-81L175.5%20384%20288%20496.5v-81h192v81zm160.5-369c34.5%200%2063%2030%2063%2064.5v384a64.7%2064.7%200%200%201-63%2064.5h-513c-34.5%200-63-30-63-64.5V192a64.7%2064.7%200%200%201%2063-64.5h102l58.5-63h192l58.5%2063h102z%22%2F%3E%3C%2Fsvg%3E");
+      }
 
-    &--loop-paused {
-      animation: spin 1000ms cubic-bezier(0.645, 0.045, 0.355, 1) infinite reverse; // This value is copied in the JS
+      &:hover,
+      &-active {
+        background-image: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22768%22%20height%3D%22768%22%3E%3Cpath%20fill%3D%22#{$icon-active}%22%20d%3D%22M480%20496.5L592.5%20384%20480%20271.5v81H288v-81L175.5%20384%20288%20496.5v-81h192v81zm160.5-369c34.5%200%2063%2030%2063%2064.5v384a64.7%2064.7%200%200%201-63%2064.5h-513c-34.5%200-63-30-63-64.5V192a64.7%2064.7%200%200%201%2063-64.5h102l58.5-63h192l58.5%2063h102z%22%2F%3E%3C%2Fsvg%3E");
+      }
     }
   }
-
 
   &__options-button {
     background: none;

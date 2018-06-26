@@ -17,6 +17,12 @@ export function get(id) {
           'media.clip.parent': [id],
         },
       },
+      order: [
+        {
+          ascending: true,
+          field: 'media.clip.start',
+        },
+      ],
       postFilter: null,
       size: 10000, // TODO: Re-evaulate if this is good enough
       aggs: null,

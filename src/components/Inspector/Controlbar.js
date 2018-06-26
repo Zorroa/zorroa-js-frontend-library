@@ -5,6 +5,7 @@ import classnames from 'classnames'
 import VolumeBar from './VolumeBar'
 import Scrubber from '../Scrubber'
 import { PubSub } from '../../services/jsUtil'
+import Asset from '../../models/Asset'
 
 export default class Controlbar extends PureComponent {
   static propTypes = {
@@ -19,11 +20,12 @@ export default class Controlbar extends PureComponent {
     status: PropTypes.instanceOf(PubSub),
     playing: PropTypes.bool,
     onVolume: PropTypes.func,
-    currentFrameNumber: PropTypes.number,
-    totalFrames: PropTypes.number,
+    frames: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     onLoop: PropTypes.func,
     shouldLoop: PropTypes.bool,
     loopPaused: PropTypes.bool,
+    onHold: PropTypes.func,
+    shouldHold: PropTypes.bool,
     frameFrequency: PropTypes.shape({
       onFrameFrequency: PropTypes.func,
       options: PropTypes.arrayOf(PropTypes.number),
@@ -37,6 +39,10 @@ export default class Controlbar extends PureComponent {
     this.state = {
       showFpsOptions: false,
     }
+  }
+
+  showHoldToggle() {
+    return typeof this.props.onHold === 'function'
   }
 
   showVideo() {
@@ -61,16 +67,8 @@ export default class Controlbar extends PureComponent {
 
   showScrubber() {
     const hasScrubHandler = typeof this.props.onScrub === 'function'
-    const hasTotalFramesCount =
-      Number.isInteger(this.props.totalFrames) === true
-    const hasCurrentFrameNumber = isNaN(this.props.currentFrameNumber) === false
     const hasShuttler = this.props.shuttler !== undefined
-    return (
-      hasScrubHandler &&
-      hasTotalFramesCount &&
-      hasCurrentFrameNumber &&
-      hasShuttler
-    )
+    return hasScrubHandler && hasShuttler
   }
 
   toggleShowFpsOptions = () => {
@@ -118,8 +116,7 @@ export default class Controlbar extends PureComponent {
               <Scrubber
                 status={this.props.status}
                 shuttler={this.props.shuttler}
-                currentFrameNumber={this.props.currentFrameNumber}
-                totalFrames={this.props.totalFrames}
+                frames={this.props.frames}
                 mode="controlbar"
               />
             </div>
@@ -205,19 +202,43 @@ export default class Controlbar extends PureComponent {
                 onClick={this.props.onLoop}
                 title={
                   this.props.shouldLoop
-                    ? 'Disable Playback Loop'
-                    : 'Enable Playback Loop'
+                    ? 'Click to disable playback loop'
+                    : 'Click to enable playback loop'
                 }
-                className={classnames('Controlbar__loop-button', {
-                  'Controlbar__loop-button--loop-paused':
-                    this.props.loopPaused === true,
-                  'Controlbar__loop-button--active':
-                    this.props.shouldLoop === true,
-                })}>
+                className={classnames(
+                  'Controlbar__control-button Controlbar__control-button--loop',
+                  {
+                    'Controlbar__control-button--loop-paused':
+                      this.props.loopPaused === true,
+                    'Controlbar__control-button--loop-active':
+                      this.props.shouldLoop === true,
+                  },
+                )}>
                 Toggle Loop
               </button>
             </div>
           )}
+          {this.showHoldToggle() && (
+            <div className="Controlbar__section">
+              <button
+                onClick={this.props.onHold}
+                title={
+                  this.props.shouldHold
+                    ? 'Click to skip over missing frames'
+                    : 'Click to hold animation for missing frames'
+                }
+                className={classnames(
+                  'Controlbar__control-button Controlbar__control-button--hold',
+                  {
+                    'Controlbar__control-button--hold-active':
+                      this.props.shouldHold === true,
+                  },
+                )}>
+                Toggle Hold For Missing Frames
+              </button>
+            </div>
+          )}
+
           {this.showVolume() && (
             <div className="Controlbar__section">
               <VolumeBar

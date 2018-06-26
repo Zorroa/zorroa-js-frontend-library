@@ -1,22 +1,20 @@
 /* eslint-env jest */
 
 import React from 'react'
-import { mount } from 'enzyme'
+import { shallow } from 'enzyme'
 import Scrubber from './Scrubber'
+import { PubSub } from '../../services/jsUtil'
 
 describe('<Scrubber />', () => {
-  describe('With no PubSub props', () => {
-    const scrubberComponent = mount(
-      <Scrubber currentFrameNumber={5} totalFrames={10} />,
-    )
+  const status = new PubSub()
+  const scrubberComponent = shallow(<Scrubber status={status} />)
 
-    it('Should have the current frame number as a title', () => {
-      expect(
-        scrubberComponent
-          .getDOMNode()
-          .querySelector('.Scrubber__progress')
-          .attributes.getNamedItem('title').value,
-      ).toBe('Frame 5')
-    })
+  it('Should indicate the amount of progress that has elapsed', () => {
+    status.publish('elapsedPercent', 0)
+    expect(scrubberComponent.state('elapsedPercent')).toBe(0)
+    status.publish('elapsedPercent', 0.5)
+    expect(scrubberComponent.state('elapsedPercent')).toBe(0.5)
+    status.publish('elapsedPercent', 1)
+    expect(scrubberComponent.state('elapsedPercent')).toBe(1)
   })
 })

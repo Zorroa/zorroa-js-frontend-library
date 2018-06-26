@@ -1,0 +1,27 @@
+.FlipbookImage {
+  // Think long and hard before changing the font size, you could introduce
+  // excess white space in certain layouts that weren't expecting any text.
+  font-size: 0;
+  position: relative;
+
+  &,
+  &__loading-status {
+    display: flex;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  &__loading-status {
+    top: 0;
+    left: 0;
+    z-index: 1;
+    position: absolute;
+
+    &--no-frame-metadata {
+      position: static;
+    }
+  }
+}

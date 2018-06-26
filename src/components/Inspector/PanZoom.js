@@ -40,6 +40,8 @@ class PanZoom extends Component {
     actions: PropTypes.object,
     onZoom: PropTypes.func,
     children: PropTypes.node.isRequired,
+    shouldHold: PropTypes.bool,
+    onHold: PropTypes.func,
   }
 
   static defaultProps = {
@@ -194,6 +196,8 @@ class PanZoom extends Component {
       userSettings,
       totalFrames,
       currentFrameNumber,
+      shouldHold,
+      onHold,
     } = this.props
     const { moving } = this.state
     const epsilon = 0.01
@@ -245,6 +249,8 @@ class PanZoom extends Component {
                   onLoop={onLoop}
                   shouldLoop={shouldLoop}
                   loopPaused={loopPaused}
+                  shouldHold={shouldHold}
+                  onHold={onHold}
                 />
               )}
             </div>

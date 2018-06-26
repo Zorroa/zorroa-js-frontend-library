@@ -57,7 +57,6 @@ export function archivistMetrics() {
 
 export function archivistSetting(name) {
   return dispatch => {
-    console.log('Get archivist setting ' + name)
     archivistGet(dispatch, `/api/v1/settings/${name}`)
       .then(response => {
         dispatch({

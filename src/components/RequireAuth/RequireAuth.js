@@ -24,7 +24,7 @@ const RequireAuth = ({
 )
 
 RequireAuth.propTypes = {
-  component: PropTypes.element,
+  component: PropTypes.func,
   location: PropTypes.object,
   authenticated: PropTypes.bool,
 }
