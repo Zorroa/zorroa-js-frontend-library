@@ -57,7 +57,7 @@ class Facet extends Component {
       if (field !== this.state.field) {
         this.setState({ field })
       }
-      if (widget.sliver.filter) {
+      if (widget.sliver.filter && widget.sliver.filter.terms) {
         const terms = widget.sliver.filter.terms[field]
         if (terms && terms !== this.state.terms) {
           // determine whether any of the current terms are in the "other" bucket

@@ -154,11 +154,18 @@ export function createFolder(folder, assetIds) {
           addAssetIdsToFolderIdProm(dispatch, assetIds, folder.id)
         }
       })
-      .catch(error => {
+      .catch(errorResponse => {
+        let error = {
+          error: 'Unable to create smart collection',
+        }
+
+        if (typeof errorResponse.response === 'object') {
+          error = errorResponse.response.data
+        }
         dispatch({
           type: CREATE_FOLDER_ERROR,
           payload: {
-            error: error.response.data,
+            error,
           },
         })
       })
