@@ -15,5 +15,5 @@ module.exports = {
   appNodeModules: path.resolve('node_modules'),
 
   // this is for the /version.html endpoint, a separate page
-  versionHtml: path.resolve('templates/version.hbs')
+  versionHtml: path.resolve('templates/version.hbs'),
 }

@@ -6,23 +6,21 @@ const ENV = 'PROD'
 
 module.exports = {
   devtool: 'source-map',
-  entry: [
-    paths.appSrc
-  ],
+  entry: [paths.appSrc],
   output: {
     path: paths.appBuild,
     pathinfo: true,
     filename: 'static/js/app.bundle.js',
-    publicPath: '/'
+    publicPath: '/',
   },
   resolve: {
     fallback: paths.nodePaths,
-    extensions: ['.js', '.json', '.jsx', '']
+    extensions: ['.js', '.json', '.jsx', ''],
   },
   module: {
     noParse: /node_modules\/.bin/,
     preLoaders: getPreloaders(ENV),
-    loaders: getLoaders(ENV)
+    loaders: getLoaders(ENV),
   },
-  plugins: getPlugins(ENV)
+  plugins: getPlugins(ENV),
 }
