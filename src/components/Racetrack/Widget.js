@@ -114,8 +114,8 @@ class Widget extends Component {
     } = this.props
     const widget = this.widget()
     const advanced = uxLevel > 0
-    const isEnabled = !advanced || (widget && widget.isEnabled)
-    const isPinned = advanced && widget && widget.isPinned
+    const isEnabled = (!advanced || (widget && widget.isEnabled)) === true
+    const isPinned = (advanced && widget && widget.isPinned) === true
     const maxWidth = onOpen ? 360 : undefined // Implicitly use onOpen to restrict width of Racebar widgets
     const WidgetHeaderParams = {
       icon,

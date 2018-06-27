@@ -37,17 +37,23 @@ function metadataBadge(fieldTemplate, asset, key) {
 
 const FieldTemplate = props => {
   const templateGroups = props.template.split(';')
+  const { asset } = props
+
+  if (asset === undefined) {
+    return null
+  }
+
   return (
     <div className="FieldTemplate">
       {templateGroups.map((template, key) =>
-        metadataBadge(template, props.asset, key),
+        metadataBadge(template, asset, key),
       )}
     </div>
   )
 }
 
 FieldTemplate.propTypes = {
-  asset: PropTypes.object.isRequired,
+  asset: PropTypes.object,
   template: PropTypes.string.isRequired,
 }
 

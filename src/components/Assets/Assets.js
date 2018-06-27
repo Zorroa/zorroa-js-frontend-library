@@ -85,6 +85,7 @@ class Assets extends Component {
     isolatedId: PropTypes.string,
     showQuickview: PropTypes.bool.isRequired,
     history: PropTypes.object,
+    location: PropTypes.object,
   }
 
   constructor(props) {
@@ -115,7 +116,6 @@ class Assets extends Component {
     this.resizer = null
     this.loaded = 0
 
-    this.history = {}
     this.historyNav = null
   }
 
@@ -348,7 +348,7 @@ class Assets extends Component {
     }
   }
 
-  componentWillMount = () => {
+  componentWillMount() {
     if (this.updateAssetsScrollSizeInterval) {
       clearInterval(this.updateAssetsScrollSizeInterval)
     }
@@ -357,57 +357,25 @@ class Assets extends Component {
       150,
     )
     this.resizer = new Resizer()
-
-    // Support using the navigation buttons to restore previous search state
-    // This 'first' history entry is a sentinel we use to warn the user about going back too far & losing their history
-    this.saveHistory('first')
-    // called in response to both Back and Forward navigation, after navigation occurs
-    window.onpopstate = this.restoreHistory
   }
 
-  restoreHistory = event => {
-    // location has the new URL, after having hit Back or Forward
-    const historyKey = location.hash.slice(1)
-    // Warn user if they're about to erase their history
-    if (historyKey === 'first') {
-      // TODO: factor this into a generic message dialog
-      return new Promise(resolve => {
-        let dismissFn = event => {
-          this.props.actions.hideModal()
-          resolve()
-        }
-        const body = (
-          <div className="Assets-history">
-            <div className="Assets-history-header">
-              <div className="Assets-history-title">History Warning</div>
-              <div className="flexOn" />
-              <div
-                className="Assets-history-close icon-cross"
-                onClick={dismissFn}
-              />
-            </div>
-            <div className="Assets-history-msg">
-              Going back any further will lose your history.
-            </div>
-            <button className="Assets-history-dismiss" onClick={dismissFn}>
-              Okay
-            </button>
-          </div>
-        )
-        this.props.actions.showModal({ body, width: '400px' })
-      }).then(_ => {
-        // TODO: erase history if they go back?
-      })
+  componentDidUpdate(prevProps) {
+    const previousHash = prevProps.location.hash
+    const currentHash = this.props.location.hash
+    if (previousHash !== currentHash) {
+      this.restoreHistory()
     }
-    const historyVal = this.history[historyKey]
-    if (!historyVal) return
+  }
+
+  restoreHistory = () => {
+    this.startHistoryNav()
+    const folder = this.props.history.location.state
+
+    if (folder === undefined) {
+      return
+    }
 
     this.startHistoryNav()
-
-    // close lightbox, restore search
-    const folder = historyVal.folder
-    this.props.actions.isolateAssetId()
-    this.props.actions.isolateParent()
     this.props.actions.restoreFolders([folder])
   }
 
@@ -427,26 +395,27 @@ class Assets extends Component {
     this.historyNav = null
   }
 
-  saveHistory = optFirstTimeHistoryKey => {
-    if (this.historyNav && !optFirstTimeHistoryKey) return
-    const { query, order, widgets } = this.props
+  saveHistory = () => {
+    if (this.historyNav) {
+      return
+    }
+    const { query, order, widgets, history, location } = this.props
     this.stopHistoryNav()
 
     const path = location.pathname + location.search
-    const historyKey = optFirstTimeHistoryKey || Date.now().toString()
+    const historyKey = Date.now().toString()
     const attrs = { widgets, order }
     const folderObj = { search: query, attrs }
     const folder = new Folder(folderObj)
-    this.history[historyKey] = { folder }
 
     // save the search in local storage - for restoring session state on reload
     localStorage.setItem(SESSION_STATE_ITEM, JSON.stringify(folderObj))
 
-    requestAnimationFrame(_ => {
+    requestAnimationFrame(() => {
       if (location.hash) {
-        history.pushState({}, 'title', `${path}#${historyKey}`)
+        history.push(`${path}#${historyKey}`, folder)
       } else {
-        history.replaceState({}, 'title', `${path}#${historyKey}`)
+        history.replace(`${path}#${historyKey}`, folder)
       }
     })
   }
@@ -784,7 +753,7 @@ class Assets extends Component {
                         this.skipNextSelectionScroll = true
                         this.select(asset, event)
                       }}
-                      onDoubleClick={_ => this.isolateToLightbox(asset)}
+                      onDoubleClick={() => this.isolateToLightbox(asset)}
                     />
                   )
                 })}
@@ -830,7 +799,9 @@ class Assets extends Component {
       }
     }
     this.assetsCounter = assetsCounter
-    if (this.historyNav) this.startHistoryNav()
+    if (this.historyNav) {
+      this.startHistoryNav()
+    }
 
     // If the selection change triggered this update, scroll to the new selection
     if (this.props.selectionCounter !== this.selectionCounter) {

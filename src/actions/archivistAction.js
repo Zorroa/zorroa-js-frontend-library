@@ -9,7 +9,6 @@ import { archivistGet, archivistPut } from './authAction'
 
 export function archivistInfo() {
   return dispatch => {
-    console.log('Update archivist info')
     archivistGet(dispatch, '/info')
       .then(response => {
         dispatch({

@@ -16,7 +16,7 @@ const initialState = {
   isFetchingSharedTableLayouts: false,
   isFetchingSharedTableLayoutsError: false,
   isFetchingSharedTableLayoutsErrorMessage: '',
-  isSavingSharedTableLayouts: false,
+  isSavingSharedTableLayouts: {},
   isSavingSharedTableLayoutsError: {},
   isSavingSharedTableLayoutsSuccess: {},
   isDeletingSharedTable: false,

@@ -29,7 +29,9 @@ const WidgetHeader = ({
       <div className="WidgetHeader-hover">
         <div
           className="WidgetHeader-toggle flexRowCenter fullWidth fullHeight"
-          onClick={_ => collapseToggleFn(!isOpen)}>
+          onClick={() =>
+            typeof collapseToggleFn === 'function' && collapseToggleFn(!isOpen)
+          }>
           <div className={iconClassNames} />
           {!isIconified && (
             <div className="WidgetHeader-header">

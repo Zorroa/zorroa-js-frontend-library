@@ -22,7 +22,6 @@ import {
   MultipageWidgetInfo,
   ImportSetWidgetInfo,
   FlipbookWidgetInfo,
-  FiletypeWidgetInfo,
 } from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
 
@@ -200,16 +199,7 @@ export default function(state = initialState, action) {
     }
     case DEISOLATE_FLIPBOOK: {
       const widgets = state.widgets.reduce((newWidgets, widget) => {
-        if (widget.type === FiletypeWidgetInfo.type) {
-          // Re-enable the FileType widget
-          newWidgets.push({
-            ...widget,
-            isEnabled: true,
-          })
-
-          return newWidgets
-        } else if (widget.type !== FlipbookWidgetInfo.type) {
-          // Removes the FlipbookWidget by only adding non-Flipbook widgets
+        if (widget.type !== FlipbookWidgetInfo.type) {
           newWidgets.push(widget)
         }
 
@@ -219,13 +209,9 @@ export default function(state = initialState, action) {
     }
     case ISOLATE_FLIPBOOK: {
       const flipbook = action.payload
-
+      const isEnabled = true
       if (flipbook) {
         const sortByPage = true
-        const index = state.widgets.findIndex(
-          widget => widget.type === FlipbookWidgetInfo.type,
-        )
-        const isEnabled = index >= 0 ? state.widgets[index].isEnabled : true
         const widgetState = {
           id: flipbook.parentId(),
           title: flipbook.document.source.filename,
@@ -237,7 +223,7 @@ export default function(state = initialState, action) {
           false,
           widgetState,
         )
-        const widgets = [widget]
+        const widgets = [...state.widgets, widget]
         return { ...state, widgets }
       }
       return state

@@ -48,8 +48,7 @@ class FlipbookWidget extends Component {
       currentFrameNumber: false,
       totalFrames: 0,
       sortByFrame:
-        props.searchOrder &&
-        props.searchOrder.field === 'media.clip.frame.start',
+        props.searchOrder && props.searchOrder.field === 'media.clip.start',
     }
   }
 
@@ -69,8 +68,9 @@ class FlipbookWidget extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (
-      nextProps.widget.state.title !== this.props.widget.state.title ||
-      nextProps.widget.state.id !== this.props.widget.state.id
+      nextProps.widget &&
+      (nextProps.widget.state.title !== this.props.widget.state.title ||
+        nextProps.widget.state.id !== this.props.widget.state.id)
     ) {
       this.setState(this.props.widget.state)
     }
@@ -100,7 +100,7 @@ class FlipbookWidget extends Component {
     })
 
     if (event.target.checked === true) {
-      this.props.actions.sortAssets('media.clip.frame.start', true, {
+      this.props.actions.sortAssets('media.clip.start', true, {
         silent: true,
       })
       return
@@ -251,9 +251,7 @@ export default connect(
     totalCount: state.assets.totalCount,
     searchOrder:
       state.assets.order &&
-      state.assets.order.find(
-        order => order.field === 'media.clip.frame.start',
-      ),
+      state.assets.order.find(order => order.field === 'media.clip.start'),
     widget:
       state.racetrack &&
       state.racetrack.widgets &&

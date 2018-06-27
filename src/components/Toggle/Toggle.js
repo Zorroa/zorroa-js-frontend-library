@@ -26,7 +26,7 @@ const Toggle = ({
     <label className={labelClasses}>
       <input
         type="checkbox"
-        checked={checked}
+        checked={checked === true}
         onChange={onChange}
         className="Toggle__checkbox"
       />
@@ -39,7 +39,7 @@ const Toggle = ({
 }
 
 Toggle.propTypes = {
-  checked: PropTypes.bool.isRequired,
+  checked: PropTypes.bool,
   disabled: PropTypes.bool,
   disabledTitle: PropTypes.string,
   onChange: PropTypes.func.isRequired,

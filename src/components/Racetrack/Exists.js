@@ -13,7 +13,7 @@ import { unCamelCase } from '../../services/jsUtil'
 
 class Exists extends Component {
   static propTypes = {
-    query: PropTypes.instanceOf(AssetSearch).isRequired,
+    query: PropTypes.instanceOf(AssetSearch),
     actions: PropTypes.object.isRequired,
     id: PropTypes.number.isRequired,
     isIconified: PropTypes.bool.isRequired,
@@ -21,6 +21,10 @@ class Exists extends Component {
     onOpen: PropTypes.func,
     floatBody: PropTypes.bool.isRequired,
     widgets: PropTypes.arrayOf(PropTypes.object),
+  }
+
+  static defaultProps = {
+    query: new AssetSearch(),
   }
 
   state = {
@@ -44,7 +48,9 @@ class Exists extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.syncWithAppState(nextProps)
+    if (this.props.query.equals(nextProps.query) === false) {
+      this.syncWithAppState(nextProps)
+    }
   }
 
   componentWillMount() {

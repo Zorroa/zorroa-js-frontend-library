@@ -97,6 +97,7 @@ class Workspace extends Component {
     showQuickview: PropTypes.bool.isRequired,
     showExportsWizard: PropTypes.bool,
     showPreferencesModal: PropTypes.bool,
+    widgets: PropTypes.array,
   }
 
   state = {
@@ -113,8 +114,16 @@ class Workspace extends Component {
   loadSharedLinkData = folderObj => {
     const { actions } = this.props
     const folder = new Folder(folderObj)
+
     actions.isolateAssetId()
-    actions.restoreFolders([folder])
+
+    if (this.hasRacetrackWidgets() === false) {
+      actions.restoreFolders([folder])
+    }
+  }
+
+  hasRacetrackWidgets() {
+    return this.props.widgets.length > 0
   }
 
   loadSharedLinkId = id => {
@@ -154,11 +163,11 @@ class Workspace extends Component {
 
     if (searchId) {
       localStorage.removeItem(LOAD_SEARCH_ITEM)
-      requestAnimationFrame(_ => {
+      requestAnimationFrame(() => {
         this.loadSharedLinkId(searchId)
       })
     } else if (sessionState) {
-      requestAnimationFrame(_ => {
+      requestAnimationFrame(() => {
         this.loadSharedLinkData(JSON.parse(sessionState))
       })
     }
@@ -194,12 +203,10 @@ class Workspace extends Component {
       .get(vurl)
       .then(response => {
         const SerVer = response.data.trim()
-        // console.log(`my version: ${zvVersion}  server says: ${SerVer}`)
         this.setState({ showReloader: SerVer !== zvVersion })
       })
       .catch(error => {
-        // should this make noise? not sure
-        console.log('error requesting curator version', error)
+        console.error('Error requesting curator version', error)
       })
   }
 
@@ -598,6 +605,7 @@ export default connect(
     monochrome: state.app.monochrome,
     showExportsWizard: state.exports.shouldShow,
     showPreferencesModal: state.app.showPreferencesModal,
+    widgets: state.racetrack.widgets,
   }),
   dispatch => ({
     actions: bindActionCreators(

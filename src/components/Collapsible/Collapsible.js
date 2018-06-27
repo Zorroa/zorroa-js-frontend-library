@@ -11,7 +11,7 @@ export default class Collapsible extends Component {
     // input props
     header: PropTypes.element.isRequired,
     isIconified: PropTypes.bool.isRequired,
-    isOpen: PropTypes.bool.isRequired,
+    isOpen: PropTypes.bool,
 
     closeIcon: PropTypes.string,
     isSelected: PropTypes.bool,
@@ -22,6 +22,10 @@ export default class Collapsible extends Component {
 
     // child props
     children: PropTypes.node,
+  }
+
+  static defaultProps = {
+    isOpen: false,
   }
 
   render() {

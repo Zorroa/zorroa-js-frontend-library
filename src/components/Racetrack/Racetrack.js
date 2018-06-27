@@ -16,8 +16,7 @@ class Racetrack extends Component {
     const widgetInfo = Object.keys(WidgetInfo)
       .map(k => WidgetInfo[k])
       .find(widgetInfo => widgetInfo.type === widget.type)
-    if (!widget.isPinned)
-      console.log('Rendering closed racetrack widget: ' + widget.type)
+
     const isPinned = true
     const isEnabled = widget.isEnabled
     const isOpen = true
@@ -35,7 +34,9 @@ class Racetrack extends Component {
   render() {
     const { widgets, isIconified, hoverFields } = this.props
     const openedWidgets = widgets && widgets.filter(widget => widget.isPinned)
-    if (!openedWidgets || !openedWidgets.length) return
+    if (!openedWidgets || !openedWidgets.length) {
+      return null
+    }
     return (
       <div className="Racetrack">
         {openedWidgets.map(widget => (
