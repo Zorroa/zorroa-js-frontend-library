@@ -5,6 +5,7 @@ env: flex
 # The settings below are to reduce costs during testing and are not appropriate
 # for production use. For more information, see:
 # https://cloud.google.com/appengine/docs/flexible/nodejs/configuring-your-app-with-app-yaml
+service: zorroa-curator
 manual_scaling:
   instances: 1
 resources:
@@ -13,4 +14,4 @@ resources:
   disk_size_gb: 10
 env_variables:
   CURATOR_PORT: 8080
-  ARCHIVIST_API_URL: 'https://qa.pool.zorroa.com'
+  ARCHIVIST_API_URL: 'https://zorroa-archivist-dot-rmaas-dit-1.appspot.com'
