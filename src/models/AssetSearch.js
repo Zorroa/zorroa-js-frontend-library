@@ -17,6 +17,7 @@ export default class AssetSearch {
       this.size = json.size // int:              Number of assets to return
       this.from = json.from // int:              First asset index to return
       this.aggs = json.aggs // {string, {string, object}}
+      this.access = json.access // {string: must be "Read", "Write" or "Export"}
     }
   }
 
