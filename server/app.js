@@ -20,7 +20,7 @@ const archivistProxy = proxy({
 app.use(express.static('bin'))
 
 // These routes should be proxied to the Archivist server
-app.use(['/api/*', '/saml/logout', '/info', '/debug'], archivistProxy)
+app.use(['/api/*', '/saml/logout', '/actuator/*', '/debug', '/info'], archivistProxy)
 
 // All other routes should be handled by the Curator
 app.get('*', (req, res) => {
