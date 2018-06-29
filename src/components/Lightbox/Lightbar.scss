@@ -69,6 +69,17 @@
     color: $zorroa-sickly-green;
     cursor: pointer;
   }
+
+  &--disabled {
+    pointer-events: none;
+    opacity: .1;
+    cursor: not-allowed;
+  }
+
+  &--loading {
+    pointer-events: none;
+    cursor: wait;
+  }
 }
 
 .Lightbar-action-text {

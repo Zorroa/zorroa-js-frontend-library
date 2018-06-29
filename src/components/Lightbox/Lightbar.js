@@ -5,14 +5,20 @@ import classnames from 'classnames'
 import downloadjs from 'downloadjs'
 import getImage from '../../services/getImage'
 import { withRouter } from 'react-router-dom'
+import api from '../../api'
 
 import User from '../../models/User'
 import Asset from '../../models/Asset'
+import AssetSearch from '../../models/AssetSearch'
 import Folders from '../Folders'
 import FieldTemplate from '../FieldTemplate'
 import { isolateAssetId } from '../../actions/assetsAction'
 import { addAssetIdsToFolderId } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
+
+const PERMISSION_STATE_LOADING = 'loading'
+const PERMISSION_STATE_ALLOWED = 'allowed'
+const PERMISSION_STATE_NONE = 'none'
 
 class Lightbar extends Component {
   static displayName = 'Lightbar'
@@ -28,12 +34,75 @@ class Lightbar extends Component {
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     actions: PropTypes.object,
-    history: PropTypes.object,
+    history: PropTypes.shape({
+      goBack: PropTypes.func.isRequired,
+    }).isRequired,
   }
 
   state = {
     showFolders: false,
     addingToCollection: false,
+    permissionsState: PERMISSION_STATE_LOADING,
+  }
+
+  componentDidMount() {
+    this.checkDownloadPermissions()
+  }
+
+  componentDidUpdate(prevProps) {
+    const currentAssetId = this.props.asset && this.props.asset.id
+    const prevAssetId = prevProps.asset && prevProps.asset.id
+    if (currentAssetId !== prevAssetId) {
+      this.checkDownloadPermissions()
+    }
+  }
+
+  getAssetId() {
+    if (this.props.asset === undefined) {
+      return
+    }
+
+    return this.props.asset.id
+  }
+
+  checkDownloadPermissions() {
+    const assetId = this.getAssetId()
+
+    this.setState({
+      permissionsState: PERMISSION_STATE_LOADING,
+    })
+
+    const assetQuery = {
+      filter: {
+        terms: {
+          _id: [assetId],
+        },
+      },
+    }
+
+    const assetSearch = new AssetSearch(assetQuery)
+    const restrictedAssetSearch = new AssetSearch({
+      ...assetSearch,
+      access: 'Export',
+    })
+    Promise.all([api.search(assetSearch), api.search(restrictedAssetSearch)])
+      .then(([readResponse, exportResponse]) => {
+        const assetsAvailableForRead = readResponse.page.totalCount
+        const assetsAvailableForExport = exportResponse.page.totalCount
+        const hasPermissions =
+          assetsAvailableForRead === assetsAvailableForExport
+        this.setState({
+          permissionsState: hasPermissions
+            ? PERMISSION_STATE_ALLOWED
+            : PERMISSION_STATE_NONE,
+        })
+      })
+      .catch(error => {
+        console.error(error)
+        this.setState({
+          permissionsState: PERMISSION_STATE_NONE,
+        })
+      })
   }
 
   closeLightbox() {
@@ -53,11 +122,17 @@ class Lightbar extends Component {
 
   onDownload = () => {
     const { asset } = this.props
+    const { permissionsState } = this.state
     const { source } = asset.document
     const { mediaType, filename } = source
     const options = {
       format: 'blob',
     }
+
+    if (permissionsState !== PERMISSION_STATE_ALLOWED) {
+      return
+    }
+
     getImage(this.isolatedAssetURL(), options).then(image => {
       downloadjs(image, filename, mediaType)
     })
@@ -96,7 +171,12 @@ class Lightbar extends Component {
       lightbarHeight,
       showFolders,
       addingToCollection,
+      permissionsState,
     } = this.state
+    const lightBarDownloadClassname = classnames('Lightbar-action', {
+      'Lightbar-action--disabled': permissionsState === PERMISSION_STATE_NONE,
+      'Lightbar-action--loading': permissionsState === PERMISSION_STATE_LOADING,
+    })
     return (
       <div className="Lightbar" style={{ height: lightbarHeight }}>
         <div className="Lightbar-metadata">
@@ -114,8 +194,13 @@ class Lightbar extends Component {
         </div>
         <div
           className="Lightbar-actions"
+          title={
+            permissionsState === PERMISSION_STATE_NONE
+              ? 'This asset is restricted from being downloaded.'
+              : 'Click to download'
+          }
           style={{ width: actionWidth, minWidth: actionWidth }}>
-          <div className="Lightbar-action" onClick={this.onDownload}>
+          <div className={lightBarDownloadClassname} onClick={this.onDownload}>
             <i className="Lightbar__icon icon-download2" />
             <span className="Lightbar-action-text Lightbar-action-download">
               Download
@@ -162,12 +247,12 @@ class Lightbar extends Component {
 
 const ConnectedLightbar = connect(
   state => ({
+    user: state.auth.user,
     assets: state.assets.all,
     asset: state.assets.all.find(asset => asset.id === state.assets.isolatedId),
     isolatedId: state.assets.isolatedId,
     lightbarFieldTemplate: state.app.lightbarFieldTemplate,
     origin: state.auth.origin,
-    user: state.auth.user,
     userSettings: state.app.userSettings,
   }),
   dispatch => ({
