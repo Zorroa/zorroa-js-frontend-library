@@ -9,7 +9,7 @@ import { archivistGet, archivistPut } from './authAction'
 
 export function archivistInfo() {
   return dispatch => {
-    archivistGet(dispatch, '/info')
+    archivistGet(dispatch, '/actuator/info')
       .then(response => {
         dispatch({
           type: ARCHIVIST_INFO,
@@ -25,7 +25,7 @@ export function archivistInfo() {
 export function archivistHealth() {
   return dispatch => {
     console.log('Update archivist health')
-    archivistGet(dispatch, '/health')
+    archivistGet(dispatch, '/actuator/health')
       .then(response => {
         dispatch({
           type: ARCHIVIST_HEALTH,
@@ -41,7 +41,7 @@ export function archivistHealth() {
 export function archivistMetrics() {
   return dispatch => {
     console.log('Update archivist metrics')
-    archivistGet(dispatch, '/metrics')
+    archivistGet(dispatch, '/actuator/metrics')
       .then(response => {
         dispatch({
           type: ARCHIVIST_METRICS,
