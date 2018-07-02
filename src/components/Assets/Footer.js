@@ -16,9 +16,14 @@ const Footer = props => (
       enabled={props.showMultipage}
       onClick={props.toggleShowMultipage}
     />
-    {props.toggleShowTable && (
-      <TableToggle enabled={props.showTable} onClick={props.toggleShowTable} />
-    )}
+    <TableToggle
+      enabled={props.showTable}
+      onClick={event => {
+        if (typeof props.toggleShowTable === 'function') {
+          props.toggleShowTable(event)
+        }
+      }}
+    />
   </div>
 )
 

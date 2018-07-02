@@ -1,10 +1,8 @@
 import React, { Component, PropTypes } from 'react'
 
-import {
-  MIN_THUMBSIZE,
-  MAX_THUMBSIZE,
-  DELTA_THUMBSIZE,
-} from '../../actions/appActions'
+const MIN_THUMBSIZE = window.innerWidth / 7
+const MAX_THUMBSIZE = window.innerWidth / 3
+const DELTA_THUMBSIZE = (MAX_THUMBSIZE - MIN_THUMBSIZE) / 10
 
 export default class ThumbSizeSlider extends Component {
   static propTypes = {
@@ -46,7 +44,7 @@ export default class ThumbSizeSlider extends Component {
             title="Thumbnail size"
             min={`${MIN_THUMBSIZE}`}
             max={`${MAX_THUMBSIZE}`}
-            step="4"
+            step="0.5"
             value={this.props.value}
             onChange={this.handleChange}
           />

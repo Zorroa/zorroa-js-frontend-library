@@ -4,6 +4,7 @@ import classnames from 'classnames'
 
 import Duration from '../Duration'
 import { DragSource } from '../../services/DragDrop'
+import getBackgroundPlaceholder from '../../services/backgroundColorPlaceholder'
 import Asset from '../../models/Asset'
 
 import {
@@ -21,9 +22,7 @@ import FieldTemplate from '../FieldTemplate'
 // Extract thumb page info from an asset
 export function page(asset, width, height, origin) {
   const url = (asset && asset.closestProxyURL(origin, width, height)) || ''
-  const tproxy = asset && asset.tinyProxy()
-  const backgroundColor = tproxy ? tproxy[4] : '#888'
-  return { url, backgroundColor }
+  return { url }
 }
 
 // Called when dragging an asset to assign assetIds to drop info
@@ -61,14 +60,30 @@ const source = {
   },
 }
 
+function getBackgroundColor(backgroundColors, psuedoRandomSeed) {
+  if (!Array.isArray(backgroundColors) || backgroundColors.length === 0) {
+    return '#fff'
+  }
+
+  const backgroundColorIndex = psuedoRandomSeed % backgroundColors.length
+  return backgroundColors[backgroundColorIndex]
+}
+
 // Internal component to render an image div with children (badges)
 const ImageThumb = props => {
-  const { url, backgroundColor, children } = props
+  const { url, backgroundColors, children } = props
   const backgroundSize = props.backgroundSize || 'contain'
+  const randomSeed = Number.parseInt(
+    url.replace(/[^0-9a-z]/gi, '').slice(-12),
+    36,
+  )
   const style = {
-    backgroundColor,
     backgroundSize,
-    backgroundImage: `url(${url})`,
+    backgroundColor: getBackgroundColor(backgroundColors, randomSeed),
+    backgroundImage: `url(${url}), ${getBackgroundPlaceholder(
+      backgroundColors,
+      randomSeed,
+    )}`,
   }
   return (
     <div className={classnames('ImageThumb')} style={style}>
@@ -79,7 +94,7 @@ const ImageThumb = props => {
 
 ImageThumb.propTypes = {
   url: PropTypes.string.isRequired,
-  backgroundColor: PropTypes.string,
+  backgroundColors: PropTypes.arrayOf(PropTypes.string),
   backgroundSize: PropTypes.oneOf(['cover', 'contain']),
   children: PropTypes.arrayOf(React.PropTypes.element),
 }
@@ -98,7 +113,6 @@ class Thumb extends Component {
     pages: PropTypes.arrayOf(
       PropTypes.shape({
         url: React.PropTypes.string,
-        backgroundColor: React.PropTypes.string,
       }),
     ).isRequired,
 
@@ -320,7 +334,7 @@ class Thumb extends Component {
   }
 
   canDisplayInset() {
-    return this.props.asset.mediaType() !== 'zorroa/x-flipbook'
+    return this.props.asset.clipType() !== 'flipbook'
   }
 
   onClick = event => {
@@ -371,7 +385,7 @@ class Thumb extends Component {
       this.props.thumbLayout === 'masonry' ? 'cover' : 'contain'
 
     if (!parentURL) {
-      const { url, backgroundColor } = pages[0]
+      const { url } = pages[0]
       const shouldRenderVideo =
         this.state.doVideoPreview && asset.mediaType().includes('video')
       const shouldRenderImageThumbForVideo = !this.state.videoPlaying
@@ -387,7 +401,7 @@ class Thumb extends Component {
           <div
             className="Thumb-video-waiting flexCenter fullWidth fullHeight"
             style={{ position: 'absolute', top: '0', left: 0 }}>
-            <ImageThumb url={url} backgroundColor={backgroundColor} />
+            <ImageThumb url={url} backgroundColors={asset.tinyProxy()} />
             {shouldRenderVideo && (
               <img
                 className="Thumb-video-waiting-spinner"
@@ -438,7 +452,7 @@ class Thumb extends Component {
               <ImageThumb
                 url={url}
                 backgroundSize={backgroundSize}
-                backgroundColor={backgroundColor}>
+                backgroundColors={asset.tinyProxy()}>
                 {this.renderOverlays()}
                 {badges}
               </ImageThumb>
@@ -471,7 +485,7 @@ class Thumb extends Component {
             .slice(0, 3)
             .reverse()
             .map((page, rindex) => {
-              const { url, backgroundColor } = page
+              const { url } = page
               const index = Math.min(3, pages.length) - rindex - 1
               return (
                 <div
@@ -482,7 +496,7 @@ class Thumb extends Component {
                     backgroundSize={
                       this.props.thumbLayout === 'masonry' ? 'cover' : 'contain'
                     }
-                    backgroundColor={backgroundColor}
+                    backgroundColors={asset.tinyProxy()}
                   />
                   {rindex === pages.length - 1 && badges}
                 </div>
@@ -490,7 +504,7 @@ class Thumb extends Component {
             })}
         {this.canDisplayInset() && (
           <div className="Thumb-inset">
-            <ImageThumb url={parentURL} />
+            <ImageThumb url={parentURL} backgroundColors={asset.tinyProxy()} />
           </div>
         )}
         {this.renderOverlays()}

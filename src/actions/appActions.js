@@ -43,9 +43,6 @@ import {
   SHOULD_HOLD,
 } from '../constants/actionTypes'
 
-export const MIN_THUMBSIZE = 48
-export const MAX_THUMBSIZE = 480
-export const DELTA_THUMBSIZE = 48
 export const DEFAULT_THUMBSIZE = 128
 
 export function setFlipbookFps(fps) {

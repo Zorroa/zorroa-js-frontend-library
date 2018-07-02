@@ -833,7 +833,7 @@ class Assets extends Component {
                 showMultipage={showMultipage}
                 toggleShowMultipage={this.toggleShowMultipage}
                 showTable={showTable}
-                toggleShowTable={uxLevel > 0 ? this.toggleShowTable : null}
+                toggleShowTable={this.toggleShowTable}
                 layout={layout}
                 handleLayout={this.changeLayout.bind(this)}
                 thumbSize={thumbSize}
@@ -841,8 +841,7 @@ class Assets extends Component {
               />
             )}
             {totalCount > 0 &&
-              showTable &&
-              uxLevel > 0 && (
+              showTable && (
                 <AssetsTable
                   height={this.clampTableHeight(tableHeight)}
                   tableIsResizing={tableIsResizing}
