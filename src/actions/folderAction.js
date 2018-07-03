@@ -333,13 +333,6 @@ export function countAssetsInFolderIds(ids, search) {
 
 function createDyHiProm(dispatch, folder, levels) {
   const folderId = folder.id
-  dispatch({
-    type: CREATE_FOLDER,
-    payload: {
-      folder,
-    },
-  })
-
   return archivistPost(dispatch, '/api/v1/dyhi', { folderId, levels })
     .then(response => {
       folder.dyhiId = response.data.id
@@ -364,13 +357,25 @@ export function createDyHiFolder(folder, dyhiLevels) {
     console.log(
       'Create dyhi for ' + folder.name + ' with ' + JSON.stringify(dyhiLevels),
     )
+    dispatch({
+      type: CREATE_FOLDER,
+      payload: {
+        folder,
+      },
+    })
     archivistPost(dispatch, `${rootEndpoint}`, folder)
       .then(response => {
         const dyhi = new Folder(response.data)
         console.log('Created DyHi folder: ' + JSON.stringify(dyhi))
-        createDyHiProm(dispatch, dyhi, dyhiLevels)
+        return createDyHiProm(dispatch, dyhi, dyhiLevels)
       })
       .catch(error => {
+        dispatch({
+          type: CREATE_FOLDER_ERROR,
+          payload: {
+            error: error.response.data,
+          },
+        })
         console.error('Error creating folder ' + folder.name + ': ' + error)
       })
   }
