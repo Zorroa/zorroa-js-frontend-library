@@ -1,6 +1,7 @@
 import React, { PropTypes, Component } from 'react'
 import classnames from 'classnames'
 import './Radio.scss'
+import { KEY_COLOR } from '../../constants/themeDefaults'
 
 export default class FormInput extends Component {
   static propTypes = {
@@ -10,6 +11,8 @@ export default class FormInput extends Component {
     onChange: PropTypes.func,
     checked: PropTypes.bool,
     name: PropTypes.string.isRequired,
+    whiteLabelEnabled: PropTypes.bool.isRequired,
+    keyColor: PropTypes.string.isRequired,
   }
 
   constructor(props) {
@@ -26,6 +29,14 @@ export default class FormInput extends Component {
         value: nextProps.checked === true,
       })
     }
+  }
+
+  getKeyColor() {
+    if (this.props.whiteLabelEnabled === true) {
+      return this.props.keyColor
+    }
+
+    return KEY_COLOR
   }
 
   onChange = event => {
@@ -58,7 +69,10 @@ export default class FormInput extends Component {
           onChange={this.onChange}
           checked={this.props.checked}
         />
-        <span className={inputClasses} />
+        <span
+          style={{ backgroundColor: this.getKeyColor() }}
+          className={inputClasses}
+        />
       </div>
     )
   }

@@ -1,0 +1,32 @@
+@import '../../styles/core-mixins.scss';
+
+.File {
+  border: 1px solid $zorroa-color-gray-dark-3;
+  height: $zorroa-metric-base * 4;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  align-content: center;
+  padding: 0 $zorroa-metric-base;
+  position: relative;
+  cursor: pointer;
+  margin: $zorroa-metric-base 0;
+
+  &__button {
+    position: absolute;
+    height: $zorroa-metric-base * 4 - 2px;
+    line-height: $zorroa-metric-base * 4;
+    top: 0;
+    right: 0;
+    padding: 0 $zorroa-metric-base * 3;
+    background: $zorroa-color-gray-dark-3;
+    display: flex;
+    align-content: center;
+    color: $zorroa-color-white;
+    text-transform: uppercase;
+  }
+
+  &__input {
+    display: none;
+  }
+}

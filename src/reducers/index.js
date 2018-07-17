@@ -11,6 +11,7 @@ import archivist from './archivistReducer'
 import users from './usersReducer'
 import exports from './exportsReducer'
 import tableLayouts from './tableLayoutsReducer'
+import theme from './themeReducer'
 
 export default combineReducers({
   app,
@@ -24,4 +25,5 @@ export default combineReducers({
   users,
   exports,
   tableLayouts,
+  theme,
 })

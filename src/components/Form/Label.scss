@@ -1,0 +1,10 @@
+@import '../../styles/core-mixins.scss';
+
+.FormInput {
+  &__label {
+    .FormInput__checkbox ~ & {
+      text-indent: $zorroa-metric-base;
+      line-height: $zorroa-metric-base * 2;
+    }
+  }
+}

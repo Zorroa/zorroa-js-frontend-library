@@ -16,12 +16,12 @@
 
   .dark & { background-color: $zorroa-nearblack; }
 
-  &.isIconified {
+  &.Sidebar--is-iconified {
     cursor: e-resize;
-    &.isRightEdge { cursor: w-resize; }
+    &--is-right-edge { cursor: w-resize; }
   }
 
-  &.isOpen {
+  &--is-open {
     min-width: $zorroa-Sidebar-width;
     max-width: 3 * $zorroa-Sidebar-width;
   }
@@ -32,7 +32,7 @@
     max-width: 100%;
 
     padding-bottom: 10px;
-    &:not(.isRightEdge) {
+    &:not(.Sidebar--is-right-edge) {
       padding-left: 10px;
       padding-right: 10px;
     }
@@ -44,7 +44,7 @@
   }
 }
 
-.Sidebar-resize-thumb {
+.Sidebar__resize-thumb {
   position: absolute;
   top: 24px;
   right: -10px; // place left sidebar resizer in the Assets' left side padding (this is awkward, will be fixed)
@@ -54,9 +54,52 @@
   background: none;
   z-index: 1;
 
-  &.isRightEdge {
+  &.Sidebar--is-right-edge {
     // place right sidebar resizer in the sidebar's left side padding
     left: 0px;
     right: auto;
   }
+}
+
+.Sidebar__logo {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: $zorroa-metric-base * 2;
+  font-size: 14px;
+  opacity: .35;
+  transition: 3000ms ease-in-out opacity, 1000ms ease-in-out filter;
+
+  &--is-iconified {
+    padding: $zorroa-metric-base * 2 0;
+    justify-content: center;
+  }
+
+  :not(.dark) & {
+    filter: grayscale(1) brightness(0);
+    &:hover {
+      filter: grayscale(0) brightness(1);
+      opacity: 1;
+    }
+  }
+
+  .dark & {
+    filter: grayscale(1) brightness(2);
+    opacity: .4;
+
+    &:hover {
+      filter: grayscale(0) brightness(1);
+      opacity: 1;
+    }
+  }
+
+  .dark & {
+    color: $zorroa-color-gray-dark-4;
+  }
+}
+
+.Sidebar__logo-description {
+  text-indent: $zorroa-metric-base;
+  font-style: italic;
+  font-size: 14px;
 }

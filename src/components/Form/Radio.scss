@@ -15,6 +15,10 @@ $radio-size: 20px;
     display: none;
   }
 
+  :not(:checked) ~ .FormInput__radio-virtual  {
+    background-color: transparent!important; // Overrides inline style
+  }
+
   &-virtual {
     content: ' ';
     display: block;
@@ -32,7 +36,6 @@ $radio-size: 20px;
       left: 50%;
       margin-top: ($radio-size - 4px) / -2;
       margin-left: ($radio-size - 4px) / -2;
-      background: $zorroa-color-green-1;
       visibility: visible;
       border-radius: 100%;
     }

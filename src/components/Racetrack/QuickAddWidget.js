@@ -3,6 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
+import { KEY_COLOR } from '../../constants/themeDefaults'
 import DisplayOptions from '../DisplayOptions'
 import AddWidget from './AddWidget'
 import Permission from '../../models/Permission'
@@ -16,6 +17,8 @@ class QuickAddWidget extends Component {
     widgets: PropTypes.arrayOf(PropTypes.object),
     permissions: PropTypes.arrayOf(PropTypes.instanceOf(Permission)),
     actions: PropTypes.object,
+    keyColor: PropTypes.string.isRequired,
+    whiteLabelEnabled: PropTypes.bool.isRequired,
   }
 
   state = {
@@ -153,6 +156,14 @@ class QuickAddWidget extends Component {
     return AddWidget.widgetInfos(widgets, filterText, permissions)
   }
 
+  getKeyColor() {
+    if (this.props.whiteLabelEnabled === true) {
+      return this.props.keyColor
+    }
+
+    return KEY_COLOR
+  }
+
   render() {
     const { selectedWidgetInfo } = this.state
     const widgetInfos = this.widgetInfos()
@@ -160,6 +171,7 @@ class QuickAddWidget extends Component {
       <div className="QuickAddWidget Racebar-add-widget">
         <div
           className="QuickAddWidget-input-container icon-plus"
+          style={{ backgroundColor: this.getKeyColor() }}
           title="Add a new search widget">
           <input
             value={this.state.filterText}
@@ -213,6 +225,8 @@ export default connect(
     fieldTypes: state.assets.types,
     widgets: state.racetrack.widgets,
     permissions: state.permissions.all,
+    keyColor: state.theme.keyColor,
+    whiteLabelEnabled: state.theme.whiteLabelEnabled,
   }),
   dispatch => ({
     actions: bindActionCreators(

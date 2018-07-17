@@ -18,6 +18,11 @@
   &:hover {
     background-color: $zorroa-color-gray-dark-4;
     border-color: $zorroa-color-gray-dark-4;
+    opacity: 1;
+  }
+
+  &--white-label {
+    opacity: .9
   }
 
   &__icon {

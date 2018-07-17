@@ -12,6 +12,7 @@ import UserTable from './UserTable'
 import PreferencesPaneMenuItem from './PreferencesPaneMenuItem'
 import ChangePassword from './ChangePassword'
 import SharedMetadata from './SharedMetadata/index.js'
+import Theme from './Theme/index.js'
 import './PreferencesPane.scss'
 import ModalOverlay, {
   ModalOverlayBody,
@@ -114,6 +115,12 @@ class PreferencesPane extends Component {
                     activePaneName={this.state.activePane}>
                     Create User
                   </PreferencesPaneMenuItem>
+                  <PreferencesPaneMenuItem
+                    onClick={this.setActivePane}
+                    paneName="theme"
+                    activePaneName={this.state.activePane}>
+                    Brand Options
+                  </PreferencesPaneMenuItem>
                 </ul>
               </li>
             </ul>
@@ -141,6 +148,7 @@ class PreferencesPane extends Component {
               title={'Change Password'}
             />
           )}
+          {this.state.activePane === 'theme' && <Theme />}
         </ModalOverlayBody>
       </ModalOverlay>
     )

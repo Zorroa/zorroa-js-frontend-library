@@ -29,6 +29,9 @@
 
     .dark & {
       background-color: $zorroa-color-gray-dark-1;
+      &--color {
+        background: transparent;
+      }
     }
   }
 
@@ -75,9 +78,38 @@
       color: $zorroa-color-danger;
       border-color: $zorroa-color-danger;
     }
+
+    &--color {
+      text-indent: $form-element-height;
+      max-width: 18ex;
+    }
   }
 
   &--error {
     color: $zorroa-color-danger;
+  }
+
+  &--color {
+    padding-right: $form-element-height + $zorroa-metric-base;
+  }
+
+  &__color-preview {
+    width: $form-element-height;
+    height: $form-element-height;
+    border-right: 1px solid $zorroa-color-gray-dark-3;
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 0;
+    border-top-left-radius: $form-element-border-radius;
+    border-bottom-left-radius: $form-element-border-radius;
+
+    &--error {
+      border: 2px solid $zorroa-color-pink-1;
+      top: 0;
+      left: 0;
+      width: $form-element-height;
+      height: $form-element-height;
+    }
   }
 }

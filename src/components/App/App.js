@@ -19,9 +19,19 @@ import {
 } from '../../constants/localStorageItems'
 import domUtils from '../../services/domUtils'
 
-class App extends Component {
+export default class App extends Component {
   static propTypes = {
     children: PropTypes.object,
+    authenticated: PropTypes.bool,
+    themeLoadState: PropTypes.oneOf(['pending', 'succeeded', 'failed'])
+      .isRequired,
+    actions: PropTypes.shape({
+      fetchTheme: PropTypes.func.isRequired,
+    }).isRequired,
+  }
+
+  state = {
+    isMandatoryLoadingPeriod: true,
   }
 
   componentWillMount() {
@@ -38,9 +48,50 @@ class App extends Component {
     if (queryParams[SHOW_IMPORT_ITEM]) {
       localStorage.setItem(SHOW_IMPORT_ITEM, queryParams[SHOW_IMPORT_ITEM])
     }
+
+    setTimeout(() => {
+      this.setState({
+        isMandatoryLoadingPeriod: false,
+      })
+    }, 750)
+  }
+
+  componentDidMount() {
+    this.props.actions.fetchTheme()
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.shouldRefetchTheme(this.props, nextProps)) {
+      this.props.actions.fetchTheme()
+    }
+  }
+
+  shouldRefetchTheme(prevProps, nextProps) {
+    const wasUnauthenticated =
+      prevProps.authenticated === undefined || prevProps.authenticated === false
+    const isAuthenticated = nextProps.authenticated
+    const isThemeUnavailable = nextProps.themeLoadState !== 'succeeded'
+    return wasUnauthenticated && isAuthenticated && isThemeUnavailable
+  }
+
+  isLoading() {
+    return (
+      // Make sure any custom themes are loaded
+      this.props.themeLoadState === 'pending' ||
+      // Make sure we know the user's auth'ed state before forwarding them
+      // (potentially unnecessarily) to the signin screen
+      this.props.authenticated === undefined ||
+      // Avoid the loading screen flashing by ensure there's a reasonable amount
+      // of time it gets displayed for
+      this.state.isMandatoryLoadingPeriod
+    )
   }
 
   render() {
+    if (this.isLoading()) {
+      return <div className="App--loading" title="App is loading" />
+    }
+
     return (
       <Router>
         <div>
@@ -57,5 +108,3 @@ class App extends Component {
     )
   }
 }
-
-export default App

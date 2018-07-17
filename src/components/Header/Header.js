@@ -18,6 +18,11 @@ import {
   dialogAlertPromise,
   showPreferencesModal,
 } from '../../actions/appActions'
+import {
+  TUTORIAL_URL,
+  FAQ_URL,
+  RELEASE_URL,
+} from '../../constants/themeDefaults'
 import { archivistBaseURL, saveUserSettings } from '../../actions/authAction'
 import { archivistInfo } from '../../actions/archivistAction'
 import {
@@ -60,6 +65,10 @@ class Header extends Component {
     }),
     widgets: PropTypes.arrayOf(PropTypes.object),
     signoutUrl: PropTypes.string.isRequired,
+    tutorialUrl: PropTypes.string.isRequired,
+    releaseNotesUrl: PropTypes.string.isRequired,
+    faqUrl: PropTypes.string.isRequired,
+    supportUrl: PropTypes.string.isRequired,
   }
 
   state = {
@@ -349,23 +358,31 @@ class Header extends Component {
           <div className="header-menu">
             <DropdownMenu label="Help">
               <a
-                href="https://zorroa.com/help-center/"
+                href={this.props.tutorialUrl || TUTORIAL_URL}
                 target="_blank"
                 className="header-menu-item">
                 Tutorials
               </a>
               <a
-                href="https://zorroa.com/help-center/faqs"
+                href={this.props.faqUrl || FAQ_URL}
                 target="_blank"
                 className="header-menu-item">
                 FAQ
               </a>
               <a
-                href="https://zorroa.com/help-center/release-notes/"
+                href={this.props.releaseNotesUrl || RELEASE_URL}
                 target="_blank"
                 className="header-menu-item">
                 Release Notes
               </a>
+              {this.props.supportUrl && (
+                <a
+                  href={this.props.supportUrl}
+                  target="_blank"
+                  className="header-menu-item">
+                  Support
+                </a>
+              )}
               <div
                 className="header-menu-item header-menu-feedback"
                 onClick={this.showFeedback}>
@@ -452,6 +469,10 @@ export default connect(
       userSettings: state.app.userSettings,
       widgets: state.racetrack.widgets,
       archivistInfo: state.archivist.info,
+      tutorialUrl: state.theme.tutorialUrl,
+      releaseNotesUrl: state.theme.releaseNotesUrl,
+      faqUrl: state.theme.faqUrl,
+      supportUrl: state.theme.supportUrl,
       signoutUrl,
     }
   },

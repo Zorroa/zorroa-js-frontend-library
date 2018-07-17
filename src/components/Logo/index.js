@@ -1,3 +1,3 @@
-import Logo from './Logo'
+import ConnectedLogo from './ConnectedLogo'
 import './Logo.scss'
-export default Logo
+export default ConnectedLogo

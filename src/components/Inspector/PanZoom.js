@@ -262,19 +262,19 @@ class PanZoom extends Component {
 }
 
 export default connect(
-  state => ({
-    lightboxPanner: state.app.lightboxPanner,
-    user: state.auth.user,
-    userSettings: state.app.userSettings,
-    minZoom: parseInt(
-      state.archivist.settings['curator.lightbox.zoom-min'].currentValue,
-      10,
-    ),
-    maxZoom: parseInt(
-      state.archivist.settings['curator.lightbox.zoom-max'].currentValue,
-      10,
-    ),
-  }),
+  state => {
+    const settings = state.archivist.settings
+    const zoomMin = settings['curator.lightbox.zoom-min']
+    const zoomMax = settings['curator.lightbox.zoom-max']
+
+    return {
+      lightboxPanner: state.app.lightboxPanner,
+      user: state.auth.user,
+      userSettings: state.app.userSettings,
+      minZoom: parseInt(zoomMin && zoomMin.currentValue, 10),
+      maxZoom: parseInt(zoomMax && zoomMax.currentValue, 10),
+    }
+  },
   dispatch => ({
     actions: bindActionCreators(
       {

@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react'
 import classnames from 'classnames'
+import './Label.scss'
 
 export default function FormLabel(props) {
   const labelClasses = classnames('FormInput', props.className, {
