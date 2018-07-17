@@ -3,6 +3,7 @@ import classnames from 'classnames'
 import { PubSub } from '../../services/jsUtil'
 import Flipbook from '../Flipbook/FlipbookImage/index.js'
 import PanZoom from './PanZoom'
+import Filmstrip from './Filmstrip/index.js'
 import {
   setFlipbookFps,
   shouldLoop,
@@ -38,6 +39,7 @@ class FlipbookViewer extends Component {
     this.state = {
       playing: false,
       loopPaused: false,
+      shouldDeferImageLoad: true,
     }
   }
 
@@ -52,19 +54,20 @@ class FlipbookViewer extends Component {
     this.status.on('loopPaused', loopPaused => {
       this.setState({ loopPaused })
     })
+    this.status.on('load', () => {
+      this.setState({
+        shouldDeferImageLoad: false,
+      })
+    })
   }
 
   componentWillReceiveProps(nextProps) {
+    const nextAsset = nextProps.isolatedAsset
     if (
-      nextProps.isolatedAsset !== this.props.isolatedAsset &&
-      nextProps.isolatedAsset.clipType() === 'flipbook' &&
-      nextProps.isolatedAsset.document.media &&
-      nextProps.isolatedAsset.document.media.clip
+      nextAsset !== this.props.isolatedAsset &&
+      nextAsset.clipType() === 'flipbook'
     ) {
-      this.shuttler.publish(
-        'scrub',
-        nextProps.isolatedAsset.document.media.clip.start,
-      )
+      this.shuttler.publish('scrub', nextAsset.startPage())
     }
   }
 
@@ -152,13 +155,19 @@ class FlipbookViewer extends Component {
                 onError={this.onError}
                 shuttler={this.shuttler}
                 status={this.status}
-                autoPlay={false} //  TODO: This is controversial, probably needs to be turned off
+                autoPlay={true}
                 defaultFrame={this.getDefaultFrameFromIsolatedAsset()}
                 clipParentId={this.props.clipParentId}
               />
             </PanZoom>
           </div>
         </div>
+        <Filmstrip
+          shuttler={this.shuttler}
+          status={this.status}
+          clipParentId={this.props.clipParentId}
+          deferImageLoad={this.state.shouldDeferImageLoad}
+        />
       </div>
     )
   }

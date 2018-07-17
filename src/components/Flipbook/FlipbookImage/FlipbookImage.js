@@ -476,6 +476,13 @@ export default class FlipbookImage extends Component {
       this.updateDefaultFrameElapsedPosition()
     }
 
+    if (
+      this.props.frames.length > 0 &&
+      this.state.loadedFrameCount + 1 === this.props.frames.length
+    ) {
+      this.publishStatusTopic('load')
+    }
+
     this.setState(state => {
       return {
         loadedFrameCount: state.loadedFrameCount + 1,

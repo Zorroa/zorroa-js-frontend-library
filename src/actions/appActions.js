@@ -41,9 +41,17 @@ import {
   FLIPBOOK_FPS,
   SHOULD_LOOP,
   SHOULD_HOLD,
+  FILMSTRIP_HEIGHT,
 } from '../constants/actionTypes'
 
 export const DEFAULT_THUMBSIZE = 128
+
+export function setFilmstripHeight(height) {
+  return {
+    type: FILMSTRIP_HEIGHT,
+    payload: height,
+  }
+}
 
 export function setFlipbookFps(fps) {
   return {

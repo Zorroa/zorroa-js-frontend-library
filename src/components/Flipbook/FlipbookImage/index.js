@@ -18,9 +18,9 @@ export default class FlipbookImageContainer extends Component {
     this.getFlipbook()
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.clipParentId !== this.props.clipParentId) {
-      this.getFlipbook(nextProps)
+  componentDidReceiveProps(prevProps) {
+    if (prevProps.clipParentId !== this.props.clipParentId) {
+      this.getFlipbook()
     }
   }
 

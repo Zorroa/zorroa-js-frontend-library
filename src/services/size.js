@@ -48,6 +48,6 @@ export function resizeByAspectRatio({ height, width, newHeight, newWidth }) {
 
   return {
     height: newHeight,
-    width: height / width * newHeight,
+    width: width / height * newHeight,
   }
 }

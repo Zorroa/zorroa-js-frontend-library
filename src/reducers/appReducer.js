@@ -45,6 +45,7 @@ import {
   ADD_TABLE_LAYOUT,
   DELETE_TABLE_LAYOUT,
   SELECT_TABLE_LAYOUT,
+  FILMSTRIP_HEIGHT,
 } from '../constants/actionTypes'
 import { DEFAULT_THUMBSIZE } from '../actions/appActions'
 import { parseVariables, fieldsForVariables } from '../services/jsUtil'
@@ -93,6 +94,7 @@ const initialState = {
   thumbSize: DEFAULT_THUMBSIZE,
   thumbLayout: 'masonry',
   tableHeight: 300,
+  filmStripHeight: 200,
   showTable: false,
   videoVolume: 0.8,
   showMultipage: true,
@@ -225,6 +227,8 @@ export default function app(state = initialState, action) {
       return { ...state, showImport: action.payload }
     case TABLE_HEIGHT:
       return { ...state, tableHeight: action.payload }
+    case FILMSTRIP_HEIGHT:
+      return { ...state, filmstripHeight: action.payload }
     case VIDEO_VOLUME:
       return { ...state, videoVolume: action.payload }
     case SHOW_MULTIPAGE:
