@@ -17,7 +17,6 @@ import {
   onlineStatus,
   createExport,
 } from '../../actions/exportsAction'
-import { getJobs } from '../../actions/jobActions'
 import { getClassFromNamespace } from './utils'
 import ZipExportPackager from './Exporters/ZipExportPackager'
 import ImageExporter from './Exporters/ImageExporter'
@@ -35,7 +34,6 @@ import ExportPreviewerPdf from './Previewers/Pdf'
 import ExportPreviewerJson from './Previewers/Json'
 import ExportPreviewerCsv from './Previewers/Csv'
 import ExportsPreview from './ExportsPreview'
-import { JobFilter } from '../../models/Job'
 import moment from 'moment'
 
 const SHOW_SUCCESS_MS = 2750
@@ -91,7 +89,6 @@ class Exports extends Component {
       exportRequest: PropTypes.func.isRequired,
       onlineStatus: PropTypes.func.isRequired,
       createExport: PropTypes.func.isRequired,
-      getJobs: PropTypes.func.isRequired,
     }),
   }
 
@@ -181,16 +178,6 @@ class Exports extends Component {
           newPresetName: `Preset ${prevState.presetSaveCounter + 1}`,
         }))
       }, SHOW_SUCCESS_MS)
-    }
-
-    if (
-      this.props.loadingCreateExportSuccess === false &&
-      nextProps.loadingCreateExportSuccess === true
-    ) {
-      const { userId } = this.props
-      const type = 'Exports'
-      const jobFilter = new JobFilter({ type, userId })
-      this.props.actions.getJobs(jobFilter, 0, 30)
     }
   }
 
@@ -761,7 +748,6 @@ export default connect(
         exportRequest,
         createExport,
         onlineStatus,
-        getJobs,
       },
       dispatch,
     ),

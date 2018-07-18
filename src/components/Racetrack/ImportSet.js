@@ -4,9 +4,9 @@ import { connect } from 'react-redux'
 
 import Widget from './Widget'
 import { ImportSetWidgetInfo } from './WidgetInfo'
-import { selectJobIds, getJobs } from '../../actions/jobActions'
+import { selectJobIds } from '../../actions/jobActions'
 import Suggestions from '../Suggestions'
-import Job, { JobFilter } from '../../models/Job'
+import Job from '../../models/Job'
 import User from '../../models/User'
 
 class ImportSet extends Component {
@@ -19,7 +19,9 @@ class ImportSet extends Component {
     onOpen: PropTypes.func,
     floatBody: PropTypes.bool.isRequired,
     user: PropTypes.instanceOf(User).isRequired,
-    actions: PropTypes.object,
+    actions: PropTypes.shape({
+      selectJobIds,
+    }),
   }
 
   state = {
@@ -29,11 +31,6 @@ class ImportSet extends Component {
   }
 
   componentWillMount() {
-    const { user } = this.props
-    const userId = user && user.id
-    const type = Job.Import
-    const filter = new JobFilter({ type, userId })
-    this.props.actions.getJobs(filter, 0, 30)
     this.componentWillReceiveProps(this.props)
   }
 
@@ -200,7 +197,6 @@ export default connect(
   dispatch => ({
     actions: bindActionCreators(
       {
-        getJobs,
         selectJobIds,
       },
       dispatch,

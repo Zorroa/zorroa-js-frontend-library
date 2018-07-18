@@ -8,7 +8,6 @@ import {
   EXPORT_ASSETS,
   IMPORT_ASSETS,
   GET_PIPELINES,
-  GET_JOBS,
   GET_JOB,
   ISOLATE_JOB,
   QUEUE_UPLOAD_FILE_ENTRIES,
@@ -100,38 +99,6 @@ export function getPipelines() {
       })
       .catch(error => {
         console.error('Error getting pipelines: ' + error)
-      })
-  }
-}
-
-export function getJobs(jobFilter, from, count) {
-  return dispatch => {
-    const request = {
-      method: 'post',
-      url: '/api/v1/jobs/_search',
-      data: jobFilter,
-      params: { from, count },
-      headers: { 'X-Requested-With': 'XMLHttpRequest' },
-    }
-    return archivistRequest(dispatch, request)
-      .then(response => {
-        dispatch({
-          type: GET_JOBS,
-          payload: response.data.list.map(job => new Job(job)),
-        })
-        return response
-      })
-      .catch(error => {
-        console.error(
-          'Error getting jobs filter=' +
-            JSON.stringify(jobFilter) +
-            ' from=' +
-            from +
-            ' count=' +
-            count +
-            ' error:' +
-            error,
-        )
       })
   }
 }
