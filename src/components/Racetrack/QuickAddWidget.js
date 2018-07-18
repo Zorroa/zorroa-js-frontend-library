@@ -170,9 +170,19 @@ class QuickAddWidget extends Component {
     return (
       <div className="QuickAddWidget Racebar-add-widget">
         <div
-          className="QuickAddWidget-input-container icon-plus"
+          className="QuickAddWidget-input-container "
           style={{ backgroundColor: this.getKeyColor() }}
           title="Add a new search widget">
+          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">
+            <path
+              fill="#FFF"
+              fillRule="evenodd"
+              d="M4 4V0h2v4h4v2H6v4H4V6H0V4h4z"
+            />
+          </svg>
+          <button className="QuickAddWidget-label" onClick={this.focus}>
+            Add Widget
+          </button>
           <input
             value={this.state.filterText}
             onChange={this.changeFilterText}

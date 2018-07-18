@@ -51,9 +51,10 @@
   border-radius: 3px;
   color: white;
   background-color: $zorroa-sickly-green;
-  padding: 5px;
+  padding: $zorroa-metric-base;
   margin-left: 2px;
   opacity: .9;
+  height: 30px;
 
   &:hover,
   &:focus {
@@ -73,4 +74,16 @@
   border: none;
   opacity: 0;
   cursor: pointer;
+}
+
+.QuickAddWidget-label {
+  border: 0;
+  background: none;
+  padding: 0;
+  margin: 0;
+  color: $zorroa-color-white;
+  font-size: 14px;
+  text-transform: uppercase;
+  font-weight: 400;
+  text-indent: $zorroa-metric-base;
 }
