@@ -1,4 +1,4 @@
-import Table from './Table'
+import Table from './ConnectedTable'
 import './Table.scss'
 import './TableField.scss'
 import './TableSettings.scss'

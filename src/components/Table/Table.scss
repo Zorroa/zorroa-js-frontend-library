@@ -275,14 +275,27 @@ $tableResizeRightPadding: 20px;
 
 .Table-settings {
   position: absolute;
-  right: 4px;
+  right: 0;
   top: 0;
-  color: $zorroa-gray;
   height: 26px;
-  padding: 5px 0 5px 2px;
-  background-color: white;
-  .dark & { background-color: black; }
-  &:hover { color: $zorroa-sickly-green; }
+  padding: 0 $zorroa-metric-base;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  background-color: $zorroa-color-blue-1;
+
+  &:hover {
+    background-color: $zorroa-color-blue-2;
+  }
+
+  &--white-label {
+    opacity: .9;
+
+    &:hover,
+    &:focus {
+      opacity: 1;
+    }
+  }
 }
 
 .Table-context-menu {

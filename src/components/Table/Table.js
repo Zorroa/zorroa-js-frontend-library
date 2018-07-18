@@ -23,6 +23,8 @@ export default class Table extends Component {
     ).isRequired,
     look: PropTypes.oneOf(['compact', 'clean']),
     isSingleSelectOnly: PropTypes.bool,
+    keyColor: PropTypes.string.isRequired,
+    whiteLabelEnabled: PropTypes.bool.isRequired,
 
     // input props
     height: PropTypes.number.isRequired,
@@ -422,7 +424,23 @@ export default class Table extends Component {
           </div>
         </div>
         {onSettings && (
-          <div className="Table-settings icon-cog" onClick={onSettings} />
+          <div
+            className={classnames('Table-settings', {
+              'Table-settings--white-label': this.props.whiteLabelEnabled,
+            })}
+            style={{
+              backgroundColor:
+                this.props.whiteLabelEnabled && this.props.keyColor,
+            }}
+            onClick={onSettings}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">
+              <path
+                fill="#FFF"
+                fillRule="evenodd"
+                d="M4 4V0h2v4h4v2H6v4H4V6H0V4h4z"
+              />
+            </svg>
+          </div>
         )}
         {children}
       </div>
