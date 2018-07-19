@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React from 'react'
 import { formatDuration, parseFormattedFloat } from '../../services/jsUtil'
 import { Flipbook as FlipbookIcon } from '../Icons'
 import classnames from 'classnames'

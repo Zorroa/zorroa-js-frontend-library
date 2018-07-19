@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 import AssetSearch from '../../models/AssetSearch'
 import { SESSION_STATE_ITEM } from '../../constants/localStorageItems'

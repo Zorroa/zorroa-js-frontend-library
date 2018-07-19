@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
@@ -96,7 +97,7 @@ ImageThumb.propTypes = {
   url: PropTypes.string.isRequired,
   backgroundColors: PropTypes.arrayOf(PropTypes.string),
   backgroundSize: PropTypes.oneOf(['cover', 'contain']),
-  children: PropTypes.arrayOf(React.PropTypes.element),
+  children: PropTypes.arrayOf(PropTypes.element),
 }
 
 @DragSource('ASSET', source)
@@ -112,7 +113,7 @@ class Thumb extends Component {
     }).isRequired,
     pages: PropTypes.arrayOf(
       PropTypes.shape({
-        url: React.PropTypes.string,
+        url: PropTypes.string,
       }),
     ).isRequired,
 

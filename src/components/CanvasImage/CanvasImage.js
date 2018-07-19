@@ -1,4 +1,5 @@
-import React, { PureComponent, PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React, { PureComponent } from 'react'
 import { size } from '../../services/size'
 
 export default class CanvasImage extends PureComponent {

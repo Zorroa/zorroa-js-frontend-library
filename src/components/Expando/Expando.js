@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React, { Component } from 'react'
 import classnames from 'classnames'
 
 import Toggle from '../Toggle'
@@ -8,10 +9,8 @@ export default class Expando extends Component {
   static propTypes = {
     items: PropTypes.arrayOf(
       PropTypes.shape({
-        id: React.PropTypes.oneOfType([
-          React.PropTypes.string,
-          React.PropTypes.number,
-        ]).isRequired,
+        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+          .isRequired,
         name: PropTypes.string.isRequired,
         info: PropTypes.string,
       }),

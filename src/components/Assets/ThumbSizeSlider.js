@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React, { Component } from 'react'
 
 const MIN_THUMBSIZE = window.innerWidth / 7
 const MAX_THUMBSIZE = window.innerWidth / 3

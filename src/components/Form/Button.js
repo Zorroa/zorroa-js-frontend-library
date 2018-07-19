@@ -1,4 +1,5 @@
-import React, { PropTypes, PureComponent } from 'react'
+import PropTypes from 'prop-types'
+import React, { PureComponent } from 'react'
 import classnames from 'classnames'
 import './Button.scss'
 import { KEY_COLOR } from '../../constants/themeDefaults'

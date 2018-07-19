@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React, { Component } from 'react'
 import { PubSub } from '../../../services/jsUtil'
 import { resizeByAspectRatio } from '../../../services/size'
 import getBackgroundPlaceholder from '../../../services/backgroundColorPlaceholder'

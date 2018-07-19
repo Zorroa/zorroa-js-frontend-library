@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React, { Component } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
@@ -37,7 +38,7 @@ class Video extends Component {
   static propTypes = {
     url: PropTypes.string.isRequired,
     backgroundURL: PropTypes.string,
-    children: PropTypes.arrayOf(React.PropTypes.element),
+    children: PropTypes.arrayOf(PropTypes.element),
     frames: PropTypes.number,
     frameRate: PropTypes.number,
     startFrame: PropTypes.number,

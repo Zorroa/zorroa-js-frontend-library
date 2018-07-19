@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React from 'react'
 import { articulateQuality, pluralize } from '../utils'
 
 export default function ExportPreviewerImage(props) {

@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React, { Component } from 'react'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
 import Signin from '../auth/Signin'
 import Signout from '../auth/Signout'

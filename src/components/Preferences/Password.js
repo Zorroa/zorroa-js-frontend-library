@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React, { Component } from 'react'
 
 import { FormInput, FormLabel } from '../Form'
 import randomAutoComplete from './randomAutoComplete'

@@ -1,4 +1,5 @@
-import React, { PropTypes, PureComponent } from 'react'
+import PropTypes from 'prop-types'
+import React, { PureComponent } from 'react'
 import ease from 'ease-component'
 
 export function CancelCircle() {

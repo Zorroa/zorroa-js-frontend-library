@@ -19,6 +19,7 @@ describe('<Theme />', () => {
         releaseNotesUrl={'release'}
         faqUrl={'faq'}
         supportUrl={'support'}
+        themeSaveState={'succeeded'}
       />,
     )
 
@@ -46,6 +47,7 @@ describe('<Theme />', () => {
           releaseNotesUrl={'release'}
           faqUrl={'faq'}
           supportUrl={'support'}
+          themeSaveState={'succeeded'}
         />,
       )
       component.instance().setColor('#f93034')
@@ -80,6 +82,7 @@ describe('<Theme />', () => {
           releaseNotesUrl={'release'}
           faqUrl={'faq'}
           supportUrl={'support'}
+          themeSaveState={'succeeded'}
         />,
       )
       component.instance().setTutorialUrl('https://help.zorroa.com/tutorial')
@@ -93,6 +96,7 @@ describe('<Theme />', () => {
       const saveTheme = jest.fn()
       const component = shallow(
         <Theme
+          themeSaveState={'succeeded'}
           lightLogo="<svg></svg>"
           darkLogo="<svg></svg>"
           whiteLabelEnabled={false}
@@ -125,6 +129,7 @@ describe('<Theme />', () => {
           tutorialUrl={'tutorial'}
           releaseNotesUrl={'release'}
           faqUrl={'faq'}
+          themeSaveState={'succeeded'}
           supportUrl={'support'}
         />,
       )
@@ -146,6 +151,7 @@ describe('<Theme />', () => {
           actions={{ saveTheme: saveTheme }}
           tutorialUrl={'tutorial'}
           releaseNotesUrl={'release'}
+          themeSaveState={'succeeded'}
           faqUrl={'faq'}
           supportUrl={'support'}
         />,
@@ -170,6 +176,7 @@ describe('<Theme />', () => {
             tutorialUrl={'tutorial'}
             releaseNotesUrl={'release'}
             faqUrl={'faq'}
+            themeSaveState={'succeeded'}
             supportUrl={'support'}
           />,
         )
@@ -195,6 +202,7 @@ describe('<Theme />', () => {
             releaseNotesUrl={'release'}
             faqUrl={'faq'}
             supportUrl={'support'}
+            themeSaveState={'succeeded'}
           />,
         )
         component.instance().toggleWhiteLabelEnabled(true)
@@ -216,6 +224,7 @@ describe('<Theme />', () => {
           actions={{ saveTheme: saveTheme }}
           tutorialUrl={'tutorial'}
           releaseNotesUrl={'release'}
+          themeSaveState={'succeeded'}
           faqUrl={'faq'}
           supportUrl={'support'}
         />,
@@ -239,6 +248,7 @@ describe('<Theme />', () => {
             actions={{ saveTheme: saveTheme }}
             tutorialUrl={'tutorial'}
             releaseNotesUrl={'release'}
+            themeSaveState={'succeeded'}
             faqUrl={'faq'}
             supportUrl={'support'}
           />,
@@ -257,6 +267,7 @@ describe('<Theme />', () => {
           darkLogo="<svg></svg>"
           whiteLabelEnabled={false}
           keyColor={'#abc123'}
+          themeSaveState={'succeeded'}
           actions={{ saveTheme: saveTheme }}
           tutorialUrl={'tutorial'}
           releaseNotesUrl={'release'}
@@ -280,6 +291,7 @@ describe('<Theme />', () => {
           whiteLabelEnabled={false}
           keyColor={'#abc123'}
           actions={{ saveTheme: saveTheme }}
+          themeSaveState={'succeeded'}
           tutorialUrl={'tutorial'}
           releaseNotesUrl={'release'}
           faqUrl={'faq'}
