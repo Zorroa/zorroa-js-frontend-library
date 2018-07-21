@@ -111,18 +111,34 @@ describe('foldersReducer', () => {
     ).toEqual(finalState)
   })
 
-  it('DELETE_FOLDER removes a folder', () => {
-    const foo = new Folder({ id: folderId1, name: 'Foo', parentId: folderId0 })
-
-    let beforeState = createInitialState()
+  it('DELETE_FOLDER decrements the childCount of the parent folder', () => {
+    const foo = new Folder({
+      id: folderId1,
+      name: 'Foo',
+      parentId: folderId0,
+    })
+    const bar = new Folder({
+      id: folderId1,
+      name: 'Foo',
+      parentId: foo.id,
+      childCount: 1,
+    })
+    const baz = new Folder({
+      id: folderId2,
+      name: 'Bar',
+      parentId: bar.id,
+      childCount: 0,
+    })
+    const beforeState = createInitialState()
     beforeState.all.set(foo.id, foo)
-    beforeState.all.get(folderId0).childIds = new Set([folderId1])
+    beforeState.all.set(bar.id, bar)
+    beforeState.all.set(baz.id, baz)
+    const folderState = foldersReducer(beforeState, {
+      type: DELETE_FOLDER,
+      payload: baz.id,
+    })
 
-    let afterState = createInitialState()
-
-    expect(
-      foldersReducer(beforeState, { type: DELETE_FOLDER, payload: foo.id }),
-    ).toEqual(afterState)
+    expect(folderState.all.get(bar.id).childCount).toEqual(0)
   })
 })
 

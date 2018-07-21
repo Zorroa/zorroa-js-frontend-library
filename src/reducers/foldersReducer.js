@@ -241,6 +241,7 @@ export default function(state = initialState, action) {
         if (folder) {
           const parent = state.all.get(folder.parentId)
           let newParent = new Folder(parent)
+          newParent.childCount = Math.max(0, (parent.childCount || 0) - 1)
           if (parent.childIds) {
             var childIds = new Set(parent.childIds)
             childIds.delete(folder.id)
