@@ -41,6 +41,10 @@ class PreferencesPane extends Component {
     }
   }
 
+  canShowWhiteLabel() {
+    return document.cookie.search('showwhitelabel=yes') > -1
+  }
+
   dismiss = event => {
     const { onDismiss } = this.props
     if (onDismiss) onDismiss(event)
@@ -116,12 +120,14 @@ class PreferencesPane extends Component {
                     activePaneName={this.state.activePane}>
                     Create User
                   </PreferencesPaneMenuItem>
-                  <PreferencesPaneMenuItem
-                    onClick={this.setActivePane}
-                    paneName="theme"
-                    activePaneName={this.state.activePane}>
-                    Brand Options
-                  </PreferencesPaneMenuItem>
+                  {this.canShowWhiteLabel() && (
+                    <PreferencesPaneMenuItem
+                      onClick={this.setActivePane}
+                      paneName="theme"
+                      activePaneName={this.state.activePane}>
+                      Brand Options
+                    </PreferencesPaneMenuItem>
+                  )}
                 </ul>
               </li>
             </ul>
