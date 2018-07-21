@@ -263,6 +263,7 @@ class FolderItem extends Component {
       folder.acl = acl
       this.props.actions.updateFolderPermissions(folder.id, acl)
     }
+    this.props.actions.hideModal()
   }
 
   rename = event => {
