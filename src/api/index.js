@@ -3,6 +3,7 @@ import * as flipbook from './flipbook.js'
 import * as localFileSystem from './localFileSystem.js'
 import user from './user.js'
 import blob from './blob.js'
+import stream from './signedStream.js'
 import search from './search.js'
 import job from './job.js'
 import * as request from './request.js'
@@ -20,4 +21,5 @@ export default {
   exports,
   job,
   folders,
+  stream,
 }

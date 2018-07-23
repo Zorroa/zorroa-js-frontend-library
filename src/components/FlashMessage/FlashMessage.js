@@ -18,5 +18,5 @@ export default function FlashMessage(props) {
 
 FlashMessage.propTypes = {
   children: PropTypes.node,
-  look: PropTypes.oneOf(['warning', 'error', 'success']).isRequired,
+  look: PropTypes.oneOf(['warning', 'error', 'success']),
 }

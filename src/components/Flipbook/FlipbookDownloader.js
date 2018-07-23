@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import getImage from '../../services/getImage'
+import getDisplayName from '../../services/componentDisplayName'
 import api from '../../api'
 
 function getTotalFrames(frames) {
@@ -18,13 +19,9 @@ function getTotalFrames(frames) {
   }, frames.length)
 }
 
-function getDisplayName(WrappedComponent) {
-  return WrappedComponent.displayName || WrappedComponent.name || 'Component'
-}
-
 export default function withFlipbook(WrappedComponent) {
   class FlipbookDownloader extends PureComponent {
-    static displayName = `WithFlipbook(${getDisplayName(WrappedComponent)})`
+    static displayName = getDisplayName(WrappedComponent, 'WithFlipbook')
     static propTypes = {
       clipParentId: PropTypes.string.isRequired,
       origin: PropTypes.string.isRequired,

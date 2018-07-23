@@ -7,10 +7,12 @@ import FlipbookViewer from './FlipbookViewer.js'
 import VideoViewer from './VideoViewer'
 import Image from './Image'
 import Asset from '../../models/Asset'
+import wrapSignedStream from '../SignedStream'
 
 class Inspector extends Component {
   static propTypes = {
     asset: PropTypes.instanceOf(Asset),
+    signedAssetUrl: PropTypes.string.isRequired,
     onNext: PropTypes.func,
     onPrev: PropTypes.func,
     origin: PropTypes.string,
@@ -25,7 +27,7 @@ class Inspector extends Component {
     const { asset, origin, thumbSize, onNext, onPrev } = this.props
     const { error } = this.state
     const mediaType = error ? 'error' : asset.mediaType().toLowerCase()
-    const url = asset.url(origin)
+    const url = this.props.signedAssetUrl
     const imageFormats = ['jpeg', 'jpg', 'png', 'gif']
     let warning = null
     let inspector = null
@@ -92,4 +94,4 @@ export default connect(state => ({
   origin: state.auth.origin,
   host: state.auth.host,
   thumbSize: state.app.thumbSize,
-}))(Inspector)
+}))(wrapSignedStream(Inspector))

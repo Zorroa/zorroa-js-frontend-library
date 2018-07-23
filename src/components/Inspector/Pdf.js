@@ -86,6 +86,14 @@ export default class Pdf extends Component {
 
   loadProgress = progress => {
     const pageNumber = this.state.pageNumber || 1
+
+    if (progress.total === undefined) {
+      // If we don't know the total size, skip doing anything with loading progress.
+      // Until IRM can implement a proper file server in the CDV this will need to
+      // stay
+      return
+    }
+
     if (progress && progress.loaded >= progress.total) {
       this.queueRenderPage(pageNumber)
       this.setState({ pageNumber, progress: null, error: null })
@@ -98,9 +106,9 @@ export default class Pdf extends Component {
     if (this.documentPromise) {
       this.documentPromise.cancel()
     }
-    this.documentPromise = makeCancelable(
-      window.PDFJS.getDocument(val, null, null, this.loadProgress).promise,
-    )
+    const loadingTask = window.PDFJS.getDocument(val)
+    loadingTask.onProgress = this.loadProgress
+    this.documentPromise = makeCancelable(loadingTask.promise)
     this.documentPromise.promise
       .then(this.onDocumentComplete)
       .catch(this.onDocumentError)

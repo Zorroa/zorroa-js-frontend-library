@@ -34,6 +34,9 @@ This component will publish status commands like 'playing' and 'played'
 
 */
 
+const HAVE_METADATA = 1
+const HAVE_CURRENT_DATA = 2
+
 class Video extends Component {
   static propTypes = {
     url: PropTypes.string.isRequired,
@@ -110,6 +113,14 @@ class Video extends Component {
     this.onProgress()
   }
 
+  getPlayerReadyState() {
+    if (typeof this.player !== 'object') {
+      return 0
+    }
+
+    return this.player.readyState
+  }
+
   onProgress = () => {
     this.progressQueued = false
     if (!this.player) return
@@ -159,9 +170,8 @@ class Video extends Component {
         this.setState({ started: true }, this._queueProgress)
       }
     }
-
     // If the player isn't ready yet, then queue a start() call next frame. Repeat until ready
-    if (this.player.readyState < 2) {
+    if (this.getPlayerReadyState() < HAVE_CURRENT_DATA) {
       this._queueStart()
     } else {
       this.props.status.publish('playing', true)
@@ -192,7 +202,7 @@ class Video extends Component {
 
     // If the player hasn't started playing, then don't call pause()
     // Otherwise, we get a console error
-    if (this.player.readyState >= 1) {
+    if (this.getPlayerReadyState() >= HAVE_METADATA) {
       this.player.pause()
     }
   }
@@ -307,7 +317,7 @@ class Video extends Component {
           ))}
           <source key="raw" src={url} />
         </video>
-        {(!this.player || this.player.readyState < 1) && (
+        {(!this.player || this.getPlayerReadyState() < HAVE_METADATA) && (
           <img className="Video-loading" src={svg} />
         )}
         {this.props.children}
