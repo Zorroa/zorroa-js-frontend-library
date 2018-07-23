@@ -8,7 +8,12 @@ import classnames from 'classnames'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
 import Logo from '../../components/Logo'
-import DropdownMenu from '../../components/DropdownMenu'
+import ToggleButton from '../../components/ToggleButton'
+import LegacyDropdownMenu from '../../components/LegacyDropdownMenu'
+import DropdownMenu, {
+  DropdownItem,
+  DropdownGroup,
+} from '../../components/DropdownMenu'
 import Feedback from '../../components/Feedback'
 import Developer from '../../components/Developer'
 import Settings from '../../components/Settings'
@@ -24,7 +29,7 @@ import {
   FAQ_URL,
   RELEASE_URL,
 } from '../../constants/themeDefaults'
-import { archivistBaseURL, saveUserSettings } from '../../actions/authAction'
+import { saveUserSettings } from '../../actions/authAction'
 import { archivistInfo } from '../../actions/archivistAction'
 import {
   selectAssetIds,
@@ -75,6 +80,7 @@ class Header extends Component {
   state = {
     similarField: '',
     isSelectedHashValid: false,
+    showHelpMenu: false,
   }
 
   componentWillMount() {
@@ -275,7 +281,7 @@ class Header extends Component {
         </div>
         {similarFields &&
           similarFields.size > 1 && (
-            <DropdownMenu>
+            <LegacyDropdownMenu>
               {[...similarFields].map(field => (
                 <div
                   className="Editbar-similar-menu-item"
@@ -295,10 +301,42 @@ class Header extends Component {
                   </div>
                 </div>
               ))}
-            </DropdownMenu>
+            </LegacyDropdownMenu>
           )}
       </div>
     )
+  }
+
+  openTutorialUrl = () => {
+    window.open(this.props.tutorialUrl || TUTORIAL_URL)
+  }
+
+  openfaqUrl = () => {
+    window.open(this.props.faqUrl || FAQ_URL)
+  }
+
+  openReleaseNotesUrl = () => {
+    window.open(this.props.releaseNotesUrl || RELEASE_URL)
+  }
+
+  openSupportUrl = () => {
+    window.open(this.props.supportUrl)
+  }
+
+  toggleUserMenu = isOpen => {
+    this.setState({
+      showUserMenu: isOpen,
+    })
+  }
+
+  toggleHelpMenu = isOpen => {
+    this.setState({
+      showHelpMenu: isOpen,
+    })
+  }
+
+  logout = () => {
+    window.location = this.props.signoutUrl
   }
 
   render() {
@@ -311,9 +349,7 @@ class Header extends Component {
       loadedCount,
       selectedIds,
       monochrome,
-      signoutUrl,
     } = this.props
-    const baseURL = archivistBaseURL()
 
     const loader = require('./loader-rolling.svg')
     const syncer =
@@ -357,88 +393,78 @@ class Header extends Component {
         {this.renderSimilar()}
         <div className="header-menu-bar fullHeight flexCenter">
           <div className="header-menu">
-            <DropdownMenu label="Help">
-              <a
-                href={this.props.tutorialUrl || TUTORIAL_URL}
-                target="_blank"
-                className="header-menu-item">
-                Tutorials
-              </a>
-              <a
-                href={this.props.faqUrl || FAQ_URL}
-                target="_blank"
-                className="header-menu-item">
-                FAQ
-              </a>
-              <a
-                href={this.props.releaseNotesUrl || RELEASE_URL}
-                target="_blank"
-                className="header-menu-item">
-                Release Notes
-              </a>
-              {this.props.supportUrl && (
-                <a
-                  href={this.props.supportUrl}
-                  target="_blank"
-                  className="header-menu-item">
-                  Support
-                </a>
-              )}
-              <div
-                className="header-menu-item header-menu-feedback"
-                onClick={this.showFeedback}>
-                Send Feedback
+            <ToggleButton onClick={this.toggleHelpMenu}>Help</ToggleButton>
+            {this.state.showHelpMenu && (
+              <div className="header-menu-container">
+                <DropdownMenu>
+                  <DropdownGroup>
+                    <DropdownItem onClick={this.openfaqUrl}>FAQ</DropdownItem>
+                    <DropdownItem onClick={this.openReleaseNotesUrl}>
+                      Release Notes
+                    </DropdownItem>
+                    <DropdownItem onClick={this.openTutorialUrl}>
+                      Tutorials
+                    </DropdownItem>
+                  </DropdownGroup>
+                  <DropdownGroup>
+                    {this.props.supportUrl && (
+                      <DropdownItem onClick={this.openSupportUrl}>
+                        Support
+                      </DropdownItem>
+                    )}
+                    <DropdownItem onClick={this.showFeedback}>
+                      Send Feedback
+                    </DropdownItem>
+                  </DropdownGroup>
+                </DropdownMenu>
               </div>
-            </DropdownMenu>
+            )}
           </div>
-          <div className="header-menu header-menu-user">
-            <span className="icon-zorroa-person-06" />
-            <DropdownMenu label={<div>{user.username}</div>}>
-              <div
-                className="header-menu-item header-menu-prefs"
-                onClick={() => {
-                  this.showPreferences('general')
-                }}>
-                Preferences...
+          <div className="header-menu">
+            <span className="header-menu-icon icon-zorroa-person-06" />
+            <ToggleButton onClick={this.toggleUserMenu}>
+              {user.username}
+            </ToggleButton>
+            {this.state.showUserMenu && (
+              <div className="header-menu-container header-menu-container--user">
+                <DropdownMenu>
+                  <DropdownGroup>
+                    <DropdownItem
+                      onClick={() => {
+                        this.showPreferences('general')
+                      }}>
+                      Preferences
+                    </DropdownItem>
+                  </DropdownGroup>
+                  {(isDeveloper || isAdministrator) && (
+                    <DropdownGroup>
+                      {isDeveloper && (
+                        <DropdownItem onClick={this.showDeveloper}>
+                          Developer
+                        </DropdownItem>
+                      )}
+                      {isAdministrator && (
+                        <DropdownItem
+                          onClick={() => {
+                            this.showPreferences('user')
+                          }}>
+                          User Admin
+                        </DropdownItem>
+                      )}
+                      {isAdministrator ||
+                        (isDeveloper && (
+                          <DropdownItem onClick={this.showSettings}>
+                            Archivist Settings
+                          </DropdownItem>
+                        ))}
+                    </DropdownGroup>
+                  )}
+                  <DropdownGroup>
+                    <DropdownItem onClick={this.logout}>Logout</DropdownItem>
+                  </DropdownGroup>
+                </DropdownMenu>
               </div>
-              {isDeveloper && (
-                <div
-                  className="header-menu-item header-menu-dev"
-                  onClick={this.showDeveloper}>
-                  Developer...
-                </div>
-              )}
-              {isAdministrator &&
-                baseURL && (
-                  <a
-                    href={`${baseURL}/admin/gui`}
-                    target="_blank"
-                    className="header-menu-item header-menu-admin">
-                    Administrator...
-                  </a>
-                )}
-              {isAdministrator && (
-                <div
-                  className="header-menu-item header-menu-settings"
-                  onClick={() => {
-                    this.showPreferences('user')
-                  }}>
-                  User Admin...
-                </div>
-              )}
-              {(isAdministrator || isDeveloper) && (
-                <div
-                  className="header-menu-item header-menu-settings"
-                  onClick={this.showSettings}>
-                  Archivist Settings...
-                </div>
-              )}
-              <a
-                className="header-menu-item header-menu-logout"
-                href={signoutUrl}>
-                Logout
-              </a>
-            </DropdownMenu>
+            )}
           </div>
         </div>
 

@@ -206,5 +206,14 @@ $border-color: 1px solid $zorroa-lightgray;
   color: $zorroa-gray;
 }
 
+.General-showFolderCounts-button-container {
+  position: relative;
+}
+
+.General-showFolderCounts-menu {
+  position: absolute;
+  top: $zorroa-metric-base * 4;
+}
+
 .General-showFolderCounts-menuitem {
 }

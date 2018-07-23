@@ -1,6 +1,10 @@
-import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import classnames from 'classnames'
+import DropdownMenu, {
+  DropdownItem,
+  DropdownGroup,
+  DropdownFontIcon,
+} from '../../components/DropdownMenu'
+import PropTypes from 'prop-types'
 
 export default class TableContextMenu extends Component {
   static propTypes = {
@@ -75,10 +79,6 @@ export default class TableContextMenu extends Component {
     onDismiss()
   }
 
-  freezeColumn = () => {
-    console.log('Freeze')
-  }
-
   // Keep the context menu from running off the bottom of the screen
   constrainContextMenu = ctxMenu => {
     if (!ctxMenu) return
@@ -118,7 +118,7 @@ export default class TableContextMenu extends Component {
       {
         fn: this.moveColumnToEnd,
         icon: 'icon-enter-right2',
-        label: 'Move to end',
+        label: 'Move column to end',
         disabled: index => index >= fields.length - 1,
       },
       {
@@ -128,7 +128,6 @@ export default class TableContextMenu extends Component {
         disabled: () => false,
       },
       {
-        fn: this.freezeColumn,
         icon: 'icon-table-freeze',
         label: 'Freeze column',
         disabled: () => true,
@@ -147,19 +146,20 @@ export default class TableContextMenu extends Component {
           onClick={onDismiss}
           onContextMenu={onDismiss}
           style={{ top: contextMenuPos.y, left: contextMenuPos.x }}>
-          {items.map(item => (
-            <div
-              className={classnames('Table-context-item', {
-                disabled: item.disabled(selectedFieldIndex),
+          <DropdownMenu>
+            <DropdownGroup>
+              {items.map(item => {
+                const isDisabled = item.disabled(selectedFieldIndex)
+                const onClickCallback = isDisabled ? undefined : item.fn
+                return (
+                  <DropdownItem onClick={onClickCallback}>
+                    <DropdownFontIcon icon={item.icon} />
+                    {item.label}
+                  </DropdownItem>
+                )
               })}
-              onClick={
-                !item.disabled(selectedFieldIndex) && (e => item.fn(item, e))
-              }
-              key={item.label}>
-              <div className={`Table-context-icon ${item.icon}`} />
-              <div className="Table-context-label">{item.label}</div>
-            </div>
-          ))}
+            </DropdownGroup>
+          </DropdownMenu>
         </div>
       </div>
     )

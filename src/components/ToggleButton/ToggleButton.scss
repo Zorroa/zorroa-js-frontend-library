@@ -1,0 +1,56 @@
+@import '../../styles/core-mixins.scss';
+
+.ToggleButton {
+  justify-content: center;
+  flex-wrap: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-direction: row;
+  display: flex;
+  align-items: center;
+  border: 1px solid transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+  text-transform: uppercase;
+  padding: $zorroa-metric-base;
+  border-radius: 3px;
+  background-color: transparent;
+
+  ~ & {
+    margin-left: $zorroa-metric-base;
+  }
+
+  &--dark {
+    color: $zorroa-color-gray-dark-3;
+  }
+
+  &__label {
+    padding-right: $zorroa-metric-base / 2;
+    display: flex;
+    align-items: center;
+    align-content: center;
+  }
+
+  &__caret {
+    font-size: 10px;
+    color: $zorroa-color-gray-dark-3;
+
+    &--is-open {
+      transform: rotate(180deg);
+    }
+  }
+
+  &--open,
+  &:hover {
+    background-color: $zorroa-color-white;
+
+    &.ToggleButton--dark {
+      &,
+      &:hover {
+        background-color: $zorroa-color-black;
+      }
+    }
+  }
+}

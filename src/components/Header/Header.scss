@@ -37,10 +37,14 @@
 }
 
 .header-menu {
-  @include flexRow;
-  @include flexAlignItemsCenter;
-  margin-right: 20px;
   position: relative;
+  display: flex;
+  align-items: center;
+  align-content: center;
+
+  ~ .header-menu {
+    margin-left: $zorroa-metric-base;
+  }
 
   .job {
     @include flexRow;
@@ -59,23 +63,25 @@
     }
   }
 
-  &.header-menu-user {
+  .header-menu-container {
+    position: absolute;
+    z-index: 1;
+    top: $zorroa-metric-base * 4;
 
-    .DropdownMenu-button {
-      text-transform: none;
-    }
-
-    [class*='icon-zorroa-person-'] {
-      .dark & { color: $zorroa-whitegray; }
-      font-size: 30px;
+    &--user {
+      left: $zorroa-metric-base * 4;
     }
   }
 }
 
 .header-menu-icon {
-  font-size: 10px;
-  color: $zorroa-gray;
-  padding: 5px;
+  font-size: 30px;
+  color: $zorroa-color-gray-dark-1;
+  margin-right: $zorroa-metric-base / 2;
+
+  .dark & {
+    color: $zorroa-color-gray-light-1;
+   }
 }
 
 .header-menu-item {

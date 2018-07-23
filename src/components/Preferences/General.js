@@ -4,6 +4,11 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import JSONTree from 'react-json-tree'
 import classnames from 'classnames'
+import DropdownMenu, {
+  DropdownItem,
+  DropdownGroup,
+} from '../../components/DropdownMenu'
+import ToggleButton from '../../components/ToggleButton'
 
 import {
   hidePreferencesModal,
@@ -29,8 +34,13 @@ import {
   defaultLightbarFieldTemplate,
 } from '../../constants/defaultState'
 import { FILTERED_COUNTS, FULL_COUNTS, NO_COUNTS } from '../Folders/Folders'
-import DropdownMenu from '../DropdownMenu/DropdownMenu'
 import './General.scss'
+
+const folderCountsNames = {
+  [FILTERED_COUNTS]: 'Filtered',
+  [FULL_COUNTS]: 'Full',
+  [NO_COUNTS]: 'None',
+}
 
 const theme = {
   scheme: 'bright',
@@ -68,6 +78,10 @@ class General extends Component {
     lightbarFieldTemplate: PropTypes.string,
     thumbFieldTemplate: PropTypes.string,
     dragFieldTemplate: PropTypes.string,
+  }
+
+  state = {
+    showFolderCountsMenu: false,
   }
 
   componentDidMount() {
@@ -192,6 +206,12 @@ class General extends Component {
     })
   }
 
+  toggleFolderCountsMenu = showMenu => {
+    this.setState({
+      showFolderCountsMenu: showMenu,
+    })
+  }
+
   render() {
     const {
       user,
@@ -257,24 +277,33 @@ class General extends Component {
                   <div className="General-showFolderCounts-label">
                     Show folder counts:{' '}
                   </div>
-                  <DropdownMenu
-                    label={userSettings.showFolderCounts || FILTERED_COUNTS}>
-                    <div
-                      className="General-showFolderCounts-menuitem"
-                      onClick={_ => this.setFolderCounts(FILTERED_COUNTS)}>
-                      {FILTERED_COUNTS}
+                  <div className="General-showFolderCounts-button-container">
+                    <ToggleButton onClick={this.toggleFolderCountsMenu}>
+                      {userSettings.showFolderCounts || FILTERED_COUNTS}
+                    </ToggleButton>
+                    <div className="General-showFolderCounts-menu">
+                      {this.state.showFolderCountsMenu && (
+                        <DropdownMenu>
+                          <DropdownGroup>
+                            <DropdownItem
+                              onClick={() =>
+                                this.setFolderCounts(FILTERED_COUNTS)
+                              }>
+                              {folderCountsNames[FILTERED_COUNTS]}
+                            </DropdownItem>
+                            <DropdownItem
+                              onClick={() => this.setFolderCounts(FULL_COUNTS)}>
+                              {folderCountsNames[FULL_COUNTS]}
+                            </DropdownItem>
+                            <DropdownItem
+                              onClick={() => this.setFolderCounts(NO_COUNTS)}>
+                              {folderCountsNames[NO_COUNTS]}
+                            </DropdownItem>
+                          </DropdownGroup>
+                        </DropdownMenu>
+                      )}
                     </div>
-                    <div
-                      className="General-showFolderCounts-menuitem"
-                      onClick={_ => this.setFolderCounts(FULL_COUNTS)}>
-                      {FULL_COUNTS}
-                    </div>
-                    <div
-                      className="General-showFolderCounts-menuitem"
-                      onClick={_ => this.setFolderCounts(NO_COUNTS)}>
-                      {NO_COUNTS}
-                    </div>
-                  </DropdownMenu>
+                  </div>
                 </div>
               </div>
             </div>
