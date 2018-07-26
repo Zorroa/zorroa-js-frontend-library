@@ -106,7 +106,7 @@ export default class Sidebar extends Component {
             />
             {isIconified === false && (
               <span className="Sidebar__logo-description">
-                Enterprise Visual Intelligence
+                Visual Intelligence
               </span>
             )}
           </div>
