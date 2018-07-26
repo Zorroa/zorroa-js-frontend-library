@@ -195,13 +195,15 @@ class Lightbar extends Component {
         </div>
         <div
           className="Lightbar-actions"
-          title={
-            permissionsState === PERMISSION_STATE_NONE
-              ? 'This asset is restricted from being downloaded.'
-              : 'Click to download'
-          }
           style={{ width: actionWidth, minWidth: actionWidth }}>
-          <div className={lightBarDownloadClassname} onClick={this.onDownload}>
+          <div
+            title={
+              permissionsState === PERMISSION_STATE_NONE
+                ? 'This asset is restricted from being downloaded.'
+                : 'Click to download'
+            }
+            className={lightBarDownloadClassname}
+            onClick={this.onDownload}>
             <i className="Lightbar__icon icon-download2" />
             <span className="Lightbar-action-text Lightbar-action-download">
               Download
