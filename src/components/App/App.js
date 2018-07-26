@@ -33,6 +33,7 @@ export default class App extends Component {
 
   state = {
     isMandatoryLoadingPeriod: true,
+    isInTimeout: false,
   }
 
   componentWillMount() {
@@ -55,6 +56,12 @@ export default class App extends Component {
         isMandatoryLoadingPeriod: false,
       })
     }, 750)
+
+    setTimeout(() => {
+      this.setState({
+        isInTimeout: true,
+      })
+    }, 5000)
   }
 
   componentDidMount() {
@@ -76,7 +83,7 @@ export default class App extends Component {
   }
 
   isLoading() {
-    return (
+    const isLoading =
       // Make sure any custom themes are loaded
       this.props.themeLoadState === 'pending' ||
       // Make sure we know the user's auth'ed state before forwarding them
@@ -85,7 +92,12 @@ export default class App extends Component {
       // Avoid the loading screen flashing by ensure there's a reasonable amount
       // of time it gets displayed for
       this.state.isMandatoryLoadingPeriod
-    )
+
+    // If there's some kind of problem loading these values, do something
+    // instead of just showing a loading spinner forever
+    const isWithinTimeoutPeriod = this.state.isInTimeout === false
+
+    return isLoading && isWithinTimeoutPeriod
   }
 
   render() {
