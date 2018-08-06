@@ -30,11 +30,15 @@ class Logo extends PureComponent {
     return LIGHT_LOGO
   }
 
-  render() {
+  generateLogoSrc() {
     const { dark } = this.props
     const isDark = dark === true
     const logo = isDark ? this.getDarkLogo() : this.getLightLogo()
-    const src = `data:image/svg+xml;utf8,${logo}`
+    return `data:image/svg+xml;utf8,${encodeURIComponent(logo)}`
+  }
+
+  render() {
+    const src = this.generateLogoSrc()
     return <img className="Logo" src={src} alt={`Logo`} />
   }
 }
