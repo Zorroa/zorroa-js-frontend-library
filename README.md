@@ -101,7 +101,7 @@ Tips for making testing quicker & easier:
 
 ### Resources for writing tests:
 
-- Test runner: [Jest](https://github.com/facebook/jest/tree/v17.0.3/docs)
+- Test runner: [Jest](https://github.com/facebook/jest/)
 - Continuous Integration:
   [TravisCI](https://travis-ci.com/Zorroa/zorroa-js-curator/)
 - React component testing: [Enzyme](http://airbnb.io/enzyme/)

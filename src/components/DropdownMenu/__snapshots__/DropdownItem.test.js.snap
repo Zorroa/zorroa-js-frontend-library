@@ -1,7 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
 exports[`<DropdownItem /> render() When in dark mode Should have a dark class 1`] = `
 <div
   className="DropdownMenu__item DropdownMenu__item--dark DropdownMenu__item--disabled"
-  onClick={[Function]}>
+  onClick={[Function]}
+>
   Preferences
 </div>
 `;
@@ -9,7 +12,8 @@ exports[`<DropdownItem /> render() When in dark mode Should have a dark class 1`
 exports[`<DropdownItem /> render() When there is no handler Should have a disabled class 1`] = `
 <div
   className="DropdownMenu__item DropdownMenu__item--disabled"
-  onClick={[Function]}>
+  onClick={[Function]}
+>
   Move Left
 </div>
 `;

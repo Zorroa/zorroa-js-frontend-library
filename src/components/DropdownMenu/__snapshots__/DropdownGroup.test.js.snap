@@ -1,4 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
 exports[`<DropdownGroup /> It should render the proper markup 1`] = `
 <div
-  className="DropdownMenu__group" />
+  className="DropdownMenu__group"
+/>
 `;
