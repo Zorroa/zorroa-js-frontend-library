@@ -29,9 +29,8 @@ app.get('*', (req, res) => {
 
 // Starts the server
 app.listen(PORT, () => {
-  console.log(
-    `App running\n`,
-    `Host: http://${os.hostname().toLowerCase()}:${PORT}\n`,
-    `Archivist API host: ${ARCHIVIST_API_URL}\n`,
-  )
+  const appRunning = `App running\n`
+  const url = `Host: http://${os.hostname().toLowerCase()}:${PORT}\n`
+  const apiUrl = `Archivist API host: ${ARCHIVIST_API_URL}\n`
+  console.log(appRunning, url, apiUrl)
 })

@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 
 import Pdf from './Pdf'
@@ -9,10 +9,11 @@ import Image from './Image'
 import Asset from '../../models/Asset'
 import wrapSignedStream from '../SignedStream'
 
-class Inspector extends Component {
+class Inspector extends PureComponent {
   static propTypes = {
     asset: PropTypes.instanceOf(Asset),
     signedAssetUrl: PropTypes.string.isRequired,
+    hasSignedUrl: PropTypes.bool.isRequired,
     onNext: PropTypes.func,
     onPrev: PropTypes.func,
     origin: PropTypes.string,
@@ -24,10 +25,18 @@ class Inspector extends Component {
   }
 
   render() {
-    const { asset, origin, thumbSize, onNext, onPrev } = this.props
+    const {
+      asset,
+      origin,
+      hasSignedUrl,
+      signedAssetUrl,
+      thumbSize,
+      onNext,
+      onPrev,
+    } = this.props
     const { error } = this.state
     const mediaType = error ? 'error' : asset.mediaType().toLowerCase()
-    const url = this.props.signedAssetUrl
+    const url = signedAssetUrl
     const imageFormats = ['jpeg', 'jpg', 'png', 'gif']
     let warning = null
     let inspector = null
@@ -53,16 +62,18 @@ class Inspector extends Component {
       )
     } else if (asset.isOfType('application/pdf') && asset.pageCount()) {
       const rangeChunkSize = 65536 * 64
+      const needsCredentials = hasSignedUrl === false
+      const documentInitParameters = {
+        url,
+        withCredentials: needsCredentials,
+        rangeChunkSize,
+      }
       inspector = (
         <Pdf
           path={asset.rawValue('source.path')}
           page={asset.startPage()}
           thumbSize={thumbSize}
-          documentInitParameters={{
-            url,
-            withCredentials: true,
-            rangeChunkSize,
-          }}
+          documentInitParameters={documentInitParameters}
         />
       )
     } else {

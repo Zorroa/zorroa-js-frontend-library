@@ -27,6 +27,7 @@ describe('<SignedStream />', () => {
         expect(component.state('signedAssetUrl')).toBe(
           'https://cdv.irm.com/asset.mp4?key=l33t',
         )
+        expect(component.state('hasSignedUrl')).toBe(true)
         expect(component.state('loadState')).toBe('LOAD_STATE_SUCCESS')
       })
     })
@@ -47,6 +48,7 @@ describe('<SignedStream />', () => {
         expect(component.state('signedAssetUrl')).toBe(
           'https://cdv.irm.com/api/v1/assets/2-b/_stream',
         )
+        expect(component.state('hasSignedUrl')).toBe(false)
         expect(component.state('loadState')).toBe('LOAD_STATE_SUCCESS')
       })
     })

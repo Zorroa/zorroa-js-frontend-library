@@ -22,6 +22,7 @@ function wrapSignedStream(WrappedComponent) {
       super(props)
 
       this.state = {
+        hasSignedUrl: false,
         loadState: LOAD_STATE_PENDING,
         signedAssetUrl: props.asset.url(props.origin),
       }
@@ -40,15 +41,18 @@ function wrapSignedStream(WrappedComponent) {
     fetchSignedUrlSuccess = response => {
       const asset = this.props.asset
       const defaultAssetUrl = asset.url(this.props.origin)
-      if (response.signedUrl) {
+      const signedUrl = response.signedUrl
+      if (signedUrl) {
         this.setState({
-          signedAssetUrl: response.signedUrl,
+          hasSignedUrl: true,
+          signedAssetUrl: signedUrl,
           loadState: LOAD_STATE_SUCCESS,
         })
         return
       }
 
       this.setState({
+        hasSignedUrl: false,
         signedAssetUrl: defaultAssetUrl,
         loadState: LOAD_STATE_SUCCESS,
       })
