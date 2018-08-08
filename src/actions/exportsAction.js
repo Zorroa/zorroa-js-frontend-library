@@ -220,7 +220,7 @@ export function updateExportInterface({
     assetSearchAggregations.aggs = {
       extension: {
         terms: {
-          field: 'source.extension',
+          field: 'source.extension.raw',
         },
       },
       clipType: {
