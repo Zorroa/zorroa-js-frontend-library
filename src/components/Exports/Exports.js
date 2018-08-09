@@ -72,6 +72,7 @@ export default class Exports extends Component {
     packageName: PropTypes.string,
     origin: PropTypes.string.isRequired,
     actions: PropTypes.shape({
+      getProcessors: PropTypes.func.isRequired,
       hideExportInterface: PropTypes.func.isRequired,
       postExportProfiles: PropTypes.func.isRequired,
       loadExportProfiles: PropTypes.func.isRequired,
@@ -80,6 +81,11 @@ export default class Exports extends Component {
       onlineStatus: PropTypes.func.isRequired,
       createExport: PropTypes.func.isRequired,
     }),
+    processors: PropTypes.arrayOf(
+      PropTypes.shape({
+        className: PropTypes.string.isRequired,
+      }),
+    ).isRequired,
   }
 
   constructor(props) {
@@ -151,6 +157,7 @@ export default class Exports extends Component {
 
   componentDidMount() {
     this.props.actions.loadExportProfiles()
+    this.props.actions.getProcessors()
     this.props.actions.onlineStatus(new AssetSearch(this.props.assetSearch))
   }
 
@@ -277,13 +284,27 @@ export default class Exports extends Component {
 
   serializeExporterArguments = () => {
     const fileName = this.state.fileName
-    const fullyQualifiedProcessorNames = {
+    let fullyQualifiedProcessorNames = {
       ImageExporter: 'com.zorroa.core.exporter.ImageExporter',
       VideoClipExporter: 'com.zorroa.core.exporter.VideoExporter',
       FlipbookExporter: 'com.zorroa.core.exporter.FlipbookExporter',
       PdfExporter: 'com.zorroa.core.exporter.PdfExporter',
       CsvExporter: 'com.zorroa.core.exporter.CsvExporter',
       JsonExporter: 'com.zorroa.core.exporter.JsonExporter',
+    }
+    const pipelineProcessors = this.props.processors
+
+    if (pipelineProcessors.length > 0) {
+      fullyQualifiedProcessorNames = pipelineProcessors.reduce(
+        (accumulator, processor) => {
+          const className = processor.className
+          const classNames = className.split('.')
+          const classShortName = classNames[classNames.length - 1]
+          accumulator[classShortName] = className
+          return accumulator
+        },
+        {},
+      )
     }
 
     const processors = Object.keys(fullyQualifiedProcessorNames).reduce(

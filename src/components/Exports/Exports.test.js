@@ -16,6 +16,7 @@ function generateActions() {
   const exportRequest = jest.fn()
   const createExport = jest.fn()
   const onlineStatus = jest.fn()
+  const getProcessors = jest.fn()
 
   const actions = {
     hideExportInterface,
@@ -25,6 +26,7 @@ function generateActions() {
     exportRequest,
     createExport,
     onlineStatus,
+    getProcessors,
   }
 
   return actions
@@ -62,6 +64,7 @@ function generateRequiredProps(customProps) {
     offlineAssets: 0,
     errorMessage: undefined,
     metadataFields: ['a.b'],
+    processors: [],
     maxExportableAssets: 100,
     ...customProps,
   }
@@ -69,8 +72,22 @@ function generateRequiredProps(customProps) {
 
 describe('<Exports />', () => {
   describe('serializeExporterArguments()', () => {
-    it('Should map arguments to the fully qualified exporter names', () => {
-      const props = generateRequiredProps()
+    it('Should map arguments to the exporter names from exports state tree', () => {
+      const props = generateRequiredProps({
+        processors: [
+          {
+            className: 'zplugins.export.processors.PdfExporter',
+            args: {
+              exportOriginal: true,
+              pageMode: 'separate',
+            },
+            execute: [],
+            filters: [],
+            fileTypes: [],
+            language: 'python',
+          },
+        ],
+      })
       const component = shallow(<Exports {...props} />)
       const serializedArgs = component.instance().serializeExporterArguments()
       expect(serializedArgs).toEqual({
@@ -78,39 +95,8 @@ describe('<Exports />', () => {
         name: 'My Test Exports',
         processors: [
           {
-            args: {
-              exportOriginal: true,
-              format: 'jpg',
-              quality: 100,
-              size: 1024,
-            },
-            className: 'com.zorroa.core.exporter.ImageExporter',
-          },
-          {
-            args: {
-              exportOriginal: true,
-              format: 'mp4',
-              quality: 'medium',
-              scale: '960:540',
-            },
-            className: 'com.zorroa.core.exporter.VideoExporter',
-          },
-          {
-            args: {
-              exportImages: true,
-              exportMovies: true,
-              frameRate: 30,
-              quality: 'medium',
-            },
-            className: 'com.zorroa.core.exporter.FlipbookExporter',
-          },
-          {
             args: { exportOriginal: true, pageMode: 'merge' },
-            className: 'com.zorroa.core.exporter.PdfExporter',
-          },
-          {
-            args: { fields: ['a.b'] },
-            className: 'com.zorroa.core.exporter.CsvExporter',
+            className: 'zplugins.export.processors.PdfExporter',
           },
         ],
         search: {
@@ -126,6 +112,68 @@ describe('<Exports />', () => {
           scroll: undefined,
           size: undefined,
         },
+      })
+    })
+
+    describe('serializeExporterArguments()', () => {
+      it('Should map arguments to the fully qualified exporter names', () => {
+        const props = generateRequiredProps()
+        const component = shallow(<Exports {...props} />)
+        const serializedArgs = component.instance().serializeExporterArguments()
+        expect(serializedArgs).toEqual({
+          compress: true,
+          name: 'My Test Exports',
+          processors: [
+            {
+              args: {
+                exportOriginal: true,
+                format: 'jpg',
+                quality: 100,
+                size: 1024,
+              },
+              className: 'com.zorroa.core.exporter.ImageExporter',
+            },
+            {
+              args: {
+                exportOriginal: true,
+                format: 'mp4',
+                quality: 'medium',
+                scale: '960:540',
+              },
+              className: 'com.zorroa.core.exporter.VideoExporter',
+            },
+            {
+              args: {
+                exportImages: true,
+                exportMovies: true,
+                frameRate: 30,
+                quality: 'medium',
+              },
+              className: 'com.zorroa.core.exporter.FlipbookExporter',
+            },
+            {
+              args: { exportOriginal: true, pageMode: 'merge' },
+              className: 'com.zorroa.core.exporter.PdfExporter',
+            },
+            {
+              args: { fields: ['a.b'] },
+              className: 'com.zorroa.core.exporter.CsvExporter',
+            },
+          ],
+          search: {
+            access: undefined,
+            aggs: undefined,
+            fields: undefined,
+            filter: undefined,
+            from: undefined,
+            order: undefined,
+            postFilter: undefined,
+            query: undefined,
+            queryFields: undefined,
+            scroll: undefined,
+            size: undefined,
+          },
+        })
       })
     })
   })
