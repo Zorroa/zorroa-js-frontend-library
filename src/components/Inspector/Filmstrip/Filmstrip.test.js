@@ -1,8 +1,11 @@
 /* eslint-env jest */
 
 import React from 'react'
-import { shallow } from 'enzyme'
+import { shallow, configure } from 'enzyme'
+import Adapter from 'enzyme-adapter-react-15'
 import Filmstrip from './Filmstrip'
+
+configure({ adapter: new Adapter() })
 
 const origin = 'http://localhost'
 const clipParentId = 'a83e9214-cb8e-5c95-8701-16d7f25deed0'

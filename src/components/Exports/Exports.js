@@ -5,19 +5,8 @@ import ModalOverlay, {
   ModalOverlaySidebar,
   ModalOverlayHeader,
 } from '../ModalOverlay'
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
 import classnames from 'classnames'
 import FlashMessage from '../FlashMessage'
-import {
-  hideExportInterface,
-  postExportProfiles,
-  loadExportProfiles,
-  clearPostExportLoadingStates,
-  exportRequest,
-  onlineStatus,
-  createExport,
-} from '../../actions/exportsAction'
 import { getClassFromNamespace } from './utils'
 import ZipExportPackager from './Exporters/ZipExportPackager'
 import ImageExporter from './Exporters/ImageExporter'
@@ -39,7 +28,7 @@ import moment from 'moment'
 
 const SHOW_SUCCESS_MS = 2750
 
-class Exports extends Component {
+export default class Exports extends Component {
   static propTypes = {
     name: PropTypes.string,
     userEmail: PropTypes.string.isRequired,
@@ -700,57 +689,3 @@ class Exports extends Component {
     )
   }
 }
-
-export default connect(
-  state => ({
-    userEmail: state.auth.user.email,
-    userFullName:
-      `${state.auth.user.firstName} ${state.auth.user.lastName}`.trim() ||
-      state.auth.user.email.split('@')[0],
-    userId: state.auth.user.id,
-    assetSearch: state.exports.assetSearch,
-    hasRestrictedAssets: state.exports.hasRestrictedAssets,
-    videoAssetCount: state.exports.videoAssetCount,
-    imageAssetCount: state.exports.imageAssetCount,
-    flipbookAssetCount: state.exports.flipbookAssetCount,
-    documentAssetCount: state.exports.documentAssetCount,
-    totalAssetCount: state.exports.totalAssetCount,
-    selectedAssets: state.exports.exportPreviewAssets,
-    shouldShow: state.exports.shouldShow,
-    origin: state.auth.origin,
-    exportProfiles: state.exports.exportProfiles,
-    packageName: state.exports.packageName,
-    exportProfilesPostingError: state.exports.exportProfilesPostingError,
-    exportProfilesSuccess: state.exports.exportProfilesSuccess,
-    exportProfilesPosting: state.exports.exportProfilesPosting,
-    isLoading: state.exports.isLoading || state.exports.loadingOnlineStatuses,
-    exportRequestPosting: state.exports.exportRequestPosting,
-    exportRequestPostingError: state.exports.exportRequestPostingError,
-    exportRequestPostingSuccess: state.exports.exportRequestPostingSuccess,
-    loadingCreateExport: state.exports.loadingCreateExport,
-    loadingCreateExportError: state.exports.loadingCreateExportError,
-    loadingCreateExportSuccess: state.exports.loadingCreateExportSuccess,
-    onlineAssets: state.exports.onlineAssets,
-    offlineAssets: state.exports.offlineAssets,
-    errorMessage: state.exports.errorMessage,
-    metadataFields: state.app.userSettings.metadataFields,
-    maxExportableAssets: parseInt(
-      state.archivist.settings['archivist.export.maxAssetCount'].currentValue,
-      10,
-    ),
-  }),
-  dispatch => ({
-    actions: bindActionCreators(
-      {
-        hideExportInterface,
-        loadExportProfiles,
-        postExportProfiles,
-        clearPostExportLoadingStates,
-        exportRequest,
-        createExport,
-        onlineStatus,
-      },
-      dispatch,
-    ),
-  }),
-)(Exports)

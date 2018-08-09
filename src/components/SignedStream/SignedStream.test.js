@@ -1,9 +1,12 @@
 /* eslint-env jest */
 
 import React from 'react'
-import { shallow } from 'enzyme'
+import { shallow, configure } from 'enzyme'
+import Adapter from 'enzyme-adapter-react-15'
 import wrapSignedStream from './SignedStream'
 import Asset from '../../models/Asset'
+
+configure({ adapter: new Adapter() })
 
 function DummyComponent() {
   return null

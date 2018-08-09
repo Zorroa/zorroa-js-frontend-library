@@ -1,9 +1,12 @@
 /* eslint-env jest */
 
 import React from 'react'
-import { shallow } from 'enzyme'
+import { shallow, configure } from 'enzyme'
+import Adapter from 'enzyme-adapter-react-15'
 import Scrubber from './Scrubber'
 import { PubSub } from '../../services/jsUtil'
+
+configure({ adapter: new Adapter() })
 
 describe('<Scrubber />', () => {
   const status = new PubSub()
