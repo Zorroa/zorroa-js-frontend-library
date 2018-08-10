@@ -5,19 +5,8 @@ import ModalOverlay, {
   ModalOverlaySidebar,
   ModalOverlayHeader,
 } from '../ModalOverlay'
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
 import classnames from 'classnames'
 import FlashMessage from '../FlashMessage'
-import {
-  hideExportInterface,
-  postExportProfiles,
-  loadExportProfiles,
-  clearPostExportLoadingStates,
-  exportRequest,
-  onlineStatus,
-  createExport,
-} from '../../actions/exportsAction'
 import { getClassFromNamespace } from './utils'
 import ZipExportPackager from './Exporters/ZipExportPackager'
 import ImageExporter from './Exporters/ImageExporter'
@@ -36,10 +25,11 @@ import ExportPreviewerJson from './Previewers/Json'
 import ExportPreviewerCsv from './Previewers/Csv'
 import ExportsPreview from './ExportsPreview'
 import moment from 'moment'
+import { JobFilter } from '../../models/Job'
 
 const SHOW_SUCCESS_MS = 2750
 
-class Exports extends Component {
+export default class Exports extends Component {
   static propTypes = {
     name: PropTypes.string,
     userEmail: PropTypes.string.isRequired,
@@ -83,6 +73,7 @@ class Exports extends Component {
     packageName: PropTypes.string,
     origin: PropTypes.string.isRequired,
     actions: PropTypes.shape({
+      getProcessors: PropTypes.func.isRequired,
       hideExportInterface: PropTypes.func.isRequired,
       postExportProfiles: PropTypes.func.isRequired,
       loadExportProfiles: PropTypes.func.isRequired,
@@ -90,7 +81,13 @@ class Exports extends Component {
       exportRequest: PropTypes.func.isRequired,
       onlineStatus: PropTypes.func.isRequired,
       createExport: PropTypes.func.isRequired,
+      getJobs: PropTypes.func.isRequired,
     }),
+    processors: PropTypes.arrayOf(
+      PropTypes.shape({
+        className: PropTypes.string.isRequired,
+      }),
+    ).isRequired,
   }
 
   constructor(props) {
@@ -163,6 +160,7 @@ class Exports extends Component {
 
   componentDidMount() {
     this.props.actions.loadExportProfiles()
+    this.props.actions.getProcessors()
     this.props.actions.onlineStatus(new AssetSearch(this.props.assetSearch))
   }
 
@@ -180,6 +178,16 @@ class Exports extends Component {
           newPresetName: `Preset ${prevState.presetSaveCounter + 1}`,
         }))
       }, SHOW_SUCCESS_MS)
+
+      if (
+        this.props.loadingCreateExportSuccess === false &&
+        nextProps.loadingCreateExportSuccess === true
+      ) {
+        const { userId } = this.props
+        const type = 'Exports'
+        const jobFilter = new JobFilter({ type, userId })
+        this.props.actions.getJobs(jobFilter, 0, 30)
+      }
     }
   }
 
@@ -289,13 +297,27 @@ class Exports extends Component {
 
   serializeExporterArguments = () => {
     const fileName = this.state.fileName
-    const fullyQualifiedProcessorNames = {
-      ImageExporter: 'zplugins.export.processors.ImageExporter',
-      VideoClipExporter: 'zplugins.export.processors.VideoExporter',
+    let fullyQualifiedProcessorNames = {
+      ImageExporter: 'com.zorroa.core.exporter.ImageExporter',
+      VideoClipExporter: 'com.zorroa.core.exporter.VideoExporter',
       FlipbookExporter: 'com.zorroa.core.exporter.FlipbookExporter',
-      PdfExporter: 'zplugins.export.processors.PdfExporter',
+      PdfExporter: 'com.zorroa.core.exporter.PdfExporter',
       CsvExporter: 'com.zorroa.core.exporter.CsvExporter',
       JsonExporter: 'com.zorroa.core.exporter.JsonExporter',
+    }
+    const pipelineProcessors = this.props.processors
+
+    if (pipelineProcessors.length > 0) {
+      fullyQualifiedProcessorNames = pipelineProcessors.reduce(
+        (accumulator, processor) => {
+          const className = processor.className
+          const classNames = className.split('.')
+          const classShortName = classNames[classNames.length - 1]
+          accumulator[classShortName] = className
+          return accumulator
+        },
+        {},
+      )
     }
 
     const processors = Object.keys(fullyQualifiedProcessorNames).reduce(
@@ -701,57 +723,3 @@ class Exports extends Component {
     )
   }
 }
-
-export default connect(
-  state => ({
-    userEmail: state.auth.user.email,
-    userFullName:
-      `${state.auth.user.firstName} ${state.auth.user.lastName}`.trim() ||
-      state.auth.user.email.split('@')[0],
-    userId: state.auth.user.id,
-    assetSearch: state.exports.assetSearch,
-    hasRestrictedAssets: state.exports.hasRestrictedAssets,
-    videoAssetCount: state.exports.videoAssetCount,
-    imageAssetCount: state.exports.imageAssetCount,
-    flipbookAssetCount: state.exports.flipbookAssetCount,
-    documentAssetCount: state.exports.documentAssetCount,
-    totalAssetCount: state.exports.totalAssetCount,
-    selectedAssets: state.exports.exportPreviewAssets,
-    shouldShow: state.exports.shouldShow,
-    origin: state.auth.origin,
-    exportProfiles: state.exports.exportProfiles,
-    packageName: state.exports.packageName,
-    exportProfilesPostingError: state.exports.exportProfilesPostingError,
-    exportProfilesSuccess: state.exports.exportProfilesSuccess,
-    exportProfilesPosting: state.exports.exportProfilesPosting,
-    isLoading: state.exports.isLoading || state.exports.loadingOnlineStatuses,
-    exportRequestPosting: state.exports.exportRequestPosting,
-    exportRequestPostingError: state.exports.exportRequestPostingError,
-    exportRequestPostingSuccess: state.exports.exportRequestPostingSuccess,
-    loadingCreateExport: state.exports.loadingCreateExport,
-    loadingCreateExportError: state.exports.loadingCreateExportError,
-    loadingCreateExportSuccess: state.exports.loadingCreateExportSuccess,
-    onlineAssets: state.exports.onlineAssets,
-    offlineAssets: state.exports.offlineAssets,
-    errorMessage: state.exports.errorMessage,
-    metadataFields: state.app.userSettings.metadataFields,
-    maxExportableAssets: parseInt(
-      state.archivist.settings['archivist.export.maxAssetCount'].currentValue,
-      10,
-    ),
-  }),
-  dispatch => ({
-    actions: bindActionCreators(
-      {
-        hideExportInterface,
-        loadExportProfiles,
-        postExportProfiles,
-        clearPostExportLoadingStates,
-        exportRequest,
-        createExport,
-        onlineStatus,
-      },
-      dispatch,
-    ),
-  }),
-)(Exports)

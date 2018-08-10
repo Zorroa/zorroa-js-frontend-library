@@ -1,12 +1,15 @@
 /* eslint-env jest */
 
 import React from 'react'
-import { shallow } from 'enzyme'
+import { shallow, configure } from 'enzyme'
+import Adapter from 'enzyme-adapter-react-15'
 import SharedMetadata from './SharedMetadata'
 import FlashMessage from '../../FlashMessage'
 import SharedTableLayout from '../../../models/SharedTableLayout'
 import User from '../../../models/User'
 import FieldList from '../../../models/FieldList'
+
+configure({ adapter: new Adapter() })
 
 function getComponent(options = {}) {
   let {

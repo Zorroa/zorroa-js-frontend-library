@@ -1,9 +1,12 @@
 /* eslint-env jest */
 
 import React from 'react'
-import { shallow } from 'enzyme'
+import { shallow, configure } from 'enzyme'
+import Adapter from 'enzyme-adapter-react-15'
 import renderer from 'react-test-renderer'
 import DropdownItem from './DropdownItem'
+
+configure({ adapter: new Adapter() })
 
 describe('<DropdownItem />', () => {
   describe('handleClick()', () => {

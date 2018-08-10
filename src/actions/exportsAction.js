@@ -19,6 +19,9 @@ import {
   CREATE_EXPORT_START,
   CREATE_EXPORT_SUCCESS,
   CREATE_EXPORT_ERROR,
+  GET_EXPORT_PROCESSORS,
+  GET_EXPORT_PROCESSORS_SUCCESS,
+  GET_EXPORT_PROCESSORS_ERROR,
 } from '../constants/actionTypes'
 import api from '../api'
 import AssetSearch from '../models/AssetSearch'
@@ -298,5 +301,37 @@ export function updateExportInterface({
         },
       })
     })
+  }
+}
+
+export function getProcessors() {
+  return dispatch => {
+    dispatch({
+      type: GET_EXPORT_PROCESSORS,
+      payload: {},
+    })
+
+    api.processorLists
+      .get({
+        type: 'export',
+      })
+      .then(
+        processors => {
+          dispatch({
+            type: GET_EXPORT_PROCESSORS_SUCCESS,
+            payload: {
+              processors,
+            },
+          })
+        },
+        errorResponse => {
+          dispatch({
+            type: GET_EXPORT_PROCESSORS_ERROR,
+            payload: {
+              errorResponse,
+            },
+          })
+        },
+      )
   }
 }
