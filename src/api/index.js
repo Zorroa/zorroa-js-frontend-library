@@ -9,6 +9,7 @@ import job from './job.js'
 import * as request from './request.js'
 import * as exports from './exports.js'
 import * as folders from './folders.js'
+import * as processorLists from './processorLists.js'
 
 export default {
   flipbook,
@@ -22,4 +23,5 @@ export default {
   job,
   folders,
   stream,
+  processorLists,
 }

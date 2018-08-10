@@ -1,5 +1,6 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { getJobs } from '../../actions/jobActions'
 import {
   hideExportInterface,
   postExportProfiles,
@@ -8,6 +9,7 @@ import {
   exportRequest,
   onlineStatus,
   createExport,
+  getProcessors,
 } from '../../actions/exportsAction'
 import Exports from './Exports'
 
@@ -33,7 +35,10 @@ export default connect(
     exportProfilesPostingError: state.exports.exportProfilesPostingError,
     exportProfilesSuccess: state.exports.exportProfilesSuccess,
     exportProfilesPosting: state.exports.exportProfilesPosting,
-    isLoading: state.exports.isLoading || state.exports.loadingOnlineStatuses,
+    isLoading:
+      state.exports.isLoading ||
+      state.exports.loadingOnlineStatuses ||
+      state.exports.loadingProcessors,
     exportRequestPosting: state.exports.exportRequestPosting,
     exportRequestPostingError: state.exports.exportRequestPostingError,
     exportRequestPostingSuccess: state.exports.exportRequestPostingSuccess,
@@ -48,6 +53,7 @@ export default connect(
       state.archivist.settings['archivist.export.maxAssetCount'].currentValue,
       10,
     ),
+    processors: state.exports.processors,
   }),
   dispatch => ({
     actions: bindActionCreators(
@@ -59,6 +65,8 @@ export default connect(
         exportRequest,
         createExport,
         onlineStatus,
+        getProcessors,
+        getJobs,
       },
       dispatch,
     ),

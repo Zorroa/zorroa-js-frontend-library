@@ -25,6 +25,7 @@ import ExportPreviewerJson from './Previewers/Json'
 import ExportPreviewerCsv from './Previewers/Csv'
 import ExportsPreview from './ExportsPreview'
 import moment from 'moment'
+import { JobFilter } from '../../models/Job'
 
 const SHOW_SUCCESS_MS = 2750
 
@@ -72,6 +73,7 @@ export default class Exports extends Component {
     packageName: PropTypes.string,
     origin: PropTypes.string.isRequired,
     actions: PropTypes.shape({
+      getProcessors: PropTypes.func.isRequired,
       hideExportInterface: PropTypes.func.isRequired,
       postExportProfiles: PropTypes.func.isRequired,
       loadExportProfiles: PropTypes.func.isRequired,
@@ -79,7 +81,13 @@ export default class Exports extends Component {
       exportRequest: PropTypes.func.isRequired,
       onlineStatus: PropTypes.func.isRequired,
       createExport: PropTypes.func.isRequired,
+      getJobs: PropTypes.func.isRequired,
     }),
+    processors: PropTypes.arrayOf(
+      PropTypes.shape({
+        className: PropTypes.string.isRequired,
+      }),
+    ).isRequired,
   }
 
   constructor(props) {
@@ -151,6 +159,7 @@ export default class Exports extends Component {
 
   componentDidMount() {
     this.props.actions.loadExportProfiles()
+    this.props.actions.getProcessors()
     this.props.actions.onlineStatus(new AssetSearch(this.props.assetSearch))
   }
 
@@ -168,6 +177,16 @@ export default class Exports extends Component {
           newPresetName: `Preset ${prevState.presetSaveCounter + 1}`,
         }))
       }, SHOW_SUCCESS_MS)
+
+      if (
+        this.props.loadingCreateExportSuccess === false &&
+        nextProps.loadingCreateExportSuccess === true
+      ) {
+        const { userId } = this.props
+        const type = 'Exports'
+        const jobFilter = new JobFilter({ type, userId })
+        this.props.actions.getJobs(jobFilter, 0, 30)
+      }
     }
   }
 
@@ -277,13 +296,27 @@ export default class Exports extends Component {
 
   serializeExporterArguments = () => {
     const fileName = this.state.fileName
-    const fullyQualifiedProcessorNames = {
+    let fullyQualifiedProcessorNames = {
       ImageExporter: 'com.zorroa.core.exporter.ImageExporter',
       VideoClipExporter: 'com.zorroa.core.exporter.VideoExporter',
       FlipbookExporter: 'com.zorroa.core.exporter.FlipbookExporter',
       PdfExporter: 'com.zorroa.core.exporter.PdfExporter',
       CsvExporter: 'com.zorroa.core.exporter.CsvExporter',
       JsonExporter: 'com.zorroa.core.exporter.JsonExporter',
+    }
+    const pipelineProcessors = this.props.processors
+
+    if (pipelineProcessors.length > 0) {
+      fullyQualifiedProcessorNames = pipelineProcessors.reduce(
+        (accumulator, processor) => {
+          const className = processor.className
+          const classNames = className.split('.')
+          const classShortName = classNames[classNames.length - 1]
+          accumulator[classShortName] = className
+          return accumulator
+        },
+        {},
+      )
     }
 
     const processors = Object.keys(fullyQualifiedProcessorNames).reduce(

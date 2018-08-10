@@ -4,10 +4,11 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
-import Job from '../../models/Job'
+import Job, { JobFilter } from '../../models/Job'
 import User from '../../models/User'
 import ProgressBar from '../ProgressBar'
 import {
+  getJobs,
   markJobDownloaded,
   downloadFilesForJob,
 } from '../../actions/jobActions'
@@ -71,7 +72,16 @@ class Jobs extends Component {
     }
   }
 
-  refreshJobs = () => {}
+  // Load the most recent jobs into full job list
+  refreshJobs = () => {
+    const { jobType, user, actions } = this.props
+    const type = jobType
+    const userId = user && user.id
+    const jobFilter = new JobFilter({ type, userId })
+    // We only get the top N jobs, irrespective of the filter.
+    // FIXME: fix the server to return the top N filtered jobs
+    actions.getJobs(jobFilter, 0, 30)
+  }
 
   filterJobs = event => {
     const filterString = event.target.value
@@ -196,11 +206,12 @@ class Jobs extends Component {
     const compare = (a, b) => _compare(a, b) * (sortAscending ? -1 : 1)
     const jobs = Object.keys(this.props.jobs)
       .map(jobId => this.props.jobs[jobId])
-      .filter(
-        job =>
+      .filter(job => {
+        return (
           job.type === jobType &&
-          job.name.toLowerCase().includes(lcFilterString),
-      )
+          job.name.toLowerCase().includes(lcFilterString)
+        )
+      })
       .sort(compare)
     return (
       <div className="Jobs">
@@ -306,6 +317,7 @@ export default connect(
       {
         markJobDownloaded,
         downloadFilesForJob,
+        getJobs,
       },
       dispatch,
     ),
