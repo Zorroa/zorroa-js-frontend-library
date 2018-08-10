@@ -1,5 +1,6 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { getJobs } from '../../actions/jobActions'
 import {
   hideExportInterface,
   postExportProfiles,
@@ -65,6 +66,7 @@ export default connect(
         createExport,
         onlineStatus,
         getProcessors,
+        getJobs,
       },
       dispatch,
     ),

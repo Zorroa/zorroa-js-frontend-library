@@ -25,6 +25,7 @@ import ExportPreviewerJson from './Previewers/Json'
 import ExportPreviewerCsv from './Previewers/Csv'
 import ExportsPreview from './ExportsPreview'
 import moment from 'moment'
+import { JobFilter } from '../../models/Job'
 
 const SHOW_SUCCESS_MS = 2750
 
@@ -80,6 +81,7 @@ export default class Exports extends Component {
       exportRequest: PropTypes.func.isRequired,
       onlineStatus: PropTypes.func.isRequired,
       createExport: PropTypes.func.isRequired,
+      getJobs: PropTypes.func.isRequired,
     }),
     processors: PropTypes.arrayOf(
       PropTypes.shape({
@@ -175,6 +177,16 @@ export default class Exports extends Component {
           newPresetName: `Preset ${prevState.presetSaveCounter + 1}`,
         }))
       }, SHOW_SUCCESS_MS)
+
+      if (
+        this.props.loadingCreateExportSuccess === false &&
+        nextProps.loadingCreateExportSuccess === true
+      ) {
+        const { userId } = this.props
+        const type = 'Exports'
+        const jobFilter = new JobFilter({ type, userId })
+        this.props.actions.getJobs(jobFilter, 0, 30)
+      }
     }
   }
 
