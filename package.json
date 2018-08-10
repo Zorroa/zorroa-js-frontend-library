@@ -30,7 +30,7 @@
   "license": "UNLICENSED",
   "private": true,
   "engines": {
-    "node": "^8.0.0",
+    "node": "8.X.X",
     "npm": "^5.6.0"
   },
   "jest": {
