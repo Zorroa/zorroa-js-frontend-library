@@ -108,8 +108,9 @@ class Exports extends Component {
       },
       PdfExporter: {
         arguments: {
+          filename: this.props.packageName,
           exportOriginal: true,
-          pageMode: 'merge',
+          pageMode: 'separate',
         },
         shouldExport: true,
         format: 'multipage',
@@ -289,10 +290,10 @@ class Exports extends Component {
   serializeExporterArguments = () => {
     const fileName = this.state.fileName
     const fullyQualifiedProcessorNames = {
-      ImageExporter: 'com.zorroa.core.exporter.ImageExporter',
-      VideoClipExporter: 'com.zorroa.core.exporter.VideoExporter',
+      ImageExporter: 'zplugins.export.processors.ImageExporter',
+      VideoClipExporter: 'zplugins.export.processors.VideoExporter',
       FlipbookExporter: 'com.zorroa.core.exporter.FlipbookExporter',
-      PdfExporter: 'com.zorroa.core.exporter.PdfExporter',
+      PdfExporter: 'zplugins.export.processors.PdfExporter',
       CsvExporter: 'com.zorroa.core.exporter.CsvExporter',
       JsonExporter: 'com.zorroa.core.exporter.JsonExporter',
     }
