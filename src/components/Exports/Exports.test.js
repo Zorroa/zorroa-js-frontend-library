@@ -95,7 +95,11 @@ describe('<Exports />', () => {
         name: 'My Test Exports',
         processors: [
           {
-            args: { exportOriginal: true, pageMode: 'merge' },
+            args: {
+              exportOriginal: true,
+              pageMode: 'separate',
+              filename: 'My Test Exports',
+            },
             className: 'zplugins.export.processors.PdfExporter',
           },
         ],
@@ -152,7 +156,11 @@ describe('<Exports />', () => {
               className: 'com.zorroa.core.exporter.FlipbookExporter',
             },
             {
-              args: { exportOriginal: true, pageMode: 'merge' },
+              args: {
+                exportOriginal: true,
+                pageMode: 'separate',
+                filename: 'My Test Exports',
+              },
               className: 'com.zorroa.core.exporter.PdfExporter',
             },
             {

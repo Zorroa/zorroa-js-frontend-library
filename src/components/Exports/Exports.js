@@ -105,8 +105,9 @@ export default class Exports extends Component {
       },
       PdfExporter: {
         arguments: {
+          filename: this.props.packageName,
           exportOriginal: true,
-          pageMode: 'merge',
+          pageMode: 'separate',
         },
         shouldExport: true,
         format: 'multipage',
