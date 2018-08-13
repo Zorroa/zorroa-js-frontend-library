@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { FormSelect, FormLabel, FormRadio } from '../../Form'
 import ExportsSection from '../ExportsSection'
+import { getClassFromNamespace } from '../utils'
 
 export default class PdfExporter extends Component {
   static propTypes = {
@@ -10,6 +11,12 @@ export default class PdfExporter extends Component {
     isOpen: PropTypes.bool,
     shouldExport: PropTypes.bool.isRequired,
     format: PropTypes.string.isRequired,
+    processors: PropTypes.arrayOf(
+      PropTypes.shape({
+        className: PropTypes.string.isRequired,
+      }),
+    ),
+    hasNonDefaultProcessors: PropTypes.bool.isRequired,
     arguments: PropTypes.shape({
       pageMode: PropTypes.string.isRequired,
       exportOriginal: PropTypes.bool.isRequired,
@@ -47,13 +54,7 @@ export default class PdfExporter extends Component {
     this.setState(newState)
   }
 
-  onFormatChange = format => {
-    let pageMode = 'merge'
-
-    if (format === 'singlepage') {
-      pageMode = 'separate'
-    }
-
+  onFormatChange = pageMode => {
     this.onChange(
       {
         pageMode,
@@ -94,7 +95,20 @@ export default class PdfExporter extends Component {
     })
   }
 
+  canDisplay() {
+    const hasProcessor =
+      this.props.processors.find(
+        processor =>
+          getClassFromNamespace(processor.className) === 'PdfExporter',
+      ) !== undefined
+    return this.props.hasNonDefaultProcessors === false || hasProcessor
+  }
+
   render() {
+    if (this.canDisplay() === false) {
+      return null
+    }
+
     const formatOptions = [
       {
         label: 'Combined PDF',

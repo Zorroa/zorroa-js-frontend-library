@@ -16,6 +16,7 @@ function generateActions() {
   const exportRequest = jest.fn()
   const createExport = jest.fn()
   const onlineStatus = jest.fn()
+  const getJobs = jest.fn()
   const getProcessors = jest.fn()
 
   const actions = {
@@ -27,6 +28,7 @@ function generateActions() {
     createExport,
     onlineStatus,
     getProcessors,
+    getJobs,
   }
 
   return actions
@@ -99,6 +101,7 @@ describe('<Exports />', () => {
               exportOriginal: true,
               pageMode: 'separate',
               filename: 'My Test Exports',
+              quality: 100,
             },
             className: 'zplugins.export.processors.PdfExporter',
           },
@@ -160,6 +163,7 @@ describe('<Exports />', () => {
                 exportOriginal: true,
                 pageMode: 'separate',
                 filename: 'My Test Exports',
+                quality: 100,
               },
               className: 'com.zorroa.core.exporter.PdfExporter',
             },

@@ -9,11 +9,11 @@ import classnames from 'classnames'
 import FlashMessage from '../FlashMessage'
 import { getClassFromNamespace } from './utils'
 import ZipExportPackager from './Exporters/ZipExportPackager'
-import ImageExporter from './Exporters/ImageExporter'
-import VideoClipExporter from './Exporters/VideoClipExporter'
-import FlipbookExporter from './Exporters/FlipbookExporter'
-import PdfExporter from './Exporters/PdfExporter'
-import MetadataExporter from './Exporters/MetadataExporter'
+import ImageExporter from './Exporters/ConnectedImageExporter'
+import VideoClipExporter from './Exporters/ConnectedVideoClipExporter'
+import FlipbookExporter from './Exporters/ConnectedFlipbookExporter'
+import PdfExporter from './Exporters/ConnectedPdfExporter'
+import MetadataExporter from './Exporters/ConnectedMetadataExporter'
 import { FormButton, FormInput, FormLabel } from '../Form'
 import Asset from '../../models/Asset'
 import AssetSearch from '../../models/AssetSearch'
@@ -108,6 +108,7 @@ export default class Exports extends Component {
           filename: this.props.packageName,
           exportOriginal: true,
           pageMode: 'separate',
+          quality: 100,
         },
         shouldExport: true,
         format: 'multipage',
@@ -311,8 +312,7 @@ export default class Exports extends Component {
       fullyQualifiedProcessorNames = pipelineProcessors.reduce(
         (accumulator, processor) => {
           const className = processor.className
-          const classNames = className.split('.')
-          const classShortName = classNames[classNames.length - 1]
+          const classShortName = getClassFromNamespace(className)
           accumulator[classShortName] = className
           return accumulator
         },

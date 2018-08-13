@@ -2,9 +2,16 @@ import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { FormSelect, FormLabel } from '../../Form'
 import ExportsSection from '../ExportsSection'
+import { getClassFromNamespace } from '../utils'
 
 export default class MetadataExporter extends Component {
   static propTypes = {
+    processors: PropTypes.arrayOf(
+      PropTypes.shape({
+        className: PropTypes.string.isRequired,
+      }),
+    ),
+    hasNonDefaultProcessors: PropTypes.bool.isRequired,
     onChange: PropTypes.func,
     onToggleAccordion: PropTypes.func.isRequired,
     isOpen: PropTypes.bool,
@@ -63,7 +70,20 @@ export default class MetadataExporter extends Component {
     })
   }
 
+  canDisplay() {
+    const hasProcessor =
+      this.props.processors.find(
+        processor =>
+          getClassFromNamespace(processor.className) === 'MetadataExporter',
+      ) !== undefined
+    return this.props.hasNonDefaultProcessors === false || hasProcessor
+  }
+
   render() {
+    if (this.canDisplay() === false) {
+      return null
+    }
+
     const formatOptions = [
       {
         label: 'CSV',
