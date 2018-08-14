@@ -8,7 +8,6 @@ import {
 import Widget, {
   createFacetWidget,
   createExistsWidget,
-  createMapWidget,
   createDateRangeWidget,
   createRangeWidget,
   createCollectionsWidget,
@@ -216,16 +215,6 @@ function restoreSearch(search) {
           isPinned,
         )
         widgets.push(filetype)
-      } else if (agg.aggs.map) {
-        const field = agg.aggs.map.geohash_grid.field
-        const map = createMapWidget(
-          field,
-          'point',
-          undefined,
-          isEnabled,
-          isPinned,
-        )
-        widgets.push(map)
       } else if (agg.aggs.dateRange) {
         const field = agg.aggs.dateRange.stats.field
         const minStr = undefined

@@ -30,6 +30,7 @@ import { resetRacetrackWidgets } from '../../actions/racetrackAction'
 import { saveSharedLink } from '../../actions/sharedLinkAction'
 import { selectJobIds } from '../../actions/jobActions'
 import { LOAD_SEARCH_ITEM } from '../../constants/localStorageItems'
+import elements from './elements'
 
 class Racebar extends Component {
   static propTypes = {
@@ -213,17 +214,19 @@ class Racebar extends Component {
   }
 
   renderWidget(widget, isIconified) {
-    const widgetInfo = Object.keys(WidgetInfo)
-      .map(k => WidgetInfo[k])
-      .find(widgetInfo => widgetInfo.type === widget.type)
-    if (!widgetInfo.element) return
+    const widgetInfo =
+      Object.keys(WidgetInfo)
+        .map(k => WidgetInfo[k])
+        .find(widgetInfo => widgetInfo.type === widget.type) || {}
+    const element = elements[widgetInfo.type]
+    if (!element) return
     const isPinned = widget.isPinned === true
     const isEnabled = widget.isEnabled
     const isOpen = !this.props.isolatedId && this.state.openId === widget.id
     const onOpen = e => this.toggleOpen(widget, e)
     const floatBody = true
     const maxWidth = 360
-    return cloneElement(widgetInfo.element, {
+    return cloneElement(element, {
       id: widget.id,
       isIconified,
       isPinned,

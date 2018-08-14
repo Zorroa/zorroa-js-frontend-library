@@ -17,7 +17,6 @@ import {
   THUMB_LAYOUT,
   SHOW_TABLE,
   TABLE_HEIGHT,
-  SHOW_MULTIPAGE,
   VIDEO_VOLUME,
   AUTH_CHANGE_PASSWORD,
   AUTH_DEFAULTS,
@@ -194,8 +193,7 @@ function authorize(dispatch, json) {
   dispatch(archivistSetting('curator.lightbox.zoom-max'))
   dispatch(archivistSetting('archivist.export.maxAssetCount'))
 
-  // ignore all UI settings when selenium testing
-  if (metadata && !api.getSeleniumTesting()) {
+  if (metadata) {
     dispatch({ type: USER_SETTINGS, payload: { user, metadata } })
     // FIXME: Should move to settings.search in server?
     /* FIXME: Disable restoring the search due to user conflicts.
@@ -252,9 +250,6 @@ function authorize(dispatch, json) {
     }
     if (metadata.tableHeight) {
       dispatch({ type: TABLE_HEIGHT, payload: metadata.tableHeight })
-    }
-    if (metadata.showMultipage !== undefined) {
-      dispatch({ type: SHOW_MULTIPAGE, payload: metadata.showMultipage })
     }
     if (metadata.videoVolume !== undefined) {
       dispatch({ type: VIDEO_VOLUME, payload: metadata.videoVolume })

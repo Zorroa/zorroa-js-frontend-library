@@ -15,8 +15,6 @@ import {
   ISOLATE_ASSET,
   SELECT_ASSETS,
   ISOLATE_PARENT,
-  ISOLATE_FLIPBOOK,
-  DEISOLATE_FLIPBOOK,
   SUGGEST_COMPLETIONS,
   ALL_ASSET_COUNT,
   SIMILAR_FIELDS,
@@ -145,19 +143,6 @@ export function isolateParent(asset) {
   return {
     type: ISOLATE_PARENT,
     payload: asset,
-  }
-}
-
-export function isolateFlipbook(asset) {
-  return {
-    type: ISOLATE_FLIPBOOK,
-    payload: asset,
-  }
-}
-
-export function deisolateFlipbook() {
-  return {
-    type: DEISOLATE_FLIPBOOK,
   }
 }
 

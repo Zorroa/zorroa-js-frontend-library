@@ -1,0 +1,65 @@
+@import '../../../styles/core-mixins.scss';
+
+.AssetsZeroState {
+  font-size: 24px;
+  background-color: rgba(200,200,200,1);
+  color: transparent;
+  text-shadow: 0px 2px 3px rgba(255,255,255,0.5);
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+  background-clip: text;
+  line-height: 1.5em;
+  @include flexOn;
+  @include flexCol;
+  @include flexAlignItemsCenter;
+  @include flexJustifyStart;
+  text-align: center;
+
+  .dark & {
+    background-color: $zorroa-darkgray;
+    text-shadow: 0px 2px 3px rgba(0,0,0,0.5);
+  }
+
+  &__button {
+    font-size: 14pt;
+    text-transform: uppercase;
+    height: $zorroa-metric-base * 4;
+    padding: 0 $zorroa-metric-base * 3;
+    margin-top: $zorroa-metric-base * 4;
+    font-weight: 500;
+    background-color: $zorroa-greyish-brown;
+    color: $zorroa-lightgray;
+    border-radius: 3px;
+    border: none;
+
+    &:hover {
+      background-color: #a5a5a5;
+      color: $zorroa-lightgray;
+      font-weight: 500;
+      .dark & { background-color: $zorroa-dimgray; }
+    }
+
+    &:active {
+      background-color: $zorroa-sickly-green;
+      color: white;
+      font-weight: 500;
+    }
+  }
+
+  &__icon {
+    margin-top: $zorroa-metric-base * 10;
+    margin-bottom: $zorroa-metric-base * 4;
+    font-size: 64px;
+    background-color: rgba(200,200,200,1);
+    color: transparent;
+    text-shadow: 0px 2px 3px rgba(255,255,255,0.5);
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    background-clip: text;
+
+    .dark & {
+      text-shadow: 0px 2px 3px rgba(0,0,0,0.5);
+      background-color: $zorroa-darkgray;
+    }
+  }
+}

@@ -10,6 +10,7 @@ import * as WidgetInfo from './WidgetInfo'
 import Permission from '../../models/Permission'
 import { modifyRacetrackWidget } from '../../actions/racetrackAction'
 import { showModal, hideModal } from '../../actions/appActions'
+import elements from './elements'
 
 class AddWidget extends Component {
   static propTypes = {
@@ -92,13 +93,14 @@ class AddWidget extends Component {
     })
     return Object.keys(WidgetInfo)
       .map(k => WidgetInfo[k])
-      .filter(
-        widgetInfo =>
-          widgetInfo.element &&
+      .filter(widgetInfo => {
+        return (
+          elements[widgetInfo.type] &&
           !singletons.has(widgetInfo.type) &&
           widgetInfo.title.toLowerCase().includes(filter) &&
-          AddWidget.hasPermission(widgetInfo.permissions, permissions),
-      )
+          AddWidget.hasPermission(widgetInfo.permissions, permissions)
+        )
+      })
   }
 
   static hasPermission = (widgetPermissions, permissions) => {

@@ -113,6 +113,36 @@ export default class AssetSearch {
     }
     return false
   }
+
+  toJSON() {
+    // Only certain values should be serialized
+    const serializableSearchParameters = {
+      scroll: this.scroll,
+      query: this.query,
+      queryFields: this.queryFields,
+      fields: this.fields,
+      filter: this.filter,
+      postFilter: this.postFilter,
+      order: this.order,
+      size: this.size,
+      from: this.from,
+      aggs: this.aggs,
+      access: this.access,
+    }
+
+    // Deep clone search parameters
+    const data = JSON.parse(JSON.stringify(serializableSearchParameters))
+
+    const isFilterEmpty =
+      typeof data.filter === 'object' && Object.keys(data.filter).length === 0
+
+    // Empty filters should not be passed to ElasticSearch
+    if (isFilterEmpty) {
+      data.filter = undefined
+    }
+
+    return data
+  }
 }
 
 // Combine an array of arrays into an array with unique elements

@@ -1,0 +1,43 @@
+@import '../../../styles/core-mixins.scss';
+
+.Multipage-body {
+  @include flexColCenter;
+  @include nowrap;
+  color: $zorroa-color-gray-dark-2;
+
+  .dark & {
+    color: $zorroa-color-gray-dark-4;
+  }
+}
+
+.Multipage-parent {
+  margin: $zorroa-metric-base * 2;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  position: relative;
+}
+
+.Multipage-sort {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  margin-left: $zorroa-metric-base;
+  margin-right: $zorroa-metric-base;
+  margin-bottom: $zorroa-metric-base;
+  input { margin-right: $zorroa-metric-base; }
+}
+
+.Multipage-toggle {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+}
+
+.Multipage-label {
+  margin: $zorroa-metric-base;
+  cursor: pointer;
+  &:hover { color: $zorroa-color-green-1; }
+}
+
+.Multipage-previewer {
+  margin: $zorroa-metric-base;
+}

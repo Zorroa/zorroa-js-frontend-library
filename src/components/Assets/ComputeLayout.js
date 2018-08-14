@@ -6,7 +6,6 @@
  assets        - Array of { width, height, parentId } matching external asset array
  panelWidth    - Width in CSS pixels of desired display width
  thumbSize     - Target size of thumbnail
- showMultipage - True if results should be collapsed into multipage docs
 
  The return value is an object that contains { position, multipage, collapsed }:
  position      - Array that matches the input array <assets> 1:1 where each
@@ -17,13 +16,7 @@
  collapsed     - Total number of assets collapsed into multipage docs
 */
 
-export function masonry(
-  assets,
-  panelWidth,
-  thumbSize,
-  showMultipage,
-  isolatedParentId,
-) {
+export function masonry(assets, panelWidth, thumbSize, isolatedParentId) {
   let idealAspectSum = panelWidth / thumbSize
   const proposedRowHeight = panelWidth / idealAspectSum
   const margin = 5
@@ -42,7 +35,7 @@ export function masonry(
     const { width, height, id, parentId } = asset
 
     let collapse = false
-    if (showMultipage && (!parentId || parentId !== isolatedParentId)) {
+    if (!parentId || parentId !== isolatedParentId) {
       // Collapse siblings by setting the aspect to zero.
       // The height and y position are retained to set the Pager top.
       if (parentId) {
@@ -109,13 +102,7 @@ export function masonry(
   return { positions, multipage, collapsed }
 }
 
-export function grid(
-  assets,
-  panelWidth,
-  thumbSize,
-  showMultipage,
-  isolatedParentId,
-) {
+export function grid(assets, panelWidth, thumbSize, isolatedParentId) {
   const numColumns = Math.floor(panelWidth / thumbSize)
   const numMargins = numColumns - 1
   const margin = 5
@@ -136,7 +123,7 @@ export function grid(
   for (var i = 0; i < assets.length; i++) {
     const asset = assets[i]
     const { id, parentId } = asset
-    if (showMultipage && parentId !== isolatedParentId) {
+    if (parentId !== isolatedParentId) {
       if (parentId) {
         const pages = multipage[parentId]
         if (!pages) {

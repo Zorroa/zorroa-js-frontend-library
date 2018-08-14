@@ -574,38 +574,40 @@ export default class FlipbookImage extends Component {
       'FlipbookImage__loading-status--no-frame-metadata': isNothingLoaded,
     })
     return (
-      <div className="FlipbookImage">
-        {this.isLoaded() === false && (
-          <div
-            className={loadingClasses}
-            style={{
-              height: height,
-              width: width,
-            }}>
-            <ProgressCircle percentage={formattedLoadingPercentage} />
-          </div>
-        )}
-        {prioritizedFrames.map(frame => {
-          const isVisible = this.shouldFrameBeVisible(frame)
-          return (
-            <img
-              onLoad={this.onFrameLoad}
-              height={height}
-              width={width}
-              key={frame.id}
+      <div>
+        <div className="FlipbookImage">
+          {this.isLoaded() === false && (
+            <div
+              className={loadingClasses}
               style={{
-                pointerEvents: 'none',
-                visibility: isVisible ? 'visible' : 'hidden',
-                position: isVisible ? 'static' : 'absolute',
-              }}
-              src={frame.closestProxyURL(
-                this.props.origin,
-                width || window.innerWidth,
-                height || window.innerHeight,
-              )}
-            />
-          )
-        })}
+                height: height,
+                width: width,
+              }}>
+              <ProgressCircle percentage={formattedLoadingPercentage} />
+            </div>
+          )}
+          {prioritizedFrames.map(frame => {
+            const isVisible = this.shouldFrameBeVisible(frame)
+            return (
+              <img
+                onLoad={this.onFrameLoad}
+                height={height}
+                width={width}
+                key={frame.id}
+                style={{
+                  pointerEvents: 'none',
+                  visibility: isVisible ? 'visible' : 'hidden',
+                  position: isVisible ? 'static' : 'absolute',
+                }}
+                src={frame.closestProxyURL(
+                  this.props.origin,
+                  width || window.innerWidth,
+                  height || window.innerHeight,
+                )}
+              />
+            )
+          })}
+        </div>
       </div>
     )
   }

@@ -1,0 +1,84 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[` 1`] = `
+<div
+  className="AssetsFooter"
+>
+  <div
+    className="ThumbSizeSlider flexRow flexAlignItemsCenter"
+  >
+    <div
+      className="ThumbSizeSlider-smaller AssetsFooter__icon flexOff flexRowCenter"
+      onClick={[Function]}
+      title="Smaller thumbnails"
+    >
+      <i
+        className="icon-picture2"
+        style={
+          Object {
+            "fontSize": "12px",
+          }
+        }
+      />
+    </div>
+    <div
+      className="ThumbSizeSlider-box flexRowCenter"
+    >
+      <div
+        className="ThumbSizeSlider-line-box flexRowCenter"
+      >
+        <div
+          className="ThumbSizeSlider-line"
+        />
+      </div>
+      <input
+        className="ThumbSizeSlider-slider"
+        max="341.3333333333333"
+        min="146.28571428571428"
+        onChange={[Function]}
+        step="0.5"
+        title="Thumbnail size"
+        type="range"
+        value={200}
+      />
+    </div>
+    <div
+      className="ThumbSizeSlider-bigger Footer__icon flexOff flexRowCenter"
+      onClick={[Function]}
+      title="Larger thumbnails"
+    >
+      <i
+        className="icon-picture2"
+        style={
+          Object {
+            "fontSize": "20px",
+          }
+        }
+      />
+    </div>
+  </div>
+  <div
+    className="thumb-layout"
+  >
+    <div
+      className="AssetsFooter__icon icon-layout2"
+      onClick={[Function]}
+      title="Grid layout"
+    />
+    <div
+      className="AssetsFooter__icon icon-layout3 AssetsFooter__icon--enabled"
+      onClick={[Function]}
+      title="Flow layout"
+    />
+  </div>
+  <div
+    className="TableToggle"
+    title="Show metadata spreadsheet"
+  >
+    <div
+      className="TableToggle-button AssetsFooter__icon icon-table AssetsFooter__icon--enabled"
+      onClick={[Function]}
+    />
+  </div>
+</div>
+`;

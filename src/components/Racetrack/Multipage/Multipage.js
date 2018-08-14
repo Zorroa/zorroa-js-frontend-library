@@ -1,17 +1,14 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
 
-import Widget from './Widget'
-import Asset from '../../models/Asset'
-import Toggle from '../Toggle'
-import { MultipageWidgetInfo } from './WidgetInfo'
-import { createMultipageWidget } from '../../models/Widget'
-import { modifyRacetrackWidget } from '../../actions/racetrackAction'
-import { isolateParent } from '../../actions/assetsAction'
+import Widget from '../Widget'
+import FlipbookWidgetFrameRateChanger from './FlipbookWidgetFrameRateChanger'
+import Asset from '../../../models/Asset'
+import Toggle from '../../Toggle'
+import { createMultipageWidget } from '../../../models/Widget'
+import FlipbookPlayer from '../../Flipbook/FlipbookImage/index.js'
 
-class Multipage extends Component {
+export default class Multipage extends Component {
   static propTypes = {
     isolatedParent: PropTypes.instanceOf(Asset),
     id: PropTypes.number.isRequired,
@@ -21,7 +18,9 @@ class Multipage extends Component {
     floatBody: PropTypes.bool.isRequired,
     widgets: PropTypes.arrayOf(PropTypes.object),
     origin: PropTypes.string,
-    actions: PropTypes.object,
+    actions: PropTypes.shape({
+      modifyRacetrackWidget: PropTypes.func.isRequired,
+    }),
   }
 
   state = {
@@ -29,14 +28,37 @@ class Multipage extends Component {
     filterMultipage: 'exists',
   }
 
-  setStatePromise = newState => {
-    return new Promise(resolve => this.setState(newState, resolve))
+  title() {
+    if (this.isFlipbook()) {
+      return 'Flipbook'
+    }
+
+    return 'Multipage'
   }
 
-  title = () => 'Multipage'
+  isFlipbook() {
+    if (this.props.isolatedParent === undefined) {
+      return false
+    }
+
+    return this.props.isolatedParent.clipType() === 'flipbook'
+  }
+
+  backgroundColor() {
+    if (this.isFlipbook()) {
+      return '#FFD000'
+    }
+
+    return '#579760'
+  }
 
   sortPages = sortByPage => {
-    this.setStatePromise({ sortByPage }).then(_ => this.modifySliver())
+    this.setState(
+      {
+        sortByPage,
+      },
+      this.modifySliver,
+    )
   }
 
   filterMultipage = () => {
@@ -46,11 +68,12 @@ class Multipage extends Component {
   }
 
   setFilter = filterMultipage => {
-    this.setStatePromise({ filterMultipage }).then(_ => this.modifySliver())
-  }
-
-  closeParent = () => {
-    this.props.actions.isolateParent()
+    this.setState(
+      {
+        filterMultipage,
+      },
+      this.modifySliver,
+    )
   }
 
   modifySliver = () => {
@@ -81,16 +104,11 @@ class Multipage extends Component {
       floatBody,
     } = this.props
     const { sortByPage, filterMultipage } = this.state
-    const active = true
-    const title = active
-      ? isOpen ? MultipageWidgetInfo.title : undefined
-      : MultipageWidgetInfo.title
-    const field = active
-      ? isOpen ? undefined : this.title(isolatedParent)
-      : undefined
+    const title = this.title()
+    const field = undefined
     const isolatedParentId = isolatedParent && isolatedParent.parentId()
     const asset = new Asset({ id: isolatedParentId })
-    const width = 120
+    const width = 230
     const height = 120
     const url = asset.closestProxyURL(this.props.origin, width, height)
     const style = {
@@ -98,6 +116,7 @@ class Multipage extends Component {
       minWidth: width,
       minHeight: height,
     }
+
     return (
       <Widget
         className="SortOrder"
@@ -107,17 +126,24 @@ class Multipage extends Component {
         floatBody={floatBody}
         title={title}
         field={field}
-        backgroundColor={MultipageWidgetInfo.color}
+        backgroundColor={this.backgroundColor()}
         isIconified={isIconified}
-        icon={MultipageWidgetInfo.icon}>
+        icon={'icon-stack-empty'}>
         {isolatedParentId ? (
           <div className="Multipage-body">
-            <div className="Multipage-parent" style={style}>
-              <div
-                className="Multipage-parent-close icon-cancel-circle"
-                onClick={this.closeParent}
-              />
-            </div>
+            {this.isFlipbook() && isOpen ? (
+              <div className="Multipage-previewer">
+                <FlipbookPlayer
+                  autoPlay
+                  shouldLoop
+                  defaultFrame={isolatedParent}
+                  clipParentId={isolatedParentId}
+                  width={width}
+                />
+              </div>
+            ) : (
+              <div className="Multipage-parent" style={style} />
+            )}
             <div className="Multipage-sort">
               <div
                 className="Multipage-label"
@@ -127,6 +153,7 @@ class Multipage extends Component {
               <Toggle
                 checked={sortByPage}
                 onChange={() => this.sortPages(!sortByPage)}
+                highlightColor={this.isFlipbook() ? 'yellow' : undefined}
               />
               <div
                 className="Multipage-label"
@@ -153,24 +180,8 @@ class Multipage extends Component {
             </div>
           </div>
         )}
+        {this.isFlipbook() && <FlipbookWidgetFrameRateChanger />}
       </Widget>
     )
   }
 }
-
-export default connect(
-  state => ({
-    isolatedParent: state.assets.isolatedParent,
-    widgets: state.racetrack.widgets,
-    origin: state.auth.origin,
-  }),
-  dispatch => ({
-    actions: bindActionCreators(
-      {
-        modifyRacetrackWidget,
-        isolateParent,
-      },
-      dispatch,
-    ),
-  }),
-)(Multipage)

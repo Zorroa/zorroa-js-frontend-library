@@ -5,6 +5,7 @@ import classnames from 'classnames'
 
 import Widget, { removeRaw } from '../../models/Widget'
 import * as WidgetInfo from './WidgetInfo'
+import elements from './elements'
 
 class Racetrack extends Component {
   static propTypes = {
@@ -22,7 +23,7 @@ class Racetrack extends Component {
     const isEnabled = widget.isEnabled
     const isOpen = true
     const floatBody = false
-    return cloneElement(widgetInfo.element, {
+    return cloneElement(elements[widgetInfo.type], {
       id: widget.id,
       isIconified,
       isPinned,
@@ -35,6 +36,7 @@ class Racetrack extends Component {
   render() {
     const { widgets, isIconified, hoverFields } = this.props
     const openedWidgets = widgets && widgets.filter(widget => widget.isPinned)
+
     if (!openedWidgets || !openedWidgets.length) {
       return null
     }

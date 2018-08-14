@@ -15,8 +15,8 @@ const ThumbLayoutSelector = props => (
   <div className="thumb-layout">
     {layouts.map(layout => {
       const onClick = handleClick.bind(null, props.onClick, layout.name)
-      const classNames = classnames('Footer__icon', layout.icon, {
-        'Footer__icon--enabled': layout.name === props.thumbLayout,
+      const classNames = classnames('AssetsFooter__icon', layout.icon, {
+        'AssetsFooter__icon--enabled': layout.name === props.thumbLayout,
       })
       return (
         <div

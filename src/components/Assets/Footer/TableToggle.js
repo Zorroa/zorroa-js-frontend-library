@@ -6,9 +6,13 @@ const TableToggle = props => (
   <div className="TableToggle" title="Show metadata spreadsheet">
     <div
       onClick={props.onClick}
-      className={classnames('TableToggle-button Footer__icon', 'icon-table', {
-        'Footer__icon--enabled': props.enabled,
-      })}
+      className={classnames(
+        'TableToggle-button AssetsFooter__icon',
+        'icon-table',
+        {
+          'AssetsFooter__icon--enabled': props.enabled,
+        },
+      )}
     />
   </div>
 )

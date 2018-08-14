@@ -13,7 +13,6 @@ import {
   THUMB_LAYOUT,
   SHOW_TABLE,
   TABLE_HEIGHT,
-  SHOW_MULTIPAGE,
   VIDEO_VOLUME,
   HOVER_FIELD,
   CLEAR_HOVER_FIELD,
@@ -309,13 +308,6 @@ export function setVideoVolume(volume) {
   return {
     type: VIDEO_VOLUME,
     payload: volume,
-  }
-}
-
-export function showMultipage(show) {
-  return {
-    type: SHOW_MULTIPAGE,
-    payload: show,
   }
 }
 

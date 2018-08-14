@@ -30,7 +30,7 @@ export default class ThumbSizeSlider extends Component {
     return (
       <div className="ThumbSizeSlider flexRow flexAlignItemsCenter">
         <div
-          className="ThumbSizeSlider-smaller Footer__icon flexOff flexRowCenter"
+          className="ThumbSizeSlider-smaller AssetsFooter__icon flexOff flexRowCenter"
           onClick={this.goSmaller}
           title="Smaller thumbnails">
           <i className="icon-picture2" style={{ fontSize: '12px' }} />

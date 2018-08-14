@@ -16,7 +16,6 @@ import {
   THUMB_LAYOUT,
   SHOW_TABLE,
   TABLE_HEIGHT,
-  SHOW_MULTIPAGE,
   VIDEO_VOLUME,
   HOVER_FIELD,
   CLEAR_HOVER_FIELD,
@@ -97,7 +96,6 @@ const initialState = {
   filmStripHeight: 200,
   showTable: false,
   videoVolume: 0.8,
-  showMultipage: true,
   sortFolders: 'alpha-asc',
   hoverFields: new Set(),
   thumbFieldTemplate: defaultThumbFieldTemplate,
@@ -231,8 +229,6 @@ export default function app(state = initialState, action) {
       return { ...state, filmstripHeight: action.payload }
     case VIDEO_VOLUME:
       return { ...state, videoVolume: action.payload }
-    case SHOW_MULTIPAGE:
-      return { ...state, showMultipage: action.payload }
     case SORT_FOLDERS:
       return { ...state, sortFolders: action.payload }
     case HOVER_FIELD: {

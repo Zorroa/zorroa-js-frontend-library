@@ -2,7 +2,6 @@ import {
   SimpleSearchWidgetInfo,
   ExistsWidgetInfo,
   FacetWidgetInfo,
-  MapWidgetInfo,
   DateRangeWidgetInfo,
   RangeWidgetInfo,
   SimilarHashWidgetInfo,
@@ -12,7 +11,6 @@ import {
   SortOrderWidgetInfo,
   MultipageWidgetInfo,
   ImportSetWidgetInfo,
-  FlipbookWidgetInfo,
 } from '../components/Racetrack/WidgetInfo'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
@@ -89,12 +87,11 @@ export function widgetTypeForField(field, type) {
   switch (type) {
     case 'date':
       return DateRangeWidgetInfo.type
-    case 'point':
-      return MapWidgetInfo.type
     case 'boolean':
     case 'keywords':
     case 'string':
       return FacetWidgetInfo.type
+    case 'point':
     case 'integer':
     case 'double':
     case 'long':
@@ -150,21 +147,6 @@ export function createFacetWidget(
       : null
   const sliver = new AssetSearch({ filter, aggs })
   return new Widget({ type, field: rawField, sliver, isEnabled, isPinned })
-}
-
-export function createMapWidget(field, fieldType, term, isEnabled, isPinned) {
-  const type = MapWidgetInfo.type
-  const aggs = { map: { geohash_grid: { field, precision: 7 } } }
-  let sliver = new AssetSearch({ aggs })
-  if (term && term.length) {
-    const terms = { [field + '.raw']: [term] }
-    const bounds = {
-      [field + '.raw']: { top_left: 'hash', bottom_right: 'hash' },
-    }
-    sliver.filter = new AssetFilter({ terms, geo_bounding_box: bounds })
-    // Add this.bounds and set agg precision
-  }
-  return new Widget({ type, field, sliver, isEnabled, isPinned })
 }
 
 export function createDateRangeWidget(
@@ -375,39 +357,5 @@ export function createMultipageWidget(
     sliver,
     isEnabled,
     isPinned,
-  })
-}
-
-export function createFlipbookWidget(
-  sortByPage,
-  asset,
-  isEnabled,
-  isPinned,
-  state,
-) {
-  const parentId = asset && asset.parentId()
-  const filter = new AssetFilter({
-    terms: {
-      'media.clip.parent.raw': [parentId],
-    },
-  })
-  const sortField = 'media.clip.start'
-  const order = sortByPage
-    ? [
-        {
-          field: sortField,
-          ascending: true,
-        },
-      ]
-    : undefined
-  const sliver = new AssetSearch({ filter, order })
-
-  return new Widget({
-    type: FlipbookWidgetInfo.type,
-    field: 'media.clip.parent',
-    sliver,
-    isEnabled,
-    isPinned,
-    state,
   })
 }

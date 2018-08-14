@@ -65,6 +65,7 @@ class FlipbookViewer extends Component {
   componentWillReceiveProps(nextProps) {
     const nextAsset = nextProps.isolatedAsset
     if (
+      nextAsset &&
       nextAsset !== this.props.isolatedAsset &&
       nextAsset.clipType() === 'flipbook'
     ) {

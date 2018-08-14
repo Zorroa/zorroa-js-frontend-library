@@ -15,7 +15,6 @@ import {
   requiredFields,
 } from '../../actions/assetsAction'
 import {
-  MapWidgetInfo,
   CollectionsWidgetInfo,
   SortOrderWidgetInfo,
   ImportSetWidgetInfo,
@@ -32,7 +31,6 @@ class Searcher extends Component {
     selectedJobIds: PropTypes.instanceOf(Set),
     order: PropTypes.arrayOf(PropTypes.object),
     fieldTypes: PropTypes.object,
-    showMultipage: PropTypes.bool,
     metadataFields: PropTypes.arrayOf(PropTypes.string),
     selectedTableLayoutId: PropTypes.string,
     tableLayouts: PropTypes.arrayOf(PropTypes.instanceOf(FieldList)),
@@ -123,10 +121,7 @@ class Searcher extends Component {
             }
             return allOther
           }
-          const allOthers =
-            widget.type === MapWidgetInfo.type
-              ? new AssetFilter()
-              : allOtherFilters(widget).convertToBool()
+          const allOthers = allOtherFilters(widget).convertToBool()
           let aggs = { [widget.id]: { filter: allOthers, aggs: sliver.aggs } }
           sliver = new AssetSearch({ aggs })
         }
@@ -181,7 +176,6 @@ class Searcher extends Component {
       query,
       trashedFolders,
       order,
-      showMultipage,
       selectedJobIds,
       metadataFields,
       lightbarFields,
@@ -233,24 +227,11 @@ class Searcher extends Component {
     const searchModified = this.inflightQuery
       ? !this.inflightQuery.equals(assetSearch, skip)
       : !query || !assetSearch.equals(query, skip)
-    const switchedMultipage = this.showMultipage !== showMultipage
-    this.showMultipage = showMultipage
-    if (
-      searchModified ||
-      missingField ||
-      this.state.importFinished ||
-      switchedMultipage
-    ) {
+    if (searchModified || missingField || this.state.importFinished) {
       assetSearch.size = AssetSearch.autoPageSize
-      const force = this.state.importFinished || switchedMultipage
+      const force = this.state.importFinished
       const isFirstPage = true
-      actions.searchAssets(
-        assetSearch,
-        query,
-        force,
-        isFirstPage,
-        showMultipage && [],
-      )
+      actions.searchAssets(assetSearch, query, force, isFirstPage, [])
       this.inflightQuery = assetSearch
       if (query) {
         // FIXME: Disable saving search to user settings to avoid conflicts
@@ -281,7 +262,6 @@ const mapStateToProps = state => ({
   selectedFolderIds: state.folders.selectedFolderIds,
   trashedFolders: state.folders.trashedFolders,
   fieldTypes: state.assets.types,
-  showMultipage: state.app.showMultipage,
   metadataFields: state.app.metadataFields,
   selectedTableLayoutId: state.app.selectedTableLayoutId,
   tableLayouts: state.app.tableLayouts,

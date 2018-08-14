@@ -17,7 +17,7 @@ import DropdownMenu, {
 import Feedback from '../../components/Feedback'
 import Developer from '../../components/Developer'
 import Settings from '../../components/Settings'
-import AssetCounter from '../Assets/AssetCounter'
+import AssetCounter from './AssetCounter'
 import {
   showModal,
   hideModal,
@@ -352,12 +352,11 @@ class Header extends Component {
     } = this.props
 
     const loader = require('./loader-rolling.svg')
-    const syncer =
-      !isDeveloper || sync ? (
-        <div className="Header-loading sync" />
-      ) : (
-        <img className="Header-loading" src={loader} />
-      )
+    const syncer = sync ? (
+      <div className="Header-loading sync" />
+    ) : (
+      <img className="Header-loading" src={loader} />
+    )
 
     const nAssetsSelected = selectedIds ? selectedIds.size : 0
     const disabledSelected = !selectedIds || !selectedIds.size
@@ -451,12 +450,11 @@ class Header extends Component {
                           User Admin
                         </DropdownItem>
                       )}
-                      {isAdministrator ||
-                        (isDeveloper && (
-                          <DropdownItem onClick={this.showSettings}>
-                            Archivist Settings
-                          </DropdownItem>
-                        ))}
+                      {(isAdministrator || isDeveloper) && (
+                        <DropdownItem onClick={this.showSettings}>
+                          Archivist Settings
+                        </DropdownItem>
+                      )}
                     </DropdownGroup>
                   )}
                   <DropdownGroup>

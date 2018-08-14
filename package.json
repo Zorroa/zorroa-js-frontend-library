@@ -35,6 +35,10 @@
   },
   "jest": {
     "testURL": "https://localhost/8081",
+    "testEnvironment": "jsdom",
+    "setupFiles": [
+      "jest-localstorage-mock"
+    ],
     "moduleNameMapper": {
       "^.+\\.(css|less|scss)$": "<rootDir>/tests/StyleStub.js",
       "^.+\\.(jpg|png|jpeg|svg)$": "<rootDir>/tests/MediaStub.js"
@@ -85,6 +89,7 @@
     "husky": "0.14.3",
     "install": "0.11.0",
     "jest-cli": "^23.0.0",
+    "jest-localstorage-mock": "2.2.0",
     "json": "9.0.6",
     "json-loader": "0.5.7",
     "less": "2.7.2",
@@ -93,7 +98,6 @@
     "pdfjs-dist": "1.10.97",
     "prettier": "1.10.2",
     "raw-loader": "0.5.1",
-    "react-mapbox-gl": "0.17.0",
     "react-test-renderer": "15.6.2",
     "sass-loader": "4.1.1",
     "style-loader": "0.13.2",
