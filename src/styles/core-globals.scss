@@ -1,4 +1,3 @@
-
 /*------------------------------
 
 Zorroa core (shared) css classes
@@ -10,21 +9,22 @@ Zorroa core (shared) css classes
 // https://fonts.google.com/?query=roboto&category=Sans+Serif,Display,Handwriting,Monospace&selection.family=Roboto
 //@import url('https://fonts.googleapis.com/css?family=Roboto');
 //@import url('https://fonts.googleapis.com/css?family=Montserrat');
-@import "../assets/fonts/Roboto/Roboto.css";
-@import "../assets/fonts/Roboto_Condensed/Roboto_Condensed.css";
+@import '../assets/fonts/Roboto/Roboto.css';
+@import '../assets/fonts/Roboto_Condensed/Roboto_Condensed.css';
 
 /*
 tread carefully!!!
 These attributes control full page settings, but they can be brittle in different browsers
 Make sure to test in all browsers after making changes here.
 */
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
   overflow: hidden;
   font-size: 14px;
-  padding:0;
-  margin:0;
+  padding: 0;
+  margin: 0;
   font-family: 'Roboto', sans-serif;
 }
 
@@ -32,13 +32,20 @@ html, body {
 html {
   box-sizing: border-box;
 }
-*, *:before, *:after {
+*,
+*:before,
+*:after {
   box-sizing: inherit;
 }
 
 // no glows, EVER!
-input,input:focus,button,button:focus,.form-control,.form-control:focus {
-  outline:none;
+input,
+input:focus,
+button,
+button:focus,
+.form-control,
+.form-control:focus {
+  outline: none;
   box-shadow: none;
 }
 
@@ -48,18 +55,19 @@ input,input:focus,button,button:focus,.form-control,.form-control:focus {
 }
 ::-webkit-scrollbar-track {
   background: $zorroa-greyish-brown;
-  box-shadow: inset 0 1px 3px 0 rgba(0,0,0,0.50);
+  box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, 0.5);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb {
   background: $zorroa-gray;
-  .dark & { background: $zorroa-gray; }
+  .dark & {
+    background: $zorroa-gray;
+  }
   border-radius: 3px;
   &:hover {
     background: $zorroa-sickly-green;
   }
 }
-
 
 // Styling Cross-Browser Compatible Range Inputs with Sass
 // Github: https://github.com/darlanrod/input-range-sass
@@ -91,14 +99,15 @@ $track-radius: 5px !default;
 $contrast: 5% !default;
 
 @mixin shadow($shadow-size, $shadow-blur, $shadow-color) {
-  box-shadow: $shadow-size $shadow-size $shadow-blur $shadow-color, 0 0 $shadow-size lighten($shadow-color, 5%);
+  box-shadow: $shadow-size $shadow-size $shadow-blur $shadow-color,
+    0 0 $shadow-size lighten($shadow-color, 5%);
 }
 
 @mixin track() {
   width: $track-width;
   height: $track-height;
   cursor: pointer;
-  transition: all .2s ease;
+  transition: all 0.2s ease;
 }
 
 @mixin thumb() {
@@ -116,7 +125,7 @@ $contrast: 5% !default;
 
 // custom input range styling
 // original source: https://css-tricks.com/styling-cross-browser-compatible-range-inputs-css/
-[type=range] {
+[type='range'] {
   -webkit-appearance: none;
   margin: $thumb-height / 2 0;
   width: $track-width;
@@ -136,7 +145,8 @@ $contrast: 5% !default;
   &::-webkit-slider-thumb {
     @include thumb();
     -webkit-appearance: none;
-    margin-top: ((-$track-border-width * 2 + $track-height) / 2) - ($thumb-height / 2);
+    margin-top: ((-$track-border-width * 2 + $track-height) / 2) - ($thumb-height /
+          2);
   }
 
   &:focus::-webkit-slider-runnable-track {
@@ -189,34 +199,71 @@ $contrast: 5% !default;
   }
 }
 
-.hide { @include hide; }
+.hide {
+  @include hide;
+}
 
-.animate { @include animate; }
+.animate {
+  @include animate;
+}
 
-.rot180 { transform: rotate(180deg); }
+.rot180 {
+  transform: rotate(180deg);
+}
 
 /*
 Make our color defs available as classes
 */
 
-.zorroa-greyish-brown  { color: $zorroa-greyish-brown  ; }
-.zorroa-black          { color: $zorroa-black          ; }
-.zorroa-white          { color: $zorroa-white          ; }
-.zorroa-avocado-green  { color: $zorroa-avocado-green  ; }
-.zorroa-sickly-green   { color: $zorroa-sickly-green   ; }
-.zorroa-faded-red      { color: $zorroa-faded-red      ; }
-.zorroa-orangish       { color: $zorroa-orangish       ; }
-.zorroa-water-blue     { color: $zorroa-water-blue     ; }
-.zorroa-darkish-purple { color: $zorroa-darkish-purple ; }
-.zorroa-medium-pink    { color: $zorroa-medium-pink    ; }
-.zorroa-warm-grey-60   { color: $zorroa-warm-grey-60   ; }
+.zorroa-greyish-brown {
+  color: $zorroa-greyish-brown;
+}
+.zorroa-black {
+  color: $zorroa-black;
+}
+.zorroa-white {
+  color: $zorroa-white;
+}
+.zorroa-avocado-green {
+  color: $zorroa-avocado-green;
+}
+.zorroa-sickly-green {
+  color: $zorroa-sickly-green;
+}
+.zorroa-faded-red {
+  color: $zorroa-faded-red;
+}
+.zorroa-orangish {
+  color: $zorroa-orangish;
+}
+.zorroa-water-blue {
+  color: $zorroa-water-blue;
+}
+.zorroa-darkish-purple {
+  color: $zorroa-darkish-purple;
+}
+.zorroa-medium-pink {
+  color: $zorroa-medium-pink;
+}
+.zorroa-warm-grey-60 {
+  color: $zorroa-warm-grey-60;
+}
 
-.zorroa-darkgray    { color : $zorroa-darkgray    ; }
-.zorroa-gray        { color : $zorroa-gray        ; }
-.zorroa-lightgray   { color : $zorroa-lightgray   ; }
-.zorroa-nearwhite   { color : $zorroa-nearwhite   ; }
-.zorroa-transparent { color : $zorroa-transparent ; }
-
+.zorroa-darkgray {
+  color: $zorroa-darkgray;
+}
+.zorroa-gray {
+  color: $zorroa-gray;
+}
+.zorroa-lightgray {
+  color: $zorroa-lightgray;
+}
+.zorroa-nearwhite {
+  color: $zorroa-nearwhite;
+}
+.zorroa-transparent {
+  color: $zorroa-transparent;
+}
 
 /* Button classes */
 
@@ -232,24 +279,37 @@ Make our color defs available as classes
 // }
 // .zorroa-btn-success  { @include zorroa-btn($zorroa-sickly-green, darken($zorroa-sickly-green, 15%) ) ; }
 
-
 /* Make our text mixins available as classes */
 
-.nowrap { @include nowrap; }
+.nowrap {
+  @include nowrap;
+}
 
-.clampText { @include clampText; }
-
+.clampText {
+  @include clampText;
+}
 
 /* Flexbox classes */
 
-
-.flexRow { @include flexRow; }
+.flexRow {
+  @include flexRow;
+}
 // .flexRowRev { @include flexRowRev; }
-.flexCol { @include flexCol; }
-.flexCenter { @include flexCenter; }
-.flexRowCenter { @include flexRowCenter; }
-.flexColCenter { @include flexColCenter; }
-.flexWrap { @include flexWrap; }
+.flexCol {
+  @include flexCol;
+}
+.flexCenter {
+  @include flexCenter;
+}
+.flexRowCenter {
+  @include flexRowCenter;
+}
+.flexColCenter {
+  @include flexColCenter;
+}
+.flexWrap {
+  @include flexWrap;
+}
 
 /* flexRowThenCol is a row when wide, then a column when narrow */
 // .flexRowThenCol {
@@ -257,38 +317,103 @@ Make our color defs available as classes
 //   @media screen and (max-width: 700px) { @include flexCol; }
 // }
 
-
 // .flexALittle { -webkit-box-flex : 0.2 0.2 auto ; -moz-box-flex : 0.2 0.2 auto; -webkit-flex : 0.2 0.2 auto ; -ms-flex : 0.2 0.2 auto; flex : 0.2 0.2 auto; }
 // .flex2       { -webkit-box-flex :   2   2 auto ; -moz-box-flex :   2   2 auto; -webkit-flex :   2   2 auto ; -ms-flex :   2   2 auto; flex :   2   2 auto; }
 
-.flexOn  { @include flexOn ; }
-.flexOff { @include flexOff; }
+.flexOn {
+  @include flexOn;
+}
+.flexOff {
+  @include flexOff;
+}
 
-.flexJustifyEnd          { -webkit-justify-content: flex-end      ; -moz-justify-content: flex-end      ; -ms-flex-pack: flex-end      ; justify-content: flex-end      ; }
-.flexJustifySpaceAround  { -webkit-justify-content: space-around  ; -moz-justify-content: space-around  ; -ms-flex-pack: space-around  ; justify-content: space-around  ; }
+.flexJustifyEnd {
+  -webkit-justify-content: flex-end;
+  -moz-justify-content: flex-end;
+  -ms-flex-pack: flex-end;
+  justify-content: flex-end;
+}
+.flexJustifySpaceAround {
+  -webkit-justify-content: space-around;
+  -moz-justify-content: space-around;
+  -ms-flex-pack: space-around;
+  justify-content: space-around;
+}
 
-.flexJustifyStart        { @include flexJustifyStart       ; }
-.flexJustifyCenter       { @include flexJustifyCenter      ; }
-.flexJustifySpaceBetween { @include flexJustifySpaceBetween; }
+.flexJustifyStart {
+  @include flexJustifyStart;
+}
+.flexJustifyCenter {
+  @include flexJustifyCenter;
+}
+.flexJustifySpaceBetween {
+  @include flexJustifySpaceBetween;
+}
 
-.flexAlignItemsStart  { @include flexAlignItemsStart; }
-.flexAlignItemsCenter { @include flexAlignItemsCenter; }
-.flexAlignItemsEnd    { -webkit-align-items: flex-end   ; -moz-align-items: flex-end   ; -ms-align-items: flex-end   ; align-items: flex-end   ; }
+.flexAlignItemsStart {
+  @include flexAlignItemsStart;
+}
+.flexAlignItemsCenter {
+  @include flexAlignItemsCenter;
+}
+.flexAlignItemsEnd {
+  -webkit-align-items: flex-end;
+  -moz-align-items: flex-end;
+  -ms-align-items: flex-end;
+  align-items: flex-end;
+}
 
-.flexAlignContentStart        { -webkit-align-content: flex-start    ; -moz-align-content: flex-start    ; -ms-align-content: flex-start    ; align-content: flex-start    ; }
-.flexAlignContentCenter       { -webkit-align-content: center        ; -moz-align-content: center        ; -ms-align-content: center        ; align-content: center        ; }
-.flexAlignContentEnd          { -webkit-align-content: flex-end      ; -moz-align-content: flex-end      ; -ms-align-content: flex-end      ; align-content: flex-end      ; }
-.flexAlignContentSpaceBetween { -webkit-align-content: space-between ; -moz-align-content: space-between ; -ms-align-content: space-between ; align-content: space-between ; }
-.flexAlignContentSpaceAround  { -webkit-align-content: space-around  ; -moz-align-content: space-around  ; -ms-align-content: space-around  ; align-content: space-around  ; }
+.flexAlignContentStart {
+  -webkit-align-content: flex-start;
+  -moz-align-content: flex-start;
+  -ms-align-content: flex-start;
+  align-content: flex-start;
+}
+.flexAlignContentCenter {
+  -webkit-align-content: center;
+  -moz-align-content: center;
+  -ms-align-content: center;
+  align-content: center;
+}
+.flexAlignContentEnd {
+  -webkit-align-content: flex-end;
+  -moz-align-content: flex-end;
+  -ms-align-content: flex-end;
+  align-content: flex-end;
+}
+.flexAlignContentSpaceBetween {
+  -webkit-align-content: space-between;
+  -moz-align-content: space-between;
+  -ms-align-content: space-between;
+  align-content: space-between;
+}
+.flexAlignContentSpaceAround {
+  -webkit-align-content: space-around;
+  -moz-align-content: space-around;
+  -ms-align-content: space-around;
+  align-content: space-around;
+}
 
-.fullWidth  { width  : 100%; max-width: 100%; }
-.fullHeight { height : 100%; }
-.fullFill   { width  : 100%; max-width: 100%; height : 100%; }
+.fullWidth {
+  width: 100%;
+  max-width: 100%;
+}
+.fullHeight {
+  height: 100%;
+}
+.fullFill {
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+}
 
 /* this allows flex items to shrink below their min content */
-.minWidth0 { min-width: 0; }
+.minWidth0 {
+  min-width: 0;
+}
 
-[class^="custom-icon-"], [class*=" custom-icon-"] {
+[class^='custom-icon-'],
+[class*=' custom-icon-'] {
   font-family: 'Lucida' !important;
   speak: none;
   font-style: normal;
@@ -300,10 +425,40 @@ Make our color defs available as classes
   /* Better Font Rendering =========== */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
 }
 
 .custom-icon-exists:before {
   font-weight: 700;
-  content: "\2203";
+  content: '\2203';
+}
+
+.AclEditor-selected-permission {
+  display: flex;
+}
+
+.AclEditor-selected-permission-username {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  flex: 1;
+  overflow: hidden;
+}
+
+.AclEditor-selected-permission-username-truncate {
+  @include clampText;
+  padding-right: $zorroa-metric-base / 2;
+}
+
+.AclEditor-perm-slider-container {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+}
+
+.AclEditor-permission {
+  display: flex;
+  width: 214px;
+}
+
+.AclEditor-permission-name {
+  @include clampText;
+  margin-top: $zorroa-metric-base / 5;
 }
