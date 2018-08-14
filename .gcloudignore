@@ -11,3 +11,4 @@ utils
 .travis.yml
 README.md
 tsconfig.json
+node_modules

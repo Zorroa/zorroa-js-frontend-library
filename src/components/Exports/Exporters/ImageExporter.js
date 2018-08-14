@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import { FormSelect, FormLabel, FormRadio } from '../../Form'
 import ExportsSection from '../ExportsSection'
 import ResizeExportAsset from '../ResizeExportAsset'
+import { getClassFromNamespace } from '../utils'
 
 export default class ImageExporter extends Component {
   static propTypes = {
@@ -10,6 +11,12 @@ export default class ImageExporter extends Component {
     isOpen: PropTypes.bool,
     onToggleAccordion: PropTypes.func.isRequired,
     shouldExport: PropTypes.bool.isRequired,
+    processors: PropTypes.arrayOf(
+      PropTypes.shape({
+        className: PropTypes.string.isRequired,
+      }),
+    ),
+    hasNonDefaultProcessors: PropTypes.bool.isRequired,
     arguments: PropTypes.shape({
       format: PropTypes.string.isRequired,
       size: PropTypes.number.isRequired,
@@ -79,7 +86,20 @@ export default class ImageExporter extends Component {
     })
   }
 
+  canDisplay() {
+    const hasProcessor =
+      this.props.processors.find(
+        processor =>
+          getClassFromNamespace(processor.className) === 'ImageExporter',
+      ) !== undefined
+    return this.props.hasNonDefaultProcessors === false || hasProcessor
+  }
+
   render() {
+    if (this.canDisplay() === false) {
+      return null
+    }
+
     const qualityOptions = [
       {
         label: 'Best',

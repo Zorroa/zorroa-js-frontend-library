@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { FormSelect, FormLabel, FormRadio } from '../../Form'
 import ExportsSection from '../ExportsSection'
+import { getClassFromNamespace } from '../utils'
 
 export default class VideoClipExporter extends Component {
   static propTypes = {
@@ -9,6 +10,12 @@ export default class VideoClipExporter extends Component {
     onToggleAccordion: PropTypes.func.isRequired,
     isOpen: PropTypes.bool,
     shouldExport: PropTypes.bool.isRequired,
+    processors: PropTypes.arrayOf(
+      PropTypes.shape({
+        className: PropTypes.string.isRequired,
+      }),
+    ),
+    hasNonDefaultProcessors: PropTypes.bool.isRequired,
     arguments: PropTypes.shape({
       scale: PropTypes.string.isRequired,
       quality: PropTypes.string.isRequired,
@@ -81,7 +88,20 @@ export default class VideoClipExporter extends Component {
     })
   }
 
+  canDisplay() {
+    const hasProcessor =
+      this.props.processors.find(
+        processor =>
+          getClassFromNamespace(processor.className) === 'VideoClipExporter',
+      ) !== undefined
+    return this.props.hasNonDefaultProcessors === false || hasProcessor
+  }
+
   render() {
+    if (this.canDisplay() === false) {
+      return null
+    }
+
     const qualityOptions = [
       {
         label: 'Best',

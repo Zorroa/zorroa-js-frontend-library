@@ -1,4 +1,8 @@
 export function articulateQuality(quality) {
+  if (quality === undefined) {
+    return 'Unknown'
+  }
+
   if (quality === 'veryslow') {
     return 'Best'
   }

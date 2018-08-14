@@ -1,9 +1,12 @@
 /* eslint-env jest */
 
 import React from 'react'
-import { shallow } from 'enzyme'
+import { shallow, configure } from 'enzyme'
+import Adapter from 'enzyme-adapter-react-15'
 import wrapSignedStream from './SignedStream'
 import Asset from '../../models/Asset'
+
+configure({ adapter: new Adapter() })
 
 function DummyComponent() {
   return null
@@ -27,6 +30,7 @@ describe('<SignedStream />', () => {
         expect(component.state('signedAssetUrl')).toBe(
           'https://cdv.irm.com/asset.mp4?key=l33t',
         )
+        expect(component.state('hasSignedUrl')).toBe(true)
         expect(component.state('loadState')).toBe('LOAD_STATE_SUCCESS')
       })
     })
@@ -47,6 +51,7 @@ describe('<SignedStream />', () => {
         expect(component.state('signedAssetUrl')).toBe(
           'https://cdv.irm.com/api/v1/assets/2-b/_stream',
         )
+        expect(component.state('hasSignedUrl')).toBe(false)
         expect(component.state('loadState')).toBe('LOAD_STATE_SUCCESS')
       })
     })

@@ -1,5 +1,12 @@
 # JS Curator
 
+
+| Branch | Status |
+|--------|--------|
+|DEVELOPMENT | [![Build Status](https://travis-ci.com/Zorroa/zorroa-js-curator.svg?token=DkSE9z1EaP34PLjqWxX2&branch=development)](https://travis-ci.com/Zorroa/zorroa-server) |
+| QA | [![Build Status](https://travis-ci.com/Zorroa/zorroa-js-curator.svg?token=DkSE9z1EaP34PLjqWxX2&branch=qa)](https://travis-ci.com/Zorroa/zorroa-server) |
+| MASTER | [![Build Status](https://travis-ci.com/Zorroa/zorroa-js-curator.svg?token=DkSE9z1EaP34PLjqWxX2&branch=master)](https://travis-ci.com/Zorroa/zorroa-server) |
+
 ## Dependency assumptions
 
 1.  You will be required to use [Node 8](https://nodejs.org/en/) for this app.

@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { FormSelect, FormLabel, FormRadio } from '../../Form'
 import ExportsSection from '../ExportsSection'
+import { getClassFromNamespace } from '../utils'
 
 export default class FlipbookExporter extends Component {
   static propTypes = {
@@ -9,8 +10,14 @@ export default class FlipbookExporter extends Component {
     onToggleAccordion: PropTypes.func.isRequired,
     isOpen: PropTypes.bool,
     shouldExport: PropTypes.bool,
+    processors: PropTypes.arrayOf(
+      PropTypes.shape({
+        className: PropTypes.string.isRequired,
+      }),
+    ),
+    hasNonDefaultProcessors: PropTypes.bool.isRequired,
     arguments: PropTypes.shape({
-      quality: PropTypes.number.isRequired,
+      quality: PropTypes.string.isRequired,
       exportImages: PropTypes.bool.isRequired,
       exportMovies: PropTypes.bool.isRequired,
       frameRate: PropTypes.number.isRequired,
@@ -94,7 +101,20 @@ export default class FlipbookExporter extends Component {
     this.onChange(options)
   }
 
+  canDisplay() {
+    const hasProcessor =
+      this.props.processors.find(
+        processor =>
+          getClassFromNamespace(processor.className) === 'FlipbookExporter',
+      ) !== undefined
+    return this.props.hasNonDefaultProcessors === false || hasProcessor
+  }
+
   render() {
+    if (this.canDisplay() === false) {
+      return null
+    }
+
     const qualityOptions = [
       {
         label: 'Best',

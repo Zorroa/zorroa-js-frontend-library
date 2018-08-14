@@ -4,10 +4,7 @@ import React, { Component } from 'react'
 export default class ModalOverlayHeader extends Component {
   static propTypes = {
     onClose: PropTypes.func.isRequired,
-    children: PropTypes.oneOfType([
-      PropTypes.arrayOf(PropTypes.element),
-      PropTypes.element,
-    ]),
+    children: React.PropTypes.any,
   }
 
   onClose = event => {
