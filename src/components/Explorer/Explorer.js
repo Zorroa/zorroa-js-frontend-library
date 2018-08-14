@@ -369,9 +369,33 @@ class Explorer extends Component {
       'date',
       'path',
     ]
+
+    // Custom array of fields to with sort disabled
+    const disabledSortFields = [
+      'analysis.faceRecognition.boxes',
+      'analysis.imageClassify.keywords',
+      'location.point',
+      'media.attrs.Orientation',
+      'media.attrs.ResolutionUnit',
+      'media.content:1.0',
+      'media.description',
+      'media.description:1.0',
+      'media.dialog',
+      'media.keywords',
+      'media.title:2.0',
+      'proxies.proxies.format',
+      'proxies.tinyProxy',
+      'source.exists',
+      'zorroa.taxonomy.keywords',
+      'zorroa.taxonomy.folderId',
+      'zorroa.taxonomy.taxId',
+    ]
     const isLeaf = this.isLeaf(field, namespace)
     const isSortable =
       isLeaf && sortableTypes.findIndex(type => type === fieldType) >= 0
+    const notSortable =
+      disabledSortFields.findIndex(disabledField => disabledField === field) >=
+      0
     const itemClass = namespace.replace('.', '-')
     return (
       <div
@@ -413,7 +437,9 @@ class Explorer extends Component {
           {isSortable && (
             <i
               onClick={e => this.sortByField(field, e)}
-              className={this.sortOrderClassnames(field, order)}
+              className={classnames(this.sortOrderClassnames(field, order), {
+                sortDisabled: notSortable,
+              })}
             />
           )}
           <div
