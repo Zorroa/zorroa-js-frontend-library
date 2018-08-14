@@ -131,7 +131,7 @@ class AclEditor extends Component {
 
   renderPermissionSlider(permissionId, access) {
     return (
-      <div className="flexRow flexAlignItemsCenter">
+      <div className="AclEditor-perm-slider-container">
         <div className="AclEditor-perm-slider">
           <div className="AclEditor-perms-tick-row">
             <div
@@ -204,7 +204,8 @@ class AclEditor extends Component {
               />
               <label
                 htmlFor={permission.id}
-                className="AclEditor-permission-name">
+                className="AclEditor-permission-name"
+                title={permission.name}>
                 {permission.name}
               </label>
             </div>
@@ -270,9 +271,13 @@ class AclEditor extends Component {
           <div className="AclEditor-shared-with-permissions">
             {Array.from(selectedPermissionIds).map(([permissionId, access]) => (
               <div key={permissionId} className="AclEditor-selected-permission">
-                <div className="flexRow flexAlignItemsCenter">
+                <div
+                  className="AclEditor-selected-permission-username"
+                  title={this.permissionName(permissionId)}>
                   <div className={this.permissionIcon(permissionId)} />
-                  {this.permissionName(permissionId)}
+                  <div className="AclEditor-selected-permission-username-truncate">
+                    {this.permissionName(permissionId)}
+                  </div>
                 </div>
                 {this.renderPermissionSlider(permissionId, access)}
               </div>
