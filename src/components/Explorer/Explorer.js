@@ -336,7 +336,8 @@ class Explorer extends Component {
       !order || index !== 0
         ? 'icon-sort'
         : order[index].ascending ? 'icon-sort-asc' : 'icon-sort-desc'
-    return `Explorer-sort ${icon}`
+    const sort = disableSort(field) ? 'disableSort' : ''
+    return `Explorer-sort ${icon} ${sort}`
   }
 
   renderPads(depth) {
@@ -415,9 +416,7 @@ class Explorer extends Component {
           {isSortable && (
             <i
               onClick={e => this.sortByField(field, e)}
-              className={classnames(this.sortOrderClassnames(field, order), {
-                disableSort: disableSort(field),
-              })}
+              className={classnames(this.sortOrderClassnames(field, order))}
             />
           )}
           <div

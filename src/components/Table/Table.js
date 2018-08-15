@@ -227,12 +227,13 @@ export default class Table extends Component {
     })
   }
 
-  sortOrderClassnames(order) {
+  sortOrderClassnames(order, field) {
     const icon = !order
       ? 'icon-sort'
       : order === 'ascending' ? 'icon-sort-asc' : 'icon-sort-desc'
+    const sort = disableSort(field) ? 'disableSort' : ''
     return `Table-header-sort ${icon} Table-header-sort-order-${order ||
-      'none'}`
+      'none'} ${sort}`
   }
 
   headerClassnames(order) {
@@ -245,7 +246,6 @@ export default class Table extends Component {
   }
 
   render() {
-    console.log(disableSort('analysis'))
     const {
       assets,
       fields,
@@ -359,7 +359,6 @@ export default class Table extends Component {
                     onClick={_ => this.props.sortFieldFn(field)}
                     className={classnames(
                       this.sortOrderClassnames(order, field),
-                      { disableSort: disableSort(field) },
                     )}
                   />
                 )}
