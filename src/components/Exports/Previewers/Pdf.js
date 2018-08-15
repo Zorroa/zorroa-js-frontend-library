@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import { articulateQuality, pluralize } from '../utils'
+import { pluralize } from '../utils'
 
 export default function ExportPreviewerPdf(props) {
   const { documentAssetCount, exporterArguments } = props
@@ -17,18 +17,14 @@ export default function ExportPreviewerPdf(props) {
             </span>
             <span>
               Export as:{' '}
-              {(({ pageMode, mediaType }) => {
-                const formattedMediaType = mediaType.toUpperCase()
-
+              {(({ pageMode }) => {
                 if (pageMode === 'merge') {
-                  return `Combined ${formattedMediaType}`
+                  return `Combined PDF`
                 }
 
-                return `Single page ${formattedMediaType}`
+                return `Single page PDF`
               })(exporterArguments)}
             </span>
-            <span>Quality: {articulateQuality(exporterArguments.quality)}</span>
-            <span>Size: {exporterArguments.size}px</span>
           </dd>
         )}
       {exporterArguments.exportOriginal === true &&
@@ -50,9 +46,6 @@ export default function ExportPreviewerPdf(props) {
 ExportPreviewerPdf.propTypes = {
   documentAssetCount: PropTypes.number.isRequired,
   exporterArguments: PropTypes.shape({
-    quality: PropTypes.number.isRequired,
-    size: PropTypes.number.isRequired,
-    mediaType: PropTypes.string.isRequired,
     pageMode: PropTypes.oneOf(['merge', 'separate']),
   }).isRequired,
 }

@@ -2,11 +2,13 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
+import { bindActionCreators } from 'redux'
 
 import Duration from '../Duration'
 import { DragSource } from '../../services/DragDrop'
 import getBackgroundPlaceholder from '../../services/backgroundColorPlaceholder'
 import Asset from '../../models/Asset'
+import { isolateParent } from '../../actions/assetsAction'
 
 import {
   addSiblings,
@@ -17,7 +19,6 @@ import {
   PubSub,
 } from '../../services/jsUtil'
 import Video from '../Video'
-import { FlipbookPlayer } from '../Flipbook'
 import FieldTemplate from '../FieldTemplate'
 
 // Extract thumb page info from an asset
@@ -29,18 +30,10 @@ export function page(asset, width, height, origin) {
 // Called when dragging an asset to assign assetIds to drop info
 const source = {
   dragStart(props) {
-    const {
-      assetId,
-      selectedAssetIds,
-      allAssets,
-      showMultipage,
-      dragFieldTemplate,
-    } = props
+    const { assetId, selectedAssetIds, allAssets, dragFieldTemplate } = props
     let assetIds = isolateSelectId(assetId, selectedAssetIds)
-    if (showMultipage) {
-      assetIds = new Set(assetIds) // Don't change app state
-      addSiblings(assetIds, allAssets) // Modifies assetIds
-    }
+    assetIds = new Set(assetIds) // Don't change app state
+    addSiblings(assetIds, allAssets) // Modifies assetIds
 
     // gather "external" asset ids, for drag and drop assets over to external apps,
     // created by evaluating the asset fields template.
@@ -137,10 +130,14 @@ class Thumb extends Component {
     origin: PropTypes.string,
     parentTotals: PropTypes.instanceOf(Map),
     unfilteredParentTotals: PropTypes.instanceOf(Map),
-    showMultipage: PropTypes.bool,
     selectedAssetIds: PropTypes.instanceOf(Set),
     thumbFieldTemplate: PropTypes.string.isRequired,
     thumbLayout: PropTypes.string.isRequired,
+
+    // Connected actions
+    actions: PropTypes.shape({
+      isolateParent: PropTypes.func.isRequired,
+    }).isRequired,
   }
 
   constructor(props) {
@@ -152,7 +149,6 @@ class Thumb extends Component {
       doVideoPreview: false,
       flipbookStarted: false,
       flipbookPlaying: false,
-      doFlipbookPreview: false,
       showBadge: false,
     }
 
@@ -178,28 +174,16 @@ class Thumb extends Component {
   }
 
   onFlipbookDurationClick = () => {
-    const doFlipbookPreview = true
-    this.setState({ doFlipbookPreview }, () =>
-      this.shuttler.publish('startOrStop'),
-    )
+    this.props.actions.isolateParent(this.props.asset)
   }
 
   // Extract badging info from an asset.
-  renderMonopageBadges = (asset, childCount) => {
+  renderMonopageBadges = asset => {
     const startPage = asset.startPage()
     const stopPage = asset.stopPage()
     let pageBadge
 
-    if (asset.mediaType() === 'zorroa/x-flipbook') {
-      pageBadge = (
-        <Duration
-          isFlipbookDuration
-          frameCount={childCount}
-          onClick={this.onFlipbookDurationClick}
-          playing={this.state.flipbookPlaying}
-        />
-      )
-    } else if (asset.mediaType().includes('video')) {
+    if (asset.mediaType().includes('video')) {
       pageBadge = (
         <Duration
           duration={asset.duration()}
@@ -248,19 +232,12 @@ class Thumb extends Component {
       pageBadge = <Duration duration={asset.duration()} />
     }
 
-    if (
-      asset.mediaType() === 'zorroa/x-flipbook' ||
-      asset.clipType() === 'flipbook'
-    ) {
+    if (asset.clipType() === 'flipbook') {
       pageBadge = (
         <Duration
           isFlipbookDuration
           frameCount={childCount}
-          onClick={
-            asset.isContainedByParent()
-              ? undefined
-              : this.onFlipbookDurationClick
-          }
+          onClick={this.onFlipbookDurationClick}
         />
       )
     }
@@ -380,8 +357,6 @@ class Thumb extends Component {
       stackCount,
       childCount,
     )
-    const shouldRenderFlipbook =
-      this.state.doFlipbookPreview && asset.mediaType() === 'zorroa/x-flipbook'
     const backgroundSize =
       this.props.thumbLayout === 'masonry' ? 'cover' : 'contain'
 
@@ -438,26 +413,15 @@ class Thumb extends Component {
               {this.renderOverlays()}
               {badges}
             </Video>
-          )) ||
-            (shouldRenderFlipbook && (
-              <div className="Thumb-flipbook">
-                <FlipbookPlayer
-                  shuttler={this.shuttler}
-                  status={this.status}
-                  clipParentId={asset.parentId()}
-                  size={backgroundSize}>
-                  {badges}
-                </FlipbookPlayer>
-              </div>
-            )) || (
-              <ImageThumb
-                url={url}
-                backgroundSize={backgroundSize}
-                backgroundColors={asset.tinyProxy()}>
-                {this.renderOverlays()}
-                {badges}
-              </ImageThumb>
-            )}
+          )) || (
+            <ImageThumb
+              url={url}
+              backgroundSize={backgroundSize}
+              backgroundColors={asset.tinyProxy()}>
+              {this.renderOverlays()}
+              {badges}
+            </ImageThumb>
+          )}
         </div>
       )
     }
@@ -471,38 +435,27 @@ class Thumb extends Component {
         onMouseEnter={this.onMouseEnter}
         onMouseLeave={this.onMouseLeave}
         {...dragparams}>
-        {shouldRenderFlipbook && (
-          <FlipbookPlayer
-            shuttler={this.shuttler}
-            status={this.status}
-            clipParentId={asset.parentId()}
-            size={backgroundSize}>
-            {badges}
-          </FlipbookPlayer>
-        )}
-
-        {shouldRenderFlipbook === false &&
-          pages
-            .slice(0, 3)
-            .reverse()
-            .map((page, rindex) => {
-              const { url } = page
-              const index = Math.min(3, pages.length) - rindex - 1
-              return (
-                <div
-                  key={`${url}-${index}`}
-                  className={classnames('Thumb-stack', `Thumb-stack-${index}`)}>
-                  <ImageThumb
-                    url={url}
-                    backgroundSize={
-                      this.props.thumbLayout === 'masonry' ? 'cover' : 'contain'
-                    }
-                    backgroundColors={asset.tinyProxy()}
-                  />
-                  {rindex === pages.length - 1 && badges}
-                </div>
-              )
-            })}
+        {pages
+          .slice(0, 3)
+          .reverse()
+          .map((page, rindex) => {
+            const { url } = page
+            const index = Math.min(3, pages.length) - rindex - 1
+            return (
+              <div
+                key={`${url}-${index}`}
+                className={classnames('Thumb-stack', `Thumb-stack-${index}`)}>
+                <ImageThumb
+                  url={url}
+                  backgroundSize={
+                    this.props.thumbLayout === 'masonry' ? 'cover' : 'contain'
+                  }
+                  backgroundColors={asset.tinyProxy()}
+                />
+                {rindex === pages.length - 1 && badges}
+              </div>
+            )
+          })}
         {this.canDisplayInset() && (
           <div className="Thumb-inset">
             <ImageThumb url={parentURL} backgroundColors={asset.tinyProxy()} />
@@ -514,14 +467,23 @@ class Thumb extends Component {
   }
 }
 
-export default connect(state => ({
-  allAssets: state.assets.all,
-  dragFieldTemplate: state.app.dragFieldTemplate,
-  origin: state.auth.origin,
-  parentTotals: state.assets.parentTotals,
-  unfilteredParentTotals: state.assets.unfilteredParentTotals,
-  selectedAssetIds: state.assets.selectedIds,
-  showMultipage: state.app.showMultipage,
-  thumbFieldTemplate: state.app.thumbFieldTemplate,
-  thumbLayout: state.app.thumbLayout,
-}))(Thumb)
+export default connect(
+  state => ({
+    allAssets: state.assets.all,
+    dragFieldTemplate: state.app.dragFieldTemplate,
+    origin: state.auth.origin,
+    parentTotals: state.assets.parentTotals,
+    unfilteredParentTotals: state.assets.unfilteredParentTotals,
+    selectedAssetIds: state.assets.selectedIds,
+    thumbFieldTemplate: state.app.thumbFieldTemplate,
+    thumbLayout: state.app.thumbLayout,
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        isolateParent,
+      },
+      dispatch,
+    ),
+  }),
+)(Thumb)

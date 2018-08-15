@@ -18,6 +18,9 @@ import {
   CREATE_EXPORT_START,
   CREATE_EXPORT_SUCCESS,
   CREATE_EXPORT_ERROR,
+  GET_EXPORT_PROCESSORS,
+  GET_EXPORT_PROCESSORS_SUCCESS,
+  GET_EXPORT_PROCESSORS_ERROR,
 } from '../constants/actionTypes'
 import {
   FILE_GROUP_IMAGES,
@@ -71,6 +74,12 @@ export const initialState = {
   isLoading: false,
   hasRestrictedAssets: false,
   assetSearch: new AssetSearch(),
+
+  // State for processor lists
+  processors: [],
+  loadingProcessors: false,
+  loadingProcessorsSuccess: false,
+  loadingProcessorsError: false,
 }
 
 export default function(state = initialState, action) {
@@ -309,6 +318,43 @@ export default function(state = initialState, action) {
         loadingCreateExportError,
         loadingCreateExportSuccess,
         errorMessage,
+      }
+    }
+    case GET_EXPORT_PROCESSORS: {
+      const loadingProcessors = true
+      const loadingProcessorsSuccess = false
+      const loadingProcessorsError = false
+
+      return {
+        ...state,
+        loadingProcessors,
+        loadingProcessorsSuccess,
+        loadingProcessorsError,
+      }
+    }
+    case GET_EXPORT_PROCESSORS_SUCCESS: {
+      const loadingProcessors = false
+      const loadingProcessorsSuccess = true
+      const loadingProcessorsError = false
+      const processors = action.payload.processors
+
+      return {
+        ...state,
+        loadingProcessors,
+        loadingProcessorsSuccess,
+        loadingProcessorsError,
+        processors,
+      }
+    }
+    case GET_EXPORT_PROCESSORS_ERROR: {
+      const loadingProcessors = false
+      const loadingProcessorsSuccess = false
+      const loadingProcessorsError = true
+      return {
+        ...state,
+        loadingProcessors,
+        loadingProcessorsError,
+        loadingProcessorsSuccess,
       }
     }
   }

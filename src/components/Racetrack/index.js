@@ -19,6 +19,6 @@ import './SimilarHash.scss'
 import './Collections.scss'
 import './SortOrder.scss'
 import './ImportSet.scss'
-import './Multipage.scss'
-import './FlipbookWidget.scss'
+import './Multipage/Multipage.scss'
+import './Multipage/FlipbookWidgetFrameRateChanger.scss'
 export default Racetrack

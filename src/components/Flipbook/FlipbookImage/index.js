@@ -5,6 +5,7 @@ import ConnectedFlipbookImage from './ConnectedFlipbookImage'
 import api from '../../../api'
 import { PubSub } from '../../../services/jsUtil'
 import Asset from '../../../models/Asset'
+import './FlipbookImage.scss'
 
 export default class FlipbookImageContainer extends Component {
   static propTypes = {

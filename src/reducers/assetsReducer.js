@@ -17,12 +17,10 @@ import {
   SUGGEST_COMPLETIONS,
   UNAUTH_USER,
   ISOLATE_PARENT,
-  ISOLATE_FLIPBOOK,
   ALL_ASSET_COUNT,
   SIMILAR_FIELDS,
 } from '../constants/actionTypes'
 
-import * as api from '../globals/api.js'
 import { deduplicateStringsByCaseAndWhitespace } from '../services/jsUtil.js'
 import Asset from '../models/Asset'
 import AssetSearch from '../models/AssetSearch'
@@ -112,7 +110,6 @@ export default function(state = initialState, action) {
           ? page.totalCount
           : state.totalCount
       const assetsCounter = state.assetsCounter + 1
-      api.setAssetsCounter(assetsCounter)
       const updates = {
         query,
         all,
@@ -196,7 +193,6 @@ export default function(state = initialState, action) {
 
     case SELECT_ASSETS: {
       const selectionCounter = state.selectionCounter + 1
-      api.setSelectionCounter(selectionCounter)
       return { ...state, selectedIds: action.payload, selectionCounter }
     }
 
@@ -291,10 +287,6 @@ export default function(state = initialState, action) {
       return { ...state, isolatedParent: action.payload }
     }
 
-    case ISOLATE_FLIPBOOK: {
-      return { ...state, isolatedParent: action.payload }
-    }
-
     case UNAUTH_USER:
       return initialState
 
@@ -315,7 +307,6 @@ export default function(state = initialState, action) {
 
       // increment asset counter
       const assetsCounter = state.assetsCounter + 1
-      api.setAssetsCounter(assetsCounter)
 
       // clear selection
       const selectedIds = new Set()

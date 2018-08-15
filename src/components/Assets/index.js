@@ -1,6 +1,4 @@
-import Assets from './Assets'
+import ConnectedAssets from './ConnectedAssets'
 import './Assets.scss'
-import './AssetCounter.scss'
 import './Pager.scss'
-import './ThumbSizeSlider.scss'
-export default Assets
+export default ConnectedAssets

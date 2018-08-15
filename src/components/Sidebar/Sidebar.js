@@ -67,8 +67,6 @@ export default class Sidebar extends Component {
     return false
   }
 
-  getLogo() {}
-
   render() {
     const {
       isIconified,
@@ -100,8 +98,8 @@ export default class Sidebar extends Component {
           <div className={sidebarLogoClass}>
             <Logo
               whiteLabelEnabled={true}
-              lightLogo={isIconified && LIGHT_LOGO_MINI}
-              darkLogo={isIconified && DARK_LOGO_MINI}
+              lightLogo={isIconified ? LIGHT_LOGO_MINI : undefined}
+              darkLogo={isIconified ? DARK_LOGO_MINI : undefined}
               dark={isDark}
             />
             {isIconified === false && (

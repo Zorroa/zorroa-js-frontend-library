@@ -1,12 +1,15 @@
 /* eslint-env jest */
 
 import React from 'react'
-import { shallow } from 'enzyme'
+import { shallow, configure } from 'enzyme'
+import Adapter from 'enzyme-adapter-react-15'
 import FlipbookImage from './FlipbookImage'
 import Asset from '../../../models/Asset'
 import { PubSub } from '../../../services/jsUtil'
+import renderer from 'react-test-renderer'
 
 const origin = 'http://localhost'
+configure({ adapter: new Adapter() })
 
 function generateFrameAsset(id, number) {
   return new Asset({
@@ -288,12 +291,11 @@ describe('<FlipbookImage />', () => {
   })
 
   describe('When no frames are loaded', () => {
-    const componentInstance = shallow(
-      <FlipbookImage origin={origin} autoplay />,
-    )
-
     it('It should render', () => {
-      expect(componentInstance.is('.FlipbookImage')).toBe(true)
+      const tree = renderer
+        .create(<FlipbookImage origin={origin} autoplay />)
+        .toJSON()
+      expect(tree).toMatchSnapshot()
     })
   })
 

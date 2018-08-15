@@ -10,14 +10,9 @@ import {
   SortOrderWidgetInfo,
   MultipageWidgetInfo,
   ImportSetWidgetInfo,
-  FlipbookWidgetInfo,
 } from './WidgetInfo'
 import { iconifyRightSidebar } from '../../actions/appActions'
-import {
-  sortAssets,
-  isolateParent,
-  deisolateFlipbook,
-} from '../../actions/assetsAction'
+import { sortAssets, isolateParent } from '../../actions/assetsAction'
 import {
   modifyRacetrackWidget,
   removeRacetrackWidgetIds,
@@ -82,19 +77,15 @@ class Widget extends Component {
       this.props.actions.selectJobIds()
     if (widget && widget.type === MultipageWidgetInfo.type)
       this.props.actions.isolateParent()
-    if (widget && widget.type === FlipbookWidgetInfo.type)
-      this.props.actions.deisolateFlipbook()
     this.props.actions.removeRacetrackWidgetIds([this.props.id])
   }
 
   // Release focus on the element when focus is moved outside.
   // From: https://gist.github.com/pstoica/4323d3e6e37e8a23dd59
   // Timeout explanation: https://stackoverflow.com/questions/11592966/get-the-newly-focussed-element-if-any-from-the-onblur-event/11592974#11592974
-  onBlur = e => {
-    const currentTarget = e.currentTarget
-    setTimeout(_ => {
+  onBlur = ({ currentTarget }) => {
+    setTimeout(() => {
       if (!currentTarget.contains(document.activeElement)) {
-        console.log('Component blurred')
         this.props.onOpen(false)
       }
     })
@@ -180,7 +171,6 @@ export default connect(
         modifyRacetrackWidget,
         removeRacetrackWidgetIds,
         isolateParent,
-        deisolateFlipbook,
       },
       dispatch,
     ),

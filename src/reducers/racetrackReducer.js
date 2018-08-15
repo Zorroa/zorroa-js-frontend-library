@@ -11,8 +11,6 @@ import {
   ISOLATE_PARENT,
   SIMILAR_MINSCORE,
   UPSERT_RACETRACK_WIDGETS,
-  ISOLATE_FLIPBOOK,
-  DEISOLATE_FLIPBOOK,
 } from '../constants/actionTypes'
 import Widget from '../models/Widget'
 import {
@@ -21,7 +19,6 @@ import {
   SortOrderWidgetInfo,
   MultipageWidgetInfo,
   ImportSetWidgetInfo,
-  FlipbookWidgetInfo,
 } from '../components/Racetrack/WidgetInfo'
 import * as assert from 'assert'
 
@@ -193,37 +190,6 @@ export default function(state = initialState, action) {
           widget.id = widgets[index].id
           widgets[index] = widget
         }
-        return { ...state, widgets }
-      }
-      return state
-    }
-    case DEISOLATE_FLIPBOOK: {
-      const widgets = state.widgets.reduce((newWidgets, widget) => {
-        if (widget.type !== FlipbookWidgetInfo.type) {
-          newWidgets.push(widget)
-        }
-
-        return newWidgets
-      }, [])
-      return { ...state, widgets }
-    }
-    case ISOLATE_FLIPBOOK: {
-      const flipbook = action.payload
-      const isEnabled = true
-      if (flipbook) {
-        const sortByPage = true
-        const widgetState = {
-          id: flipbook.parentId(),
-          title: flipbook.document.source.filename,
-        }
-        const widget = FlipbookWidgetInfo.create(
-          sortByPage,
-          flipbook,
-          isEnabled,
-          false,
-          widgetState,
-        )
-        const widgets = [...state.widgets, widget]
         return { ...state, widgets }
       }
       return state

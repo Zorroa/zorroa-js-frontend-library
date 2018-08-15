@@ -435,3 +435,34 @@ Make our color defs available as classes
 .disableSort {
   display: none;
 }
+
+.AclEditor-selected-permission {
+  display: flex;
+}
+
+.AclEditor-selected-permission-username {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  flex: 1;
+  overflow: hidden;
+}
+
+.AclEditor-selected-permission-username-truncate {
+  @include clampText;
+  padding-right: $zorroa-metric-base / 2;
+}
+
+.AclEditor-perm-slider-container {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+}
+
+.AclEditor-permission {
+  display: flex;
+  width: 214px;
+}
+
+.AclEditor-permission-name {
+  @include clampText;
+  margin-top: $zorroa-metric-base / 5;
+}

@@ -1,61 +1,32 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import Measure from 'react-measure'
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
 import keydown from 'react-keydown'
-import * as assert from 'assert'
 
 import Thumb, { page } from '../Thumb'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
 import Widget from '../../models/Widget'
-import Folder from '../../models/Folder'
-import {
-  isolateAssetId,
-  selectAssetIds,
-  sortAssets,
-  searchAssets,
-  updateParentTotals,
-  unorderAssets,
-  isolateParent,
-  isolateFlipbook,
-} from '../../actions/assetsAction'
-import {
-  resetRacetrackWidgets,
-  restoreFolders,
-} from '../../actions/racetrackAction'
-import { selectFolderIds } from '../../actions/folderAction'
-import { saveUserSettings } from '../../actions/authAction'
-import {
-  setThumbSize,
-  setThumbLayout,
-  showTable,
-  setTableHeight,
-  showMultipage,
-  showModal,
-  hideModal,
-  iconifyRightSidebar,
-  showQuickview,
-} from '../../actions/appActions'
 import Pager from './Pager'
-import Footer from './Footer'
+import Footer from './Footer/index.js'
+import AssetsZeroState from './ZeroState/index.js'
 import AssetsTable from './AssetsTable'
 import Sidebar from '../Sidebar'
 import Racetrack from '../Racetrack'
 import * as ComputeLayout from './ComputeLayout.js'
 import AssetSearch from '../../models/AssetSearch'
 import Resizer from '../../services/Resizer'
-import TrashedFolder from '../../models/TrashedFolder'
 import { equalSets } from '../../services/jsUtil'
-import * as api from '../../globals/api.js'
-import { SESSION_STATE_ITEM } from '../../constants/localStorageItems'
+import Folder from '../../models/Folder'
+import {
+  SESSION_STATE_ITEM,
+  ASSETS_HISTORY,
+} from '../../constants/localStorageItems'
 
 const assetsScrollPadding = 8
 const defaultTableHeight = 300
 
-class Assets extends Component {
+export default class Assets extends Component {
   static propTypes = {
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     assetsCounter: PropTypes.number.isRequired,
@@ -73,16 +44,31 @@ class Assets extends Component {
     layout: PropTypes.string.isRequired,
     showTable: PropTypes.bool.isRequired,
     tableHeight: PropTypes.number.isRequired,
-    showMultipage: PropTypes.bool.isRequired,
     rightSidebarIsIconified: PropTypes.bool,
-    folders: PropTypes.instanceOf(Map),
-    trashedFolders: PropTypes.arrayOf(PropTypes.instanceOf(TrashedFolder)),
     widgets: PropTypes.arrayOf(PropTypes.instanceOf(Widget)),
     uxLevel: PropTypes.number,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     origin: PropTypes.string,
-    actions: PropTypes.object,
+    actions: PropTypes.shape({
+      isolateAssetId: PropTypes.func.isRequired,
+      isolateParent: PropTypes.func.isRequired,
+      selectAssetIds: PropTypes.func.isRequired,
+      searchAssets: PropTypes.func.isRequired,
+      updateParentTotals: PropTypes.func.isRequired,
+      unorderAssets: PropTypes.func.isRequired,
+      restoreFolders: PropTypes.func.isRequired,
+      selectFolderIds: PropTypes.func.isRequired,
+      setThumbSize: PropTypes.func.isRequired,
+      setThumbLayout: PropTypes.func.isRequired,
+      showTable: PropTypes.func.isRequired,
+      setTableHeight: PropTypes.func.isRequired,
+      showModal: PropTypes.func.isRequired,
+      hideModal: PropTypes.func.isRequired,
+      iconifyRightSidebar: PropTypes.func.isRequired,
+      saveUserSettings: PropTypes.func.isRequired,
+      showQuickview: PropTypes.func.isRequired,
+    }),
     isolatedId: PropTypes.string,
     showQuickview: PropTypes.bool.isRequired,
     history: PropTypes.object,
@@ -116,8 +102,52 @@ class Assets extends Component {
     this.assetsCounter = 0
     this.resizer = null
     this.loaded = 0
-
+    this.history = this.getHistory()
     this.historyNav = null
+  }
+
+  getHistory() {
+    let parsedAssetsHistory = {}
+
+    try {
+      const rawAssetsHistory = localStorage.getItem(ASSETS_HISTORY)
+      parsedAssetsHistory = JSON.parse(rawAssetsHistory)
+    } catch (error) {
+      // Parse errors and localStorage are expected. If they happen consider that
+      // there isn't any history available
+    }
+
+    if (parsedAssetsHistory === null) {
+      parsedAssetsHistory = {}
+    }
+
+    if (typeof parsedAssetsHistory === 'object') {
+      return parsedAssetsHistory
+    }
+
+    return {}
+  }
+
+  setHistory() {
+    const recentHistory = Object.keys(this.history).reduce(
+      (previousValue, currentValue) => {
+        const historyTime = Number(currentValue)
+        const maxHistoryAgeSeconds = 60 * 60 * 24
+        const currentTimeSeconds = Date.now()
+        const isHistoryUnexpired =
+          currentTimeSeconds - maxHistoryAgeSeconds < historyTime
+        if (isHistoryUnexpired) {
+          return {
+            [historyTime]: this.history[currentValue],
+            ...previousValue,
+          }
+        }
+
+        return previousValue
+      },
+      {},
+    )
+    localStorage.setItem(ASSETS_HISTORY, JSON.stringify(recentHistory))
   }
 
   // Adjust the selection set for the specified asset using
@@ -216,20 +246,13 @@ class Assets extends Component {
     }
   }
 
-  shouldIsolateFlipbook(asset) {
-    const { showMultipage, isolatedParent } = this.props
-    const isolatedParentId = isolatedParent && isolatedParent.parentId()
-
-    return (
-      asset.clipType() === 'flipbook' &&
-      showMultipage === true &&
-      isolatedParentId !== asset.parentId()
-    )
-  }
-
   isolateToLightbox = asset => {
-    const { showMultipage, parentTotals, isolatedParent } = this.props
-    const parentId = showMultipage && asset.parentId()
+    const nonIsolatableParentClipTypes = ['flipbook']
+    const canIsolateParent = !nonIsolatableParentClipTypes.includes(
+      asset.clipType(),
+    )
+    const { parentTotals, isolatedParent } = this.props
+    const parentId = asset.parentId()
     const isolatedParentId = isolatedParent && isolatedParent.parentId()
     const stackCount =
       parentId &&
@@ -237,12 +260,7 @@ class Assets extends Component {
       parentTotals &&
       parentTotals.get(parentId)
 
-    if (this.shouldIsolateFlipbook(asset)) {
-      this.props.actions.isolateFlipbook(asset)
-      return
-    }
-
-    if (stackCount > 1) {
+    if (stackCount > 1 && canIsolateParent) {
       this.props.actions.isolateParent(asset)
       return
     }
@@ -250,58 +268,8 @@ class Assets extends Component {
     this.props.actions.isolateAssetId(asset.id, this.props.history)
   }
 
-  toggleShowTable = () => {
-    const { showTable, user, userSettings, actions } = this.props
-    actions.showTable(!showTable)
-    actions.saveUserSettings(user, { ...userSettings, showTable: !showTable })
-  }
-
-  toggleShowMultipage = () => {
-    const { showMultipage, user, userSettings, actions } = this.props
-    actions.showMultipage(!showMultipage)
-    actions.saveUserSettings(user, {
-      ...userSettings,
-      showMultipage: !showMultipage,
-    })
+  changeLayout = () => {
     this.queueAssetsLayout()
-  }
-
-  uncollapse = () => {
-    const { user, userSettings, actions } = this.props
-    actions.showMultipage(false)
-    actions.saveUserSettings(user, { ...userSettings, showMultipage: false })
-    this.queueAssetsLayout()
-  }
-
-  changeLayout(layout) {
-    if (this.props.layout !== layout) {
-      this.props.actions.setThumbLayout(layout)
-      this.props.actions.saveUserSettings(this.props.user, {
-        ...this.props.userSettings,
-        thumbLayout: layout,
-      })
-      this.queueAssetsLayout()
-    }
-  }
-
-  changeThumbSize(thumbSize) {
-    assert.ok(typeof thumbSize === 'number')
-    if (this.props.thumbSize !== thumbSize) {
-      this.props.actions.setThumbSize(thumbSize)
-      this.props.actions.saveUserSettings(this.props.user, {
-        ...this.props.userSettings,
-        thumbSize,
-      })
-      this.queueAssetsLayout()
-    }
-  }
-
-  clearSearch = () => {
-    this.props.actions.resetRacetrackWidgets()
-    this.props.actions.selectFolderIds()
-    this.props.actions.unorderAssets()
-    this.props.actions.selectJobIds()
-    this.props.actions.isolateParent()
   }
 
   tableResizeStart = event => {
@@ -358,33 +326,35 @@ class Assets extends Component {
       150,
     )
     this.resizer = new Resizer()
+    window.addEventListener('popstate', this.restoreHistory)
+    this.history = this.getHistory()
   }
 
-  componentDidUpdate(prevProps) {
-    const previousHash = prevProps.location.hash
-    const currentHash = this.props.location.hash
-    if (previousHash !== currentHash) {
-      this.restoreHistory()
-    }
+  componentWillUnmount = () => {
+    clearInterval(this.updateAssetsScrollSizeInterval)
+    this.updateAssetsScrollSizeInterval = null
+
+    // clear any pending layout
+    this.clearAssetsLayoutTimer()
+    this.resizer.release()
+    window.removeEventListener('popstate', this.restoreHistory)
+    this.setHistory()
   }
 
-  restoreHistory = () => {
-    this.startHistoryNav()
-    const folder = this.props.history.location.state
-
-    if (folder === undefined) {
-      return
-    }
+  restoreHistory = event => {
+    // location has the new URL, after having hit Back or Forward
+    const historyKey = location.hash.slice(1)
+    const historyVal = this.history[historyKey]
+    if (!historyVal) return
 
     this.startHistoryNav()
+
+    // close lightbox, restore search
+    const folder = historyVal.folder
+    this.props.actions.isolateAssetId()
+    this.props.actions.isolateParent()
     this.props.actions.restoreFolders([folder])
   }
-
-  // We need to detect when the search changes because of navigation (fwd/back buttons)
-  // or whether the user modified the query without navigating.
-  // Mark us as navigating on the popstate event, and then wait for the query to change.
-  // If the query doesn't change after some time, time out and assume user is not navigating
-  // To reduce the likelihood of timing out, restart the timer during render() if it's running.
 
   startHistoryNav = () => {
     clearTimeout(this.historyNav)
@@ -400,7 +370,8 @@ class Assets extends Component {
     if (this.historyNav) {
       return
     }
-    const { query, order, widgets, history, location } = this.props
+
+    const { query, order, widgets } = this.props
     this.stopHistoryNav()
 
     const path = location.pathname + location.search
@@ -408,26 +379,18 @@ class Assets extends Component {
     const attrs = { widgets, order }
     const folderObj = { search: query, attrs }
     const folder = new Folder(folderObj)
+    this.history[historyKey] = { folder }
 
     // save the search in local storage - for restoring session state on reload
     localStorage.setItem(SESSION_STATE_ITEM, JSON.stringify(folderObj))
 
     requestAnimationFrame(() => {
-      if (location.hash) {
-        history.push(`${path}#${historyKey}`, folder)
+      if (this.props.location.hash) {
+        this.props.history.push(`${path}#${historyKey}`)
       } else {
-        history.replace(`${path}#${historyKey}`, folder)
+        this.props.history.replace(`${path}#${historyKey}`)
       }
     })
-  }
-
-  componentWillUnmount = () => {
-    clearInterval(this.updateAssetsScrollSizeInterval)
-    this.updateAssetsScrollSizeInterval = null
-
-    // clear any pending layout
-    this.clearAssetsLayoutTimer()
-    this.resizer.release()
   }
 
   onAssetsScrollScroll = event => {
@@ -444,7 +407,6 @@ class Assets extends Component {
       assets,
       layout,
       thumbSize,
-      showMultipage,
       isolatedParent,
       parentTotals,
     } = this.props
@@ -466,7 +428,6 @@ class Assets extends Component {
             assetSizes,
             width,
             thumbSize,
-            showMultipage,
             isolatedParentId,
           )
         case 'masonry':
@@ -474,7 +435,6 @@ class Assets extends Component {
             assetSizes,
             width,
             thumbSize,
-            showMultipage,
             isolatedParentId,
           )
       }
@@ -485,7 +445,7 @@ class Assets extends Component {
     const b = new Set(Object.keys(this.state.multipage))
     const parentsModified = !equalSets(a, b)
     this.setState({ positions, multipage, collapsed })
-    const parentIds = showMultipage && multipage && Object.keys(multipage)
+    const parentIds = multipage && Object.keys(multipage)
     const untotaledParentIds = parentIds.filter(
       parentId =>
         parentTotals === undefined || parentTotals.has(parentId) === false,
@@ -594,10 +554,6 @@ class Assets extends Component {
     return clampedTableHeight
   }
 
-  sortAssets = (field, ascending) => {
-    this.props.actions.sortAssets(field, ascending)
-  }
-
   toggleRightSidebar = () => {
     const { actions, rightSidebarIsIconified } = this.props
     actions.iconifyRightSidebar(!rightSidebarIsIconified)
@@ -610,7 +566,6 @@ class Assets extends Component {
       loadedCount,
       filteredCount,
       layout,
-      showMultipage,
       parentCounts,
       parentTotals,
       origin,
@@ -618,35 +573,22 @@ class Assets extends Component {
       query,
       isolatedParent,
     } = this.props
-    const { positions, multipage, tableIsResizing } = this.state
-    api.setTableIsResizing(tableIsResizing)
 
     if (!assets || !assets.length) {
-      return (
-        <div className="assets-layout-empty">
-          <div className="assets-layout-icon icon-search" />
-          {query && !query.empty() && <div>No results</div>}
-          {query &&
-            !query.empty() && (
-              <button onClick={this.clearSearch}>Clear Search</button>
-            )}
-        </div>
-      )
+      return null
     }
 
-    let assetsScrollParams = {
-      className: 'assets-scroll fullWidth flexOn',
-      onScroll: this.onAssetsScrollScroll,
-      ref: 'assetsScroll',
-      style: { padding: `${assetsScrollPadding}px` },
-    }
-    if (tableIsResizing) {
-      // this is to prevent the assets panel from scrolling while table resizing
-      assetsScrollParams.style.pointerEvents = 'none'
-    }
+    const { positions, multipage, tableIsResizing } = this.state
 
     return (
-      <div {...assetsScrollParams}>
+      <div
+        className="assets-scroll fullWidth flexOn"
+        onScroll={this.onAssetsScrollScroll}
+        ref="assetsScroll"
+        style={{
+          padding: `${assetsScrollPadding}px`,
+          pointerEvents: tableIsResizing ? 'none' : 'initial',
+        }}>
         <Measure>
           {({ width }) => {
             if (!width || !positions.length) {
@@ -672,11 +614,7 @@ class Assets extends Component {
 
             return (
               <div className={`Assets-layout ${layout}`}>
-                <div
-                  className="Assets-layout-top"
-                  style={{ top: 0, width: 0, height: 0 }}>
-                  &nbsp;
-                </div>
+                <div className="Assets-layout-top">&nbsp;</div>
                 {assets.map((asset, index) => {
                   const dim =
                     index < positions.length
@@ -697,7 +635,6 @@ class Assets extends Component {
                   const isolatedParentId =
                     isolatedParent && isolatedParent.parentId()
                   const parentIds =
-                    showMultipage &&
                     parentCounts &&
                     [...parentCounts.keys()].filter(
                       id =>
@@ -707,7 +644,7 @@ class Assets extends Component {
                     index === assets.length - 1 &&
                     index < positions.length &&
                     loadedCount < filteredCount &&
-                    (!showMultipage || parentIds) &&
+                    parentIds &&
                     this.loaded !== assets.length
                   ) {
                     this.loaded = assets.length
@@ -728,8 +665,6 @@ class Assets extends Component {
                   if (!dim || width <= 0 || height <= 0) return null
                   const parentId = asset.parentId()
                   const badgeHeight = thumbSize < 100 ? 15 : 25
-                  const showMultipageBadges =
-                    showMultipage && parentId !== isolatedParentId
 
                   const indexes = parentId && multipage[parentId]
                   const pages = (indexes &&
@@ -748,7 +683,9 @@ class Assets extends Component {
                       assetId={asset.id}
                       pages={pages}
                       badgeHeight={badgeHeight}
-                      showMultipageBadges={showMultipageBadges}
+                      showMultipageBadges={this.shouldShowMultipageBadges(
+                        asset,
+                      )}
                       onClick={event => {
                         // don't scroll assets when we select thumbs. (table selection will scroll)
                         this.skipNextSelectionScroll = true
@@ -771,19 +708,40 @@ class Assets extends Component {
     )
   }
 
+  shouldShowMultipageBadges(asset) {
+    const { isolatedParent } = this.props
+    const isolatedParentId = isolatedParent && isolatedParent.parentId()
+
+    return asset.parentId() !== isolatedParentId
+  }
+
+  isNewBareSearch() {
+    const { query } = this.props
+    return query.from === undefined
+  }
+
+  hasPinnedWidget() {
+    const { uxLevel, widgets } = this.props
+
+    return (
+      uxLevel > 0 &&
+      widgets &&
+      widgets.findIndex(widget => widget.isPinned) >= 0
+    )
+  }
+
+  hasNoAssets() {
+    const assets = this.props.assets
+    return !assets || !assets.length
+  }
+
   render() {
     const {
-      query,
       totalCount,
       tableHeight,
       showTable,
-      showMultipage,
-      layout,
-      thumbSize,
       assetsCounter,
       rightSidebarIsIconified,
-      widgets,
-      uxLevel,
     } = this.props
     const { tableIsResizing } = this.state
 
@@ -793,7 +751,7 @@ class Assets extends Component {
 
       // Only scroll to selection if we haven't already loaded the selection.
       // Invalidate the auto-load cache each time we have a new bare search.
-      if (query.from === undefined) {
+      if (this.isNewBareSearch()) {
         this.loaded = 0
         this.saveHistory()
         this.scrollToTop()
@@ -813,34 +771,21 @@ class Assets extends Component {
       this.skipNextSelectionScroll = false
     }
 
-    const pinnedWidget =
-      uxLevel > 0 &&
-      widgets &&
-      widgets.findIndex(widget => widget.isPinned) >= 0
+    const pinnedWidget = this.hasPinnedWidget()
 
     return (
-      <div className="Assets" ref="Assets">
+      <div className="Assets">
         <div className="Assets-workspace">
           <div className="Assets-body">
             {this.renderAssets()}
+            <AssetsZeroState />
             {showTable && (
               <div
                 className="Assets-tableResize"
                 onMouseDown={this.tableResizeStart}
               />
             )}
-            {totalCount > 0 && (
-              <Footer
-                showMultipage={showMultipage}
-                toggleShowMultipage={this.toggleShowMultipage}
-                showTable={showTable}
-                toggleShowTable={this.toggleShowTable}
-                layout={layout}
-                handleLayout={this.changeLayout.bind(this)}
-                thumbSize={thumbSize}
-                handleThumbSize={this.changeThumbSize.bind(this)}
-              />
-            )}
+            {totalCount > 0 && <Footer handleLayout={this.changeLayout} />}
             {totalCount > 0 &&
               showTable && (
                 <AssetsTable
@@ -866,65 +811,3 @@ class Assets extends Component {
     )
   }
 }
-
-const ConnectedAssets = connect(
-  state => ({
-    assets: state.assets.all,
-    assetsCounter: state.assets.assetsCounter,
-    query: state.assets.query,
-    order: state.assets.order,
-    parentCounts: state.assets.parentCounts,
-    parentTotals: state.assets.parentTotals,
-    isolatedParent: state.assets.isolatedParent,
-    isolatedId: state.assets.isolatedId,
-    selectedIds: state.assets.selectedIds,
-    selectionCounter: state.assets.selectionCounter,
-    totalCount: state.assets.totalCount,
-    loadedCount: state.assets.loadedCount,
-    filteredCount: state.assets.filteredCount,
-    rightSidebarIsIconified: state.app.rightSidebarIsIconified,
-    folders: state.folders.all,
-    trashedFolders: state.folders.trashedFolders,
-    uxLevel: state.app.uxLevel,
-    user: state.auth.user,
-    userSettings: state.app.userSettings,
-    thumbSize: state.app.thumbSize,
-    layout: state.app.thumbLayout,
-    showTable: state.app.showTable,
-    tableHeight: state.app.tableHeight,
-    showMultipage: state.app.showMultipage,
-    widgets: state.racetrack.widgets,
-    origin: state.auth.origin,
-    showQuickview: state.app.showQuickview,
-  }),
-  dispatch => ({
-    actions: bindActionCreators(
-      {
-        isolateFlipbook,
-        isolateAssetId,
-        isolateParent,
-        selectAssetIds,
-        sortAssets,
-        searchAssets,
-        updateParentTotals,
-        unorderAssets,
-        resetRacetrackWidgets,
-        restoreFolders,
-        selectFolderIds,
-        setThumbSize,
-        setThumbLayout,
-        showTable,
-        setTableHeight,
-        showMultipage,
-        showModal,
-        hideModal,
-        iconifyRightSidebar,
-        saveUserSettings,
-        showQuickview,
-      },
-      dispatch,
-    ),
-  }),
-)(Assets)
-
-export default withRouter(ConnectedAssets)
