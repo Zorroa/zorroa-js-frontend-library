@@ -226,12 +226,41 @@ export default class Table extends Component {
     })
   }
 
-  sortOrderClassnames(order) {
+  sortDisabled(field) {
+    const disabledSortFields = [
+      'analysis.faceRecognition.boxes',
+      'analysis.imageClassify.keywords',
+      'location.point',
+      'media.attrs.Orientation',
+      'media.attrs.ResolutionUnit',
+      'media.content:1.0',
+      'media.description',
+      'media.description:1.0',
+      'media.dialog',
+      'media.keywords',
+      'media.title:2.0',
+      'proxies.proxies.format',
+      'proxies.tinyProxy',
+      'source.exists',
+      'zorroa.taxonomy.keywords',
+      'zorroa.taxonomy.folderId',
+      'zorroa.taxonomy.taxId',
+    ]
+
+    const notSortable =
+      disabledSortFields.findIndex(disabledField => disabledField === field) >=
+      0
+    return notSortable
+  }
+
+  sortOrderClassnames(order, field) {
     const icon = !order
       ? 'icon-sort'
       : order === 'ascending' ? 'icon-sort-asc' : 'icon-sort-desc'
+    const notSortable = this.sortDisabled(field) ? 'sortDisabled' : ''
+    console.log(field)
     return `Table-header-sort ${icon} Table-header-sort-order-${order ||
-      'none'}`
+      'none'} ${notSortable}`
   }
 
   headerClassnames(order) {
@@ -355,7 +384,7 @@ export default class Table extends Component {
                 {this.props.sortFieldFn && (
                   <i
                     onClick={_ => this.props.sortFieldFn(field)}
-                    className={this.sortOrderClassnames(order)}
+                    className={this.sortOrderClassnames(order, field)}
                   />
                 )}
                 <div
