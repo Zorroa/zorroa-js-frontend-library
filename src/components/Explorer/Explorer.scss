@@ -1,9 +1,10 @@
 @import '../../styles/core-mixins.scss';
 
 .Explorer {
-
   background-color: white;
-  .dark & { background-color: black; }
+  .dark & {
+    background-color: black;
+  }
   max-height: 40vh;
   @include flexCol;
 
@@ -31,7 +32,9 @@
         bottom: 0;
         height: 16px;
         color: $zorroa-lightgray;
-        .dark & { color: $zorroa-greyish-brown; }
+        .dark & {
+          color: $zorroa-greyish-brown;
+        }
       }
     }
 
@@ -57,7 +60,9 @@
     position: relative;
     overflow-y: auto;
     overflow-x: hidden;
-    &::-webkit-scrollbar { width: 5px; }
+    &::-webkit-scrollbar {
+      width: 5px;
+    }
   }
 }
 
@@ -66,27 +71,33 @@
   @include flexAlignItemsCenter;
   margin-left: 4px;
   border-bottom: 1px solid $zorroa-nearwhite;
-  .dark & { border-bottom: 1px solid $zorroa-dimgray; }
+  .dark & {
+    border-bottom: 1px solid $zorroa-dimgray;
+  }
 }
 
 .Explorer-middle {
   @include flexOn;
   height: 26px;
   border-bottom: 1px solid $zorroa-nearwhite;
-  .dark & { border-bottom: 1px solid $zorroa-dimgray; }
+  .dark & {
+    border-bottom: 1px solid $zorroa-dimgray;
+  }
 }
 
 .Explorer-right {
   @include flexRow;
   @include flexAlignItemsCenter;
   border-bottom: 1px solid $zorroa-nearwhite;
-  .dark & { border-bottom: 1px solid $zorroa-dimgray; }
+  .dark & {
+    border-bottom: 1px solid $zorroa-dimgray;
+  }
 }
 
 .Explorer-item {
   margin-left: 8px;
   margin-right: 8px;
-  margin-bottom: -1px;  // Forces borders together
+  margin-bottom: -1px; // Forces borders together
   font-size: 14px;
   cursor: pointer;
 
@@ -96,11 +107,15 @@
   .Explorer-item-label {
     @include flexRow;
     color: $zorroa-greyish-brown;
-    .dark & { color: $zorroa-whitegray; }
+    .dark & {
+      color: $zorroa-whitegray;
+    }
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    &.hasChildren { font-weight: 500; }
+    &.hasChildren {
+      font-weight: 500;
+    }
   }
 
   .Explorer-item-right {
@@ -109,11 +124,15 @@
 
   &:hover:not(.isSelected) {
     background-color: $zorroa-hover;
-    .dark & { background-color: $zorroa-dark-hover; }
+    .dark & {
+      background-color: $zorroa-dark-hover;
+    }
   }
   &.isSelected {
     background-color: $zorroa-selected;
-    .dark & { background-color: $zorroa-dark-selected; }
+    .dark & {
+      background-color: $zorroa-dark-selected;
+    }
   }
 }
 
@@ -121,7 +140,9 @@
   width: 14px;
   height: 25px;
   border-right: 1px solid $zorroa-lightgray;
-  .dark & { border-right: 1px solid $zorroa-darkgray; }
+  .dark & {
+    border-right: 1px solid $zorroa-darkgray;
+  }
 }
 
 .Explorer-cancel-filter {
@@ -137,7 +158,9 @@
   height: 16px;
   cursor: pointer;
 
-  &:hover { color: $zorroa-gray; }
+  &:hover {
+    color: $zorroa-gray;
+  }
 }
 
 .Explorer-item-favorite {
@@ -157,7 +180,9 @@
   &:hover:not(.isSelected) {
     background-color: $zorroa-nearwhite;
     color: $zorroa-golden-yellow;
-    .dark & { background-color: $zorroa-darkgray; }
+    .dark & {
+      background-color: $zorroa-darkgray;
+    }
   }
 
   &.isSelected {
@@ -165,7 +190,7 @@
   }
 }
 
-$FolderItemHeight : 25px;
+$FolderItemHeight: 25px;
 
 .Explorer-item-toggle {
   @include flexOff;
@@ -178,11 +203,22 @@ $FolderItemHeight : 25px;
 
   .FolderItem.isSelected & {
     background-color: $zorroa-selected;
-    .dark & { background-color: $zorroa-dark-selected; }
+    .dark & {
+      background-color: $zorroa-dark-selected;
+    }
   }
-  .FolderItem.isSelected &.hasChildren:not(.isSelected):hover { color: white; background-color: $zorroa-darkgray; }
-  .FolderItem.isDropTarget.dragHover & { color: white; background-color: $zorroa-sickly-green; }
-  .FolderItem.isSelected.isDropTarget.dragHover & { color: white; background-color: darken($zorroa-sickly-green, 15%); }
+  .FolderItem.isSelected &.hasChildren:not(.isSelected):hover {
+    color: white;
+    background-color: $zorroa-darkgray;
+  }
+  .FolderItem.isDropTarget.dragHover & {
+    color: white;
+    background-color: $zorroa-sickly-green;
+  }
+  .FolderItem.isSelected.isDropTarget.dragHover & {
+    color: white;
+    background-color: darken($zorroa-sickly-green, 15%);
+  }
 }
 
 .Explorer-toggle-open {
@@ -202,8 +238,12 @@ $FolderItemHeight : 25px;
   cursor: pointer;
   border: none;
 
-  .dark & { background-color: $zorroa-nearblack; }
-  &.isSelected { color: $zorroa-golden-yellow; }
+  .dark & {
+    background-color: $zorroa-nearblack;
+  }
+  &.isSelected {
+    color: $zorroa-golden-yellow;
+  }
 
   &:hover:not(.isSelected) {
     background-color: transparent;
@@ -239,4 +279,8 @@ $FolderItemHeight : 25px;
     background-color: $zorroa-sickly-green;
     color: white;
   }
+}
+
+.disableSort {
+  display: none;
 }

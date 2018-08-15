@@ -18,8 +18,8 @@
   &--no-scroll {
     overflow: visible;
     overflow-x: scroll;
-    height: initial!important; // Override JSX height
-    max-height: initial!important; // Override JSX height
+    height: initial !important; // Override JSX height
+    max-height: initial !important; // Override JSX height
   }
 }
 
@@ -33,7 +33,9 @@ $tableResizeRightPadding: 20px;
   // height is defined in JSX
   min-width: 100%;
   background-color: white;
-  .dark & { background-color: black; }
+  .dark & {
+    background-color: black;
+  }
 
   padding-right: $tableResizeRightPadding;
 
@@ -47,7 +49,7 @@ $tableResizeRightPadding: 20px;
   @include flexRowCenter;
 
   .Table--no-scroll & {
-    position: static!important; // Override JSX style
+    position: static !important; // Override JSX style
   }
 }
 
@@ -62,16 +64,22 @@ $tableResizeRightPadding: 20px;
   border-radius: 3px;
   color: $zorroa-lightgray;
 
-  .dark & { color: $zorroa-gray; }
+  .dark & {
+    color: $zorroa-gray;
+  }
 
   &.icon-sort {
     color: $zorroa-nearwhite;
-    .dark & { color: $zorroa-dimgray; }
+    .dark & {
+      color: $zorroa-dimgray;
+    }
   }
 
   .ordered & {
     color: black;
-    .dark & { color: white; }
+    .dark & {
+      color: white;
+    }
   }
 
   &:hover {
@@ -82,7 +90,9 @@ $tableResizeRightPadding: 20px;
 
 .Table-header-sort-order-0 {
   color: $zorroa-darkgray;
-  .dark & { color: $zorroa-whitegray; }
+  .dark & {
+    color: $zorroa-whitegray;
+  }
 }
 
 .Table-header-sort-order-1 {
@@ -105,7 +115,9 @@ $tableResizeRightPadding: 20px;
   height: 100%;
   color: #f1f1f1;
   border-right: 1px solid $zorroa-nearwhite;
-  .dark & { border-right: 1px solid $zorroa-dimgray; }
+  .dark & {
+    border-right: 1px solid $zorroa-dimgray;
+  }
 }
 
 .Table-scroll-clip {
@@ -118,7 +130,7 @@ $tableResizeRightPadding: 20px;
 
   .Table--no-scroll & {
     overflow: visible;
-    height: initial!important;
+    height: initial !important;
     position: static;
   }
 }
@@ -155,7 +167,7 @@ $tableResizeRightPadding: 20px;
 
   .Table--no-scroll & {
     overflow: visible;
-    height: initial!important;
+    height: initial !important;
     position: static;
   }
 }
@@ -178,29 +190,36 @@ $tableResizeRightPadding: 20px;
   color: $zorroa-greyish-brown;
   border: 2px solid transparent;
 
-  .dark & { background-color: black; }
+  .dark & {
+    background-color: black;
+  }
   &.even {
     background-color: #fff;
-    .dark & { background-color: $zorroa-mattblack; }
+    .dark & {
+      background-color: $zorroa-mattblack;
+    }
   }
   &.isSingleSelectOnly {
     border: 1px solid transparent;
   }
   &.isSelected:not(.isSingleSelectOnly) {
     background-color: $zorroa-selected;
-    .dark & { background-color: $zorroa-dark-selected; }
+    .dark & {
+      background-color: $zorroa-dark-selected;
+    }
   }
   &.isSelected.isSingleSelectOnly {
     border-color: $zorroa-selected;
 
-    .dark & { border-color: $zorroa-dark-selected; }
+    .dark & {
+      border-color: $zorroa-dark-selected;
+    }
   }
 
   .Table--no-scroll & {
     position: static;
   }
 }
-
 
 .Table-header {
   @include flexRow;
@@ -212,7 +231,9 @@ $tableResizeRightPadding: 20px;
 
 .Table-body .Table-row:hover:not(.isSelected) {
   background-color: $zorroa-color-gray-light-1;
-  .dark & { background-color: $zorroa-color-gray-dark-2; }
+  .dark & {
+    background-color: $zorroa-color-gray-dark-2;
+  }
 }
 
 .Table-cell {
@@ -221,11 +242,17 @@ $tableResizeRightPadding: 20px;
   font-family: Roboto;
   color: $zorroa-whitegray;
 
-  &.dark { color: $zorroa-whitegray; }
-  &:not(.isOpen) { @include clampText; }
+  &.dark {
+    color: $zorroa-whitegray;
+  }
+  &:not(.isOpen) {
+    @include clampText;
+  }
   &.ordered {
     color: black;
-    &.dark { color: white; }
+    &.dark {
+      color: white;
+    }
   }
 }
 
@@ -256,11 +283,15 @@ $tableResizeRightPadding: 20px;
 
   .ordered & {
     color: black;
-    .dark & { color: white; }
+    .dark & {
+      color: white;
+    }
   }
   .Table-header-cell:hover & {
-     color: $zorroa-darkgray;
-     .dark & { color: $zorroa-lightgray; }
+    color: $zorroa-darkgray;
+    .dark & {
+      color: $zorroa-lightgray;
+    }
   }
 }
 
@@ -289,7 +320,7 @@ $tableResizeRightPadding: 20px;
   }
 
   &--white-label {
-    opacity: .9;
+    opacity: 0.9;
 
     &:hover,
     &:focus {
@@ -302,11 +333,11 @@ $tableResizeRightPadding: 20px;
   @include flexCol;
   background-color: white;
   color: $zorroa-greyish-brown;
-  box-shadow: 0 0 4px 4px rgba(0,0,0,0.15);
+  box-shadow: 0 0 4px 4px rgba(0, 0, 0, 0.15);
   .dark & {
     background-color: $zorroa-mattblack;
     color: $zorroa-whitegray;
-    box-shadow: 0 0 4px 4px rgba(0,0,0,0.45);
+    box-shadow: 0 0 4px 4px rgba(0, 0, 0, 0.45);
   }
   border-radius: 3px;
   position: fixed;
@@ -314,7 +345,6 @@ $tableResizeRightPadding: 20px;
   left: 28px;
   z-index: 1000;
 }
-
 
 .Table-context-item {
   @include flexRow;
@@ -326,15 +356,21 @@ $tableResizeRightPadding: 20px;
   font-size: 14px;
   &.disabled {
     color: $zorroa-lightgray;
-    .dark & { color: $zorroa-darkgray; }
+    .dark & {
+      color: $zorroa-darkgray;
+    }
   }
   &:not(:last-child) {
     border-bottom: 2px solid $zorroa-lightgray;
-    .dark & { border-bottom: 2px solid $zorroa-darkgray}
+    .dark & {
+      border-bottom: 2px solid $zorroa-darkgray;
+    }
   }
   &:hover:not(.disabled) {
     background-color: $zorroa-nearwhite;
-    .dark & { background-color: $zorroa-nearblack; }
+    .dark & {
+      background-color: $zorroa-nearblack;
+    }
   }
 }
 
@@ -357,4 +393,8 @@ $tableResizeRightPadding: 20px;
   z-index: 1000;
   background-color: transparent;
   box-sizing: border-box;
+}
+
+.disableSort {
+  display: none;
 }
