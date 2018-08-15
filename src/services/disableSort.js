@@ -19,6 +19,6 @@ export function disableSort(field) {
   const notSortable =
     analysis.test(field) ||
     proxies.test(field) ||
-    disabledSortFields.indexOf(field)
+    disabledSortFields.includes(field)
   return notSortable
 }
