@@ -134,7 +134,8 @@ export default class AssetSearch {
     const data = JSON.parse(JSON.stringify(serializableSearchParameters))
 
     const isFilterEmpty =
-      typeof data.filter === 'object' && Object.keys(data.filter).length === 0
+      !data.filter ||
+      (typeof data.filter === 'object' && Object.keys(data.filter).length === 0)
 
     // Empty filters should not be passed to ElasticSearch
     if (isFilterEmpty) {
