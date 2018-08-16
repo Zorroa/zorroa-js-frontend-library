@@ -31,7 +31,7 @@
   "private": true,
   "engines": {
     "node": "8.X.X",
-    "npm": "^5.6.0"
+    "npm": "^6.3.0"
   },
   "jest": {
     "testURL": "https://localhost/8081",
