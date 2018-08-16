@@ -123,7 +123,7 @@
 .AclEditor-permissions {
   margin-top: 20px;
 
-  input[type=checkbox] {
+  input[type='checkbox'] {
     width: auto;
     height: auto;
     padding: 0;
@@ -131,12 +131,16 @@
   }
 
   .AclEditor-permission {
+    display: flex;
     color: $zorroa-gray;
     font-size: 12px;
     min-height: 20px;
+    width: 214px;
   }
 
   .AclEditor-permission-name {
+    @include clampText;
+    margin-top: $zorroa-metric-base / 5;
     margin-left: 4px;
   }
 
@@ -165,7 +169,6 @@
   overflow-y: auto;
 }
 
-
 .AclEditor-perm-slider {
   position: relative;
   width: 60px;
@@ -179,8 +182,8 @@
     border: none;
     width: 6px;
     height: 6px;
-    margin-top:-2px;
-    margin-bottom:0;
+    margin-top: -2px;
+    margin-bottom: 0;
     color: transparent;
   }
 
@@ -213,8 +216,8 @@
     outline: none;
   }
 
-  input[type=range]::-moz-focus-outer {
-    border: 0;  // Removes focus dotted outline
+  input[type='range']::-moz-focus-outer {
+    border: 0; // Removes focus dotted outline
   }
 
   .AclEditor-perm-progress {
@@ -256,7 +259,7 @@
     font-size: 15px;
     margin-right: 4px;
     margin-left: 4px;
-    color: $zorroa-gray
+    color: $zorroa-gray;
   }
 
   .icon-cross {
@@ -270,6 +273,18 @@
   .AclEditor-selected-permission-name {
     margin-left: 6px;
   }
+}
+
+.AclEditor-selected-permission-username {
+  @include flexRow;
+  @include flexAlignItemsCenter;
+  flex: 1;
+  overflow: hidden;
+}
+
+.AclEditor-selected-permission-username-truncate {
+  @include clampText;
+  padding-right: $zorroa-metric-base / 2;
 }
 
 .AclEditor-shared-with-permissions {
@@ -308,4 +323,9 @@
       color: $zorroa-sickly-green;
     }
   }
+}
+
+.AclEditor-perm-slider-container {
+  @include flexRow;
+  @include flexAlignItemsCenter;
 }
