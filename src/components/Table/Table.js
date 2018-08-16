@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import classnames from 'classnames'
+import { disableSort } from '../../services/disableSort'
 
 import Resizer from '../../services/Resizer'
 
@@ -226,12 +227,13 @@ export default class Table extends Component {
     })
   }
 
-  sortOrderClassnames(order) {
+  sortOrderClassnames(order, field) {
     const icon = !order
       ? 'icon-sort'
       : order === 'ascending' ? 'icon-sort-asc' : 'icon-sort-desc'
+    const sort = disableSort(field) ? 'disableSort' : ''
     return `Table-header-sort ${icon} Table-header-sort-order-${order ||
-      'none'}`
+      'none'} ${sort}`
   }
 
   headerClassnames(order) {
@@ -355,7 +357,9 @@ export default class Table extends Component {
                 {this.props.sortFieldFn && (
                   <i
                     onClick={_ => this.props.sortFieldFn(field)}
-                    className={this.sortOrderClassnames(order)}
+                    className={classnames(
+                      this.sortOrderClassnames(order, field),
+                    )}
                   />
                 )}
                 <div

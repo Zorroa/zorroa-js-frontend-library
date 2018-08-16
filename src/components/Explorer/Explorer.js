@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
+import { disableSort } from '../../services/disableSort'
 
 import User from '../../models/User'
 import {
@@ -335,7 +336,8 @@ class Explorer extends Component {
       !order || index !== 0
         ? 'icon-sort'
         : order[index].ascending ? 'icon-sort-asc' : 'icon-sort-desc'
-    return `Explorer-sort ${icon}`
+    const sort = disableSort(field) ? 'disableSort' : ''
+    return `Explorer-sort ${icon} ${sort}`
   }
 
   renderPads(depth) {
@@ -369,6 +371,7 @@ class Explorer extends Component {
       'date',
       'path',
     ]
+
     const isLeaf = this.isLeaf(field, namespace)
     const isSortable =
       isLeaf && sortableTypes.findIndex(type => type === fieldType) >= 0
@@ -413,7 +416,7 @@ class Explorer extends Component {
           {isSortable && (
             <i
               onClick={e => this.sortByField(field, e)}
-              className={this.sortOrderClassnames(field, order)}
+              className={classnames(this.sortOrderClassnames(field, order))}
             />
           )}
           <div
