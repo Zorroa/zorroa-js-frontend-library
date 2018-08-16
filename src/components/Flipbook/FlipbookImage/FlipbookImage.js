@@ -455,7 +455,12 @@ export default class FlipbookImage extends Component {
     const { activeFrame } = this.state
 
     this.calculateFrameElapsedPosition()
+
+    // In order to maintain API compability with the Video player, this emits the frame number
     this.publishStatusTopic('played', activeFrame && activeFrame.startPage())
+
+    // This allows subscribees to get the entire activeFrame object
+    this.publishStatusTopic('playedFlipbookFrame', activeFrame)
   }
 
   stopAnimation() {

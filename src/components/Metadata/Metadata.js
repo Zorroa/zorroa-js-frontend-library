@@ -1,7 +1,5 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 import User from '../../models/User'
@@ -11,25 +9,14 @@ import Resizer from '../../services/Resizer'
 import { minimalUniqueFieldTitle } from '../../models/Asset'
 import { unCamelCase, equalSets } from '../../services/jsUtil'
 import { assetsForIds } from '../../actions/assetsAction'
-import { saveUserSettings } from '../../actions/authAction'
 import {
   fieldUsedInWidget,
   widgetTypeForField,
   createFacetWidget,
 } from '../../models/Widget'
-import {
-  modifyRacetrackWidget,
-  removeRacetrackWidgetIds,
-} from '../../actions/racetrackAction'
-import {
-  iconifyRightSidebar,
-  toggleCollapsible,
-  hoverField,
-  clearHoverField,
-} from '../../actions/appActions'
 import * as WidgetInfo from '../Racetrack/WidgetInfo'
 
-class Metadata extends Component {
+export default class Metadata extends Component {
   static propTypes = {
     dark: PropTypes.bool,
     height: PropTypes.string.isRequired,
@@ -402,30 +389,3 @@ class Metadata extends Component {
     )
   }
 }
-
-export default connect(
-  state => ({
-    assets: state.assets.all,
-    isolatedId: state.assets.isolatedId,
-    metadataFields: state.app.metadataFields,
-    widgets: state.racetrack.widgets,
-    collapsibleOpen: state.app.collapsibleOpen,
-    fieldTypes: state.assets.types,
-    user: state.auth.user,
-    userSettings: state.app.userSettings,
-  }),
-  dispatch => ({
-    actions: bindActionCreators(
-      {
-        iconifyRightSidebar,
-        saveUserSettings,
-        toggleCollapsible,
-        modifyRacetrackWidget,
-        removeRacetrackWidgetIds,
-        hoverField,
-        clearHoverField,
-      },
-      dispatch,
-    ),
-  }),
-)(Metadata)

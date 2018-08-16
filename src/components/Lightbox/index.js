@@ -1,4 +1,4 @@
-import Lightbox from './Lightbox'
+import Lightbox from './ConnectedLightbox'
 import './Lightbox.scss'
 import './Lightbar.scss'
 export default Lightbox

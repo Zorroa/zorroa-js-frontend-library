@@ -111,6 +111,27 @@ describe('<FlipbookImage />', () => {
       componentInstance.instance().notifySubscribeesOfNewFrame()
       expect(elapsedPercent).toBe(1)
     })
+
+    it('Should publish the active frame', () => {
+      let activeFrame
+      const status = new PubSub()
+      status.on('playedFlipbookFrame', frame => {
+        activeFrame = frame
+      })
+      const frame1 = generateFrameAsset(undefined, 1)
+      const frame2 = generateFrameAsset(undefined, 2)
+      const frames = [frame1, frame2]
+      const componentInstance = shallow(
+        <FlipbookImage status={status} origin={origin} frames={frames} />,
+      )
+
+      componentInstance.instance().setActiveFrame(frames[0])
+      componentInstance.instance().notifySubscribeesOfNewFrame()
+      expect(activeFrame).toBe(frame1)
+      componentInstance.instance().setActiveFrame(frames[1])
+      componentInstance.instance().notifySubscribeesOfNewFrame()
+      expect(activeFrame).toBe(frame2)
+    })
   })
 
   describe('updateDefaultFrameElapsedPosition()', () => {

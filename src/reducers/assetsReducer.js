@@ -35,6 +35,7 @@ const initialState = {
   commands: new Map(),
   similarFields: new Set(),
   all: [],
+  types: {},
 }
 
 export default function(state = initialState, action) {

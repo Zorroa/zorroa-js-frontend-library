@@ -1,34 +1,41 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { PubSub } from '../../services/jsUtil'
 import Flipbook from '../Flipbook/FlipbookImage/index.js'
 import PanZoom from './PanZoom'
 import Filmstrip from './Filmstrip/index.js'
-import {
-  setFlipbookFps,
-  shouldLoop,
-  shouldHold as actionShouldHold,
-} from '../../actions/appActions'
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
 import { defaultFpsFrequencies } from '../../constants/defaultState.js'
 import Asset from '../../models/Asset'
+import User from '../../models/User'
 import keydown from 'react-keydown'
+import Metadata from '../Metadata'
+import ResizableWindow from '../ResizableWindow'
 
-class FlipbookViewer extends Component {
+export default class FlipbookViewer extends PureComponent {
   static propTypes = {
     clipParentId: PropTypes.string.isRequired,
     onError: PropTypes.func,
     actions: PropTypes.shape({
-      setFlipbookFps: PropTypes.func,
-      shouldLoop: PropTypes.func,
-      shouldHold: PropTypes.func,
+      setFlipbookFps: PropTypes.func.isRequired,
+      shouldLoop: PropTypes.func.isRequired,
+      shouldHold: PropTypes.func.isRequired,
+      saveUserSettings: PropTypes.func.isRequired,
+      lightboxMetadata: PropTypes.func.isRequired,
     }),
     shouldLoop: PropTypes.bool,
     fps: PropTypes.number.isRequired,
     isolatedAsset: PropTypes.instanceOf(Asset),
     shouldHold: PropTypes.bool,
+    lightboxMetadata: PropTypes.shape({
+      show: PropTypes.bool.isRequired,
+      left: PropTypes.number.isRequired,
+      top: PropTypes.number.isRequired,
+      width: PropTypes.number.isRequired,
+      height: PropTypes.number.isRequired,
+    }),
+    user: PropTypes.instanceOf(User),
+    userSettings: PropTypes.object.isRequired,
   }
 
   constructor(props) {
@@ -41,6 +48,7 @@ class FlipbookViewer extends Component {
       playing: false,
       loopPaused: false,
       shouldDeferImageLoad: true,
+      playingFrame: undefined,
     }
   }
 
@@ -49,6 +57,10 @@ class FlipbookViewer extends Component {
   }
 
   componentDidMount() {
+    this.registerStatusEventHandlers()
+  }
+
+  registerStatusEventHandlers() {
     this.status.on('playing', playing => {
       this.setState({ playing })
     })
@@ -58,6 +70,11 @@ class FlipbookViewer extends Component {
     this.status.on('load', () => {
       this.setState({
         shouldDeferImageLoad: false,
+      })
+    })
+    this.status.on('playedFlipbookFrame', activeFrame => {
+      this.setState({
+        playingFrame: activeFrame,
       })
     })
   }
@@ -128,8 +145,45 @@ class FlipbookViewer extends Component {
     this.props.actions.shouldLoop(!this.props.shouldLoop)
   }
 
+  toggleMetadata = event => {
+    this.updateMetadata({
+      show: !this.props.lightboxMetadata.show,
+    })
+  }
+
+  closeMetadata = event => {
+    this.updateMetadata({
+      show: false,
+    })
+    event.stopPropagation()
+  }
+
+  moveMetadata = moveMetadata => {
+    this.updateMetadata(moveMetadata)
+  }
+
+  updateMetadata(lightboxMetadataChange) {
+    const { user, userSettings } = this.props
+    const lightboxMetadata = {
+      ...this.props.lightboxMetadata,
+      ...lightboxMetadataChange,
+    }
+    this.props.actions.lightboxMetadata(lightboxMetadata)
+    this.props.actions.saveUserSettings(user, {
+      ...userSettings,
+      lightboxMetadata,
+    })
+  }
+
+  shouldDisplayMetadata() {
+    const { lightboxMetadata } = this.props
+    const shouldShowMetadata = lightboxMetadata.show
+    const hasAsset = this.state.playingFrame instanceof Asset
+    return shouldShowMetadata && hasAsset
+  }
+
   render() {
-    const { playing } = this.state
+    const { playing, playingFrame } = this.state
     const { shouldHold } = this.props
     const frameFrequency = {
       onFrameFrequency: this.onFrameFrequency,
@@ -137,9 +191,30 @@ class FlipbookViewer extends Component {
       rate: this.props.fps,
     }
     const panZoomClassNames = classnames('FlipbookViewer__pan-zoom')
+    const metadataTitle = (
+      <div className="Lightbox-metadata-title">
+        <div className="Lightbox__metadata-icon icon-register" />
+        <div>Metadata</div>
+      </div>
+    )
 
     return (
       <div className="FlipbookViewer">
+        {this.shouldDisplayMetadata() && (
+          <ResizableWindow
+            onClose={this.closeMetadata}
+            onMove={this.moveMetadata}
+            preventOutOfBounds
+            {...this.props.lightboxMetadata}
+            title={metadataTitle}>
+            <Metadata
+              assetIds={new Set([playingFrame.id])}
+              dark={true}
+              height="100%"
+              isolatedId={playingFrame.id}
+            />
+          </ResizableWindow>
+        )}
         <div className="FlipbookViewer__media">
           <div className={panZoomClassNames}>
             <PanZoom
@@ -174,24 +249,3 @@ class FlipbookViewer extends Component {
     )
   }
 }
-
-export default connect(
-  state => ({
-    fps: state.app.flipbookFps,
-    shouldLoop: state.app.shouldLoop,
-    shouldHold: state.app.shouldHold,
-    isolatedAsset: state.assets.all.find(
-      asset => asset.id === state.assets.isolatedId,
-    ),
-  }),
-  dispatch => ({
-    actions: bindActionCreators(
-      {
-        setFlipbookFps,
-        shouldLoop,
-        shouldHold: actionShouldHold,
-      },
-      dispatch,
-    ),
-  }),
-)(FlipbookViewer)

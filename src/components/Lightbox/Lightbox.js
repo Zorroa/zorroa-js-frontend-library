@@ -1,21 +1,15 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
 import keydown from 'react-keydown'
-import { withRouter } from 'react-router-dom'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
 import Lightbar from './Lightbar'
 import Inspector from '../Inspector'
 import Metadata from '../Metadata'
 import ResizableWindow from '../ResizableWindow'
-import { isolateAssetId, searchAssets } from '../../actions/assetsAction'
-import { lightboxMetadata } from '../../actions/appActions'
-import { saveUserSettings } from '../../actions/authAction'
 import AssetSearch from '../../models/AssetSearch'
 
-class Lightbox extends Component {
+export default class Lightbox extends Component {
   static propTypes = {
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     match: PropTypes.shape({
@@ -30,6 +24,7 @@ class Lightbox extends Component {
       width: PropTypes.number.isRequired,
       height: PropTypes.number.isRequired,
     }),
+    fieldTypes: PropTypes.object.isRequired,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
     actions: PropTypes.shape({
@@ -37,6 +32,7 @@ class Lightbox extends Component {
       saveUserSettings: PropTypes.func.isRequired,
       lightboxMetadata: PropTypes.func.isRequired,
       isolateAssetId: PropTypes.func.isRequired,
+      getAssetFields: PropTypes.func.isRequired,
     }),
     history: PropTypes.object,
   }
@@ -62,15 +58,39 @@ class Lightbox extends Component {
   }
 
   componentWillMount() {
-    const { assets, match } = this.props
-    const { params } = match
-    const { isolatedId } = params
+    this.fetchAssetIfMissing()
+    if (this.hasFieldTypes() === false) {
+      this.props.actions.getAssetFields()
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (
+      prevProps.match.params.isolatedId !== this.props.match.params.isolatedId
+    ) {
+      this.fetchAssetIfMissing()
+    }
+  }
+
+  hasFieldTypes() {
+    return Object.keys(this.props.fieldTypes).length > 0
+  }
+
+  getIsolatedAsset() {
+    const { assets } = this.props
+    const isolatedId = this.getIsolatedId()
     const asset = assets && assets.find(asset => asset.id === isolatedId)
+    return asset
+  }
+
+  fetchAssetIfMissing() {
+    const isolatedId = this.getIsolatedId()
+    const asset = this.getIsolatedAsset()
     if (!asset) {
       const assetSearchQuery = new AssetSearch({
         filter: {
           terms: {
-            _id: [this.getIsolatedId()],
+            _id: [isolatedId],
           },
         },
         size: 1,
@@ -81,52 +101,54 @@ class Lightbox extends Component {
   }
 
   isolateIndexOffset(offset) {
-    const { assets, actions } = this.props
+    const { assets } = this.props
     const isolatedId = this.getIsolatedId()
     const index = assets.findIndex(asset => asset.id === isolatedId)
     if (index + offset >= 0 && index + offset < assets.length) {
-      actions.isolateAssetId(assets[index + offset].id)
+      const assetId = assets[index + offset].id
+      this.props.history.push(`/asset/${assetId}`)
     }
   }
 
   toggleMetadata = event => {
-    const { user, userSettings } = this.props
-    const lightboxMetadata = {
-      ...this.props.lightboxMetadata,
+    this.updateMetadata({
       show: !this.props.lightboxMetadata.show,
-    }
-    this.props.actions.lightboxMetadata(lightboxMetadata)
-    this.props.actions.saveUserSettings(user, {
-      ...userSettings,
-      lightboxMetadata,
     })
   }
 
   closeMetadata = event => {
-    const { user, userSettings } = this.props
-    const lightboxMetadata = { ...this.props.lightboxMetadata, show: false }
-    this.props.actions.lightboxMetadata(lightboxMetadata)
-    this.props.actions.saveUserSettings(user, {
-      ...userSettings,
-      lightboxMetadata,
+    this.updateMetadata({
+      show: false,
     })
     event.stopPropagation()
   }
 
-  moveMetadata = ({ left, top, width, height }) => {
+  moveMetadata = moveMetadata => {
+    this.updateMetadata(moveMetadata)
+  }
+
+  updateMetadata(lightboxMetadataChange) {
     const { user, userSettings } = this.props
     const lightboxMetadata = {
       ...this.props.lightboxMetadata,
-      left,
-      top,
-      width,
-      height,
+      ...lightboxMetadataChange,
     }
     this.props.actions.lightboxMetadata(lightboxMetadata)
     this.props.actions.saveUserSettings(user, {
       ...userSettings,
       lightboxMetadata,
     })
+  }
+
+  shouldDisplayLightboxMetadata() {
+    const { lightboxMetadata } = this.props
+    const asset = this.getIsolatedAsset()
+    const disabledClipTypes = ['flipbook']
+    const shouldShowMetadata = lightboxMetadata.show
+    const isDisplayableAssetType =
+      asset && !disabledClipTypes.includes(asset.clipType())
+
+    return shouldShowMetadata && isDisplayableAssetType
   }
 
   render() {
@@ -156,7 +178,7 @@ class Lightbox extends Component {
       </div>
     )
 
-    // By using an inspectorKey that's set to an asset ID, we force a re-render
+    // By using a React `key` prop that's set to an asset ID, we force a re-render
     // of the inspector when the asset changes. This is essential to ensure child
     // canvas elements get the correct and latest render output. We also assume
     // that if a parent ID is shared between assets a full re-render isn't needed.
@@ -165,7 +187,7 @@ class Lightbox extends Component {
     return (
       <div className="lightbox dark">
         <Lightbar
-          showMetadata={lightboxMetadata.show}
+          showMetadata={this.shouldDisplayLightboxMetadata()}
           onMetadata={this.toggleMetadata}
         />
         <div className="lightbox-body">
@@ -176,7 +198,7 @@ class Lightbox extends Component {
             onPrev={hasPrev ? () => this.isolateIndexOffset(-1) : null}
           />
         </div>
-        {lightboxMetadata.show && (
+        {this.shouldDisplayLightboxMetadata() && (
           <ResizableWindow
             onClose={this.closeMetadata}
             onMove={this.moveMetadata}
@@ -194,25 +216,3 @@ class Lightbox extends Component {
     )
   }
 }
-
-const ConnectedLightbox = connect(
-  state => ({
-    assets: state.assets.all,
-    lightboxMetadata: state.app.lightboxMetadata,
-    user: state.auth.user,
-    userSettings: state.app.userSettings,
-  }),
-  dispatch => ({
-    actions: bindActionCreators(
-      {
-        isolateAssetId,
-        lightboxMetadata,
-        saveUserSettings,
-        searchAssets,
-      },
-      dispatch,
-    ),
-  }),
-)(Lightbox)
-
-export default withRouter(ConnectedLightbox)

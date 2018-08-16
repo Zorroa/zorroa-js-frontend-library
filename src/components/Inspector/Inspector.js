@@ -3,7 +3,7 @@ import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 
 import Pdf from './Pdf'
-import FlipbookViewer from './FlipbookViewer.js'
+import FlipbookViewer from './ConnectedFlipbookViewer.js'
 import VideoViewer from './VideoViewer'
 import Image from './Image'
 import Asset from '../../models/Asset'
