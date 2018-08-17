@@ -127,6 +127,7 @@
     "react-dom": "15.6.2",
     "react-json-tree": "0.10.9",
     "react-keydown": "1.9.4",
+    "react-mapbox-gl": "0.17.0",
     "react-masonry-component": "6.0.2",
     "react-measure": "1.4.7",
     "react-redux": "4.4.8",

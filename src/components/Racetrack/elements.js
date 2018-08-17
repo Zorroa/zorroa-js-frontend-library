@@ -11,6 +11,7 @@ import Collections from './Collections'
 import SortOrder from './SortOrder'
 import ImportSet from './ImportSet'
 import Multipage from './Multipage'
+import Map from './Map'
 import * as WidgetInfo from './WidgetInfo'
 
 export default {
@@ -25,4 +26,5 @@ export default {
   [WidgetInfo.SortOrderWidgetInfo.type]: <SortOrder />,
   [WidgetInfo.ImportSetWidgetInfo.type]: <ImportSet />,
   [WidgetInfo.MultipageWidgetInfo.type]: <Multipage />,
+  [WidgetInfo.MapWidgetInfo.type]: <Map />,
 }

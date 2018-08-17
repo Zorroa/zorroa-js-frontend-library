@@ -11,6 +11,7 @@ import {
   SortOrderWidgetInfo,
   MultipageWidgetInfo,
   ImportSetWidgetInfo,
+  MapWidgetInfo,
 } from '../components/Racetrack/WidgetInfo'
 import AssetSearch from '../models/AssetSearch'
 import AssetFilter from '../models/AssetFilter'
@@ -358,4 +359,19 @@ export function createMultipageWidget(
     isEnabled,
     isPinned,
   })
+}
+
+export function createMapWidget(field, fieldType, term, isEnabled, isPinned) {
+  const type = MapWidgetInfo.type
+  const aggs = { map: { geohash_grid: { field, precision: 7 } } }
+  let sliver = new AssetSearch({ aggs })
+  if (term && term.length) {
+    const terms = { [field + '.raw']: [term] }
+    const bounds = {
+      [field + '.raw']: { top_left: 'hash', bottom_right: 'hash' },
+    }
+    sliver.filter = new AssetFilter({ terms, geo_bounding_box: bounds })
+    // Add this.bounds and set agg precision
+  }
+  return new Widget({ type, field, sliver, isEnabled, isPinned })
 }

@@ -11,6 +11,7 @@ import {
   createSortOrderWidget,
   createMultipageWidget,
   createImportSetWidget,
+  createMapWidget,
 } from '../../models/Widget'
 
 // Pick colors from the style guide
@@ -144,4 +145,15 @@ export const MultipageWidgetInfo = {
   create: createMultipageWidget,
   fieldTypes: [],
   color: '#579760',
+}
+
+export const MapWidgetInfo = {
+  type: 'MAP',
+  icon: 'icon-location',
+  title: 'Map',
+  description:
+    'Map GPS locations on a map and select to search for matching fields',
+  create: createMapWidget,
+  fieldTypes: ['point'],
+  color: '#744E19',
 }

@@ -1,5 +1,5 @@
 /* eslint-env jest */
-
+jest.mock('../Racetrack/Map')
 import React from 'react'
 import { shallow, configure } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-15'
