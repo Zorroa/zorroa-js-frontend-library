@@ -88,7 +88,7 @@ export default class Multipage extends Component {
       sortByPage,
       filterMultipage,
       widget.isEnabled,
-      widget.isPrototypeOf(),
+      widget.isPinned,
     )
     w.id = id
     this.props.actions.modifyRacetrackWidget(w)
