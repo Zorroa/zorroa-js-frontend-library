@@ -75,25 +75,35 @@ export function fetchTheme() {
       type: LOAD_THEME,
     })
 
-    api
-      .blob(APP_NAME)
-      .get({
-        feature: BLOB_FEATURE_NAME_THEME,
-        name: WHITE_LABEL_NAME,
+    const blobConfig = api.blob(APP_NAME).get({
+      feature: BLOB_FEATURE_NAME_THEME,
+      name: WHITE_LABEL_NAME,
+    })
+    const curatorConfig = api
+      .whitelabel()
+      .get()
+      .catch(() => {
+        // If there's no config, ignore the error and carry on
+        return Promise.resolve({})
       })
-      .then(
-        response => {
-          dispatch({
-            type: LOAD_THEME_SUCCESS,
-            payload: response,
-          })
-        },
-        errorResponse => {
-          dispatch({
-            type: LOAD_THEME_ERROR,
-            payload: errorResponse,
-          })
-        },
-      )
+
+    Promise.all([blobConfig, curatorConfig]).then(
+      ([blobResponse, curatorConfig]) => {
+        const theme = {
+          ...curatorConfig,
+          ...blobResponse,
+        }
+        dispatch({
+          type: LOAD_THEME_SUCCESS,
+          payload: theme,
+        })
+      },
+      errorResponse => {
+        dispatch({
+          type: LOAD_THEME_ERROR,
+          payload: errorResponse,
+        })
+      },
+    )
   }
 }
