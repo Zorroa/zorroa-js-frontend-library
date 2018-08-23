@@ -75,10 +75,17 @@ export function fetchTheme() {
       type: LOAD_THEME,
     })
 
-    const blobConfig = api.blob(APP_NAME).get({
-      feature: BLOB_FEATURE_NAME_THEME,
-      name: WHITE_LABEL_NAME,
-    })
+    const blobConfig = api
+      .blob(APP_NAME)
+      .get({
+        feature: BLOB_FEATURE_NAME_THEME,
+        name: WHITE_LABEL_NAME,
+      })
+      .catch(() => {
+        // If there's no config, ignore the error and carry on
+        return Promise.resolve({})
+      })
+
     const curatorConfig = api
       .whitelabel()
       .get()
