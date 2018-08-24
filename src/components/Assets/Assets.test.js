@@ -179,6 +179,244 @@ describe('<Assets />', () => {
     })
   })
 
+  describe('When assets are selected', () => {
+    describe('Without shift or cmd', () => {
+      it('Should select one asset', () => {
+        const props = generateRequiredProps({
+          assets: [
+            new Asset({ id: 'a' }),
+            new Asset({ id: 'b' }),
+            new Asset({ id: 'c' }),
+          ],
+        })
+        const component = shallow(<Assets {...props} />)
+        const asset = component.instance().props.assets[0]
+        const event = {}
+        component.instance().select(asset, event)
+        expect(props.actions.selectAssetIds.mock.calls[0][0]).toEqual(
+          new Set('a'),
+        )
+      })
+    })
+
+    describe('With shift', () => {
+      const shiftSelect = { shiftKey: true }
+      describe('When no other assets are selected', () => {
+        it('Should select one asset', () => {
+          const props = generateRequiredProps({
+            assets: [new Asset({ id: 'a' })],
+          })
+          const component = shallow(<Assets {...props} />)
+          const asset = component.instance().props.assets[0]
+          component.instance().select(asset, shiftSelect)
+          expect(props.actions.selectAssetIds.mock.calls[0][0]).toEqual(
+            new Set(['a']),
+          )
+        })
+      })
+      describe('When another asset is selected', () => {
+        it(`Should select all assets between selected
+            assets (inclusive) in ascending order`, () => {
+          const props = generateRequiredProps({
+            assets: [
+              new Asset({ id: 'a' }),
+              new Asset({ id: 'b' }),
+              new Asset({ id: 'c' }),
+            ],
+            selectedIds: new Set(['a']),
+          })
+          const component = shallow(<Assets {...props} />)
+          const asset = component.instance().props.assets[2]
+          component.instance().setState({ selectAnchor: 'a' })
+          component.instance().select(asset, shiftSelect)
+          expect(props.actions.selectAssetIds.mock.calls[0][0]).toEqual(
+            new Set(['a', 'b', 'c']),
+          )
+        })
+        it(`Should select all assets between selected
+            assets (inclusive) in descending order`, () => {
+          const props = generateRequiredProps({
+            assets: [
+              new Asset({ id: 'a' }),
+              new Asset({ id: 'b' }),
+              new Asset({ id: 'c' }),
+            ],
+            selectedIds: new Set(['c']),
+          })
+          const component = shallow(<Assets {...props} />)
+          const asset = component.instance().props.assets[0]
+          component.instance().setState({ selectAnchor: 'c' })
+          component.instance().select(asset, shiftSelect)
+          expect(props.actions.selectAssetIds.mock.calls[0][0]).toEqual(
+            new Set(['a', 'b', 'c']),
+          )
+        })
+      })
+    })
+    describe('With cmd', () => {
+      const cmdSelect = { metaKey: true }
+      describe('Select single asset', () => {
+        it('Should select one asset', () => {
+          const props = generateRequiredProps({
+            assets: [
+              new Asset({ id: 'a' }),
+              new Asset({ id: 'b' }),
+              new Asset({ id: 'c' }),
+            ],
+          })
+          const component = shallow(<Assets {...props} />)
+          const asset = component.instance().props.assets[0]
+          component.instance().select(asset, cmdSelect)
+          expect(props.actions.selectAssetIds.mock.calls[0][0]).toEqual(
+            new Set(['a']),
+          )
+        })
+      })
+      describe('Select multiple, non-consecutive assets', () => {
+        it('Should batch select all assets', () => {
+          const props = generateRequiredProps({
+            assets: [
+              new Asset({ id: 'a' }),
+              new Asset({ id: 'b' }),
+              new Asset({ id: 'c' }),
+            ],
+            selectedIds: new Set(['a']),
+          })
+          const component = shallow(<Assets {...props} />)
+          const asset = component.instance().props.assets[2]
+          component.instance().select(asset, cmdSelect)
+          expect(props.actions.selectAssetIds.mock.calls[0][0]).toEqual(
+            new Set(['a', 'c']),
+          )
+        })
+      })
+      describe('Cmd selecting an asset that is batch selected', () => {
+        it('Should deselect asset, keep other assets selected', () => {
+          const props = generateRequiredProps({
+            assets: [
+              new Asset({ id: 'a' }),
+              new Asset({ id: 'b' }),
+              new Asset({ id: 'c' }),
+            ],
+            selectedIds: new Set(['a', 'b', 'c']),
+          })
+          const component = shallow(<Assets {...props} />)
+          const asset = component.instance().props.assets[1]
+          component.instance().select(asset, cmdSelect)
+          expect(props.actions.selectAssetIds.mock.calls[0][0]).toEqual(
+            new Set(['a', 'c']),
+          )
+        })
+      })
+      describe('Shift and cmd select used together', () => {
+        const shiftSelect = { shiftKey: true }
+        const props = generateRequiredProps({
+          assets: [
+            new Asset({ id: 'a' }),
+            new Asset({ id: 'b' }),
+            new Asset({ id: 'c' }),
+            new Asset({ id: 'd' }),
+            new Asset({ id: 'e' }),
+            new Asset({ id: 'f' }),
+          ],
+          selectedIds: new Set(['b', 'c']),
+        })
+        const component = shallow(<Assets {...props} />)
+        describe('Cmd select new asset', () => {
+          it(`Sets asset as the new anchor and
+              adds other selected assets to reserves`, () => {
+            const asset = component.instance().props.assets[4]
+            component.instance().select(asset, cmdSelect)
+            expect(component.instance().state.selectAnchor).toEqual('e')
+            expect(component.instance().state.reserves).toEqual(
+              new Set(['b', 'c']),
+            )
+            expect(props.actions.selectAssetIds.mock.calls[0][0]).toEqual(
+              new Set(['b', 'c', 'e']),
+            )
+          })
+        })
+        describe('Shift select new asset', () => {
+          const props = generateRequiredProps({
+            assets: [
+              new Asset({ id: 'a' }),
+              new Asset({ id: 'b' }),
+              new Asset({ id: 'c' }),
+              new Asset({ id: 'd' }),
+              new Asset({ id: 'e' }),
+              new Asset({ id: 'f' }),
+            ],
+            selectedIds: new Set(['b', 'c', 'e']),
+          })
+          const component = shallow(<Assets {...props} />)
+          component
+            .instance()
+            .setState({ selectAnchor: 'e', reserves: new Set(['b', 'c']) })
+          it(`Should call selectAssetIds()
+              with new batch of assets plus reserves`, () => {
+            const asset = component.instance().props.assets[5]
+            component.instance().select(asset, shiftSelect)
+            expect(props.actions.selectAssetIds.mock.calls[0][0]).toEqual(
+              new Set(['b', 'c', 'e', 'f']),
+            )
+          })
+        })
+        describe(`Shift select asset with index less than
+                  lowest index of reserve assets`, () => {
+          const props = generateRequiredProps({
+            assets: [
+              new Asset({ id: 'a' }),
+              new Asset({ id: 'b' }),
+              new Asset({ id: 'c' }),
+              new Asset({ id: 'd' }),
+              new Asset({ id: 'e' }),
+              new Asset({ id: 'f' }),
+            ],
+            selectedIds: new Set(['b', 'c', 'e', 'f']),
+          })
+          const component = shallow(<Assets {...props} />)
+          component
+            .instance()
+            .setState({ selectAnchor: 'e', reserves: new Set(['b', 'c']) })
+          it(`Should set reserves to empty Set() and call
+              selectAssetIds() with all assets between
+              selected asset and anchor asset (inclusive)`, () => {
+            const asset = component.instance().props.assets[0]
+            component.instance().select(asset, shiftSelect)
+            expect(component.instance().state.reserves).toEqual(new Set())
+            expect(props.actions.selectAssetIds.mock.calls[0][0]).toEqual(
+              new Set(['a', 'b', 'c', 'd', 'e']),
+            )
+          })
+        })
+        describe(`Shift select asset with index greater
+                  than index of anchor asset`, () => {
+          const props = generateRequiredProps({
+            assets: [
+              new Asset({ id: 'a' }),
+              new Asset({ id: 'b' }),
+              new Asset({ id: 'c' }),
+              new Asset({ id: 'd' }),
+              new Asset({ id: 'e' }),
+              new Asset({ id: 'f' }),
+            ],
+            selectedIds: new Set(['a', 'b', 'c', 'd', 'e']),
+          })
+          const component = shallow(<Assets {...props} />)
+          component.instance().setState({ selectAnchor: 'e' })
+          it(`Should call selectAssetIds() with
+              anchor asset and selected asset`, () => {
+            const asset = component.instance().props.assets[5]
+            component.instance().select(asset, shiftSelect)
+            expect(props.actions.selectAssetIds.mock.calls[0][0]).toEqual(
+              new Set(['e', 'f']),
+            )
+          })
+        })
+      })
+    })
+  })
+
   describe('hasPinnedWidget()', () => {
     describe('When the UX level is non-advanced', () => {
       it('Should be false', () => {

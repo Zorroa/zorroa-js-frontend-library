@@ -83,7 +83,9 @@ export default class Assets extends Component {
     // than passing in global app state, which would also force the
     // otherwise simple sub-components to be Redux containers.
     this.state = {
-      lastSelectedId: null,
+      selectAnchor: null,
+      reserves: new Set(),
+      selectedIndexes: null,
       assetsScrollTop: 0,
       assetsScrollHeight: 0,
       assetsScrollWidth: 0,
@@ -156,54 +158,78 @@ export default class Assets extends Component {
   // in local state and must update it when the search changes.
   select = (asset, event) => {
     const { assets, selectedIds, actions } = this.props
-    const { lastSelectedId } = this.state
+    const { selectAnchor, reserves } = this.state
+    let newIndexes
     let ids
     if (event.shiftKey) {
       // Use the local state anchor point to extend the selected set.
-      // Empty selectedIds implies new search -> ignore lastSelectedId
-      if (lastSelectedId && selectedIds && selectedIds.size) {
-        const lastSelectedIndex = assets.findIndex(a => a.id === lastSelectedId)
-        if (lastSelectedIndex >= 0) {
-          const index = assets.findIndex(a => a.id === asset.id)
-          if (index >= 0) {
-            ids = new Set()
-            const min = Math.min(index, lastSelectedIndex)
-            const max = Math.max(index, lastSelectedIndex)
-            for (var i = min; i <= max; ++i) {
-              ids.add(assets[i].id)
-            }
-          }
+      // Empty selectedIds implies new search -> ignore selectAnchor
+      if (selectAnchor && selectedIds && selectedIds.size) {
+        const lastSelectedIndex = assets.findIndex(a => a.id === selectAnchor)
+        const index = assets.findIndex(a => a.id === asset.id)
+        const min = Math.min(index, lastSelectedIndex)
+        const max = Math.max(index, lastSelectedIndex)
+        // Assets previously selected and not deselected by ctrl/cmd + select
+        const reserveIndexes = new Set()
+        if (reserves) {
+          reserves.forEach(r =>
+            reserveIndexes.add(assets.findIndex(a => a.id === r)),
+          )
         }
+        newIndexes = new Set([...reserveIndexes])
+        for (var i = min; i <= max; ++i) {
+          newIndexes.add(i)
+        }
+        ids = new Set()
+        newIndexes.forEach(i => {
+          ids.add(assets[i].id)
+        })
+        // Remove ids from reserves if selected by shift + select
+        reserveIndexes.forEach(rI => {
+          if (rI >= min && rI <= max) {
+            reserves.delete(assets[rI].id)
+          }
+        })
+        this.setState({ reserves })
       }
       if (!ids) {
         // Nothing in the extended selection set, treat as new selection
         ids = new Set([asset.id])
-        this.setState({ lastSelectedId: asset.id })
+        this.setState({ selectAnchor: asset.id })
       }
-    } else if (event.metaKey) {
-      // Toggle the current asset on or off
-      ids = new Set([...selectedIds])
-      const siblings = new Set([asset.id])
-      siblings.forEach(id => {
-        if (ids.has(id)) {
-          ids.delete(id)
+    } else if (event.ctrlKey || event.metaKey) {
+      // Toggle the ctrl (Windows) or cmd (macOS) + selected asset on or off
+      const toggled = asset.id
+      if (!selectedIds) {
+        ids = new Set([toggled])
+      } else {
+        ids = new Set([...selectedIds])
+        if (ids.has(toggled)) {
+          ids.delete(toggled)
         } else {
-          ids.add(id)
+          ids.add(toggled)
         }
-      })
-      const lastSelectedId = ids.length ? asset.id : null
-      this.setState({ lastSelectedId })
+      }
+      this.setState({ selectAnchor: toggled, reserves: selectedIds })
     } else {
       ids = new Set([asset.id])
       if (selectedIds && equalSets(ids, selectedIds)) {
         // single click of a single selected asset should deselect
         ids = new Set()
-        this.setState({ lastSelectedId: null })
+        this.setState({ selectAnchor: null })
       } else {
         // Select the single asset and use it as the anchor point
-        this.setState({ lastSelectedId: asset.id })
+        this.setState({ selectAnchor: asset.id, reserves: new Set([asset.id]) })
       }
     }
+
+    const newSelectedIndexes = new Set()
+    ids.forEach(id => {
+      let index = assets.findIndex(a => a.id === id)
+      newSelectedIndexes.add(index)
+    })
+    this.setState({ selectedIndexes: newSelectedIndexes })
+
     actions.selectAssetIds(ids)
   }
 
