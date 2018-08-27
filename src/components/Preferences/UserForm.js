@@ -232,16 +232,15 @@ class UserForm extends Component {
                 vertical
                 label="Permissions"
                 className="UserForm__form-element">
-                {this.isForeignUser() === false &&
-                  this.getUnassignedPermissions().length > 0 && (
-                    <FormSelect
-                      options={this.getUnassignedPermissions()}
-                      onChange={this.onPermissionSelected}
-                      fieldKey="id"
-                      fieldLabel="fullName"
-                      deafultLabel="Add Permissions"
-                    />
-                  )}
+                {this.getUnassignedPermissions().length > 0 && (
+                  <FormSelect
+                    options={this.getUnassignedPermissions()}
+                    onChange={this.onPermissionSelected}
+                    fieldKey="id"
+                    fieldLabel="fullName"
+                    deafultLabel="Add Permissions"
+                  />
+                )}
                 {Array.isArray(user.permissions) &&
                   user.permissions.length > 0 && (
                     <ListEditor
@@ -249,9 +248,7 @@ class UserForm extends Component {
                       items={user.permissions}
                       labelField="fullName"
                       keyField="id"
-                      disabled={
-                        this.isForeignUser() || this.isEditingOwnAccount()
-                      }
+                      disabled={this.isEditingOwnAccount()}
                     />
                   )}
               </FormLabel>
