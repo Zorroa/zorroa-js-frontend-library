@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'zorroa-icons';
-  src:  url('fonts/zorroa-icons.eot?efyxyj');
-  src:  url('fonts/zorroa-icons.eot?efyxyj#iefix') format('embedded-opentype'),
-    url('fonts/zorroa-icons.woff2?efyxyj') format('woff2'),
-    url('fonts/zorroa-icons.ttf?efyxyj') format('truetype'),
-    url('fonts/zorroa-icons.woff?efyxyj') format('woff'),
-    url('fonts/zorroa-icons.svg?efyxyj#zorroa-icons') format('svg');
+  src:  url('fonts/zorroa-icons.eot?6kgmom');
+  src:  url('fonts/zorroa-icons.eot?6kgmom#iefix') format('embedded-opentype'),
+    url('fonts/zorroa-icons.woff2?6kgmom') format('woff2'),
+    url('fonts/zorroa-icons.ttf?6kgmom') format('truetype'),
+    url('fonts/zorroa-icons.woff?6kgmom') format('woff'),
+    url('fonts/zorroa-icons.svg?6kgmom#zorroa-icons') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -46,6 +46,9 @@
 .icon-sync:before {
   content: "\e627";
 }
+.icon-switch_camera:before {
+  content: "\e41e";
+}
 .icon-add_circle:before {
   content: "\e986";
 }
@@ -72,6 +75,9 @@
 }
 .icon-plus2:before {
   content: "\e928";
+}
+.icon-folder-plus:before {
+  content: "\e9b0";
 }
 .icon-database-download:before {
   content: "\e99e";
