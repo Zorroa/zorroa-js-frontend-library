@@ -11,7 +11,14 @@ import { showModal } from '../../actions/appActions'
 import Widget from './Widget'
 import Check from '../Check'
 import Suggestions from '../Suggestions'
-import { allExts, groupExts } from '../../constants/fileTypes'
+import {
+  allExts,
+  groupExts,
+  FILE_GROUP_IMAGES,
+  FILE_GROUP_VECTORS,
+  FILE_GROUP_VIDEOS,
+  FILE_GROUP_DOCUMENTS,
+} from '../../constants/fileTypes'
 
 const extField = 'source.extension'
 
@@ -130,7 +137,6 @@ class Filetype extends Component {
   }
 
   select = text => {
-    console.log('Select ' + text)
     this.setState({ suggestions: [], suggestion: '' })
     if (text) {
       if (groupExts[text]) {
@@ -153,7 +159,8 @@ class Filetype extends Component {
 
   groupAggCount(group) {
     let count = 0
-    groupExts[group].forEach(ext => {
+    const exts = groupExts[group]
+    exts.forEach(ext => {
       count += this.aggCount(ext)
     })
     return count
@@ -203,6 +210,13 @@ class Filetype extends Component {
   renderGroup(group) {
     const exts = groupExts[group]
     const count = this.groupAggCount(group)
+    const icons = {
+      [FILE_GROUP_VECTORS]: 'icon-vector',
+      [FILE_GROUP_VIDEOS]: 'icon-play2',
+      [FILE_GROUP_IMAGES]: 'icon-picture2',
+      [FILE_GROUP_DOCUMENTS]: 'icon-papers',
+    }
+    const icon = icons[group]
     return (
       <div
         className={classnames('Filetype-group', `Filetype-group-${group}`, {
@@ -214,7 +228,7 @@ class Filetype extends Component {
           onClick={() => this.selectTypes(exts)}
           color={FiletypeWidgetInfo.color}
         />
-        <div className="Filetype-group-icon icon-files" />
+        <div className={classnames('Filetype-group-icon', `${icon}`)} />
         <div className="Filetype-group-label">{group}</div>
         {count ? <div className="Filetype-group-count">{count}</div> : null}
       </div>
@@ -268,7 +282,7 @@ class Filetype extends Component {
     const { exts, suggestions, suggestion } = this.state
     const isSelected = this.state.exts && this.state.exts.length > 0
     const placeholder = isSelected ? '' : 'Search filetypes'
-    const style = { width: isSelected ? '60px' : '140px' }
+    const style = { width: isSelected ? '60px' : '150px' }
     const active = exts && exts.length
     const title = active
       ? isOpen ? FiletypeWidgetInfo.title : undefined

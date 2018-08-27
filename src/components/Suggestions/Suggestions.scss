@@ -19,18 +19,21 @@
   border: none;
   position: absolute;
   padding-left: 4px;
-  padding-right: 20px;
   left: 0;
   width: 100%;
   height: 100%;
   background: transparent;
-  .dark & { color: $zorroa-greyish-brown; }
+  .dark & {
+    color: $zorroa-greyish-brown;
+  }
 }
 
 .Suggestions-typeahead {
   //z-index: -1;
   color: $zorroa-lightgray;
-  .dark & { color: $zorroa-gray; }
+  .dark & {
+    color: $zorroa-gray;
+  }
   font-size: 14px;
   border: none;
   position: absolute;
@@ -40,7 +43,6 @@
   width: 100%;
   background: transparent;
 }
-
 
 // Clear text button
 .Suggestions-clear {
@@ -68,7 +70,10 @@
 
   background-clip: padding-box;
   background-color: rgba(255, 255, 255, 0.85);
-  .dark & { background-color: rgba(0,0,0, 0.75); border: 1px solid $zorroa-dimgray; }
+  .dark & {
+    background-color: rgba(0, 0, 0, 0.75);
+    border: 1px solid $zorroa-dimgray;
+  }
   border-radius: 3px;
   border: 1px solid $zorroa-lightgray;
   list-style-type: none;
@@ -90,10 +95,16 @@
   color: $zorroa-darkgray;
   line-height: 1.8;
 
-  .dark & { color: $zorroa-whitegray; }
+  .dark & {
+    color: $zorroa-whitegray;
+  }
 
-  &:not(.selected):hover { color: $zorroa-sickly-green; }
-  &.selected { background-color: rgba(192, 192, 192, 0.5); }
+  &:not(.selected):hover {
+    color: $zorroa-sickly-green;
+  }
+  &.selected {
+    background-color: rgba(192, 192, 192, 0.5);
+  }
 }
 
 .Suggestions-instructions {
@@ -116,7 +127,10 @@
   font-size: 12px;
   margin-left: 4px;
 
-  .Suggestions.clear & { display: none; }
+  .Suggestions.clear & {
+    display: none;
+    // padding-right: $zorroa-metric-base;
+  }
 }
 
 .Suggestions-search-button-body {
@@ -128,7 +142,15 @@
   background-color: $zorroa-darkgray;
   padding-left: 8px;
   padding-right: 8px;
-  &:hover { color: $zorroa-gray; }
+  &:hover {
+    color: $zorroa-gray;
+  }
 
-  .Suggestions.clear & { padding: 0; color: $zorroa-gray; background-color: transparent; }
+  .Suggestions.clear & {
+    padding: 0;
+    padding-right: $zorroa-metric-base;
+    padding-top: $zorroa-metric-base / 5;
+    color: $zorroa-gray;
+    background-color: transparent;
+  }
 }

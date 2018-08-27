@@ -107,7 +107,8 @@ export default function(state = initialState, action) {
         FILE_GROUP_VIDEOS,
         FILE_GROUP_DOCUMENTS,
       ].reduce((accumulatorGroupCounts, groupKey) => {
-        accumulatorGroupCounts[groupKey] = groupExts[groupKey].reduce(
+        const exts = groupExts[groupKey].exts
+        accumulatorGroupCounts[groupKey] = exts.reduce(
           (accumulator, extension) => {
             const extensionDocumentCount =
               action.payload.documentCounts.extension[extension]

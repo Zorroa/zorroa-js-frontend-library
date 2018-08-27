@@ -8,6 +8,10 @@
 .Widget-body {
   filter: grayscale(100%) opacity(50%);
   min-width: 100%;
+  background-color: $zorroa-color-white;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+
   .dark & {
     color: $zorroa-whitegray;
     background-color: $zorroa-color-black;
@@ -28,12 +32,11 @@
     position: absolute;
     top: 100%;
     right: 0;
-    box-shadow: 0 20px 30px 0 $zorroa-darkgray;
-    border-bottom-right-radius: 3px;
-    border-bottom-left-radius: 3px;
-    border-top-left-radius: 3px;
+    box-shadow: 0 10px 30px 0 $zorroa-color-black;
 
-    .dark & { box-shadow: 0 20px 30px 0 black; }
+    .dark & {
+      box-shadow: 0 20px 30px 0 black;
+    }
   }
 }
 
