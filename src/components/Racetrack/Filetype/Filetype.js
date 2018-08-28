@@ -1,16 +1,12 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
 import classnames from 'classnames'
 
-import { createFiletypeWidget } from '../../models/Widget'
-import { FiletypeWidgetInfo } from './WidgetInfo'
-import { modifyRacetrackWidget } from '../../actions/racetrackAction'
-import { showModal } from '../../actions/appActions'
-import Widget from './Widget'
-import Check from '../Check'
-import Suggestions from '../Suggestions'
+import { createFiletypeWidget } from '../../../models/Widget'
+import { FiletypeWidgetInfo } from '../WidgetInfo'
+import Widget from '../Widget'
+import Check from '../../Check'
+import Suggestions from '../../Suggestions'
 import {
   allExts,
   groupExts,
@@ -18,7 +14,7 @@ import {
   FILE_GROUP_VECTORS,
   FILE_GROUP_VIDEOS,
   FILE_GROUP_DOCUMENTS,
-} from '../../constants/fileTypes'
+} from '../../../constants/fileTypes'
 
 const extField = 'source.extension'
 
@@ -207,9 +203,7 @@ class Filetype extends Component {
     ))
   }
 
-  renderGroup(group) {
-    const exts = groupExts[group]
-    const count = this.groupAggCount(group)
+  getClassNamesForFileIcons(group) {
     const icons = {
       [FILE_GROUP_VECTORS]: 'icon-vector',
       [FILE_GROUP_VIDEOS]: 'icon-play2',
@@ -217,6 +211,13 @@ class Filetype extends Component {
       [FILE_GROUP_DOCUMENTS]: 'icon-papers',
     }
     const icon = icons[group]
+    return icon
+  }
+
+  renderGroup(group) {
+    const exts = groupExts[group]
+    const count = this.groupAggCount(group)
+    const icon = this.getClassNamesForFileIcons(group)
     return (
       <div
         className={classnames('Filetype-group', `Filetype-group-${group}`, {
@@ -332,18 +333,4 @@ class Filetype extends Component {
   }
 }
 
-export default connect(
-  state => ({
-    aggs: state.assets && state.assets.aggs,
-    widgets: state.racetrack && state.racetrack.widgets,
-  }),
-  dispatch => ({
-    actions: bindActionCreators(
-      {
-        modifyRacetrackWidget,
-        showModal,
-      },
-      dispatch,
-    ),
-  }),
-)(Filetype)
+export default Filetype
