@@ -2,7 +2,6 @@ const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const HandlebarsPlugin = require('handlebars-webpack-plugin')
 const paths = require('./paths.js')
-const childProcess = require('child_process')
 
 function BuildFinishedOutputPlugin() {
   this.apply = function(compiler) {
@@ -14,24 +13,12 @@ function BuildFinishedOutputPlugin() {
 }
 
 module.exports = function getPlugins(env) {
-  const date = new Date()
-  const zvVersion = JSON.stringify(require('../package.json').version)
-    .replace(/"/g, '')
-    .trim()
-  const zvCommit = childProcess
-    .execSync('git rev-parse --short HEAD')
-    .toString()
-    .trim()
-  const zvBranch = childProcess
-    .execSync('git rev-parse --abbrev-ref HEAD')
-    .toString()
-    .trim()
-  const zvCount = childProcess
-    .execSync('git rev-list HEAD --count')
-    .toString()
-    .trim()
-  const zvDateMs = date.valueOf().toString()
-  const zvDateStr = date.toISOString()
+  const zvVersion = 'q'
+  const zvCommit = 'q'
+  const zvBranch = 'q'
+  const zvCount = 'q'
+  const zvDateMs = 'q'
+  const zvDateStr = 'q'
 
   let plugins = [
     new BuildFinishedOutputPlugin({}),

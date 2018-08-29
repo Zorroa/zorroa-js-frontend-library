@@ -9,14 +9,16 @@
 
 ## Dependency assumptions
 
-1.  You will be required to use [Node 8](https://nodejs.org/en/) for this app.
+1. To run the app you'll need to have [Docker](https://www.docker.com/).
+1. You will be required to use [Node 8](https://nodejs.org/en/) for this app.
     You can also use [Node Version Manager](https://github.com/creationix/nvm)
     which will make your life a lot easier. After installing NVM you can run a
     command such as `nvm use 8`.
 
-## Install the app and its dependencies using your terminal
-
-Clone the repo from Github
+## Starting the App
+1. Run `npm run build-docker` (This only needs to be run the first time, or when
+   the code has changed).
+1. Run `npm run start:docker`
 
 ### Project Dependencies
 
@@ -44,12 +46,6 @@ Example class names could look like:
 .ImageThumb__fan-stack--disabled {
   // Stuff
 }
-```
-
-## Starting the App
-
-```
-$ npm start
 ```
 
 ## Dev mode
