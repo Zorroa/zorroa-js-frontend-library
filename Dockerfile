@@ -4,7 +4,7 @@ COPY package*.json ./
 RUN npm install
 COPY ./ ./
 RUN cat ./server/app.js
-RUN npm run build
+RUN npm run build-docker
 EXPOSE 8081
 EXPOSE 8443
 RUN git rev-parse --short HEAD

@@ -44,7 +44,7 @@ module.exports = function getPlugins(env) {
         ROOT_URL: JSON.stringify('http://localhost:3090'),
       },
       DEBUG: env === 'DEV',
-      PROD: env === 'PROD',
+      PROD: env === 'PROD' || env === 'DOCKER',
       PRODLOCAL: env === 'PRODLOCAL',
       zvCommit: `"${zvCommit}"`,
       zvBranch: `"${zvBranch}"`,
