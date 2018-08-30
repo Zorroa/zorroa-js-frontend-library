@@ -30,11 +30,21 @@ class Logo extends PureComponent {
     return LIGHT_LOGO
   }
 
+  recursiveDecode(string) {
+    const decodedString = decodeURIComponent(string)
+    if (decodedString === string) {
+      return decodedString
+    }
+    return this.recursiveDecode(decodedString)
+  }
+
   generateLogoSrc() {
     const { dark } = this.props
     const isDark = dark === true
     const logo = isDark ? this.getDarkLogo() : this.getLightLogo()
-    return `data:image/svg+xml;utf8,${encodeURIComponent(logo)}`
+    return `data:image/svg+xml;utf8,${encodeURIComponent(
+      this.recursiveDecode(logo),
+    )}`
   }
 
   render() {

@@ -1,6 +1,6 @@
 /* eslint-env jest */
 import React from 'react'
-import { mount, configure } from 'enzyme'
+import { shallow, mount, configure } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-15'
 import Logo from './Logo'
 
@@ -19,17 +19,50 @@ describe('<Logo />', () => {
     expect(logo.length).toBeTruthy()
   })
 
-  describe('generateLogoSrc()', () => {
-    const component = mount(
-      <Logo
-        dark={false}
-        whiteLabelEnabled={true}
-        darkLogo="<svg></svg>"
-        lightLogo="<svg></svg>"
-      />,
-    )
+  describe('recursiveDecode()', () => {
+    it('should decode encoded logo', () => {
+      const component = shallow(
+        <Logo
+          dark={false}
+          whiteLabelEnabled={true}
+          darkLogo="%3Csvg%3E%3C%2Fsvg%3E"
+        />,
+      )
+      const logo = component.instance().props.darkLogo
+      expect(component.instance().recursiveDecode(logo)).toEqual('<svg></svg>')
+    })
+  })
 
-    const logo = component.instance().generateLogoSrc()
-    expect(logo).toBe('data:image/svg+xml;utf8,%3Csvg%3E%3C%2Fsvg%3E')
+  describe('generateLogoSrc()', () => {
+    describe('decoded logo', () => {
+      it('Should render', () => {
+        const component = mount(
+          <Logo
+            dark={false}
+            whiteLabelEnabled={true}
+            darkLogo="<svg></svg>"
+            lightLogo="<svg></svg>"
+          />,
+        )
+
+        const logo = component.instance().generateLogoSrc()
+        expect(logo).toBe('data:image/svg+xml;utf8,%3Csvg%3E%3C%2Fsvg%3E')
+      })
+    })
+    describe('encoded logo', () => {
+      it('should render', () => {
+        const component = mount(
+          <Logo
+            dark={false}
+            whiteLabelEnabled={true}
+            darkLogo="%3Csvg%3E%3C%2Fsvg%3E"
+            lightLogo="%3Csvg%3E%3C%2Fsvg%3E"
+          />,
+        )
+
+        const logo = component.instance().generateLogoSrc()
+        expect(logo).toBe('data:image/svg+xml;utf8,%3Csvg%3E%3C%2Fsvg%3E')
+      })
+    })
   })
 })
