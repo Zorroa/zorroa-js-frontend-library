@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
+
 import { Link } from 'react-router-dom'
 import classnames from 'classnames'
 
@@ -18,31 +17,19 @@ import Feedback from '../../components/Feedback'
 import Developer from '../../components/Developer'
 import Settings from '../../components/Settings'
 import AssetCounter from './AssetCounter'
-import {
-  showModal,
-  hideModal,
-  dialogAlertPromise,
-  showPreferencesModal,
-} from '../../actions/appActions'
+
 import {
   TUTORIAL_URL,
   FAQ_URL,
   RELEASE_URL,
 } from '../../constants/themeDefaults'
-import { saveUserSettings } from '../../actions/authAction'
-import { archivistInfo } from '../../actions/archivistAction'
-import {
-  selectAssetIds,
-  findSimilarFields,
-  assetsForIds,
-} from '../../actions/assetsAction'
-import { resetRacetrackWidgets } from '../../actions/racetrackAction'
+
 import { equalSets } from '../../services/jsUtil'
-import detectLoginSource from '../../services/detectLoginSource'
 import { createSimilarityWidget } from '../../models/Widget'
 import fieldNamespaceToName from '../../services/fieldNamespaceToName'
+import { assetsForIds } from '../../actions/assetsAction'
 
-class Header extends Component {
+export default class Header extends Component {
   static propTypes = {
     sync: PropTypes.bool.isRequired,
     user: PropTypes.instanceOf(User).isRequired,
@@ -339,6 +326,35 @@ class Header extends Component {
     window.location = this.props.signoutUrl
   }
 
+  getAssetsString(selectedIds) {
+    const selectedCount = selectedIds ? selectedIds.size : 0
+    const pluralizable = selectedCount === 1 ? 'asset' : 'assets'
+    return `${selectedCount.toLocaleString()} ${pluralizable}`
+  }
+
+  showSelectedAssets() {
+    const { selectedIds } = this.props
+    const nAssetsSelected = selectedIds ? selectedIds.size : 0
+    const disabledSelected = !selectedIds || !selectedIds.size
+
+    return (
+      <div
+        className={classnames('Editbar-selected', {
+          disabled: disabledSelected,
+        })}>
+        {nAssetsSelected ? `${this.getAssetsString(selectedIds)} selected` : ''}
+        {nAssetsSelected ? (
+          <div
+            onClick={this.deselectAll}
+            className={classnames('Editbar-cancel', 'icon-cancel-circle', {
+              disabledSelected,
+            })}
+          />
+        ) : null}
+      </div>
+    )
+  }
+
   render() {
     const {
       sync,
@@ -347,19 +363,14 @@ class Header extends Component {
       isAdministrator,
       totalCount,
       loadedCount,
-      selectedIds,
       monochrome,
     } = this.props
-
     const loader = require('./loader-rolling.svg')
     const syncer = sync ? (
       <div className="Header-loading sync" />
     ) : (
       <img className="Header-loading" src={loader} />
     )
-
-    const nAssetsSelected = selectedIds ? selectedIds.size : 0
-    const disabledSelected = !selectedIds || !selectedIds.size
 
     return (
       <nav className="header flexOff flexCenter fullWidth">
@@ -374,20 +385,7 @@ class Header extends Component {
             loaded={loadedCount || 0}
           />
         </div>
-        <div
-          className={classnames('Editbar-selected', {
-            disabled: disabledSelected,
-          })}>
-          {nAssetsSelected ? `${nAssetsSelected} assets selected` : ''}
-          {nAssetsSelected ? (
-            <div
-              onClick={this.deselectAll}
-              className={classnames('Editbar-cancel', 'icon-cancel-circle', {
-                disabledSelected,
-              })}
-            />
-          ) : null}
-        </div>
+        {this.showSelectedAssets()}
         <div className="flexOn" />
         {this.renderSimilar()}
         <div className="header-menu-bar fullHeight flexCenter">
@@ -472,49 +470,3 @@ class Header extends Component {
     )
   }
 }
-
-export default connect(
-  state => {
-    const isSaml = detectLoginSource(state.auth.source) === 'saml'
-    let signoutUrl = isSaml ? '/saml/logout?local=true' : '/signout'
-
-    return {
-      sync: state.auth.sync,
-      user: state.auth.user,
-      isDeveloper: state.auth.isDeveloper,
-      isAdministrator: state.auth.isAdministrator,
-      monochrome: state.app.monochrome,
-      assets: state.assets.all,
-      selectedIds: state.assets.selectedIds,
-      totalCount: state.assets.totalCount,
-      loadedCount: state.assets.loadedCount,
-      assetFields: state.assets.fields,
-      similarFields: state.assets.similarFields,
-      similarMinScore: state.racetrack.similarMinScore,
-      userSettings: state.app.userSettings,
-      widgets: state.racetrack.widgets,
-      archivistInfo: state.archivist.info,
-      tutorialUrl: state.theme.tutorialUrl,
-      releaseNotesUrl: state.theme.releaseNotesUrl,
-      faqUrl: state.theme.faqUrl,
-      supportUrl: state.theme.supportUrl,
-      signoutUrl,
-    }
-  },
-  dispatch => ({
-    actions: bindActionCreators(
-      {
-        archivistInfo,
-        showModal,
-        hideModal,
-        selectAssetIds,
-        saveUserSettings,
-        dialogAlertPromise,
-        findSimilarFields,
-        resetRacetrackWidgets,
-        showPreferencesModal,
-      },
-      dispatch,
-    ),
-  }),
-)(Header)
