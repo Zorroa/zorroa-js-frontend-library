@@ -13,7 +13,7 @@
   @include flexJustifySpaceBetween;
   @include flexAlignItemsCenter;
   min-height: 30px;
-  background: rgba(0, 0, 0, .8);
+  background: rgba(0, 0, 0, 0.8);
   cursor: move;
   color: #fff;
 }
@@ -38,7 +38,9 @@
 .ResizeableWindow-handle {
   position: absolute;
   border-radius: 3px;
-  &:hover { background-color: rgba(128, 128, 128, 0.75); }
+  &:hover {
+    background-color: rgba(128, 128, 128, 0.75);
+  }
 }
 
 $handle-dim: 7px;

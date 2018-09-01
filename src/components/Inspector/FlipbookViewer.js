@@ -206,7 +206,8 @@ export default class FlipbookViewer extends PureComponent {
             onMove={this.moveMetadata}
             preventOutOfBounds
             {...this.props.lightboxMetadata}
-            title={metadataTitle}>
+            title={metadataTitle}
+            classes="FlipbookViewer__metadata-container">
             <Metadata
               assetIds={new Set([playingFrame.id])}
               dark={true}

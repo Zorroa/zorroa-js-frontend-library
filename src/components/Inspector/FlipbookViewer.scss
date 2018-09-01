@@ -11,14 +11,6 @@ $film-strip-grabber-height: $zorroa-metric-base * 3;
   @include fullHeight;
   @include flexOn;
 
-  &__media {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
-    flex-shrink: 1000;
-  }
-
   &__loading-status {
     height: 100%;
     width: 100%;
@@ -30,6 +22,18 @@ $film-strip-grabber-height: $zorroa-metric-base * 3;
     position: absolute;
     top: 0;
     left: 0;
+  }
+
+  &__media {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    flex-shrink: 1000;
+  }
+
+  &__metadata-container {
+    z-index: 3;
   }
 
   &__pan-zoom {

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
+import classnames from 'classnames'
 
 import Resizer from '../../services/Resizer'
 
@@ -17,6 +18,7 @@ export default class ResizableWindow extends Component {
     height: PropTypes.number,
     children: PropTypes.node,
     preventOutOfBounds: PropTypes.bool,
+    classes: PropTypes.string,
   }
 
   static defaultProps = {
@@ -44,7 +46,6 @@ export default class ResizableWindow extends Component {
     this.resizer.release()
     window.removeEventListener('resize', this.onResize)
   }
-
   onResize = () => {
     this.forceUpdate()
   }
@@ -97,7 +98,7 @@ export default class ResizableWindow extends Component {
   }
 
   render() {
-    const { title, children, onClose, preventOutOfBounds } = this.props
+    const { title, children, onClose, preventOutOfBounds, classes } = this.props
     let { top, left, width, height } = this.state
     let style = { ...this.state }
 
@@ -116,7 +117,7 @@ export default class ResizableWindow extends Component {
     }
 
     return (
-      <div className="ResizableWindow" style={style}>
+      <div className={classnames('ResizableWindow', classes)} style={style}>
         <div
           onMouseDown={() =>
             this.resizer.capture(this.moveHeader, this.release, left, top)
