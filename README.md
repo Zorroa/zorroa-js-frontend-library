@@ -121,6 +121,14 @@ relevant places.
 More information on deploy processes can be found on the wiki at
 https://wiki.zorroa.com/display/TECH/SDLC+Explained
 
+### SSL in Production
+
+The docker container can be configured to automatically pull SSL certificate files from 
+a GCS bucket. To set this up create a bucket and upload a key.pem and cert.pem file to the bucket.
+When running the container set the GCLOUD_SSL_BUCKET env var. This env var should be the name of the 
+bucket, optionally it can be the complete path to a folder within a bucket. Examples are "my-ssl-certs-bucket" 
+or "my-configs-bucket/ssl-certs".
+
 ## Development Tools
 
 Our project will run in most standard JavaScript editors, including Atom and
