@@ -7,14 +7,10 @@ const fs = require('fs')
 const express = require('express')
 const proxy = require('http-proxy-middleware')
 
-const privateKey = fs.readFileSync('key.pem', 'utf8')
-const certificate = fs.readFileSync('cert.pem', 'utf8')
-var credentials = { key: privateKey, cert: certificate }
-
 const app = express()
 
 const PORT = process.env.CURATOR_PORT || 8081
-const PORT_SECURE = process.env.CURATOR_PORT_SECURE || 8443
+const PORT_SECURE = process.env.CURATOR_PORT_SECURE
 const ARCHIVIST_API_URL =
   process.env.ARCHIVIST_API_URL || 'http://localhost:8080'
 const WHITELABEL_CONFIGURATION = process.env.WHITELABEL_CONFIGURATION || '{}'
@@ -27,14 +23,16 @@ const archivistProxy = proxy({
 })
 
 // Redirect insecure requests first
-app.use((req, res, next) => {
-  if (req.secure) {
-    return next()
-  }
+if (PORT_SECURE) {
+  app.use((req, res, next) => {
+    if (req.secure) {
+      return next()
+    }
 
-  const redirectUrl = `https://${req.hostname}/`
-  res.redirect(301, redirectUrl)
-})
+    const redirectUrl = `https://${req.hostname}/`
+    res.redirect(301, redirectUrl)
+  })
+}
 
 // Serve static files such as CSS and JS
 app.use(express.static('bin'))
@@ -52,10 +50,16 @@ app.get('*', (req, res) => {
 })
 
 const httpServer = http.createServer(app)
-const httpsServer = https.createServer(credentials, app)
-
 httpServer.listen(PORT)
-httpsServer.listen(PORT_SECURE)
+
+if (PORT_SECURE) {
+  const privateKey = fs.readFileSync('key.pem', 'utf8')
+  const certificate = fs.readFileSync('cert.pem', 'utf8')
+  var credentials = { key: privateKey, cert: certificate }
+  const httpsServer = https.createServer(credentials, app)
+  httpsServer.listen(PORT_SECURE)
+}
+
 const appRunning = `App running\n`
 const url = `Host: http://${os.hostname().toLowerCase()}:${PORT}\n`
 const seureURL = `Host: https://${os.hostname().toLowerCase()}:${PORT_SECURE}\n`
