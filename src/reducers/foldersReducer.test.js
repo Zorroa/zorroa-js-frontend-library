@@ -63,7 +63,7 @@ describe('foldersReducer', () => {
     expect(
       foldersReducer(beforeState, {
         type: GET_FOLDER_CHILDREN,
-        payload: { parentId: Folder.ROOT_ID, children: [child1, child2] },
+        payload: { parentId: Folder.getRootId(), children: [child1, child2] },
       }),
     ).toEqual(afterState)
   })

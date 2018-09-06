@@ -4,8 +4,6 @@ import AssetSearch from './AssetSearch'
 import Permission from './Permission'
 
 export default class Folder {
-  static ROOT_ID = '00000000-0000-0000-0000-000000000000'
-
   static Filters = {
     browsing: folder => {
       return folder.isDyhi()
@@ -16,6 +14,14 @@ export default class Folder {
     simple: folder => {
       return !folder.isDyhi() && !folder.search
     },
+  }
+
+  static getRootId() {
+    if (window && window.ZORROA_ROOT_FOLDER_ID) {
+      return window.ZORROA_ROOT_FOLDER_ID
+    }
+
+    return '00000000-0000-0000-0000-000000000000'
   }
 
   constructor(json) {
@@ -134,9 +140,10 @@ export default class Folder {
 }
 
 // is the parent ancestor of child? Requires on state.folders.all
-export function isAncestor(parentId, childId, folders) {
+function isAncestor(parentId, childId, folders) {
   if (!parentId || !childId) return false
-  if (parentId === Folder.ROOT_ID || childId === Folder.ROOT_ID) return false
+  if (parentId === Folder.getRootId() || childId === Folder.getRootId())
+    return false
   if (parentId === childId) return true
-  return isAncestor(parentId, folders.get(childId).parentId, folders)
+  return isAncestor(parentId, (folders.get(childId) || {}).parentId, folders)
 }

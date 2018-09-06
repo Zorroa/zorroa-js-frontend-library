@@ -10,6 +10,7 @@ import Workspace from '../Workspace'
 import Lightbox from '../Lightbox'
 import FolderRedirect from '../FolderRedirect'
 import RequireAuth from '../RequireAuth'
+import api from '../../api'
 
 import {
   EMBEDMODE_ITEM,
@@ -66,11 +67,16 @@ export default class App extends Component {
 
   componentDidMount() {
     this.props.actions.fetchTheme()
+    this.createRootFolderId()
   }
 
   componentWillReceiveProps(nextProps) {
     if (this.shouldRefetchTheme(this.props, nextProps)) {
       this.props.actions.fetchTheme()
+    }
+
+    if (this.shouldRecreateRootFolderId(this.props, nextProps)) {
+      this.createRootFolderId()
     }
   }
 
@@ -80,6 +86,19 @@ export default class App extends Component {
     const isAuthenticated = nextProps.authenticated
     const isThemeUnavailable = nextProps.themeLoadState !== 'succeeded'
     return wasUnauthenticated && isAuthenticated && isThemeUnavailable
+  }
+
+  shouldRecreateRootFolderId(prevProps, nextProps) {
+    const wasUnauthenticated =
+      prevProps.authenticated === undefined || prevProps.authenticated === false
+    const isAuthenticated = nextProps.authenticated
+    return wasUnauthenticated && isAuthenticated
+  }
+
+  createRootFolderId() {
+    api.folders.getRootFolder().then(folder => {
+      window.ZORROA_ROOT_FOLDER_ID = folder.id
+    })
   }
 
   isLoading() {

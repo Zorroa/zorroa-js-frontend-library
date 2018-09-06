@@ -16,6 +16,7 @@ import {
   DELETE_TAXONOMY,
   UPDATE_FOLDER_PERMISSIONS,
   GET_FOLDER_BY_ID,
+  CREATE_ROOT_FOLDER,
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import {
@@ -71,25 +72,41 @@ export function getFolderById(folderId) {
 // Queue a load of the children for folder <parentId>
 // pass optOnDoneFn optionally to receive a callback when the request is returned
 // the request will be passed the list of children loaded
-export function getFolderChildren(parentId, optOnDoneFn) {
+export function getFolderChildren(parentId, shouldPreloadRoot) {
   if (parentId < Folder.ROOT_ID) {
     // Catch "fake" folders, if used
     return () => {
       return Promise.resolve()
     }
   }
+
+  const rootPromise = shouldPreloadRoot
+    ? api.folders.getRootFolder()
+    : Promise.resolve()
+
   return dispatch => {
     console.log('Load folder ' + parentId)
-    return archivistGet(dispatch, `${rootEndpoint}/${parentId}/_children`).then(
-      response => {
-        const children = response.data.map(folder => new Folder(folder))
-        if (optOnDoneFn) optOnDoneFn(children)
-        return dispatch({
-          type: GET_FOLDER_CHILDREN,
-          payload: { parentId, children },
+    rootPromise
+      .then(folder => {
+        if (folder) {
+          return dispatch({
+            type: CREATE_ROOT_FOLDER,
+            payload: folder,
+          })
+        }
+      })
+      .then(() => {
+        return archivistGet(
+          dispatch,
+          `${rootEndpoint}/${parentId}/_children`,
+        ).then(response => {
+          const children = response.data.map(folder => new Folder(folder))
+          return dispatch({
+            type: GET_FOLDER_CHILDREN,
+            payload: { parentId, children },
+          })
         })
-      },
-    )
+      })
   }
 }
 

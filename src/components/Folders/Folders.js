@@ -202,10 +202,14 @@ class Folders extends Component {
 
   componentWillMount() {
     const all = this.props.folders.all
-    const { rootId } = this.props
-    const rootFolder = all.get(rootId === undefined ? Folder.ROOT_ID : rootId)
-    if (!rootFolder.childIds || !rootFolder.childIds.size) {
-      this.loadChildren(rootFolder)
+    const rootId = this.getRootId()
+    const rootFolder = all.get(rootId)
+    if (!rootFolder || !rootFolder.childIds || !rootFolder.childIds.size) {
+      this.loadChildren(
+        new Folder({
+          id: rootId,
+        }),
+      )
     }
     this.componentWillReceiveProps(this.props)
   }
@@ -213,7 +217,7 @@ class Folders extends Component {
   componentWillReceiveProps(nextProps) {
     // Force load the User folder's children so we can find the home folder
     const all = nextProps.folders.all
-    const rootFolder = all.get(Folder.ROOT_ID)
+    const rootFolder = all.get(Folder.getRootId())
     if (rootFolder && rootFolder.childIds) {
       const rootChildIds = [...rootFolder.childIds]
       const index = rootChildIds.findIndex(id => all.get(id).name === 'Users')
@@ -227,7 +231,7 @@ class Folders extends Component {
     if (this.state.rootId === undefined && nextProps.rootName) {
       // Find the folder in the root node that matches the requested prop root name
       const all = nextProps.folders.all
-      const rootFolder = all.get(Folder.ROOT_ID)
+      const rootFolder = all.get(Folder.getRootId())
       if (rootFolder && rootFolder.childIds) {
         const rootChildIds = [...rootFolder.childIds]
         const index = rootChildIds.findIndex(
@@ -241,7 +245,7 @@ class Folders extends Component {
     ) {
       this.setState({ rootId: nextProps.rootId })
     } else if (this.state.rootId === undefined) {
-      this.setState({ rootId: Folder.ROOT_ID })
+      this.setState({ rootId: Folder.getRootId() })
     }
 
     // Recompute counts if the folder count setting has changed
@@ -260,8 +264,18 @@ class Folders extends Component {
   }
 
   loadChildren(folder) {
+    const shouldPreloadRoot = this.hasRootFolder() === false
     folder.childIds = new Set() // Warning: modifying app state to avoid multiple loads
-    this.props.actions.getFolderChildren(folder.id)
+    this.props.actions.getFolderChildren(folder.id, shouldPreloadRoot)
+  }
+
+  hasRootFolder() {
+    return this.props.folders.all.get(this.getRootId()) !== undefined
+  }
+
+  getRootId() {
+    const rootId = this.props.rootId
+    return rootId === undefined ? Folder.getRootId() : rootId
   }
 
   isOpen = folderId =>
@@ -520,7 +534,7 @@ class Folders extends Component {
 
   depth(folder) {
     const { folders } = this.props
-    if (folder.id === this.state.rootId) return 0
+    if (folder === undefined || folder.id === this.state.rootId) return 0
     const parent = folders.all.get(folder.parentId)
     return this.depth(parent) + 1
   }

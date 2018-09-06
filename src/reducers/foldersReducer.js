@@ -23,6 +23,7 @@ import {
   CREATE_TAXONOMY,
   DELETE_TAXONOMY,
   UPDATE_FOLDER_PERMISSIONS,
+  CREATE_ROOT_FOLDER,
 } from '../constants/actionTypes'
 import Folder from '../models/Folder'
 import * as assert from 'assert'
@@ -34,17 +35,17 @@ import * as assert from 'assert'
 export var createInitialState = () => ({
   // Folder model data from the server
   all: new Map([
-    [Folder.ROOT_ID, new Folder({ id: Folder.ROOT_ID, name: 'Root' })],
+    [Folder.getRootId(), new Folder({ id: Folder.getRootId(), name: 'Root' })],
   ]),
 
   // Total counts of folders for the full repository
-  counts: new Map([[Folder.ROOT_ID, 0]]),
+  counts: new Map([[Folder.getRootId(), 0]]),
 
   // Filtered counts of folders for the current search
   filteredCounts: new Map(),
 
   // a set of folder ids. items in the set are "open", meaning visible & un-collapsed in the UI
-  openFolderIds: new Set([Folder.ROOT_ID]),
+  openFolderIds: new Set([Folder.getRootId()]),
 
   // a set of folder ids, indicating which folders are user-selected
   selectedFolderIds: new Set(),
@@ -67,7 +68,6 @@ export default function(state = initialState, action) {
   switch (action.type) {
     case TOGGLE_FOLDER:
       const { folderId, isOpen } = action.payload
-      assert.ok(folderId >= Folder.ROOT_ID)
       let openFolderIds = new Set(state.openFolderIds)
       openFolderIds[isOpen ? 'add' : 'delete'](folderId)
       return { ...state, openFolderIds }
@@ -89,15 +89,12 @@ export default function(state = initialState, action) {
           all.set(newChild.id, newChild)
         })
 
-        // Update parent's childIds list
-        if (parentId >= Folder.ROOT_ID) {
-          const parent = all.get(parentId)
-          assert.ok(parent instanceof Folder)
-          let newParent = new Folder(parent)
-          // Add children
-          newParent.childIds = new Set(children.map(child => child.id))
-          all.set(newParent.id, newParent)
-        }
+        const parent = all.get(parentId)
+        assert.ok(parent instanceof Folder)
+        let newParent = new Folder(parent)
+        // Add children
+        newParent.childIds = new Set(children.map(child => child.id))
+        all.set(newParent.id, newParent)
 
         return { ...state, all }
       }
@@ -389,13 +386,18 @@ export default function(state = initialState, action) {
 
     case UNAUTH_USER:
       return initialState
+
+    case CREATE_ROOT_FOLDER: {
+      const folder = new Folder(action.payload)
+      return { ...state, all: new Map([[folder.id, folder]]) }
+    }
   }
 
   return state
 }
 
 function _addAncestorIds(folder, set, folders) {
-  if (!folder || folder.id === Folder.ROOT_ID) return
+  if (!folder || folder.id === Folder.getRootId()) return
   set.add(folder.id)
   const parent = folders.get(folder.parentId)
   _addAncestorIds(parent, set, folders)
