@@ -16,7 +16,7 @@
     command such as `nvm use 8`.
 
 ## Starting the App
-1. Run `npm run build-docker` (This only needs to be run the first time, or when
+1. Run `npm run deploy` (This only needs to be run the first time, or when
    the code has changed).
 1. Run `npm run start:docker`
 
