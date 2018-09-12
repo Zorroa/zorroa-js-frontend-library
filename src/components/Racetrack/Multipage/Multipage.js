@@ -1,10 +1,14 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
+import classnames from 'classnames'
 
+import { PubSub } from '../../../services/jsUtil'
 import Widget from '../Widget'
 import FlipbookWidgetFrameRateChanger from './FlipbookWidgetFrameRateChanger'
 import Asset from '../../../models/Asset'
 import Toggle from '../../Toggle'
+import Scrubber from '../../Scrubber'
+import { Flipbook as FlipbookIcon } from '../../Icons'
 import { createMultipageWidget } from '../../../models/Widget'
 import FlipbookPlayer from '../../Flipbook/FlipbookImage/index.js'
 
@@ -26,6 +30,29 @@ export default class Multipage extends Component {
   state = {
     sortByPage: false,
     filterMultipage: 'exists',
+    isPlaying: false,
+  }
+
+  constructor(props) {
+    super(props)
+
+    this.shuttler = new PubSub()
+    this.status = new PubSub()
+  }
+
+  componentDidMount() {
+    this.status.on('playing', this.setPlaying)
+  }
+
+  componentWillUnmount() {
+    this.status.off()
+    this.shuttler.off()
+  }
+
+  setPlaying = isPlaying => {
+    this.setState({
+      isPlaying,
+    })
   }
 
   title() {
@@ -94,6 +121,13 @@ export default class Multipage extends Component {
     this.props.actions.modifyRacetrackWidget(w)
   }
 
+  getStartStopClasses() {
+    return classnames('Multipage-player-start-or-stop', {
+      'Multipage-player-start-or-stop--playing': this.state.isPlaying,
+      'Multipage-player-start-or-stop--stopped': this.state.isPlaying === false,
+    })
+  }
+
   render() {
     const {
       isolatedParent,
@@ -133,13 +167,33 @@ export default class Multipage extends Component {
           <div className="Multipage-body">
             {this.isFlipbook() && isOpen ? (
               <div className="Multipage-previewer">
-                <FlipbookPlayer
-                  autoPlay
-                  shouldLoop
-                  defaultFrame={isolatedParent}
-                  clipParentId={isolatedParentId}
-                  width={width}
-                />
+                <div className="Multipage-player">
+                  <FlipbookPlayer
+                    autoPlay
+                    shouldLoop={true}
+                    defaultFrame={isolatedParent}
+                    clipParentId={isolatedParentId}
+                    width={width}
+                    shuttler={this.shuttler}
+                    status={this.status}
+                  />
+                  <div className="Multipage-player-controls">
+                    <div className="Multipage-player-badge">
+                      <FlipbookIcon />
+                    </div>
+                    <div className="Multipage-player-badge">
+                      <button
+                        className={this.getStartStopClasses()}
+                        title="Start or stop clip"
+                        onClick={event => {
+                          event.preventDefault()
+                          this.shuttler.publish('startOrStop')
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <Scrubber shuttler={this.shuttler} status={this.status} />
               </div>
             ) : (
               <div className="Multipage-parent" style={style} />

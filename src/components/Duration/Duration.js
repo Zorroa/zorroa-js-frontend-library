@@ -36,7 +36,7 @@ export default class Duration extends PureComponent {
         onClick={this.onClick}
         onDoubleClick={this.onDoubleClick}>
         {isFlipbookDuration && (
-          <div className="Duration__icon" title="Flipbook">
+          <div className="Duration__icon" title="See all Flipbook frames">
             <FlipbookIcon />
           </div>
         )}

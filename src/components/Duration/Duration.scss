@@ -42,7 +42,14 @@ $background: rgba($zorroa-color-white, 0.75);
 
   &__icon {
     height: 25px;
-    cursor: default;
+    cursor: pointer;
+    opacity: .9;
+
+    &:hover {
+      opacity: 1;
+      transform: scale(1.15);
+      transition: 300ms transform ease-in-out;
+    }
   }
 
   &__frame-count {

@@ -174,12 +174,58 @@ describe('<Multipage />', () => {
 
     describe('When the isolated parent is not a flipbook', () => {
       it('Should be greenish', () => {
+        const props = generateProps()
+        const component = shallow(<Multipage {...props} />)
+        const backgroundColor = component.instance().backgroundColor()
+        expect(backgroundColor).toBe('#579760')
+      })
+    })
+  })
+
+  describe('getStartStopClasses()', () => {
+    describe('When `playing` is started', () => {
+      it('Should have the started classes', () => {
+        const props = generateProps()
+        const component = shallow(<Multipage {...props} />)
+        component.instance().status.publish('playing', true)
+        expect(component.instance().getStartStopClasses()).toBe(
+          'Multipage-player-start-or-stop Multipage-player-start-or-stop--playing',
+        )
+      })
+    })
+
+    describe('When `playing` is stopped', () => {
+      it('Should have the stopped classes', () => {
+        const props = generateProps()
+        const component = shallow(<Multipage {...props} />)
+        component.instance().status.publish('playing', false)
+        expect(component.instance().getStartStopClasses()).toBe(
+          'Multipage-player-start-or-stop Multipage-player-start-or-stop--stopped',
+        )
+      })
+    })
+  })
+
+  describe('When a `playing` event is emited', () => {
+    describe('When `playing` is started', () => {
+      it('Should set `isPlaying` state to true', () => {
         const props = generateProps({
           isolatedParent: new Asset(mockVideo),
         })
         const component = shallow(<Multipage {...props} />)
-        const backgroundColor = component.instance().backgroundColor()
-        expect(backgroundColor).toBe('#579760')
+        component.instance().status.publish('playing', true)
+        expect(component.state('isPlaying')).toBe(true)
+      })
+    })
+
+    describe('When `playing` is stopped', () => {
+      it('Should set `isPlaying` state to false', () => {
+        const props = generateProps({
+          isolatedParent: new Asset(mockVideo),
+        })
+        const component = shallow(<Multipage {...props} />)
+        component.instance().status.publish('playing', false)
+        expect(component.state('isPlaying')).toBe(false)
       })
     })
   })

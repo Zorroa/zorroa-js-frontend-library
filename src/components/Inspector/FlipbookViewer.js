@@ -234,6 +234,7 @@ export default class FlipbookViewer extends PureComponent {
                 shuttler={this.shuttler}
                 status={this.status}
                 autoPlay={true}
+                shouldLoop={this.props.shouldLoop}
                 defaultFrame={this.getDefaultFrameFromIsolatedAsset()}
                 clipParentId={this.props.clipParentId}
               />
