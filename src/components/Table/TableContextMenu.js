@@ -148,11 +148,11 @@ export default class TableContextMenu extends Component {
           style={{ top: contextMenuPos.y, left: contextMenuPos.x }}>
           <DropdownMenu>
             <DropdownGroup>
-              {items.map(item => {
+              {items.map((item, index) => {
                 const isDisabled = item.disabled(selectedFieldIndex)
                 const onClickCallback = isDisabled ? undefined : item.fn
                 return (
-                  <DropdownItem onClick={onClickCallback}>
+                  <DropdownItem key={index} onClick={onClickCallback}>
                     <DropdownFontIcon icon={item.icon} />
                     {item.label}
                   </DropdownItem>

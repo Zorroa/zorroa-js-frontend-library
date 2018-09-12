@@ -1,5 +1,3 @@
-jest.mock('../components/Racetrack/Map')
-
 import racetrackReducer from './racetrackReducer'
 import {
   MODIFY_RACETRACK_WIDGET,
@@ -9,6 +7,8 @@ import {
 import { SimpleSearchWidgetInfo } from '../components/Racetrack/WidgetInfo'
 import Widget from '../models/Widget'
 import AssetSearch from '../models/AssetSearch'
+
+jest.mock('../components/Racetrack/Map')
 
 describe('racetrackReducer', () => {
   it('MODIFY_RACETRACK_WIDGET returns modified widget', () => {

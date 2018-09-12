@@ -5,7 +5,7 @@ import ellipsis from '../Header/ellipsis.svg'
 
 const tips = [
   'Your files stay where they are. Zorroa takes a snapshot -- we call them proxies -- of your assets to import. We never touch your original assets.',
-  <div>
+  <div key="paragraph">
     You can check the status of imports or add more cloud services, servers, or
     files from your computer from the Imports menu at the top of the screen. It
     will display <img className="ImportingTip-tip-img" src={ellipsis} /> until

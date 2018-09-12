@@ -2,8 +2,6 @@ import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import classnames from 'classnames'
 import Resizer from '../../services/Resizer'
-import Logo from '../../components/Logo/Logo.js'
-import { LIGHT_LOGO_MINI, DARK_LOGO_MINI } from '../../constants/themeDefaults'
 
 export default class Sidebar extends Component {
   static displayName() {
@@ -68,18 +66,9 @@ export default class Sidebar extends Component {
   }
 
   render() {
-    const {
-      isIconified,
-      children,
-      isRightEdge,
-      whiteLabelEnabled,
-      isDark,
-    } = this.props
+    const { isIconified, children, isRightEdge } = this.props
     const { width } = this.state
     const isOpen = !isIconified
-    const sidebarLogoClass = classnames('Sidebar__logo', {
-      'Sidebar__logo--is-iconified': isIconified,
-    })
     return (
       <div
         style={{ width }}
@@ -94,21 +83,6 @@ export default class Sidebar extends Component {
           onClick={this.toggleIfNotIconified}>
           {children}
         </div>
-        {whiteLabelEnabled && (
-          <div className={sidebarLogoClass}>
-            <Logo
-              whiteLabelEnabled={true}
-              lightLogo={isIconified ? LIGHT_LOGO_MINI : undefined}
-              darkLogo={isIconified ? DARK_LOGO_MINI : undefined}
-              dark={isDark}
-            />
-            {isIconified === false && (
-              <span className="Sidebar__logo-description">
-                Visual Intelligence
-              </span>
-            )}
-          </div>
-        )}
         {isOpen && (
           <div
             onMouseDown={this.resizeStart}

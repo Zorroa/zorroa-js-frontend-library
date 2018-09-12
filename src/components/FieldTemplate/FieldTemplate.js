@@ -18,7 +18,7 @@ function metadataBadge(fieldTemplate, asset, key) {
       field = null
     }
     if (field) return <TableField asset={asset} field={field} />
-    return <div />
+    return <div key={key} />
   })
   // If template syntax changes, see also jsUtil.js:parseVariables
   const text = fieldTemplate.replace(/%{[a-zA-Z0-9.|]*}/g, '%%')

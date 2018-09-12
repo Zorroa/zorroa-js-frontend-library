@@ -38,6 +38,7 @@ export default connect(
       releaseNotesUrl: state.theme.releaseNotesUrl,
       faqUrl: state.theme.faqUrl,
       supportUrl: state.theme.supportUrl,
+      whiteLabelEnabled: state.theme.whiteLabelEnabled,
       signoutUrl,
     }
   },

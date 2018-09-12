@@ -57,13 +57,13 @@ server that uses the files in your working tree.
 The first time you run the dev server you'll need to generate a certificate.
 
 ```
-npm run dev-https-cert
+npm run build:https-cert
 ```
 
 From then on you can start the dev server by running the following.
 
 ```
-npm run dev-https
+npm run start:dev
 ```
 
 Once the build is complete you can access the server at
@@ -78,18 +78,6 @@ Make sure you install all the fonts in the
 [./src/assets/fonts](https://github.com/Zorroa/zorroa-js-curator/tree/master/src/assets/fonts)
 directory. It's not strictly needed for running, but trust us, it'll make your
 life easier.
-
-## Production mode
-
-Production mode is for testing the build. This fires up an Express-based web
-server that serves static assets and routes requests to the correct backend
-(this backend defaults to http://localhost:8066, but may be overridden by
-changing the `ARCHIVIST_API_URL` enviromental variable.
-
-```
-npm run build # create static build in bin/
-npm start     # serve the static content in bin/
-```
 
 ## Testing
 
@@ -111,22 +99,19 @@ Tips for making testing quicker & easier:
 
 ## Deploying the project
 
-This is in flux as the system is migrated to the cloud. One day merging to qa
-and master will trigger deploys to a staging server and production respectively.
-
-For now though files are copy and pasted in to RPM builds. To perform a
-production build run `npm run build`, and copy the `./bin` directory to the
-relevant places.
+Run `npm run deploy` to create a Docker image. The Docker image will contain a
+freshly compiled version of the Curator. The image can then be pushed to any
+server that supports Docker images.
 
 More information on deploy processes can be found on the wiki at
 https://wiki.zorroa.com/display/TECH/SDLC+Explained
 
 ### SSL in Production
 
-The docker container can be configured to automatically pull SSL certificate files from 
+The docker container can be configured to automatically pull SSL certificate files from
 a GCS bucket. To set this up create a bucket and upload a key.pem and cert.pem file to the bucket.
-When running the container set the GCLOUD_SSL_BUCKET env var. This env var should be the name of the 
-bucket, optionally it can be the complete path to a folder within a bucket. Examples are "my-ssl-certs-bucket" 
+When running the container set the GCLOUD_SSL_BUCKET env var. This env var should be the name of the
+bucket, optionally it can be the complete path to a folder within a bucket. Examples are "my-ssl-certs-bucket"
 or "my-configs-bucket/ssl-certs".
 
 ## Development Tools

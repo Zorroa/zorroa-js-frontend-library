@@ -39,6 +39,7 @@ export default class Header extends Component {
     assets: PropTypes.arrayOf(PropTypes.instanceOf(Asset)),
     selectedIds: PropTypes.object,
     totalCount: PropTypes.number,
+    whiteLabelEnabled: PropTypes.bool,
     loadedCount: PropTypes.number,
     assetFields: PropTypes.object,
     similarFields: PropTypes.instanceOf(Set),
@@ -403,16 +404,13 @@ export default class Header extends Component {
                       Tutorials
                     </DropdownItem>
                   </DropdownGroup>
-                  <DropdownGroup>
-                    {this.props.supportUrl && (
+                  {this.props.supportUrl && (
+                    <DropdownGroup>
                       <DropdownItem onClick={this.openSupportUrl}>
                         Support
                       </DropdownItem>
-                    )}
-                    <DropdownItem onClick={this.showFeedback}>
-                      Send Feedback
-                    </DropdownItem>
-                  </DropdownGroup>
+                    </DropdownGroup>
+                  )}
                 </DropdownMenu>
               </div>
             )}

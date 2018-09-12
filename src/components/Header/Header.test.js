@@ -1,5 +1,3 @@
-jest.mock('../../components/Logo')
-jest.mock('../../components/ToggleButton')
 import React from 'react'
 import { render, configure } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-15'
@@ -7,6 +5,8 @@ import { MemoryRouter } from 'react-router-dom'
 
 import Header from './Header'
 import User from '../../models/User'
+jest.mock('../../components/Logo')
+jest.mock('../../components/ToggleButton')
 
 configure({ adapter: new Adapter(), disableLifecycleMethods: false })
 

@@ -1,5 +1,3 @@
-jest.mock('../components/Racetrack/Map')
-
 import {
   modifyRacetrackWidget,
   removeRacetrackWidgetIds,
@@ -13,6 +11,8 @@ import {
 import Widget from '../models/Widget'
 import AssetSearch from '../models/AssetSearch'
 import { SimpleSearchWidgetInfo } from '../components/Racetrack/WidgetInfo'
+
+jest.mock('../components/Racetrack/Map')
 
 describe('racetrackActions', () => {
   it('should modify widget', () => {

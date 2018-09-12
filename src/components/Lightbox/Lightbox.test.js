@@ -1,11 +1,11 @@
 /* eslint-env jest */
-jest.mock('../Racetrack/Map')
 import React from 'react'
 import { shallow, configure } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-15'
 import Lightbox from './Lightbox.js'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
+jest.mock('../Racetrack/Map')
 
 configure({
   adapter: new Adapter(),

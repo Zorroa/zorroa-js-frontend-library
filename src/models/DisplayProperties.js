@@ -2,6 +2,8 @@
 // interface element, typically associated with a processor argument,
 // or to edit asset fields.
 
+import { unCamelCase } from '../services/jsUtil'
+
 export default class DisplayProperties {
   constructor(json) {
     this.name = json.name
@@ -50,8 +52,6 @@ export function displayPropertiesForFields(fields) {
   }
   return displayProperties
 }
-
-import { unCamelCase } from '../services/jsUtil'
 
 // Flatten a hierarchical display property tree into a list of:
 //   { title, field, displayProperties }

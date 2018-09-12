@@ -2,11 +2,6 @@ import axios from 'axios'
 import * as utils from './utils.js'
 import Folder from '../models/Folder.js'
 
-const SPRING_METHOD_NOT_SUPPORTED =
-  'org.springframework.web.HttpRequestMethodNotSupportedException'
-const METHOD_NOT_SUPPORTED = 405
-const NOT_FOUND = 404
-
 export function getById(folderId) {
   const origin = utils.getOrigin()
   const client = axios.create({
@@ -32,19 +27,13 @@ export function getRootFolder() {
       return folder
     },
     errorResponse => {
-      const isApiEndpointAvailabnle =
-        errorResponse.status === METHOD_NOT_SUPPORTED ||
-        errorResponse.status === NOT_FOUND ||
-        errorResponse.data.cause === SPRING_METHOD_NOT_SUPPORTED
-      if (isApiEndpointAvailabnle) {
+      const isApiEndpointAvailable = errorResponse.status < 500
+      if (isApiEndpointAvailable) {
         return new Folder({
           id: Folder.getRootId(),
         })
       }
 
-      console.error(
-        'Encountered unexpected error'.JSON.stringify(errorResponse),
-      )
       return Promise.reject(errorResponse)
     },
   )

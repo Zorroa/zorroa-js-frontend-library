@@ -47,6 +47,11 @@
     "zvVersion": true,
     "emailjs": true
   },
+  "settings": {
+    "react": {
+      "version": "15.0"
+    }
+  },
   "rules": {
     "standard/computed-property-even-spacing": "off",
     "no-unused-vars": [
@@ -57,6 +62,11 @@
         "ignoreRestSiblings": false
       }
     ],
+    "prefer-promise-reject-errors": "warn",
+    "no-use-before-define": "warn",
+    "react/no-unescaped-entities": "warn",
+    "react/no-deprecated": "warn",
+    "react/no-string-refs": "warn",
     "prettier/prettier": "error"
   }
 }

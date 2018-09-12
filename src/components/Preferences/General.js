@@ -78,6 +78,7 @@ class General extends Component {
     lightbarFieldTemplate: PropTypes.string,
     thumbFieldTemplate: PropTypes.string,
     dragFieldTemplate: PropTypes.string,
+    whiteLabelEnabled: PropTypes.bool,
   }
 
   state = {
@@ -224,6 +225,7 @@ class General extends Component {
       uxLevel,
       monochrome,
       userSettings,
+      whiteLabelEnabled,
     } = this.props
     return (
       <div className="General">
@@ -387,16 +389,17 @@ class General extends Component {
                 </tbody>
               </table>
             </div>
-            {info && (
-              <div className="General-archivist">
-                Archivisit Info<JSONTree
-                  data={info}
-                  theme={theme}
-                  invertTheme
-                  hideRoot
-                />
-              </div>
-            )}
+            {info &&
+              whiteLabelEnabled === false && (
+                <div className="General-archivist">
+                  Archivisit Info<JSONTree
+                    data={info}
+                    theme={theme}
+                    invertTheme
+                    hideRoot
+                  />
+                </div>
+              )}
             {health && (
               <div className="General-archivist">
                 Archivisit Health<JSONTree
@@ -439,6 +442,7 @@ export default connect(
     lightbarFieldTemplate: state.app.lightbarFieldTemplate,
     thumbFieldTemplate: state.app.thumbFieldTemplate,
     dragFieldTemplate: state.app.dragFieldTemplate,
+    whiteLabelEnabled: state.theme.whiteLabelEnabled,
   }),
   dispatch => ({
     actions: bindActionCreators(

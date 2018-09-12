@@ -58,7 +58,7 @@ class Jobs extends Component {
     const hasNoJobsForType =
       Object.keys(jobs).some(jobKey => {
         const job = jobs[jobKey]
-        job.type === jobType
+        return job.type === jobType
       }) === false
 
     const containsActiveJob =

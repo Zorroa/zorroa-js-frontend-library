@@ -166,7 +166,7 @@ export default class Asset {
   }
   duration() {
     // seconds in this clip -- a subset of the entire film
-    this.frameRange() / (this.frameRate() || 30)
+    return this.frameRange() / (this.frameRate() || 30)
   }
   isClip() {
     return !!(this.document.media && this.document.media.clip)

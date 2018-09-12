@@ -42,9 +42,7 @@ class Signin extends Component {
       try {
         url = url && new URL(this.props.defaults.origin)
       } catch (e) {
-        console.error('Invalid default URL: ' + this.props.defaults.origin) +
-          ': ' +
-          e
+        console.error('Invalid default URL: ' + this.props.defaults.origin)
       }
       const host = (url && url.host) || ''
       const isLocalhost = host && host.includes('localhost')
@@ -147,12 +145,8 @@ class Signin extends Component {
   }
 
   render() {
-    const { username, password, host, ssl, acceptEULA } = this.state
-    const disabled =
-      !username ||
-      !username.length ||
-      (!PROD && (!host || !host.length)) ||
-      !acceptEULA
+    const { username, password, acceptEULA } = this.state
+    const disabled = !username || !username.length || !acceptEULA
     const { from } = this.props.location.state || { from: { pathname: '/' } }
 
     if (this.props.authenticated) {
@@ -189,30 +183,6 @@ class Signin extends Component {
               />
               <label className="auth-label">Password</label>
             </div>
-            {!PROD && (
-              <div className="auth-host">
-                <div className="auth-field">
-                  <input
-                    className="auth-input flexOn"
-                    type="text"
-                    value={host}
-                    name="host"
-                    onChange={this.changeHost}
-                    onKeyDown={!disabled && this.submit}
-                  />
-                  <label className="auth-label">Archivist</label>
-                </div>
-                <div className="flexRowCenter">
-                  <input
-                    type="checkbox"
-                    checked={ssl}
-                    onChange={this.changeSSL}
-                    name="ssl"
-                  />
-                  <label className="auth-label">SSL</label>
-                </div>
-              </div>
-            )}
             <div className="auth-eula">
               <input
                 type="checkbox"

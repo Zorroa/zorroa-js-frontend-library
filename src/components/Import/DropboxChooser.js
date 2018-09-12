@@ -43,7 +43,6 @@ export default class DropboxChooser extends Component {
         console.log('Error getting Dropbox account: ' + error)
         DropboxAuthenticator.deauthorize()
         this.props.onBack()
-        return
       })
 
     this.setState({ loading: true })
