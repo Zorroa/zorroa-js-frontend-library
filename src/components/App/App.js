@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
 import Signin from '../auth/Signin'
 import Signout from '../auth/Signout'
+import ssoLogout from '../auth/ssoLogout'
 import Onboard from '../auth/Onboard'
 import ResetPassword from '../auth/ResetPassword'
 import ForgotPassword from '../auth/ForgotPassword'
@@ -29,7 +30,9 @@ export default class App extends Component {
       .isRequired,
     actions: PropTypes.shape({
       fetchTheme: PropTypes.func.isRequired,
+      samlOptionsRequest: PropTypes.func.isRequired,
     }).isRequired,
+    samlOptionsStatus: PropTypes.oneOf(['pending', 'success', 'error']),
   }
 
   state = {
@@ -68,6 +71,7 @@ export default class App extends Component {
   componentDidMount() {
     this.props.actions.fetchTheme()
     this.createRootFolderId()
+    this.props.actions.samlOptionsRequest()
   }
 
   componentWillReceiveProps(nextProps) {
@@ -103,6 +107,8 @@ export default class App extends Component {
 
   isLoading() {
     const isLoading =
+      // Check if user is logged in using saml
+      this.props.samlOptionsStatus === 'pending' ||
       // Make sure any custom themes are loaded
       this.props.themeLoadState === 'pending' ||
       // Make sure we know the user's auth'ed state before forwarding them
@@ -132,6 +138,7 @@ export default class App extends Component {
           <RequireAuth path="/folder/:folderId" component={FolderRedirect} />
           <Route path="/signin" component={Signin} />
           <Route path="/signout" component={Signout} />
+          <Route path="/sso/loggedout" component={ssoLogout} />
           <Route path="/forgot" component={ForgotPassword} />
           <Route path="/password" component={ResetPassword} />
           <Route path="/onboard" component={Onboard} />

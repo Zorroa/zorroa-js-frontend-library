@@ -31,6 +31,9 @@ import {
   LIGHTBOX_PANNER,
   TABLE_LAYOUTS,
   SELECT_TABLE_LAYOUT,
+  SAML_OPTIONS_REQUEST,
+  SAML_OPTIONS_REQUEST_SUCCESS,
+  SAML_OPTIONS_REQUEST_ERROR,
 } from '../constants/actionTypes'
 import { USER_ITEM, ORIGIN_ITEM } from '../constants/localStorageItems'
 import User from '../models/User'
@@ -39,6 +42,7 @@ import FieldList from '../models/FieldList'
 import Permission from '../models/Permission'
 import { archivistSetting } from './archivistAction'
 import { defaultTableFields } from '../constants/defaultState'
+import saml from '../api/saml'
 
 // Global variable to hold axios connection
 // FIXME: Should this be state?
@@ -495,5 +499,20 @@ export function listServerImportFiles(path) {
       // Return the payload, for use in promises
       return response.data
     })
+  }
+}
+
+export function samlOptionsRequest() {
+  return dispatch => {
+    dispatch({ type: SAML_OPTIONS_REQUEST, payload: {} })
+    saml
+      .getOptions()
+      .then(response => {
+        dispatch({ type: SAML_OPTIONS_REQUEST_SUCCESS, payload: response })
+      })
+      .catch(error => {
+        console.error('Can not fetch SAML options', JSON.stringify(error))
+        dispatch({ type: SAML_OPTIONS_REQUEST_ERROR, payload: {} })
+      })
   }
 }

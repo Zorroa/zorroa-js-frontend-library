@@ -7,13 +7,14 @@ const RequireAuth = ({
   component: Component,
   location,
   authenticated,
+  samlUrl,
   ...rest
 }) => (
   <Route
     {...rest}
     render={props => {
       const redirectDestination = {
-        pathname: '/signin',
+        pathname: samlUrl ? '/sso/loggedout' : '/signin',
         state: { from: location },
       }
       if (authenticated === true) {
@@ -28,10 +29,12 @@ RequireAuth.propTypes = {
   component: PropTypes.func,
   location: PropTypes.object,
   authenticated: PropTypes.bool,
+  samlUrl: PropTypes.string,
 }
 
-const ConnectedRequireAuth = connect(state => {
-  return { authenticated: state.auth.authenticated }
-})(RequireAuth)
+const ConnectedRequireAuth = connect(state => ({
+  authenticated: state.auth.authenticated,
+  samlUrl: state.auth.samlUrl,
+}))(RequireAuth)
 
 export default withRouter(ConnectedRequireAuth)

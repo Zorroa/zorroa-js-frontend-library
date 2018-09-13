@@ -51,6 +51,7 @@ export default class Header extends Component {
       hideModal: PropTypes.func.isRequired,
       selectAssetIds: PropTypes.func.isRequired,
       saveUserSettings: PropTypes.func.isRequired,
+      hideLogout: PropTypes.func.isRequired,
       dialogAlertPromise: PropTypes.func.isRequired,
       findSimilarFields: PropTypes.func.isRequired,
       resetRacetrackWidgets: PropTypes.func.isRequired,
@@ -63,6 +64,7 @@ export default class Header extends Component {
     releaseNotesUrl: PropTypes.string.isRequired,
     faqUrl: PropTypes.string.isRequired,
     supportUrl: PropTypes.string.isRequired,
+    shouldHideLogout: PropTypes.bool,
   }
 
   state = {
@@ -365,6 +367,7 @@ export default class Header extends Component {
       totalCount,
       loadedCount,
       monochrome,
+      shouldHideLogout,
     } = this.props
     const loader = require('./loader-rolling.svg')
     const syncer = sync ? (
@@ -453,9 +456,11 @@ export default class Header extends Component {
                       )}
                     </DropdownGroup>
                   )}
-                  <DropdownGroup>
-                    <DropdownItem onClick={this.logout}>Logout</DropdownItem>
-                  </DropdownGroup>
+                  {!shouldHideLogout && (
+                    <DropdownGroup>
+                      <DropdownItem onClick={this.logout}>Logout</DropdownItem>
+                    </DropdownGroup>
+                  )}
                 </DropdownMenu>
               </div>
             )}

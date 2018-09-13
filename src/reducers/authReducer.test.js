@@ -7,6 +7,8 @@ import {
   AUTH_ORIGIN,
   AUTH_ERROR,
   AUTH_PERMISSIONS,
+  SAML_OPTIONS_REQUEST_SUCCESS,
+  SAML_OPTIONS_REQUEST_ERROR,
 } from '../constants/actionTypes'
 
 describe('authReducer', () => {
@@ -69,6 +71,47 @@ describe('authReducer', () => {
       isSharer: false,
       isExporter: false,
       isLibrarian: false,
+    })
+  })
+
+  it('SAML_OPTIONS_REQUEST_SUCCESS', () => {
+    expect(
+      authReducer(
+        {},
+        {
+          type: SAML_OPTIONS_REQUEST_SUCCESS,
+          payload: {
+            logout: true,
+            baseUrl: 'https://insight.stage1.ironmountainconnect.com',
+            landing: 'https://insight.stage1.ironmountainconnect.com',
+            discovery: true,
+            proxyBase: true,
+            idps: [
+              '/saml/login?disco=true&idp=https://www.spogs1.ironmountainconnect.com/RMaaS',
+            ],
+          },
+        },
+      ),
+    ).toEqual({
+      samlUrl: 'https://www.spogs1.ironmountainconnect.com/RMaaS',
+      shouldHideLogout: true,
+      samlOptionsStatus: 'success',
+    })
+  })
+
+  it('SAML_OPTIONS_REQUEST_ERROR', () => {
+    expect(
+      authReducer(
+        {},
+        {
+          type: SAML_OPTIONS_REQUEST_ERROR,
+          payload: {},
+        },
+      ),
+    ).toEqual({
+      samlUrl: '',
+      shouldHideLogout: false,
+      samlOptionsStatus: 'error',
     })
   })
 })

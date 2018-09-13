@@ -2,6 +2,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { fetchTheme } from '../../actions/themeAction'
 import App from './App'
+import { samlOptionsRequest } from '../../actions/authAction'
 
 export default connect(
   state => {
@@ -14,6 +15,7 @@ export default connect(
     actions: bindActionCreators(
       {
         fetchTheme,
+        samlOptionsRequest,
       },
       dispatch,
     ),

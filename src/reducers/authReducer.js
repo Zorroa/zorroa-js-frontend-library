@@ -1,3 +1,4 @@
+import urlParse from 'url-parse'
 import {
   AUTH_USER,
   UNAUTH_USER,
@@ -10,6 +11,9 @@ import {
   AUTH_DEFAULTS,
   AUTH_ONBOARDING,
   CLEAR_AUTH_ERROR,
+  SAML_OPTIONS_REQUEST,
+  SAML_OPTIONS_REQUEST_SUCCESS,
+  SAML_OPTIONS_REQUEST_ERROR,
 } from '../constants/actionTypes'
 import User from '../models/User'
 import Permission from '../models/Permission'
@@ -17,6 +21,9 @@ import Permission from '../models/Permission'
 const initialState = {
   sync: true,
   source: 'local',
+  shouldHideLogout: false,
+  samlUrl: '',
+  samlOptionsStatus: 'pending',
 }
 
 export default function(state = initialState, action) {
@@ -84,6 +91,25 @@ export default function(state = initialState, action) {
       return { ...state, onboarding: action.payload }
     case AUTH_HMAC:
       return { ...state, hmacKey: action.payload }
+    case SAML_OPTIONS_REQUEST:
+      return { ...state, samlOptionsStatus: 'pending' }
+    case SAML_OPTIONS_REQUEST_SUCCESS: {
+      const shouldHideLogout = action.payload.logout
+      const samlOptions = urlParse(action.payload.idps[0], true)
+      return {
+        ...state,
+        shouldHideLogout,
+        samlUrl: samlOptions.query.idp,
+        samlOptionsStatus: 'success',
+      }
+    }
+    case SAML_OPTIONS_REQUEST_ERROR:
+      return {
+        ...state,
+        samlUrl: '',
+        shouldHideLogout: false,
+        samlOptionsStatus: 'error',
+      }
   }
 
   return state

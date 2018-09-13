@@ -16,7 +16,7 @@ import Header from './Header'
 export default connect(
   state => {
     const isSaml = detectLoginSource(state.auth.source) === 'saml'
-    let signoutUrl = isSaml ? '/saml/logout?local=true' : '/signout'
+    const signoutUrl = isSaml ? '/saml/logout?local=true' : '/signout'
 
     return {
       sync: state.auth.sync,
@@ -38,6 +38,7 @@ export default connect(
       releaseNotesUrl: state.theme.releaseNotesUrl,
       faqUrl: state.theme.faqUrl,
       supportUrl: state.theme.supportUrl,
+      shouldHideLogout: state.auth.shouldHideLogout,
       whiteLabelEnabled: state.theme.whiteLabelEnabled,
       signoutUrl,
     }
