@@ -21,7 +21,7 @@ import Permission from '../models/Permission'
 const initialState = {
   sync: true,
   source: 'local',
-  shouldHideLogout: false,
+  shouldShowLogout: true,
   samlUrl: '',
   samlOptionsStatus: 'pending',
 }
@@ -94,11 +94,11 @@ export default function(state = initialState, action) {
     case SAML_OPTIONS_REQUEST:
       return { ...state, samlOptionsStatus: 'pending' }
     case SAML_OPTIONS_REQUEST_SUCCESS: {
-      const shouldHideLogout = action.payload.logout
+      const shouldShowLogout = action.payload.logout
       const samlOptions = urlParse(action.payload.idps[0], true)
       return {
         ...state,
-        shouldHideLogout,
+        shouldShowLogout,
         samlUrl: samlOptions.query.idp,
         samlOptionsStatus: 'success',
       }
@@ -107,7 +107,7 @@ export default function(state = initialState, action) {
       return {
         ...state,
         samlUrl: '',
-        shouldHideLogout: false,
+        shouldShowLogout: true,
         samlOptionsStatus: 'error',
       }
   }

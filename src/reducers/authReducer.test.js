@@ -81,7 +81,7 @@ describe('authReducer', () => {
         {
           type: SAML_OPTIONS_REQUEST_SUCCESS,
           payload: {
-            logout: true,
+            logout: false,
             baseUrl: 'https://insight.stage1.ironmountainconnect.com',
             landing: 'https://insight.stage1.ironmountainconnect.com',
             discovery: true,
@@ -94,7 +94,7 @@ describe('authReducer', () => {
       ),
     ).toEqual({
       samlUrl: 'https://www.spogs1.ironmountainconnect.com/RMaaS',
-      shouldHideLogout: true,
+      shouldShowLogout: false,
       samlOptionsStatus: 'success',
     })
   })
@@ -110,7 +110,7 @@ describe('authReducer', () => {
       ),
     ).toEqual({
       samlUrl: '',
-      shouldHideLogout: false,
+      shouldShowLogout: true,
       samlOptionsStatus: 'error',
     })
   })

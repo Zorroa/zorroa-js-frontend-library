@@ -64,7 +64,7 @@ export default class Header extends Component {
     releaseNotesUrl: PropTypes.string.isRequired,
     faqUrl: PropTypes.string.isRequired,
     supportUrl: PropTypes.string.isRequired,
-    shouldHideLogout: PropTypes.bool,
+    shouldShowLogout: PropTypes.bool,
   }
 
   state = {
@@ -367,8 +367,9 @@ export default class Header extends Component {
       totalCount,
       loadedCount,
       monochrome,
-      shouldHideLogout,
+      shouldShowLogout,
     } = this.props
+
     const loader = require('./loader-rolling.svg')
     const syncer = sync ? (
       <div className="Header-loading sync" />
@@ -456,7 +457,7 @@ export default class Header extends Component {
                       )}
                     </DropdownGroup>
                   )}
-                  {!shouldHideLogout && (
+                  {shouldShowLogout && (
                     <DropdownGroup>
                       <DropdownItem onClick={this.logout}>Logout</DropdownItem>
                     </DropdownGroup>
