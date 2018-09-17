@@ -199,9 +199,8 @@ class Workspace extends Component {
   }
 
   checkForStaleVersion = () => {
-    const vurl = DEBUG ? '/bin/version.html' : '/version.html'
     axios
-      .get(vurl)
+      .get('/version.html')
       .then(response => {
         const SerVer = response.data.trim()
         this.setState({ showReloader: SerVer !== zvVersion })

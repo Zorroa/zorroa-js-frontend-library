@@ -3,6 +3,7 @@ const http = require('http')
 const https = require('https')
 const fs = require('fs')
 const webpack = require('webpack')
+const packageJson = require('../package.json')
 const middleware = require('webpack-dev-middleware')
 const webpackConfig = require('../build/webpack.config.js')
 const compiler = webpack(webpackConfig)
@@ -71,6 +72,10 @@ app.get('/favicon.ico', (req, res) => {
   res.setHeader('Content-Length', icon.length)
   res.setHeader('Content-Type', 'image/x-icon')
   res.end(icon)
+})
+
+app.get('/version.html', (req, res) => {
+  res.send(packageJson.version)
 })
 
 // All other routes should be handled by the Curator
