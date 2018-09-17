@@ -46,6 +46,7 @@
   position: absolute;
   cursor: pointer;
   &.isSelected {
+    cursor: move;
     $selected-border-size: 5px;
     &::before {
         border: $selected-border-size solid $zorroa-water-blue;
