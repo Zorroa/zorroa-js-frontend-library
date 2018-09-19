@@ -9,6 +9,14 @@ import {
   unorderAssets,
   isolateParent,
 } from '../../actions/assetsAction'
+import {
+  showTableContextMenu,
+  showThumbContextMenu,
+  showMetaContextMenu,
+  dismissTableContextMenu,
+  dismissThumbContextMenu,
+  dismissMetaContextMenu,
+} from '../../actions/contextMenuActions'
 import { restoreFolders } from '../../actions/racetrackAction'
 import { selectFolderIds } from '../../actions/folderAction'
 import { saveUserSettings } from '../../actions/authAction'
@@ -52,6 +60,11 @@ const ConnectedAssets = connect(
     widgets: state.racetrack.widgets,
     origin: state.auth.origin,
     showQuickview: state.app.showQuickview,
+    isAdministrator: state.auth.isAdministrator,
+    contextMenuPos: state.contextMenu.contextMenuPos,
+    showTableCtxtMenu: state.contextMenu.showTableCtxtMenu,
+    showThumbCtxtMenu: state.contextMenu.showThumbCtxtMenu,
+    showMetaCtxtMenu: state.contextMenu.showMetaCtxtMenu,
   }),
   dispatch => ({
     actions: bindActionCreators(
@@ -73,6 +86,12 @@ const ConnectedAssets = connect(
         iconifyRightSidebar,
         saveUserSettings,
         showQuickview,
+        showTableContextMenu,
+        showThumbContextMenu,
+        showMetaContextMenu,
+        dismissTableContextMenu,
+        dismissThumbContextMenu,
+        dismissMetaContextMenu,
       },
       dispatch,
     ),

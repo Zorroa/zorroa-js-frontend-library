@@ -1,9 +1,5 @@
 import React, { Component } from 'react'
-import DropdownMenu, {
-  DropdownItem,
-  DropdownGroup,
-  DropdownFontIcon,
-} from '../../components/DropdownMenu'
+import ContextMenu from '../../ContextMenu'
 import PropTypes from 'prop-types'
 
 export default class TableContextMenu extends Component {
@@ -21,12 +17,15 @@ export default class TableContextMenu extends Component {
       y: PropTypes.number.isRequired,
     }).isRequired,
     selectedFieldIndex: PropTypes.number.isRequired,
-    onDismiss: PropTypes.func.isRequired,
     updateFieldsFn: PropTypes.func.isRequired,
+    actions: PropTypes.shape({
+      dismissTableContextMenu: PropTypes.func.isRequired,
+    }).isRequired,
   }
 
   moveColumnLeft = () => {
-    const { fields, selectedFieldIndex, updateFieldsFn, onDismiss } = this.props
+    const { fields, selectedFieldIndex, updateFieldsFn } = this.props
+    const { dismissTableContextMenu } = this.props.actions
     const shift = [
       ...fields.slice(0, selectedFieldIndex - 1),
       fields[selectedFieldIndex],
@@ -34,11 +33,12 @@ export default class TableContextMenu extends Component {
       ...fields.slice(selectedFieldIndex + 1),
     ]
     updateFieldsFn(shift.map(field => field.field))
-    onDismiss()
+    dismissTableContextMenu()
   }
 
   moveColumnRight = () => {
-    const { fields, selectedFieldIndex, updateFieldsFn, onDismiss } = this.props
+    const { fields, selectedFieldIndex, updateFieldsFn } = this.props
+    const { dismissTableContextMenu } = this.props.actions
     const shift = [
       ...fields.slice(0, selectedFieldIndex),
       fields[selectedFieldIndex + 1],
@@ -46,56 +46,44 @@ export default class TableContextMenu extends Component {
       ...fields.slice(selectedFieldIndex + 2),
     ]
     updateFieldsFn(shift.map(field => field.field))
-    onDismiss()
+    dismissTableContextMenu()
   }
 
   moveColumnToStart = () => {
-    const { fields, selectedFieldIndex, updateFieldsFn, onDismiss } = this.props
+    const { fields, selectedFieldIndex, updateFieldsFn } = this.props
+    const { dismissTableContextMenu } = this.props.actions
     const shift = [
       fields[selectedFieldIndex],
       ...fields.slice(0, selectedFieldIndex),
       ...fields.slice(selectedFieldIndex + 1),
     ]
     updateFieldsFn(shift.map(field => field.field))
-    onDismiss()
+    dismissTableContextMenu()
   }
 
   moveColumnToEnd = () => {
-    const { fields, selectedFieldIndex, updateFieldsFn, onDismiss } = this.props
+    const { fields, selectedFieldIndex, updateFieldsFn } = this.props
+    const { dismissTableContextMenu } = this.props.actions
     const shift = [
       ...fields.slice(0, selectedFieldIndex),
       ...fields.slice(selectedFieldIndex + 1),
       fields[selectedFieldIndex],
     ]
     updateFieldsFn(shift.map(field => field.field))
-    onDismiss()
+    dismissTableContextMenu()
   }
 
   removeColumn = () => {
-    const { fields, selectedFieldIndex, updateFieldsFn, onDismiss } = this.props
+    const { fields, selectedFieldIndex, updateFieldsFn } = this.props
+    const { dismissTableContextMenu } = this.props.actions
     const shift = [...fields]
     shift.splice(selectedFieldIndex, 1)
     updateFieldsFn(shift.map(field => field.field))
-    onDismiss()
+    dismissTableContextMenu()
   }
 
-  // Keep the context menu from running off the bottom of the screen
-  constrainContextMenu = ctxMenu => {
-    if (!ctxMenu) return
-    const { contextMenuPos } = this.props
-    if (contextMenuPos.y + ctxMenu.clientHeight > window.innerHeight) {
-      this.setState({
-        contextMenuPos: {
-          ...contextMenuPos,
-          y: window.innerHeight - ctxMenu.clientHeight,
-        },
-      })
-    }
-  }
-
-  render() {
+  getMenuItems = () => {
     const { fields } = this.props
-    const { contextMenuPos, selectedFieldIndex, onDismiss } = this.props
     const items = [
       {
         fn: this.moveColumnLeft,
@@ -133,35 +121,22 @@ export default class TableContextMenu extends Component {
         disabled: () => true,
       },
     ]
+
+    return items
+  }
+
+  render() {
+    const { contextMenuPos, selectedFieldIndex } = this.props
+    const { dismissTableContextMenu } = this.props.actions
     return (
-      <div>
-        <div
-          onClick={onDismiss}
-          className="Table-context-background"
-          onContextMenu={onDismiss}
-        />
-        <div
-          className="Table-context-menu"
-          ref={this.constrainContextMenu}
-          onClick={onDismiss}
-          onContextMenu={onDismiss}
-          style={{ top: contextMenuPos.y, left: contextMenuPos.x }}>
-          <DropdownMenu>
-            <DropdownGroup>
-              {items.map((item, index) => {
-                const isDisabled = item.disabled(selectedFieldIndex)
-                const onClickCallback = isDisabled ? undefined : item.fn
-                return (
-                  <DropdownItem key={index} onClick={onClickCallback}>
-                    <DropdownFontIcon icon={item.icon} />
-                    {item.label}
-                  </DropdownItem>
-                )
-              })}
-            </DropdownGroup>
-          </DropdownMenu>
-        </div>
-      </div>
+      <ContextMenu
+        contextMenuPos={contextMenuPos}
+        onDismissFn={dismissTableContextMenu}
+        updateFieldsFn={this.updateFields}
+        selectedAssetIds={this.selectedAssetIds}
+        items={this.getMenuItems()}
+        selectedFieldIndex={selectedFieldIndex}
+      />
     )
   }
 }

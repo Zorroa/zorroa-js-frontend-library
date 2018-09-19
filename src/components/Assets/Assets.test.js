@@ -32,6 +32,8 @@ function generateActions() {
   const iconifyRightSidebar = jest.fn()
   const saveUserSettings = jest.fn()
   const showQuickview = jest.fn()
+  const showThumbContextMenu = jest.fn()
+  const dismissThumbContextMenu = jest.fn()
 
   const actions = {
     isolateAssetId,
@@ -52,6 +54,8 @@ function generateActions() {
     iconifyRightSidebar,
     saveUserSettings,
     showQuickview,
+    showThumbContextMenu,
+    dismissThumbContextMenu,
   }
 
   return actions
@@ -525,6 +529,65 @@ describe('<Assets />', () => {
           .shouldShowMultipageBadges(assetB)
         expect(shouldShowMultipageBadges).toBe(true)
       })
+    })
+  })
+
+  describe('renderThumbContextMenu()', () => {
+    describe('When showThumbCtxtMenu is true', () => {
+      it('Should return a ThumbContextMenu component', () => {
+        const props = generateRequiredProps({
+          contextMenuPos: { x: 0, y: 0 },
+          selectedIds: new Set([1]),
+          showThumbCtxtMenu: true,
+        })
+        const component = shallow(<Assets {...props} />)
+        const ThumbContextMenu = component.instance().renderThumbContextMenu()
+        expect(ThumbContextMenu).toBeTruthy()
+      })
+    })
+    describe('When showThumbCtxtMenu is false', () => {
+      it('Should return null', () => {
+        const props = generateRequiredProps({
+          contextMenuPos: { x: 0, y: 0 },
+          selectedIds: new Set([1]),
+          showThumbCtxtMenu: false,
+        })
+        const component = shallow(<Assets {...props} />)
+        const ThumbContextMenu = component.instance().renderThumbContextMenu()
+        expect(ThumbContextMenu).toBe(null)
+      })
+    })
+  })
+
+  describe('canAccessAdministratorMenu()', () => {
+    it('Should return prop value', () => {
+      const props = generateRequiredProps({
+        isAdministrator: true,
+      })
+      const component = shallow(<Assets {...props} />)
+      const isAdministrator = component.instance().canAccessAdministratorMenu()
+      expect(isAdministrator).toBe(true)
+    })
+  })
+
+  describe('toggleContextMenu()', () => {
+    it('Should invoke select() and showThumbContextMenu()', () => {
+      const props = generateRequiredProps({
+        assets: [
+          new Asset({ id: 1 }),
+          new Asset({ id: 2 }),
+          new Asset({ id: 3 }),
+        ],
+        showThumbCtxtMenu: false,
+        selectedIds: new Set([1]),
+      })
+      const event = { preventDefault: () => {}, pageX: 0, pageY: 0 }
+      const asset = new Asset({ id: 2 })
+      const component = shallow(<Assets {...props} />)
+      component.instance().select = jest.fn()
+      component.instance().toggleContextMenu(event, asset)
+      expect(component.instance().select).toBeCalledWith(asset, event)
+      expect(props.actions.showThumbContextMenu).toBeCalledWith({ x: 0, y: 0 })
     })
   })
 })

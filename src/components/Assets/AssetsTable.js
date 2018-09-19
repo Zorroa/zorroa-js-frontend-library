@@ -26,13 +26,15 @@ import {
   unorderAssets,
   isolateAssetId,
 } from '../../actions/assetsAction'
+import { dismissMetaContextMenu } from '../../actions/contextMenuActions'
 import { saveUserSettings } from '../../actions/authAction'
 import Table from '../Table'
 import AclEntry from '../../models/Acl'
 import FieldList from '../../models/FieldList'
 import TableField from '../Table/TableField'
 import TableSettings from '../Table/TableSettings'
-import TableContextMenu from '../Table/TableContextMenu'
+import TableContextMenu from '../Table/TableContextMenu/index.js'
+import AssetContextMenu from './AssetContextMenu/index.js'
 import {
   defaultTableFields,
   defaultTableFieldWidth,
@@ -59,6 +61,11 @@ class AssetsTable extends Component {
     isSavingSharedTableLayouts: PropTypes.object.isRequired,
     isSavingSharedTableLayoutsError: PropTypes.object.isRequired,
     isSavingSharedTableLayoutsSuccess: PropTypes.object.isRequired,
+    showTableCtxtMenu: PropTypes.bool,
+    showThumbCtxtMenu: PropTypes.bool,
+    showMetaCtxtMenu: PropTypes.bool,
+    contextMenuPos: PropTypes.object,
+    selectedFieldIndex: PropTypes.number,
 
     // input props
     height: PropTypes.number.isRequired,
@@ -80,6 +87,7 @@ class AssetsTable extends Component {
       hideModal: PropTypes.func.isRequired,
       saveUserSettings: PropTypes.func.isRequired,
       shareTableLayout: PropTypes.func.isRequired,
+      dismissMetaContextMenu: PropTypes.func.isRequired,
     }).isRequired,
 
     // router props
@@ -94,9 +102,6 @@ class AssetsTable extends Component {
 
   state = {
     showSettings: false,
-    showContextMenu: false,
-    contextMenuPos: { x: 0, y: 0 },
-    selectedFieldIndex: -1,
   }
 
   setFieldWidth = (field, width) => {
@@ -273,20 +278,6 @@ class AssetsTable extends Component {
     this.props.actions.hideModal()
   }
 
-  showContextMenu = (selectedFieldIndex, event) => {
-    event.preventDefault()
-    this.setState({
-      selectedFieldIndex,
-      showContextMenu: true,
-      contextMenuPos: { x: event.pageX, y: event.pageY },
-    })
-  }
-
-  dismissContextMenu = event => {
-    if (event) event.preventDefault()
-    this.setState({ showContextMenu: false })
-  }
-
   createTagFacet = (term, field, event) => {
     const fieldType = this.props.fieldTypes[field]
     field = field && field.endsWith('.raw') ? field : field + '.raw'
@@ -446,18 +437,39 @@ class AssetsTable extends Component {
     )
   }
 
-  renderContextMenu(fields) {
-    const { contextMenuPos, selectedFieldIndex } = this.state
-    if (!this.state.showContextMenu) return
+  renderTableContextMenu(fields) {
+    const { contextMenuPos, selectedFieldIndex } = this.props
+    if (!this.props.showTableCtxtMenu) {
+      return null
+    }
     return (
       <TableContextMenu
         fields={fields}
         contextMenuPos={contextMenuPos}
         selectedFieldIndex={selectedFieldIndex}
-        onDismiss={this.dismissContextMenu}
         updateFieldsFn={this.updateFields}
       />
     )
+  }
+
+  renderMetaContextMenu() {
+    const { contextMenuPos } = this.props
+    const { dismissMetaContextMenu } = this.props.actions
+    if (!this.props.showMetaCtxtMenu) {
+      return null
+    }
+    return (
+      <AssetContextMenu
+        contextMenuPos={contextMenuPos}
+        onDismiss={dismissMetaContextMenu}
+        selectedIds={this.props.selectedAssetIds}
+      />
+    )
+  }
+
+  canAccessAdministratorMenu() {
+    const { isAdministrator } = this.props
+    return isAdministrator
   }
 
   render() {
@@ -470,7 +482,6 @@ class AssetsTable extends Component {
       selectedTableLayoutId,
       tableIsResizing,
       height,
-      selectFn,
     } = this.props
     const layout =
       tableLayouts && this.getTableLayoutById(selectedTableLayoutId)
@@ -494,8 +505,7 @@ class AssetsTable extends Component {
           height={height}
           tableIsResizing={tableIsResizing}
           onSettings={() => this.setState({ showSettings: true })}
-          onColumnHeaderContextMenu={this.showContextMenu}
-          selectFn={selectFn}
+          selectFn={this.select}
           isolateFn={this.isolateToLightbox}
           autoResizeFieldFn={this.columnAutoResize}
           setFieldWidthFn={this.setFieldWidth}
@@ -503,7 +513,8 @@ class AssetsTable extends Component {
           sortFieldFn={this.sortByField}
           elementFn={this.renderElement}>
           {this.renderSettings(fields, layout)}
-          {this.renderContextMenu(fields)}
+          {this.renderTableContextMenu(fields)}
+          {this.canAccessAdministratorMenu() && this.renderMetaContextMenu()}
         </Table>
       </div>
     )
@@ -532,6 +543,11 @@ const ConnectedAssetsTable = connect(
       state.tableLayouts.isSavingSharedTableLayoutsError,
     isSavingSharedTableLayoutsSuccess:
       state.tableLayouts.isSavingSharedTableLayoutsSuccess,
+    contextMenuPos: state.contextMenu.contextMenuPos,
+    showTableCtxtMenu: state.contextMenu.showTableCtxtMenu,
+    showThumbCtxtMenu: state.contextMenu.showThumbCtxtMenu,
+    showMetaCtxtMenu: state.contextMenu.showMetaCtxtMenu,
+    selectedFieldIndex: state.contextMenu.selectedFieldIndex,
   }),
   dispatch => ({
     actions: bindActionCreators(
@@ -549,6 +565,7 @@ const ConnectedAssetsTable = connect(
         hideModal,
         saveUserSettings,
         shareTableLayout,
+        dismissMetaContextMenu,
       },
       dispatch,
     ),

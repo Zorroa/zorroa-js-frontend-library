@@ -4,6 +4,7 @@ import Measure from 'react-measure'
 import keydown from 'react-keydown'
 
 import Thumb, { page } from '../Thumb'
+import AssetContextMenu from './AssetContextMenu/index.js'
 import User from '../../models/User'
 import Asset from '../../models/Asset'
 import Widget from '../../models/Widget'
@@ -68,11 +69,18 @@ export default class Assets extends Component {
       iconifyRightSidebar: PropTypes.func.isRequired,
       saveUserSettings: PropTypes.func.isRequired,
       showQuickview: PropTypes.func.isRequired,
+      showThumbContextMenu: PropTypes.func.isRequired,
+      dismissThumbContextMenu: PropTypes.func.isRequired,
     }),
     isolatedId: PropTypes.string,
     showQuickview: PropTypes.bool.isRequired,
     history: PropTypes.object,
     location: PropTypes.object,
+    isAdministrator: PropTypes.bool,
+    showTableCtxtMenu: PropTypes.bool,
+    showThumbCtxtMenu: PropTypes.bool,
+    showMetaCtxtMenu: PropTypes.bool,
+    contextMenuPos: PropTypes.object,
   }
 
   constructor(props) {
@@ -585,6 +593,35 @@ export default class Assets extends Component {
     actions.iconifyRightSidebar(!rightSidebarIsIconified)
   }
 
+  renderThumbContextMenu() {
+    const { contextMenuPos, selectedIds } = this.props
+    const { dismissThumbContextMenu } = this.props.actions
+    if (!this.props.showThumbCtxtMenu) {
+      return null
+    }
+    return (
+      <AssetContextMenu
+        contextMenuPos={contextMenuPos}
+        onDismiss={dismissThumbContextMenu}
+        selectedIds={selectedIds}
+      />
+    )
+  }
+
+  canAccessAdministratorMenu() {
+    const { isAdministrator } = this.props
+    return isAdministrator
+  }
+
+  toggleContextMenu(e, asset) {
+    e.preventDefault()
+    const position = { x: e.pageX, y: e.pageY }
+    if (!this.props.selectedIds || !this.props.selectedIds.has(asset.id)) {
+      this.select(asset, e)
+    }
+    this.props.actions.showThumbContextMenu(position)
+  }
+
   renderAssets() {
     const {
       assets,
@@ -599,6 +636,8 @@ export default class Assets extends Component {
       query,
       isolatedParent,
     } = this.props
+
+    const { dismissThumbContextMenu } = this.props.actions
 
     if (!assets || !assets.length) {
       return null
@@ -700,27 +739,37 @@ export default class Assets extends Component {
                         page(assets[index], width, height, origin, indexes),
                       )) || [page(asset, width, height, origin)]
                   return (
-                    <Thumb
-                      isSelected={selectedIds && selectedIds.has(asset.id)}
-                      dim={dim}
-                      parentWidth={this.refs.assetsScroll.clientWidth}
+                    <div
                       key={asset.id}
-                      asset={asset}
-                      assetId={asset.id}
-                      pages={pages}
-                      badgeHeight={badgeHeight}
-                      showMultipageBadges={this.shouldShowMultipageBadges(
-                        asset,
-                      )}
-                      onClick={event => {
-                        // don't scroll assets when we select thumbs. (table selection will scroll)
-                        this.skipNextSelectionScroll = true
-                        this.select(asset, event)
-                      }}
-                      onDoubleClick={() => this.isolateToLightbox(asset)}
-                    />
+                      onContextMenu={e => {
+                        this.toggleContextMenu(e, asset)
+                      }}>
+                      <Thumb
+                        isSelected={selectedIds && selectedIds.has(asset.id)}
+                        dim={dim}
+                        parentWidth={this.refs.assetsScroll.clientWidth}
+                        key={asset.id}
+                        asset={asset}
+                        assetId={asset.id}
+                        pages={pages}
+                        badgeHeight={badgeHeight}
+                        showMultipageBadges={this.shouldShowMultipageBadges(
+                          asset,
+                        )}
+                        onClick={event => {
+                          // don't scroll assets when we select thumbs. (table selection will scroll)
+                          event.preventDefault()
+                          dismissThumbContextMenu()
+                          this.skipNextSelectionScroll = true
+                          this.select(asset, event)
+                        }}
+                        onDoubleClick={() => this.isolateToLightbox(asset)}
+                      />
+                    </div>
                   )
                 })}
+                {this.canAccessAdministratorMenu() &&
+                  this.renderThumbContextMenu()}
                 <Pager
                   total={filteredCount}
                   loaded={loadedCount}
@@ -769,6 +818,7 @@ export default class Assets extends Component {
       assetsCounter,
       rightSidebarIsIconified,
     } = this.props
+
     const { tableIsResizing } = this.state
 
     // Trigger layout if assets change.

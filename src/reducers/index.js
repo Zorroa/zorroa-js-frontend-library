@@ -12,6 +12,7 @@ import users from './usersReducer'
 import exports from './exportsReducer'
 import tableLayouts from './tableLayoutsReducer'
 import theme from './themeReducer'
+import contextMenu from './contextMenuReducer'
 
 export default combineReducers({
   app,
@@ -26,4 +27,5 @@ export default combineReducers({
   exports,
   tableLayouts,
   theme,
+  contextMenu,
 })

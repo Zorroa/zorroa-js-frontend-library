@@ -32,8 +32,13 @@ export default class Table extends Component {
     height: PropTypes.number.isRequired,
     tableIsResizing: PropTypes.bool.isRequired,
     onSettings: PropTypes.func,
-    onColumnHeaderContextMenu: PropTypes.func,
     children: PropTypes.arrayOf(PropTypes.element),
+
+    // connect actions
+    actions: PropTypes.shape({
+      showMetaContextMenu: PropTypes.func.isRequired,
+      showTableContextMenu: PropTypes.func.isRequired,
+    }).isRequired,
 
     // Callbacks
     selectFn: PropTypes.func.isRequired,
@@ -80,12 +85,17 @@ export default class Table extends Component {
     return 26
   }
 
-  onColumnHeaderContextMenu = (fieldIndex, event) => {
-    const onColumnHeaderContextMenu = this.props.onColumnHeaderContextMenu
-
-    if (typeof this.props.onColumnHeaderContextMenu === 'function') {
-      onColumnHeaderContextMenu(fieldIndex, event)
+  toggleMetaContextMenu(e, asset) {
+    e.preventDefault()
+    const position = { x: e.pageX, y: e.pageY }
+    if (
+      !this.props.selectedAssetIds ||
+      !this.props.selectedAssetIds.has(asset.id)
+    ) {
+      this.select(asset, e)
     }
+
+    this.props.actions.showMetaContextMenu(position)
   }
 
   tableScroll = event => {
@@ -245,6 +255,12 @@ export default class Table extends Component {
     return typeof this.props.setFieldWidthFn === 'function'
   }
 
+  getContextMenuPos(event) {
+    event.preventDefault()
+    const position = { x: event.pageX, y: event.pageY }
+    return position
+  }
+
   render() {
     const {
       assets,
@@ -256,6 +272,8 @@ export default class Table extends Component {
       children,
       isSingleSelectOnly,
     } = this.props
+
+    const { showTableContextMenu } = this.props.actions
     const tableHeaderHeight = this.getTableHeaderHeight()
     if (!assets) return
 
@@ -342,9 +360,10 @@ export default class Table extends Component {
             return (
               <div
                 key={fieldIndex}
-                onContextMenu={e =>
-                  this.onColumnHeaderContextMenu(fieldIndex, e)
-                }
+                onContextMenu={e => {
+                  const position = this.getContextMenuPos(e)
+                  showTableContextMenu(position, fieldIndex)
+                }}
                 className={this.headerClassnames(order)}
                 style={{
                   width: `${width}px`,
@@ -411,7 +430,8 @@ export default class Table extends Component {
                       width: `${sumOfFieldWidths}px`,
                     }}
                     onClick={event => this.select(asset, event)}
-                    onDoubleClick={event => this.isolate(asset, event)}>
+                    onDoubleClick={event => this.isolate(asset, event)}
+                    onContextMenu={e => this.toggleMetaContextMenu(e, asset)}>
                     {visibleFields.map(fieldIndex => {
                       const { field, width, order } = fields[fieldIndex]
                       return this.props.elementFn(

@@ -1,4 +1,3 @@
-
 /*------------------------------
 
 Zorroa core (shared) css mixins
@@ -8,10 +7,13 @@ Only put definitions & mixins here, not selectors/globals
 
 ------------------------------*/
 
+@mixin hide {
+  display: none !important;
+}
 
-@mixin hide { display:none!important; }
-
-@mixin animate { transition:0.25s; }
+@mixin animate {
+  transition: 0.25s;
+}
 
 $zorroa-color-blue-1: #4160b8;
 $zorroa-color-blue-2: #387ca3;
@@ -20,6 +22,7 @@ $zorroa-color-blue-4: #39897e;
 $zorroa-color-blue-5: #54a8a8;
 
 $zorroa-color-black: #1f1a17;
+$zorroa-color-black-2: #161616;
 $zorroa-color-white: #ffffff;
 
 $zorroa-color-gray-dark-1: #1f1a17;
@@ -67,53 +70,52 @@ These are legacy colors. DO NOT use these anymore. Only colors starting
 with $zorroa-color should be used.
 */
 
-$zorroa-greyish-brown  : #4d4948;
-$zorroa-blackish-brown : #201E1D;
-$zorroa-black          : #1f1a17;
-$zorroa-white          : #e1e1e1;
-$zorroa-avocado-green  : #82a626;
-$zorroa-sickly-green   : #73b61c;
-$zorroa-faded-red      : #ce2d3f;
-$zorroa-orangish       : #fc6c2c;
-$zorroa-water-blue     : #1875d1;
-$zorroa-navy-blue      : #445faa;
-$zorroa-darkish-purple : #a11e77;
-$zorroa-medium-pink    : #ee4688;
-$zorroa-warm-grey-60   : rgba(128, 128, 128, 0.6);
-$zorroa-slategray      : #787a77;
-$zorroa-light-green    : #b7df4d;
-$zorroa-golden-yellow  : #ead011;
-$zorroa-army-taupe     : #77804d;
-$zorroa-brow-taupe     : #7b5f52;
-$zorroa-blue-taupe     : #5a7a7e;
-$zorroa-purple-taupe   : #786974;
-$zorroa-orange-taupe   : #7d6358;
-$zorroa-hover-green    : #4F7F15;
+$zorroa-greyish-brown: #4d4948;
+$zorroa-blackish-brown: #201e1d;
+$zorroa-black: #1f1a17;
+$zorroa-white: #e1e1e1;
+$zorroa-avocado-green: #82a626;
+$zorroa-sickly-green: #73b61c;
+$zorroa-faded-red: #ce2d3f;
+$zorroa-orangish: #fc6c2c;
+$zorroa-water-blue: #1875d1;
+$zorroa-navy-blue: #445faa;
+$zorroa-darkish-purple: #a11e77;
+$zorroa-medium-pink: #ee4688;
+$zorroa-warm-grey-60: rgba(128, 128, 128, 0.6);
+$zorroa-slategray: #787a77;
+$zorroa-light-green: #b7df4d;
+$zorroa-golden-yellow: #ead011;
+$zorroa-army-taupe: #77804d;
+$zorroa-brow-taupe: #7b5f52;
+$zorroa-blue-taupe: #5a7a7e;
+$zorroa-purple-taupe: #786974;
+$zorroa-orange-taupe: #7d6358;
+$zorroa-hover-green: #4f7f15;
 
 // A few extra useful colors Amber didn't specify
 
-$zorroa-mattblack : #161616;
-$zorroa-nearblack  : #2e2e2e;
-$zorroa-darkgray   : $zorroa-color-gray-dark-2;
-$zorroa-dimgray    : #606060;
-$zorroa-gray       : $zorroa-color-gray-dark-3;
-$zorroa-whitegray  : $zorroa-color-gray-dark-4;
-$zorroa-lightgray  : #c3c3c3;
-$zorroa-darkwhite  : $zorroa-color-gray-light-1;
-$zorroa-nearwhite  : $zorroa-color-gray-light-2;
-$zorroa-white      : $zorroa-color-white;
+$zorroa-mattblack: #161616;
+$zorroa-nearblack: #2e2e2e;
+$zorroa-darkgray: $zorroa-color-gray-dark-2;
+$zorroa-dimgray: #606060;
+$zorroa-gray: $zorroa-color-gray-dark-3;
+$zorroa-whitegray: $zorroa-color-gray-dark-4;
+$zorroa-lightgray: #c3c3c3;
+$zorroa-darkwhite: $zorroa-color-gray-light-1;
+$zorroa-nearwhite: $zorroa-color-gray-light-2;
+$zorroa-white: $zorroa-color-white;
 $zorroa-transparent: transparent;
 
-$zorroa-selected       : rgba($zorroa-color-green-1, 0.25);
-$zorroa-dark-selected  : rgba($zorroa-color-green-1, 0.5);
-$zorroa-hover          : rgba($zorroa-color-black,0.1);
-$zorroa-dark-hover     : rgba($zorroa-color-white,0.2);
-$zorroa-dropzone       : rgba($zorroa-color-green-2, 0.75);
+$zorroa-selected: rgba($zorroa-color-green-1, 0.25);
+$zorroa-dark-selected: rgba($zorroa-color-green-1, 0.5);
+$zorroa-hover: rgba($zorroa-color-black, 0.1);
+$zorroa-dark-hover: rgba($zorroa-color-white, 0.2);
+$zorroa-dropzone: rgba($zorroa-color-green-2, 0.75);
 
 /* shared metrics */
-$zorroa-metric-base : 10px;
-$zorroa-Sidebar-width : 340px;
-
+$zorroa-metric-base: 10px;
+$zorroa-Sidebar-width: 340px;
 
 /* Button classes */
 
@@ -148,7 +150,7 @@ $zorroa-Sidebar-width : 340px;
 @mixin zorroa-lighten {
   &:hover {
     font-weight: 700;
-    background-color: rgba(255,255,255,0.2);
+    background-color: rgba(255, 255, 255, 0.2);
   }
 }
 
@@ -160,7 +162,7 @@ $zorroa-Sidebar-width : 340px;
 @mixin zorroa-darken {
   &:hover {
     font-weight: 700;
-    background-color: rgba(0,0,0,0.2);
+    background-color: rgba(0, 0, 0, 0.2);
   }
 }
 
@@ -196,13 +198,19 @@ $zorroa-Sidebar-width : 340px;
   cursor: pointer;
   @include nowrap;
 
-  &:hover:not(.disabled) { background-color: $zorroa-gray; }
-  &.disabled { background-color: $zorroa-lightgray; }
+  &:hover:not(.disabled) {
+    background-color: $zorroa-gray;
+  }
+  &.disabled {
+    background-color: $zorroa-lightgray;
+  }
 }
 
 /* Text classes */
 
-@mixin nowrap { white-space: nowrap; }
+@mixin nowrap {
+  white-space: nowrap;
+}
 
 @mixin clampText {
   @include nowrap;
@@ -213,113 +221,174 @@ $zorroa-Sidebar-width : 340px;
 
 @mixin noSelect {
   /* Prevent selection */
-  -webkit-user-select : none;
-  -moz-user-select    : none;
-  -ms-user-select     : none;
-  user-select         : none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 
   cursor: default;
 
   /* Prevent dragging too */
-  -webkit-user-drag : none;
-  user-drag         : none;
+  -webkit-user-drag: none;
+  user-drag: none;
 }
 
 /* Flexbox classes */
 
-
 @mixin flexRow {
-  display : -webkit-box  ;
-  display : -moz-box     ;
-  display : -ms-flexbox  ;
-  display : -webkit-flex ;
-  display : flex         ;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
 
-  -webkit-flex-direction : row ;
-  -moz-flex-direction    : row ;
-  -ms-flex-direction     : row ;
-  flex-direction         : row ;
+  -webkit-flex-direction: row;
+  -moz-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
 }
 
 @mixin flexRowRev {
-  display : -webkit-box  ;
-  display : -moz-box     ;
-  display : -ms-flexbox  ;
-  display : -webkit-flex ;
-  display : flex         ;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
 
-  -webkit-flex-direction : row-reverse ;
-  -moz-flex-direction    : row-reverse ;
-  -ms-flex-direction     : row-reverse ;
-  flex-direction         : row-reverse ;
+  -webkit-flex-direction: row-reverse;
+  -moz-flex-direction: row-reverse;
+  -ms-flex-direction: row-reverse;
+  flex-direction: row-reverse;
 }
 
 @mixin flexCol {
-  display : -webkit-box  ;
-  display : -moz-box     ;
-  display : -ms-flexbox  ;
-  display : -webkit-flex ;
-  display : flex         ;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
 
-  -webkit-flex-direction : column ;
-  -moz-flex-direction    : column ;
-  -ms-flex-direction     : column ;
-  flex-direction         : column ;
+  -webkit-flex-direction: column;
+  -moz-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
 }
 
 @mixin flexColRev {
-  display : -webkit-box  ;
-  display : -moz-box     ;
-  display : -ms-flexbox  ;
-  display : -webkit-flex ;
-  display : flex         ;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
 
-  -webkit-flex-direction : column-reverse ;
-  -moz-flex-direction    : column-reverse ;
-  -ms-flex-direction     : column-reverse ;
-  flex-direction         : column-reverse ;
+  -webkit-flex-direction: column-reverse;
+  -moz-flex-direction: column-reverse;
+  -ms-flex-direction: column-reverse;
+  flex-direction: column-reverse;
 }
 
 /* flexRowThenCol is a row when wide, then a column when narrow */
 
 @mixin flexRowThenCol($breakWidth) {
   @include flexRow;
-  @media screen and (max-width: $breakWidth) { @include flexCol; }
+  @media screen and (max-width: $breakWidth) {
+    @include flexCol;
+  }
 }
 
 @mixin flexRowThenColRev($breakWidth) {
   @include flexRow;
-  @media screen and (max-width: $breakWidth) { @include flexColRev; }
+  @media screen and (max-width: $breakWidth) {
+    @include flexColRev;
+  }
 }
 
 @mixin flexWrap {
-    -webkit-flex-wrap: wrap;
-    -moz-flex-wrap: wrap;
-    -ms-flex-wrap: wrap;
-    flex-wrap: wrap;
+  -webkit-flex-wrap: wrap;
+  -moz-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
 }
 
 @mixin flexNoWrap {
-    -webkit-flex-wrap: no-wrap;
-    -moz-flex-wrap: no-wrap;
-    -ms-flex-wrap: no-wrap;
-    flex-wrap: no-wrap;
+  -webkit-flex-wrap: no-wrap;
+  -moz-flex-wrap: no-wrap;
+  -ms-flex-wrap: no-wrap;
+  flex-wrap: no-wrap;
 }
 
-@mixin flexOn  { -webkit-box-flex : 1 1 auto ; -moz-box-flex : 1 1 auto; -webkit-flex : 1 1 auto ; -ms-flex : 1 1 auto; flex : 1 1 auto; }
-@mixin flexOff { -webkit-box-flex : 0 0 auto ; -moz-box-flex : 0 0 auto; -webkit-flex : 0 0 auto ; -ms-flex : 0 0 auto; flex : 0 0 auto; }
+@mixin flexOn {
+  -webkit-box-flex: 1 1 auto;
+  -moz-box-flex: 1 1 auto;
+  -webkit-flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+}
+@mixin flexOff {
+  -webkit-box-flex: 0 0 auto;
+  -moz-box-flex: 0 0 auto;
+  -webkit-flex: 0 0 auto;
+  -ms-flex: 0 0 auto;
+  flex: 0 0 auto;
+}
 
-@mixin flexShrinkOnly { -webkit-box-flex : 0 1 auto ; -moz-box-flex : 0 1 auto; -webkit-flex : 0 1 auto ; -ms-flex : 0 1 auto; flex : 0 1 auto; }
+@mixin flexShrinkOnly {
+  -webkit-box-flex: 0 1 auto;
+  -moz-box-flex: 0 1 auto;
+  -webkit-flex: 0 1 auto;
+  -ms-flex: 0 1 auto;
+  flex: 0 1 auto;
+}
 
-@mixin flexJustifyStart  { -webkit-justify-content: flex-start ; -moz-justify-content: flex-start ; -ms-flex-pack: flex-start ; justify-content: flex-start ; }
-@mixin flexJustifyEnd    { -webkit-justify-content: flex-end   ; -moz-justify-content: flex-end   ; -ms-flex-pack: flex-end   ; justify-content: flex-end   ; }
-@mixin flexJustifyCenter { -webkit-justify-content: center     ; -moz-justify-content: center     ; -ms-flex-pack: center     ; justify-content: center     ; }
-@mixin flexJustifySpaceBetween { -webkit-justify-content: space-between ; -moz-justify-content: space-between ; -ms-flex-pack: space-between ; justify-content: space-between ; }
-@mixin flexJustifySpaceAround  { -webkit-justify-content: space-around  ; -moz-justify-content: space-around  ; -ms-flex-pack: space-around  ; justify-content: space-around  ; }
+@mixin flexJustifyStart {
+  -webkit-justify-content: flex-start;
+  -moz-justify-content: flex-start;
+  -ms-flex-pack: flex-start;
+  justify-content: flex-start;
+}
+@mixin flexJustifyEnd {
+  -webkit-justify-content: flex-end;
+  -moz-justify-content: flex-end;
+  -ms-flex-pack: flex-end;
+  justify-content: flex-end;
+}
+@mixin flexJustifyCenter {
+  -webkit-justify-content: center;
+  -moz-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+@mixin flexJustifySpaceBetween {
+  -webkit-justify-content: space-between;
+  -moz-justify-content: space-between;
+  -ms-flex-pack: space-between;
+  justify-content: space-between;
+}
+@mixin flexJustifySpaceAround {
+  -webkit-justify-content: space-around;
+  -moz-justify-content: space-around;
+  -ms-flex-pack: space-around;
+  justify-content: space-around;
+}
 
-@mixin flexAlignItemsCenter { -webkit-align-items: center     ; -moz-align-items: center     ; -ms-align-items: center     ; align-items: center     ; }
-@mixin flexAlignItemsStart  { -webkit-align-items: flex-start ; -moz-align-items: flex-start ; -ms-align-items: flex-start ; align-items: flex-start ; }
-@mixin flexAlignItemsEnd  { -webkit-align-items: flex-end ; -moz-align-items: flex-end ; -ms-align-items: flex-end ; align-items: flex-end ; }
+@mixin flexAlignItemsCenter {
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+}
+@mixin flexAlignItemsStart {
+  -webkit-align-items: flex-start;
+  -moz-align-items: flex-start;
+  -ms-align-items: flex-start;
+  align-items: flex-start;
+}
+@mixin flexAlignItemsEnd {
+  -webkit-align-items: flex-end;
+  -moz-align-items: flex-end;
+  -ms-align-items: flex-end;
+  align-items: flex-end;
+}
 
 @mixin flexCenter {
   @include flexRow;
@@ -339,5 +408,10 @@ $zorroa-Sidebar-width : 340px;
   @include flexJustifyCenter;
 }
 
-@mixin fullWidth { width  : 100%; max-width: 100%; }
-@mixin fullHeight { height : 100%; }
+@mixin fullWidth {
+  width: 100%;
+  max-width: 100%;
+}
+@mixin fullHeight {
+  height: 100%;
+}
