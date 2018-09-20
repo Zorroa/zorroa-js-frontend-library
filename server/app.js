@@ -22,6 +22,8 @@ const archivistProxy = proxy({
   changeOrigin: true,
   // TODO work with devops to fix UNABLE_TO_VERIFY_LEAF_SIGNATURE so secure can be set to `true`
   secure: false,
+  proxyTimeout: 10000,
+  timeout: 10000,
 })
 
 function getWhitelabelConfiguration() {
