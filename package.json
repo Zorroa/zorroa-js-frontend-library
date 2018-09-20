@@ -10,7 +10,7 @@
     "parser": "babel-eslint"
   },
   "scripts": {
-    "prepush": "npm test",
+    "prepush": "npm run test:lint && npm run test:unit",
     "start": "$(npm bin)/forever -f ./server/app.js",
     "start:docker": "docker run -p 80:8081 -p 443:8443 -e 'NODE_ENV=production' -e WHITELABEL_CONFIGURATION -e ARCHIVIST_API_URL -e 'CURATOR_PORT_SECURE=8443' --init -u node -m 1g --memory-swap 4g zorroa-js-curator",
     "start:dev": "CURATOR_PORT_SECURE=8443 CURATOR_PORT=8081 NODE_ENV=development ARCHIVIST_API_URL='https://qa.pool.zorroa.com' node ./server/app.js",
@@ -18,7 +18,7 @@
     "build": "npx webpack --config build/webpack.config.js --progress --colors",
     "build:docker": "npx webpack --config build/webpack.config.js",
     "build:https-cert": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj '/CN=localhost'",
-    "test": "npm run test:lint && npm run test:unit",
+    "test": "npm run test:lint && npm run test:unit -- --ci --runInBand --bail",
     "test:watch": "$(npm bin)/jest src/**/*.test.js --verbose --watch",
     "test:lint": "$(npm bin)/eslint ./",
     "test:unit": "$(npm bin)/jest",
