@@ -9,11 +9,19 @@ import {
   AUTH_SYNC,
   AUTH_CHANGE_PASSWORD,
   AUTH_DEFAULTS,
-  AUTH_ONBOARDING,
   CLEAR_AUTH_ERROR,
+  RESET_PASSWORD_REQUEST,
+  RESET_PASSWORD_REQUEST_SUCCESS,
+  RESET_PASSWORD_REQUEST_ERROR,
+  PASSWORD_RESET,
+  PASSWORD_RESET_SUCCESS,
+  PASSWORD_RESET_ERROR,
   SAML_OPTIONS_REQUEST,
   SAML_OPTIONS_REQUEST_SUCCESS,
   SAML_OPTIONS_REQUEST_ERROR,
+  SIGNIN_USER,
+  SIGNIN_USER_SUCCESS,
+  SIGNIN_USER_ERROR,
 } from '../constants/actionTypes'
 import User from '../models/User'
 import Permission from '../models/Permission'
@@ -21,9 +29,16 @@ import Permission from '../models/Permission'
 const initialState = {
   sync: true,
   source: 'local',
+  userSigninStatus: undefined,
+  passwordResetRequestStatus: undefined,
+  passwordResetStatus: undefined,
   shouldShowLogout: true,
   samlUrl: '',
   samlOptionsStatus: 'pending',
+  passwordResetErrorCause: undefined,
+  passwordResetErrorMessage: undefined,
+  passwordResetException: undefined,
+  userSigninErrorStatusCode: undefined,
 }
 
 export default function(state = initialState, action) {
@@ -87,13 +102,49 @@ export default function(state = initialState, action) {
       return { ...state, defaults: action.payload }
     case AUTH_CHANGE_PASSWORD:
       return { ...state, changePassword: action.payload }
-    case AUTH_ONBOARDING:
-      return { ...state, onboarding: action.payload }
     case AUTH_HMAC:
       return { ...state, hmacKey: action.payload }
+    case RESET_PASSWORD_REQUEST:
+      return { ...state, passwordResetRequestStatus: 'pending' }
+    case RESET_PASSWORD_REQUEST_SUCCESS:
+      return { ...state, passwordResetRequestStatus: 'succeeded' }
+    case RESET_PASSWORD_REQUEST_ERROR:
+      return { ...state, passwordResetRequestStatus: 'errored' }
+    case PASSWORD_RESET:
+      return {
+        ...state,
+        passwordResetStatus: 'pending',
+        passwordResetErrorCause: undefined,
+        passwordResetErrorMessage: undefined,
+        passwordResetException: undefined,
+      }
+    case PASSWORD_RESET_SUCCESS:
+      return { ...state, passwordResetStatus: 'succeeded' }
+    case PASSWORD_RESET_ERROR:
+      return {
+        ...state,
+        passwordResetStatus: 'errored',
+        passwordResetErrorCause: action.payload.cause,
+        passwordResetErrorMessage: action.payload.message,
+        passwordResetException: action.payload.exception,
+      }
+    case SIGNIN_USER:
+      return {
+        ...state,
+        userSigninStatus: 'pending',
+        userSigninErrorStatusCode: undefined,
+      }
+    case SIGNIN_USER_SUCCESS:
+      return { ...state, userSigninStatus: 'succeeded' }
+    case SIGNIN_USER_ERROR:
+      return {
+        ...state,
+        userSigninStatus: 'errored',
+        userSigninErrorStatusCode: action.payload.statusCode,
+      }
     case SAML_OPTIONS_REQUEST:
       return { ...state, samlOptionsStatus: 'pending' }
-    case SAML_OPTIONS_REQUEST_SUCCESS: {
+    case SAML_OPTIONS_REQUEST_SUCCESS:
       const shouldShowLogout = action.payload.logout
       const samlOptions = urlParse(action.payload.idps[0], true)
       return {
@@ -102,7 +153,6 @@ export default function(state = initialState, action) {
         samlUrl: samlOptions.query.idp,
         samlOptionsStatus: 'success',
       }
-    }
     case SAML_OPTIONS_REQUEST_ERROR:
       return {
         ...state,

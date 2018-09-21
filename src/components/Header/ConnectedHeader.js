@@ -1,5 +1,6 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 import {
   showModal,
   hideModal,
@@ -13,7 +14,7 @@ import { resetRacetrackWidgets } from '../../actions/racetrackAction'
 import detectLoginSource from '../../services/detectLoginSource'
 import Header from './Header'
 
-export default connect(
+const ConnectedHeader = connect(
   state => {
     const isSaml = detectLoginSource(state.auth.source) === 'saml'
     const signoutUrl = isSaml ? '/saml/logout?local=true' : '/signout'
@@ -60,3 +61,5 @@ export default connect(
     ),
   }),
 )(Header)
+
+export default withRouter(ConnectedHeader)

@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<IntensityBar /> When the intensity is none Should render an empty bar 1`] = `
+<div
+  className="IntensityBar"
+>
+  <div
+    className="IntensityBar__meter"
+    style={
+      Object {
+        "width": "0%",
+      }
+    }
+  />
+</div>
+`;
+
+exports[`<IntensityBar /> When the intensity is over the defaul threshold Should render a bar indicating the threshold was reached 1`] = `
+<div
+  className="IntensityBar"
+>
+  <div
+    className="IntensityBar__meter IntensityBar__meter--threshhold-acquired"
+    style={
+      Object {
+        "width": "90%",
+      }
+    }
+  />
+</div>
+`;

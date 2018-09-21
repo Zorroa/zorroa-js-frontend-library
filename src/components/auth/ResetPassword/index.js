@@ -1,2 +1,3 @@
-import ResetPassword from './ResetPassword'
+import ResetPassword from './ConnectedResetPassword'
+import './ResetPassword.scss'
 export default ResetPassword

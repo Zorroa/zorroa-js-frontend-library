@@ -10,7 +10,6 @@ import {
   AUTH_PERMISSIONS,
   AUTH_SYNC,
   METADATA_FIELDS,
-  AUTH_ONBOARDING,
   AUTH_HMAC,
   CLEAR_AUTH_ERROR,
   THUMB_SIZE,
@@ -31,9 +30,18 @@ import {
   LIGHTBOX_PANNER,
   TABLE_LAYOUTS,
   SELECT_TABLE_LAYOUT,
+  RESET_PASSWORD_REQUEST,
+  RESET_PASSWORD_REQUEST_SUCCESS,
+  RESET_PASSWORD_REQUEST_ERROR,
+  PASSWORD_RESET,
+  PASSWORD_RESET_SUCCESS,
+  PASSWORD_RESET_ERROR,
   SAML_OPTIONS_REQUEST,
   SAML_OPTIONS_REQUEST_SUCCESS,
   SAML_OPTIONS_REQUEST_ERROR,
+  SIGNIN_USER,
+  SIGNIN_USER_SUCCESS,
+  SIGNIN_USER_ERROR,
 } from '../constants/actionTypes'
 import { USER_ITEM, ORIGIN_ITEM } from '../constants/localStorageItems'
 import User from '../models/User'
@@ -162,6 +170,10 @@ export function signinUser(username, password, origin) {
   return dispatch => {
     // Create a new archivist, if needed for a new host
     createArchivist(dispatch, origin)
+    dispatch({
+      type: SIGNIN_USER,
+      payload: {},
+    })
     archivistPost(
       dispatch,
       '/api/v1/login',
@@ -173,9 +185,21 @@ export function signinUser(username, password, origin) {
       },
     )
       .then(response => {
+        dispatch({
+          type: SIGNIN_USER_SUCCESS,
+          payload: {},
+        })
         authorize(dispatch, response.data)
       })
-      .catch(error => dispatch(authError('Bad Login Info', error)))
+      .catch(error => {
+        dispatch({
+          type: SIGNIN_USER_ERROR,
+          payload: {
+            statusCode: error.response && error.response.status,
+          },
+        })
+        dispatch(authError('Bad Login Info', error))
+      })
   }
 }
 
@@ -293,24 +317,30 @@ function authorize(dispatch, json) {
   }
 }
 
-export function forgotPassword(email, origin) {
+export function forgotPassword(email) {
   return dispatch => {
-    const url = PROD
-      ? origin
-      : origin.replace('localhost:8081', 'localhost:8066')
-    createArchivist(dispatch, url)
-    archivistPost(
-      dispatch,
-      '/api/v1/send-password-reset-email',
-      { email },
-      {
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }, // disable browser auth
+    dispatch({
+      type: RESET_PASSWORD_REQUEST,
+      payload: {},
+    })
+
+    archivistPost(dispatch, '/api/v1/send-password-reset-email', {
+      email,
+    }).then(
+      ({ data }) => {
+        dispatch({ type: UNAUTH_USER, payload: data })
+        dispatch({
+          type: RESET_PASSWORD_REQUEST_SUCCESS,
+          payload: data,
+        })
+      },
+      error => {
+        dispatch({
+          type: RESET_PASSWORD_REQUEST_ERROR,
+          payload: error,
+        })
       },
     )
-      .then(response => {
-        dispatch({ type: UNAUTH_USER, payload: response.data })
-      })
-      .catch(error => dispatch(authError('Cannot reset ' + email, error)))
   }
 }
 
@@ -334,7 +364,6 @@ export function updatePassword(user, password) {
     )
       .then(response => {
         dispatch({ type: AUTH_CHANGE_PASSWORD, payload: false })
-        dispatch({ type: AUTH_ONBOARDING, payload: false })
       })
       .catch(error =>
         dispatch(
@@ -344,11 +373,14 @@ export function updatePassword(user, password) {
   }
 }
 
-export function resetPassword(password, token, origin, source) {
+export function resetPassword(password, token) {
   return dispatch => {
-    const url = PROD
-      ? origin
-      : origin.replace('localhost:8081', 'localhost:8066')
+    dispatch({
+      type: PASSWORD_RESET,
+      payload: {},
+    })
+
+    const url = window.location.origin
     createArchivist(dispatch, url)
     archivistPost(
       dispatch,
@@ -362,10 +394,20 @@ export function resetPassword(password, token, origin, source) {
       },
     )
       .then(response => {
-        const url = source && source.length ? '?source=' + source : ''
-        authorize(dispatch, response.data, url)
-        const onboarding = source && source.length > 0
-        dispatch({ type: AUTH_ONBOARDING, payload: onboarding })
+        authorize(dispatch, response.data)
+        dispatch({
+          type: PASSWORD_RESET_SUCCESS,
+          payload: {},
+        })
+      })
+      .catch(error => {
+        const { response } = error
+        if (response && response.data)
+          dispatch({
+            type: PASSWORD_RESET_ERROR,
+            payload: response.data,
+          })
+        dispatch(authError('Cannot reset password', error))
       })
       .catch(error => dispatch(authError('Cannot reset password', error)))
   }

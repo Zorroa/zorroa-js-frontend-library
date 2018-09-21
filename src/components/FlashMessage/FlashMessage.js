@@ -5,6 +5,7 @@ import classnames from 'classnames'
 export default function FlashMessage(props) {
   const flashMessageBodyClasses = classnames('FlashMessage__body', {
     'FlashMessage__body--warning': props.look === 'warning',
+    'FlashMessage__body--info': props.look === 'information',
     'FlashMessage__body--error': props.look === 'error',
     'FlashMessage__body--success': props.look === 'success',
   })

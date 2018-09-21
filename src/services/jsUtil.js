@@ -29,7 +29,10 @@ export function unCamelCase(str) {
 }
 
 export function isValidEmail(email) {
-  return /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email)
+  // This is designed to be the most rudimentary email address validator. If
+  // more robust validation is needed do a server-side call that can check the
+  // DNS' MX record.
+  return /.+@.+/.test(email)
 }
 
 export function formatDuration(seconds, fps) {

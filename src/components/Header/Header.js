@@ -65,6 +65,9 @@ export default class Header extends Component {
     faqUrl: PropTypes.string.isRequired,
     supportUrl: PropTypes.string.isRequired,
     shouldShowLogout: PropTypes.bool,
+    history: PropTypes.shape({
+      push: PropTypes.func.isRequired,
+    }),
   }
 
   state = {
@@ -326,6 +329,12 @@ export default class Header extends Component {
   }
 
   logout = () => {
+    if (this.props.signoutUrl === '/signout') {
+      this.props.history.push(this.props.signoutUrl)
+      return
+    }
+
+    // Force a hard load of a page for SSO-based logouts
     window.location = this.props.signoutUrl
   }
 

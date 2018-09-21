@@ -125,24 +125,7 @@
     }
 
     &--error {
-      width: 0;
-      height: 0;
-      border-left: 14px solid transparent;
-      border-right: 14px solid transparent;
-      border-bottom: 20px solid $zorroa-color-white;
-
-      &::before {
-        content: '!';
-        color: $zorroa-color-pink-1;
-        font-size: 12px;
-        text-align: center;
-        width: 100%;
-        display: block;
-        position: absolute;
-        left: -1px;
-        line-height: 24px;
-        font-weight: bold;
-      }
+      background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22512%22%20height%3D%22512%22%20version%3D%221%22%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M505%20458L286%2022c-8-15-19-22-30-22s-22%207-30%2022L7%20458c-17%2030-2%2054%2032%2054h434c34%200%2049-24%2032-54zm-249-10a32%2032%200%201%201%200-64%2032%2032%200%200%201%200%2064zm32-128a32%2032%200%200%201-64%200v-96a32%2032%200%200%201%2064%200v96z%22%2F%3E%3C%2Fsvg%3E')
     }
   }
 

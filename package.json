@@ -1,6 +1,6 @@
 {
   "name": "zorroa-js-curator",
-  "description": "Frontend for the Zorroa Archivist, part of the EVI platform",
+  "description": "Frontend for the Zorroa Archivist, part of the ZVI platform",
   "version": "0.40.0",
   "repository": {
     "type": "git",
@@ -11,17 +11,17 @@
   },
   "scripts": {
     "prepush": "npm run test:lint && npm run test:unit",
-    "start": "$(npm bin)/forever -f ./server/app.js",
+    "start": "npx forever -f ./server/app.js",
     "start:docker": "docker run -p 80:8081 -p 443:8443 -e 'NODE_ENV=production' -e WHITELABEL_CONFIGURATION -e ARCHIVIST_API_URL -e 'CURATOR_PORT_SECURE=8443' --init -u node -m 1g --memory-swap 4g zorroa-js-curator",
-    "start:dev": "CURATOR_PORT_SECURE=8443 CURATOR_PORT=8081 NODE_ENV=development ARCHIVIST_API_URL='https://qa.pool.zorroa.com' node ./server/app.js",
+    "start:dev": "CURATOR_PORT_SECURE=443 CURATOR_PORT=80 NODE_ENV=development ARCHIVIST_API_URL='https://qa.pool.zorroa.com' node ./server/app.js",
     "deploy": "docker build -m 4g -t zorroa-js-curator .",
     "build": "npx webpack --config build/webpack.config.js --progress --colors",
     "build:docker": "npx webpack --config build/webpack.config.js",
     "build:https-cert": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj '/CN=localhost'",
     "test": "npm run test:lint && npm run test:unit -- --ci --runInBand --bail",
-    "test:watch": "$(npm bin)/jest src/**/*.test.js --verbose --watch",
-    "test:lint": "$(npm bin)/eslint ./",
-    "test:unit": "$(npm bin)/jest",
+    "test:watch": "npx jest --verbose --watch",
+    "test:lint": "npx eslint ./",
+    "test:unit": "npx jest",
     "update-fonts": "src/assets/fonts/zorroa-icons/update-fonts.bash",
     "preview-fonts": "src/assets/fonts/zorroa-icons/preview-fonts.bash"
   },
@@ -60,6 +60,7 @@
     "@babel/plugin-proposal-class-properties": "^7.0.0",
     "@babel/plugin-proposal-decorators": "^7.0.0",
     "@babel/plugin-proposal-export-default-from": "^7.0.0",
+    "@babel/plugin-syntax-dynamic-import": "^7.0.0",
     "@babel/plugin-transform-modules-commonjs": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
@@ -69,6 +70,7 @@
     "babel-eslint": "^9.0.0",
     "babel-jest": "^23.6.0",
     "babel-loader": "^8.0.2",
+    "babel-plugin-dynamic-import-node": "^2.1.0",
     "css-loader": "^1.0.0",
     "enzyme": "3.4.0",
     "enzyme-adapter-react-15": "1.0.6",
@@ -136,6 +138,7 @@
     "redux-multi": "0.1.12",
     "redux-promise": "0.5.3",
     "redux-thunk": "2.2.0",
-    "url-parse": "^1.4.3"
+    "url-parse": "^1.4.3",
+    "zxcvbn": "^4.4.2"
   }
 }

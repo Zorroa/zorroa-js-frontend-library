@@ -103,7 +103,7 @@ app.get('*', (req, res) => {
         <title>${context.title || 'Zorroa'}</title>
       </head>
       <body>
-        <script type="application/javascript" src="/bundle.js?${
+        <script type="application/javascript" src="/app.js?${
           context.version
         }"></script>
       </body>

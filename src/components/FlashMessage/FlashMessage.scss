@@ -4,30 +4,34 @@
   position: relative;
 
   &__body {
-    background: $zorroa-color-blue-3;
-    border: 1px solid $zorroa-color-blue-2;
-    padding: 10px;
-    margin: 10px 0;
+    background: $zorroa-color-white;
+    border-top: $zorroa-metric-base / 2 solid;
+    padding: $zorroa-metric-base * 1.5;
+    margin: $zorroa-metric-base 0 $zorroa-metric-base * 3;
     max-width: 100%;
     color: $zorroa-color-white;
     z-index: 2;
     animation-duration: 400ms;
     animation-name: slidein;
     animation-timing-function: ease-in-out;
+    color: $zorroa-color-gray-dark-1;
+    box-shadow: 0 2px 15px -1px rgba(0,0,0,.2);
+    line-height: 1.2;
 
     &--success {
-      background: $zorroa-color-green-1;
       border-color: $zorroa-color-green-4;
     }
 
     &--warning {
-      background: $zorroa-color-yellow-1;
       border-color: $zorroa-color-yellow-2;
     }
 
     &--error {
-      background: $zorroa-color-pink-2;
       border-color: $zorroa-color-pink-1;
+    }
+
+    &--info {
+      border-color: $zorroa-color-blue-1;
     }
   }
 }

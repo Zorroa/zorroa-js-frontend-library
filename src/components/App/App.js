@@ -4,7 +4,6 @@ import { BrowserRouter as Router, Route } from 'react-router-dom'
 import Signin from '../auth/Signin'
 import Signout from '../auth/Signout'
 import ssoLogout from '../auth/ssoLogout'
-import Onboard from '../auth/Onboard'
 import ResetPassword from '../auth/ResetPassword'
 import ForgotPassword from '../auth/ForgotPassword'
 import Workspace from '../Workspace'
@@ -141,7 +140,6 @@ export default class App extends Component {
           <Route path="/sso/loggedout" component={ssoLogout} />
           <Route path="/forgot" component={ForgotPassword} />
           <Route path="/password" component={ResetPassword} />
-          <Route path="/onboard" component={Onboard} />
         </div>
       </Router>
     )

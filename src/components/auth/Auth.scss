@@ -15,6 +15,8 @@
   justify-content: space-between;
   border-radius: 3px;
   box-shadow: 0px 24px 20px -20px #BBB;
+  align-items: center;
+  justify-content: center;
 }
 
 .auth-input {
@@ -42,13 +44,19 @@
 }
 
 .auth-forgot {
-  display: inline-block;
   font-family: Roboto-Light, sans-serif;
   font-size: 12px;
   margin-top: 16px;
   color: $zorroa-lightgray;
   text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+
   &:hover { color: $zorroa-sickly-green; }
+}
+
+.auth-confirm {
+  margin-top: $zorroa-metric-base * 2;
 }
 
 .auth-button-primary {
@@ -74,10 +82,7 @@
 
 .auth-field {
   width: 100%;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  margin-left: 4px;
-  margin-right: 4px;
+  margin: $zorroa-metric-base $zorroa-metric-base / 2
 }
 
 .auth-message {
@@ -94,7 +99,7 @@
 .auth-error {
   font-size: 14px;
   color: $zorroa-faded-red;
-  height: 3.5em;
+  min-height: 5em;
   margin: 1em 0;
   padding: 3px 0;
   border-radius: 3px;
@@ -106,6 +111,20 @@
 
   background-color: rgba(#ffffff, 0);
   transition: background-color 0.5s ease-out;
+}
+
+.auth-button-group {
+  text-align: center;
+  margin-top: $zorroa-metric-base * 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+}
+
+.auth-help {
+  width: 100%;
+  margin: $zorroa-metric-base $zorroa-metric-base / 2 $zorroa-metric-base * 3
 }
 
 .auth-error-msg {

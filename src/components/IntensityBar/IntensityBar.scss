@@ -1,0 +1,21 @@
+@import '../../styles/core-mixins.scss';
+
+.IntensityBar {
+  background: $zorroa-color-gray-dark-4;
+  height: $zorroa-metric-base;
+  border-radius: $zorroa-metric-base / 4;
+  width: 100%;
+  position: relative;
+
+  &__meter {
+    background: $zorroa-color-orange-1;
+    height: $zorroa-metric-base;
+    border-radius: $zorroa-metric-base / 4;
+    position: absolute;
+    transition: ease-in-out 500ms width;
+
+    &--threshhold-acquired {
+      background: $zorroa-color-green-1;
+    }
+  }
+}

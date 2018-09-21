@@ -1,81 +1,48 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
 import { Link, Redirect } from 'react-router-dom'
-import classnames from 'classnames'
+import { FormButton as Button } from '../../Form'
 
 import Logo from '../../Logo'
-import {
-  signinUser,
-  authError,
-  clearAuthError,
-} from '../../../actions/authAction'
-import { EULA_VERSION_ITEM } from '../../../constants/localStorageItems'
+import FlashMessage from '../../FlashMessage'
 
-// Update whenever legal agreement is changed.
-// CORS prevents using the current version on zorroa.com. Drats.
-const currentEULAVersion = '1.0'
+const ERROR_UNAUTHORIZED = 401
+const ERROR_FORBIDDEN = 403
 
-class Signin extends Component {
+export default class Signin extends Component {
   static propTypes = {
     error: PropTypes.string,
     defaults: PropTypes.object,
-    actions: PropTypes.object,
+    actions: PropTypes.shape({
+      clearAuthError: PropTypes.func.isRequired,
+      signinUser: PropTypes.func.isRequired,
+    }).isRequired,
     authenticated: PropTypes.bool,
-    location: PropTypes.object,
+    location: PropTypes.shape({
+      origin: PropTypes.string.isRequired,
+      state: PropTypes.string,
+    }).isRequired,
+    userSigninStatus: PropTypes.string,
+    userSigninErrorStatusCode: PropTypes.number,
   }
 
   state = {
-    errTime: 0,
     username: '',
     password: '',
-    host: '',
-    ssl: false,
-    acceptEULA: false,
   }
 
   componentWillMount() {
     if (this.props.defaults) {
       const username = this.props.defaults.username
-      let url
-      try {
-        url = url && new URL(this.props.defaults.origin)
-      } catch (e) {
-        console.error('Invalid default URL: ' + this.props.defaults.origin)
-      }
-      const host = (url && url.host) || ''
-      const isLocalhost = host && host.includes('localhost')
-      const ssl = !isLocalhost // Development settings
-      const acceptEULA = isLocalhost
-      this.setState({ username, host, ssl, acceptEULA })
+      this.setState({ username })
     }
     this.clearError()
-    this.checkLocalEULA()
-  }
-
-  checkLocalEULA() {
-    const { acceptEULA } = this.state
-    if (!acceptEULA) {
-      const localVersion = localStorage.getItem(EULA_VERSION_ITEM)
-      if (localVersion && localVersion === currentEULAVersion) {
-        this.setState({ acceptEULA: true })
-      }
-    }
   }
 
   clearError = () => {
     if (this.props.error) {
       this.props.actions.clearAuthError()
     }
-  }
-
-  signin = event => {
-    const { username, password, ssl, host } = this.state
-    const protocol = ssl ? 'https:' : 'http:'
-    const origin = protocol && host && protocol + '//' + host
-    this.props.actions.signinUser(username, password, origin)
-    this.forceUpdate()
   }
 
   changeUsername = event => {
@@ -88,65 +55,49 @@ class Signin extends Component {
     this.clearError()
   }
 
-  changeHost = event => {
-    const host = event.target.value
-    const isLocalhost = host && host.includes('localhost')
-    const ssl = this.state.ssl && isLocalhost ? false : this.state.ssl
-    const acceptEULA =
-      !this.state.acceptEULA && isLocalhost ? true : this.state.acceptEULA
-    this.setState({ host, ssl, acceptEULA })
-    this.clearError()
-  }
-
-  changeSSL = event => {
-    this.setState({ ssl: !this.state.ssl })
-    this.clearError()
-  }
-
   submit = event => {
-    if (event.key === 'Enter') {
-      this.signin()
+    event.preventDefault()
+    if (this.isDisabled()) {
+      return
+    }
+
+    const { username, password } = this.state
+    const origin = this.props.location.origin
+    this.props.actions.signinUser(username, password, origin)
+  }
+
+  getErrorMessage() {
+    const { userSigninErrorStatusCode } = this.props
+    if (
+      userSigninErrorStatusCode === ERROR_UNAUTHORIZED ||
+      userSigninErrorStatusCode === ERROR_FORBIDDEN
+    ) {
+      return 'The username or password is incorrect.'
+    }
+
+    if (userSigninErrorStatusCode !== undefined) {
+      return `A problem happened while trying to log in. Please try again in a few minutes. If this error persists please contact support with error code '${userSigninErrorStatusCode}'`
+    }
+
+    if (this.props.userSigninStatus === 'errored') {
+      return 'An unknown error occured. Please try again in a few minutes.'
     }
   }
 
-  toggleEULA = event => {
-    const acceptEULA = event.target.checked
-    this.setState({ acceptEULA })
-    if (acceptEULA) {
-      localStorage.setItem(EULA_VERSION_ITEM, currentEULAVersion)
-    } else {
-      localStorage.removeItem(EULA_VERSION_ITEM)
-    }
+  isDisabled() {
+    const { username, password } = this.state
+    return !username || !username.length || !password || !password.length
   }
 
-  renderAlert() {
-    const { error } = this.props
-    let changed = false
-    let msg = ''
-    if (error) {
-      if (Date.now() - this.state.errTime > 300) {
-        changed = true
-        setTimeout(() => {
-          this.setState({ errTime: Date.now() })
-        }, 0)
-      }
-      console.log(error)
-      msg = (
-        <div className="auth-error-msg">
-          {error}. Please try again or use the{' '}
-          <Link className="" to="/forgot">
-            forgot password
-          </Link>{' '}
-          link.
-        </div>
-      )
+  getButtonState() {
+    if (this.props.userSigninStatus === 'pending') {
+      return 'loading'
     }
-    return <div className={classnames('auth-error', { changed })}>{msg}</div>
   }
 
   render() {
-    const { username, password, acceptEULA } = this.state
-    const disabled = !username || !username.length || !acceptEULA
+    const { username, password } = this.state
+    const disabled = this.isDisabled()
     const { from } = this.props.location.state || { from: { pathname: '/' } }
 
     if (this.props.authenticated) {
@@ -159,8 +110,14 @@ class Signin extends Component {
           <div className="auth-logo">
             <Logo />
           </div>
-          <div className="auth-form">
-            {this.renderAlert()}
+          <form onSubmit={this.submit} className="auth-form">
+            <div className="auth-error">
+              {this.props.userSigninStatus === 'errored' && (
+                <FlashMessage look="information">
+                  {this.getErrorMessage()}
+                </FlashMessage>
+              )}
+            </div>
             <div className="auth-field">
               <input
                 className="auth-input"
@@ -168,7 +125,6 @@ class Signin extends Component {
                 value={username}
                 name="username"
                 onChange={this.changeUsername}
-                onKeyDown={!disabled && this.submit}
               />
               <label className="auth-label">Username</label>
             </div>
@@ -179,29 +135,16 @@ class Signin extends Component {
                 value={password}
                 name="password"
                 onChange={this.changePassword}
-                onKeyDown={!disabled && this.submit}
               />
               <label className="auth-label">Password</label>
             </div>
-            <div className="auth-eula">
-              <input
-                type="checkbox"
-                className="auth-eula-input"
-                name="eula"
-                checked={acceptEULA}
-                onChange={this.toggleEULA}
-              />
-              <div className="auth-eula-label">
-                I accept the Zorroa{' '}
-                <a href="http://zorroa.com/eula">terms of use</a>
-              </div>
-            </div>
-            <div
-              className={classnames('auth-button-primary', { disabled })}
-              onClick={!disabled && this.signin}>
+            <Button
+              state={this.getButtonState()}
+              type="submit"
+              disabled={disabled}>
               Login
-            </div>
-          </div>
+            </Button>
+          </form>
           <Link className="auth-forgot" to="/forgot">
             Forgot Password?
           </Link>
@@ -210,21 +153,3 @@ class Signin extends Component {
     )
   }
 }
-
-export default connect(
-  state => ({
-    error: state.auth.error,
-    defaults: state.auth.defaults,
-    authenticated: state.auth.authenticated,
-  }),
-  dispatch => ({
-    actions: bindActionCreators(
-      {
-        signinUser,
-        authError,
-        clearAuthError,
-      },
-      dispatch,
-    ),
-  }),
-)(Signin)

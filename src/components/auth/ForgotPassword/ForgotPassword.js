@@ -1,26 +1,30 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
-import classnames from 'classnames'
-import { withRouter } from 'react-router-dom'
 import Logo from '../../Logo'
+import Heading from '../../Heading'
+import Paragraph from '../../Paragraph'
+import FlashMessage from '../../FlashMessage'
+import Button from '../../Form/Button'
 import User from '../../../models/User'
 import { isValidEmail } from '../../../services/jsUtil'
-import { forgotPassword, authError } from '../../../actions/authAction'
 
-class ForgotPassword extends Component {
+export default class ForgotPassword extends Component {
   static propTypes = {
     user: PropTypes.instanceOf(User),
-    error: PropTypes.string,
-    actions: PropTypes.object,
+    actions: PropTypes.shape({
+      forgotPassword: PropTypes.func.isRequired,
+      authError: PropTypes.func.isRequired,
+    }),
+    passwordResetStatus: PropTypes.string.isRequired,
     history: PropTypes.shape({
       goBack: PropTypes.func.isRequired,
+      push: PropTypes.func.isRequired,
     }),
   }
 
   state = {
     email: '',
+    showSuccessMessage: false,
   }
 
   static get contextTypes() {
@@ -33,13 +37,24 @@ class ForgotPassword extends Component {
     this.props.actions.authError() // clear any existing errors
   }
 
-  changeEmail = event => {
-    this.setState({ email: event.target.value })
+  componentDidUpdate(prevProps) {
+    if (this.shouldUpdateSuccessStatus(prevProps)) {
+      this.updateResetStatusState()
+    }
   }
 
-  update = event => {
-    const origin = window.location.origin
-    this.props.actions.forgotPassword(this.state.email, origin)
+  shouldUpdateSuccessStatus({ passwordResetStatus }) {
+    return passwordResetStatus !== this.props.passwordResetStatus
+  }
+
+  updateResetStatusState() {
+    this.setState({
+      showSuccessMessage: this.props.passwordResetStatus === 'succeeded',
+    })
+  }
+
+  changeEmail = event => {
+    this.setState({ email: event.target.value })
   }
 
   cancel = event => {
@@ -47,13 +62,20 @@ class ForgotPassword extends Component {
   }
 
   submit = event => {
-    if (event.key === 'Enter') this.update()
+    event.preventDefault()
+    this.props.actions.forgotPassword(this.state.email)
+  }
+
+  login = event => {
+    event.preventDefault()
+    this.props.history.push('/signin')
   }
 
   render() {
-    const { user, error } = this.props
-    const { email } = this.state
+    const { passwordResetStatus } = this.props
+    const { email, showSuccessMessage } = this.state
     const disabled = !email || !email.length || !isValidEmail(email)
+
     return (
       <div className="auth">
         <div className="auth-box">
@@ -61,29 +83,55 @@ class ForgotPassword extends Component {
             <Logo />
           </div>
           <div className="auth-form">
-            <div className="auth-error">{error}</div>
-            <div className="auth-field">
-              <div className="auth-forgot-label">
-                Enter your email below to reset your password:
+            {showSuccessMessage === true && (
+              <div className="auth-confirm">
+                <Heading>Thank you.</Heading>
+                <Paragraph>
+                  If that email address matches an exisiting account you will
+                  recieve a password reset link.
+                </Paragraph>
+                <div className="auth-button-group">
+                  <Button onClick={this.login}>Login</Button>
+                </div>
               </div>
-              <input
-                className="auth-input"
-                type="text"
-                value={email}
-                onChange={this.changeEmail}
-                onKeyDown={!disabled && this.submit}
-              />
-              <label className="auth-label">Email</label>
-            </div>
-            <div
-              className={classnames('auth-button-primary', { disabled })}
-              onClick={!disabled && this.update}>
-              Send Email
-            </div>
-            {!user && (
-              <div className="auth-forgot" onClick={this.cancel}>
-                Cancel
-              </div>
+            )}
+            {showSuccessMessage === false && (
+              <form onSubmit={!disabled && this.submit}>
+                <div className="auth-error">
+                  {passwordResetStatus === 'errored' && (
+                    <FlashMessage look="information">
+                      There was a problem sending the request. Please try again
+                      in a few minutes.
+                    </FlashMessage>
+                  )}
+                </div>
+                <div className="auth-help">
+                  <Heading>Let’s get your account back</Heading>
+                  <Paragraph>
+                    Enter your email address and we’ll send you a link to reset
+                    your password.
+                  </Paragraph>
+                </div>
+                <div className="auth-field">
+                  <input
+                    className="auth-input"
+                    type="text"
+                    value={email}
+                    onChange={this.changeEmail}
+                  />
+                  <label className="auth-label">Email Address</label>
+                </div>
+                <div className="auth-button-group">
+                  <Button
+                    type="submit"
+                    state={
+                      passwordResetStatus === 'pending' ? 'loading' : undefined
+                    }
+                    disabled={disabled}>
+                    Send Password Link
+                  </Button>
+                </div>
+              </form>
             )}
           </div>
         </div>
@@ -91,15 +139,3 @@ class ForgotPassword extends Component {
     )
   }
 }
-
-const ConnectedForgotPassword = connect(
-  state => ({
-    user: state.auth.user,
-    error: state.auth.error,
-  }),
-  dispatch => ({
-    actions: bindActionCreators({ forgotPassword, authError }, dispatch),
-  }),
-)(ForgotPassword)
-
-export default withRouter(ConnectedForgotPassword)
