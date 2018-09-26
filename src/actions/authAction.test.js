@@ -14,3 +14,14 @@ describe('authActions', () => {
     })
   })
 })
+
+describe('checkSession()', () => {
+  it('should set sessionExpired to true', () => {
+    const expired = true
+    const expectedAction = {
+      type: types.SESSION_TIMEOUT,
+      payload: true,
+    }
+    expect(actions.checkSession(expired)).toEqual(expectedAction)
+  })
+})

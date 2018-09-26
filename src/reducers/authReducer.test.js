@@ -9,6 +9,7 @@ import {
   AUTH_PERMISSIONS,
   SAML_OPTIONS_REQUEST_SUCCESS,
   SAML_OPTIONS_REQUEST_ERROR,
+  SESSION_TIMEOUT,
 } from '../constants/actionTypes'
 
 describe('authReducer', () => {
@@ -112,6 +113,17 @@ describe('authReducer', () => {
       samlUrl: '',
       shouldShowLogout: true,
       samlOptionsStatus: 'error',
+    })
+  })
+
+  it('SESSION_TIMEOUT returns sessionExpired boolean', () => {
+    const initialState = { sessionExpired: false }
+    const action = {
+      type: SESSION_TIMEOUT,
+      payload: true,
+    }
+    expect(authReducer(initialState, action)).toEqual({
+      sessionExpired: true,
     })
   })
 })

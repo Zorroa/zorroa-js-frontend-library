@@ -22,6 +22,7 @@ import {
   SIGNIN_USER,
   SIGNIN_USER_SUCCESS,
   SIGNIN_USER_ERROR,
+  SESSION_TIMEOUT,
 } from '../constants/actionTypes'
 import User from '../models/User'
 import Permission from '../models/Permission'
@@ -39,6 +40,7 @@ const initialState = {
   passwordResetErrorMessage: undefined,
   passwordResetException: undefined,
   userSigninErrorStatusCode: undefined,
+  sessionExpired: false,
 }
 
 export default function(state = initialState, action) {
@@ -159,6 +161,12 @@ export default function(state = initialState, action) {
         samlUrl: '',
         shouldShowLogout: true,
         samlOptionsStatus: 'error',
+      }
+
+    case SESSION_TIMEOUT:
+      return {
+        ...state,
+        sessionExpired: action.payload,
       }
   }
 

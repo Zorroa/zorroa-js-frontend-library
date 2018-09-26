@@ -4,18 +4,22 @@ import classnames from 'classnames'
 
 export default class ModalOverlayBody extends Component {
   static propTypes = {
-    size: PropTypes.oneOf(['narrow']),
+    size: PropTypes.oneOf(['narrow', 'small']),
     children: PropTypes.node,
   }
 
   render() {
-    const className = classnames('ModalOverlayBody', {
+    const bodyClasses = classnames('ModalOverlayBody', {
+      'ModalOverlayBody--small': this.props.size === 'small',
       'ModalOverlayBody--narrow': this.props.size === 'narrow',
+    })
+    const scrollClasses = classnames('ModalOverlayBody__scroll', {
+      'ModalOverlayBody__scroll--small': this.props.size === 'small',
     })
 
     return (
-      <div className={className}>
-        <div className="ModalOverlayBody__scroll">{this.props.children}</div>
+      <div className={bodyClasses}>
+        <div className={scrollClasses}>{this.props.children}</div>
       </div>
     )
   }

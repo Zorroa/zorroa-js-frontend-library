@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
 import Signin from '../auth/Signin'
 import Signout from '../auth/Signout'
-import ssoLogout from '../auth/ssoLogout'
+import TimedLogout from '../auth/TimedLogout'
 import ResetPassword from '../auth/ResetPassword'
 import ForgotPassword from '../auth/ForgotPassword'
 import Workspace from '../Workspace'
@@ -11,6 +11,8 @@ import Lightbox from '../Lightbox'
 import FolderRedirect from '../FolderRedirect'
 import RequireAuth from '../RequireAuth'
 import api from '../../api'
+import axios from 'axios'
+import ModalOverlay, { ModalOverlayBody } from '../ModalOverlay'
 
 import {
   EMBEDMODE_ITEM,
@@ -25,11 +27,13 @@ export default class App extends Component {
   static propTypes = {
     children: PropTypes.object,
     authenticated: PropTypes.bool,
+    sessionExpired: PropTypes.bool,
     themeLoadState: PropTypes.oneOf(['pending', 'succeeded', 'failed'])
       .isRequired,
     actions: PropTypes.shape({
       fetchTheme: PropTypes.func.isRequired,
       samlOptionsRequest: PropTypes.func.isRequired,
+      checkSession: PropTypes.func.isRequired,
     }).isRequired,
     samlOptionsStatus: PropTypes.oneOf(['pending', 'success', 'error']),
   }
@@ -71,6 +75,7 @@ export default class App extends Component {
     this.props.actions.fetchTheme()
     this.createRootFolderId()
     this.props.actions.samlOptionsRequest()
+    this.checkSessionIntervalId = setInterval(this.checkSession, 2000)
   }
 
   componentWillReceiveProps(nextProps) {
@@ -81,6 +86,25 @@ export default class App extends Component {
     if (this.shouldRecreateRootFolderId(this.props, nextProps)) {
       this.createRootFolderId()
     }
+  }
+
+  componentDidUnmount() {
+    clearInterval(this.checkSessionIntervalId)
+  }
+
+  setSessionExpiration(error) {
+    if (error.response.status === 401) {
+      this.props.actions.checkSession()
+    }
+  }
+
+  checkSession = () => {
+    if (!this.props.authenticated) {
+      return
+    }
+    axios.get('/api/v1/who').catch(error => {
+      this.setSessionExpiration(error)
+    })
   }
 
   shouldRefetchTheme(prevProps, nextProps) {
@@ -124,20 +148,32 @@ export default class App extends Component {
     return isLoading && isWithinTimeoutPeriod
   }
 
+  sessionIsExpired() {
+    if (this.props.sessionExpired) {
+      return (
+        <ModalOverlay size="small">
+          <ModalOverlayBody>
+            <TimedLogout size="small" />
+          </ModalOverlayBody>
+        </ModalOverlay>
+      )
+    }
+  }
+
   render() {
     if (this.isLoading()) {
       return <div className="App--loading" title="App is loading" />
     }
-
     return (
       <Router>
         <div>
+          {this.sessionIsExpired()}
           <RequireAuth exact path="/" component={Workspace} />
           <RequireAuth path="/asset/:isolatedId" component={Lightbox} />
           <RequireAuth path="/folder/:folderId" component={FolderRedirect} />
           <Route path="/signin" component={Signin} />
           <Route path="/signout" component={Signout} />
-          <Route path="/sso/loggedout" component={ssoLogout} />
+          <Route path="/sso/loggedout" component={TimedLogout} />
           <Route path="/forgot" component={ForgotPassword} />
           <Route path="/password" component={ResetPassword} />
         </div>

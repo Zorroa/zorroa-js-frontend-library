@@ -34,7 +34,6 @@ const rootEndpoint = '/api/v1/folders'
 
 export function toggleFolder(folderId, isOpen) {
   return dispatch => {
-    console.log('Toggle Folder', folderId, isOpen)
     dispatch({
       type: TOGGLE_FOLDER,
       payload: { folderId, isOpen },
@@ -85,7 +84,6 @@ export function getFolderChildren(parentId, shouldPreloadRoot) {
     : Promise.resolve()
 
   return dispatch => {
-    console.log('Load folder ' + parentId)
     rootPromise
       .then(folder => {
         if (folder) {
@@ -191,7 +189,6 @@ export function createFolder(folder, assetIds) {
 
 export function updateFolder(folder) {
   return dispatch => {
-    console.log('Update folder: ' + JSON.stringify(folder))
     archivistPut(dispatch, `${rootEndpoint}/${folder.id}`, folder)
       .then(response => {
         dispatch({
@@ -207,9 +204,6 @@ export function updateFolder(folder) {
 
 export function updateFolderPermissions(folderId, acl) {
   return dispatch => {
-    console.log(
-      'Update folder ' + folderId + ' permissions: ' + JSON.stringify(acl),
-    )
     archivistPut(dispatch, `${rootEndpoint}/${folderId}/_permissions`, { acl })
       .then(response => {
         dispatch({
@@ -228,7 +222,6 @@ export function updateFolderPermissions(folderId, acl) {
 export function deleteFolderIds(ids) {
   return dispatch => {
     for (let id of ids) {
-      console.log('Delete folder ' + id)
       // Workaround CORS issue in OPTIONS preflight request for axios.delete
       const request = {
         method: 'delete',
@@ -255,9 +248,6 @@ export function addAssetIdsToFolderId(assetIds, folderId) {
 
 export function addAssetIdsToFolderIdProm(dispatch, assetIds, folderId) {
   if (assetIds instanceof Set) assetIds = [...assetIds]
-  console.log(
-    'Add assets ' + JSON.stringify(assetIds) + ' to folder ' + folderId,
-  )
   return archivistPost(dispatch, `${rootEndpoint}/${folderId}/assets`, assetIds)
     .then(response => {
       dispatch({
@@ -280,9 +270,6 @@ export function addAssetIdsToFolderIdProm(dispatch, assetIds, folderId) {
 export function removeAssetIdsFromFolderId(assetIds, folderId) {
   return dispatch => {
     if (assetIds instanceof Set) assetIds = [...assetIds]
-    console.log(
-      'Remove assets ' + JSON.stringify(assetIds) + ' from folder ' + folderId,
-    )
     // Workaround CORS issue in OPTIONS preflight request for axios.delete
     const request = {
       method: 'delete',
@@ -319,11 +306,6 @@ export function countAssetsInFolderIds(ids, search) {
     ]
   }
   return dispatch => {
-    console.log(
-      'Count query assets in folders ' +
-        JSON.stringify(ids) +
-        (search ? ' with query ' + JSON.stringify(search) : ' without search'),
-    )
     dispatch({ type: CLEAR_MODIFIED_FOLDERS, payload: ids })
     return archivistPost(dispatch, `${rootEndpoint}/_assetCounts`, {
       search,
@@ -371,9 +353,6 @@ function createDyHiProm(dispatch, folder, levels) {
 
 export function createDyHiFolder(folder, dyhiLevels) {
   return dispatch => {
-    console.log(
-      'Create dyhi for ' + folder.name + ' with ' + JSON.stringify(dyhiLevels),
-    )
     dispatch({
       type: CREATE_FOLDER,
       payload: {
@@ -383,7 +362,6 @@ export function createDyHiFolder(folder, dyhiLevels) {
     archivistPost(dispatch, `${rootEndpoint}`, folder)
       .then(response => {
         const dyhi = new Folder(response.data)
-        console.log('Created DyHi folder: ' + JSON.stringify(dyhi))
         return createDyHiProm(dispatch, dyhi, dyhiLevels)
       })
       .catch(error => {
@@ -407,7 +385,6 @@ export function dropFolderId(id) {
 
 export function createTaxonomy(folderId) {
   return dispatch => {
-    console.log('Create taxonomy for folder id ' + folderId)
     archivistPost(dispatch, '/api/v1/taxonomy', { folderId })
       .then(response => {
         dispatch({
@@ -425,7 +402,6 @@ export function createTaxonomy(folderId) {
 
 export function deleteTaxonomy(folderId) {
   return dispatch => {
-    console.log('Delete taxonomy for folder id ' + folderId)
     archivistGet(dispatch, `/api/v1/taxonomy/_folder/${folderId}`)
       .then(response => {
         const taxonomy = response.data

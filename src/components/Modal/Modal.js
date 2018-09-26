@@ -11,6 +11,13 @@ export default class Modal extends Component {
 
   static defaultProps = { width: '75%' }
 
+  constructor(props) {
+    super(props)
+    console.warn(
+      'The Modal.js component is deprecated, use ModalOverlay.js instead',
+    )
+  }
+
   isModalUnderlayClickable() {
     return typeof this.props.onModalUnderlayClick === 'function'
   }

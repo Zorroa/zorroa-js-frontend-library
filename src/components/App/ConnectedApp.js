@@ -1,14 +1,15 @@
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { fetchTheme } from '../../actions/themeAction'
+import { samlOptionsRequest, checkSession } from '../../actions/authAction'
 import App from './App'
-import { samlOptionsRequest } from '../../actions/authAction'
 
 export default connect(
   state => {
     return {
       authenticated: state.auth.authenticated,
       themeLoadState: state.theme.themeLoadState,
+      sessionExpired: state.auth.sessionExpired,
     }
   },
   dispatch => ({
@@ -16,6 +17,7 @@ export default connect(
       {
         fetchTheme,
         samlOptionsRequest,
+        checkSession,
       },
       dispatch,
     ),

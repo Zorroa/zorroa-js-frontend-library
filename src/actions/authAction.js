@@ -42,6 +42,7 @@ import {
   SIGNIN_USER,
   SIGNIN_USER_SUCCESS,
   SIGNIN_USER_ERROR,
+  SESSION_TIMEOUT,
 } from '../constants/actionTypes'
 import { USER_ITEM, ORIGIN_ITEM } from '../constants/localStorageItems'
 import User from '../models/User'
@@ -556,5 +557,12 @@ export function samlOptionsRequest() {
         console.error('Can not fetch SAML options', JSON.stringify(error))
         dispatch({ type: SAML_OPTIONS_REQUEST_ERROR, payload: {} })
       })
+  }
+}
+
+export function checkSession() {
+  return {
+    type: SESSION_TIMEOUT,
+    payload: true,
   }
 }

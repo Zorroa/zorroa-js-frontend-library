@@ -12,7 +12,6 @@ const rootEndpoint = '/api/v1/trash'
 
 export function getTrashedFolders() {
   return dispatch => {
-    console.log('Get trashed folders')
     return archivistGet(dispatch, `${rootEndpoint}`)
       .then(response => {
         const trashedFolders = response.data.map(
