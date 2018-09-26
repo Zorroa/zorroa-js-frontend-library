@@ -2,6 +2,7 @@ const os = require('os')
 const http = require('http')
 const https = require('https')
 const fs = require('fs')
+const path = require('path')
 const webpack = require('webpack')
 const packageJson = require('../package.json')
 const middleware = require('webpack-dev-middleware')
@@ -10,8 +11,8 @@ const compiler = webpack(webpackConfig)
 const express = require('express')
 const app = express()
 const proxy = require('http-proxy-middleware')
-const PORT = process.env.CURATOR_PORT || 8081
-const PORT_SECURE = process.env.CURATOR_PORT_SECURE
+const PORT = Number(process.env.CURATOR_PORT) || 8081
+const PORT_SECURE = Number(process.env.CURATOR_PORT_SECURE)
 const ARCHIVIST_API_URL =
   process.env.ARCHIVIST_API_URL || 'http://localhost:8080'
 const WHITELABEL_CONFIGURATION = process.env.WHITELABEL_CONFIGURATION || '{}'
@@ -40,13 +41,19 @@ if (NODE_ENV === 'development') {
 }
 
 // Redirect insecure requests first
-if (PORT_SECURE) {
+if (Number.isNaN(PORT_SECURE) === false) {
   app.use((req, res, next) => {
     if (req.secure) {
       return next()
     }
 
-    const redirectUrl = `https://${req.hostname}/`
+    let urlPort = ''
+
+    if (PORT_SECURE !== 443) {
+      urlPort = `:${PORT_SECURE}`
+    }
+
+    const redirectUrl = `https://${req.hostname}${urlPort}/`
     res.redirect(301, redirectUrl)
   })
 }
@@ -65,8 +72,9 @@ app.get('/favicon.ico', (req, res) => {
   const whitelabelSettings = getWhitelabelConfiguration()
 
   if (!whitelabelSettings.favicon) {
-    res.status(404)
-    res.send('No favicon configured')
+    res.sendFile('favicon.ico', {
+      root: path.join(__dirname, '..', 'src', 'assets'),
+    })
     return
   }
 
