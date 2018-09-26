@@ -54,15 +54,9 @@ export function removeRaw(field) {
 export function aggField(field, fieldType) {
   field = field && removeRaw(field)
   if (!field || !field.length || !fieldType || !fieldType.length) return
-  const numericFieldTypes = new Set([
-    'double',
-    'integer',
-    'long',
-    'date',
-    'boolean',
-  ])
-  const isNumeric = numericFieldTypes.has(fieldType)
-  return isNumeric ? field : field + '.raw'
+  const rawFieldTypes = new Set(['string'])
+  const isRawRequired = rawFieldTypes.has(fieldType)
+  return isRawRequired ? `${field}.raw` : field
 }
 
 export function widgetTypeForField(field, type) {
@@ -241,7 +235,7 @@ export function createFiletypeWidget(
   isEnabled,
   isPinned,
 ) {
-  if (!field || !field.length) field = 'source.extension'
+  if (!field || !field.length) field = 'source.extension.raw'
   const type = FiletypeWidgetInfo.type
   const order = { _term: 'asc' }
   const aggs = { filetype: { terms: { field, order, size: 100 } } }

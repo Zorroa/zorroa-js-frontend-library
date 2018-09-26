@@ -16,7 +16,7 @@ import {
   FILE_GROUP_DOCUMENTS,
 } from '../../../constants/fileTypes'
 
-const extField = 'source.extension'
+const extField = 'source.extension.raw'
 
 class Filetype extends Component {
   static propTypes = {
