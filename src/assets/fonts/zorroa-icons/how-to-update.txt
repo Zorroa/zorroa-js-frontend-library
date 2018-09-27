@@ -9,7 +9,7 @@ Make sure you don't have any staged git files, then...
 Run these commands (OSX) from the fonts/zorroa-icons directory:
 
 cd src/assets/fonts/zorroa-icons
-git checkout master
+git checkout development
 git checkout -b zorroa-icons
 unzip -o zorroa-icons.zip
 git add -- .
