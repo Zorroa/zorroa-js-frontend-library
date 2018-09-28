@@ -34,9 +34,10 @@ class Lightbar extends Component {
     origin: PropTypes.string,
     user: PropTypes.instanceOf(User),
     userSettings: PropTypes.object.isRequired,
+    offsetCount: PropTypes.number,
     actions: PropTypes.object,
     history: PropTypes.shape({
-      goBack: PropTypes.func.isRequired,
+      go: PropTypes.func.isRequired,
     }).isRequired,
   }
 
@@ -106,8 +107,10 @@ class Lightbar extends Component {
       })
   }
 
+  // moves pointer in history stack back to before user entered Lightbox
   closeLightbox() {
-    this.props.history.goBack()
+    const n = this.props.offsetCount
+    this.props.history.go(-n)
     this.props.actions.isolateAssetId()
   }
 

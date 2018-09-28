@@ -37,6 +37,10 @@ export default class Lightbox extends Component {
     history: PropTypes.object,
   }
 
+  state = {
+    offsetCount: 1,
+  }
+
   @keydown('esc')
   closeLightbox(event) {
     this.props.history.goBack()
@@ -107,6 +111,9 @@ export default class Lightbox extends Component {
     if (index + offset >= 0 && index + offset < assets.length) {
       const assetId = assets[index + offset].id
       this.props.history.push(`/asset/${assetId}`)
+      this.setState(state => {
+        return { offsetCount: state.offsetCount + 1 }
+      })
     }
   }
 
@@ -153,8 +160,8 @@ export default class Lightbox extends Component {
 
   render() {
     const { assets, lightboxMetadata } = this.props
+    const { offsetCount } = this.state
     const isolatedId = this.getIsolatedId()
-
     let asset = null
     let hasNext = false
     let hasPrev = false
@@ -183,12 +190,12 @@ export default class Lightbox extends Component {
     // canvas elements get the correct and latest render output. We also assume
     // that if a parent ID is shared between assets a full re-render isn't needed.
     const inspectorKey = asset.parentId() || asset.id
-
     return (
       <div className="lightbox dark">
         <Lightbar
           showMetadata={this.shouldDisplayLightboxMetadata()}
           onMetadata={this.toggleMetadata}
+          offsetCount={offsetCount}
         />
         <div className="lightbox-body">
           <Inspector

@@ -16,6 +16,14 @@ export default class AssetContextMenu extends Component {
     onDismiss: PropTypes.func.isRequired,
     selectedIds: PropTypes.instanceOf(Set),
     origin: PropTypes.string,
+
+    // connect actions
+    actions: PropTypes.shape({
+      isolateAssetId: PropTypes.func.isRequired,
+    }).isRequired,
+
+    // router props
+    history: PropTypes.object,
   }
 
   getMenuItems = () => {
@@ -24,6 +32,12 @@ export default class AssetContextMenu extends Component {
         fn: this.downloadAsset,
         icon: 'icon-download5',
         label: 'Download',
+        disabled: () => false,
+      },
+      {
+        fn: this.openInLightbox,
+        icon: 'icon-open_in_browser',
+        label: 'Open in Lightbox',
         disabled: () => false,
       },
       // features not ready
@@ -72,11 +86,21 @@ export default class AssetContextMenu extends Component {
       const { source } = asset.document
       const { filename, mediaType } = source
       const options = { format: 'blob' }
-
-      getImage(this.getAssetURL(asset), options).then(image => {
-        downloadjs(image, filename, mediaType)
-      })
+      const url = this.getAssetURL(asset)
+      this.fetch(url, options, filename, mediaType)
     })
+  }
+
+  fetch(url, options, filename, mediaType) {
+    getImage(url, options).then(image => {
+      downloadjs(image, filename, mediaType)
+    })
+  }
+
+  openInLightbox = () => {
+    const { history } = this.props
+    const idArray = [...this.props.selectedIds]
+    this.props.actions.isolateAssetId(idArray[0], history)
   }
 
   editHold = () => {

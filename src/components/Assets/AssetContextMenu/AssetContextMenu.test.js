@@ -10,10 +10,21 @@ configure({
   disableLifecycleMethods: true,
 })
 
+function generateActions() {
+  const isolateAssetId = jest.fn()
+  const actions = {
+    isolateAssetId,
+  }
+
+  return actions
+}
+
 function generateRequiredProps(customProps) {
   return {
+    actions: generateActions(),
     contextMenuPos: { x: 0, y: 0 },
     onDismiss: jest.fn(),
+    history: {},
     ...customProps,
   }
 }
@@ -69,6 +80,49 @@ describe('<AssetContextMenu />', () => {
         const assetdURL = component.instance().getAssetURL()
         expect(assetdURL).toBe(null)
       })
+    })
+  })
+
+  describe('downloadAsset()', () => {
+    it('Should call getImage for each asset', () => {
+      const props = generateRequiredProps({
+        assets: [
+          new Asset({
+            id: 'a',
+            document: { source: { mediaType: '', filename: '' } },
+          }),
+          new Asset({ id: 'b' }),
+          new Asset({ id: 'c' }),
+        ],
+        selectedIds: new Set(['a']),
+      })
+      const component = shallow(<AssetContextMenu {...props} />)
+      const instance = component.instance()
+      instance.fetch = jest.fn()
+      instance.downloadAsset()
+      expect(instance.fetch.mock.calls.length).toBe(1)
+      expect(typeof instance.fetch.mock.calls[0][0]).toBe('string')
+      expect(typeof instance.fetch.mock.calls[0][1]).toBe('object')
+      expect(instance.fetch.mock.calls[0][1].format).toBe('blob')
+    })
+  })
+
+  describe('openInLightbox()', () => {
+    it('Should push call isolateAssetId()', () => {
+      const props = generateRequiredProps({
+        assets: [
+          new Asset({ id: 'a' }),
+          new Asset({ id: 'b' }),
+          new Asset({ id: 'c' }),
+        ],
+        selectedIds: new Set(['a']),
+      })
+      const component = shallow(<AssetContextMenu {...props} />)
+      component.instance().openInLightbox()
+      expect(props.actions.isolateAssetId.mock.calls.length).toEqual(
+        props.selectedIds.size,
+      )
+      expect(props.actions.isolateAssetId.mock.calls[0][0]).toBe('a')
     })
   })
 })
