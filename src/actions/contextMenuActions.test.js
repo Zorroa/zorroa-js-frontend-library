@@ -5,6 +5,7 @@ import {
   dismissThumbContextMenu,
   showMetaContextMenu,
   dismissMetaContextMenu,
+  resetContextMenuPos,
 } from './contextMenuActions'
 import {
   RENDER_TABLE_CONTEXT_MENU,
@@ -13,6 +14,7 @@ import {
   DISMISS_TABLE_CONTEXT_MENU,
   DISMISS_THUMB_CONTEXT_MENU,
   DISMISS_META_CONTEXT_MENU,
+  RESET_CONTEXT_MENU,
 } from '../constants/actionTypes'
 
 describe('contextMenuActions', () => {
@@ -102,6 +104,33 @@ describe('contextMenuActions', () => {
         },
       }
       expect(dismissMetaContextMenu()).toEqual(expectedAction)
+    })
+  })
+
+  describe('resetContextMenuPos()', () => {
+    it('Should reset the ContextMenu position', () => {
+      const expectedAction = {
+        type: RESET_CONTEXT_MENU,
+        payload: {
+          contextMenuPos: { x: 47, y: 33 },
+        },
+      }
+      expect(
+        resetContextMenuPos({
+          contextMenuPos: {
+            x: 47,
+            y: 33,
+          },
+        }),
+      ).toEqual(expectedAction)
+    })
+
+    it('Null contenxtmenu sends undefined', () => {
+      const expectedAction = {
+        type: RESET_CONTEXT_MENU,
+        payload: undefined,
+      }
+      expect(resetContextMenuPos()).toEqual(expectedAction)
     })
   })
 })
