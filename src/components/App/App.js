@@ -98,8 +98,16 @@ export default class App extends Component {
     }
   }
 
+  canCheckSession() {
+    return (
+      this.props.authenticated === true &&
+      document.hidden === false &&
+      navigator.onLine === true
+    )
+  }
+
   checkSession = () => {
-    if (!this.props.authenticated) {
+    if (!this.canCheckSession()) {
       return
     }
     axios.get('/api/v1/who').catch(error => {
