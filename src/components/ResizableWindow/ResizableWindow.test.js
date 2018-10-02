@@ -21,15 +21,17 @@ describe('ResizableWIndow', () => {
     const props = generateProps()
     const component = shallow(<ResizableWindow {...props} />)
     const html = component.html()
-    expect(html.includes('FlipbookViewer__metadata-container')).toEqual(false)
+    expect(html.includes('FlipbookInspector__metadata-container')).toEqual(
+      false,
+    )
   })
 
   it('should add coverScrubber class when available as prop', () => {
     const props = generateProps({
-      classes: 'FlipbookViewer__metadata-container',
+      classes: 'FlipbookInspector__metadata-container',
     })
     const component = shallow(<ResizableWindow {...props} />)
     const html = component.html()
-    expect(html.includes('FlipbookViewer__metadata-container')).toEqual(true)
+    expect(html.includes('FlipbookInspector__metadata-container')).toEqual(true)
   })
 })

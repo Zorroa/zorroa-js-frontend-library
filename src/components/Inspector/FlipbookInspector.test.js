@@ -2,7 +2,7 @@
 import React from 'react'
 import { shallow, configure } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-15'
-import FlipbookViewer from './FlipbookViewer.js'
+import FlipbookInspector from './FlipbookInspector.js'
 import Asset from '../../models/Asset'
 import User from '../../models/User'
 
@@ -59,11 +59,11 @@ function generateRequiredProps(customProps) {
   }
 }
 
-describe('<FlipbookViewer />', () => {
+describe('<FlipbookInspector />', () => {
   describe('getDefaultFrameFromIsolatedAsset()', () => {
     it('Should get the default frame', () => {
       const props = generateRequiredProps()
-      const component = shallow(<FlipbookViewer {...props} />)
+      const component = shallow(<FlipbookInspector {...props} />)
       const defaultFrame = component
         .instance()
         .getDefaultFrameFromIsolatedAsset()
@@ -75,7 +75,7 @@ describe('<FlipbookViewer />', () => {
     describe('playedFlipbookFrame', () => {
       it('Should set the `playingFrame` to the activeFrame', () => {
         const props = generateRequiredProps()
-        const component = shallow(<FlipbookViewer {...props} />)
+        const component = shallow(<FlipbookInspector {...props} />)
         const nextFrame = new Asset({
           id: 'f-l-i-p',
           document: {},
@@ -94,7 +94,7 @@ describe('<FlipbookViewer />', () => {
   describe('toggleMetadata()', () => {
     it('Should set `show` to `true` if it was `false`', () => {
       const props = generateRequiredProps({})
-      const component = shallow(<FlipbookViewer {...props} />)
+      const component = shallow(<FlipbookInspector {...props} />)
       component.instance().toggleMetadata()
       component.update()
       const lightboxMetadata = props.actions.lightboxMetadata.mock.calls[0][0]
@@ -111,7 +111,7 @@ describe('<FlipbookViewer />', () => {
           height: 200,
         },
       })
-      const component = shallow(<FlipbookViewer {...props} />)
+      const component = shallow(<FlipbookInspector {...props} />)
       component.instance().toggleMetadata()
       component.update()
       const lightboxMetadata = props.actions.lightboxMetadata.mock.calls[0][0]
@@ -133,7 +133,7 @@ describe('<FlipbookViewer />', () => {
           height: 200,
         },
       })
-      const component = shallow(<FlipbookViewer {...props} />)
+      const component = shallow(<FlipbookInspector {...props} />)
       component.instance().closeMetadata(event)
       component.update()
       const lightboxMetadata = props.actions.lightboxMetadata.mock.calls[0][0]
@@ -155,7 +155,7 @@ describe('<FlipbookViewer />', () => {
           height: 100,
         },
       })
-      const component = shallow(<FlipbookViewer {...props} />)
+      const component = shallow(<FlipbookInspector {...props} />)
       component.instance().moveMetadata({
         show: true,
         left: 50,
@@ -184,7 +184,7 @@ describe('<FlipbookViewer />', () => {
             height: 200,
           },
         })
-        const component = shallow(<FlipbookViewer {...props} />)
+        const component = shallow(<FlipbookInspector {...props} />)
         const shouldDisplayMetadata = component
           .instance()
           .shouldDisplayMetadata()
@@ -195,7 +195,7 @@ describe('<FlipbookViewer />', () => {
     describe('When the lightbox `show` property is false', () => {
       it('Should be `false`', () => {
         const props = generateRequiredProps({})
-        const component = shallow(<FlipbookViewer {...props} />)
+        const component = shallow(<FlipbookInspector {...props} />)
         const nextFrame = new Asset({
           id: 'f-l-i-p',
           document: {},
@@ -219,7 +219,7 @@ describe('<FlipbookViewer />', () => {
             height: 200,
           },
         })
-        const component = shallow(<FlipbookViewer {...props} />)
+        const component = shallow(<FlipbookInspector {...props} />)
         const nextFrame = new Asset({
           id: 'f-l-i-p',
           document: {},

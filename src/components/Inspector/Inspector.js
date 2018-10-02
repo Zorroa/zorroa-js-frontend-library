@@ -3,9 +3,9 @@ import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 
 import Pdf from './Pdf'
-import FlipbookViewer from './ConnectedFlipbookViewer.js'
-import VideoViewer from './VideoViewer'
-import Image from './Image'
+import FlipbookInspector from './ConnectedFlipbookInspector.js'
+import VideoInspector from './VideoInspector'
+import ImageInspector from './ImageInspector'
 import Asset from '../../models/Asset'
 import wrapSignedStream from '../SignedStream'
 
@@ -42,15 +42,17 @@ class Inspector extends PureComponent {
     let inspector = null
 
     if (asset.clipType() === 'flipbook') {
-      inspector = <FlipbookViewer clipParentId={asset.parentId()} />
+      inspector = <FlipbookInspector clipParentId={asset.parentId()} />
     } else if (
       asset.isOfType('image') &&
       imageFormats.findIndex(format => mediaType.endsWith(format)) >= 0
     ) {
-      inspector = <Image url={url} onNextPage={onNext} onPrevPage={onPrev} />
+      inspector = (
+        <ImageInspector url={url} onNextPage={onNext} onPrevPage={onPrev} />
+      )
     } else if (asset.isOfType('video') && asset.validVideo()) {
       inspector = (
-        <VideoViewer
+        <VideoInspector
           url={url}
           backgroundURL={asset.backgroundURL(origin)}
           frames={asset.frames()}
@@ -81,7 +83,7 @@ class Inspector extends PureComponent {
         ? error.code === 4 ? 'Cannot open video file' : error.message
         : asset.isOfType('video') ? 'Invalid video file' : undefined
       const proxy = asset.biggestProxy()
-      inspector = <Image url={asset.largestProxyURL(origin)} />
+      inspector = <ImageInspector url={asset.largestProxyURL(origin)} />
       warning = (
         <div className="Inspector-proxy">
           <div className="Inspector-proxy">

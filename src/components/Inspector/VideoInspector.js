@@ -12,7 +12,7 @@ import VideoRange from './VideoRange'
 import Video from '../Video'
 import User from '../../models/User'
 
-class VideoViewer extends Component {
+class VideoInspector extends Component {
   static propTypes = {
     url: PropTypes.string.isRequired,
     backgroundURL: PropTypes.string,
@@ -127,9 +127,9 @@ class VideoViewer extends Component {
     const seconds = played ? (played * frames - startFrame) / frameRate : 0
     const duration = (stopFrame - startFrame) / frameRate
     const title = (
-      <div className="VideoViewer-time">
+      <div className="VideoInspector-time">
         <Duration
-          className="VideoViewer-remaining"
+          className="VideoInspector-remaining"
           seconds={seconds}
           frameRate={frameRate}
         />/<Duration seconds={duration} frameRate={frameRate} />
@@ -137,8 +137,8 @@ class VideoViewer extends Component {
     )
     const total = frames * 10
     return (
-      <div className="VideoViewer">
-        <div className="VideoViewer-pan-zoom">
+      <div className="VideoInspector">
+        <div className="VideoInspector-pan-zoom">
           <PanZoom
             title={title}
             titleWidth={300}
@@ -195,13 +195,13 @@ export default connect(
       dispatch,
     ),
   }),
-)(VideoViewer)
+)(VideoInspector)
 
 const Duration = ({ className, seconds, frameRate }) => {
   return (
     <time
       dateTime={`P${Math.round(seconds)}S`}
-      className={className || 'VideoViewer-duration'}>
+      className={className || 'VideoInspector-duration'}>
       {formatDuration(seconds, frameRate)}
     </time>
   )

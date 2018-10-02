@@ -12,7 +12,7 @@ import keydown from 'react-keydown'
 import Metadata from '../Metadata'
 import ResizableWindow from '../ResizableWindow'
 
-export default class FlipbookViewer extends PureComponent {
+export default class FlipbookInspector extends PureComponent {
   static propTypes = {
     clipParentId: PropTypes.string.isRequired,
     onError: PropTypes.func,
@@ -190,7 +190,7 @@ export default class FlipbookViewer extends PureComponent {
       options: defaultFpsFrequencies,
       rate: this.props.fps,
     }
-    const panZoomClassNames = classnames('FlipbookViewer__pan-zoom')
+    const panZoomClassNames = classnames('FlipbookInspector__pan-zoom')
     const metadataTitle = (
       <div className="Lightbox-metadata-title">
         <div className="Lightbox__metadata-icon icon-register" />
@@ -199,7 +199,7 @@ export default class FlipbookViewer extends PureComponent {
     )
 
     return (
-      <div className="FlipbookViewer">
+      <div className="FlipbookInspector">
         {this.shouldDisplayMetadata() && (
           <ResizableWindow
             onClose={this.closeMetadata}
@@ -207,7 +207,7 @@ export default class FlipbookViewer extends PureComponent {
             preventOutOfBounds
             {...this.props.lightboxMetadata}
             title={metadataTitle}
-            classes="FlipbookViewer__metadata-container">
+            classes="FlipbookInspector__metadata-container">
             <Metadata
               assetIds={new Set([playingFrame.id])}
               dark={true}
@@ -216,7 +216,7 @@ export default class FlipbookViewer extends PureComponent {
             />
           </ResizableWindow>
         )}
-        <div className="FlipbookViewer__media">
+        <div className="FlipbookInspector__media">
           <div className={panZoomClassNames}>
             <PanZoom
               frameFrequency={frameFrequency}

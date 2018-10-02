@@ -6,7 +6,7 @@ import {
 } from '../../actions/appActions'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import FlipbookViewer from './FlipbookViewer'
+import FlipbookInspector from './FlipbookInspector'
 import { saveUserSettings } from '../../actions/authAction'
 import { getAssetFields } from '../../actions/assetsAction'
 
@@ -39,4 +39,4 @@ export default connect(
       dispatch,
     ),
   }),
-)(FlipbookViewer)
+)(FlipbookInspector)

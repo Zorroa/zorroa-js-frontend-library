@@ -1,15 +1,29 @@
 @import '../../styles/core-mixins.scss';
 
-.Image {
+.ImageInspector {
   @include flexOn;
   width: 100%;
   max-width:100%;
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
+
+  &__loading-status {
+    display: flex;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+  }
 }
 
-.Image-frame {
+.ImageInspector-frame {
   width: 100%;
   height: 100%;
   max-width:100%;

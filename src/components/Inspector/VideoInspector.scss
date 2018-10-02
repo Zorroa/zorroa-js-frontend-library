@@ -1,6 +1,6 @@
 @import '../../styles/core-mixins.scss';
 
-.VideoViewer {
+.VideoInspector {
   @include flexCol;
   @include flexAlignItemsCenter;
   @include fullWidth;
@@ -18,7 +18,7 @@
     margin-right: 0;
   }
 
-  .VideoViewer-pan-zoom {
+  .VideoInspector-pan-zoom {
     @include flexCol;
     @include flexOn;
     @include fullWidth;
@@ -28,7 +28,7 @@
     position: relative;
   }
 
-  .VideoViewer-player {
+  .VideoInspector-player {
     @include flexColCenter;
     @include flexOn;
     @include fullWidth;
@@ -37,7 +37,7 @@
     max-height: 100%;
   }
 
-  .VideoViewer-progress-bar {
+  .VideoInspector-progress-bar {
     @include fullWidth;
     @include flexOff;
     @include flexRowCenter;
@@ -47,7 +47,7 @@
     left: 0;
     height: 16px;
 
-    .VideoViewer-scrub {
+    .VideoInspector-scrub {
       @include fullWidth;
       z-index: 10;
       position: relative;
@@ -59,7 +59,7 @@
       background-color: rgba(64,64,64,0.05);
     }
 
-    input.VideoViewer-scrub[type=range] {
+    input.VideoInspector-scrub[type=range] {
       &::-webkit-slider-thumb {
         -webkit-appearance: none;
         border: none;
@@ -92,17 +92,17 @@
       background-color: transparent;
     }
 
-    .VideoViewer-progress-progress {
+    .VideoInspector-progress-progress {
       @include fullWidth;
       height: 4px;
 
       position: absolute;
       left:0;
-      top: 6px; // .VideoViewer-progress-bar.height - 0.5 * .VideoViewer-progress-progress.height
+      top: 6px; // .VideoInspector-progress-bar.height - 0.5 * .VideoInspector-progress-progress.height
     }
   }
 
-  .VideoViewer-control-bar {
+  .VideoInspector-control-bar {
     @include fullWidth;
     @include flexRow;
     @include flexJustifySpaceBetween;
@@ -119,7 +119,7 @@
   }
 }
 
-  .VideoViewer-controls {
+  .VideoInspector-controls {
     @include flexRow;
     @include flexJustifyCenter;
     @include flexAlignItemsCenter;
@@ -137,7 +137,7 @@
       }
     }
 
-    .VideoViewer-play {
+    .VideoInspector-play {
       color: white;
       border-radius: 3px;
       background: $zorroa-sickly-green;
@@ -166,10 +166,10 @@
     }
   }
 
-  .VideoViewer-misc {
+  .VideoInspector-misc {
   }
 
-  .VideoViewer-multipage {
+  .VideoInspector-multipage {
     &:hover {
       cursor: pointer;
       color: $zorroa-sickly-green;
@@ -177,12 +177,12 @@
   }
 }
 
-.VideoViewer-time {
+.VideoInspector-time {
   padding-left: 10px;
   font-size: 18px;
   color: $zorroa-gray;
 
-  .VideoViewer-duration {
+  .VideoInspector-duration {
     font-size: 16px;
     padding: 8px;
     font-weight: 100;
@@ -191,13 +191,13 @@
     -webkit-font-smoothing: subpixel-antialiased;
   }
 
-  .VideoViewer-remaining {
-    @extend .VideoViewer-duration;
+  .VideoInspector-remaining {
+    @extend .VideoInspector-duration;
     color: $zorroa-lightgray;
   }
 }
 
-.VideoViewer-error {
+.VideoInspector-error {
   position: absolute;
   left: 8px;
   top: 8px;
