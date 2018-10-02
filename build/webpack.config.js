@@ -40,6 +40,7 @@ module.exports = {
         use: ['babel-loader'],
       },
     ],
+    noParse: /(mapbox-gl)\.js$/,
   },
   resolve: {
     extensions: ['*', '.js', '.jsx'],
