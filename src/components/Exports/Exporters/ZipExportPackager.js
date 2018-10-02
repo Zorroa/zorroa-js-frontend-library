@@ -64,7 +64,7 @@ export default class ZipExportPackager extends Component {
           <FormLabel
             vertical
             label="Load Export Profile"
-            className="Exports__form-element Exports__form-element--nested">
+            className="Exports__form-element">
             <FormSelect
               className="Exports__form-select Exports__form-select--large"
               options={this.props.presets}

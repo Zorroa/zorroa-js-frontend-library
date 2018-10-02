@@ -1,6 +1,7 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { getJobs } from '../../actions/jobActions'
+import { toggleCollapsible } from '../../actions/appActions'
 import {
   hideExportInterface,
   postExportProfiles,
@@ -67,6 +68,7 @@ export default connect(
         onlineStatus,
         getProcessors,
         getJobs,
+        toggleCollapsible,
       },
       dispatch,
     ),

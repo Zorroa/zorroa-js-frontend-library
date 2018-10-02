@@ -24,6 +24,12 @@ import ExportPreviewerPdf from './Previewers/Pdf'
 import ExportPreviewerJson from './Previewers/Json'
 import ExportPreviewerCsv from './Previewers/Csv'
 import ExportsPreview from './ExportsPreview'
+import {
+  FILE_GROUP_IMAGES,
+  FILE_GROUP_VIDEOS,
+  FILE_GROUP_DOCUMENTS,
+  groupExts,
+} from '../../constants/fileTypes.js'
 import moment from 'moment'
 import { JobFilter } from '../../models/Job'
 
@@ -82,6 +88,7 @@ export default class Exports extends Component {
       onlineStatus: PropTypes.func.isRequired,
       createExport: PropTypes.func.isRequired,
       getJobs: PropTypes.func.isRequired,
+      toggleCollapsible: PropTypes.func.isRequired,
     }),
     processors: PropTypes.arrayOf(
       PropTypes.shape({
@@ -101,16 +108,14 @@ export default class Exports extends Component {
           size: 1024,
           quality: 100,
         },
-        shouldExport: true,
+        shouldExport: false,
       },
       PdfExporter: {
         arguments: {
-          filename: this.props.packageName,
           exportOriginal: true,
           pageMode: 'separate',
-          quality: 100,
         },
-        shouldExport: true,
+        shouldExport: false,
         format: 'multipage',
       },
       FlipbookExporter: {
@@ -120,7 +125,7 @@ export default class Exports extends Component {
           exportMovies: true,
           frameRate: 30,
         },
-        shouldExport: true,
+        shouldExport: false,
         flipbookExportType: 'image',
       },
       CsvExporter: {
@@ -142,7 +147,7 @@ export default class Exports extends Component {
           format: 'mp4',
           exportOriginal: true,
         },
-        shouldExport: true,
+        shouldExport: false,
       },
     }
 
@@ -179,21 +184,58 @@ export default class Exports extends Component {
           newPresetName: `Preset ${prevState.presetSaveCounter + 1}`,
         }))
       }, SHOW_SUCCESS_MS)
+    }
 
-      if (
-        this.props.loadingCreateExportSuccess === false &&
-        nextProps.loadingCreateExportSuccess === true
-      ) {
-        const { userId } = this.props
-        const type = 'Exports'
-        const jobFilter = new JobFilter({ type, userId })
-        this.props.actions.getJobs(jobFilter, 0, 30)
+    if (this.hasNewAssets(nextProps)) {
+      this.updateAssetExportability()
+    }
+  }
+
+  hasNewAssets(otherProps) {
+    return otherProps.selectedAssets !== this.props.selectedAssets
+  }
+
+  updateAssetExportability() {
+    const extensions = groupExts
+    this.setState((state, props) => {
+      return {
+        ...state,
+        ImageExporter: {
+          ...state.ImageExporter,
+          shouldExport: props.selectedAssets.some(asset => {
+            return extensions[FILE_GROUP_IMAGES].includes(asset.extension())
+          }),
+        },
+        VideoClipExporter: {
+          ...state.VideoClipExporter,
+          shouldExport: props.selectedAssets.some(asset => {
+            return extensions[FILE_GROUP_VIDEOS].includes(asset.extension())
+          }),
+        },
+        PdfExporter: {
+          ...state.PdfExporter,
+          shouldExport: props.selectedAssets.some(asset => {
+            return extensions[FILE_GROUP_DOCUMENTS].includes(asset.extension())
+          }),
+        },
       }
+    })
+  }
+
+  getJobs() {
+    const { userId } = this.props
+    const type = 'Exports'
+    const jobFilter = new JobFilter({ type, userId })
+    this.props.actions.getJobs(jobFilter, 0, 30)
+    if (this.props.loadingCreateExportSuccess) {
+      const isOpen = true
+      this.props.actions.toggleCollapsible('exportJobs', isOpen)
     }
   }
 
   close = () => {
     this.props.actions.hideExportInterface()
+    this.getJobs()
   }
 
   onChange = newState => {

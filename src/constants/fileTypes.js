@@ -1,7 +1,6 @@
 export const FILE_GROUP_IMAGES = 'Image Files'
 export const FILE_GROUP_VECTORS = 'Vector Files'
 export const FILE_GROUP_VIDEOS = 'Video Files'
-export const FILE_GROUP_FLIPBOOKS = 'Flipbook Files'
 export const FILE_GROUP_DOCUMENTS = 'Document Files'
 
 export const allExts = {

@@ -81,6 +81,10 @@ export default class Asset {
     return `${origin}/api/v1/ofs/${id}`
   }
 
+  extension() {
+    return this.document.source && this.document.source.extension
+  }
+
   mediaType() {
     return (this.document.source && this.document.source.mediaType) || 'unknown'
   }

@@ -18,6 +18,11 @@
     box-shadow: 0 2px 15px -1px rgba(0,0,0,.2);
     line-height: 1.2;
 
+    .dark & {
+      background: $zorroa-color-gray-dark-2;
+      color: $zorroa-color-white;
+    }
+
     &--success {
       border-color: $zorroa-color-green-4;
     }

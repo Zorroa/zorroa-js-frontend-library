@@ -5,6 +5,7 @@ import { shallow, configure } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-15'
 import Exports from './Exports.js'
 import AssetSearch from '../../models/AssetSearch'
+import Asset from '../../models/Asset'
 
 configure({ adapter: new Adapter() })
 
@@ -74,58 +75,83 @@ function generateRequiredProps(customProps) {
 
 describe('<Exports />', () => {
   describe('serializeExporterArguments()', () => {
-    it('Should map arguments to the exporter names from exports state tree', () => {
-      const props = generateRequiredProps({
-        processors: [
-          {
-            className: 'zplugins.export.processors.PdfExporter',
-            args: {
-              exportOriginal: true,
-              pageMode: 'separate',
+    describe('When there are custom exporters', () => {
+      it('Should map arguments to the exporter names from exports state tree', () => {
+        const props = generateRequiredProps({
+          selectedAssets: [
+            new Asset({
+              document: {
+                source: {
+                  extension: 'pdf',
+                },
+              },
+            }),
+          ],
+          processors: [
+            {
+              className: 'zplugins.export.processors.PdfExporter',
+              args: {
+                exportOriginal: true,
+                pageMode: 'separate',
+              },
+              execute: [],
+              filters: [],
+              fileTypes: [],
+              language: 'python',
             },
-            execute: [],
-            filters: [],
-            fileTypes: [],
-            language: 'python',
-          },
-        ],
-      })
-      const component = shallow(<Exports {...props} />)
-      const serializedArgs = component.instance().serializeExporterArguments()
-      expect(serializedArgs).toEqual({
-        compress: true,
-        name: 'My Test Exports',
-        processors: [
-          {
-            args: {
-              exportOriginal: true,
-              pageMode: 'separate',
-              filename: 'My Test Exports',
-              quality: 100,
+          ],
+        })
+        const component = shallow(<Exports {...props} />)
+        component.instance().updateAssetExportability()
+        const serializedArgs = component.instance().serializeExporterArguments()
+        expect(serializedArgs).toEqual({
+          compress: true,
+          name: 'My Test Exports',
+          processors: [
+            {
+              args: {
+                exportOriginal: true,
+                pageMode: 'separate',
+              },
+              className: 'zplugins.export.processors.PdfExporter',
             },
-            className: 'zplugins.export.processors.PdfExporter',
+          ],
+          search: {
+            filter: undefined,
           },
-        ],
-        search: {
-          access: undefined,
-          aggs: undefined,
-          fields: undefined,
-          filter: undefined,
-          from: undefined,
-          order: undefined,
-          postFilter: undefined,
-          query: undefined,
-          queryFields: undefined,
-          scroll: undefined,
-          size: undefined,
-        },
+        })
       })
     })
 
     describe('serializeExporterArguments()', () => {
       it('Should map arguments to the fully qualified exporter names', () => {
-        const props = generateRequiredProps()
+        const props = generateRequiredProps({
+          selectedAssets: [
+            new Asset({
+              document: {
+                source: {
+                  extension: 'jpg',
+                },
+              },
+            }),
+            new Asset({
+              document: {
+                source: {
+                  extension: 'mov',
+                },
+              },
+            }),
+            new Asset({
+              document: {
+                source: {
+                  extension: 'pdf',
+                },
+              },
+            }),
+          ],
+        })
         const component = shallow(<Exports {...props} />)
+        component.instance().updateAssetExportability()
         const serializedArgs = component.instance().serializeExporterArguments()
         expect(serializedArgs).toEqual({
           compress: true,
@@ -151,19 +177,8 @@ describe('<Exports />', () => {
             },
             {
               args: {
-                exportImages: true,
-                exportMovies: true,
-                frameRate: 30,
-                quality: 'medium',
-              },
-              className: 'com.zorroa.core.exporter.FlipbookExporter',
-            },
-            {
-              args: {
                 exportOriginal: true,
                 pageMode: 'separate',
-                filename: 'My Test Exports',
-                quality: 100,
               },
               className: 'com.zorroa.core.exporter.PdfExporter',
             },
@@ -173,17 +188,7 @@ describe('<Exports />', () => {
             },
           ],
           search: {
-            access: undefined,
-            aggs: undefined,
-            fields: undefined,
             filter: undefined,
-            from: undefined,
-            order: undefined,
-            postFilter: undefined,
-            query: undefined,
-            queryFields: undefined,
-            scroll: undefined,
-            size: undefined,
           },
         })
       })

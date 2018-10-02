@@ -273,13 +273,12 @@ export function updateExportInterface({
       const { aggregations, assets, page } = assetSearchResponse
       const totalAssetCount = page.totalCount
       const availableSearchAssets = restrictedAssetSearch.page.totalCount
-
       dispatch({
         type: UPDATE_EXPORT_UI,
         payload: {
           exportPreviewAssets: assets,
-          hasRestrictedAssets: availableSearchAssets >= totalAssetCount,
           totalAssetCount,
+          unrestrictedAssetCount: availableSearchAssets,
           clipParentCounts: {
             type: aggregations.clipType.buckets.reduce(
               (accumulator, bucket) => {

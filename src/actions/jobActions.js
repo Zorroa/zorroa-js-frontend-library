@@ -162,19 +162,17 @@ export function markJobDownloaded(jobId) {
   return { type: MARK_JOB_DOWNLOADED, payload: jobId }
 }
 
-export function downloadFilesForJob(jobId, origin) {
+export function downloadFilesForJob(jobId) {
   return dispatch => {
     api
       .job(jobId)
       .files.get()
       .then(files => {
-        return Promise.all(
-          files.map(file => {
-            const { jobId, id } = file
-            const downloadUrl = `${origin}/api/v1/exports/${jobId}/_files/${id}/_stream`
-            window.open(downloadUrl, '_blank')
-          }),
-        )
+        files.map(file => {
+          const { jobId, id } = file
+          const downloadUrl = `/api/v1/exports/${jobId}/_files/${id}/_stream`
+          window.open(downloadUrl, '_blank')
+        })
       })
       .then(() => {
         dispatch({

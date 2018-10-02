@@ -98,16 +98,16 @@ export default function(state = initialState, action) {
     }
     case UPDATE_EXPORT_UI: {
       const {
-        hasRestrictedAssets,
         totalAssetCount,
         exportPreviewAssets,
+        unrestrictedAssetCount,
       } = action.payload
       const assetGroupCounts = [
         FILE_GROUP_IMAGES,
         FILE_GROUP_VIDEOS,
         FILE_GROUP_DOCUMENTS,
       ].reduce((accumulatorGroupCounts, groupKey) => {
-        const exts = groupExts[groupKey].exts
+        const exts = groupExts[groupKey]
         accumulatorGroupCounts[groupKey] = exts.reduce(
           (accumulator, extension) => {
             const extensionDocumentCount =
@@ -128,7 +128,7 @@ export default function(state = initialState, action) {
         ...state,
         isLoading: false,
         exportPreviewAssets,
-        hasRestrictedAssets,
+        hasRestrictedAssets: totalAssetCount !== unrestrictedAssetCount,
         imageAssetCount: assetGroupCounts[FILE_GROUP_IMAGES] || 0,
         videoAssetCount: assetGroupCounts[FILE_GROUP_VIDEOS] || 0,
         flipbookAssetCount: action.payload.clipParentCounts.type.flipbook || 0,
@@ -331,13 +331,16 @@ export default function(state = initialState, action) {
         loadingProcessors,
         loadingProcessorsSuccess,
         loadingProcessorsError,
+        processors: [],
       }
     }
     case GET_EXPORT_PROCESSORS_SUCCESS: {
       const loadingProcessors = false
       const loadingProcessorsSuccess = true
       const loadingProcessorsError = false
-      const processors = action.payload.processors
+      const processors = Array.isArray(action.payload.processors)
+        ? action.payload.processors
+        : []
 
       return {
         ...state,
@@ -356,6 +359,7 @@ export default function(state = initialState, action) {
         loadingProcessors,
         loadingProcessorsError,
         loadingProcessorsSuccess,
+        processors: [],
       }
     }
   }

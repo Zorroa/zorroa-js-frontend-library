@@ -25,8 +25,8 @@ describe('Asset()', () => {
     })
   })
 
-  describe('height()', () => {
-    it('Should return the height', () => {
+  describe('width()', () => {
+    it('Should return the width', () => {
       const asset = new Asset({
         id: '2',
         document: {
@@ -38,12 +38,34 @@ describe('Asset()', () => {
       expect(asset.width()).toBe(120)
     })
 
-    it('Should not crash if the height is unavailable', () => {
+    it('Should not crash if the width is unavailable', () => {
       const asset = new Asset({
         id: '2',
         document: {},
       })
       expect(asset.width()).toBe(undefined)
+    })
+  })
+
+  describe('extension()', () => {
+    it('Should return the extension', () => {
+      const asset = new Asset({
+        id: '3',
+        document: {
+          source: {
+            extension: 'jpg',
+          },
+        },
+      })
+      expect(asset.extension()).toBe('jpg')
+    })
+
+    it('Should not crash if the source is unavailable', () => {
+      const asset = new Asset({
+        id: '2',
+        document: {},
+      })
+      expect(asset.extension()).toBe(undefined)
     })
   })
 })
