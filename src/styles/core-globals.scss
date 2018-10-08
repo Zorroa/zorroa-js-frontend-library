@@ -1,10 +1,11 @@
+@import './core-mixins.scss';
+
 /*------------------------------
 
 Zorroa core (shared) css classes
 
 ------------------------------*/
 
-@import 'core-mixins';
 
 // https://fonts.google.com/?query=roboto&category=Sans+Serif,Display,Handwriting,Monospace&selection.family=Roboto
 //@import url('https://fonts.googleapis.com/css?family=Roboto');
@@ -54,18 +55,18 @@ button:focus,
   width: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: $zorroa-greyish-brown;
+  background: $zorroa-color-gray-dark-2;
   box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, 0.5);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb {
-  background: $zorroa-gray;
+  background: $zorroa-color-gray-dark-1;
   .dark & {
-    background: $zorroa-gray;
+    background: $zorroa-color-gray-dark-1;
   }
   border-radius: 3px;
   &:hover {
-    background: $zorroa-sickly-green;
+    background: $zorroa-color-green-1;
   }
 }
 
@@ -76,7 +77,7 @@ button:focus,
 // MIT License
 
 $track-color: transparent !default;
-$thumb-color: $zorroa-sickly-green !default;
+$thumb-color: $zorroa-color-green-1 !default;
 
 $thumb-radius: 15px !default;
 $thumb-height: $thumb-radius !default;
@@ -85,17 +86,17 @@ $thumb-shadow-size: 0 !default;
 $thumb-shadow-blur: 0 !default;
 $thumb-shadow-color: transparent !default;
 $thumb-border-width: 2px !default;
-$thumb-border-color: #fff !default;
+$thumb-border-color: $zorroa-color-white !default;
 
 $track-width: 100% !default;
 $track-height: 15px !default;
 $track-shadow-size: 0 !default;
 $track-shadow-blur: 0 !default;
-$track-shadow-color: #000 !default;
+$track-shadow-color: $zorroa-color-black !default;
 $track-border-width: 0 !default;
-$track-border-color: #000 !default;
+$track-border-color: $zorroa-color-black !default;
 
-$track-radius: 5px !default;
+$track-radius: $zorroa-metric-base / 2 !default;
 $contrast: 5% !default;
 
 @mixin shadow($shadow-size, $shadow-blur, $shadow-color) {
@@ -197,237 +198,4 @@ $contrast: 5% !default;
   &:focus::-ms-fill-upper {
     background: lighten($track-color, $contrast);
   }
-}
-
-.hide {
-  @include hide;
-}
-
-.animate {
-  @include animate;
-}
-
-.rot180 {
-  transform: rotate(180deg);
-}
-
-/*
-Make our color defs available as classes
-*/
-
-.zorroa-greyish-brown {
-  color: $zorroa-greyish-brown;
-}
-.zorroa-black {
-  color: $zorroa-black;
-}
-.zorroa-white {
-  color: $zorroa-white;
-}
-.zorroa-avocado-green {
-  color: $zorroa-avocado-green;
-}
-.zorroa-sickly-green {
-  color: $zorroa-sickly-green;
-}
-.zorroa-faded-red {
-  color: $zorroa-faded-red;
-}
-.zorroa-orangish {
-  color: $zorroa-orangish;
-}
-.zorroa-water-blue {
-  color: $zorroa-water-blue;
-}
-.zorroa-darkish-purple {
-  color: $zorroa-darkish-purple;
-}
-.zorroa-medium-pink {
-  color: $zorroa-medium-pink;
-}
-.zorroa-warm-grey-60 {
-  color: $zorroa-warm-grey-60;
-}
-
-.zorroa-darkgray {
-  color: $zorroa-darkgray;
-}
-.zorroa-gray {
-  color: $zorroa-gray;
-}
-.zorroa-lightgray {
-  color: $zorroa-lightgray;
-}
-.zorroa-nearwhite {
-  color: $zorroa-nearwhite;
-}
-.zorroa-transparent {
-  color: $zorroa-transparent;
-}
-
-/* Button classes */
-
-// .zorroa-btn {
-//   color: white;
-//   text-transform: uppercase;
-//   white-space: nowrap;
-//   border: none;
-//   font-size: 14px;
-//   padding: 10px 30px;
-//   border-radius: 3px;
-//   cursor: pointer;
-// }
-// .zorroa-btn-success  { @include zorroa-btn($zorroa-sickly-green, darken($zorroa-sickly-green, 15%) ) ; }
-
-/* Make our text mixins available as classes */
-
-.nowrap {
-  @include nowrap;
-}
-
-.clampText {
-  @include clampText;
-}
-
-/* Flexbox classes */
-
-.flexRow {
-  @include flexRow;
-}
-// .flexRowRev { @include flexRowRev; }
-.flexCol {
-  @include flexCol;
-}
-.flexCenter {
-  @include flexCenter;
-}
-.flexRowCenter {
-  @include flexRowCenter;
-}
-.flexColCenter {
-  @include flexColCenter;
-}
-.flexWrap {
-  @include flexWrap;
-}
-
-/* flexRowThenCol is a row when wide, then a column when narrow */
-// .flexRowThenCol {
-//   @include flexRow;
-//   @media screen and (max-width: 700px) { @include flexCol; }
-// }
-
-// .flexALittle { -webkit-box-flex : 0.2 0.2 auto ; -moz-box-flex : 0.2 0.2 auto; -webkit-flex : 0.2 0.2 auto ; -ms-flex : 0.2 0.2 auto; flex : 0.2 0.2 auto; }
-// .flex2       { -webkit-box-flex :   2   2 auto ; -moz-box-flex :   2   2 auto; -webkit-flex :   2   2 auto ; -ms-flex :   2   2 auto; flex :   2   2 auto; }
-
-.flexOn {
-  @include flexOn;
-}
-.flexOff {
-  @include flexOff;
-}
-
-.flexJustifyEnd {
-  -webkit-justify-content: flex-end;
-  -moz-justify-content: flex-end;
-  -ms-flex-pack: flex-end;
-  justify-content: flex-end;
-}
-.flexJustifySpaceAround {
-  -webkit-justify-content: space-around;
-  -moz-justify-content: space-around;
-  -ms-flex-pack: space-around;
-  justify-content: space-around;
-}
-
-.flexJustifyStart {
-  @include flexJustifyStart;
-}
-.flexJustifyCenter {
-  @include flexJustifyCenter;
-}
-.flexJustifySpaceBetween {
-  @include flexJustifySpaceBetween;
-}
-
-.flexAlignItemsStart {
-  @include flexAlignItemsStart;
-}
-.flexAlignItemsCenter {
-  @include flexAlignItemsCenter;
-}
-.flexAlignItemsEnd {
-  -webkit-align-items: flex-end;
-  -moz-align-items: flex-end;
-  -ms-align-items: flex-end;
-  align-items: flex-end;
-}
-
-.flexAlignContentStart {
-  -webkit-align-content: flex-start;
-  -moz-align-content: flex-start;
-  -ms-align-content: flex-start;
-  align-content: flex-start;
-}
-.flexAlignContentCenter {
-  -webkit-align-content: center;
-  -moz-align-content: center;
-  -ms-align-content: center;
-  align-content: center;
-}
-.flexAlignContentEnd {
-  -webkit-align-content: flex-end;
-  -moz-align-content: flex-end;
-  -ms-align-content: flex-end;
-  align-content: flex-end;
-}
-.flexAlignContentSpaceBetween {
-  -webkit-align-content: space-between;
-  -moz-align-content: space-between;
-  -ms-align-content: space-between;
-  align-content: space-between;
-}
-.flexAlignContentSpaceAround {
-  -webkit-align-content: space-around;
-  -moz-align-content: space-around;
-  -ms-align-content: space-around;
-  align-content: space-around;
-}
-
-.fullWidth {
-  width: 100%;
-  max-width: 100%;
-}
-.fullHeight {
-  height: 100%;
-}
-.fullFill {
-  width: 100%;
-  max-width: 100%;
-  height: 100%;
-}
-
-/* this allows flex items to shrink below their min content */
-.minWidth0 {
-  min-width: 0;
-}
-
-[class^='custom-icon-'],
-[class*=' custom-icon-'] {
-  font-family: 'Lucida' !important;
-  speak: none;
-  font-style: normal;
-  font-weight: normal;
-  font-variant: normal;
-  text-transform: none;
-  line-height: 1;
-
-  /* Better Font Rendering =========== */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-.custom-icon-exists:before {
-  font-weight: 700;
-  content: '\2203';
 }

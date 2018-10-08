@@ -1,0 +1,6 @@
+@import '../../styles/core-mixins.scss';
+
+.Section {
+  margin: $zorroa-metric-base * 3;
+  max-width: $zorroa-metric-base * 60;
+}

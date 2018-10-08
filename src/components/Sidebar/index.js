@@ -1,3 +1,4 @@
-import Sidebar from './ConnectedSidebar'
+import { withRouter } from 'react-router-dom'
+import Sidebar from './Sidebar'
 import './Sidebar.scss'
-export default Sidebar
+export default withRouter(Sidebar)

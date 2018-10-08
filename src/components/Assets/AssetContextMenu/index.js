@@ -1,2 +1,0 @@
-import ConnectedAssetContextMenu from './ConnectedAssetContextMenu'
-export default ConnectedAssetContextMenu

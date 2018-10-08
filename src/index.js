@@ -11,12 +11,10 @@ import ReduxPromise from 'redux-promise'
 
 import App from './components/App'
 import reducers from './reducers'
-import { USER_ITEM, ORIGIN_ITEM } from './constants/localStorageItems'
-import { validateUser, signinDefaults } from './actions/authAction'
-import User from './models/User'
 
 // Include all our app-wide style classes
 require('./styles/core-globals.scss')
+
 // The custom icon set Amber made for us
 // To update icons, see /src/assets/fonts/zorroa-icons/how-to-update.txt
 require('./assets/fonts/zorroa-icons/style.css')
@@ -50,18 +48,6 @@ const applicationNode = (
   </Provider>
 )
 
-// If we have a token, consider the user to be signed in, and update local state
-const userItem = JSON.parse(localStorage.getItem(USER_ITEM))
-const user = userItem ? new User(userItem) : null
-const origin = localStorage.getItem(ORIGIN_ITEM)
-if (user && origin) {
-  // Initialize form to avoid faking user & host in state.auth triggering Searcher
-  store.dispatch(signinDefaults(user.username, origin))
-}
-
-store.dispatch(validateUser(origin))
-
-log('creating dom node')
 const domNode = document.createElement('div')
 domNode.id = 'application'
 document.body.appendChild(domNode)

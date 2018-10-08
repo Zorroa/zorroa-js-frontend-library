@@ -1,23 +1,18 @@
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { fetchTheme } from '../../actions/themeAction'
-import { samlOptionsRequest, checkSession } from '../../actions/authAction'
+import { toggleDarkMode } from '../../actions/appActions'
 import App from './App'
 
 export default connect(
   state => {
     return {
-      authenticated: state.auth.authenticated,
-      themeLoadState: state.theme.themeLoadState,
-      sessionExpired: state.auth.sessionExpired,
+      isDark: state.app.isDark,
     }
   },
   dispatch => ({
     actions: bindActionCreators(
       {
-        fetchTheme,
-        samlOptionsRequest,
-        checkSession,
+        toggleDarkMode,
       },
       dispatch,
     ),

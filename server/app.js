@@ -4,37 +4,16 @@ const https = require('https')
 const fs = require('fs')
 const path = require('path')
 const webpack = require('webpack')
-const packageJson = require('../package.json')
 const middleware = require('webpack-dev-middleware')
 const webpackConfig = require('../build/webpack.config.js')
 const compiler = webpack(webpackConfig)
 const express = require('express')
 const app = express()
-const proxy = require('http-proxy-middleware')
 const PORT = Number(process.env.CURATOR_PORT) || 8081
 const PORT_SECURE = Number(process.env.CURATOR_PORT_SECURE)
 const ARCHIVIST_API_URL =
   process.env.ARCHIVIST_API_URL || 'http://localhost:8080'
-const WHITELABEL_CONFIGURATION = process.env.WHITELABEL_CONFIGURATION || '{}'
 const NODE_ENV = process.env.NODE_ENV || 'production'
-
-const archivistProxy = proxy({
-  target: ARCHIVIST_API_URL,
-  changeOrigin: true,
-  // TODO work with devops to fix UNABLE_TO_VERIFY_LEAF_SIGNATURE so secure can be set to `true`
-  secure: false,
-  proxyTimeout: 10000,
-  timeout: 10000,
-})
-
-function getWhitelabelConfiguration() {
-  try {
-    return JSON.parse(WHITELABEL_CONFIGURATION) || {}
-  } catch (error) {
-    console.error(error)
-    return {}
-  }
-}
 
 if (NODE_ENV === 'development') {
   app.use(middleware(compiler, {}))
@@ -61,39 +40,14 @@ if (Number.isNaN(PORT_SECURE) === false) {
 // Serve static files such as CSS and JS
 app.use(express.static('dist'))
 
-// These routes should be proxied to the Archivist server
-app.use(['/api/*', '/saml/*', '/actuator/*', '/debug', '/info'], archivistProxy)
-
-app.get('/curator/api/whitelabel', (req, res) => {
-  res.json(getWhitelabelConfiguration())
-})
-
 app.get('/favicon.ico', (req, res) => {
-  const whitelabelSettings = getWhitelabelConfiguration()
-
-  if (!whitelabelSettings.favicon) {
-    res.sendFile('favicon.ico', {
-      root: path.join(__dirname, '..', 'src', 'assets'),
-    })
-    return
-  }
-
-  const icon = Buffer.from(whitelabelSettings.favicon || '', 'base64')
-  res.setHeader('Content-Length', icon.length)
-  res.setHeader('Content-Type', 'image/x-icon')
-  res.end(icon)
-})
-
-app.get('/version.html', (req, res) => {
-  res.send(packageJson.version)
+  res.sendFile('favicon.ico', {
+    root: path.join(__dirname, '..', 'src', 'assets'),
+  })
 })
 
 // All other routes should be handled by the Curator
 app.get('*', (req, res) => {
-  const whitelabelSettings = getWhitelabelConfiguration()
-  const context = Object.assign(whitelabelSettings)
-  // TODO add version details
-
   res.send(`
     <!DOCTYPE html>
     <html>
@@ -108,12 +62,10 @@ app.get('*', (req, res) => {
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <title>${context.title || 'Zorroa'}</title>
+        <title>Zorroa Design Library</title>
       </head>
       <body>
-        <script type="application/javascript" src="/app.js?${
-          context.version
-        }"></script>
+        <script type="application/javascript" src="/app.js}"></script>
       </body>
     </html>
   `)

@@ -1,105 +1,22 @@
 @import '../../styles/core-mixins.scss';
 
-// Sidebars use flex-basis to toggle between open and close
 .Sidebar {
-  @include flexCol;
-  @include flexOff;
-
-  position: relative;   // For resize-thumb absolute
-  max-height: 100%;
-
-  width: 60px;
-  max-width: 60px;
-  min-width: 60px;
-
-  background-color: $zorroa-nearwhite;
-
-  .dark & { background-color: $zorroa-nearblack; }
-
-  &.Sidebar--is-iconified {
-    cursor: e-resize;
-    &--is-right-edge { cursor: w-resize; }
-  }
-
-  &--is-open {
-    min-width: $zorroa-Sidebar-width;
-    max-width: 3 * $zorroa-Sidebar-width;
-  }
-
-  .scroller {
-    max-height: 100%;
-    width: 100%;
-    max-width: 100%;
-
-    padding-bottom: 10px;
-    &:not(.Sidebar--is-right-edge) {
-      padding-left: 10px;
-      padding-right: 10px;
-    }
-
-    overflow-x: hidden;
-    overflow-y: auto;
-
-    @include flexOn;
-  }
-}
-
-.Sidebar__resize-thumb {
-  position: absolute;
-  top: 24px;
-  right: -10px; // place left sidebar resizer in the Assets' left side padding (this is awkward, will be fixed)
-  width: 10px;
-  height: 100%;
-  cursor: col-resize;
-  background: none;
-  z-index: 1;
-
-  &.Sidebar--is-right-edge {
-    // place right sidebar resizer in the sidebar's left side padding
-    left: 0px;
-    right: auto;
-  }
-}
-
-.Sidebar__logo {
   display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  padding: $zorroa-metric-base * 2;
-  font-size: 14px;
-  opacity: .35;
-  transition: 3000ms ease-in-out opacity, 1000ms ease-in-out filter;
+  flex-direction: column;
+  width: $zorroa-metric-base * 20;
 
-  &--is-iconified {
-    padding: $zorroa-metric-base * 2 0;
-    justify-content: center;
-  }
-
-  :not(.dark) & {
-    filter: grayscale(1) brightness(0);
-    &:hover {
-      filter: grayscale(0) brightness(1);
-      opacity: 1;
-    }
-  }
-
-  .dark & {
-    filter: grayscale(1) brightness(2);
-    opacity: .4;
+  &__link {
+    color: $zorroa-color-blue-1;
+    display: block;
+    padding: $zorroa-metric-base;
+    text-decoration: none;
 
     &:hover {
-      filter: grayscale(0) brightness(1);
-      opacity: 1;
+      color: $zorroa-color-blue-2;
+    }
+
+    &--active {
+      color: $zorroa-color-green-1!important;
     }
   }
-
-  .dark & {
-    color: $zorroa-color-gray-dark-4;
-  }
-}
-
-.Sidebar__logo-description {
-  text-indent: $zorroa-metric-base;
-  font-style: italic;
-  font-size: 14px;
 }
