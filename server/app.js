@@ -65,7 +65,7 @@ app.get('*', (req, res) => {
         <title>Zorroa Design Library</title>
       </head>
       <body>
-        <script type="application/javascript" src="/app.js}"></script>
+        <script type="application/javascript" src="/app.js"></script>
       </body>
     </html>
   `)

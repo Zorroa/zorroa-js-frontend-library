@@ -1,9 +1,9 @@
 import Input from './Input.js'
 import Label from './Label.js'
-import Button from './ConnectedButton.js'
+import Button from './Button.js'
 import Select from './Select.js'
-import Checkbox from './ConnectedCheckbox.js'
-import Radio from './ConnectedRadio.js'
+import Checkbox from './Checkbox.js'
+import Radio from './Radio.js'
 import File from './File.js'
 
 export {

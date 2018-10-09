@@ -34,7 +34,7 @@ export default class FormInput extends Component {
   onChange = event => {
     const checked = event.target.checked
     if (typeof this.props.onChange === 'function') {
-      this.props.onChange(checked)
+      this.props.onChange(checked, event)
     }
     this.setState({
       checked,

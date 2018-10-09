@@ -1,8 +1,8 @@
-@import '../../styles/colors.scss';
+@import '../../styles/core-mixins.scss';
 
-$form-element-height: 40px;
-$form-element-top-margin: 5px;
-$form-element-bottom-margin: 10px;
+$form-element-height: $zorroa-metric-base * 4;
+$form-element-top-margin: $zorroa-metric-base / 2;
+$form-element-bottom-margin: $zorroa-metric-base;
 $form-element-border-size: 1px;
 $form-element-border: $form-element-border-size solid $zorroa-color-gray-dark-2;
 $form-element-border-radius: 3px;
