@@ -1,0 +1,12 @@
+*.log
+*.debug
+.idea
+.DS_Store
+
+node_modules
+node_cache
+tmp
+coverage
+cert.pem
+key.pem
+dist

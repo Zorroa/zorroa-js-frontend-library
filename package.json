@@ -1,0 +1,31 @@
+{
+  "name": "zorroa-js-frontend-library",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/zorroa-frontend-library.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.4",
+    "css-loader": "^1.0.0",
+    "node-sass": "^4.9.3",
+    "sass-loader": "^7.1.0",
+    "style-loader": "^0.23.1",
+    "webpack": "^4.20.2",
+    "webpack-cli": "^3.1.2"
+  },
+  "dependencies": {
+    "react": "^15.6.2",
+    "classnames": "^2.2.6"
+  },
+  "peerDependencies": {
+    "react": ">=15.6.0 <17"
+  }
+}
