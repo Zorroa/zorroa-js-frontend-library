@@ -1,0 +1,106 @@
+@import '../variables.scss';
+$form-element-height: 40px;
+$form-element-top-margin: 5px;
+$form-element-bottom-margin: 10px;
+$form-element-border-size: 1px;
+$form-element-border: $form-element-border-size solid $zorroa-color-gray-dark-2;
+$form-element-border-radius: 3px;
+
+.Input {
+  margin-top: $form-element-top-margin;
+  margin-bottom: $form-element-bottom-margin;
+  position: relative;
+
+  .dark & {
+    background-color: $zorroa-color-black;
+    &--color {
+      background: transparent;
+    }
+  }
+
+  .dark & {
+    color: $zorroa-color-white;
+  }
+
+  &--vertical {
+    flex-direction: column;
+  }
+
+  &__input-inline-reset {
+    content: ' ';
+    display: block;
+    height: 100%;
+    line-height: $form-element-height!important; // Hack to override icon font classes
+    width: 10px;
+    color: $zorroa-color-gray-dark-4;
+    position: absolute;
+    top: 0;
+    text-align: center;
+    right: 10px;
+    padding: 0 15px;
+    cursor: pointer;
+
+    &:hover,
+    &:focus {
+      color: $zorroa-color-black;
+
+      .dark & {
+        color: $zorroa-color-gray-dark-3;
+      }
+    }
+  }
+
+  &__input-native {
+    border-radius: $form-element-border-radius;
+    height: $form-element-height;
+    line-height: 20px;
+    padding: 10px;
+    border: 1px solid $zorroa-color-gray-dark-3;
+    font-size: 14px;
+    background: none;
+    max-width: 100%;
+    width: 100%;
+
+    .dark & {
+      color: $zorroa-color-gray-dark-4;
+    }
+
+    &--error {
+      color: $zorroa-color-pink-1;
+      border-color: $zorroa-color-pink-1;
+    }
+
+    &--color {
+      text-indent: $form-element-height;
+      max-width: 18ex;
+    }
+  }
+
+  &--error {
+    color: $zorroa-color-pink-1;
+  }
+
+  &--color {
+    padding-right: $form-element-height + $zorroa-metric-base;
+  }
+
+  &__color-preview {
+    width: $form-element-height;
+    height: $form-element-height;
+    border-right: 1px solid $zorroa-color-gray-dark-3;
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 0;
+    border-top-left-radius: $form-element-border-radius;
+    border-bottom-left-radius: $form-element-border-radius;
+
+    &--error {
+      border: 2px solid $zorroa-color-pink-1;
+      top: 0;
+      left: 0;
+      width: $form-element-height;
+      height: $form-element-height;
+    }
+  }
+}

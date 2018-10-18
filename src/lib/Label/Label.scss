@@ -1,0 +1,23 @@
+@import '../variables.scss';
+
+.Label {
+  color: $zorroa-color-gray-dark-3;
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 20px;
+
+  .dark & {
+    color: $zorroa-color-gray-dark-4;
+  }
+
+  &--vertical {
+    flex-direction: column;
+  }
+
+  &__label {
+    .Checkbox ~ & {
+      text-indent: $zorroa-metric-base;
+      line-height: $zorroa-metric-base * 2;
+    }
+  }
+}

@@ -1,16 +1,12 @@
 import PropTypes from 'prop-types'
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import classnames from 'classnames'
 import './Button.scss'
-import { KEY_COLOR } from '../variables.js'
+import { ZORROA_COLOR_GREEN_1 } from '../variables.js'
 
-export default class FormButton extends PureComponent {
+export default class Button extends Component {
   getKeyColor() {
-    if (this.props.whiteLabelEnabled === true) {
-      return this.props.keyColor
-    }
-
-    return ZORROA_COLOR_GREEN_1
+    return this.props.keyColor
   }
 
   getStyle() {
@@ -28,23 +24,23 @@ export default class FormButton extends PureComponent {
   render() {
     const props = this.props
     const isNormalLook = props.look === 'normal' || props.look === undefined
-    const buttonClasses = classnames('FormButton', {
-      'FormButton--disabled': props.disabled === true,
-      'FormButton--minimal': props.look === 'minimal',
-      'FormButton--error': props.state === 'error',
-      'FormButton--mini': props.look === 'mini',
-      'FormButton--white-label': props.whiteLabelEnabled === true,
+    const buttonClasses = classnames('Button', {
+      'Button--disabled': props.disabled === true,
+      'Button--minimal': props.look === 'minimal',
+      'Button--error': props.state === 'error',
+      'Button--mini': props.look === 'mini',
+      'Button--white-label': props.whiteLabelEnabled === true,
     })
-    const buttonStateClasses = classnames('FormButton__state', {
-      'FormButton__state--inactive': props.state === undefined,
-      'FormButton__state--active': props.state !== undefined,
-      'FormButton__state--loading': props.state === 'loading',
-      'FormButton__state--success': props.state === 'success',
-      'FormButton__state--error': props.state === 'error',
+    const buttonStateClasses = classnames('Button__state', {
+      'Button__state--inactive': props.state === undefined,
+      'Button__state--active': props.state !== undefined,
+      'Button__state--loading': props.state === 'loading',
+      'Button__state--success': props.state === 'success',
+      'Button__state--error': props.state === 'error',
     })
-    const buttonLabelClasses = classnames('FormButton__label', {
-      'FormButton__label--state-active': props.state !== undefined,
-      'FormButton__label--mini': props.look === 'mini',
+    const buttonLabelClasses = classnames('Button__label', {
+      'Button__label--state-active': props.state !== undefined,
+      'Button__label--mini': props.look === 'mini',
     })
     return (
       <button
@@ -58,7 +54,7 @@ export default class FormButton extends PureComponent {
           <span className={buttonStateClasses} title={props.state} />
         )}
         {props.icon !== undefined && (
-          <span className="FormButton__icon">{props.icon}</span>
+          <span className="Button__icon">{props.icon}</span>
         )}
         <span className={buttonLabelClasses}>{props.children}</span>
       </button>
@@ -66,7 +62,12 @@ export default class FormButton extends PureComponent {
   }
 }
 
-FormButton.propTypes = {
+Button.defaultProps = {
+  keyColor: ZORROA_COLOR_GREEN_1,
+  whiteLabelEnabled: false,
+}
+
+Button.propTypes = {
   children: PropTypes.node,
   state: PropTypes.oneOf(['loading', 'success', 'error']),
   type: PropTypes.oneOf(['button', 'submit', 'reset']),
@@ -75,6 +76,6 @@ FormButton.propTypes = {
   disabled: PropTypes.bool,
   title: PropTypes.string,
   icon: PropTypes.node,
-  keyColor: PropTypes.string.isRequired,
-  whiteLabelEnabled: PropTypes.bool.isRequired,
+  keyColor: PropTypes.string,
+  whiteLabelEnabled: PropTypes.bool,
 }

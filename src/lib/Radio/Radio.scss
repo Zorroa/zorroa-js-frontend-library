@@ -1,0 +1,43 @@
+@import '../variables.scss';
+
+$radio-size: $zorroa-metric-base * 2;
+
+.Radio {
+  display: block;
+  height: $radio-size;
+  width: $radio-size;
+  position: relative;
+  border-radius: 100%;
+  border: 1px solid $zorroa-color-gray-dark-2;
+  margin-right: $zorroa-metric-base;
+
+  &__native {
+    display: none;
+  }
+
+  :not(:checked) ~ .Radio__virtual  {
+    background-color: transparent!important; // Overrides inline style
+  }
+
+  &__virtual {
+    content: ' ';
+    display: block;
+    width: $radio-size;
+    height: $radio-size ;
+    visibility: visible;
+
+    :checked ~ & {
+      content: ' ';
+      display: block;
+      width: $radio-size - 4px;
+      height: $radio-size - 4px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-top: ($radio-size - 4px) / -2;
+      margin-left: ($radio-size - 4px) / -2;
+      visibility: visible;
+      border-radius: 100%;
+    }
+  }
+}

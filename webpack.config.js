@@ -1,6 +1,7 @@
 var path = require('path');
 
 module.exports = {
+  mode: 'development', // Since this is a library, assume upstream code will handle production mode
   module: {
     rules: [
       {
