@@ -9,4 +9,3 @@ tmp
 coverage
 cert.pem
 key.pem
-dist
