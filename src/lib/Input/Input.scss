@@ -10,6 +10,7 @@ $form-element-border-radius: 3px;
   margin-top: $form-element-top-margin;
   margin-bottom: $form-element-bottom-margin;
   position: relative;
+  font-family: $zorroa-font-family-body;
 
   .dark & {
     background-color: $zorroa-color-black;

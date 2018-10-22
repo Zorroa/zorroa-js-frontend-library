@@ -1,6 +1,7 @@
 @import '../variables.scss';
 
 .Button {
+  font-family: $zorroa-font-family-body;
   height: 40px;
   background: $zorroa-color-green-1;
   color: $zorroa-color-white;

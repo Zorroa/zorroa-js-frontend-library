@@ -2,10 +2,16 @@ import React from 'react';
 import { storiesOf } from '@storybook/react';
 import { Button, FlashMessage, Heading, Input, Label, Radio } from '../src/lib'
 import { withInfo, setDefaults } from '@storybook/addon-info';
+import Colors from './components/Colors'
 
 setDefaults({
   inline: true,
 });
+
+storiesOf('Colors', module)
+  .add('Colors', () => (
+    <Colors />
+  ))
 
 storiesOf('Button', module)
   .add('With text',withInfo('A standard button')(() => <Button>Hello Button</Button>))
