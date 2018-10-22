@@ -11,6 +11,10 @@ $form-element-border-radius: 3px;
   margin-bottom: $form-element-bottom-margin;
   position: relative;
   font-family: $zorroa-font-family-body;
+  &,
+  * {
+    box-sizing: border-box;
+  }
 
   .dark & {
     background-color: $zorroa-color-black;
@@ -27,7 +31,7 @@ $form-element-border-radius: 3px;
     flex-direction: column;
   }
 
-  &__input-inline-reset {
+  &__inline-reset {
     content: ' ';
     display: block;
     height: 100%;
@@ -51,7 +55,7 @@ $form-element-border-radius: 3px;
     }
   }
 
-  &__input-native {
+  &__native {
     border-radius: $form-element-border-radius;
     height: $form-element-height;
     line-height: 20px;

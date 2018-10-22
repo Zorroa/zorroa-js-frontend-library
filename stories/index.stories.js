@@ -86,13 +86,22 @@ storiesOf('Heading', module)
 
   storiesOf('Input', module)
     .add('Normal', withInfo()(() => (
-      <Input  />
+      <Input onChange={() => {}} />
     )))
+    .add('Color', withInfo()(() => (
+      <Input type="color" value="#73b61c" onChange={() => {}} />
+    )))
+    .add('File', withInfo()(() => (
+      <Input type="file" />
+    )))
+    .add('Inline Reset', withInfo(`
+      Add a reset button that can clear the input field
+    `)(() => (<Input inlineReset={true} onChange={() => {}} />)))
 
   storiesOf('Label', module)
     .add('Horizontal', withInfo()(() => (
       <Label label="Your name">
-        <Input />
+        <Input onChange={() => {}} />
       </Label>
     )))
     .add('Vertical', withInfo()(() => (
@@ -102,13 +111,13 @@ storiesOf('Heading', module)
     )))
 
   storiesOf('Radio', module)
-    .add('Radio', withInfo()(() => (
+    .add('Radio Group', withInfo(`Radio buttons are best used with labels and in a group for accesibility and consistent UX. While the \`Radio\` component can be used indepdently, it is not reccomended. As such this component includes multiple radio buttons inside of \`Label\`'s to demonstrate the correct use.`)(() => (
         <form>
         <Label afterLabel="Vanilla">
-          <Radio name="flavors" value="vnll" />
+          <Radio name="flavors" value="vnla" />
         </Label>
         <Label afterLabel="Strawberry">
-          <Radio name="flavors" value="sbry" />
+          <Radio name="flavors" value="swby" />
         </Label>
         <Label afterLabel="Chocolate">
           <Radio name="flavors" value="choc" />

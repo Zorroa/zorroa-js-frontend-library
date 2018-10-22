@@ -16,13 +16,15 @@ export default class Input extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.value !== this.state.value) {
-      this.setState({
-        value: nextProps.value || '',
+      this.setState(state => {
+        return {
+          value: nextProps.value || state.value,
+        }
       })
     }
   }
 
-  _onChangeUnbound() {
+  _onChangeUnbound(event) {
     const value = event.target.value
     if (this.props.type === 'file') {
       event.persist()
@@ -66,16 +68,16 @@ export default class Input extends Component {
       autocomplete,
     } = this.props
     const inputClasses = classnames(
-      'Input__input',
+      'Input',
       {
-        'Input__input--error': error === true,
-        'Input__input--color': type === 'color',
+        'Input--error': error === true,
+        'Input--color': type === 'color',
       },
       className,
     )
 
-    const inputNativeClasses = classnames('Input__input-native', {
-      'Input__input-native--color': type === 'color',
+    const inputNativeClasses = classnames('Input__native', {
+      'Input__native--color': type === 'color',
     })
 
     const colorPreviewClasses = classnames('Input__color-preview', {
@@ -103,7 +105,7 @@ export default class Input extends Component {
         )}
         {this.props.inlineReset && (
           <span
-            className="icon-cancel-circle Input__input-inline-reset"
+            className="icon-cancel-circle Input__inline-reset"
             onClick={this.resetInput}
           />
         )}
