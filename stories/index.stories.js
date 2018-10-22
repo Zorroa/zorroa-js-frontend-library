@@ -1,43 +1,79 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
-import { Button, FlashMessage } from '../src/lib'
+import { Button, FlashMessage, Heading, Input, Label, Radio } from '../src/lib'
+import { withInfo, setDefaults } from '@storybook/addon-info';
+
+setDefaults({
+  inline: true,
+});
 
 storiesOf('Button', module)
-  .add('With text', () => <Button>Hello Button</Button>)
-  .add('With some emoji', () => (
-    <Button onClick={action('clicked')}>
-        😀 😎 👍 💯
-    </Button>
-  ))
-  .add('Minimal', () => (
+  .add('With text',withInfo('A standard button')(() => <Button>Hello Button</Button>))
+  .add('Minimal', withInfo(`
+      When there's a series of buttons non-primary actions should use the minimal look.
+    `)(() => (
     <Button look="minimal">Minimal</Button>
-  ))
-  .add('Mini', () => (
+  )))
+  .add('Mini', withInfo(`
+      When a button needs to be shown in non-obtrusive context use the mini look.
+    `)(() => (
     <Button look="mini">Mini</Button>
-  ))
-  .add('Loading', () => (
+  )))
+  .add('Loading', withInfo(`
+      When a button sets off a long running action, such as an AJAX request
+      to a server set the state to loading to give the user an indication that
+      activity is taking place.
+    `)(() => (
     <Button state="loading">Loading</Button>
+  )))
+  .add('Success', withInfo(`
+      When a long running action (such as an AJAX request) has completed succesfully
+      update the state of the component to reflect that success has occured. If the
+      user is allowed to do the action multiple times use \`setTimeout\` to reset
+      the state after a short amount of time.
+    `)(() => (<Button state="success">Loaded!</Button>)
   ))
-  .add('Success', () => (
-    <Button state="success">Loaded!</Button>
+  .add('Error', withInfo(`
+      When a long running action (such as an AJAX request) has completed with an error
+      update the state of the component to reflect that an error has occured.
+    `)(() => (<Button state="error">Problem!</Button>)
   ))
-  .add('Error', () => (
-    <Button state="error">Whooops</Button>
-  ))
-  .add('Disabled', () => (
-    <Button disabled={true}>Can Not</Button>
+  .add('Disabled', withInfo(`
+      When a button is ready for user interaction disable it. This is useful in
+      cases where a form hasn't been completed or there is invalid data.
+    `)(() => (<Button disabled={true}>Can Not</Button>)
   ))
 
 storiesOf('FlashMessage', module)
-  .add('Warning', () => (
+  .add('Warning', withInfo(`Warnings, such as potential problems with permissions or a long running request should be noted with a warning.`)(() => (
     <FlashMessage look="warning">This is a warning message.</FlashMessage>
-  ))
-  .add('Info', () => (
+  )))
+  .add('Info', withInfo(`Generic information for the user should be displayed here.`)(() => (
     <FlashMessage look="info">This is an informational message.</FlashMessage>
-  ))
-  .add('Error', () => (
+  )))
+  .add('Error', withInfo(`When an error has occured detail the error message in a user friendly manner, with an optional error code or technical explanation at the end.`)(() => (
     <FlashMessage look="error">This is an error message.</FlashMessage>
-  ))
-  .add('Success', () => (
+  )))
+  .add('Success', withInfo(`When an action has successfully completed display a message to indicate that status.`)(() => (
     <FlashMessage look="success">This is a success message.</FlashMessage>
-  ))
+  )))
+
+storiesOf('Heading', module)
+  .add('Huge', withInfo()(() => (
+    <Heading size="huge">This Heading Is Absolutely Huge</Heading>
+  )))
+  .add('Large', withInfo()(() => (
+    <Heading size="large">This Heading Is Absolutely Large</Heading>
+  )))
+  .add('Medium', withInfo()(() => (
+    <Heading size="medium">This Heading Is Absolutely Medium</Heading>
+  )))
+  .add('Small', withInfo()(() => (
+    <Heading size="small">This Heading Is Absolutely Small</Heading>
+  )))
+  .add('Tiny', withInfo()(() => (
+    <Heading size="tiny">This Heading Is Absolutely Tiny</Heading>
+  )))
+  .add('Micro', withInfo()(() => (
+    <Heading size="micro">This Heading Is Absolutely Micro</Heading>
+  )))
