@@ -83,3 +83,35 @@ storiesOf('Heading', module)
   .add('Micro', withInfo()(() => (
     <Heading size="micro">This Heading Is Absolutely Micro</Heading>
   )))
+
+  storiesOf('Input', module)
+    .add('Normal', withInfo()(() => (
+      <Input  />
+    )))
+
+  storiesOf('Label', module)
+    .add('Horizontal', withInfo()(() => (
+      <Label label="Your name">
+        <Input />
+      </Label>
+    )))
+    .add('Vertical', withInfo()(() => (
+      <Label vertical={true} label="Your name">
+        <Input />
+      </Label>
+    )))
+
+  storiesOf('Radio', module)
+    .add('Radio', withInfo()(() => (
+        <form>
+        <Label afterLabel="Vanilla">
+          <Radio name="flavors" value="vnll" />
+        </Label>
+        <Label afterLabel="Strawberry">
+          <Radio name="flavors" value="sbry" />
+        </Label>
+        <Label afterLabel="Chocolate">
+          <Radio name="flavors" value="choc" />
+        </Label>
+      </form>
+    )))

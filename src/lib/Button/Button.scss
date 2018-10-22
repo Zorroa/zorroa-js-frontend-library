@@ -16,6 +16,11 @@
   cursor: pointer;
   position: relative;
 
+  &,
+  * {
+    box-sizing: border-box;
+  }
+
   &:hover {
     background-color: $zorroa-color-gray-dark-4;
     border-color: $zorroa-color-gray-dark-4;
