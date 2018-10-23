@@ -4,8 +4,8 @@ const {readFileSync, writeFileSync} = require('fs')
 
 const git = require("nodegit");
 const program = require('commander');
-const DEVELOPMENT_BRANCH = 'jd/storybook' // TODO change this to master
-const RELEASE_BRANCH = 'jd/release' // TODO change this to master
+const DEVELOPMENT_BRANCH = 'master'
+const RELEASE_BRANCH = 'release'
 const RELEASE_TYPES = ['major', 'minor', 'patch']
 
 program
