@@ -11,7 +11,7 @@ const RELEASE_TYPES = ['major', 'minor', 'patch']
 program
   .version('0.0.0')
   .option('-r, --release-type <release-type>', 'Choose a semantic versioning type: major, minor or patch')
-  .option('-d, --dry', 'Executes a dry run, i.e. it will not push anything', false)
+  .option('-d, --dry', 'Executes a dry run, i.e. it will not push anything')
   .parse(process.argv);
 
 if (!RELEASE_TYPES.includes(program.releaseType)) {
@@ -48,13 +48,13 @@ execSync('NODE_ENV="development" npm run build')
 console.log('Commit release changes')
 execSync(`git add dist package.json && git commit -m "Release ${packageJson.version}"`)
 
-console.log('Pushing release')
-if (program.dry === false) {
+if (program.dry !== true) {
+  console.log('Pushing release')
   execSync(`git push origin ${RELEASE_BRANCH}`)
   execSync(`git tag ${packageJson.version} && git push origin ${packageJson.version}`)
 }
 
-console.log('Update online Storybook documenation')
-if (program.dry === false) {
+if (program.dry !== true) {
+  console.log('Update online Storybook documenation')
   execSync('npx storybook-to-ghpages')
 }
