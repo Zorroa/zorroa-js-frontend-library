@@ -14,22 +14,37 @@
  This project depends on the Node/NPM ecosystem. You must have Node and NPM
  installed locally to run this.
 
- 0) Run `npm install` to install the dependencies
- 0) Run `npm run storybook` to get a live-reloading dev server
+ 1) Run `npm install` to install the dependencies
+ 1) Run `npm start` to get a live-reloading dev server
 
  ## Releases
 
- Releases are currently a manual process, the goal is to automate this more in to
- a single command such as `npm run release --version='1.2.3'`, but until now
- follow these instructions to cut a release.
+Releases are handled by running the release tool. It will checkout the latest
+changes from master, add them to the release branch, update version numbers,
+push the changes to a release branch, create tags, and push out the latest
+version of Storybook to Github pages.
 
- 0) Pull the latest change and checkout master: `git fetch origin master && git checkout master`
- 0) Run the tests: `npm run test`
- 0) Update the version property in package.json, adhering to SEMVER conventions
- 0) Pull the latest release branch and checkout: `git fetch origin release && git checkout release`
- 0) Merge master: `npm run master`
- 0) Build the library code: `npm run build`
- 0) Commit the built code, including a message that indicates the release number: `git commit -m "Release 1.2.3"`
- 0) Push the release branch: `git push origin release`
- 0) Tag the release and push the tag: `git tag 1.2.3 && git push origin 1.2.3`
- 0) Deploy the latest Storybook documentation to Github pages: `npx storybook-to-ghpages`
+To perform a dry run (i.e. no code is pushed, but commits are made locally), run
+the release tool with the --dry option. For a full list of options run
+`npm run deploy -- -h`
+
+### Major Release
+
+If there are breaking changes, perform a major release. A breaking change is a
+release that would break any consumer of the components in ./src/lib/*.
+
+Run `npm run deploy -- -r major`
+
+### Minor Release
+
+If there are *no* breaking changes, and you've written a new feature, perform
+a minor release.
+
+Run `npm run deploy -- -r minor`
+
+### Patch Release
+
+If there are *no* breaking changes, and you've only fixed a bug, perform
+a patch release.
+
+Run `npm run deploy -- -r patch`
