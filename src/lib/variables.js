@@ -1,11 +1,12 @@
 // WARNING = Ensure this file is kept up to date with variables.js
-export const ZORROA_METRIC_BASE = '10px';
+export const ZORROA_METRIC_BASE = 10;
 
 export const ZORROA_COLOR_BLUE_1 = '#4160b8';
 export const ZORROA_COLOR_BLUE_2 = '#387ca3';
 export const ZORROA_COLOR_BLUE_3 = '#4ba8d7';
 export const ZORROA_COLOR_BLUE_4 = '#39897e';
 export const ZORROA_COLOR_BLUE_5 = '#54a8a8';
+export const ZORROA_FONT_FAMILY_BODY = "'Roboto', sans-serif";
 
 export const ZORROA_COLOR_BLACK = '#1f1a17';
 export const ZORROA_COLOR_WHITE = '#ffffff';
