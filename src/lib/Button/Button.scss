@@ -1,6 +1,7 @@
 @import '../variables.scss';
 
 .Button {
+  font-family: $zorroa-font-family-body;
   height: 40px;
   background: $zorroa-color-green-1;
   color: $zorroa-color-white;
@@ -14,6 +15,11 @@
   font-size: 14px;
   cursor: pointer;
   position: relative;
+
+  &,
+  * {
+    box-sizing: border-box;
+  }
 
   &:hover {
     background-color: $zorroa-color-gray-dark-4;
