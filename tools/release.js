@@ -31,7 +31,7 @@ console.log('Building library')
 execSync('NODE_ENV="development" npm run build')
 
 console.log('Commit release changes')
-execSync(`git commit -m "Release ${packageJson.version}"`)
+execSync(`git add dist package.json && git commit -m "Release ${packageJson.version}"`)
 
 console.log('Pushing release')
 execSync(`git push origin ${RELEASE_BRANCH}`)
