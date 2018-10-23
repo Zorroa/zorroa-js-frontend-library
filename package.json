@@ -4,10 +4,11 @@
   "description": "",
   "main": "dist/zorroa-frontend-library.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 0",
     "build": "npx webpack",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build:storybook": "build-storybook",
+    "deploy": "node tools/release.js",
+    "start": "start-storybook -p 6006",
+    "test": "echo \"Error: no test specified\" && exit 0"
   },
   "keywords": [],
   "author": "",
