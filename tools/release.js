@@ -4,14 +4,14 @@ const {readFileSync, writeFileSync} = require('fs')
 
 const git = require("nodegit");
 const program = require('commander');
-const DEVELOPMENT_BRANCH = 'master'
-const RELEASE_BRANCH = 'release'
+const DEVELOPMENT_BRANCH = 'jd/storybook'
+const RELEASE_BRANCH = 'jd/release'
 const RELEASE_TYPES = ['major', 'minor', 'patch']
 
 program
   .version('0.0.0')
   .option('-r, --release-type <release-type>', 'Choose a semantic versioning type: major, minor or patch')
-  .option('-d, --dry', 'Executes a dry run, i.e. it will not push anything')
+  .option('-d, --dry', 'Executes a dry run, i.e. it will not push anything', false)
   .parse(process.argv);
 
 if (!RELEASE_TYPES.includes(program.releaseType)) {
