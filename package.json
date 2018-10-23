@@ -1,6 +1,6 @@
 {
   "name": "zorroa-js-frontend-library",
-  "version": "1.0.3",
+  "version": "1.1.3",
   "description": "",
   "main": "dist/zorroa-frontend-library.js",
   "scripts": {
