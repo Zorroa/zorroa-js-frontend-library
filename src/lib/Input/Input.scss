@@ -1,7 +1,7 @@
 @import '../variables.scss';
-$form-element-height: 40px;
-$form-element-top-margin: 5px;
-$form-element-bottom-margin: 10px;
+$form-element-height: $zorroa-metric-base * 4;
+$form-element-top-margin: $zorroa-metric-base / 2;
+$form-element-bottom-margin: $zorroa-metric-base;
 $form-element-border-size: 1px;
 $form-element-border: $form-element-border-size solid $zorroa-color-gray-dark-2;
 $form-element-border-radius: 3px;
@@ -36,13 +36,13 @@ $form-element-border-radius: 3px;
     display: block;
     height: 100%;
     line-height: $form-element-height!important; // Hack to override icon font classes
-    width: 10px;
+    width: $zorroa-metric-base;
     color: $zorroa-color-gray-dark-4;
     position: absolute;
     top: 0;
     text-align: center;
-    right: 10px;
-    padding: 0 15px;
+    right: $zorroa-metric-base;
+    padding: 0 $zorroa-metric-base * 1.5;
     cursor: pointer;
 
     &:hover,
@@ -58,8 +58,8 @@ $form-element-border-radius: 3px;
   &__native {
     border-radius: $form-element-border-radius;
     height: $form-element-height;
-    line-height: 20px;
-    padding: 10px;
+    line-height: $zorroa-metric-base * 2;
+    padding: $zorroa-metric-base;
     border: 1px solid $zorroa-color-gray-dark-3;
     font-size: 14px;
     background: none;

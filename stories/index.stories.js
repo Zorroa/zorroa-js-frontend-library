@@ -99,18 +99,24 @@ storiesOf('Heading', module)
     `)(() => (<Input inlineReset={true} onChange={() => {}} />)))
 
   storiesOf('Label', module)
-    .add('Horizontal', withInfo()(() => (
-      <Label label="Your name">
-        <Input onChange={() => {}} />
-      </Label>
+    .add("Default", withInfo()(() => (
+      <Label label="A fine description for a form element" />
     )))
-    .add('Vertical', withInfo()(() => (
+    .add('Vertical', withInfo(`Use this with form elements such as textareas or text inputs`)(() => (
       <Label vertical={true} label="Your name">
         <Input />
       </Label>
     )))
+    .add('Horizontal', withInfo(`Use this for form elements such as checkboxes and radio buttons that should be displayed "inline."`)(() => (
+      <Label afterLabel="Select me">
+        <Radio />
+      </Label>
+    )))
 
   storiesOf('Radio', module)
+    .add('Default', withInfo(`A single radio button.`)(() => (
+          <Radio name="flavors" value="vnla" />
+    )))
     .add('Radio Group', withInfo(`Radio buttons are best used with labels and in a group for accesibility and consistent UX. While the \`Radio\` component can be used indepdently, it is not reccomended. As such this component includes multiple radio buttons inside of \`Label\`'s to demonstrate the correct use.`)(() => (
         <form>
         <Label afterLabel="Vanilla">
