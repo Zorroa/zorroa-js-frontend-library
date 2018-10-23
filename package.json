@@ -8,8 +8,8 @@
     "build": "npx webpack"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Zorroa Corp.",
+  "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.1.2",
     "@babel/plugin-transform-modules-commonjs": "^7.0.0",
