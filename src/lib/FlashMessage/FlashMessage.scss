@@ -2,6 +2,7 @@
 
 .FlashMessage {
   position: relative;
+  font-family: $zorroa-font-family-body;
 
   &__body {
     background: $zorroa-color-white;
@@ -17,6 +18,7 @@
     color: $zorroa-color-black;
     box-shadow: 0 2px 15px -1px rgba(0,0,0,.2);
     line-height: 1.2;
+    font-family: $zorroa-font-family-body;
 
     .dark & {
       background: $zorroa-color-gray-dark-2;

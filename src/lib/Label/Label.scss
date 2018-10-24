@@ -5,12 +5,15 @@
   display: flex;
   flex-direction: row;
   margin-bottom: 20px;
+  font-family: $zorroa-font-family-body;
+  align-items: center;
 
   .dark & {
     color: $zorroa-color-gray-dark-4;
   }
 
   &--vertical {
+    align-items: start;
     flex-direction: column;
   }
 
