@@ -2,8 +2,8 @@ const { execSync } = require('child_process')
 const { readFileSync, writeFileSync } = require('fs')
 
 const program = require('commander')
-const DEVELOPMENT_BRANCH = 'jd/storybook'
-const RELEASE_BRANCH = 'jd/release'
+const DEVELOPMENT_BRANCH = 'master'
+const RELEASE_BRANCH = 'release'
 const RELEASE_TYPES = ['major', 'minor', 'patch']
 
 program
