@@ -3,6 +3,7 @@
 .idea
 .DS_Store
 
+storybook-static
 node_modules
 node_cache
 tmp

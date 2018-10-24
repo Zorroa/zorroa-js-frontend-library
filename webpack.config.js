@@ -1,11 +1,11 @@
-var path = require('path');
+var path = require('path')
 
 module.exports = {
   mode: 'development', // Since this is a library, assume upstream code will handle production mode
   module: {
     rules: [
       {
-      test: /\.css$/,
+        test: /\.css$/,
         loader: 'style-loader!css-loader',
       },
       {
@@ -22,10 +22,10 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/preset-env']
-          }
-        }
-      }
+            presets: ['@babel/preset-env'],
+          },
+        },
+      },
     ],
   },
   entry: './src/lib/index.js',
@@ -33,14 +33,14 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: 'zorroa-frontend-library.js',
     library: 'zorroaFrontendLibrary',
-    libraryTarget: 'umd'
+    libraryTarget: 'umd',
   },
   externals: {
     react: {
       commonjs: 'react',
       commonjs2: 'react',
       amd: 'react',
-      root: 'React'
-    }
-  }
+      root: 'React',
+    },
+  },
 }

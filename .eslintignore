@@ -1,0 +1,7 @@
+dist
+node_modules
+src/assets
+tmp
+coverage
+.git
+storybook-static

@@ -1,0 +1,72 @@
+{
+  "extends": [
+    "plugin:react/recommended",
+    "standard",
+    "prettier"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 7,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "impliedStrict": true,
+      "jsx": true
+    }
+  },
+  "env": {
+    "browser": true,
+    "es6": true,
+    "node": true
+  },
+  "parser": "babel-eslint",
+  "plugins": [
+    "react",
+    "prettier"
+  ],
+  "globals": {
+    "jest": true,
+    "describe": true,
+    "jasmine": true,
+    "jasmineRequire": true,
+    "it": true,
+    "fit": true,
+    "xit": true,
+    "expect": true,
+    "beforeEach": true,
+    "afterEach": true,
+    "beforeAll": true,
+    "afterAll": true,
+    "React": true,
+    "DEBUG": true,
+    "PROD": true,
+    "PRODLOCAL": true,
+    "zvBranch": true,
+    "zvCommit": true,
+    "zvCount": true,
+    "zvDateStr": true,
+    "zvDateMs": true,
+    "zvVersion": true,
+    "emailjs": true
+  },
+  "settings": {
+    "react": {
+      "version": "15.0"
+    }
+  },
+  "rules": {
+    "standard/computed-property-even-spacing": "off",
+    "no-unused-vars": [
+      "error", {
+        "vars": "all",
+        "args": "after-used",
+        "argsIgnorePattern": "_|event|response",
+        "ignoreRestSiblings": false
+      }
+    ],
+    "prefer-promise-reject-errors": "warn",
+    "no-use-before-define": "warn",
+    "react/no-unescaped-entities": "warn",
+    "react/no-deprecated": "warn",
+    "react/no-string-refs": "warn",
+    "prettier/prettier": "error"
+  }
+}

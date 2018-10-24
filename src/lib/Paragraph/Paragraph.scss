@@ -1,0 +1,20 @@
+@import '../variables.scss';
+
+.Paragraph {
+  margin: $zorroa-metric-base 0;
+  font-family: $zorroa-font-family-body;
+  font-weight: 300;
+  line-height: 1.2;
+
+  &--large {
+    font-size: 18px;
+  }
+
+  &--normal {
+    font-size: 16px;
+  }
+
+  &--small {
+    font-size: 12px;
+  }
+}
