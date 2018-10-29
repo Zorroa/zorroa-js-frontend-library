@@ -9,6 +9,14 @@ storiesOf('Button', module)
     withInfo('A standard button')(() => <Button>Hello Button</Button>),
   )
   .add(
+    'keyColor',
+    withInfo(`
+    Certain button designs can be overriden with a keyColor. KeyColors are used
+    to support whitelabeling and custom branding. If a keyColor is used it's
+    reccomended that only one keyColor is used throughout the entire project.
+  `)(() => <Button keyColor="#294775">Resolution Blue</Button>),
+  )
+  .add(
     'Minimal',
     withInfo(`
       When there's a series of buttons non-primary actions should use the minimal look.

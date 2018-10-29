@@ -5,3 +5,4 @@ tmp
 coverage
 .git
 storybook-static
+.cache

@@ -3,6 +3,7 @@
 .idea
 .DS_Store
 
+storybook-static.zip
 storybook-static
 node_modules
 node_cache
@@ -11,3 +12,4 @@ coverage
 cert.pem
 key.pem
 dist
+.cache

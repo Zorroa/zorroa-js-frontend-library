@@ -26,12 +26,9 @@ export default class Radio extends Component {
     return this.props.keyColor
   }
 
-  onChange() {
+  onChange(event) {
     const checked = event.target.checked
-
-    if (typeof this.props.onChange === 'function') {
-      this.props.onChange(checked)
-    }
+    this.props.onChange(checked)
     this.setState({
       value: checked,
     })
@@ -77,4 +74,6 @@ Radio.propTypes = {
 
 Radio.defaultProps = {
   keyColor: ZORROA_COLOR_GREEN_1,
+  error: false,
+  onChange: () => {},
 }
