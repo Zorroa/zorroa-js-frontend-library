@@ -12,11 +12,14 @@ export default class Button extends Component {
   getStyle() {
     const isEnabled = this.props.disabled === false
 
-    if (isEnabled && ['normal', undefined].includes(this.props.look)) {
+    if (
+      isEnabled &&
+      ['normal'].includes(this.props.look) &&
+      !['error'].includes(this.props.state)
+    ) {
       const keyColor = this.getKeyColor()
       return {
         backgroundColor: keyColor,
-        borderColor: keyColor,
       }
     }
   }
@@ -29,7 +32,6 @@ export default class Button extends Component {
       'Button--minimal': props.look === 'minimal',
       'Button--error': props.state === 'error',
       'Button--mini': props.look === 'mini',
-      'Button--white-label': props.whiteLabelEnabled === true,
     })
     const buttonStateClasses = classnames('Button__state', {
       'Button__state--inactive': props.state === undefined,
@@ -42,13 +44,18 @@ export default class Button extends Component {
       'Button__label--state-active': props.state !== undefined,
       'Button__label--mini': props.look === 'mini',
     })
+    const buttonUnderlayClasses = classnames('Button__underlay', {
+      'Button__underlay--minimal': props.look === 'minimal',
+      'Button__underlay--error': props.state === 'error',
+      'Button__underlay--disabled': props.disabled === true,
+      'Button__underlay--mini': props.look === 'mini',
+    })
     return (
       <button
         className={buttonClasses}
-        type={props.type || 'button'}
+        type={props.type}
         disabled={props.disabled}
         onClick={props.onClick}
-        style={this.getStyle()}
         title={props.title}>
         {(isNormalLook || props.look === 'mini') && (
           <span className={buttonStateClasses} title={props.state} />
@@ -57,6 +64,7 @@ export default class Button extends Component {
           <span className="Button__icon">{props.icon}</span>
         )}
         <span className={buttonLabelClasses}>{props.children}</span>
+        <span style={this.getStyle()} className={buttonUnderlayClasses} />
       </button>
     )
   }
@@ -64,7 +72,9 @@ export default class Button extends Component {
 
 Button.defaultProps = {
   keyColor: ZORROA_COLOR_GREEN_1,
-  whiteLabelEnabled: false,
+  look: 'normal',
+  type: 'button',
+  disabled: false,
 }
 
 Button.propTypes = {
@@ -77,5 +87,4 @@ Button.propTypes = {
   title: PropTypes.string,
   icon: PropTypes.node,
   keyColor: PropTypes.string,
-  whiteLabelEnabled: PropTypes.bool,
 }
