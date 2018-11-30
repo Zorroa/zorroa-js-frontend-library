@@ -60,8 +60,11 @@ export default class FormInput extends Component {
   }
 
   render() {
-    const { className } = this.props
-    const inputClasses = classnames('FormInput__checkbox-virtual', className)
+    const { className, size } = this.props
+    const inputClasses = classnames('FormInput__checkbox-virtual', className, {
+      'FormInput__checkbox-virtual--normal': size === 'normal',
+      'FormInput__checkbox-virtual--small': size === 'small',
+    })
 
     return (
       <div className="FormInput__checkbox">
@@ -89,9 +92,11 @@ FormInput.propTypes = {
   checked: PropTypes.bool,
   keyColor: PropTypes.string.isRequired,
   indetermined: PropTypes.bool,
+  size: PropTypes.oneOf(['normal', 'small']),
 }
 
 FormInput.defaultProps = {
   keyColor: ZORROA_COLOR_GREEN_1,
   indetermined: false,
+  size: 'normal',
 }

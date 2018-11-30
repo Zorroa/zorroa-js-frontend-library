@@ -6,21 +6,29 @@
   }
 
   &-virtual {
-    width: $zorroa-metric-base * 2;
-    height: $zorroa-metric-base * 2;
     margin: 0;
     border: 1px solid $zorroa-color-gray-dark-3;
     border-radius: 2px;
     display: block;
     background-size: cover;
     background-position: center center;
+
+    &--normal {
+      width: $zorroa-metric-base * 2;
+      height: $zorroa-metric-base * 2;
+    }
+
+    &--small {
+      width: $zorroa-metric-base * 1.5;
+      height: $zorroa-metric-base * 1.5;
+    }
   }
 
-  :not(:checked) ~ .FormInput__checkbox-virtual  {
-    background-image: none!important; // Overrides inline style
+  :not(:checked) ~ .FormInput__checkbox-virtual {
+    background-image: none !important; // Overrides inline style
   }
 
-  :checked ~ &-virtual  {
+  :checked ~ &-virtual {
     border-width: 0;
   }
 }
