@@ -66,18 +66,24 @@ export default class Input extends Component {
       error,
       readOnly,
       autocomplete,
+      placeholder,
+      disabled,
+      search,
     } = this.props
     const inputClasses = classnames(
       'Input',
       {
         'Input--error': error === true,
         'Input--color': type === 'color',
+        'Input--disabled': disabled,
       },
       className,
     )
 
     const inputNativeClasses = classnames('Input__native', {
       'Input__native--color': type === 'color',
+      'Input__native--disabled': disabled,
+      'Input__native--search': search === true,
     })
 
     const colorPreviewClasses = classnames('Input__color-preview', {
@@ -94,6 +100,8 @@ export default class Input extends Component {
           readOnly={readOnly}
           onChange={this.onChange}
           value={this.state.value}
+          placeholder={placeholder}
+          disabled={disabled ? 'disabled' : false}
         />
         {type === 'color' && (
           <span
@@ -121,11 +129,14 @@ Input.propTypes = {
   vertical: PropTypes.bool,
   error: PropTypes.bool,
   required: PropTypes.bool,
+  search: PropTypes.bool,
   onChange: PropTypes.func,
   readOnly: PropTypes.bool,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   inlineReset: PropTypes.bool,
   autocomplete: PropTypes.string,
+  disabled: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+  placeholder: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   type: PropTypes.oneOf([
     'text',
     'password',

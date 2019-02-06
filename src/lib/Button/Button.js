@@ -27,6 +27,7 @@ export default class Button extends Component {
   render() {
     const props = this.props
     const isNormalLook = props.look === 'normal' || props.look === undefined
+    const isDangerLook = props.look === 'danger'
     const buttonClasses = classnames('Button', {
       'Button--disabled': props.disabled === true,
       'Button--minimal': props.look === 'minimal',
@@ -57,7 +58,7 @@ export default class Button extends Component {
         disabled={props.disabled}
         onClick={props.onClick}
         title={props.title}>
-        {(isNormalLook || props.look === 'mini') && (
+        {(isNormalLook || isDangerLook || props.look === 'mini') && (
           <span className={buttonStateClasses} title={props.state} />
         )}
         {props.icon !== undefined && (
@@ -81,7 +82,7 @@ Button.propTypes = {
   children: PropTypes.node,
   state: PropTypes.oneOf(['loading', 'success', 'error']),
   type: PropTypes.oneOf(['button', 'submit', 'reset']),
-  look: PropTypes.oneOf(['normal', 'minimal', 'mini']),
+  look: PropTypes.oneOf(['normal', 'minimal', 'mini', 'danger']),
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
   title: PropTypes.string,

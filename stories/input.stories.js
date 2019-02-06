@@ -18,3 +18,5 @@ storiesOf('Input', module)
     Add a reset button that can clear the input field
   `)(() => <Input inlineReset={true} onChange={() => {}} />),
   )
+  .add('Disabled', withInfo()(() => <Input disabled />))
+  .add('Search', withInfo()(() => <Input search />))

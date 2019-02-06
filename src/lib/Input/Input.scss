@@ -7,6 +7,12 @@ $form-element-border: $form-element-border-size solid $zorroa-color-gray-dark-2;
 $form-element-border-radius: 3px;
 
 .Input {
+  @mixin disabledState {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed !important;
+  }
+
   margin-top: $form-element-top-margin;
   margin-bottom: $form-element-bottom-margin;
   position: relative;
@@ -35,7 +41,7 @@ $form-element-border-radius: 3px;
     content: ' ';
     display: block;
     height: 100%;
-    line-height: $form-element-height!important; // Hack to override icon font classes
+    line-height: $form-element-height !important; // Hack to override icon font classes
     width: $zorroa-metric-base;
     color: $zorroa-color-gray-dark-4;
     position: absolute;
@@ -79,6 +85,16 @@ $form-element-border-radius: 3px;
       text-indent: $form-element-height;
       max-width: 18ex;
     }
+
+    &--disabled {
+      @include disabledState;
+    }
+
+    &--search {
+      background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2215%22%20height%3D%2215%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%3E%3Cdefs%3E%3Cpath%20d%3D%22M14.866%2013.571a.458.458%200%200%201%200%20.648l-.647.647a.458.458%200%200%201-.648%200L9.04%2010.334a.447.447%200%200%201-.104-.169%205.59%205.59%200%200%201-3.311%201.085%205.625%205.625%200%201%201%205.625-5.625%205.59%205.59%200%200%201-1.085%203.31c.062.023.12.055.17.105l4.531%204.531zM5.625%201.875a3.75%203.75%200%201%200%200%207.5%203.75%203.75%200%200%200%200-7.5z%22%20id%3D%22a%22%2F%3E%3C%2Fdefs%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cmask%20id%3D%22b%22%20fill%3D%22%23fff%22%3E%3Cuse%20xlink%3Ahref%3D%22%23a%22%2F%3E%3C%2Fmask%3E%3Cuse%20fill%3D%22%23000%22%20fill-rule%3D%22nonzero%22%20xlink%3Ahref%3D%22%23a%22%2F%3E%3Cg%20mask%3D%22url(%23b)%22%20fill%3D%22%234D4948%22%3E%3Cpath%20d%3D%22M0%200h15v15H0z%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E');
+      background-position: calc(100% - #{$zorroa-metric-base}) center;
+      background-repeat: no-repeat;
+    }
   }
 
   &--error {
@@ -87,6 +103,10 @@ $form-element-border-radius: 3px;
 
   &--color {
     padding-right: $form-element-height + $zorroa-metric-base;
+  }
+
+  &--disabled {
+    @include disabledState;
   }
 
   &__color-preview {
